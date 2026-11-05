@@ -27,7 +27,10 @@ Fuentes en §9. No he abierto los PDF oficiales; los datos vienen de Bulbapedia 
 1. **Cómo se calcula X.** El oficial suma el mejor ataque *de cada jugador* (4 números). El GDD suma el máximo daño *de cada Pokémon* (hasta 8 números), que da valores casi el doble de grandes para el mismo equipo. Con los mismos cortes (400/600/800), un equipo normal caería un nivel por encima de lo que el HP oficial espera. **Decidido: se usa la definición oficial** (§7, decisión A).
 2. **Derrota.** Oficial: 4 KO en total. GDD: un jugador cae al perder todos sus Pokémon y se pierde cuando caen todos. Con 4 jugadores y 2 Pokémon cada uno son 8 KO en vez de 4, así que a igual daño de jefe nuestra versión es más fácil. **Decidido: se mantiene la regla del GDD** (§7, decisión C); el simulador la usa por defecto.
 3. **Objetivo de los ataques.** Oficial: cada carta apunta a un jugador concreto. GDD: todos / uno elegido / uno al azar. Los ataques "a todos" no existen en el oficial y pegan mucho más fuerte al equipo.
-4. **Revivir.** Oficial: el Cheer devuelve al Pokémon caído. GDD: no hay revivir definido.
+4. **Revivir.** Oficial: el Pokémon KO se salta su turno, su jugador hace Cheer y al final del turno se le quita el contador de KO. GDD: no hay revivir definido.
+5. **Menos de 4 jugadores.** Oficial: siempre hacen falta 4 parejas; con menos jugadores, cada uno lleva más de una pareja. GDD: formato pensado para 3-4 jugadores, con una pareja cada uno.
+6. **Ataque GX.** Oficial: un ataque GX por jugador y partida.
+7. **Texto de los ataques.** Oficial: el texto se aplica si se puede hacer y se ignora si no (sin Energía ni Entrenador).
 
 ## 4. La fórmula
 
@@ -119,15 +122,19 @@ Esto confirma que el playtest en papel (T-17) es lo que decide la calibración d
 
 Equipo de prueba: una carta de cada uno de 8 tipos distintos (`balance/tablas/cartas_prueba.csv`: Básico, Fase 2, EX, TAG TEAM-GX, V, VMAX, ex y Mega ex). Se simulan las 105 formas de formar 4 parejas con los HP reales de las cartas y los jefes calibrados de §8.2.
 
-**Reglas aplicadas (según la página oficial del Raid Battle):** se juega solo con cartas de Pokémon, sin Entrenador ni Energía. X = suma, por pareja, del **daño base más alto** de sus ataques (el número impreso). Nivel por X: Nv1 < 400 ≤ Nv2 < 600 ≤ Nv3 < 800 ≤ Nv4.
+**Reglas aplicadas (hoja de instrucciones oficial del Raid Battle, junio 2020, páginas 2-5):**
 
-**Restricciones modeladas por ataque:** el ataque que impide atacar el turno siguiente se respeta (Miraidon ex); el ataque GX se usa una vez por partida; los ataques cuyo daño depende de la Energía se consideran no disponibles, o se usan con su daño base impreso (dos variantes). Cada turno el Pokémon activo usa su mejor ataque disponible, y si no puede atacar, la pareja se retira y ataca el otro. Las condiciones especiales sobre el jefe y los efectos de Energía, mazo o mano se ignoran.
+- Se juega solo con cartas de Pokémon; no hay Entrenador ni Energía. El coste de Energía de los ataques no se usa.
+- Si un ataque tiene texto adicional, se aplica si se puede hacer y se ignora si no. Ejemplo oficial: «Discard an Energy from this Pokémon» no se puede hacer; «Flip a coin» sí. Por eso los ataques cuyo daño depende de la Energía hacen solo su daño base (Max Burst de Rayquaza VMAX = 20, Spiral Burst = 20, Evil Ball = 20).
+- Cada jugador solo puede usar un ataque GX por partida.
+- X: para cada Pokémon se toma el daño máximo que puede hacer en una ronda (normalmente el número más alto del cuerpo de la carta, sin contar texto que lo modifique); de cada jugador cuenta el más alto de sus dos y se suman. Nv1 250-390, Nv2 400-590, Nv3 600 o más; por debajo de 250 se aconseja cambiar algún Pokémon.
+- Turno de jugador: retirada opcional y un ataque. Si el texto dice «no puede atacar el próximo turno» (Miraidon ex), se respeta.
+- Un Pokémon KO se salta su turno y su jugador hace Cheer.
 
 | Variante | Nv2 (X 570-590) | Nv3 (X 620-750) | Nv4 (X 850) | Media |
 |---|---|---|---|---|
 | Sin restricciones | 100 % | 83 % | 14 % | 68 % |
-| Con restricciones, ataques que dependen de la Energía excluidos | 100 % | 72 % | 8 % | 58 % |
-| Con restricciones, esos ataques hacen su daño base | 100 % | 71 % | 6 % | 57 % |
+| **Reglas oficiales del PDF** | 100 % | 71 % | 6 % | 57 % |
 
 Conclusiones:
 
@@ -135,7 +142,7 @@ Conclusiones:
 - Las restricciones de ataque cuestan unos 10 puntos de victoria, y no se pueden ignorar en la calibración.
 - El límite de nivel es un salto brusco: de X ≤ 750 (Nv3, ≈ 72 %) a X = 850 (Nv4, ≈ 8 %).
 - Los HP reales dependen de la carta (130 a 350), no del ataque. La hipótesis `60 + 0,6 × ataque` queda descartada; la calibración de §8.2 hay que rehacerla con cartas reales.
-- Pendiente de confirmar con el PDF oficial de instrucciones: si el coste de Energía se ignora, y qué pasa con los ataques cuyo daño depende de la Energía.
+- Con las reglas oficiales, un Rayquaza VMAX solo hace 20 de daño base, así que aporta poco a X y al daño real. Una carta con mucha vida y ataque dependiente de la Energía es mala en este formato.
 
 ### 8.4 Pendiente
 
