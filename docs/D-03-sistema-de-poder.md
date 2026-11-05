@@ -1,6 +1,6 @@
 # D-03 · Sistema de poder y balance
 
-**Estado:** borrador 1. Pendiente de dos decisiones (ver §7). Los números marcados como *propuesta* o *hipótesis* no están validados todavía: los validará el simulador (`sim/`) y los playtests (T-17).
+**Estado:** borrador 1. Decisiones A y B tomadas (ver §7); falta validar con el simulador. Los números marcados como *propuesta* o *hipótesis* no están validados todavía: los validará el simulador (`sim/`) y los playtests (T-17).
 
 ## 1. Para qué sirve
 
@@ -24,7 +24,7 @@ Fuentes en §9. No he abierto los PDF oficiales; los datos vienen de Bulbapedia 
 
 ## 3. Diferencias entre nuestro GDD v0.5 y el oficial
 
-1. **Cómo se calcula X.** El oficial suma el mejor ataque *de cada jugador* (4 números). El GDD suma el máximo daño *de cada Pokémon* (hasta 8 números), que da valores casi el doble de grandes para el mismo equipo. Con los mismos cortes (400/600/800), un equipo normal caería un nivel por encima de lo que el HP oficial espera. **Hay que elegir una definición** (§7, decisión A).
+1. **Cómo se calcula X.** El oficial suma el mejor ataque *de cada jugador* (4 números). El GDD suma el máximo daño *de cada Pokémon* (hasta 8 números), que da valores casi el doble de grandes para el mismo equipo. Con los mismos cortes (400/600/800), un equipo normal caería un nivel por encima de lo que el HP oficial espera. **Decidido: se usa la definición oficial** (§7, decisión A).
 2. **Derrota.** Oficial: 4 KO en total. GDD: un jugador cae al perder todos sus Pokémon y se pierde cuando caen todos. Con 4 jugadores y 2 Pokémon cada uno son 8 KO en vez de 4, así que a igual daño de jefe nuestra versión es más fácil. El simulador tiene que medirlo.
 3. **Objetivo de los ataques.** Oficial: cada carta apunta a un jugador concreto. GDD: todos / uno elegido / uno al azar. Los ataques "a todos" no existen en el oficial y pegan mucho más fuerte al equipo.
 4. **Revivir.** Oficial: el Cheer devuelve al Pokémon caído. GDD: no hay revivir definido.
@@ -64,16 +64,11 @@ Dos jefes con el mismo Poder son igual de difíciles en media, aunque se jueguen
 
 El oficial llega hasta Nv3. Con X de referencia ≈ 900 y la misma regla: Poder ≈ 1,5 × 900² ≈ 1.215.000. Con ataques 80/120/240, hasta 5 ataques por turno (amenaza ≈ 323) sale **HP ≈ 3750**. El valor lo confirmará el simulador. Que Nv4 use 3 Pokémon por jugador cambia la durabilidad del equipo y también hay que simularlo.
 
-## 7. Decisiones pendientes
+## 7. Decisiones tomadas (2026-11-05)
 
-**A. Definición de X.** (recomendada: la oficial)
-- Oficial: mejor ataque de cada jugador. Con ella, los HP oficiales y la regla Poder ≈ 1,5 × X² cuadran tal cual.
-- GDD actual: ataque máximo de cada Pokémon. Habría que rehacer los cortes (≈ el doble) o reducir los HP de la tabla.
-
-**B. Jugar con menos de 4 jugadores.** Con X oficial, 1 jugador suma ≈ 80-150 y 2 jugadores ≈ 160-300. Un jefe Nv1 de 1600 HP necesita ≈ 5 rondas de X = 320 de daño por ronda. Para 1-2 jugadores sería mucho más largo y duro. Opciones:
-- Añadir niveles bajos (Nv0 o más tramos) con jefes de HP pequeño.
-- Aceptar que el formato está pensado para 3-4 jugadores y 1-2 usan Pokémon más fuertes.
-- Que el jefe tenga distinto HP según nº de jugadores (rompe "carta fija").
+- **A. X se calcula como en el oficial:** se suma el ataque base más fuerte de cada jugador. El GDD v0.6 ya lo recoge.
+- **B. Formato pensado para 3-4 jugadores.** Con 1 o 2 jugadores la partida es más larga y dura (un jefe Nv1 de 1600 HP necesita ≈ 5 rondas de X = 320; con X ≈ 100-200 son 8-16 rondas). Se acepta. No se añaden niveles bajos por ahora.
+- **Jefe = carta fija** (sin escalado) con HP parecido al oficial.
 
 ## 8. Lo que falta validar con el simulador
 
