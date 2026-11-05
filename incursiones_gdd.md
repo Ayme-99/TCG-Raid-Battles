@@ -132,7 +132,7 @@ FIN (VICTORIA / DERROTA)
 - [x] Curación del jefe: sin límite de número de veces, nunca por encima de su HP máximo inicial
 - [x] Invocación de aliados: un slot por jugador (hasta 4; con menos jugadores, menos slots), solo en slots de jugadores activos sin aliado; objetivo del ataque al azar entre jugadores activos; si el dueño queda eliminado, el aliado sigue atacando pero ya no bloquea (`docs/D-04-aliados.md`), un único ataque cada uno (algunos con habilidad), no atacan el turno en que son invocados, HP propio independiente del jefe
 - [x] Habilidades de aliados: efectos como reducir el daño que recibe el jefe, aumentar el daño del jefe, o forzar a la banca al Pokémon atacante si golpea al aliado. Se resuelven físicamente en la mesa — **el asistente no las computa**, solo puede registrar en el log qué habilidad se activó si se le indica
-- [x] Mientras un jugador tenga aliado en su slot, debe debilitarlo antes de dañar al jefe
+- [x] Mientras un jugador tenga aliado en su slot, debe debilitarlo antes de dañar al jefe; cualquier jugador activo puede atacar a cualquier aliado para ayudarle (`docs/D-04-aliados.md`)
 - [x] Estados alterados (dormido/paralizado/veneno/quemado) solo afectan al Pokémon activo, nunca a la banca
 
 ---
@@ -173,4 +173,4 @@ Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 | v0.7 | Regla de derrota confirmada: solo se pierde cuando no queda ningún Pokémon en pie en toda la mesa (8 KO con 4 jugadores y 2 Pokémon). No se adopta el límite oficial de 4 KO. Primer simulador de balance en `sim/` y resultados en `docs/D-03-sistema-de-poder.md` §8. Objetivo de victoria 75 / 50 / 30 / 15 % y HP de referencia recalibrados a 1700 / 2400 / 3300 / 4400. |
 | v0.8 | Setup sin circularidad (D-01): cada jugador usa 2 Pokémon en todos los niveles, incluido el Nv4 (como el juego oficial). Un X menor de 250 se juega como Nv1. HP de referencia por nivel recalibrado con cartas reales (D-03 §8.4). Se añade `docs/D-01-setup.md`. |
 | v0.9 | D-02 cerrada: cada jugador introduce a mano el número de su mejor ataque, todos lo ven y lo comprueban con la carta física; qué número cuenta lo acuerda la mesa con un tope de 200 por ataque (criterio recomendado en `docs/D-02-dano-maximo.md`). Los modificadores de la partida no cuentan para X. |
-| v0.10 | D-04 cerrada: un slot de aliado por jugador, invocación solo en slots de jugadores activos sin aliado, el aliado ataca a un jugador activo al azar (moneda o dado de 3/4 caras) y, si su dueño queda eliminado, sigue atacando pero ya no bloquea. Se añade `docs/D-04-aliados.md`. |
+| v0.10 | D-04 cerrada: un slot de aliado por jugador, invocación solo en slots de jugadores activos sin aliado, el aliado ataca a un jugador activo al azar (moneda o dado de 3/4 caras) y, si su dueño queda eliminado, sigue atacando pero ya no bloquea. Cualquier jugador activo puede atacar a cualquier aliado. Se añade `docs/D-04-aliados.md`. |
