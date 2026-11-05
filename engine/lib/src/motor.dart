@@ -212,12 +212,6 @@ EstadoPartida _pokemonKo(EstadoPartida e, PokemonKo ev) {
   jugadores[ev.jugador] = jugador.conPokemonVivos(vivos);
   var nuevo = e.copiarCon(jugadores: jugadores);
 
-  if (jugadores.every((j) => j.eliminado)) {
-    return nuevo.copiarCon(
-      fase: Fase.terminada,
-      resultado: Resultado.derrota,
-    );
-  }
   if (vivos > 0) {
     // Le queda un Pokémon: asciende la banca y gana prioridad la ronda
     // siguiente (una sola vez, aunque caigan varios).
@@ -226,6 +220,7 @@ EstadoPartida _pokemonKo(EstadoPartida e, PokemonKo ev) {
     }
     return nuevo;
   }
+
   // Queda eliminado: no actúa, no gana prioridad y no roba carta.
   nuevo = nuevo.copiarCon(
     prioridad: [for (final a in nuevo.prioridad) if (a != ev.jugador) a],
@@ -234,6 +229,12 @@ EstadoPartida _pokemonKo(EstadoPartida e, PokemonKo ev) {
         if (a != ev.jugador) a,
     ],
   );
+  if (jugadores.every((j) => j.eliminado)) {
+    return nuevo.copiarCon(
+      fase: Fase.terminada,
+      resultado: Resultado.derrota,
+    );
+  }
   if (nuevo.fase == Fase.turnoJugadores) {
     // Si era el jugador al que le tocaba, se salta su turno.
     return _avanzarTurno(nuevo, nuevo.turnoActual);
