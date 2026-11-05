@@ -1,0 +1,12 @@
+jefe_id,nivel,puntos_necesarios,de_lanzamiento,estado
+lanzamiento-lv1-a,1,0,si,pendiente de catalogo
+lanzamiento-lv1-b,1,0,si,pendiente de catalogo
+lanzamiento-lv2-a,2,0,si,pendiente de catalogo
+lanzamiento-lv2-b,2,0,si,pendiente de catalogo
+lanzamiento-lv3-a,3,0,si,pendiente de catalogo
+lanzamiento-lv3-b,3,0,si,pendiente de catalogo
+lanzamiento-lv4-a,4,0,si,pendiente de catalogo
+extra-lv1,1,5,no,ejemplo
+extra-lv2,2,12,no,ejemplo
+extra-lv3,3,25,no,ejemplo
+extra-lv4,4,40,no,ejemplo
