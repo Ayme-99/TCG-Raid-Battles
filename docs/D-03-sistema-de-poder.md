@@ -89,15 +89,38 @@ Lectura:
 - La victoria baja de forma regular con el nivel en todas las variantes, así que el orden de dificultad de la tabla es correcto.
 - Pasar de 3 a 4 jugadores casi no cambia el resultado (X ya escala con los jugadores).
 - El nivel absoluto depende de dos incógnitas: la vida de los Pokémon de los jugadores y la regla de derrota. Con la regla de derrota decidida (decisión C), queda la vida de los Pokémon.
-- Con la regla del GDD el Nv1 queda en ≈ 84 %, el Nv3 en ≈ 45 % y el Nv4 en ≈ 34 %. El Nv1 sale alto para un nivel inicial; el objetivo de victoria por nivel está por fijar.
+- Con la regla del GDD y los HP oficiales el Nv1 queda en ≈ 84 %, el Nv3 en ≈ 45 % y el Nv4 en ≈ 34 %, por encima del objetivo; ver §8.2.
 
-### 8.2 Pendiente
+### 8.2 Calibración al objetivo de victoria (decisión D)
+
+Objetivo fijado: **75 % / 50 % / 30 % / 15 %** de victoria en Nv1 / Nv2 / Nv3 / Nv4 (X en el centro de la banda, 4 jugadores, regla de derrota del GDD, modelo de §8.1). Se mantienen los ataques oficiales y se ajusta solo el HP del jefe:
+
+| Nivel | HP oficial | HP calibrado | Victoria con el HP calibrado |
+|---|---|---|---|
+| 1 | 1600 | **1700** (+6 %) | ≈ 76 % |
+| 2 | 2200 | **2400** (+9 %) | ≈ 52 % |
+| 3 | 3000 | **3300** (+10 %) | ≈ 29 % |
+| 4 | propuesta 3750 | **4400** (+17 %) | ≈ 14 % |
+
+Los HP quedan cerca de los oficiales (+6 % a +10 %), así que se cumple la decisión de HP "parecido al oficial". Esta calibración se hizo con una réplica del simulador en Python, que coincide con el de Dart (misma tabla base: 84 / 67 / 43 / 33 frente a 84 / 66 / 45 / 34). Hay que confirmarla ejecutando `dart run bin/sim.dart` con la tabla nueva.
+
+**Sensibilidad a la vida de los Pokémon de los jugadores** (HP calibrados, victoria Nv1 / Nv2 / Nv3 / Nv4):
+
+| Factor de HP | Nv1 | Nv2 | Nv3 | Nv4 |
+|---|---|---|---|---|
+| 0,4 | 63 % | 28 % | 14 % | 5 % |
+| **0,6 (hipótesis actual)** | 73 % | 49 % | 30 % | 14 % |
+| 0,8 | 93 % | 70 % | 48 % | 30 % |
+| 1,0 | 97 % | 87 % | 69 % | 49 % |
+
+Esto confirma que el playtest en papel (T-17) es lo que decide la calibración definitiva: si los Pokémon reales resultan tener mucha más vida que la hipótesis, hay que subir el HP de los jefes.
+
+### 8.3 Pendiente
 
 - **Medir la vida de los Pokémon de los jugadores** con cartas reales en playtest (T-17). Es la incógnita principal (hipótesis `60-100 + 0,6 × ataque`).
-- **Fijar el objetivo de victoria por nivel** y, si hace falta, retocar HP o ataques de los jefes de `balance/tablas/niveles.csv`.
 - Dentro de un nivel, la dificultad cambia mucho entre el X más bajo y el más alto de la banda (el Poder crece con X²: de 400 a 590 es ≈ 2,2 veces). Es lo mismo que pasa en el oficial; hay que decidir si lo aceptamos o estrechamos bandas.
 - Modelar el efecto de no tener "revivir" y de los ataques "a todos".
-- Validar el Nv4 (sigue siendo propuesta sin validar).
+- Validar el Nv4 (sigue siendo propuesta sin validar, ahora con HP 4400).
 
 ## 9. Fuentes
 
