@@ -144,7 +144,30 @@ Conclusiones:
 - Los HP reales dependen de la carta (130 a 350), no del ataque. La hipótesis `60 + 0,6 × ataque` queda descartada; la calibración de §8.2 hay que rehacerla con cartas reales.
 - Con las reglas oficiales, un Rayquaza VMAX solo hace 20 de daño base, así que aporta poco a X y al daño real. Una carta con mucha vida y ataque dependiente de la Energía es mala en este formato.
 
-### 8.4 Pendiente
+### 8.4 Catálogo de prueba de 16 cartas y recalibración (2 por categoría)
+
+Se añadió una segunda carta por categoría (`balance/tablas/cartas_prueba.csv`, ahora 16): Pikachu (Evolutions) como Básico, Blastoise (Pokémon GO) como Fase 2, Mewtwo-EX, Reshiram & Charizard-GX, Zacian V, Charizard VMAX, Charizard ex y Mega Charizard X ex. Todas son legales en Expandido (datos de HP y ataques contrastados en varias fuentes). Reglas del PDF aplicadas: sin Energía (los ataques que escalan con Energía, contadores o Premios hacen solo su daño base), texto imposible ignorado, "no puede atacar el turno siguiente" respetado y un ataque GX por jugador.
+
+Método: equipos de 4 parejas (150 equipos por nivel, 60 partidas cada uno). Nv2-Nv4 salen de 8 cartas al azar entre las 16 y el nivel lo da X. Como con cartas modernas el Nv1 casi no aparece, sus equipos se hacen solo con las cartas sin regla especial (Snorlax, Charizard, Pikachu, Blastoise, repitiendo cartas). Con los jefes de §8.2 (HP 1700/2400/3300/4400) la victoria era ≈ 98 % en Nv2, 70 % en Nv3 y 34 % en Nv4.
+
+Vida del jefe que da el objetivo 75 / 50 / 30 / 15 % (ataques sin cambios):
+
+| Nivel | X de los equipos | HP jefe (modelo abstracto) | HP jefe (16 cartas reales) | Victoria obtenida |
+|---|---|---|---|---|
+| Nv1 | 250-390 | 1700 | 2382 | 74,5 % |
+| Nv2 | 420-590 | 2400 | 4313 | 49,9 % |
+| Nv3 | 600-790 | 3300 | 4411 | 29,2 % |
+| Nv4 | 800-990 | 4400 | 5205 | 14,9 % |
+
+Conclusiones:
+
+- Los valores del modelo abstracto no valen con cartas reales. El HP de los jefes sube bastante, sobre todo en Nv2.
+- Hay un salto brusco entre Nv1 y Nv2 (2382 -> 4313): un equipo de Nv2 ya incluye cartas con regla especial y mucha vida, así que aguanta mucho más que uno de Nv1.
+- Nv2 y Nv3 quedan casi iguales en HP (4313 / 4411). Lo que los separa es el ataque del jefe (160 vs 200 y 3 vs 4 ataques). Si se quiere una progresión más limpia, habría que estrechar las bandas de X o subir más los ataques de Nv3.
+- Son valores provisionales: dependen del catálogo de 16 cartas y de cómo se forman los equipos. Hay que repetirlo cuando el catálogo crezca.
+- Reglas con efecto no modeladas todavía: monedas, autodaño (Pikachu) y habilidades.
+
+### 8.5 Pendiente
 
 - **Medir la vida de los Pokémon de los jugadores** con cartas reales en playtest (T-17). Es la incógnita principal (hipótesis `60-100 + 0,6 × ataque`).
 - Dentro de un nivel, la dificultad cambia mucho entre el X más bajo y el más alto de la banda (el Poder crece con X²: de 400 a 590 es ≈ 2,2 veces). Es lo mismo que pasa en el oficial; hay que decidir si lo aceptamos o estrechamos bandas.

@@ -7,3 +7,11 @@ id,nombre,tipo_carta,expansion,numero,hp,ataque1,dano1,ataque2,dano2,notas
 6,Rayquaza VMAX,VMAX,Evolving Skies,111/203,320,Max Burst,20+,,,Suma 80 por cada Energía Fuego o Rayo descartada; habilidad Azure Pulse
 7,Miraidon ex,ex,Scarlet & Violet,81/198,220,Photon Blaster,220,,,No puede atacar el turno siguiente
 8,Mega Gengar ex,Mega ex,Phantasmal Flames,56/94,350,Void Gale,230,,,Habilidad Shadowy Concealment
+9,Pikachu,Básico,Evolutions,35/108,60,Gnaw,10,Thunder Jolt,30,Thunder Jolt: si sale cruz se hace 10 de daño a sí mismo (moneda aplicable)
+10,Blastoise,Fase 2,Pokémon GO,17/78,170,Hydro Pump,90,,,Hydro Pump suma 30 por Energía Agua (en la raid solo base); habilidad Vitality Spring inaplicable
+11,Mewtwo-EX,EX,Next Destinies,54/99,170,X Ball,20,Psydrive,120,X Ball es 20× Energías (en la raid solo base); Psydrive descarta Energía (se ignora)
+12,Reshiram & Charizard-GX,TAG TEAM-GX,Unbroken Bonds,20/214,270,Outrage,30,Flare Strike,230,Outrage suma 10 por contador de daño (se usa base); Flare Strike no puede usarse el turno siguiente; Double Blaze-GX 200+ (GX una vez por partida)
+13,Zacian V,V,Sword & Shield,138/202,220,Brave Blade,230,,,No puede atacar el turno siguiente; habilidad Intrepid Sword inaplicable
+14,Charizard VMAX,VMAX,Darkness Ablaze,20/189,330,Claw Slash,100,G-Max Wildfire,300,G-Max Wildfire descarta 2 Energías (se ignora)
+15,Charizard ex,ex,Obsidian Flames,125/197,330,Burning Darkness,180,,,Suma 30 por cada Premio robado por el rival (en la raid solo base); Tera
+16,Mega Charizard X ex,Mega ex,Phantasmal Flames,13/94,360,Inferno X,90,,,Inferno X es 90× Energías descartadas (en la raid solo base)

@@ -1,5 +1,5 @@
 nivel,x_min,x_max,x_centro,hp,ataque1,ataque2,ataque3,max_ataques_turno,amenaza_esperada,poder,estado
-1,250,390,320,1700,30,60,120,2,99,168300,ajustado por simulador (oficial 1600)
-2,400,590,500,2400,40,80,160,3,166,397824,ajustado por simulador (oficial 2200)
-3,600,799,700,3300,60,100,200,4,244,805490,ajustado por simulador (oficial 3000)
-4,800,,900,4400,80,120,240,5,323,1422643,ajustado por simulador (propuesta sin validar)
+1,250,390,320,2382,30,60,120,2,99,235818,provisional: calibrado con 16 cartas reales (D-03 8.4)
+2,400,590,500,4313,40,80,160,3,166,715958,provisional: calibrado con 16 cartas reales (D-03 8.4)
+3,600,799,700,4411,60,100,200,4,244,1076284,provisional: calibrado con 16 cartas reales (D-03 8.4)
+4,800,,900,5205,80,120,240,5,323,1681215,provisional: calibrado con 16 cartas reales (D-03 8.4)
