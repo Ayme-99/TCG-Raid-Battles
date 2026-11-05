@@ -65,7 +65,7 @@ Dos jefes con el mismo Poder son igual de difíciles en media, aunque se jueguen
 
 ## 6. Propuesta de Nv4 (hipótesis, sin validar)
 
-El oficial llega hasta Nv3. Con X de referencia ≈ 900 y la misma regla: Poder ≈ 1,5 × 900² ≈ 1.215.000. Con ataques 80/120/240, hasta 5 ataques por turno (amenaza ≈ 323) sale **HP ≈ 3750**. El valor lo confirmará el simulador. Que Nv4 use 3 Pokémon por jugador cambia la durabilidad del equipo y también hay que simularlo.
+El oficial llega hasta Nv3. Con X de referencia ≈ 900 y la misma regla: Poder ≈ 1,5 × 900² ≈ 1.215.000. Con ataques 80/120/240, hasta 5 ataques por turno (amenaza ≈ 323) sale **HP ≈ 3750**. El valor lo confirmará el simulador. Se decidió en D-01 que el Nv4 mantiene 2 Pokémon por jugador, así que la simulación con 3 Pokémon ya no hace falta.
 
 ## 7. Decisiones tomadas (2026-11-05)
 
@@ -175,7 +175,7 @@ Validación (2026-11-05): `sim/bin/sim_cartas.dart` (Dart, mismo modelo que el p
 - **Medir la vida de los Pokémon de los jugadores** con cartas reales en playtest (T-17). Es la incógnita principal (hipótesis `60-100 + 0,6 × ataque`).
 - Dentro de un nivel, la dificultad cambia mucho entre el X más bajo y el más alto de la banda (el Poder crece con X²: de 400 a 590 es ≈ 2,2 veces). Es lo mismo que pasa en el oficial; hay que decidir si lo aceptamos o estrechamos bandas.
 - Modelar el efecto de no tener "revivir" y de los ataques "a todos".
-- Validar el Nv4 (sigue siendo propuesta sin validar, ahora con HP 4400).
+- Validar el Nv4 en playtest (T-17); sigue siendo una propuesta calibrada solo con el simulador.
 
 ## 9. Fuentes
 
