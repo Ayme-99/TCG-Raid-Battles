@@ -1,0 +1,9 @@
+id,nombre,tipo_carta,expansion,numero,hp,ataque1,dano1,ataque2,dano2,notas
+1,Snorlax,Básico,Vivid Voltage,131/185,130,Body Slam,100,,,Habilidad Gormandize; un solo ataque
+2,Charizard,Fase 2,Evolutions,11/108,150,Fire Spin,200,,,Descarta 3 Energías al atacar; un solo ataque
+3,Yveltal-EX,EX,XY,79/146,170,Evil Ball,20+,Y Cyclone,90,Evil Ball suma 20 por cada Energía en los dos Activos
+4,Pikachu & Zekrom-GX,TAG TEAM-GX,Team Up,33/181,240,Full Blitz,150,Tag Bolt-GX,200,Ataque GX una vez por partida
+5,Rayquaza V,V,Evolving Skies,110/203,210,Dragon Pulse,40,Spiral Burst,20+,Spiral Burst suma 80 por cada Energía Fuego o Rayo descartada (hasta 2)
+6,Rayquaza VMAX,VMAX,Evolving Skies,111/203,320,Max Burst,20+,,,Suma 80 por cada Energía Fuego o Rayo descartada; habilidad Azure Pulse
+7,Miraidon ex,ex,Scarlet & Violet,81/198,220,Photon Blaster,220,,,No puede atacar el turno siguiente
+8,Mega Gengar ex,Mega ex,Phantasmal Flames,56/94,350,Void Gale,230,,,Habilidad Shadowy Concealment
