@@ -24,7 +24,7 @@ El aliado no ataca a su dueño por defecto: **cada vez que ataca, se tira un dad
 | 3 | dado de 3 caras |
 | 4 | dado de 4 caras |
 
-El jugador de la mesa introduce a mano el resultado y el daño, igual que con el jefe. El aliado hace su único ataque; el asistente no computa su habilidad (GDD §6.2).
+El jugador de la mesa introduce a mano el resultado y el daño, igual que con el jefe. El aliado hace su único ataque; el asistente no computa su habilidad (GDD §4.4).
 
 ## 4. Jugador eliminado
 

@@ -42,7 +42,7 @@ Cada ronda actúa primero cualquier jugador cuyo Pokémon activo cayó KO desde 
 ## 5. Casos límite
 
 - **Ataque «a todos» que deja a un jugador sin ningún Pokémon**: el jugador queda eliminado y no tiene prioridad.
-- **El aliado o el jefe manda el Pokémon activo a la banca** (habilidad, GDD §6.2): se resuelve en la mesa, sin KO y sin carta de ánimo.
+- **El aliado o el jefe manda el Pokémon activo a la banca** (habilidad, GDD §4.4): se resuelve en la mesa, sin KO y sin carta de ánimo.
 - **Daño de Cheer**: las cartas de ánimo no hacen daño por sí mismas. El daño extra de «doble daño» y «+50» sale de los ataques del jugador, así que ya cuenta para él en D-10.
 
 ## 6. Cambios en otros documentos

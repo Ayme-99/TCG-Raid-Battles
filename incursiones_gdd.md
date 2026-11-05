@@ -1,30 +1,42 @@
 # Incursiones — Game Design Document
 
-**Versión:** 0.12 (borrador de trabajo)
+**Versión:** 1.0 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
-**Jugadores:** 1-4, cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
+**Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
+
+Este documento es la fuente de verdad del diseño. Recoge todas las decisiones cerradas (D-01 a D-05, D-10 y D-11) y marca en §9 lo que sigue siendo provisional hasta los playtests (T-17). El detalle y la justificación de cada decisión están en `docs/`.
 
 ---
 
 ## 1. Concepto y objetivo
 
-Formato cooperativo de Pokémon TCG en el que 1-4 jugadores se enfrentan juntos a un **jefe** controlado por el sistema (nunca por un jugador humano). El asistente virtual actúa como **Game Master**: no simula el juego, solo lleva el HP del jefe, registra lo que ocurre y comprueba condiciones de fin de partida. Todo lo demás (cartas, mazos, contadores de daño de los Pokémon de los jugadores) vive físicamente en la mesa.
+Formato cooperativo de Pokémon TCG en el que 1-4 jugadores se enfrentan juntos a un **jefe** controlado por el sistema (nunca por un jugador humano). El asistente virtual actúa como **Game Master**: no simula el juego, solo lleva el HP del jefe, registra lo que ocurre y comprueba condiciones de fin de partida. Todo lo demás (cartas, contadores de daño de los Pokémon de los jugadores) vive físicamente en la mesa.
 
 **Objetivo del jugador:** derrotar al jefe reduciendo su HP a 0 antes de que todos los jugadores se queden sin Pokémon en juego.
 
-No existe mazo del que robar cartas — cada jugador participa con un número fijo de Pokémon (ver §2), y los ataques no requieren energías.
+Reglas base heredadas del Raid Battle oficial: solo cartas de Pokémon (sin Entrenador ni Energía), los ataques no tienen coste de Energía, no hay mazo del que robar, el texto de un ataque se aplica si se puede hacer y se ignora si no (el daño que depende de Energía hace solo su daño base), y cada jugador solo puede usar un ataque GX por partida.
 
 ---
 
 ## 2. Setup de partida
 
-| Parámetro | Quién lo decide | Notas |
-|---|---|---|
-| Nivel del jefe | **Calculado automáticamente** | X = suma, de todos los jugadores, del **ataque base más fuerte de cada jugador** (se cuenta un solo valor por jugador, el mayor entre sus Pokémon; igual que el juego oficial). `X < 400` → Nv1 · `400 ≤ X < 600` → Nv2 · `600 ≤ X < 800` → Nv3 · `X ≥ 800` → Nv4; un `X` menor de 250 se juega también como Nv1 (no hay nivel inferior). Detalle y justificación en `docs/D-03-sistema-de-poder.md` |
-| Jefe | Elegido **a mano o al azar dentro del nivel calculado** | Catálogo oficial de jefes (datos versionados, se amplía con actualizaciones). Cada jefe es una **carta fija**: tiene su propio HP y sus propios ataques, y no se escalan según los jugadores. El nivel indica la dificultad, no un HP concreto: un jefe con poco HP y mucho daño también puede ser Nv3. Lanzamiento: 2 jefes en cada uno de Nv1-Nv3 y 1 en Nv4. El asistente conoce el HP y el daño de cada ataque, pero **no** computa los efectos de texto de sus ataques. |
-| Nº de jugadores | Automático (según quién juega) | Contribuye al cálculo de X, pero no fija el HP del jefe directamente (ver fila siguiente). El formato está pensado para **3-4 jugadores**; con 1-2 es más difícil (decisión de diseño, v0.6) |
-| HP del jefe | Fijo, el de su carta | No escala con el nº de jugadores ni con X. Referencia de HP por nivel (calibrada con el simulador para un objetivo de victoria de 75 / 50 / 30 / 15 %; recalibrada con cartas reales en D-03 §8.4): 2382 / 4313 / 4411 / 5205 en Nv1 / Nv2 / Nv3 / Nv4. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md` |
-| Nº de Pokémon por jugador | **Fijo: 2 en todos los niveles** | 1 Activo + 1 Banca. Como el juego oficial. Al no depender del nivel, no hay circularidad: cada jugador elige sus 2 Pokémon, se calcula X y de X sale el nivel. Orden del setup en `docs/D-01-setup.md` |
+Orden (detalle en `docs/D-01-setup.md`):
+
+1. Cada jugador elige **2 Pokémon** (1 Activo + 1 Banca), de cualquier carta del formato. Son 2 en todos los niveles.
+2. Cada jugador introduce a mano el daño de su mejor ataque; el asistente calcula **X** (ver abajo).
+3. El asistente muestra el **nivel** según X y lo fija. Los Pokémon ya no se pueden cambiar.
+4. Se elige el **jefe** del catálogo de ese nivel, a mano o al azar.
+5. Empieza la partida.
+
+| Parámetro | Regla |
+|---|---|
+| **X** | Suma, de todos los jugadores, del daño del mejor ataque de cada jugador (un solo valor por jugador: el mayor entre sus 2 Pokémon). Se calcula una sola vez, en el setup. |
+| Qué número cuenta (`docs/D-02-dano-maximo.md`) | Cada jugador lo introduce a mano y todos lo ven y lo comprueban con la carta física. La mesa acuerda el número caso a caso, con un **tope de 200 por ataque** (la app recorta lo que pase de 200). Daño fijo: el impreso. Daño por Energía: solo el base impreso. Los modificadores de la partida no cuentan. |
+| **Nivel** | `X < 400` → Nv1 · `400 ≤ X < 600` → Nv2 · `600 ≤ X < 800` → Nv3 · `X ≥ 800` → Nv4. El valor umbral pertenece al nivel de arriba. Un X menor de 250 se juega como Nv1 (no hay nivel inferior). |
+| **Jefe** | Elegido a mano o al azar dentro del nivel. Es una **carta fija** del catálogo: tiene su propio HP y sus propios ataques; no se escala con los jugadores. El asistente conoce el HP y el daño de cada ataque, pero **no** computa sus efectos de texto. Lanzamiento: 7 jefes (2 en Nv1, 2 en Nv2, 2 en Nv3, 1 en Nv4), todos disponibles desde el principio. |
+| **HP del jefe** | El de su carta. Referencia por nivel (calibrada con 16 cartas reales para un objetivo de victoria de 75 / 50 / 30 / 15 %): **2382 / 4313 / 4411 / 5205** en Nv1 / Nv2 / Nv3 / Nv4. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
+| Ataques del jefe por nivel | Nv1 30/60/120 · Nv2 40/80/160 · Nv3 60/100/200 · Nv4 80/120/240. Máximo de ataques por turno: 2 / 3 / 4 / 5. |
+| Menos de 4 jugadores | No se añaden parejas extra. El nivel se autoajusta con X, y los slots de aliados bajan con el número de jugadores (§4.4). |
 
 ---
 
@@ -32,135 +44,180 @@ No existe mazo del que robar cartas — cada jugador participa con un número fi
 
 ```
 INICIO
-  └─ Setup: X = suma del ataque base más fuerte de cada jugador
-     → determina Nivel del jefe → se elige (a mano o al azar) una
-     carta del catálogo de ese nivel → HP y ataques fijos de la carta
+  └─ Setup (§2): 2 Pokémon por jugador → X → nivel → jefe
       └─ TURNO DE JUGADORES (bucle)
             Orden de actuación cada ronda:
-              1º) Jugadores cuyo Pokémon activo acaba de recibir K.O.
-                  (reciben carta de ánimo; si hay varios, por orden de asiento)
-              2º) Resto de jugadores, en orden de asiento (J1, J2, J3, J4),
-                  excluyendo a los que ya han actuado en el paso 1º
-            Por cada jugador activo (no eliminado), en ese orden:
-              - Juega su turno normal (sus Pokémon, ataques sin coste de energía)
-              - Introduce manualmente el daño hecho al jefe
-              - El asistente resta ese daño del HP del jefe
-              - Si HP del jefe ≤ 0 → FIN: VICTORIA (inmediata, no
-                hace falta esperar a que ataquen el resto)
-            Cuando ya no quedan jugadores por atacar → pasa el turno
+              1º) Jugadores cuyo Pokémon activo cayó KO y siguen en juego
+                  (roban carta de ánimo; varios a la vez: por orden de asiento)
+              2º) Resto de jugadores, por orden de asiento (J1..J4)
+            Por cada jugador activo, en ese orden:
+              - Juega su turno (ataques sin coste de energía)
+              - Ataca al jefe, o a cualquier aliado (cualquier jugador
+                puede atacar a cualquier aliado)
+              - Un jugador con aliado vivo en su slot no puede dañar al
+                jefe hasta debilitarlo
+              - Introduce a mano el daño hecho al jefe; el asistente lo resta
+              - Si HP del jefe ≤ 0 → FIN: VICTORIA (inmediata)
       └─ TURNO DEL JEFE
-            - Se revela una carta del jefe (física, en la mesa)
-            - El jugador indica al asistente: qué ranura de ataque
-              fue (1/2/3 — solo etiqueta, sin efecto conocido),
-              cuánto daño hace, y a quién va:
+            - Se revela una carta del jefe (física)
+            - El jugador indica al asistente: ranura de ataque (1/2/3, solo
+              etiqueta), daño y objetivo:
                 · Todos los jugadores
                 · Un jugador elegido
-                · Un jugador al azar (se tira un dado físico;
-                  el resultado se introduce a mano)
-            - Si la carta invoca un aliado: se coloca en el slot libre de
-              un jugador activo (un slot por jugador; si no hay ninguno
-              libre, no tiene efecto). No ataca este turno.
-              A partir del turno del jefe siguiente, si sigue vivo,
-              usa su único ataque (y su habilidad, si tiene); el objetivo
-              se tira (moneda / dado de 3 / dado de 4 según jugadores
-              activos) y el jugador introduce daño/objetivo manualmente
-            - Mientras un jugador tenga un aliado en su slot, los
-              jugadores deben debilitarlo antes de poder dañar al jefe
-            - El jefe puede curarse sin límite de nº de veces, pero
-              nunca por encima de su HP máximo inicial
+                · Un jugador al azar (dado físico, resultado a mano)
+            - Si la carta cura al jefe: sube su HP sin pasar del HP máximo
+            - Si la carta invoca un aliado: se coloca en el slot libre de un
+              jugador activo (si no hay ninguno libre, no tiene efecto). No
+              ataca este turno
+            - Cada aliado vivo (no invocado este turno) usa su único ataque:
+              el objetivo se tira entre los jugadores activos (moneda con 2,
+              dado de 3 con 3, dado de 4 con 4; con 1 no hay tirada)
             - Los jugadores aplican el daño a sus Pokémon en mesa
-              (fuera del asistente); los estados alterados
-              (dormido/paralizado/veneno/quemado) solo afectan al
-              Pokémon activo, nunca a la banca
-            - Si un Pokémon de un jugador cae KO, se registra en el
-              asistente (contador, no elimina al jugador todavía)
-            - Si un jugador se queda sin Pokémon en juego (todos KO)
-              → queda ELIMINADO de la partida
+            - Si un Pokémon cae KO, se registra en el asistente
+            - Si un jugador se queda sin Pokémon → queda ELIMINADO
             - Si TODOS los jugadores están eliminados → FIN: DERROTA
             - Si no, vuelve al TURNO DE JUGADORES
 FIN (VICTORIA / DERROTA)
-  └─ Resultado enviado al backend (jefe, nº jugadores, victoria/derrota,
-     turnos jugados) para estadísticas
+  └─ Se calculan los puntos y se guarda la partida (§7)
 ```
 
 ---
 
-## 4. Condiciones de fin de partida
+## 4. Reglas detalladas
 
-| Condición | Resultado | Estado en el motor |
-|---|---|---|
-| HP del jefe llega a 0 | **Victoria** | Inmediata, se comprueba tras cada daño de jugador |
-| Todos los jugadores eliminados (sin Pokémon en juego) | **Derrota** | Se comprueba tras cada KO registrado |
+### 4.1 Pokémon, KO y eliminación
 
-**Regla clave (corregida en desarrollo):** un jugador NO queda eliminado con el primer Pokémon KO — solo cuando **todos** sus Pokémon en juego han caído. Antes de esta corrección el motor eliminaba al jugador con el primer KO, lo cual era incorrecto.
+- Un Pokémon que cae KO **no revive**: queda fuera toda la partida.
+- Cuando cae el Activo, la **Banca asciende automáticamente** (solo hay un Pokémon en la banca, no hay elección).
+- Un jugador solo queda **eliminado** cuando no le queda ningún Pokémon en juego. El primer KO no lo elimina.
+- Un jugador eliminado no actúa, no gana prioridad y no cuenta en las tiradas de objetivo.
+
+### 4.2 Carta de ánimo (Cheer)
+
+Detalle en `docs/D-05-carta-de-animo.md`.
+
+- El jugador cuyo Pokémon activo cae KO (y al que le queda otro Pokémon) **actúa primero en la ronda siguiente y roba una carta de ánimo**. Si cae el último Pokémon, queda eliminado y no roba.
+- Con varios KO a la vez, actúan por orden de asiento. Un KO da prioridad una sola vez.
+- Las cartas son las **5 oficiales de Cheer** y se resuelven en la mesa (el asistente no computa su efecto, solo puede registrar cuál salió): doble daño a un Pokémon, curar 80 a cada Pokémon, curar todo a 1 Pokémon, el jefe solo juega una carta el próximo turno, +50 de daño a todos los Pokémon de los jugadores.
+- El sistema está abierto a nuevas cartas y mecánicas según se desarrolle el juego.
+
+### 4.3 Estados alterados
+
+Dormido, paralizado, envenenado y quemado solo afectan al Pokémon Activo, nunca a la Banca. Se resuelven en la mesa; el asistente no los modela.
+
+### 4.4 Aliados del jefe
+
+Detalle en `docs/D-04-aliados.md`.
+
+- **Un slot por jugador** (hasta 4; con 3 jugadores, 3 slots; con 2, 2). Un aliado como máximo por slot, solo en slots de jugadores activos.
+- Un aliado tiene HP propio (independiente del jefe), un único ataque y a veces una habilidad. No ataca el turno en que se invoca.
+- **Bloqueo**: mientras un jugador tiene un aliado vivo en su slot, debe debilitarlo antes de dañar al jefe. El resto puede seguir dañando al jefe.
+- **Ayuda**: cualquier jugador activo puede atacar a cualquier aliado, opcionalmente y en lugar de atacar al jefe, para quitar los aliados que estorban a un compañero.
+- **Objetivo del aliado**: al atacar, se tira entre los jugadores activos (moneda / dado de 3 / dado de 4). Con un solo jugador activo, ataca a ese jugador.
+- Si el dueño de un slot queda eliminado, su aliado **sigue vivo y atacando**, pero ya no bloquea a nadie.
+- Las **habilidades** de los aliados (reducir daño al jefe, aumentar el daño del jefe, forzar a la banca al atacante...) se resuelven en la mesa; el asistente no las computa.
+
+### 4.5 Curación del jefe
+
+El jefe puede curarse sin límite de veces, sin pasar nunca de su HP máximo inicial.
 
 ---
 
-## 5. Roles y responsabilidades (mesa física vs. asistente virtual)
+## 5. Condiciones de fin de partida
+
+| Condición | Resultado | Cuándo se comprueba |
+|---|---|---|
+| HP del jefe llega a 0 | **Victoria** | Tras cada daño de un jugador (inmediata) |
+| Todos los jugadores eliminados | **Derrota** | Tras cada KO registrado |
+
+Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO con 4 jugadores). No se adopta el límite oficial de 4 KO.
+
+---
+
+## 6. Roles y responsabilidades (mesa física vs. asistente virtual)
 
 | Elemento | Lo lleva... |
 |---|---|
-| Cartas de Pokémon de los jugadores | Física (mesa) |
-| HP de los Pokémon de los jugadores | Física (contadores de daño en las cartas) |
-| HP del jefe | **Asistente virtual** (único cálculo numérico automático de HP del jefe) |
-| Aliados del jefe (HP, slot, si sigue vivo) | Asistente virtual (mecánica de Incursiones, pendiente de implementar) |
-| Efecto de las habilidades de los aliados | Física — el asistente no las computa, solo puede registrar en el log qué habilidad se usó |
-| Efecto de las cartas de ataque del jefe | Física — el asistente no las conoce, solo registra el resultado que le dicta el jugador |
-| Objetivo aleatorio del ataque del jefe | Física (dado real) — el asistente solo registra el resultado |
-| Estados alterados del Pokémon activo | Física (mesa) — el asistente no los modela |
-| Registro/historial de partida | Asistente virtual |
-| Resultado final (para stats) | Asistente virtual → backend |
+| Cartas de Pokémon de los jugadores y HP de sus Pokémon | Física (mesa, contadores de daño) |
+| HP del jefe | **Asistente virtual** (único cálculo automático de HP) |
+| Aliados del jefe (HP, slot, si sigue vivo) | Asistente virtual |
+| Efecto de las habilidades de los aliados | Física: el asistente solo puede registrar en el log cuál se usó |
+| Efecto de las cartas de ataque del jefe | Física: el asistente solo registra el resultado que le dicta el jugador |
+| Cartas de ánimo (efecto) | Física: el asistente solo registra cuál salió |
+| Objetivo aleatorio (ataque del jefe y de aliados) | Física (dado o moneda real): el asistente registra el resultado |
+| Estados alterados | Física |
+| Registro / historial de partida | Asistente virtual |
+| Puntos y desbloqueos | Asistente virtual → backend |
 
 ---
 
-## 6. Mecánicas confirmadas
+## 7. Puntos y desbloqueos
 
-### 6.1 — Alcance básico (v1, ya implementado en el motor)
+Detalle en `docs/D-10-sistema-de-puntos.md`. Cifras en `balance/tablas/`.
 
-- [x] Selección de jefe y nivel (carta fija del catálogo, sin escalado por nº de jugadores)
-- [x] Turno de jugadores con daño manual, en el orden correcto (§3)
-- [x] Victoria inmediata al llegar el jefe a 0 HP
-- [x] Turno del jefe con ataque manual (ranura, daño, objetivo)
-- [x] Objetivo aleatorio vía dado físico
-- [x] Contador de Pokémon KO por jugador, con eliminación solo al agotarse todos
-- [x] Derrota cuando todos los jugadores están eliminados
-- [x] Sin mazo ni deck-out: nº fijo de Pokémon por jugador según nivel del jefe
-- [x] Ataques sin coste de energía
-
-### 6.2 — Mecánicas de Incursiones (diseño cerrado, pendiente de implementar)
-
-- [x] Curación del jefe: sin límite de número de veces, nunca por encima de su HP máximo inicial
-- [x] Invocación de aliados: un slot por jugador (hasta 4; con menos jugadores, menos slots), solo en slots de jugadores activos sin aliado; objetivo del ataque al azar entre jugadores activos; si el dueño queda eliminado, el aliado sigue atacando pero ya no bloquea (`docs/D-04-aliados.md`), un único ataque cada uno (algunos con habilidad), no atacan el turno en que son invocados, HP propio independiente del jefe
-- [x] Habilidades de aliados: efectos como reducir el daño que recibe el jefe, aumentar el daño del jefe, o forzar a la banca al Pokémon atacante si golpea al aliado. Se resuelven físicamente en la mesa — **el asistente no las computa**, solo puede registrar en el log qué habilidad se activó si se le indica
-- [x] Mientras un jugador tenga aliado en su slot, debe debilitarlo antes de dañar al jefe; cualquier jugador activo puede atacar a cualquier aliado para ayudarle (`docs/D-04-aliados.md`)
-- [x] Estados alterados (dormido/paralizado/veneno/quemado) solo afectan al Pokémon activo, nunca a la banca
+- Los puntos son **individuales**: cada partida genera un total para el equipo que se reparte según lo aportado en el combate (el daño hecho por la fuente de cada jugador: ataques, daño extra de las cartas de ánimo y aliados que invoca).
+- **Victoria**: el total es el tope del nivel (3000 / 6000 / 9000 / 15000). **Derrota**: `round(daño total × Y ÷ 4) + 1`, con Y = tope del nivel ÷ HP del jefe (perder sin hacer nada da 1 punto).
+- **Reparto**: 1 jugador 100 % · 2 jugadores 55 / 45 · 3 jugadores 40 / 33 / 27 · 4 jugadores 27 / 25 / 25 / 23 (los intermedios van primero a quien no perdió Pokémon, luego por daño; empate: menos Pokémon perdidos, luego al azar).
+- **Desbloqueos**: los puntos de una cuenta se acumulan y no se gastan. Un jefe nuevo se desbloquea al llegar a su coste: Nv1 10 000 · Nv2 20 000 · Nv3 30 000 · Nv4 40 000. Los 7 jefes de lanzamiento están disponibles desde el principio.
+- El daño hecho a los aliados no cuenta para los puntos.
 
 ---
 
-## 7. Decisiones pendientes (a cerrar antes de seguir programando)
+## 8. Identidad, cuentas y conexión
 
-Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
+Detalle en `docs/D-11-identidad-jugadores.md`.
 
-- **D-10** Sistema de puntos (qué puntúa, reparto y cómo se guarda).
-- **D-03** Validar la tabla de niveles y el Nv4 propuesto (primer simulador hecho; falta medir la vida de los Pokémon en playtest, T-17).
-- La regla de derrota queda decidida: se pierde solo cuando todos los Pokémon de todos los jugadores han caído (no se adopta el límite oficial de 4 KO).
+- Las cuentas son **las mismas que las de Deck Tracker**. El backend de Incursiones valida esa sesión y guarda solo el id de usuario.
+- El **host** necesita cuenta. Un jugador con cuenta se une desde su dispositivo por **código de sala, QR o enlace de invitación** y cobra sus puntos. Un **invitado** juega en el dispositivo del host con un nombre de mesa, ocupa su puesto en el reparto, pero su parte no se abona a nadie.
+- Las filas de invitados se guardan en el historial sin abonar, para poder auditar el reparto.
+- Se puede jugar **sin conexión** y guardar al reconectar (la partida lleva un id generado por el cliente para no duplicarse). Unirse con otra cuenta requiere conexión; sin red, solo el host cobra.
+- El resultado de cada partida se envía al backend (jefe, nº de jugadores, victoria/derrota, turnos, daño por jugador).
 
 ---
 
-## 8. Glosario
+## 9. Valores provisionales (a ajustar en los playtests, T-17)
+
+| Valor | Estado |
+|---|---|
+| HP del jefe por nivel (2382 / 4313 / 4411 / 5205) | Calibrado con el simulador y 16 cartas reales; falta contrastar con playtests. Saltos entre niveles grandes (Nv1→Nv2) y casi nulos (Nv2≈Nv3): probar otras bandas de X |
+| Tope de 200 por ataque para X | Provisional |
+| Cartas de ánimo: una por KO y máximo 3 cartas distintas por partida | Adoptado del juego oficial, sin confirmar |
+| Efectos de las cartas de ánimo (curas, +50) | No están en el simulador: la partida real será algo más fácil que lo calibrado |
+| Topes y costes de puntos (3000 / 6000 / 9000 / 15000; 10 000 a 40 000) | Calibrados para desbloquear en ≈ 17 / 22 / 29 / 36 partidas con un grupo de 4 |
+| Jugar con 1-2 jugadores | Más difícil; se acepta |
+
+---
+
+## 10. Glosario
 
 - **Jefe (Boss):** Pokémon controlado por el sistema, sin jugador humano al mando.
+- **X:** suma del mejor ataque de cada jugador; fija el nivel del jefe.
 - **Ranura de ataque (Attack slot):** Ataque 1/2/3 del jefe; el asistente solo conoce el número, no el efecto.
-- **Carta de ánimo:** La recibe un jugador cuando su Pokémon activo acaba de caer KO y le queda otro Pokémon; le da prioridad de actuación en la siguiente ronda y un efecto de las 5 cartas oficiales de Cheer, resuelto en la mesa (el Pokémon KO no revive; el sistema se podrá ampliar). Ver `docs/D-05-carta-de-animo.md`.
-- **Aliado:** Pokémon invocado por el jefe, uno por slot de jugador (hasta 4 según jugadores). Un único ataque, a veces con habilidad. No ataca el turno en que es invocado. Hay que debilitarlo antes de poder dañar al jefe desde esa posición.
-- **Habilidad (de aliado):** Efecto pasivo que algunos aliados tienen (p. ej. reducir daño al jefe, aumentar daño del jefe, mandar a la banca al atacante). Se resuelve físicamente; el asistente no la computa.
-- **KO (jugador):** Un Pokémon del jugador ha sido derrotado. No elimina al jugador hasta agotar todos sus Pokémon en juego (activo + banca).
-- **Eliminado:** Jugador sin Pokémon en juego; deja de participar en turnos, pero la partida sigue si queda algún jugador activo.
-- **Incursiones:** Mecánicas extendidas sobre el Raid Battle base (curación del jefe, invocación de aliados), en diseño.
+- **Carta de ánimo (Cheer):** carta que roba el jugador cuyo Pokémon activo cae KO; le da prioridad en la ronda siguiente y un efecto resuelto en la mesa.
+- **Aliado:** Pokémon invocado por el jefe, uno por slot de jugador. Un único ataque, a veces con habilidad.
+- **Habilidad (de aliado):** efecto pasivo que algunos aliados tienen; se resuelve físicamente.
+- **KO (jugador):** un Pokémon del jugador ha sido derrotado. No elimina al jugador hasta agotar todos sus Pokémon.
+- **Eliminado:** jugador sin Pokémon en juego; deja de participar, pero la partida sigue si queda alguno activo.
+- **Invitado:** jugador sin cuenta que juega en el dispositivo del host; no cobra puntos.
+- **Incursiones:** mecánicas extendidas sobre el Raid Battle base (curación del jefe, aliados, puntos y desbloqueos).
 
 ---
 
-## 9. Historial de cambios de este documento
+## 11. Documentos de apoyo
+
+| Documento | Contenido |
+|---|---|
+| `docs/D-01-setup.md` | Orden del setup, 2 Pokémon en todos los niveles, casos límite |
+| `docs/D-02-dano-maximo.md` | Qué cuenta para X y quién lo introduce |
+| `docs/D-03-sistema-de-poder.md` | Fórmula de poder, calibración y simulador |
+| `docs/D-04-aliados.md` | Slots, bloqueo y objetivo de los aliados |
+| `docs/D-05-carta-de-animo.md` | Cheer, KO, promoción desde la banca |
+| `docs/D-10-sistema-de-puntos.md` | Puntos, reparto, desbloqueos y modelo de datos |
+| `docs/D-11-identidad-jugadores.md` | Cuentas, unirse a una partida, modo sin conexión |
+
+---
+
+## 12. Historial de cambios de este documento
 
 | Fecha | Cambio |
 |---|---|
@@ -176,3 +233,4 @@ Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 | v0.10 | D-04 cerrada: un slot de aliado por jugador, invocación solo en slots de jugadores activos sin aliado, el aliado ataca a un jugador activo al azar (moneda o dado de 3/4 caras) y, si su dueño queda eliminado, sigue atacando pero ya no bloquea. Cualquier jugador activo puede atacar a cualquier aliado. Se añade `docs/D-04-aliados.md`. |
 | v0.11 | D-05 cerrada: la carta de ánimo da prioridad de turno y un efecto de las 5 cartas oficiales de Cheer (resuelto en la mesa, ampliable), el Pokémon KO no revive, la banca asciende automáticamente (solo hay un Pokémon en la banca) y con varios KO a la vez se actúa por orden de asiento. Se añade `docs/D-05-carta-de-animo.md`. |
 | v0.12 | D-11 cerrada: Incursiones usa las mismas cuentas que Deck Tracker (solo guarda el id de usuario), el host necesita cuenta, los demás jugadores se unen con su cuenta por código de sala, QR o enlace de invitación, los invitados se guardan con nombre de mesa sin abonar, y se puede jugar sin conexión y guardar al reconectar. Se añade `docs/D-11-identidad-jugadores.md`. |
+| v1.0 | T-02: el GDD pasa a ser la especificación del motor. Consolida D-01, D-02, D-04, D-05, D-10 y D-11 en un solo documento sin contradicciones: se eliminan las secciones de decisiones pendientes y el estado «implementado» del motor (§6.1 antiguo), se añaden las reglas detalladas (§4), los puntos (§7), la identidad (§8), la tabla de valores provisionales (§9) y el índice de documentos de apoyo (§11). |
