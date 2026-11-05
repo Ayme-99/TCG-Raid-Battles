@@ -15,7 +15,7 @@ La dificultad del Nv4 sale del jefe (más HP y más ataques por turno), no de da
 ## 3. Orden del setup
 
 1. Cada jugador elige **2 Pokémon** de cualquier carta del formato (sin restricciones de tipo de carta).
-2. Se calcula **X** = suma, de todos los jugadores, del ataque base más fuerte de cada jugador (reglas de D-02 para qué cuenta y quién lo introduce).
+2. Se calcula **X** = suma, de todos los jugadores, del ataque base más fuerte de cada jugador (qué cuenta y quién lo introduce: `docs/D-02-dano-maximo.md`).
 3. El asistente muestra el **nivel** según X y lo fija:
 
 | X | Nivel |
@@ -32,7 +32,7 @@ La dificultad del Nv4 sale del jefe (más HP y más ataques por turno), no de da
 
 - **Valores justo en el umbral**: el umbral inferior pertenece al nivel de arriba (X = 400 es Nv2, X = 600 es Nv3, X = 800 es Nv4).
 - **X menor de 250**: se juega como Nv1. El juego oficial pone un jefe más duro, pero aquí no existe nivel inferior al Nv1. En el simulador, equipos con X entre 190 y 390 dan ≈ 75 % de victoria en Nv1.
-- **Cambiar Pokémon después de ver el nivel**: no se permite. Una vez mostrado el nivel, los Pokémon quedan fijados, para que nadie ajuste su X a un nivel concreto. Qué cuenta como daño y cómo se evita la manipulación se cierra en D-02.
+- **Cambiar Pokémon después de ver el nivel**: no se permite. Una vez mostrado el nivel, los Pokémon quedan fijados, para que nadie ajuste su X a un nivel concreto. Qué cuenta como daño y cómo se evita la manipulación se cierra en `docs/D-02-dano-maximo.md`.
 - **Menos de 4 jugadores**: el formato está pensado para 3-4 jugadores (GDD v0.6). Si juegan menos, se mantiene el criterio del GDD y no se añaden parejas extra; la regla de aliados con menos jugadores va en D-04.
 - **Jugador eliminado**: no cambia X ni el nivel durante la partida; X se calcula una sola vez, en el setup.
 
