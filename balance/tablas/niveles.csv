@@ -1,0 +1,5 @@
+nivel,x_min,x_max,x_centro,hp,ataque1,ataque2,ataque3,max_ataques_turno,amenaza_esperada,poder,estado
+1,250,390,320,1600,30,60,120,2,99,158400,oficial (Drednaw VMAX)
+2,400,590,500,2200,40,80,160,3,166,364760,oficial (Drednaw VMAX)
+3,600,799,700,3000,60,100,200,4,244,732303,oficial (Drednaw VMAX; el oficial no pone tope superior)
+4,800,,900,3750,80,120,240,5,323,1215000,propuesta sin validar
