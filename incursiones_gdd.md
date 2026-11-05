@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 0.11 (borrador de trabajo)
+**Versión:** 0.12 (borrador de trabajo)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4, cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -175,3 +175,4 @@ Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 | v0.9 | D-02 cerrada: cada jugador introduce a mano el número de su mejor ataque, todos lo ven y lo comprueban con la carta física; qué número cuenta lo acuerda la mesa con un tope de 200 por ataque (criterio recomendado en `docs/D-02-dano-maximo.md`). Los modificadores de la partida no cuentan para X. |
 | v0.10 | D-04 cerrada: un slot de aliado por jugador, invocación solo en slots de jugadores activos sin aliado, el aliado ataca a un jugador activo al azar (moneda o dado de 3/4 caras) y, si su dueño queda eliminado, sigue atacando pero ya no bloquea. Cualquier jugador activo puede atacar a cualquier aliado. Se añade `docs/D-04-aliados.md`. |
 | v0.11 | D-05 cerrada: la carta de ánimo da prioridad de turno y un efecto de las 5 cartas oficiales de Cheer (resuelto en la mesa, ampliable), el Pokémon KO no revive, la banca asciende automáticamente (solo hay un Pokémon en la banca) y con varios KO a la vez se actúa por orden de asiento. Se añade `docs/D-05-carta-de-animo.md`. |
+| v0.12 | D-11 cerrada: Incursiones usa las mismas cuentas que Deck Tracker (solo guarda el id de usuario), el host necesita cuenta, los demás jugadores se unen con su cuenta por código de sala, QR o enlace de invitación, los invitados se guardan con nombre de mesa sin abonar, y se puede jugar sin conexión y guardar al reconectar. Se añade `docs/D-11-identidad-jugadores.md`. |

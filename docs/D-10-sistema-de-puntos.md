@@ -73,11 +73,11 @@ Se guarda el **registro de partidas** y los totales se **calculan** a partir de 
 | `desbloqueos` | `jefe_id`, `cuenta_id`, `fecha` |
 
 - El `puntos` de cada fila se calcula al cerrar la partida con las tablas vigentes y se guarda, para que cambios futuros de las tablas no reescriban el historial.
-- Los invitados no tienen `jugador_id`: sus filas se guardan sin cuenta (`jugador_id` vacío, `puntos` calculados pero no abonados) para poder auditar el reparto, o no se guardan. Decisión pendiente.
+- Los invitados no tienen `jugador_id`: sus filas se guardan sin cuenta (`jugador_id` vacío, nombre de mesa, `puntos` calculados pero no abonados) para poder auditar el reparto (decidido en D-11).
 - Total de una cuenta = suma de sus `partida_jugadores.puntos` abonados.
 - Los 7 jefes de lanzamiento están disponibles desde el principio. Un jefe nuevo se desbloquea al llegar a su coste. Los puntos no se gastan.
 - Una partida se guarda una sola vez (clave `_id` del cliente) para que los reintentos de red no sumen dos veces.
-- `jugador_id` es el id de cuenta. Depende de D-11 (identidad de jugadores y cuentas).
+- `jugador_id` es el id de usuario de Deck Tracker (decidido en D-11, `docs/D-11-identidad-jugadores.md`).
 
 ## 6. Preguntas abiertas
 
@@ -91,4 +91,4 @@ Resueltas: reparto de 4 jugadores (27 / 25 / 25 / 23), derrota a un cuarto del c
 - Para que un jugador cobre sus puntos tiene que **unirse con su cuenta desde su propio dispositivo**. Entonces cada jugador puede introducir sus valores en su turno, o puede hacerlo todo el host.
 - Los invitados participan en el reparto (ocupan su puesto y porcentaje), pero su parte **no se abona a nadie**.
 - En `partida_jugadores`, un invitado se guarda con `jugador_id` vacío y un nombre de mesa, para poder calcular el reparto.
-- La gestión del dispositivo y de quién introduce cada valor pertenece a D-11 y a las tarjetas del motor.
+- Cómo se une un jugador (código, QR, enlace de invitación) está en `docs/D-11-identidad-jugadores.md`; quién introduce cada valor pertenece a las tarjetas del motor.
