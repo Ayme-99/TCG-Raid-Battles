@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ayme-99/TCG-Raid-Battles/catalog/schema/boss.schema.json",
+  "title": "Jefe de Incursiones (BORRADOR, se cierra en T-13)",
+  "type": "object",
+  "required": ["id", "nombre", "nivel", "hp", "ataques"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "nombre": { "type": "string", "minLength": 1 },
+    "nivel": { "type": "integer", "minimum": 1, "maximum": 4 },
+    "hp": { "type": "integer", "minimum": 1 },
+    "ataques": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["nombre", "dano", "objetivo"],
+        "additionalProperties": false,
+        "properties": {
+          "nombre": { "type": "string" },
+          "dano": { "type": "integer", "minimum": 0 },
+          "objetivo": { "enum": ["todos", "elegido", "aleatorio"] },
+          "efecto": { "type": "string" }
+        }
+      }
+    },
+    "imagen": { "type": "string" }
+  }
+}

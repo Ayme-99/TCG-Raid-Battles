@@ -16,12 +16,20 @@ Asistente de combate para **Incursiones**, un formato cooperativo casero de Pok�
 
 El desarrollo se retomará cuando termine [deck-tracker-app](#) / [deck-tracker-server](#) (proyecto hermano, en curso).
 
-## Planteamiento técnico (decidido, pendiente de construir)
+## Planteamiento técnico
 
-- App Flutter independiente (no integrada en el Deck Tracker), pensada para uso "tablet en medio de la mesa".
-- Backend: namespace propio (`/api/incursiones/*`) dentro del backend Node ya existente de Deck Tracker, reutilizando despliegue en Render sin acoplar modelos de datos entre proyectos.
-- Motor de partida: lógica pura en Dart (sin dependencia de Flutter Widgets), pensada para conectarse a cualquier gestor de estado.
+Monorepo: motor, simulador, app y backend viven en este repo.
+
+- `engine/`: motor de partida en Dart puro (sin Flutter), con estado inmutable y registro de eventos.
+- `sim/`: simulador Monte Carlo para validar el balance de cada jefe.
+- `catalog/`: catálogo de jefes en JSON (datos, no código) y su esquema de validación.
+- `balance/`: tablas de la fórmula de poder (CSV) e informes del simulador.
+- `app/`: app Flutter independiente (no integrada en el Deck Tracker), pensada para "tablet en medio de la mesa".
+- `server/`: backend Node (`/api/incursiones/*`), exportado como router para montarlo en el backend de Deck Tracker y reutilizar su despliegue en Render sin acoplar modelos de datos.
+- `docs/`: notas de playtest y bocetos de interfaz.
 
 ## Documentación
 
 - [`incursiones_gdd.md`](./incursiones_gdd.md) — Game Design Document (fuente de verdad del diseño de juego)
+- [`docs/`](./docs) — playtests y diseño de interfaz
+- Tablero de trabajo: [GitHub Project #10](https://github.com/users/Ayme-99/projects/10)
