@@ -1,0 +1,11 @@
+name: incursiones_sim
+description: Simulador de balance de Incursiones (Monte Carlo).
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  incursiones_engine:
+    path: ../engine

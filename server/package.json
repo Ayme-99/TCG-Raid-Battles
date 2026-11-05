@@ -1,0 +1,10 @@
+{
+  "name": "incursiones-server",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Backend de Incursiones (router /api/incursiones/*)",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"sin tests todavía\" && exit 0"
+  }
+}

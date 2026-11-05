@@ -1,0 +1,21 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+build/
+pubspec.lock
+*.iml
+
+# Node
+node_modules/
+npm-debug.log*
+.env
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Salida del simulador (los informes que se versionan van en balance/informes/)
+sim/out/
