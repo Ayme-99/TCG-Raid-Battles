@@ -1,5 +1,5 @@
-nivel,puntos_victoria,puntos_derrota,victoria_objetivo,intentos_esperados_por_victoria,estado
-1,1,0,0.75,1.33,propuesta
-2,2,0,0.50,2.00,propuesta
-3,3,0,0.30,3.33,propuesta
-4,5,0,0.15,6.67,propuesta
+nivel,puntos_victoria,hp_jefe_referencia,coeficiente_y,estado
+1,100,2382,0.0420,propuesta
+2,200,4313,0.0464,propuesta
+3,300,4411,0.0680,propuesta
+4,500,5205,0.0961,propuesta
