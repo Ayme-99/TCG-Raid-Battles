@@ -115,7 +115,24 @@ Los HP quedan cerca de los oficiales (+6 % a +10 %), así que se cumple la decis
 
 Esto confirma que el playtest en papel (T-17) es lo que decide la calibración definitiva: si los Pokémon reales resultan tener mucha más vida que la hipótesis, hay que subir el HP de los jefes.
 
-### 8.3 Pendiente
+### 8.3 Prueba con 8 cartas reales del formato Expandido
+
+Equipo de prueba: una carta de cada uno de 8 tipos distintos (`balance/tablas/cartas_prueba.csv`: Básico, Fase 2, EX, TAG TEAM-GX, V, VMAX, ex y Mega ex). Se simulan las 105 formas de formar 4 parejas, con los HP reales de las cartas y los jefes calibrados de §8.2. X = suma del mejor ataque de cada jugador; el nivel sale de X (Nv1 < 400 ≤ Nv2 < 600 ≤ Nv3 < 800 ≤ Nv4).
+
+| Interpretación de «ataque base» | Resultado |
+|---|---|
+| Número impreso (V = 40, VMAX = 20) | X entre 570 y 850. Nv2: 100 %. Nv3: 75 %. Nv4: 10 % |
+| Uso razonable de ataques variables (V = 180, VMAX = 180, Yveltal-EX = 140) | X entre 750 y 850. Nv3: 97 %. Nv4: 33 % |
+
+Conclusiones:
+
+- Con cartas reales X sale alto (570-850) y casi nunca cae en Nv1. Los equipos de cartas modernas viven en Nv3-Nv4.
+- Hay un **salto brusco en el límite de nivel**: el mismo equipo pasa de 97 % de victoria (X ≈ 790, Nv3) a 30 % (X ≈ 810, Nv4).
+- Los HP reales dependen del tipo de carta (130 a 350) y no del ataque, así que la hipótesis `60 + 0,6 × ataque` no vale. Un VMAX (320 HP) tiene ataque impreso 20, y un Mega ex (350 HP) tiene 230.
+- **«Ataque base» (D-02) cambia por completo el resultado.** Con el número impreso un VMAX aporta casi nada a X; con el uso razonable aporta 180.
+- Este modelo supone que todos los ataques están disponibles cada turno. No modela el coste de Energía (una por turno) ni los ataques con restricciones (Charizard descarta Energías, Miraidon ex no ataca el turno siguiente). Los resultados son optimistas para los jugadores.
+
+### 8.4 Pendiente
 
 - **Medir la vida de los Pokémon de los jugadores** con cartas reales en playtest (T-17). Es la incógnita principal (hipótesis `60-100 + 0,6 × ataque`).
 - Dentro de un nivel, la dificultad cambia mucho entre el X más bajo y el más alto de la banda (el Poder crece con X²: de 400 a 590 es ≈ 2,2 veces). Es lo mismo que pasa en el oficial; hay que decidir si lo aceptamos o estrechamos bandas.
