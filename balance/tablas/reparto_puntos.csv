@@ -5,7 +5,7 @@ jugadores,puesto,porcentaje,regla
 3,1,40,mas dano
 3,2,33,intermedio: sin Pokemon perdidos (si no, segundo en dano)
 3,3,27,el otro
-4,1,28,mas dano
+4,1,27,mas dano
 4,2,25,intermedio: sin Pokemon perdidos (si no, segundo en dano)
 4,3,25,intermedio: sin Pokemon perdidos (si no, segundo en dano)
 4,4,23,el otro

@@ -14,11 +14,13 @@ Estado: **propuesta v2 para validar** (2026-11-05). Issue #10.
 
 ## 2. Puntos de una partida
 
-1. Cada nivel tiene un **tope de puntos por victoria** (`balance/tablas/puntos_niveles.csv`): Nv1 = 100, Nv2 = 200, Nv3 = 300, Nv4 = 500. Mantienen la proporción 1 : 2 : 3 : 5 de la dificultad (D-03).
-2. Cada jefe tiene su coeficiente **Y = puntos de victoria de su nivel ÷ vida del jefe**. Así el daño total de una victoria (la vida del jefe) siempre da exactamente el tope del nivel. Con los jefes de referencia: Nv1 0,0420; Nv2 0,0464; Nv3 0,0680; Nv4 0,0961.
-3. **Victoria**: puntos = tope del nivel. **Derrota**: puntos = `round(X × Y) + 1`, con X = daño hecho al jefe en la partida.
-4. El total se reparte entre los jugadores con la tabla de §3. Cada jugador recibe `floor(total × porcentaje)` y el resto por redondeo va al primer puesto.
-5. **Cuentas e invitados**: el reparto se calcula siempre con todos los jugadores de la mesa. Después, solo se abonan los puntos de los jugadores con cuenta. La parte de un invitado no se abona a nadie. El host recibe la suya (ver pregunta abierta 2 sobre si el host necesita cuenta).
+1. Cada nivel tiene un **tope de puntos por victoria** (`balance/tablas/puntos_niveles.csv`): Nv1 = 1000, Nv2 = 2000, Nv3 = 3000, Nv4 = 5000. Mantienen la proporción de dificultad de D-03 y son cifras grandes para no tener decimales.
+2. Cada jefe tiene un coeficiente **Y = tope de victoria de su nivel ÷ vida del jefe**. Con los jefes de referencia: Nv1 0,4198; Nv2 0,4637; Nv3 0,6801; Nv4 0,9606.
+3. **Victoria**: puntos = X × Y, con X el daño hecho (la vida del jefe), es decir el tope del nivel.
+4. **Derrota**: el coeficiente baja a **Y ÷ 4**, es decir, solo se lleva una cuarta parte. Puntos = `round(X × Y ÷ 4) + 1`. Perder sin hacer nada da 1 punto.
+5. El total se reparte entre los jugadores con la tabla de §3. Cada jugador recibe `floor(total × porcentaje)` y el resto por redondeo va al primer puesto.
+6. **Cuentas e invitados**: el reparto se calcula siempre con todos los jugadores de la mesa. Después, solo se abonan los puntos de los jugadores con cuenta. La parte de un invitado no se abona a nadie. El host recibe la suya (ver pregunta abierta 1).
+7. **Qué cuenta como daño de un jugador**: el de sus ataques y el de las cartas de Cheer que juegue. El daño de un aliado invocado se atribuye al jugador que lo invocó (propuesta).
 
 ## 3. Reparto entre jugadores
 
@@ -29,7 +31,7 @@ Tabla en `balance/tablas/reparto_puntos.csv`.
 | 1 | 100 % | | |
 | 2 | 55 % | | 45 % |
 | 3 | 40 % | 33 % | 27 % |
-| 4 | 28 % | 25 % y 25 % | 23 % |
+| 4 | 27 % | 25 % y 25 % | 23 % |
 
 Cómo se asignan los puestos (propuesta para dejar la regla sin ambigüedad):
 1. El que más daño hizo es el puesto 1. En empate gana el que perdió menos Pokémon; si sigue el empate, se decide al azar.
@@ -37,19 +39,25 @@ Cómo se asignan los puestos (propuesta para dejar la regla sin ambigüedad):
 3. Si sobran puestos intermedios, se rellenan con los demás por orden de daño.
 4. El que queda es el último.
 
-Ejemplo con 4 jugadores y victoria Nv2 (200 puntos): A hace el 40 % del daño, B el 30 % y perdió un Pokémon, C el 20 % y D el 10 %, ambos sin perder ninguno.
-A es puesto 1 (28 % = 56 puntos). C y D, sin pérdidas, ocupan los dos intermedios (25 % = 50 puntos cada uno). B, aunque hizo más daño que ellos, queda último (23 % = 46 puntos). Suma 202: ver pregunta abierta 1.
+Ejemplo con 4 jugadores y victoria Nv2 (2000 puntos): A hace el 40 % del daño, B el 30 % y perdió un Pokémon, C el 20 % y D el 10 %, ambos sin perder ninguno.
+A es puesto 1 (27 % = 540 puntos). C y D, sin pérdidas, ocupan los dos intermedios (25 % = 500 puntos cada uno). B, aunque hizo más daño que ellos, queda último (23 % = 460 puntos). Suma 2000.
 
-## 4. Resultado del simulador (cartas de prueba, jefes de D-03)
+## 4. Cuánto se tarda en desbloquear (simulador, cartas de prueba)
 
-| Nivel | Victoria | Daño medio en derrota | Puntos medios por derrota | Puntos medios por partida |
-|---|---|---|---|---|
-| Nv1 | 74 % | 82 % de la vida | 82 | 96 |
-| Nv2 | 49 % | 81 % | 163 | 182 |
-| Nv3 | 33 % | 76 % | 230 | 253 |
-| Nv4 | 15 % | 69 % | 347 | 369 |
+Coste de desbloquear un jefe nuevo (por cuenta, sobre el total acumulado, sin gastar): Lv1 = 10.000, Lv2 = 20.000, Lv3 = 30.000, Lv4 = 40.000. De salida solo habrá un jefe extra de Lv4 y se irán añadiendo.
 
-Consecuencia: con puntos proporcionales al daño, **perder da entre el 69 y el 82 % de lo que da ganar**, porque casi todas las derrotas llegan cerca de matar al jefe. Ganar apenas se premia más que perder. Si se quiere que la victoria pese más, hace falta un bonus de victoria (por ejemplo +50 %). Pregunta abierta 3.
+Con la derrota a un cuarto, los puntos medios por partida y las partidas que necesita una cuenta jugando siempre ese nivel son:
+
+| Nivel | Victoria | Derrota media | Puntos medios por partida (equipo) | Partidas para desbloquear: 4 jugadores (25 % medio) | Jugando solo |
+|---|---|---|---|---|---|
+| Nv1 | 74 % | 205 | 793 | 50 | 13 |
+| Nv2 | 49 % | 405 | 1187 | 67 | 17 |
+| Nv3 | 33 % | 570 | 1372 | 87 | 22 |
+| Nv4 | 15 % | 862 | 1483 | 108 | 27 |
+
+Dos consecuencias:
+- Ahora ganar sí pesa: una victoria da cuatro veces lo que da una derrota con el mismo daño.
+- **Jugar solo desbloquea unas 4 veces más rápido** que jugar en grupo de 4, porque el jugador solo se lleva el 100 %. Es lo que sale de las reglas actuales (pregunta abierta 2).
 
 ## 5. Modelo de datos del guardado
 
@@ -70,10 +78,9 @@ Se guarda el **registro de partidas** y los totales se **calculan** a partir de 
 
 ## 6. Preguntas abiertas
 
-Resuelto: el desbloqueo es por cuenta (cada cuenta acumula sus puntos).
+Resueltas: reparto de 4 jugadores (27 / 25 / 25 / 23), derrota a un cuarto del coeficiente, el daño de Cheer cuenta para el jugador que la juega, costes de desbloqueo 10.000 / 20.000 / 30.000 / 40.000, el desbloqueo es por cuenta.
 
-1. **El 4 jugadores suma 101 %** (28 + 25 + 25 + 23). Habría que ajustar uno, por ejemplo 27 / 25 / 25 / 23.
-2. **Host sin cuenta**: ¿el host necesita cuenta para cobrar su parte? Se asume que sí, porque sin cuenta no hay dónde abonar los puntos.
-3. **Bonus de victoria**: ver §4.
-4. **Costes de desbloqueo**: sin decidir. Referencia: una partida da entre ~100 y ~500 puntos en total, repartidos entre los jugadores.
-5. **Daño de los aliados o efectos de Cheer**: si cuentan como daño de un jugador.
+1. **Host sin cuenta**: ¿el host necesita cuenta para cobrar su parte? Se asume que sí, porque sin cuenta no hay dónde abonar los puntos.
+2. **Jugar solo**: con el 100 % de los puntos, desbloquear es ~4 veces más rápido que en grupo. ¿Se acepta o se reduce el tope por jugador cuando hay pocos jugadores?
+3. **Escala de los puntos**: se han propuesto topes de 1000 a 5000 por victoria. Si se quiere desbloquear más rápido o más lento, basta con cambiar esos topes (los costes no cambian).
+4. **Aliados**: el daño de un aliado invocado se atribuye a quien lo invocó. Confirmar.
