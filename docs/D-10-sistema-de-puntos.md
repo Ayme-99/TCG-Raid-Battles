@@ -81,7 +81,14 @@ Se guarda el **registro de partidas** y los totales se **calculan** a partir de 
 
 ## 6. Preguntas abiertas
 
-Resueltas: reparto de 4 jugadores (27 / 25 / 25 / 23), derrota a un cuarto del coeficiente, todo el daño de la fuente de un jugador (ataques, Cheer, aliados que invoca) cuenta para él, costes de desbloqueo 10.000 / 20.000 / 30.000 / 40.000, el desbloqueo es por cuenta, el host necesita cuenta (porque la aplicación exige cuenta), jugar solo es posible aunque casi siempre se pierda.
+Resueltas: reparto de 4 jugadores (27 / 25 / 25 / 23), derrota a un cuarto del coeficiente, todo el daño de la fuente de un jugador (ataques, Cheer, aliados que invoca) cuenta para él, costes de desbloqueo 10.000 / 20.000 / 30.000 / 40.000, el desbloqueo es por cuenta, el host necesita cuenta (la aplicación la exige), jugar solo es posible aunque casi siempre se pierda, y el modo invitado existe (ver §7).
 
 1. **Escala de los topes**: 3000 / 6000 / 9000 / 15000 dan de 17 a 36 partidas por desbloqueo en grupo de 4. Confirmar o ajustar tras playtests (T-17).
-2. **Invitados**: si la aplicación exige cuenta para usarla, ¿existe de verdad el modo invitado? Confirmar cómo entra un invitado (D-11).
+
+## 7. Modo de juego: invitados
+
+- Un **invitado** es un jugador sin cuenta que juega en el dispositivo del host: todos los daños se gestionan desde un solo dispositivo.
+- Para que un jugador cobre sus puntos tiene que **unirse con su cuenta desde su propio dispositivo**. Entonces cada jugador puede introducir sus valores en su turno, o puede hacerlo todo el host.
+- Los invitados participan en el reparto (ocupan su puesto y porcentaje), pero su parte **no se abona a nadie**.
+- En `partida_jugadores`, un invitado se guarda con `jugador_id` vacío y un nombre de mesa, para poder calcular el reparto.
+- La gestión del dispositivo y de quién introduce cada valor pertenece a D-11 y a las tarjetas del motor.
