@@ -25,7 +25,7 @@ Fuentes en §9. No he abierto los PDF oficiales; los datos vienen de Bulbapedia 
 ## 3. Diferencias entre nuestro GDD v0.5 y el oficial
 
 1. **Cómo se calcula X.** El oficial suma el mejor ataque *de cada jugador* (4 números). El GDD suma el máximo daño *de cada Pokémon* (hasta 8 números), que da valores casi el doble de grandes para el mismo equipo. Con los mismos cortes (400/600/800), un equipo normal caería un nivel por encima de lo que el HP oficial espera. **Decidido: se usa la definición oficial** (§7, decisión A).
-2. **Derrota.** Oficial: 4 KO en total. GDD: un jugador cae al perder todos sus Pokémon y se pierde cuando caen todos. Con 4 jugadores y 2 Pokémon cada uno son 8 KO en vez de 4, así que a igual daño de jefe nuestra versión es más fácil. El simulador tiene que medirlo.
+2. **Derrota.** Oficial: 4 KO en total. GDD: un jugador cae al perder todos sus Pokémon y se pierde cuando caen todos. Con 4 jugadores y 2 Pokémon cada uno son 8 KO en vez de 4, así que a igual daño de jefe nuestra versión es más fácil. **Decidido: se mantiene la regla del GDD** (§7, decisión C); el simulador la usa por defecto.
 3. **Objetivo de los ataques.** Oficial: cada carta apunta a un jugador concreto. GDD: todos / uno elegido / uno al azar. Los ataques "a todos" no existen en el oficial y pegan mucho más fuerte al equipo.
 4. **Revivir.** Oficial: el Cheer devuelve al Pokémon caído. GDD: no hay revivir definido.
 
@@ -69,12 +69,35 @@ El oficial llega hasta Nv3. Con X de referencia ≈ 900 y la misma regla: Poder 
 - **A. X se calcula como en el oficial:** se suma el ataque base más fuerte de cada jugador. El GDD v0.6 ya lo recoge.
 - **B. Formato pensado para 3-4 jugadores.** Con 1 o 2 jugadores la partida es más larga y dura (un jefe Nv1 de 1600 HP necesita ≈ 5 rondas de X = 320; con X ≈ 100-200 son 8-16 rondas). Se acepta. No se añaden niveles bajos por ahora.
 - **Jefe = carta fija** (sin escalado) con HP parecido al oficial.
+- **C. Regla de derrota: se mantiene la del GDD.** La partida solo se pierde cuando todos los Pokémon de todos los jugadores han caído (8 KO con 4 jugadores y 2 Pokémon cada uno). Mientras quede uno en pie, se sigue. No se adopta el límite oficial de 4 KO. Consecuencia: a igual jefe nuestra versión es más fácil que la oficial y la tabla de HP se valida con esta regla.
 
-## 8. Lo que falta validar con el simulador
+## 8. Resultados del simulador y lo que falta validar
 
-- Un modelo simplificado del juego oficial (4 jugadores, 4 KO, Cheer sin efectos) da victoria entre 24 % y 96 % y 5-6 rondas **según cuánta vida suponga a los Pokémon de los jugadores**. Esa vida (hipótesis `60-100 + 0,6 × ataque`) es la incógnita principal. Hay que medir Pokémon reales en playtest (T-17).
+### 8.1 Primeros resultados (`sim/bin/sim.dart`, 2000 partidas por nivel, X en el centro de cada banda)
+
+Modelo simplificado: 4 jugadores × 2 Pokémon, Pokémon con HP `60 + 0,6 × ataque`, el segundo Pokémon ataca al 60 % del primero, eficiencia 85 %, el jefe encadena ataques con probabilidad 0,65 y cada ataque va a un jugador al azar. Cheer y revivir no están modelados.
+
+| Variante | Nv1 | Nv2 | Nv3 | Nv4 |
+|---|---|---|---|---|
+| Regla oficial (4 KO), HP 0,6 | 42 % | 32 % | 17 % | 13 % |
+| Regla oficial, 3 jugadores | 49 % | 27 % | 17 % | 15 % |
+| Regla oficial, HP 1,0 | 83 % | 69 % | 52 % | 41 % |
+| **Regla GDD (todos eliminados), HP 0,6** | **84 %** | **66 %** | **45 %** | **34 %** |
+
+Lectura:
+
+- La victoria baja de forma regular con el nivel en todas las variantes, así que el orden de dificultad de la tabla es correcto.
+- Pasar de 3 a 4 jugadores casi no cambia el resultado (X ya escala con los jugadores).
+- El nivel absoluto depende de dos incógnitas: la vida de los Pokémon de los jugadores y la regla de derrota. Con la regla de derrota decidida (decisión C), queda la vida de los Pokémon.
+- Con la regla del GDD el Nv1 queda en ≈ 84 %, el Nv3 en ≈ 45 % y el Nv4 en ≈ 34 %. El Nv1 sale alto para un nivel inicial; el objetivo de victoria por nivel está por fijar.
+
+### 8.2 Pendiente
+
+- **Medir la vida de los Pokémon de los jugadores** con cartas reales en playtest (T-17). Es la incógnita principal (hipótesis `60-100 + 0,6 × ataque`).
+- **Fijar el objetivo de victoria por nivel** y, si hace falta, retocar HP o ataques de los jefes de `balance/tablas/niveles.csv`.
 - Dentro de un nivel, la dificultad cambia mucho entre el X más bajo y el más alto de la banda (el Poder crece con X²: de 400 a 590 es ≈ 2,2 veces). Es lo mismo que pasa en el oficial; hay que decidir si lo aceptamos o estrechamos bandas.
-- Cómo afecta que no haya "revivir" en nuestra versión y que los ataques "a todos" existan.
+- Modelar el efecto de no tener "revivir" y de los ataques "a todos".
+- Validar el Nv4 (sigue siendo propuesta sin validar).
 
 ## 9. Fuentes
 

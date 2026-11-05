@@ -14,7 +14,7 @@
 //   --hp-base=N        HP base de un Pokémon de jugador (defecto 60)
 //   --hp-factor=F      HP extra por punto de ataque (defecto 0.6)
 //   --eficiencia=F     fracción del ataque que realmente se aplica (defecto 0.85)
-//   --regla=oficial|gdd  derrota a los 4 KO (oficial) o con todos eliminados (gdd)
+//   --regla=gdd|oficial  derrota con todos eliminados (gdd, defecto del proyecto) o a los 4 KO (oficial)
 //   --max-turnos=N     límite de turnos antes de dar la partida por perdida (30)
 //   --semilla=N        semilla del generador aleatorio (defecto 1)
 //   --tabla=RUTA       CSV de niveles (defecto ../balance/tablas/niveles.csv)
@@ -37,7 +37,7 @@ class Config {
   double hpBase = 60;
   double hpFactor = 0.6;
   double eficiencia = 0.85;
-  String regla = 'oficial';
+  String regla = 'gdd';
   int maxTurnos = 30;
   int semilla = 1;
   String tabla = '../balance/tablas/niveles.csv';

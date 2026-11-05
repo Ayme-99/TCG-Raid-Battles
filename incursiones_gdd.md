@@ -142,8 +142,8 @@ Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 - **D-01** Setup circular: el nivel depende de X, pero el nº de Pokémon por jugador (2 o 3) depende del nivel.
 - **D-02** Qué cuenta como "ataque base" para X y quién lo introduce.
 - **D-10** Sistema de puntos (qué puntúa, reparto y cómo se guarda).
-- **D-03** Terminar el simulador y validar la tabla de niveles y el Nv4 propuesto.
-- Reglas de derrota y de revivir respecto al oficial (ver `docs/D-03-sistema-de-poder.md` §3).
+- **D-03** Validar la tabla de niveles y el Nv4 propuesto (primer simulador hecho; falta medir la vida de los Pokémon en playtest, T-17).
+- Regla de revivir respecto al oficial (ver `docs/D-03-sistema-de-poder.md` §3). La regla de derrota queda decidida: se pierde solo cuando todos los Pokémon de todos los jugadores han caído (no se adopta el límite oficial de 4 KO).
 
 ---
 
@@ -170,3 +170,4 @@ Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 | v0.4 | Cerrada la pregunta de dificultad con menos jugadores: el nivel del jefe ya no lo eligen los jugadores, se **calcula automáticamente** a partir de X = suma del daño máximo de cada Pokémon de todos los jugadores (`X<400`→Nv1, `400-599`→Nv2, `600-799`→Nv3, `≥800`→Nv4), lo que autoajusta el reto según cuántos/qué tan fuertes son los jugadores. Reordenada la sección de setup para reflejar que el nivel se calcula antes de elegir la carta del jefe. |
 | v0.5 | Cerrada la última pregunta abierta (habilidades de aliados): son efectos resueltos físicamente en la mesa (reducir/aumentar daño del jefe, forzar banca al atacante, etc.), el asistente no las computa. **No quedan decisiones de diseño pendientes** para la v1 + Incursiones descritas en este documento. |
 | v0.6 | Balance de jefes: X se calcula como en el juego oficial (ataque base más fuerte de cada jugador, no de cada Pokémon). El jefe es una carta fija de un catálogo oficial, elegida a mano o al azar dentro del nivel, con HP de referencia 1600/2200/3000 (oficial Nv1-Nv3) y ~3750 (propuesta Nv4). Lanzamiento con 7 jefes (2+2+2+1). Formato pensado para 3-4 jugadores. Se añade `docs/D-03-sistema-de-poder.md` (fórmula de poder: HP × amenaza ≈ 1,5 × X²) y se reabren decisiones de setup y puntos en §7. |
+| v0.7 | Regla de derrota confirmada: solo se pierde cuando no queda ningún Pokémon en pie en toda la mesa (8 KO con 4 jugadores y 2 Pokémon). No se adopta el límite oficial de 4 KO. Primer simulador de balance en `sim/` y resultados en `docs/D-03-sistema-de-poder.md` §8. |
