@@ -5,7 +5,8 @@ Estado: **propuesta v2 para validar** (2026-11-05). Issue #10.
 ## 1. Lo que decidió Ayme
 
 - Los puntos **no son una puntuación competitiva**. Sirven para **desbloquear jefes nuevos**.
-- Cada partida reparte unos puntos entre los jugadores según el **daño que hizo cada uno**.
+- Cada partida genera unos puntos **para todo el equipo**, pero **no se reparten a partes iguales**: cada jugador recibe según lo que aportó en el combate (el daño que hizo).
+- **Solo cobran los jugadores con cuenta** en la aplicación. Un invitado no cobra, y su parte **se pierde** (no se reparte a los demás). Si la partida se juega en modo invitado, solo el host recibe la parte que le toca.
 - Los puntos de la partida dependen del **daño total hecho al jefe**: `puntos = X × Y`, con X el daño hecho y Y un coeficiente propio de cada jefe, calculado a partir de su vida.
 - **Perder da `X × Y + 1`**: perder sin haber hecho nada da 1 punto.
 - El coste de desbloquear jefes nuevos **no está decidido**.
@@ -17,6 +18,7 @@ Estado: **propuesta v2 para validar** (2026-11-05). Issue #10.
 2. Cada jefe tiene su coeficiente **Y = puntos de victoria de su nivel ÷ vida del jefe**. Así el daño total de una victoria (la vida del jefe) siempre da exactamente el tope del nivel. Con los jefes de referencia: Nv1 0,0420; Nv2 0,0464; Nv3 0,0680; Nv4 0,0961.
 3. **Victoria**: puntos = tope del nivel. **Derrota**: puntos = `round(X × Y) + 1`, con X = daño hecho al jefe en la partida.
 4. El total se reparte entre los jugadores con la tabla de §3. Cada jugador recibe `floor(total × porcentaje)` y el resto por redondeo va al primer puesto.
+5. **Cuentas e invitados**: el reparto se calcula siempre con todos los jugadores de la mesa. Después, solo se abonan los puntos de los jugadores con cuenta. La parte de un invitado no se abona a nadie. El host recibe la suya (ver pregunta abierta 2 sobre si el host necesita cuenta).
 
 ## 3. Reparto entre jugadores
 
@@ -57,18 +59,21 @@ Se guarda el **registro de partidas** y los totales se **calculan** a partir de 
 |---|---|
 | `partidas` | `_id` (generado por el cliente), `fecha`, `jefe_id`, `nivel`, `jugadores` (nº), `resultado`, `dano_total`, `coeficiente_y`, `puntos_total` |
 | `partida_jugadores` | `partida_id`, `jugador_id`, `dano`, `pokemon_perdidos`, `puesto`, `porcentaje`, `puntos` |
-| `desbloqueos` | `jefe_id`, `ambito` (jugador o grupo), `ambito_id`, `fecha` |
+| `desbloqueos` | `jefe_id`, `cuenta_id`, `fecha` |
 
 - El `puntos` de cada fila se calcula al cerrar la partida con las tablas vigentes y se guarda, para que cambios futuros de las tablas no reescriban el historial.
-- Total de un jugador = suma de sus `partida_jugadores.puntos`.
+- Los invitados no tienen `jugador_id`: sus filas se guardan sin cuenta (`jugador_id` vacío, `puntos` calculados pero no abonados) para poder auditar el reparto, o no se guardan. Decisión pendiente.
+- Total de una cuenta = suma de sus `partida_jugadores.puntos` abonados.
 - Los 7 jefes de lanzamiento están disponibles desde el principio. Un jefe nuevo se desbloquea al llegar a su coste. Los puntos no se gastan.
 - Una partida se guarda una sola vez (clave `_id` del cliente) para que los reintentos de red no sumen dos veces.
-- `jugador_id` depende de D-11 (identidad de jugadores).
+- `jugador_id` es el id de cuenta. Depende de D-11 (identidad de jugadores y cuentas).
 
 ## 6. Preguntas abiertas
 
+Resuelto: el desbloqueo es por cuenta (cada cuenta acumula sus puntos).
+
 1. **El 4 jugadores suma 101 %** (28 + 25 + 25 + 23). Habría que ajustar uno, por ejemplo 27 / 25 / 25 / 23.
-2. **¿Los puntos para desbloquear son del jugador o del grupo?** Con este reparto cada jugador acumula los suyos. Hay que decidir si un jefe se desbloquea para cada jugador por separado o para todo el grupo con la suma.
+2. **Host sin cuenta**: ¿el host necesita cuenta para cobrar su parte? Se asume que sí, porque sin cuenta no hay dónde abonar los puntos.
 3. **Bonus de victoria**: ver §4.
 4. **Costes de desbloqueo**: sin decidir. Referencia: una partida da entre ~100 y ~500 puntos en total, repartidos entre los jugadores.
 5. **Daño de los aliados o efectos de Cheer**: si cuentan como daño de un jugador.
