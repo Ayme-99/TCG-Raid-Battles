@@ -4,11 +4,23 @@ Estado: decidido (2026-11-05). Issue #18.
 
 ## 1. Qué es la carta de ánimo
 
-La carta de ánimo (Cheer) **solo da prioridad de turno**: el jugador cuyo Pokémon activo cae KO actúa primero en la ronda siguiente. No tiene efectos extra (no cura, no sube el daño, no limita al jefe), así que no hay cartas de Cheer físicas ni que el asistente deba computar. Las 5 cartas oficiales de Cheer no se usan.
+El jugador cuyo Pokémon activo cae KO (y al que le queda otro Pokémon) **actúa primero en la ronda siguiente y roba una carta de ánimo (Cheer)**.
+
+La base son las **5 cartas oficiales de Cheer**, que se resuelven en la mesa (el asistente no computa su efecto, solo puede registrar cuál salió):
+
+1. Un Pokémon a elección hace doble daño este turno.
+2. Cura 80 de daño a cada Pokémon de los jugadores.
+3. Cura todo el daño de 1 Pokémon.
+4. El jefe no puede jugar más de una carta el próximo turno.
+5. Los ataques de todos los Pokémon de los jugadores hacen 50 más de daño este turno.
+
+El sistema está abierto: según se desarrolle el juego se podrán añadir cartas y mecánicas nuevas.
+
+Pendiente de playtest (T-17): el simulador no modela estos efectos (las curas y el +50 hacen la partida algo más fácil de lo calibrado), y se adopta de forma provisional el resto de la regla oficial (una carta por KO, máximo 3 cartas distintas por partida).
 
 ## 2. Pokémon KO: no revive
 
-Un Pokémon que cae KO queda fuera de la partida. No se revive al final de la ronda, a diferencia del juego oficial. Es lo que asume la calibración del simulador (D-03): se pierde cuando caen todos los Pokémon de todos los jugadores.
+Un Pokémon que cae KO queda fuera de la partida. No se revive al final de la ronda, a diferencia del juego oficial: la carta de ánimo no revive. Es lo que asume la calibración del simulador (D-03): se pierde cuando caen todos los Pokémon de todos los jugadores.
 
 ## 3. Promoción desde la banca
 
@@ -31,10 +43,10 @@ Cada ronda actúa primero cualquier jugador cuyo Pokémon activo cayó KO desde 
 
 - **Ataque «a todos» que deja a un jugador sin ningún Pokémon**: el jugador queda eliminado y no tiene prioridad.
 - **El aliado o el jefe manda el Pokémon activo a la banca** (habilidad, GDD §6.2): se resuelve en la mesa, sin KO y sin carta de ánimo.
-- **Daño de Cheer**: la carta de ánimo no hace daño, así que no suma en los puntos de D-10.
+- **Daño de Cheer**: las cartas de ánimo no hacen daño por sí mismas. El daño extra de «doble daño» y «+50» sale de los ataques del jugador, así que ya cuenta para él en D-10.
 
 ## 6. Cambios en otros documentos
 
 - `incursiones_gdd.md` → v0.11: orden de turno, glosario y §7 (sin pregunta de revivir).
 - `docs/D-03-sistema-de-poder.md` §3.4: el GDD no revive (decisión cerrada).
-- `docs/D-10-sistema-de-puntos.md`: la carta de ánimo no cuenta como daño.
+- `docs/D-10-sistema-de-puntos.md`: el daño extra de las cartas de ánimo cuenta para el jugador que ataca.
