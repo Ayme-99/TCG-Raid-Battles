@@ -1,0 +1,5 @@
+nivel,puntos_victoria,hp_jefe_referencia,coeficiente_y_victoria,coeficiente_y_derrota,coste_desbloqueo,estado
+1,3000,2382,1.2594,0.3149,10000,propuesta
+2,6000,4313,1.3911,0.3478,20000,propuesta
+3,9000,4411,2.0404,0.5101,30000,propuesta
+4,15000,5205,2.8818,0.7205,40000,propuesta

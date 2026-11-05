@@ -1,0 +1,11 @@
+jugadores,puesto,porcentaje,regla
+1,1,100,unico jugador
+2,1,55,mas dano
+2,2,45,el otro
+3,1,40,mas dano
+3,2,33,intermedio: sin Pokemon perdidos (si no, segundo en dano)
+3,3,27,el otro
+4,1,27,mas dano
+4,2,25,intermedio: sin Pokemon perdidos (si no, segundo en dano)
+4,3,25,intermedio: sin Pokemon perdidos (si no, segundo en dano)
+4,4,23,el otro
