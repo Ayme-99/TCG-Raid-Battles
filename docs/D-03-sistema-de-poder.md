@@ -167,7 +167,10 @@ Conclusiones:
 - Son valores provisionales: dependen del catálogo de 16 cartas y de cómo se forman los equipos. Hay que repetirlo cuando el catálogo crezca.
 - Reglas con efecto no modeladas todavía: monedas, autodaño (Pikachu) y habilidades.
 
+Validación (2026-11-05): `sim/bin/sim_cartas.dart` (Dart, mismo modelo que el prototipo) reproduce estos valores en el PC de Ayme. Rayquaza VMAX queda confirmado: sin Energía su Max Burst hace 20 + 0, es decir 20 de daño.
+
 ### 8.5 Pendiente
+- **Suavizar los saltos entre niveles** (Nv1 -> Nv2 y Nv2 ≈ Nv3): probar bandas de X distintas. Tarjeta nueva, fuera de D-03.
 
 - **Medir la vida de los Pokémon de los jugadores** con cartas reales en playtest (T-17). Es la incógnita principal (hipótesis `60-100 + 0,6 × ataque`).
 - Dentro de un nivel, la dificultad cambia mucho entre el X más bajo y el más alto de la banda (el Poder crece con X²: de 400 a 590 es ≈ 2,2 veces). Es lo mismo que pasa en el oficial; hay que decidir si lo aceptamos o estrechamos bandas.
