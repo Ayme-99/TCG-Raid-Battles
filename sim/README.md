@@ -11,3 +11,14 @@ cd sim
 dart pub get
 dart run bin/sim.dart
 ```
+
+## Simulador con cartas reales (D-03)
+
+`bin/sim_cartas.dart` usa cartas reales (`balance/tablas/cartas_prueba.csv` y `ataques_prueba.csv`) y las
+reglas de la hoja oficial de Raid Battle. Es el que debe usarse para calibrar los jefes de
+`balance/tablas/niveles.csv`. `bin/sim.dart` es el modelo abstracto anterior y ya no está calibrado.
+
+```
+dart run bin/sim_cartas.dart              # mide con los HP de niveles.csv
+dart run bin/sim_cartas.dart --calibrar   # busca el HP que da 75/50/30/15 %
+```
