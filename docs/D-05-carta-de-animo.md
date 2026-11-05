@@ -1,0 +1,40 @@
+# D-05 · Carta de ánimo, KO y promoción desde la banca
+
+Estado: decidido (2026-11-05). Issue #18.
+
+## 1. Qué es la carta de ánimo
+
+La carta de ánimo (Cheer) **solo da prioridad de turno**: el jugador cuyo Pokémon activo cae KO actúa primero en la ronda siguiente. No tiene efectos extra (no cura, no sube el daño, no limita al jefe), así que no hay cartas de Cheer físicas ni que el asistente deba computar. Las 5 cartas oficiales de Cheer no se usan.
+
+## 2. Pokémon KO: no revive
+
+Un Pokémon que cae KO queda fuera de la partida. No se revive al final de la ronda, a diferencia del juego oficial. Es lo que asume la calibración del simulador (D-03): se pierde cuando caen todos los Pokémon de todos los jugadores.
+
+## 3. Promoción desde la banca
+
+Cada jugador lleva 2 Pokémon (1 activo + 1 banca, D-01). Cuando cae el activo:
+
+- Si el jugador tiene Pokémon en la banca, **ese Pokémon pasa a ser el activo automáticamente**. No hay elección, porque solo hay uno.
+- Si no le queda ninguno, el jugador queda **eliminado** y no recibe carta de ánimo.
+
+Un jugador con un solo Pokémon vivo no tiene banca: si cae, queda eliminado.
+
+## 4. Orden de turno
+
+Cada ronda actúa primero cualquier jugador cuyo Pokémon activo cayó KO desde su último turno (y que sigue en juego), y después el resto por orden de asiento.
+
+- **Varios KO a la vez** (por ejemplo, un ataque del jefe «a todos»): los jugadores con prioridad actúan entre sí **por orden de asiento** (J1, J2, J3, J4), no por el orden en que cayeron.
+- Un jugador solo gana la prioridad una vez por KO: si cae su Pokémon y el nuevo activo vuelve a caer en la misma ronda, no gana una segunda prioridad.
+- Un jugador eliminado no actúa ni gana prioridad.
+
+## 5. Casos límite
+
+- **Ataque «a todos» que deja a un jugador sin ningún Pokémon**: el jugador queda eliminado y no tiene prioridad.
+- **El aliado o el jefe manda el Pokémon activo a la banca** (habilidad, GDD §6.2): se resuelve en la mesa, sin KO y sin carta de ánimo.
+- **Daño de Cheer**: la carta de ánimo no hace daño, así que no suma en los puntos de D-10.
+
+## 6. Cambios en otros documentos
+
+- `incursiones_gdd.md` → v0.11: orden de turno, glosario y §7 (sin pregunta de revivir).
+- `docs/D-03-sistema-de-poder.md` §3.4: el GDD no revive (decisión cerrada).
+- `docs/D-10-sistema-de-puntos.md`: la carta de ánimo no cuenta como daño.

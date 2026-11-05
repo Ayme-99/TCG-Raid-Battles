@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 0.10 (borrador de trabajo)
+**Versión:** 0.11 (borrador de trabajo)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4, cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -38,7 +38,7 @@ INICIO
       └─ TURNO DE JUGADORES (bucle)
             Orden de actuación cada ronda:
               1º) Jugadores cuyo Pokémon activo acaba de recibir K.O.
-                  (reciben carta de ánimo)
+                  (reciben carta de ánimo; si hay varios, por orden de asiento)
               2º) Resto de jugadores, en orden de asiento (J1, J2, J3, J4),
                   excluyendo a los que ya han actuado en el paso 1º
             Por cada jugador activo (no eliminado), en ese orden:
@@ -143,7 +143,7 @@ Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 
 - **D-10** Sistema de puntos (qué puntúa, reparto y cómo se guarda).
 - **D-03** Validar la tabla de niveles y el Nv4 propuesto (primer simulador hecho; falta medir la vida de los Pokémon en playtest, T-17).
-- Regla de revivir respecto al oficial (ver `docs/D-03-sistema-de-poder.md` §3). La regla de derrota queda decidida: se pierde solo cuando todos los Pokémon de todos los jugadores han caído (no se adopta el límite oficial de 4 KO).
+- La regla de derrota queda decidida: se pierde solo cuando todos los Pokémon de todos los jugadores han caído (no se adopta el límite oficial de 4 KO).
 
 ---
 
@@ -151,7 +151,7 @@ Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 
 - **Jefe (Boss):** Pokémon controlado por el sistema, sin jugador humano al mando.
 - **Ranura de ataque (Attack slot):** Ataque 1/2/3 del jefe; el asistente solo conoce el número, no el efecto.
-- **Carta de ánimo:** La recibe un jugador cuando su Pokémon activo acaba de caer KO; le da prioridad de actuación en la siguiente ronda.
+- **Carta de ánimo:** La recibe un jugador cuando su Pokémon activo acaba de caer KO y le queda otro Pokémon; solo le da prioridad de actuación en la siguiente ronda (sin efectos extra; el Pokémon KO no revive). Ver `docs/D-05-carta-de-animo.md`.
 - **Aliado:** Pokémon invocado por el jefe, uno por slot de jugador (hasta 4 según jugadores). Un único ataque, a veces con habilidad. No ataca el turno en que es invocado. Hay que debilitarlo antes de poder dañar al jefe desde esa posición.
 - **Habilidad (de aliado):** Efecto pasivo que algunos aliados tienen (p. ej. reducir daño al jefe, aumentar daño del jefe, mandar a la banca al atacante). Se resuelve físicamente; el asistente no la computa.
 - **KO (jugador):** Un Pokémon del jugador ha sido derrotado. No elimina al jugador hasta agotar todos sus Pokémon en juego (activo + banca).
@@ -174,3 +174,4 @@ Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 | v0.8 | Setup sin circularidad (D-01): cada jugador usa 2 Pokémon en todos los niveles, incluido el Nv4 (como el juego oficial). Un X menor de 250 se juega como Nv1. HP de referencia por nivel recalibrado con cartas reales (D-03 §8.4). Se añade `docs/D-01-setup.md`. |
 | v0.9 | D-02 cerrada: cada jugador introduce a mano el número de su mejor ataque, todos lo ven y lo comprueban con la carta física; qué número cuenta lo acuerda la mesa con un tope de 200 por ataque (criterio recomendado en `docs/D-02-dano-maximo.md`). Los modificadores de la partida no cuentan para X. |
 | v0.10 | D-04 cerrada: un slot de aliado por jugador, invocación solo en slots de jugadores activos sin aliado, el aliado ataca a un jugador activo al azar (moneda o dado de 3/4 caras) y, si su dueño queda eliminado, sigue atacando pero ya no bloquea. Cualquier jugador activo puede atacar a cualquier aliado. Se añade `docs/D-04-aliados.md`. |
+| v0.11 | D-05 cerrada: la carta de ánimo solo da prioridad de turno, el Pokémon KO no revive, la banca asciende automáticamente (solo hay un Pokémon en la banca) y con varios KO a la vez se actúa por orden de asiento. Se añade `docs/D-05-carta-de-animo.md`. |

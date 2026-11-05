@@ -20,7 +20,7 @@ Estado: **propuesta v2 para validar** (2026-11-05). Issue #10.
 4. **Derrota**: el coeficiente baja a **Y ÷ 4**, es decir, solo se lleva una cuarta parte. Puntos = `round(X × Y ÷ 4) + 1`. Perder sin hacer nada da 1 punto.
 5. El total se reparte entre los jugadores con la tabla de §3. Cada jugador recibe `floor(total × porcentaje)` y el resto por redondeo va al primer puesto.
 6. **Cuentas e invitados**: el reparto se calcula siempre con todos los jugadores de la mesa. Después, solo se abonan los puntos de los jugadores con cuenta. La parte de un invitado no se abona a nadie. El host recibe la suya (ver pregunta abierta 1).
-7. **Qué cuenta como daño de un jugador**: el de sus ataques y el de las cartas de Cheer que juegue. El daño de un aliado invocado se atribuye al jugador que lo invocó (propuesta).
+7. **Qué cuenta como daño de un jugador**: el de sus ataques (la carta de ánimo no hace daño, D-05). El daño de un aliado invocado se atribuye al jugador que lo invocó (propuesta).
 
 ## 3. Reparto entre jugadores
 
@@ -81,7 +81,7 @@ Se guarda el **registro de partidas** y los totales se **calculan** a partir de 
 
 ## 6. Preguntas abiertas
 
-Resueltas: reparto de 4 jugadores (27 / 25 / 25 / 23), derrota a un cuarto del coeficiente, todo el daño de la fuente de un jugador (ataques, Cheer, aliados que invoca) cuenta para él, costes de desbloqueo 10.000 / 20.000 / 30.000 / 40.000, el desbloqueo es por cuenta, el host necesita cuenta (la aplicación la exige), jugar solo es posible aunque casi siempre se pierda, y el modo invitado existe (ver §7).
+Resueltas: reparto de 4 jugadores (27 / 25 / 25 / 23), derrota a un cuarto del coeficiente, todo el daño de la fuente de un jugador (ataques y aliados que invoca; la carta de ánimo no hace daño, D-05) cuenta para él, costes de desbloqueo 10.000 / 20.000 / 30.000 / 40.000, el desbloqueo es por cuenta, el host necesita cuenta (la aplicación la exige), jugar solo es posible aunque casi siempre se pierda, y el modo invitado existe (ver §7).
 
 1. **Escala de los topes**: 3000 / 6000 / 9000 / 15000 dan de 17 a 36 partidas por desbloqueo en grupo de 4. Confirmar o ajustar tras playtests (T-17).
 
