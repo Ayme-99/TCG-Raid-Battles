@@ -117,20 +117,25 @@ Esto confirma que el playtest en papel (T-17) es lo que decide la calibración d
 
 ### 8.3 Prueba con 8 cartas reales del formato Expandido
 
-Equipo de prueba: una carta de cada uno de 8 tipos distintos (`balance/tablas/cartas_prueba.csv`: Básico, Fase 2, EX, TAG TEAM-GX, V, VMAX, ex y Mega ex). Se simulan las 105 formas de formar 4 parejas, con los HP reales de las cartas y los jefes calibrados de §8.2. X = suma del mejor ataque de cada jugador; el nivel sale de X (Nv1 < 400 ≤ Nv2 < 600 ≤ Nv3 < 800 ≤ Nv4).
+Equipo de prueba: una carta de cada uno de 8 tipos distintos (`balance/tablas/cartas_prueba.csv`: Básico, Fase 2, EX, TAG TEAM-GX, V, VMAX, ex y Mega ex). Se simulan las 105 formas de formar 4 parejas con los HP reales de las cartas y los jefes calibrados de §8.2.
 
-| Interpretación de «ataque base» | Resultado |
-|---|---|
-| Número impreso (V = 40, VMAX = 20) | X entre 570 y 850. Nv2: 100 %. Nv3: 75 %. Nv4: 10 % |
-| Uso razonable de ataques variables (V = 180, VMAX = 180, Yveltal-EX = 140) | X entre 750 y 850. Nv3: 97 %. Nv4: 33 % |
+**Reglas aplicadas (según la página oficial del Raid Battle):** se juega solo con cartas de Pokémon, sin Entrenador ni Energía. X = suma, por pareja, del **daño base más alto** de sus ataques (el número impreso). Nivel por X: Nv1 < 400 ≤ Nv2 < 600 ≤ Nv3 < 800 ≤ Nv4.
+
+**Restricciones modeladas por ataque:** el ataque que impide atacar el turno siguiente se respeta (Miraidon ex); el ataque GX se usa una vez por partida; los ataques cuyo daño depende de la Energía se consideran no disponibles, o se usan con su daño base impreso (dos variantes). Cada turno el Pokémon activo usa su mejor ataque disponible, y si no puede atacar, la pareja se retira y ataca el otro. Las condiciones especiales sobre el jefe y los efectos de Energía, mazo o mano se ignoran.
+
+| Variante | Nv2 (X 570-590) | Nv3 (X 620-750) | Nv4 (X 850) | Media |
+|---|---|---|---|---|
+| Sin restricciones | 100 % | 83 % | 14 % | 68 % |
+| Con restricciones, ataques que dependen de la Energía excluidos | 100 % | 72 % | 8 % | 58 % |
+| Con restricciones, esos ataques hacen su daño base | 100 % | 71 % | 6 % | 57 % |
 
 Conclusiones:
 
-- Con cartas reales X sale alto (570-850) y casi nunca cae en Nv1. Los equipos de cartas modernas viven en Nv3-Nv4.
-- Hay un **salto brusco en el límite de nivel**: el mismo equipo pasa de 97 % de victoria (X ≈ 790, Nv3) a 30 % (X ≈ 810, Nv4).
-- Los HP reales dependen del tipo de carta (130 a 350) y no del ataque, así que la hipótesis `60 + 0,6 × ataque` no vale. Un VMAX (320 HP) tiene ataque impreso 20, y un Mega ex (350 HP) tiene 230.
-- **«Ataque base» (D-02) cambia por completo el resultado.** Con el número impreso un VMAX aporta casi nada a X; con el uso razonable aporta 180.
-- Este modelo supone que todos los ataques están disponibles cada turno. No modela el coste de Energía (una por turno) ni los ataques con restricciones (Charizard descarta Energías, Miraidon ex no ataca el turno siguiente). Los resultados son optimistas para los jugadores.
+- Con cartas modernas X sale alto (570-850) y casi nunca cae en Nv1. Es coherente: el Nv1 es para Pokémon básicos y evoluciones sin regla especial.
+- Las restricciones de ataque cuestan unos 10 puntos de victoria, y no se pueden ignorar en la calibración.
+- El límite de nivel es un salto brusco: de X ≤ 750 (Nv3, ≈ 72 %) a X = 850 (Nv4, ≈ 8 %).
+- Los HP reales dependen de la carta (130 a 350), no del ataque. La hipótesis `60 + 0,6 × ataque` queda descartada; la calibración de §8.2 hay que rehacerla con cartas reales.
+- Pendiente de confirmar con el PDF oficial de instrucciones: si el coste de Energía se ignora, y qué pasa con los ataques cuyo daño depende de la Energía.
 
 ### 8.4 Pendiente
 
