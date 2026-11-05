@@ -39,4 +39,4 @@ La dificultad del Nv4 sale del jefe (más HP y más ataques por turno), no de da
 ## 5. Cambios en otros documentos
 
 - `incursiones_gdd.md` pasa a v0.8: fila "Nº de Pokémon por jugador" fija en 2, regla de X < 250 y HP de referencia recalibrado (2382 / 4313 / 4411 / 5205).
-- `docs/D-03-sistema-de-poder.md`: ya asumía 4 parejas de 2 Pokémon; el Nv4 propuesto con 3 Pokémon queda descartado.
+- `docs/D-03-sistema-de-poder.md`: ya asumía 4 parejas de 2 Pokémon; la nota sobre simular el Nv4 con 3 Pokémon se ha retirado.
