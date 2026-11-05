@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 0.6 (borrador de trabajo)
+**Versión:** 0.8 (borrador de trabajo)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4, cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -20,11 +20,11 @@ No existe mazo del que robar cartas — cada jugador participa con un número fi
 
 | Parámetro | Quién lo decide | Notas |
 |---|---|---|
-| Nivel del jefe | **Calculado automáticamente** | X = suma, de todos los jugadores, del **ataque base más fuerte de cada jugador** (se cuenta un solo valor por jugador, el mayor entre sus Pokémon; igual que el juego oficial). `X < 400` → Nv1 · `400 ≤ X < 600` → Nv2 · `600 ≤ X < 800` → Nv3 · `X ≥ 800` → Nv4. Detalle y justificación en `docs/D-03-sistema-de-poder.md` |
+| Nivel del jefe | **Calculado automáticamente** | X = suma, de todos los jugadores, del **ataque base más fuerte de cada jugador** (se cuenta un solo valor por jugador, el mayor entre sus Pokémon; igual que el juego oficial). `X < 400` → Nv1 · `400 ≤ X < 600` → Nv2 · `600 ≤ X < 800` → Nv3 · `X ≥ 800` → Nv4; un `X` menor de 250 se juega también como Nv1 (no hay nivel inferior). Detalle y justificación en `docs/D-03-sistema-de-poder.md` |
 | Jefe | Elegido **a mano o al azar dentro del nivel calculado** | Catálogo oficial de jefes (datos versionados, se amplía con actualizaciones). Cada jefe es una **carta fija**: tiene su propio HP y sus propios ataques, y no se escalan según los jugadores. El nivel indica la dificultad, no un HP concreto: un jefe con poco HP y mucho daño también puede ser Nv3. Lanzamiento: 2 jefes en cada uno de Nv1-Nv3 y 1 en Nv4. El asistente conoce el HP y el daño de cada ataque, pero **no** computa los efectos de texto de sus ataques. |
 | Nº de jugadores | Automático (según quién juega) | Contribuye al cálculo de X, pero no fija el HP del jefe directamente (ver fila siguiente). El formato está pensado para **3-4 jugadores**; con 1-2 es más difícil (decisión de diseño, v0.6) |
-| HP del jefe | Fijo, el de su carta | No escala con el nº de jugadores ni con X. Referencia de HP por nivel (calibrada con el simulador para un objetivo de victoria de 75 / 50 / 30 / 15 %; cercana a la oficial 1600 / 2200 / 3000 en Nv1-Nv3, propuesta para Nv4): 1700 / 2400 / 3300 / 4400. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md` |
-| Nº de Pokémon por jugador | Determinado por el nivel del jefe | Niveles 1-3: 1 Activo + 1 Banca (2 total). Nivel 4: 1 Activo + 2 Banca (3 total) |
+| HP del jefe | Fijo, el de su carta | No escala con el nº de jugadores ni con X. Referencia de HP por nivel (calibrada con el simulador para un objetivo de victoria de 75 / 50 / 30 / 15 %; recalibrada con cartas reales en D-03 §8.4): 2382 / 4313 / 4411 / 5205 en Nv1 / Nv2 / Nv3 / Nv4. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md` |
+| Nº de Pokémon por jugador | **Fijo: 2 en todos los niveles** | 1 Activo + 1 Banca. Como el juego oficial. Al no depender del nivel, no hay circularidad: cada jugador elige sus 2 Pokémon, se calcula X y de X sale el nivel. Orden del setup en `docs/D-01-setup.md` |
 
 ---
 
@@ -139,7 +139,6 @@ FIN (VICTORIA / DERROTA)
 
 Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 
-- **D-01** Setup circular: el nivel depende de X, pero el nº de Pokémon por jugador (2 o 3) depende del nivel.
 - **D-02** Qué cuenta como "ataque base" para X y quién lo introduce.
 - **D-10** Sistema de puntos (qué puntúa, reparto y cómo se guarda).
 - **D-03** Validar la tabla de niveles y el Nv4 propuesto (primer simulador hecho; falta medir la vida de los Pokémon en playtest, T-17).
@@ -171,3 +170,4 @@ Reabierto en v0.6 al replantear el balance. Pendientes (tarjetas del tablero):
 | v0.5 | Cerrada la última pregunta abierta (habilidades de aliados): son efectos resueltos físicamente en la mesa (reducir/aumentar daño del jefe, forzar banca al atacante, etc.), el asistente no las computa. **No quedan decisiones de diseño pendientes** para la v1 + Incursiones descritas en este documento. |
 | v0.6 | Balance de jefes: X se calcula como en el juego oficial (ataque base más fuerte de cada jugador, no de cada Pokémon). El jefe es una carta fija de un catálogo oficial, elegida a mano o al azar dentro del nivel, con HP de referencia 1600/2200/3000 (oficial Nv1-Nv3) y ~3750 (propuesta Nv4). Lanzamiento con 7 jefes (2+2+2+1). Formato pensado para 3-4 jugadores. Se añade `docs/D-03-sistema-de-poder.md` (fórmula de poder: HP × amenaza ≈ 1,5 × X²) y se reabren decisiones de setup y puntos en §7. |
 | v0.7 | Regla de derrota confirmada: solo se pierde cuando no queda ningún Pokémon en pie en toda la mesa (8 KO con 4 jugadores y 2 Pokémon). No se adopta el límite oficial de 4 KO. Primer simulador de balance en `sim/` y resultados en `docs/D-03-sistema-de-poder.md` §8. Objetivo de victoria 75 / 50 / 30 / 15 % y HP de referencia recalibrados a 1700 / 2400 / 3300 / 4400. |
+| v0.8 | Setup sin circularidad (D-01): cada jugador usa 2 Pokémon en todos los niveles, incluido el Nv4 (como el juego oficial). Un X menor de 250 se juega como Nv1. HP de referencia por nivel recalibrado con cartas reales (D-03 §8.4). Se añade `docs/D-01-setup.md`. |
