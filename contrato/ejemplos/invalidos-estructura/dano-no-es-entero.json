@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "partidaId": "ejemplo-dano-texto",
+  "eventos": [
+    { "tipo": "configurarJugadores", "jugadores": [ { "nombre": "Ana", "ataqueMaximo": 100 } ] },
+    { "tipo": "elegirJefe", "nombre": "Jefe", "nivel": 1, "hp": 500 },
+    { "tipo": "turnoJugador", "jugador": 0, "dano": "cien" }
+  ]
+}

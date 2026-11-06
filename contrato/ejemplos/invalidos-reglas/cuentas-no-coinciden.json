@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "partidaId": "ejemplo-cuentas-no-coinciden",
+  "cuentas": ["usuario-ana"],
+  "eventos": [
+    { "tipo": "configurarJugadores", "jugadores": [
+      { "nombre": "Ana", "ataqueMaximo": 100 },
+      { "nombre": "Bea", "ataqueMaximo": 100 }
+    ] }
+  ]
+}

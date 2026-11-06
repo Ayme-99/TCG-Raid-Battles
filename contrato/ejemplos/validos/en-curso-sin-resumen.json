@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "partidaId": "ejemplo-en-curso",
+  "eventos": [
+    { "tipo": "configurarJugadores", "jugadores": [ { "nombre": "Ana", "ataqueMaximo": 150 } ] },
+    { "tipo": "elegirJefe", "nombre": "Jefe sin catálogo", "nivel": 1, "hp": 2000 },
+    { "tipo": "turnoJugador", "jugador": 0, "dano": 150 }
+  ]
+}

@@ -111,7 +111,7 @@ class PuntosJugador {
         'asiento': asiento,
         'nombre': nombre,
         'dano': dano,
-        'pokemon_perdidos': pokemonPerdidos,
+        'pokemonPerdidos': pokemonPerdidos,
         'puesto': puesto,
         'porcentaje': porcentaje,
         'puntos': puntos,
@@ -143,9 +143,9 @@ class PuntosPartida {
   Map<String, Object?> toJson() => {
         'nivel': nivel,
         'resultado': resultado.name,
-        'dano_total': danoTotal,
-        'coeficiente_y': coeficienteY,
-        'puntos_total': puntosTotal,
+        'danoTotal': danoTotal,
+        'coeficienteY': coeficienteY,
+        'puntosTotal': puntosTotal,
         'jugadores': [for (final j in jugadores) j.toJson()],
       };
 }

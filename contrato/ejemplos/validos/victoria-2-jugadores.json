@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "partidaId": "ejemplo-victoria-2-jugadores",
+  "creadaEn": "2026-11-06T09:30:00Z",
+  "cuentas": ["usuario-ana", null],
+  "eventos": [
+    { "tipo": "configurarJugadores", "jugadores": [
+      { "nombre": "Ana", "ataqueMaximo": 100 },
+      { "nombre": "Bea", "ataqueMaximo": 100 }
+    ] },
+    { "tipo": "elegirJefe", "jefeId": "ejemplo-nv1", "nombre": "Jefe de ejemplo", "nivel": 1, "hp": 300 },
+    { "tipo": "turnoJugador", "jugador": 0, "dano": 120 },
+    { "tipo": "turnoJugador", "jugador": 1, "dano": 100 },
+    { "tipo": "ataqueJefe", "ranura": 2, "dano": 60, "jugador": 1 },
+    { "tipo": "finTurnoJefe" },
+    { "tipo": "turnoJugador", "jugador": 0, "dano": 80 }
+  ],
+  "resumen": {
+    "jefeId": "ejemplo-nv1",
+    "nivel": 1,
+    "resultado": "victoria",
+    "danoTotal": 300,
+    "coeficienteY": 10.0,
+    "puntosTotal": 3000,
+    "jugadores": [
+      { "asiento": 0, "nombre": "Ana", "dano": 200, "pokemonPerdidos": 0, "puesto": 1, "porcentaje": 55, "puntos": 1650, "abonado": true },
+      { "asiento": 1, "nombre": "Bea", "dano": 100, "pokemonPerdidos": 0, "puesto": 2, "porcentaje": 45, "puntos": 1350, "abonado": false }
+    ]
+  }
+}

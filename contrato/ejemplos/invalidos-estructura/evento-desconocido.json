@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "partidaId": "ejemplo-evento-desconocido",
+  "eventos": [
+    { "tipo": "configurarJugadores", "jugadores": [ { "nombre": "Ana", "ataqueMaximo": 100 } ] },
+    { "tipo": "teletransportar", "jugador": 0 }
+  ]
+}
