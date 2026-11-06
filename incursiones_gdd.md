@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.2 (especificación del motor)
+**Versión:** 1.3 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -141,6 +141,8 @@ El jefe puede curarse sin límite de veces, sin pasar nunca de su HP máximo ini
 
 No existe el empate: o gana el equipo o pierde (abandonar cuenta como derrota).
 
+**Orden de comprobación (D-08, `docs/D-08-orden-fin-de-partida.md`).** El fin de partida se evalúa tras cada evento registrado y la primera condición que se cumple termina la partida: a partir de ahí no se acepta ningún evento más, así que no puede acabar a la vez en victoria y derrota. Si un mismo efecto deja al jefe a 0 HP y elimina al último Pokémon de la mesa (retroceso, veneno, quemadura), **gana la victoria**: la mesa registra primero el daño al jefe y después los KO de los jugadores. El daño al jefe fuera de turno se registra como daño del jugador que lo causó y cuenta para sus puntos.
+
 Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO con 4 jugadores). No se adopta el límite oficial de 4 KO.
 
 ---
@@ -250,3 +252,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.0 | T-02: el GDD pasa a ser la especificación del motor. Consolida D-01, D-02, D-04, D-05, D-10 y D-11 en un solo documento sin contradicciones: se eliminan las secciones de decisiones pendientes y el estado «implementado» del motor (§6.1 antiguo), se añaden las reglas detalladas (§4), los puntos (§7), la identidad (§8), la tabla de valores provisionales (§9) y el índice de documentos de apoyo (§11). |
 | v1.1 | D-07 cerrada: la invocación de aliados la define cada jefe (umbral de HP perdidos, moneda y dado de slot, lista de aliados); se intenta en cuanto el HP del jefe cruza un umbral, cada umbral una sola vez, y el aliado ataca al entrar y al final del turno del jefe contra el dueño de su slot. Las habilidades de aliados son pasivas. El exceso de daño a un aliado se pierde. Ver `docs/D-04-aliados.md` §3, §6 y §7. |
 | v1.2 | D-06 cerrada: la curación del jefe sigue sin límite y sin tope de rondas (toda partida acaba por KO o abandono); abandonar cuenta como derrota y no existe el empate; los puntos de una derrota usan la vida perdida por el jefe (neto), no el daño bruto. Se añade `docs/D-06-curacion-del-jefe.md`. |
+| v1.3 | D-08 cerrada: el fin de partida se evalúa tras cada evento registrado; si un efecto deja al jefe a 0 HP y elimina al último Pokémon de la mesa a la vez, gana la victoria (se registra primero el daño al jefe); el daño al jefe fuera de turno cuenta como daño del jugador que lo causó. Propuesta abierta: veneno y quemadura como estado en el asistente. |
