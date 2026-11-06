@@ -27,9 +27,11 @@ Este proyecto no incluye las carpetas de plataforma (`android/`, `windows/`...),
 
 ```
 cd app
-flutter create . --org dev.ayme99 --project-name incursiones_app --platforms=android,windows
+flutter create . --org dev.ayme99 --project-name incursiones_app --platforms=android,windows,web
 git status        # revisa que no haya tocado lib/ ni test/; si lo hizo: git checkout -- lib test
 flutter pub get
 flutter test
 flutter run
 ```
+
+La versión web (`flutter run -d chrome`) funciona igual, pero **sin conexión no funciona**: la cola offline de envío (T-09) es solo para Android y Windows. El CI compila la web en cada cambio (`flutter build web`).

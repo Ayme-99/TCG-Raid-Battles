@@ -56,3 +56,21 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+
+  web:
+    name: App web (flutter build web)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      # El repo no lleva las carpetas de plataforma: se generan aquí, solo
+      # para comprobar que la app compila para web.
+      - run: flutter create . --org dev.ayme99 --project-name incursiones_app --platforms=web
+      - run: flutter pub get
+      - run: flutter build web --release
