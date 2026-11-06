@@ -47,7 +47,7 @@ function crearRepoMemoria() {
       for (const f of filas.values()) {
         if (f.cuentaId !== cuentaId) continue;
         partidasJugadas += 1;
-        if (f.abonado) puntos += f.puntos;
+        if (f.abonado) puntos += f.puntos + (f.bonoEstados ?? 0);
       }
       return { puntos, partidas: partidasJugadas };
     },

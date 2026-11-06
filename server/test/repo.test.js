@@ -41,6 +41,15 @@ function pruebasDeRepo(nombre, crear, opciones = {}) {
     assert.deepStrictEqual(await repo.puntosDe('nadie'), { puntos: 0, partidas: 0 });
   });
 
+  test(`${nombre}: puntosDe suma también el bono de estados`, opciones, async (t) => {
+    const repo = await crear(t);
+    const conBono = { ...fila('p1', 0, 'a', 100, true, 't1'), bonoEstados: 30 };
+    const invitado = { ...fila('p2', 0, 'a', 100, false, 't2'), bonoEstados: 60 };
+    await repo.guardarPartida({ partida: partida('p1', 't1'), jugadores: [conBono] });
+    await repo.guardarPartida({ partida: partida('p2', 't2'), jugadores: [invitado] });
+    assert.deepStrictEqual(await repo.puntosDe('a'), { puntos: 130, partidas: 2 });
+  });
+
   test(`${nombre}: obtenerPartida devuelve null si no existe`, opciones, async (t) => {
     const repo = await crear(t);
     assert.strictEqual(await repo.obtenerPartida('x'), null);

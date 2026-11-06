@@ -1,6 +1,6 @@
 'use strict';
 const express = require('express');
-const { crearValidador, VERSION_SOPORTADA } = require('./esquema');
+const { crearValidador, VERSIONES_SOPORTADAS } = require('./esquema');
 const { comprobarCoherencia, abonos } = require('./coherencia');
 const { COSTE_DESBLOQUEO } = require('./puntos');
 
@@ -50,6 +50,7 @@ function resumenDeFila(f) {
     miAsiento: f.asiento,
     miPuesto: f.puesto,
     misPuntos: f.puntos,
+    bonoEstados: f.bonoEstados ?? 0,
     abonado: f.abonado,
   };
 }
@@ -96,9 +97,9 @@ function crearRouter({
     if (!registro || typeof registro !== 'object' || Array.isArray(registro)) {
       return error(res, 400, 'estructura_invalida', 'el cuerpo debe ser un registro de partida');
     }
-    if (registro.version !== VERSION_SOPORTADA) {
+    if (!VERSIONES_SOPORTADAS.includes(registro.version)) {
       return error(res, 400, 'version_no_soportada',
-        `este servidor entiende la versión ${VERSION_SOPORTADA} del registro`,
+        `este servidor entiende las versiones ${VERSIONES_SOPORTADAS.join(' y ')} del registro`,
         { version: registro.version ?? null });
     }
     const errores = validar(registro);
@@ -144,7 +145,7 @@ function crearRouter({
       partidaId: partida.partidaId,
       guardadaEn: partida.guardadaEn,
       duplicada: !creada,
-      tusPuntos: mia.abonado ? mia.puntos : 0,
+      tusPuntos: mia.abonado ? mia.puntos + mia.bonoEstados : 0,
     });
   }));
 

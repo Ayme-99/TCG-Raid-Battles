@@ -75,7 +75,9 @@ function crearRepoMongo(db) {
           {
             $group: {
               _id: null,
-              puntos: { $sum: { $cond: ['$abonado', '$puntos', 0] } },
+              puntos: {
+                $sum: { $cond: ['$abonado', { $add: ['$puntos', { $ifNull: ['$bonoEstados', 0] }] }, 0] },
+              },
               partidas: { $sum: 1 },
             },
           },
