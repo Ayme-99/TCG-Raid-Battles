@@ -16,6 +16,7 @@ EstadoPartida apply(EstadoPartida estado, Evento evento) {
     PokemonKo ev => _pokemonKo(estado, ev),
     CartaAnimoRobada ev => _cartaAnimo(estado, ev),
     FinTurnoJefe() => _finTurnoJefe(estado),
+    Abandonar() => _abandonar(estado),
   };
 }
 
@@ -272,4 +273,16 @@ EstadoPartida _cartaAnimo(EstadoPartida e, CartaAnimoRobada ev) {
 EstadoPartida _finTurnoJefe(EstadoPartida e) {
   _exigeFase(e, Fase.turnoJefe, 'FinTurnoJefe');
   return _empezarRonda(e);
+}
+
+EstadoPartida _abandonar(EstadoPartida e) {
+  if (e.fase != Fase.turnoJugadores && e.fase != Fase.turnoJefe) {
+    _error('Abandonar no es válido en la fase ${e.fase.name}');
+  }
+  return e.copiarCon(
+    fase: Fase.terminada,
+    resultado: Resultado.derrota,
+    prioridad: const [],
+    cartasAnimoPendientes: const [],
+  );
 }

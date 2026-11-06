@@ -4,6 +4,7 @@ import 'package:test/test.dart';
 import 'ayudas.dart';
 
 void main() {
+  abandonarTests();
   group('eliminación de jugadores', () {
     test('un solo KO deja al jugador en juego con un Pokémon', () {
       var s = todosActuan(empezar());
@@ -144,6 +145,42 @@ void main() {
       s = aplicarTodos(s, const [PokemonKo(0), PokemonKo(0)]);
       expect(s.jefe!.hp, 380);
       expect(s.resultado, Resultado.derrota);
+    });
+  });
+}
+
+void abandonarTests() {
+  group('abandonar', () {
+    test('termina en derrota con el daño hecho', () {
+      var s = empezar(ataques: const [100, 100], hp: 2382);
+      s = apply(s, const TurnoJugador(jugador: 0, dano: 600));
+      s = apply(s, const Abandonar());
+      expect(s.terminada, isTrue);
+      expect(s.resultado, Resultado.derrota);
+      expect(s.jefe!.hp, 1782);
+    });
+
+    test('se puede abandonar en el turno del jefe', () {
+      final s = apply(todosActuan(empezar()), const Abandonar());
+      expect(s.resultado, Resultado.derrota);
+    });
+
+    test('los puntos son los de una derrota', () {
+      var s = empezar(ataques: const [100, 100], hp: 2382);
+      s = apply(s, const TurnoJugador(jugador: 0, dano: 600));
+      s = apply(s, const TurnoJugador(jugador: 1, dano: 400));
+      s = apply(s, const Abandonar());
+      expect(calcularPuntos(s).puntosTotal, 316);
+    });
+
+    test('no vale antes de empezar ni después de terminar', () {
+      expect(() => apply(EstadoPartida.inicial(), const Abandonar()),
+          throwsA(isA<ReglaIncumplida>()));
+      expect(() => apply(configurar([100]), const Abandonar()),
+          throwsA(isA<ReglaIncumplida>()));
+      final fin = apply(empezar(), const Abandonar());
+      expect(() => apply(fin, const Abandonar()),
+          throwsA(isA<ReglaIncumplida>()));
     });
   });
 }
