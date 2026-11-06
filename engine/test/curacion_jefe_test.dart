@@ -80,6 +80,7 @@ void main() {
       var s = empezar(ataques: const [100], hp: 2382);
       s = apply(s, const TurnoJugador(jugador: 0, dano: 1000));
       s = apply(s, const CuracionJefe(1000));
+      s = apply(s, const FinTurnoJefe());
       s = apply(s, const TurnoJugador(jugador: 0, dano: 2382));
       expect(s.resultado, Resultado.victoria);
       expect(calcularPuntos(s).puntosTotal, 3000);
