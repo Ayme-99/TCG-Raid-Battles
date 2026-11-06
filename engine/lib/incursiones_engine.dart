@@ -11,3 +11,4 @@ export 'src/motor.dart';
 export 'src/puntos.dart';
 export 'src/registro.dart';
 export 'src/reglas.dart';
+export 'src/scripts_aliado.dart';

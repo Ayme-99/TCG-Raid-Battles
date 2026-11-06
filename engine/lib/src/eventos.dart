@@ -144,23 +144,46 @@ final class SinInvocacion extends Evento {
   const SinInvocacion();
 }
 
-/// La mesa resuelve un intento de invocación con un aliado nuevo en [slot].
+/// Categoría de un aliado del jefe (D-13). Cada jefe tiene un aliado por
+/// categoría y no puede haber dos de la misma categoría a la vez.
+enum CategoriaAliado { danio, barrera, cura, picaro }
+
+/// Quién aplica los efectos de la carta de un aliado (D-13).
+enum EfectosAliado {
+  /// Los resuelve la mesa; el asistente solo los registra.
+  jugador,
+
+  /// Los ejecuta el programa con un script identificado por `scriptId`.
+  programa,
+}
+
+/// La mesa resuelve un intento de invocación con un aliado nuevo en [slot] y
+/// de la categoría [categoria] (D-13). Los dos salen de dados que tira la mesa
+/// sin repetir slots ni categorías en uso.
 /// [ataqueDano] null: el aliado no tiene ataque.
+/// [efectos] indica quién aplica los efectos de su carta; si es
+/// [EfectosAliado.programa], [scriptId] es el script que los ejecuta.
 final class AliadoInvocado extends Evento {
   final int slot;
+  final CategoriaAliado categoria;
   final String nombre;
   final int hp;
   final String? ataqueNombre;
   final int? ataqueDano;
   final String? habilidad;
+  final EfectosAliado efectos;
+  final String? scriptId;
 
   const AliadoInvocado({
     required this.slot,
+    required this.categoria,
     required this.nombre,
     required this.hp,
     this.ataqueNombre,
     this.ataqueDano,
     this.habilidad,
+    this.efectos = EfectosAliado.jugador,
+    this.scriptId,
   });
 }
 

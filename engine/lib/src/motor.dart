@@ -2,12 +2,19 @@ import 'errores.dart';
 import 'estado.dart';
 import 'eventos.dart';
 import 'reglas.dart';
+import 'scripts_aliado.dart';
 
 /// Aplica un evento al estado y devuelve un estado nuevo.
 ///
 /// No modifica el estado recibido. Si el evento no es válido en este momento
 /// lanza [ReglaIncumplida] y el estado queda como estaba.
-EstadoPartida apply(EstadoPartida estado, Evento evento) {
+///
+/// [scripts] son los efectos de aliados que ejecuta el programa (D-13).
+EstadoPartida apply(
+  EstadoPartida estado,
+  Evento evento, {
+  Map<String, ScriptAliado> scripts = scriptsAliado,
+}) {
   return switch (evento) {
     ConfigurarJugadores ev => _configurar(estado, ev),
     ElegirJefe ev => _elegirJefe(estado, ev),
@@ -15,12 +22,12 @@ EstadoPartida apply(EstadoPartida estado, Evento evento) {
     AtaqueJefe ev => _ataqueJefe(estado, ev),
     PokemonKo ev => _pokemonKo(estado, ev),
     CartaAnimoRobada ev => _cartaAnimo(estado, ev),
-    FinTurnoJefe ev => _finTurnoJefe(estado, ev),
+    FinTurnoJefe ev => _finTurnoJefe(estado, ev, scripts),
     AplicarEstadoJefe ev => _aplicarEstadoJefe(estado, ev),
     CuracionJefe ev => _curacionJefe(estado, ev),
     AtaqueAAliado ev => _ataqueAAliado(estado, ev),
     SinInvocacion() => _sinInvocacion(estado),
-    AliadoInvocado ev => _aliadoInvocado(estado, ev),
+    AliadoInvocado ev => _aliadoInvocado(estado, ev, scripts),
     AtaqueAliado ev => _ataqueAliado(estado, ev),
     Abandonar() => _abandonar(estado),
   };
@@ -320,7 +327,32 @@ EstadoPartida _cartaAnimo(EstadoPartida e, CartaAnimoRobada ev) {
   );
 }
 
-EstadoPartida _finTurnoJefe(EstadoPartida e, FinTurnoJefe ev) {
+/// Ejecuta el script de cada aliado vivo que lo tenga, en el momento
+/// indicado por [momento]. Un script no puede terminar la partida.
+EstadoPartida _ejecutarScripts(
+  EstadoPartida e,
+  Map<String, ScriptAliado> scripts,
+  EfectoAliado? Function(ScriptAliado) momento,
+) {
+  var estado = e;
+  for (final aliado in e.aliados) {
+    final id = aliado.scriptId;
+    if (aliado.efectos != EfectosAliado.programa || id == null) continue;
+    final efecto = momento(scripts[id]!);
+    if (efecto == null) continue;
+    estado = efecto(estado, aliado);
+    if (estado.fase != e.fase) {
+      _error('el script «$id» no puede terminar la partida');
+    }
+  }
+  return estado;
+}
+
+EstadoPartida _finTurnoJefe(
+  EstadoPartida e,
+  FinTurnoJefe ev,
+  Map<String, ScriptAliado> scripts,
+) {
   _exigeFase(e, Fase.turnoJefe, 'FinTurnoJefe');
   _exigeSinPendientes(e, 'FinTurnoJefe');
   final jefe = e.jefe!;
@@ -333,14 +365,17 @@ EstadoPartida _finTurnoJefe(EstadoPartida e, FinTurnoJefe ev) {
   }
   // Chequeo de estados (D-12): veneno y quemadura bajan el HP del jefe sin
   // atribuirse a ningún jugador. Si lo dejan a 0 HP, victoria.
-  var estado = e;
-  final dano = (jefe.envenenado ? danoVeneno : 0) + (jefe.quemado ? danoQuemadura : 0);
+  // Antes, los efectos de los aliados que aplica el programa (D-13).
+  var estado = _ejecutarScripts(e, scripts, (s) => s.alFinTurnoJefe);
+  final jefeActual = estado.jefe!;
+  final dano = (jefeActual.envenenado ? danoVeneno : 0) +
+      (jefeActual.quemado ? danoQuemadura : 0);
   if (dano > 0) {
-    final aplicado = dano < jefe.hp ? dano : jefe.hp;
-    final nuevoHp = jefe.hp - aplicado;
-    estado = e.copiarCon(
-      jefe: jefe.conHp(nuevoHp),
-      danoEstados: e.danoEstados + aplicado,
+    final aplicado = dano < jefeActual.hp ? dano : jefeActual.hp;
+    final nuevoHp = jefeActual.hp - aplicado;
+    estado = estado.copiarCon(
+      jefe: jefeActual.conHp(nuevoHp),
+      danoEstados: estado.danoEstados + aplicado,
     );
     if (nuevoHp <= 0) {
       return estado.copiarCon(
@@ -453,7 +488,11 @@ EstadoPartida _sinInvocacion(EstadoPartida e) {
   );
 }
 
-EstadoPartida _aliadoInvocado(EstadoPartida e, AliadoInvocado ev) {
+EstadoPartida _aliadoInvocado(
+  EstadoPartida e,
+  AliadoInvocado ev,
+  Map<String, ScriptAliado> scripts,
+) {
   _exigeResolverInvocacion(e, 'AliadoInvocado');
   if (ev.slot < 0 || ev.slot >= e.jugadores.length) {
     _error('el slot ${ev.slot} no existe');
@@ -464,6 +503,20 @@ EstadoPartida _aliadoInvocado(EstadoPartida e, AliadoInvocado ev) {
   if (e.aliadoEn(ev.slot) != null) {
     _error('el slot ${ev.slot} ya tiene un aliado');
   }
+  if (e.aliados.any((a) => a.categoria == ev.categoria)) {
+    _error('ya hay un aliado de la categoría ${ev.categoria.name}');
+  }
+  if (ev.efectos == EfectosAliado.programa) {
+    final id = ev.scriptId;
+    if (id == null) {
+      _error('un aliado con efectos del programa necesita un scriptId');
+    }
+    if (!scripts.containsKey(id)) {
+      _error('no existe el script «$id» de los efectos del aliado');
+    }
+  } else if (ev.scriptId != null) {
+    _error('un aliado con efectos del jugador no lleva scriptId');
+  }
   if (ev.hp <= 0) {
     _error('el HP del aliado debe ser mayor que 0');
   }
@@ -473,19 +526,30 @@ EstadoPartida _aliadoInvocado(EstadoPartida e, AliadoInvocado ev) {
   }
   final aliado = AliadoEstado(
     slot: ev.slot,
+    categoria: ev.categoria,
     nombre: ev.nombre,
     hpMaximo: ev.hp,
     hp: ev.hp,
     ataqueNombre: ev.ataqueNombre,
     ataqueDano: dano,
     habilidad: ev.habilidad,
+    efectos: ev.efectos,
+    scriptId: ev.scriptId,
     // Sin ataque no hay ataque de entrada que esperar.
     entradaResuelta: dano == null,
   );
-  return e.copiarCon(
+  final nuevo = e.copiarCon(
     aliados: [...e.aliados, aliado],
     intentosInvocacionPendientes: e.intentosInvocacionPendientes - 1,
   );
+  if (aliado.efectos != EfectosAliado.programa) return nuevo;
+  final alEntrar = scripts[aliado.scriptId]!.alEntrar;
+  if (alEntrar == null) return nuevo;
+  final resultado = alEntrar(nuevo, aliado);
+  if (resultado.fase != nuevo.fase) {
+    _error('el script «${aliado.scriptId}» no puede terminar la partida');
+  }
+  return resultado;
 }
 
 EstadoPartida _ataqueAliado(EstadoPartida e, AtaqueAliado ev) {

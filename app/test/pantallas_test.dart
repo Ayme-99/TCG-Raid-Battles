@@ -223,6 +223,7 @@ void main() {
     expect(c.read(estadoProvider).intentosInvocacionPendientes, 1);
 
     await tocar(tester, 'invocar-aliado');
+    await tocar(tester, 'aliado-categoria-cura');
     await tester.enterText(find.byKey(const Key('aliado-nombre')), 'Pikachu');
     await tester.enterText(
       find.descendant(
@@ -237,6 +238,7 @@ void main() {
     expect(estado.intentosInvocacionPendientes, 0);
     expect(estado.aliados.single.nombre, 'Pikachu');
     expect(estado.aliados.single.slot, 0);
+    expect(estado.aliados.single.categoria, CategoriaAliado.cura);
     expect(find.text('Turno de Jugador 2'), findsOneWidget);
   });
 

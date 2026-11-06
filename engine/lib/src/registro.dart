@@ -9,11 +9,11 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 2;
+const int versionRegistro = 3;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {1: _v1AV2};
+    _migraciones = {1: _v1AV2, 2: _v2AV3};
 
 /// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
 /// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
@@ -39,6 +39,31 @@ Map<String, Object?> _v1AV2(Map<String, Object?> datos) {
       ];
     }
     resultado['resumen'] = nuevo;
+  }
+  return resultado;
+}
+
+/// Versión 3 (D-13): aliados por categoría. Cada `aliadoInvocado` gana
+/// `categoria`. Las partidas antiguas no la tenían, así que se asigna una por
+/// orden de invocación (danio, barrera, cura, picaro y vuelta a empezar):
+/// solo sirve para poder leerlas, no refleja lo que pasó en la mesa.
+Map<String, Object?> _v2AV3(Map<String, Object?> datos) {
+  final resultado = Map<String, Object?>.of(datos);
+  resultado['version'] = 3;
+  final eventos = datos['eventos'];
+  if (eventos is List) {
+    var invocados = 0;
+    resultado['eventos'] = [
+      for (final e in eventos)
+        if (e is Map && e['tipo'] == 'aliadoInvocado' && !e.containsKey('categoria'))
+          {
+            ...Map<String, Object?>.from(e),
+            'categoria': CategoriaAliado
+                .values[invocados++ % CategoriaAliado.values.length].name,
+          }
+        else
+          e,
+    ];
   }
   return resultado;
 }
@@ -105,11 +130,14 @@ Map<String, Object?> eventoAJson(Evento evento) {
     AliadoInvocado ev => {
         'tipo': 'aliadoInvocado',
         'slot': ev.slot,
+        'categoria': ev.categoria.name,
         'nombre': ev.nombre,
         'hp': ev.hp,
         if (ev.ataqueNombre != null) 'ataqueNombre': ev.ataqueNombre,
         if (ev.ataqueDano != null) 'ataqueDano': ev.ataqueDano,
         if (ev.habilidad != null) 'habilidad': ev.habilidad,
+        if (ev.efectos != EfectosAliado.jugador) 'efectos': ev.efectos.name,
+        if (ev.scriptId != null) 'scriptId': ev.scriptId,
       },
     AtaqueAliado ev => {
         'tipo': 'ataqueAliado',
@@ -196,19 +224,27 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
       c.permitir({
         'tipo',
         'slot',
+        'categoria',
         'nombre',
         'hp',
         'ataqueNombre',
         'ataqueDano',
         'habilidad',
+        'efectos',
+        'scriptId',
       });
       return AliadoInvocado(
         slot: c.entero('slot', min: 0, max: 3),
+        categoria: c.enumerado('categoria', CategoriaAliado.values),
         nombre: c.texto('nombre'),
         hp: c.entero('hp', min: 1),
         ataqueNombre: c.textoOpt('ataqueNombre'),
         ataqueDano: c.enteroOpt('ataqueDano', min: 0),
         habilidad: c.textoOpt('habilidad'),
+        efectos: c.textoOpt('efectos') == null
+            ? EfectosAliado.jugador
+            : c.enumerado('efectos', EfectosAliado.values),
+        scriptId: c.textoOpt('scriptId'),
       );
     case 'ataqueAliado':
       c.permitir({'tipo', 'slot', 'dano', 'objetivo'});
