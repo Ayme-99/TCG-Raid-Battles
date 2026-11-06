@@ -4,7 +4,13 @@ const path = require('node:path');
 const Ajv2020 = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
 
-const CARPETA_CONTRATO = path.join(__dirname, '..', '..', 'contrato');
+// En el monorepo los esquemas están en `contrato/` (dos niveles arriba). Al
+// exportar el módulo a otro repo (scripts/exportar.js) viajan en `./contrato`.
+const CARPETA_CONTRATO = [
+  path.join(__dirname, '..', '..', 'contrato'),
+  path.join(__dirname, 'contrato'),
+].find((c) => fs.existsSync(path.join(c, 'partida.v2.schema.json')))
+  ?? path.join(__dirname, '..', '..', 'contrato');
 
 // Versiones del registro que entiende este servidor (contrato/README.md). Las
 // antiguas se siguen aceptando: hay clientes que aún las envían.
