@@ -28,7 +28,15 @@ final class ElegirJefe extends Evento {
   final int nivel;
   final int hp;
 
-  const ElegirJefe({required this.nombre, required this.nivel, required this.hp});
+  /// Cada cuántos HP perdidos hay un intento de invocación. null: no invoca.
+  final int? invocacionCadaHp;
+
+  const ElegirJefe({
+    required this.nombre,
+    required this.nivel,
+    required this.hp,
+    this.invocacionCadaHp,
+  });
 }
 
 /// Turno de un jugador: daño que ha hecho al jefe (0 si no le ha dañado,
@@ -89,4 +97,56 @@ final class Abandonar extends Evento {
 final class CuracionJefe extends Evento {
   final int cantidad;
   const CuracionJefe(this.cantidad);
+}
+
+/// Un jugador ataca a un aliado (en lugar de al jefe) y gasta su turno.
+/// Cualquier jugador puede atacar a cualquier aliado. El exceso de daño se
+/// pierde y el daño a aliados no cuenta para los puntos.
+final class AtaqueAAliado extends Evento {
+  final int jugador;
+  final int slot;
+  final int dano;
+
+  const AtaqueAAliado({
+    required this.jugador,
+    required this.slot,
+    required this.dano,
+  });
+}
+
+/// La mesa resuelve un intento de invocación sin aliado (la moneda no salió
+/// cara o no quedan slots libres).
+final class SinInvocacion extends Evento {
+  const SinInvocacion();
+}
+
+/// La mesa resuelve un intento de invocación con un aliado nuevo en [slot].
+/// [ataqueDano] null: el aliado no tiene ataque.
+final class AliadoInvocado extends Evento {
+  final int slot;
+  final String nombre;
+  final int hp;
+  final String? ataqueNombre;
+  final int? ataqueDano;
+  final String? habilidad;
+
+  const AliadoInvocado({
+    required this.slot,
+    required this.nombre,
+    required this.hp,
+    this.ataqueNombre,
+    this.ataqueDano,
+    this.habilidad,
+  });
+}
+
+/// Ataque de un aliado: al entrar y una vez en cada turno del jefe.
+/// [objetivo] null: ataca al dueño de su slot. Si el dueño está eliminado
+/// hay que indicar el jugador activo que salió en la tirada.
+final class AtaqueAliado extends Evento {
+  final int slot;
+  final int dano;
+  final int? objetivo;
+
+  const AtaqueAliado({required this.slot, required this.dano, this.objetivo});
 }

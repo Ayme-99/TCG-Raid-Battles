@@ -31,15 +31,64 @@ List<Evento> _partidaAleatoria(int semilla) {
     for (var i = 0; i < n; i++)
       ConfigJugador(nombre: 'J$i', ataqueMaximo: azar.nextInt(260)),
   ]));
-  aplica(ElegirJefe(nombre: 'Jefe', nivel: s.nivel, hp: 100 + azar.nextInt(900)));
+  aplica(ElegirJefe(
+    nombre: 'Jefe',
+    nivel: s.nivel,
+    hp: 100 + azar.nextInt(900),
+    invocacionCadaHp: azar.nextBool() ? null : 40 + azar.nextInt(200),
+  ));
+
+  int objetivoVivo() {
+    final v = vivos();
+    return v[azar.nextInt(v.length)];
+  }
+
+  // Resuelve los intentos de invocación y los ataques de entrada.
+  void resolverPendientes() {
+    while (s.intentosInvocacionPendientes > 0) {
+      final libres = s.slotsLibres;
+      if (libres.isEmpty || azar.nextBool()) {
+        aplica(const SinInvocacion());
+      } else {
+        aplica(AliadoInvocado(
+          slot: libres[azar.nextInt(libres.length)],
+          nombre: 'Aliado',
+          hp: 20 + azar.nextInt(100),
+          ataqueNombre: 'Placaje',
+          ataqueDano: azar.nextBool() ? 10 + azar.nextInt(30) : null,
+        ));
+      }
+    }
+    for (final a in List.of(s.entradasPendientes)) {
+      aplica(AtaqueAliado(
+        slot: a.slot,
+        dano: azar.nextInt(40),
+        objetivo: s.jugadores[a.slot].eliminado ? objetivoVivo() : null,
+      ));
+    }
+  }
 
   var pasos = 0;
   while (!s.terminada && pasos++ < 400) {
+    resolverPendientes();
     if (s.fase == Fase.turnoJugadores) {
       for (final a in List.of(s.cartasAnimoPendientes)) {
         aplica(CartaAnimoRobada(jugador: a, carta: 1 + azar.nextInt(5)));
       }
-      aplica(TurnoJugador(jugador: s.jugadorActual!, dano: azar.nextInt(120)));
+      final j = s.jugadorActual!;
+      if (s.aliados.isNotEmpty && azar.nextInt(3) == 0) {
+        final objetivo = s.aliados[azar.nextInt(s.aliados.length)];
+        aplica(AtaqueAAliado(
+          jugador: j,
+          slot: objetivo.slot,
+          dano: azar.nextInt(120),
+        ));
+      } else {
+        aplica(TurnoJugador(
+          jugador: j,
+          dano: s.estaBloqueado(j) ? 0 : azar.nextInt(120),
+        ));
+      }
       if (!s.terminada && azar.nextInt(6) == 0) koAlAzar();
     } else if (s.fase == Fase.turnoJefe) {
       if (azar.nextInt(3) == 0) aplica(CuracionJefe(azar.nextInt(300)));
@@ -50,6 +99,15 @@ List<Evento> _partidaAleatoria(int semilla) {
           dano: azar.nextInt(250),
           jugador: azar.nextBool() ? null : v[azar.nextInt(v.length)],
         ));
+      }
+      for (final a in List.of(s.aliados)) {
+        if (a.tieneAtaque && !a.atacoEnTurnoJefe) {
+          aplica(AtaqueAliado(
+            slot: a.slot,
+            dano: azar.nextInt(40),
+            objetivo: s.jugadores[a.slot].eliminado ? objetivoVivo() : null,
+          ));
+        }
       }
       while (!s.terminada && azar.nextInt(3) == 0) {
         koAlAzar();
@@ -74,6 +132,14 @@ void _comprobar(EstadoPartida s, String donde) {
   for (final a in [...s.prioridad, ...s.cartasAnimoPendientes]) {
     expect(s.jugadores[a].eliminado, isFalse, reason: '$donde: asiento $a');
   }
+  final slots = [for (final a in s.aliados) a.slot];
+  expect(slots.toSet().length, slots.length,
+      reason: '$donde: un aliado como máximo por slot');
+  for (final a in s.aliados) {
+    expect(a.hp, inInclusiveRange(1, a.hpMaximo), reason: donde);
+  }
+  expect(s.intentosInvocacionPendientes, greaterThanOrEqualTo(0),
+      reason: donde);
   if (s.terminada) {
     expect(s.resultado, isNotNull, reason: donde);
     if (s.resultado == Resultado.victoria) {

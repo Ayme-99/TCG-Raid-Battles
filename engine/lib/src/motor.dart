@@ -17,6 +17,10 @@ EstadoPartida apply(EstadoPartida estado, Evento evento) {
     CartaAnimoRobada ev => _cartaAnimo(estado, ev),
     FinTurnoJefe() => _finTurnoJefe(estado),
     CuracionJefe ev => _curacionJefe(estado, ev),
+    AtaqueAAliado ev => _ataqueAAliado(estado, ev),
+    SinInvocacion() => _sinInvocacion(estado),
+    AliadoInvocado ev => _aliadoInvocado(estado, ev),
+    AtaqueAliado ev => _ataqueAliado(estado, ev),
     Abandonar() => _abandonar(estado),
   };
 }
@@ -73,6 +77,18 @@ void _exigeJugador(EstadoPartida e, int jugador) {
   }
 }
 
+/// Antes de seguir con la partida hay que resolver los intentos de
+/// invocación y los ataques de entrada de los aliados.
+void _exigeSinPendientes(EstadoPartida e, String evento) {
+  if (e.intentosInvocacionPendientes > 0) {
+    _error('$evento: quedan ${e.intentosInvocacionPendientes} intentos de '
+        'invocación por resolver');
+  }
+  if (e.entradasPendientes.isNotEmpty) {
+    _error('$evento: hay aliados que aún no han usado su ataque al entrar');
+  }
+}
+
 EstadoPartida _configurar(EstadoPartida e, ConfigurarJugadores ev) {
   _exigeFase(e, Fase.preparacion, 'ConfigurarJugadores');
   final n = ev.jugadores.length;
@@ -109,12 +125,17 @@ EstadoPartida _elegirJefe(EstadoPartida e, ElegirJefe ev) {
   if (ev.hp <= 0) {
     _error('el HP del jefe debe ser mayor que 0');
   }
+  final cada = ev.invocacionCadaHp;
+  if (cada != null && cada <= 0) {
+    _error('los HP entre intentos de invocación deben ser mayores que 0');
+  }
   final conJefe = e.copiarCon(
     jefe: JefeEstado(
       nombre: ev.nombre,
       nivel: ev.nivel,
       hpMaximo: ev.hp,
       hp: ev.hp,
+      invocacionCadaHp: cada,
     ),
   );
   return _empezarRonda(conJefe);
@@ -143,6 +164,9 @@ EstadoPartida _empezarRonda(EstadoPartida e) {
     prioridad: const [],
     cartasAnimoPendientes: primeros,
     ataquesJefeEnTurno: 0,
+    aliados: [
+      for (final a in e.aliados) a.copiarCon(atacoEnTurnoJefe: false),
+    ],
   );
 }
 
@@ -165,12 +189,17 @@ EstadoPartida _avanzarTurno(EstadoPartida e, int desde) {
 
 EstadoPartida _turnoJugador(EstadoPartida e, TurnoJugador ev) {
   _exigeFase(e, Fase.turnoJugadores, 'TurnoJugador');
+  _exigeSinPendientes(e, 'TurnoJugador');
   _exigeJugador(e, ev.jugador);
   if (e.jugadorActual != ev.jugador) {
     _error('no es el turno del jugador ${ev.jugador}');
   }
   if (ev.dano < 0) {
     _error('el daño no puede ser negativo');
+  }
+  if (ev.dano > 0 && e.estaBloqueado(ev.jugador)) {
+    _error('el jugador ${ev.jugador} tiene un aliado vivo en su slot: '
+        'debe debilitarlo antes de dañar al jefe');
   }
   final jefe = e.jefe!;
   // El daño que cuenta es el que de verdad resta HP al jefe.
@@ -185,11 +214,29 @@ EstadoPartida _turnoJugador(EstadoPartida e, TurnoJugador ev) {
       resultado: Resultado.victoria,
     );
   }
-  return _avanzarTurno(conDano, e.turnoActual + 1);
+  return _avanzarTurno(_cruzarUmbrales(conDano), e.turnoActual + 1);
+}
+
+/// Cuenta los umbrales de invocación que el jefe acaba de cruzar. Cada
+/// umbral cuenta una sola vez por partida y el último (HP 0) no existe.
+EstadoPartida _cruzarUmbrales(EstadoPartida e) {
+  final jefe = e.jefe!;
+  final cada = jefe.invocacionCadaHp;
+  if (cada == null) return e;
+  final maximo = (jefe.hpMaximo - 1) ~/ cada;
+  var cruzados = (jefe.hpMaximo - jefe.hp) ~/ cada;
+  if (cruzados > maximo) cruzados = maximo;
+  if (cruzados <= e.umbralesCruzados) return e;
+  return e.copiarCon(
+    umbralesCruzados: cruzados,
+    intentosInvocacionPendientes:
+        e.intentosInvocacionPendientes + (cruzados - e.umbralesCruzados),
+  );
 }
 
 EstadoPartida _ataqueJefe(EstadoPartida e, AtaqueJefe ev) {
   _exigeFase(e, Fase.turnoJefe, 'AtaqueJefe');
+  _exigeSinPendientes(e, 'AtaqueJefe');
   if (ev.ranura < 1 || ev.ranura > ranurasAtaqueJefe) {
     _error('la ranura de ataque debe estar entre 1 y $ranurasAtaqueJefe');
   }
@@ -273,6 +320,7 @@ EstadoPartida _cartaAnimo(EstadoPartida e, CartaAnimoRobada ev) {
 
 EstadoPartida _finTurnoJefe(EstadoPartida e) {
   _exigeFase(e, Fase.turnoJefe, 'FinTurnoJefe');
+  _exigeSinPendientes(e, 'FinTurnoJefe');
   return _empezarRonda(e);
 }
 
@@ -301,5 +349,131 @@ EstadoPartida _curacionJefe(EstadoPartida e, CuracionJefe ev) {
   return e.copiarCon(
     jefe: jefe.conHp(jefe.hp + efectiva),
     curacionJefe: e.curacionJefe + efectiva,
+  );
+}
+
+EstadoPartida _ataqueAAliado(EstadoPartida e, AtaqueAAliado ev) {
+  _exigeFase(e, Fase.turnoJugadores, 'AtaqueAAliado');
+  _exigeSinPendientes(e, 'AtaqueAAliado');
+  _exigeJugador(e, ev.jugador);
+  if (e.jugadorActual != ev.jugador) {
+    _error('no es el turno del jugador ${ev.jugador}');
+  }
+  final aliado = e.aliadoEn(ev.slot);
+  if (aliado == null) {
+    _error('no hay ningún aliado en el slot ${ev.slot}');
+  }
+  if (ev.dano < 0) {
+    _error('el daño no puede ser negativo');
+  }
+  // El exceso de daño se pierde: no pasa al jefe ni a otro aliado.
+  final restante = aliado.hp - ev.dano;
+  final aliados = <AliadoEstado>[
+    for (final a in e.aliados)
+      if (a.slot != ev.slot)
+        a
+      else if (restante > 0)
+        a.copiarCon(hp: restante),
+  ];
+  final conDano = e.copiarCon(
+    aliados: aliados,
+    aliadosDerrotados: e.aliadosDerrotados + (restante > 0 ? 0 : 1),
+  );
+  return _avanzarTurno(conDano, e.turnoActual + 1);
+}
+
+void _exigeResolverInvocacion(EstadoPartida e, String evento) {
+  if (e.fase != Fase.turnoJugadores && e.fase != Fase.turnoJefe) {
+    _error('$evento no es válido en la fase ${e.fase.name}');
+  }
+  if (e.intentosInvocacionPendientes <= 0) {
+    _error('$evento: no hay ningún intento de invocación por resolver');
+  }
+}
+
+EstadoPartida _sinInvocacion(EstadoPartida e) {
+  _exigeResolverInvocacion(e, 'SinInvocacion');
+  return e.copiarCon(
+    intentosInvocacionPendientes: e.intentosInvocacionPendientes - 1,
+  );
+}
+
+EstadoPartida _aliadoInvocado(EstadoPartida e, AliadoInvocado ev) {
+  _exigeResolverInvocacion(e, 'AliadoInvocado');
+  if (ev.slot < 0 || ev.slot >= e.jugadores.length) {
+    _error('el slot ${ev.slot} no existe');
+  }
+  if (e.jugadores[ev.slot].eliminado) {
+    _error('el jugador ${ev.slot} está eliminado: su slot no admite aliados');
+  }
+  if (e.aliadoEn(ev.slot) != null) {
+    _error('el slot ${ev.slot} ya tiene un aliado');
+  }
+  if (ev.hp <= 0) {
+    _error('el HP del aliado debe ser mayor que 0');
+  }
+  final dano = ev.ataqueDano;
+  if (dano != null && dano < 0) {
+    _error('el daño del ataque del aliado no puede ser negativo');
+  }
+  final aliado = AliadoEstado(
+    slot: ev.slot,
+    nombre: ev.nombre,
+    hpMaximo: ev.hp,
+    hp: ev.hp,
+    ataqueNombre: ev.ataqueNombre,
+    ataqueDano: dano,
+    habilidad: ev.habilidad,
+    // Sin ataque no hay ataque de entrada que esperar.
+    entradaResuelta: dano == null,
+  );
+  return e.copiarCon(
+    aliados: [...e.aliados, aliado],
+    intentosInvocacionPendientes: e.intentosInvocacionPendientes - 1,
+  );
+}
+
+EstadoPartida _ataqueAliado(EstadoPartida e, AtaqueAliado ev) {
+  if (e.fase != Fase.turnoJugadores && e.fase != Fase.turnoJefe) {
+    _error('AtaqueAliado no es válido en la fase ${e.fase.name}');
+  }
+  final aliado = e.aliadoEn(ev.slot);
+  if (aliado == null) {
+    _error('no hay ningún aliado en el slot ${ev.slot}');
+  }
+  if (!aliado.tieneAtaque) {
+    _error('${aliado.nombre} no tiene ataque');
+  }
+  if (ev.dano < 0) {
+    _error('el daño no puede ser negativo');
+  }
+  final objetivo = ev.objetivo;
+  if (objetivo == null) {
+    if (e.jugadores[aliado.slot].eliminado) {
+      _error('el dueño del slot ${aliado.slot} está eliminado: indica a qué '
+          'jugador activo ataca el aliado');
+    }
+  } else {
+    _exigeJugador(e, objetivo);
+  }
+
+  AliadoEstado actualizado;
+  if (!aliado.entradaResuelta) {
+    // Ataque al entrar.
+    actualizado = aliado.copiarCon(entradaResuelta: true);
+  } else if (e.fase == Fase.turnoJefe && !aliado.atacoEnTurnoJefe) {
+    // Ataque del final del turno del jefe, una vez por turno.
+    actualizado = aliado.copiarCon(atacoEnTurnoJefe: true);
+  } else if (e.fase == Fase.turnoJefe) {
+    _error('${aliado.nombre} ya ha atacado en este turno del jefe');
+  } else {
+    _error('${aliado.nombre} solo ataca al entrar y al final del turno del '
+        'jefe');
+  }
+  return e.copiarCon(
+    aliados: [
+      for (final a in e.aliados)
+        if (a.slot == ev.slot) actualizado else a,
+    ],
   );
 }

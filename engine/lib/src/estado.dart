@@ -67,11 +67,16 @@ class JefeEstado {
   final int hpMaximo;
   final int hp;
 
+  /// Cada cuántos HP perdidos hay un intento de invocar un aliado (D-04 §7).
+  /// null: el jefe nunca invoca.
+  final int? invocacionCadaHp;
+
   const JefeEstado({
     required this.nombre,
     required this.nivel,
     required this.hpMaximo,
     required this.hp,
+    this.invocacionCadaHp,
   });
 
   JefeEstado conHp(int nuevoHp) => JefeEstado(
@@ -79,6 +84,7 @@ class JefeEstado {
         nivel: nivel,
         hpMaximo: hpMaximo,
         hp: nuevoHp,
+        invocacionCadaHp: invocacionCadaHp,
       );
 
   Map<String, Object?> toJson() => {
@@ -86,6 +92,70 @@ class JefeEstado {
         'nivel': nivel,
         'hpMaximo': hpMaximo,
         'hp': hp,
+        'invocacionCadaHp': invocacionCadaHp,
+      };
+}
+
+/// Aliado invocado por el jefe, en el slot de un jugador (D-04).
+class AliadoEstado {
+  /// Asiento del jugador dueño del slot.
+  final int slot;
+  final String nombre;
+  final int hpMaximo;
+  final int hp;
+  final String? ataqueNombre;
+
+  /// Daño de su único ataque. null: el aliado no ataca (solo habilidad).
+  final int? ataqueDano;
+  final String? habilidad;
+
+  /// Ya usó su ataque y/o habilidad al entrar.
+  final bool entradaResuelta;
+
+  /// Ya atacó en el turno del jefe actual.
+  final bool atacoEnTurnoJefe;
+
+  const AliadoEstado({
+    required this.slot,
+    required this.nombre,
+    required this.hpMaximo,
+    required this.hp,
+    this.ataqueNombre,
+    this.ataqueDano,
+    this.habilidad,
+    this.entradaResuelta = false,
+    this.atacoEnTurnoJefe = false,
+  });
+
+  bool get tieneAtaque => ataqueDano != null;
+
+  AliadoEstado copiarCon({
+    int? hp,
+    bool? entradaResuelta,
+    bool? atacoEnTurnoJefe,
+  }) =>
+      AliadoEstado(
+        slot: slot,
+        nombre: nombre,
+        hpMaximo: hpMaximo,
+        hp: hp ?? this.hp,
+        ataqueNombre: ataqueNombre,
+        ataqueDano: ataqueDano,
+        habilidad: habilidad,
+        entradaResuelta: entradaResuelta ?? this.entradaResuelta,
+        atacoEnTurnoJefe: atacoEnTurnoJefe ?? this.atacoEnTurnoJefe,
+      );
+
+  Map<String, Object?> toJson() => {
+        'slot': slot,
+        'nombre': nombre,
+        'hpMaximo': hpMaximo,
+        'hp': hp,
+        'ataqueNombre': ataqueNombre,
+        'ataqueDano': ataqueDano,
+        'habilidad': habilidad,
+        'entradaResuelta': entradaResuelta,
+        'atacoEnTurnoJefe': atacoEnTurnoJefe,
       };
 }
 
@@ -146,6 +216,19 @@ class EstadoPartida {
   /// Curación efectiva acumulada del jefe (lo que subió de verdad, sin pasar
   /// del máximo). El daño bruto menos esta cifra es la vida que ha perdido.
   final int curacionJefe;
+
+  /// Aliados vivos, en el orden en que fueron invocados.
+  final List<AliadoEstado> aliados;
+
+  /// Aliados derrotados en la partida (para estadísticas).
+  final int aliadosDerrotados;
+
+  /// Umbrales de invocación ya cruzados. Cada umbral cuenta una sola vez
+  /// por partida aunque el jefe se cure y vuelva a cruzarlo.
+  final int umbralesCruzados;
+
+  /// Intentos de invocación que la mesa aún tiene que resolver.
+  final int intentosInvocacionPendientes;
   final Resultado? resultado;
 
   EstadoPartida({
@@ -163,13 +246,18 @@ class EstadoPartida {
     required this.ataquesJefeEnTurno,
     required List<int> danoPorJugador,
     required this.curacionJefe,
+    required List<AliadoEstado> aliados,
+    required this.aliadosDerrotados,
+    required this.umbralesCruzados,
+    required this.intentosInvocacionPendientes,
     required this.resultado,
   })  : jugadores = _fija(jugadores),
         orden = _fija(orden),
         prioridad = _fija(prioridad),
         cartasAnimoPendientes = _fija(cartasAnimoPendientes),
         cartasAnimo = _fija(cartasAnimo),
-        danoPorJugador = _fija(danoPorJugador);
+        danoPorJugador = _fija(danoPorJugador),
+        aliados = _fija(aliados);
 
   /// Estado de una partida recién creada, sin jugadores.
   factory EstadoPartida.inicial() => EstadoPartida(
@@ -187,6 +275,10 @@ class EstadoPartida {
         ataquesJefeEnTurno: 0,
         danoPorJugador: const [],
         curacionJefe: 0,
+        aliados: const [],
+        aliadosDerrotados: 0,
+        umbralesCruzados: 0,
+        intentosInvocacionPendientes: 0,
         resultado: null,
       );
 
@@ -197,6 +289,29 @@ class EstadoPartida {
           : null;
 
   bool get terminada => fase == Fase.terminada;
+
+  /// Aliado vivo en el slot del jugador [slot], o null.
+  AliadoEstado? aliadoEn(int slot) {
+    for (final a in aliados) {
+      if (a.slot == slot) return a;
+    }
+    return null;
+  }
+
+  /// Slots de jugadores activos que no tienen aliado.
+  List<int> get slotsLibres => [
+        for (final j in jugadores)
+          if (!j.eliminado && aliadoEn(j.asiento) == null) j.asiento,
+      ];
+
+  /// Un jugador con un aliado vivo en su slot no puede dañar al jefe.
+  bool estaBloqueado(int jugador) => aliadoEn(jugador) != null;
+
+  /// Aliados con ataque que aún no han usado su ataque al entrar.
+  List<AliadoEstado> get entradasPendientes => [
+        for (final a in aliados)
+          if (a.tieneAtaque && !a.entradaResuelta) a,
+      ];
 
   /// Copia con cambios. Los campos que no se indican se mantienen.
   EstadoPartida copiarCon({
@@ -214,6 +329,10 @@ class EstadoPartida {
     int? ataquesJefeEnTurno,
     List<int>? danoPorJugador,
     int? curacionJefe,
+    List<AliadoEstado>? aliados,
+    int? aliadosDerrotados,
+    int? umbralesCruzados,
+    int? intentosInvocacionPendientes,
     Resultado? resultado,
   }) =>
       EstadoPartida(
@@ -232,6 +351,11 @@ class EstadoPartida {
         ataquesJefeEnTurno: ataquesJefeEnTurno ?? this.ataquesJefeEnTurno,
         danoPorJugador: danoPorJugador ?? this.danoPorJugador,
         curacionJefe: curacionJefe ?? this.curacionJefe,
+        aliados: aliados ?? this.aliados,
+        aliadosDerrotados: aliadosDerrotados ?? this.aliadosDerrotados,
+        umbralesCruzados: umbralesCruzados ?? this.umbralesCruzados,
+        intentosInvocacionPendientes:
+            intentosInvocacionPendientes ?? this.intentosInvocacionPendientes,
         resultado: resultado ?? this.resultado,
       );
 
@@ -251,6 +375,10 @@ class EstadoPartida {
         'ataquesJefeEnTurno': ataquesJefeEnTurno,
         'danoPorJugador': danoPorJugador,
         'curacionJefe': curacionJefe,
+        'aliados': [for (final a in aliados) a.toJson()],
+        'aliadosDerrotados': aliadosDerrotados,
+        'umbralesCruzados': umbralesCruzados,
+        'intentosInvocacionPendientes': intentosInvocacionPendientes,
         'resultado': resultado?.name,
       };
 }
