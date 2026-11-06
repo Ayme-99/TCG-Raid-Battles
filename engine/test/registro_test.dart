@@ -20,42 +20,100 @@ List<(String, Object?)> _ejemplos(String nombre) => [
     ]..sort((a, b) => a.$1.compareTo(b.$1));
 
 void main() {
-  group('ejemplos del contrato', () {
+  /// Lo que debe salir de leer un registro de la versión 1: el mismo registro
+  /// en versión 2, con el bono de estados a 0 en cada jugador del resumen.
+  Object? migradoDeV1(Object? json) {
+    final m = Map<String, Object?>.from(json as Map);
+    m['version'] = 2;
+    final r = m['resumen'];
+    if (r is Map) {
+      final resumen = Map<String, Object?>.from(r);
+      resumen['jugadores'] = [
+        for (final j in resumen['jugadores'] as List)
+          {
+            ...Map<String, Object?>.from(j as Map),
+            'estadosAplicados': 0,
+            'bonoEstados': 0,
+          },
+      ];
+      m['resumen'] = resumen;
+    }
+    return m;
+  }
+
+  void resumenEsElDelMotor(Object? json) {
+    final registro = RegistroPartida.deJson(json);
+    if (!registro.estado.terminada) {
+      expect(registro.resumen, isNull);
+      return;
+    }
+    final nuevo = RegistroPartida.crear(
+      partidaId: registro.partidaId,
+      eventos: registro.eventos,
+      cuentas: registro.cuentas,
+    );
+    expect(registro.resumen, equals(nuevo.resumen));
+  }
+
+  group('ejemplos del contrato v1 (se migran a la versión 2)', () {
     test('hay ejemplos de cada tipo', () {
-      expect(_ejemplos('validos'), isNotEmpty);
-      expect(_ejemplos('invalidos-estructura'), isNotEmpty);
-      expect(_ejemplos('invalidos-reglas'), isNotEmpty);
+      expect(_ejemplos('v1/validos'), isNotEmpty);
+      expect(_ejemplos('v1/invalidos-estructura'), isNotEmpty);
+      expect(_ejemplos('v1/invalidos-reglas'), isNotEmpty);
     });
 
-    for (final (nombre, json) in _ejemplos('validos')) {
-      test('válido: $nombre se lee y se vuelve a escribir igual', () {
+    for (final (nombre, json) in _ejemplos('v1/validos')) {
+      test('válido: $nombre se lee, se migra y se escribe en versión 2', () {
         final registro = RegistroPartida.deJson(json);
-        expect(registro.toJson(), equals(json));
+        expect(registro.version, 2);
+        expect(registro.toJson(), equals(migradoDeV1(json)));
       });
 
       test('válido: $nombre guarda el resumen que calcularía el motor', () {
-        final registro = RegistroPartida.deJson(json);
-        if (!registro.estado.terminada) {
-          expect(registro.resumen, isNull);
-          return;
-        }
-        final nuevo = RegistroPartida.crear(
-          partidaId: registro.partidaId,
-          eventos: registro.eventos,
-          cuentas: registro.cuentas,
-        );
-        expect(registro.resumen, equals(nuevo.resumen));
+        resumenEsElDelMotor(json);
       });
     }
 
-    for (final (nombre, json) in _ejemplos('invalidos-estructura')) {
+    for (final (nombre, json) in _ejemplos('v1/invalidos-estructura')) {
       test('inválido de estructura: $nombre', () {
         expect(() => RegistroPartida.deJson(json),
             throwsA(isA<RegistroInvalido>()));
       });
     }
 
-    for (final (nombre, json) in _ejemplos('invalidos-reglas')) {
+    for (final (nombre, json) in _ejemplos('v1/invalidos-reglas')) {
+      test('reglas incumplidas: $nombre', () {
+        expect(() => RegistroPartida.deJson(json),
+            throwsA(isA<RegistroInvalido>()));
+      });
+    }
+  });
+
+  group('ejemplos del contrato v2', () {
+    test('hay ejemplos de cada tipo', () {
+      expect(_ejemplos('v2/validos'), isNotEmpty);
+      expect(_ejemplos('v2/invalidos-estructura'), isNotEmpty);
+      expect(_ejemplos('v2/invalidos-reglas'), isNotEmpty);
+    });
+
+    for (final (nombre, json) in _ejemplos('v2/validos')) {
+      test('válido: $nombre se lee y se vuelve a escribir igual', () {
+        expect(RegistroPartida.deJson(json).toJson(), equals(json));
+      });
+
+      test('válido: $nombre guarda el resumen que calcularía el motor', () {
+        resumenEsElDelMotor(json);
+      });
+    }
+
+    for (final (nombre, json) in _ejemplos('v2/invalidos-estructura')) {
+      test('inválido de estructura: $nombre', () {
+        expect(() => RegistroPartida.deJson(json),
+            throwsA(isA<RegistroInvalido>()));
+      });
+    }
+
+    for (final (nombre, json) in _ejemplos('v2/invalidos-reglas')) {
       test('reglas incumplidas: $nombre', () {
         expect(() => RegistroPartida.deJson(json),
             throwsA(isA<RegistroInvalido>()));
@@ -74,7 +132,7 @@ void main() {
     }
 
     Map<String, Object?> ejemplo(String nombre) =>
-        Map<String, Object?>.from(_ejemplos('validos')
+        Map<String, Object?>.from(_ejemplos('v1/validos')
             .firstWhere((e) => e.$1 == nombre)
             .$2 as Map);
 
@@ -91,7 +149,7 @@ void main() {
     });
 
     test('indica el evento y el campo que fallan', () {
-      final m = mensaje(_ejemplos('invalidos-estructura')
+      final m = mensaje(_ejemplos('v1/invalidos-estructura')
           .firstWhere((e) => e.$1 == 'dano-no-es-entero.json')
           .$2);
       expect(m, contains('eventos[2]'));
@@ -99,14 +157,14 @@ void main() {
     });
 
     test('indica el evento que rompe las reglas', () {
-      final m = mensaje(_ejemplos('invalidos-reglas')
+      final m = mensaje(_ejemplos('v1/invalidos-reglas')
           .firstWhere((e) => e.$1 == 'turno-fuera-de-orden.json')
           .$2);
       expect(m, startsWith('eventos[2]:'));
     });
 
     test('campo desconocido', () {
-      final m = mensaje(_ejemplos('invalidos-estructura')
+      final m = mensaje(_ejemplos('v1/invalidos-estructura')
           .firstWhere((e) => e.$1 == 'campo-desconocido.json')
           .$2);
       expect(m, contains('critico'));

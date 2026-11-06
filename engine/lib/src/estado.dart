@@ -71,12 +71,18 @@ class JefeEstado {
   /// null: el jefe nunca invoca.
   final int? invocacionCadaHp;
 
+  /// Veneno (permanente) y quemadura del jefe (D-12).
+  final bool envenenado;
+  final bool quemado;
+
   const JefeEstado({
     required this.nombre,
     required this.nivel,
     required this.hpMaximo,
     required this.hp,
     this.invocacionCadaHp,
+    this.envenenado = false,
+    this.quemado = false,
   });
 
   JefeEstado conHp(int nuevoHp) => JefeEstado(
@@ -85,6 +91,18 @@ class JefeEstado {
         hpMaximo: hpMaximo,
         hp: nuevoHp,
         invocacionCadaHp: invocacionCadaHp,
+        envenenado: envenenado,
+        quemado: quemado,
+      );
+
+  JefeEstado conEstados({bool? envenenado, bool? quemado}) => JefeEstado(
+        nombre: nombre,
+        nivel: nivel,
+        hpMaximo: hpMaximo,
+        hp: hp,
+        invocacionCadaHp: invocacionCadaHp,
+        envenenado: envenenado ?? this.envenenado,
+        quemado: quemado ?? this.quemado,
       );
 
   Map<String, Object?> toJson() => {
@@ -93,6 +111,8 @@ class JefeEstado {
         'hpMaximo': hpMaximo,
         'hp': hp,
         'invocacionCadaHp': invocacionCadaHp,
+        'envenenado': envenenado,
+        'quemado': quemado,
       };
 }
 
@@ -213,6 +233,10 @@ class EstadoPartida {
   /// Daño aplicado al jefe por cada jugador (por asiento), para los puntos.
   final List<int> danoPorJugador;
 
+  /// Veces que cada jugador (por asiento) ha aplicado un estado que el jefe no
+  /// tenía; cuentan para el bono de puntos (D-12).
+  final List<int> estadosAplicados;
+
   /// Curación efectiva acumulada del jefe (lo que subió de verdad, sin pasar
   /// del máximo). El daño bruto menos esta cifra es la vida que ha perdido.
   final int curacionJefe;
@@ -245,6 +269,7 @@ class EstadoPartida {
     required List<RegistroCartaAnimo> cartasAnimo,
     required this.ataquesJefeEnTurno,
     required List<int> danoPorJugador,
+    required List<int> estadosAplicados,
     required this.curacionJefe,
     required List<AliadoEstado> aliados,
     required this.aliadosDerrotados,
@@ -257,6 +282,7 @@ class EstadoPartida {
         cartasAnimoPendientes = _fija(cartasAnimoPendientes),
         cartasAnimo = _fija(cartasAnimo),
         danoPorJugador = _fija(danoPorJugador),
+        estadosAplicados = _fija(estadosAplicados),
         aliados = _fija(aliados);
 
   /// Estado de una partida recién creada, sin jugadores.
@@ -274,6 +300,7 @@ class EstadoPartida {
         cartasAnimo: const [],
         ataquesJefeEnTurno: 0,
         danoPorJugador: const [],
+        estadosAplicados: const [],
         curacionJefe: 0,
         aliados: const [],
         aliadosDerrotados: 0,
@@ -328,6 +355,7 @@ class EstadoPartida {
     List<RegistroCartaAnimo>? cartasAnimo,
     int? ataquesJefeEnTurno,
     List<int>? danoPorJugador,
+    List<int>? estadosAplicados,
     int? curacionJefe,
     List<AliadoEstado>? aliados,
     int? aliadosDerrotados,
@@ -350,6 +378,7 @@ class EstadoPartida {
         cartasAnimo: cartasAnimo ?? this.cartasAnimo,
         ataquesJefeEnTurno: ataquesJefeEnTurno ?? this.ataquesJefeEnTurno,
         danoPorJugador: danoPorJugador ?? this.danoPorJugador,
+        estadosAplicados: estadosAplicados ?? this.estadosAplicados,
         curacionJefe: curacionJefe ?? this.curacionJefe,
         aliados: aliados ?? this.aliados,
         aliadosDerrotados: aliadosDerrotados ?? this.aliadosDerrotados,
@@ -374,6 +403,7 @@ class EstadoPartida {
         'cartasAnimo': [for (final c in cartasAnimo) c.toJson()],
         'ataquesJefeEnTurno': ataquesJefeEnTurno,
         'danoPorJugador': danoPorJugador,
+        'estadosAplicados': estadosAplicados,
         'curacionJefe': curacionJefe,
         'aliados': [for (final a in aliados) a.toJson()],
         'aliadosDerrotados': aliadosDerrotados,

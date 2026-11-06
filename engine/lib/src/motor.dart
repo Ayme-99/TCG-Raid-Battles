@@ -15,7 +15,8 @@ EstadoPartida apply(EstadoPartida estado, Evento evento) {
     AtaqueJefe ev => _ataqueJefe(estado, ev),
     PokemonKo ev => _pokemonKo(estado, ev),
     CartaAnimoRobada ev => _cartaAnimo(estado, ev),
-    FinTurnoJefe() => _finTurnoJefe(estado),
+    FinTurnoJefe ev => _finTurnoJefe(estado, ev),
+    AplicarEstadoJefe ev => _aplicarEstadoJefe(estado, ev),
     CuracionJefe ev => _curacionJefe(estado, ev),
     AtaqueAAliado ev => _ataqueAAliado(estado, ev),
     SinInvocacion() => _sinInvocacion(estado),
@@ -114,6 +115,7 @@ EstadoPartida _configurar(EstadoPartida e, ConfigurarJugadores ev) {
     x: x,
     nivel: nivelPorX(x),
     danoPorJugador: List<int>.filled(n, 0),
+    estadosAplicados: List<int>.filled(n, 0),
   );
 }
 
@@ -318,10 +320,60 @@ EstadoPartida _cartaAnimo(EstadoPartida e, CartaAnimoRobada ev) {
   );
 }
 
-EstadoPartida _finTurnoJefe(EstadoPartida e) {
+EstadoPartida _finTurnoJefe(EstadoPartida e, FinTurnoJefe ev) {
   _exigeFase(e, Fase.turnoJefe, 'FinTurnoJefe');
   _exigeSinPendientes(e, 'FinTurnoJefe');
-  return _empezarRonda(e);
+  final jefe = e.jefe!;
+  if (jefe.quemado && ev.monedaQuemadura == null) {
+    _error('el jefe está quemado: FinTurnoJefe necesita el resultado de la '
+        'moneda');
+  }
+  if (!jefe.quemado && ev.monedaQuemadura != null) {
+    _error('el jefe no está quemado: no hay moneda que registrar');
+  }
+  // Chequeo de estados (D-12): veneno y quemadura bajan el HP del jefe sin
+  // atribuirse a ningún jugador. Si lo dejan a 0 HP, victoria.
+  var estado = e;
+  final dano = (jefe.envenenado ? danoVeneno : 0) + (jefe.quemado ? danoQuemadura : 0);
+  if (dano > 0) {
+    final aplicado = dano < jefe.hp ? dano : jefe.hp;
+    final nuevoHp = jefe.hp - aplicado;
+    estado = e.copiarCon(jefe: jefe.conHp(nuevoHp));
+    if (nuevoHp <= 0) {
+      return estado.copiarCon(
+        fase: Fase.terminada,
+        resultado: Resultado.victoria,
+      );
+    }
+  }
+  // Moneda de la quemadura, después de aplicar su daño: cara la quita.
+  if (ev.monedaQuemadura == true) {
+    estado = estado.copiarCon(jefe: estado.jefe!.conEstados(quemado: false));
+  }
+  return _empezarRonda(_cruzarUmbrales(estado));
+}
+
+EstadoPartida _aplicarEstadoJefe(EstadoPartida e, AplicarEstadoJefe ev) {
+  if (e.fase != Fase.turnoJugadores && e.fase != Fase.turnoJefe) {
+    _error('AplicarEstadoJefe no es válido en la fase ${e.fase.name}');
+  }
+  _exigeJugador(e, ev.jugador);
+  final jefe = e.jefe!;
+  final yaLoTiene = switch (ev.estado) {
+    EstadoDelJefe.veneno => jefe.envenenado,
+    EstadoDelJefe.quemadura => jefe.quemado,
+  };
+  // Aplicar un estado que ya tiene no cambia nada ni cuenta (D-12).
+  if (yaLoTiene) return e;
+  final aplicados = [...e.estadosAplicados];
+  aplicados[ev.jugador] += 1;
+  return e.copiarCon(
+    jefe: switch (ev.estado) {
+      EstadoDelJefe.veneno => jefe.conEstados(envenenado: true),
+      EstadoDelJefe.quemadura => jefe.conEstados(quemado: true),
+    },
+    estadosAplicados: aplicados,
+  );
 }
 
 EstadoPartida _abandonar(EstadoPartida e) {

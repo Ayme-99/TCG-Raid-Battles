@@ -9,12 +9,39 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 1;
+const int versionRegistro = 2;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
-/// Vacío mientras solo exista la versión 1.
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {};
+    _migraciones = {1: _v1AV2};
+
+/// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
+/// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
+/// `bonoEstados`, que en las partidas de la versión 1 valen 0.
+Map<String, Object?> _v1AV2(Map<String, Object?> datos) {
+  final resultado = Map<String, Object?>.of(datos);
+  resultado['version'] = 2;
+  final resumen = datos['resumen'];
+  if (resumen is Map) {
+    final nuevo = Map<String, Object?>.from(resumen);
+    final jugadores = resumen['jugadores'];
+    if (jugadores is List) {
+      nuevo['jugadores'] = [
+        for (final j in jugadores)
+          if (j is Map)
+            {
+              ...Map<String, Object?>.from(j),
+              'estadosAplicados': 0,
+              'bonoEstados': 0,
+            }
+          else
+            j,
+      ];
+    }
+    resultado['resumen'] = nuevo;
+  }
+  return resultado;
+}
 
 // ---------------------------------------------------------------------------
 // Eventos <-> JSON
@@ -57,7 +84,15 @@ Map<String, Object?> eventoAJson(Evento evento) {
         'jugador': ev.jugador,
         'carta': ev.carta,
       },
-    FinTurnoJefe() => {'tipo': 'finTurnoJefe'},
+    FinTurnoJefe ev => {
+        'tipo': 'finTurnoJefe',
+        if (ev.monedaQuemadura != null) 'monedaQuemadura': ev.monedaQuemadura,
+      },
+    AplicarEstadoJefe ev => {
+        'tipo': 'aplicarEstadoJefe',
+        'jugador': ev.jugador,
+        'estado': ev.estado.name,
+      },
     Abandonar() => {'tipo': 'abandonar'},
     CuracionJefe ev => {'tipo': 'curacionJefe', 'cantidad': ev.cantidad},
     AtaqueAAliado ev => {
@@ -133,8 +168,14 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
         carta: c.entero('carta', min: 1, max: 5),
       );
     case 'finTurnoJefe':
-      c.permitir({'tipo'});
-      return const FinTurnoJefe();
+      c.permitir({'tipo', 'monedaQuemadura'});
+      return FinTurnoJefe(monedaQuemadura: c.booleanoOpt('monedaQuemadura'));
+    case 'aplicarEstadoJefe':
+      c.permitir({'tipo', 'jugador', 'estado'});
+      return AplicarEstadoJefe(
+        jugador: c.entero('jugador', min: 0, max: 3),
+        estado: c.enumerado('estado', EstadoDelJefe.values),
+      );
     case 'abandonar':
       c.permitir({'tipo'});
       return const Abandonar();
@@ -433,6 +474,22 @@ class _Campos {
     final v = datos[clave];
     if (v is! bool) falla('«$clave» debe ser verdadero o falso');
     return v;
+  }
+
+  bool? booleanoOpt(String clave) {
+    if (!datos.containsKey(clave)) return null;
+    final v = datos[clave];
+    if (v is! bool) falla('«$clave» debe ser verdadero o falso');
+    return v;
+  }
+
+  T enumerado<T extends Enum>(String clave, List<T> valores) {
+    final v = datos[clave];
+    for (final valor in valores) {
+      if (v == valor.name) return valor;
+    }
+    final admitidos = valores.map((x) => '«${x.name}»').join(', ');
+    falla('«$clave» debe ser uno de: $admitidos');
   }
 
   List<Object?> lista(String clave) {
