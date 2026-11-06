@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.4 (especificación del motor)
+**Versión:** 1.5 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -113,14 +113,14 @@ Detalle en `docs/D-04-aliados.md`.
 
 - **Un slot por jugador** (hasta 4; con 3 jugadores, 3 slots; con 2, 2). Un aliado como máximo por slot, solo en slots de jugadores activos.
 - Un aliado tiene HP propio (independiente del jefe), a lo sumo un ataque y a veces una habilidad. Hay aliados sin ataque (solo habilidad) y las habilidades son **pasivas**: una vez en juego se mantienen mientras el aliado siga en el combate.
-- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y su lista de aliados); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: moneda, y si sale cara, un dado del tamaño del número de slots elige el slot (se repite si el slot está ocupado o su jugador eliminado; si no hay slot libre, no se tira). El aliado sale al azar de la lista del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que empezará a bloquear.
+- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y sus 4 aliados, uno por categoría: Daño, Barrera, Cura y Pícaro, D-13); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: moneda, y si sale cara, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay invocación) y un d4 elige la categoría (no se repite una categoría en uso). Entra el aliado de esa categoría de la ficha del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que empezará a bloquear.
 - **Entrada**: al entrar, el aliado usa su ataque y/o su habilidad contra el dueño de su slot (salvo que su texto diga otra cosa) y no vuelve a atacar hasta el final del turno del jefe.
 - **Exceso de daño**: si un jugador hace a un aliado más daño del que le queda, el exceso se pierde (no pasa al jefe ni a otro aliado).
 - **Bloqueo**: mientras un jugador tiene un aliado vivo en su slot, debe debilitarlo antes de dañar al jefe. El resto puede seguir dañando al jefe.
 - **Ayuda**: cualquier jugador activo puede atacar a cualquier aliado, opcionalmente y en lugar de atacar al jefe, para quitar los aliados que estorban a un compañero.
 - **Objetivo del aliado**: el dueño de su slot, siempre. Si ese jugador está eliminado, se tira entre los jugadores activos (moneda / dado de 3 / dado de 4); con un solo jugador activo, ataca a ese jugador.
 - Si el dueño de un slot queda eliminado, su aliado **sigue vivo y atacando**, pero ya no bloquea a nadie.
-- Las **habilidades** de los aliados (reducir daño al jefe, aumentar el daño del jefe, forzar a la banca al atacante...) se resuelven en la mesa; el asistente no las computa.
+- Las **habilidades** de los aliados (reducir daño al jefe, aumentar el daño del jefe, forzar a la banca al atacante...) las aplica el **programa** o el **jugador** según indique la carta (D-13). Las del jugador se resuelven en la mesa y el asistente solo las registra.
 
 ### 4.5 Curación del jefe
 
@@ -201,7 +201,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | Cartas de ánimo: una por KO y máximo 3 cartas distintas por partida | Adoptado del juego oficial, sin confirmar |
 | Efectos de las cartas de ánimo (curas, +50) | No están en el simulador: la partida real será algo más fácil que lo calibrado |
 | Topes y costes de puntos (3000 / 6000 / 9000 / 15000; 10 000 a 40 000) | Calibrados para desbloquear en ≈ 17 / 22 / 29 / 36 partidas con un grupo de 4 |
-| Invocación de aliados (umbral de HP, probabilidad y lista por jefe; vida y daño de cada aliado) | Todo propuesta sin calibrar; los aliados aún no están en el simulador |
+| Invocación de aliados (umbral de HP, probabilidad y aliados por jefe; vida, daño y efectos de cada aliado y de cada categoría) | Todo propuesta sin calibrar; los aliados aún no están en el simulador |
 | Jugar con 1-2 jugadores | Más difícil; se acepta |
 
 ---
@@ -212,7 +212,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 - **X:** suma del mejor ataque de cada jugador; fija el nivel del jefe.
 - **Ranura de ataque (Attack slot):** Ataque 1/2/3 del jefe; el asistente solo conoce el número, no el efecto.
 - **Carta de ánimo (Cheer):** carta que roba el jugador cuyo Pokémon activo cae KO; le da prioridad en la ronda siguiente y un efecto resuelto en la mesa.
-- **Aliado:** Pokémon invocado por el jefe, uno por slot de jugador. Un único ataque, a veces con habilidad.
+- **Aliado:** Pokémon invocado por el jefe, uno por slot de jugador y de una de las 4 categorías (Daño, Barrera, Cura, Pícaro). Un único ataque, a veces con habilidad.
 - **Habilidad (de aliado):** efecto pasivo que algunos aliados tienen; se resuelve físicamente.
 - **KO (jugador):** un Pokémon del jugador ha sido derrotado. No elimina al jugador hasta agotar todos sus Pokémon.
 - **Eliminado:** jugador sin Pokémon en juego; deja de participar, pero la partida sigue si queda alguno activo.
@@ -234,6 +234,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | `docs/D-05-carta-de-animo.md` | Cheer, KO, promoción desde la banca |
 | `docs/D-10-sistema-de-puntos.md` | Puntos, reparto, desbloqueos y modelo de datos |
 | `docs/D-11-identidad-jugadores.md` | Cuentas, unirse a una partida, modo sin conexión |
+| `docs/D-13-aliados-por-categoria.md` | 4 aliados por jefe, invocación con dado de slot y de categoría, efectos del programa o del jugador |
 
 ---
 
@@ -258,3 +259,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.2 | D-06 cerrada: la curación del jefe sigue sin límite y sin tope de rondas (toda partida acaba por KO o abandono); abandonar cuenta como derrota y no existe el empate; los puntos de una derrota usan la vida perdida por el jefe (neto), no el daño bruto. Se añade `docs/D-06-curacion-del-jefe.md`. |
 | v1.3 | D-08 cerrada: el fin de partida se evalúa tras cada evento registrado; si un efecto deja al jefe a 0 HP y elimina al último Pokémon de la mesa a la vez, gana la victoria (se registra primero el daño al jefe); el daño al jefe fuera de turno cuenta como daño del jugador que lo causó. Propuesta abierta: veneno y quemadura como estado en el asistente. |
 | v1.4 | D-12 cerrada: el asistente lleva los estados del jefe (veneno permanente de 10, quemadura de 20 con moneda automática para quitarla) con chequeo al cerrar la ronda; su daño no se atribuye a ningún jugador y se sustituye por un bono individual de puntos de `tope ÷ 100 × min(n, 3)` (÷ 4 en derrota), fuera del total del equipo. Sustituye la decisión de D-08 sobre el daño de estados. |
+| v1.5 | D-13 cerrada: cada jefe tiene 4 aliados, uno por categoría (Daño, Barrera, Cura, Pícaro). Tras la moneda, un dado elige el slot y otro la categoría sin repetir valores en uso. Cada carta de aliado indica si sus efectos los aplica el programa (con script) o el jugador. Se añade `docs/D-13-aliados-por-categoria.md`. |
