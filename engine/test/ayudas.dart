@@ -96,8 +96,10 @@ List<Evento> partidaAleatoria(
       if (libres.isEmpty || azar.nextBool()) {
         aplica(const SinInvocacion());
       } else {
+        final categorias = s.categoriasLibres;
         aplica(AliadoInvocado(
           slot: libres[azar.nextInt(libres.length)],
+          categoria: categorias[azar.nextInt(categorias.length)],
           nombre: 'Aliado',
           hp: 20 + azar.nextInt(100),
           ataqueNombre: 'Placaje',

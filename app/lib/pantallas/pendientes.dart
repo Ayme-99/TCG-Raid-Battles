@@ -99,6 +99,13 @@ Future<void> atacarConAliado(
   );
 }
 
+String _etiquetaCategoria(CategoriaAliado c) => switch (c) {
+      CategoriaAliado.danio => 'Daño',
+      CategoriaAliado.barrera => 'Barrera',
+      CategoriaAliado.cura => 'Cura',
+      CategoriaAliado.picaro => 'Pícaro',
+    };
+
 class _DialogoAliado extends StatefulWidget {
   const _DialogoAliado({required this.estado});
 
@@ -117,6 +124,9 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
   late int _slot = widget.estado.slotsLibres.isEmpty
       ? 0
       : widget.estado.slotsLibres.first;
+  late CategoriaAliado _categoria = widget.estado.categoriasLibres.isEmpty
+      ? CategoriaAliado.danio
+      : widget.estado.categoriasLibres.first;
 
   @override
   void dispose() {
@@ -149,6 +159,20 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
                     label: Text('Slot de ${widget.estado.jugadores[a].nombre}'),
                     selected: _slot == a,
                     onSelected: (_) => setState(() => _slot = a),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Categoría (D-13): solo las que no tienen aliado vivo.
+            Wrap(
+              spacing: 8,
+              children: [
+                for (final c in widget.estado.categoriasLibres)
+                  ChoiceChip(
+                    key: Key('aliado-categoria-${c.name}'),
+                    label: Text(_etiquetaCategoria(c)),
+                    selected: _categoria == c,
+                    onSelected: (_) => setState(() => _categoria = c),
                   ),
               ],
             ),
@@ -193,6 +217,7 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
           onPressed: () => Navigator.of(context).pop(
             AliadoInvocado(
               slot: _slot,
+              categoria: _categoria,
               nombre: _nombre.text.trim().isEmpty ? 'Aliado' : _nombre.text.trim(),
               hp: int.tryParse(_hp.text) ?? 0,
               ataqueNombre: _opcional(_ataqueNombre),

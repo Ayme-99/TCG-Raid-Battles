@@ -1,3 +1,4 @@
+import 'eventos.dart';
 import 'reglas.dart';
 
 /// Fase en la que está la partida.
@@ -120,6 +121,9 @@ class JefeEstado {
 class AliadoEstado {
   /// Asiento del jugador dueño del slot.
   final int slot;
+
+  /// Categoría del aliado (D-13): no hay dos vivos de la misma categoría.
+  final CategoriaAliado categoria;
   final String nombre;
   final int hpMaximo;
   final int hp;
@@ -129,6 +133,10 @@ class AliadoEstado {
   final int? ataqueDano;
   final String? habilidad;
 
+  /// Quién aplica los efectos de su carta, y el script si lo hace el programa.
+  final EfectosAliado efectos;
+  final String? scriptId;
+
   /// Ya usó su ataque y/o habilidad al entrar.
   final bool entradaResuelta;
 
@@ -137,12 +145,15 @@ class AliadoEstado {
 
   const AliadoEstado({
     required this.slot,
+    required this.categoria,
     required this.nombre,
     required this.hpMaximo,
     required this.hp,
     this.ataqueNombre,
     this.ataqueDano,
     this.habilidad,
+    this.efectos = EfectosAliado.jugador,
+    this.scriptId,
     this.entradaResuelta = false,
     this.atacoEnTurnoJefe = false,
   });
@@ -156,24 +167,30 @@ class AliadoEstado {
   }) =>
       AliadoEstado(
         slot: slot,
+        categoria: categoria,
         nombre: nombre,
         hpMaximo: hpMaximo,
         hp: hp ?? this.hp,
         ataqueNombre: ataqueNombre,
         ataqueDano: ataqueDano,
         habilidad: habilidad,
+        efectos: efectos,
+        scriptId: scriptId,
         entradaResuelta: entradaResuelta ?? this.entradaResuelta,
         atacoEnTurnoJefe: atacoEnTurnoJefe ?? this.atacoEnTurnoJefe,
       );
 
   Map<String, Object?> toJson() => {
         'slot': slot,
+        'categoria': categoria.name,
         'nombre': nombre,
         'hpMaximo': hpMaximo,
         'hp': hp,
         'ataqueNombre': ataqueNombre,
         'ataqueDano': ataqueDano,
         'habilidad': habilidad,
+        'efectos': efectos.name,
+        'scriptId': scriptId,
         'entradaResuelta': entradaResuelta,
         'atacoEnTurnoJefe': atacoEnTurnoJefe,
       };
@@ -335,6 +352,12 @@ class EstadoPartida {
   List<int> get slotsLibres => [
         for (final j in jugadores)
           if (!j.eliminado && aliadoEn(j.asiento) == null) j.asiento,
+      ];
+
+  /// Categorías sin aliado vivo (D-13): son las que puede elegir el dado.
+  List<CategoriaAliado> get categoriasLibres => [
+        for (final c in CategoriaAliado.values)
+          if (!aliados.any((a) => a.categoria == c)) c,
       ];
 
   /// Un jugador con un aliado vivo en su slot no puede dañar al jefe.

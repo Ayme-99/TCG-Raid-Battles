@@ -27,6 +27,9 @@ void _comprobar(EstadoPartida s, String donde) {
   final slots = [for (final a in s.aliados) a.slot];
   expect(slots.toSet().length, slots.length,
       reason: '$donde: un aliado como máximo por slot');
+  final categorias = [for (final a in s.aliados) a.categoria];
+  expect(categorias.toSet().length, categorias.length,
+      reason: '$donde: un aliado como máximo por categoría');
   for (final a in s.aliados) {
     expect(a.hp, inInclusiveRange(1, a.hpMaximo), reason: donde);
   }

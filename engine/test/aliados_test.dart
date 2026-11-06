@@ -4,8 +4,13 @@ import 'package:test/test.dart';
 import 'ayudas.dart';
 
 // Aliados de prueba (propuestas de D-04 §7.5, sin definir en el catálogo).
-AliadoInvocado rattata(int slot) => AliadoInvocado(
+AliadoInvocado rattata(
+  int slot, {
+  CategoriaAliado categoria = CategoriaAliado.danio,
+}) =>
+    AliadoInvocado(
       slot: slot,
+      categoria: categoria,
       nombre: 'Rattata',
       hp: 60,
       ataqueNombre: 'Placaje',
@@ -14,6 +19,7 @@ AliadoInvocado rattata(int slot) => AliadoInvocado(
 
 AliadoInvocado wobbuffet(int slot) => AliadoInvocado(
       slot: slot,
+      categoria: CategoriaAliado.barrera,
       nombre: 'Wobbuffet',
       hp: 110,
       habilidad: 'Contraataque (pasiva)',
@@ -21,6 +27,7 @@ AliadoInvocado wobbuffet(int slot) => AliadoInvocado(
 
 AliadoInvocado cleffairy(int slot) => AliadoInvocado(
       slot: slot,
+      categoria: CategoriaAliado.cura,
       nombre: 'Cleffairy',
       hp: 80,
       habilidad: 'Deseo: cura al final del turno del jefe',
@@ -38,6 +45,30 @@ EstadoPartida palkia({int cada = 600, int hp = 3000}) {
 /// El jugador 0 baja a Palkia a 2400 y salta el primer intento.
 EstadoPartida conIntento() =>
     apply(palkia(), const TurnoJugador(jugador: 0, dano: 600));
+
+// Efectos de aliado de prueba (D-13). Son funciones de nivel superior para
+// poder usarlas en un mapa `const`.
+
+/// El jefe se cura 50 (sin pasar de su máximo).
+EstadoPartida curaDe50(EstadoPartida e, AliadoEstado aliado) {
+  final jefe = e.jefe!;
+  final falta = jefe.hpMaximo - jefe.hp;
+  final sube = falta < 50 ? falta : 50;
+  return e.copiarCon(
+    jefe: jefe.conHp(jefe.hp + sube),
+    curacionJefe: e.curacionJefe + sube,
+  );
+}
+
+/// Termina la partida: un script no puede hacerlo.
+EstadoPartida mataAlJefe(EstadoPartida e, AliadoEstado aliado) =>
+    e.copiarCon(fase: Fase.terminada, resultado: Resultado.victoria);
+
+const scriptsDePrueba = {
+  'cura-al-final': ScriptAliado(alFinTurnoJefe: curaDe50),
+  'cura-al-entrar': ScriptAliado(alEntrar: curaDe50),
+  'termina': ScriptAliado(alEntrar: mataAlJefe),
+};
 
 void main() {
   group('umbrales de invocación', () {
@@ -155,7 +186,12 @@ void main() {
       expect(
         () => apply(
           conIntento(),
-          const AliadoInvocado(slot: 1, nombre: 'X', hp: 0),
+          const AliadoInvocado(
+            slot: 1,
+            categoria: CategoriaAliado.danio,
+            nombre: 'X',
+            hp: 0,
+          ),
         ),
         throwsA(isA<ReglaIncumplida>()),
       );
@@ -172,8 +208,8 @@ void main() {
     test('con los slots ocupados los intentos se pierden', () {
       var s = apply(palkia(), const TurnoJugador(jugador: 0, dano: 1800));
       s = apply(s, rattata(0));
-      s = apply(s, rattata(1));
-      s = apply(s, rattata(2));
+      s = apply(s, rattata(1, categoria: CategoriaAliado.barrera));
+      s = apply(s, rattata(2, categoria: CategoriaAliado.cura));
       expect(s.slotsLibres, isEmpty);
       expect(s.intentosInvocacionPendientes, 0);
     });
@@ -368,6 +404,117 @@ void main() {
       expect(s.jefe!.hp, 2500);
       expect(s.curacionJefe, 100);
       expect(s.aliadoEn(1)!.nombre, 'Cleffairy');
+    });
+  });
+
+  group('categorías de aliado (D-13)', () {
+    // Dos intentos de golpe: Palkia baja a 1800.
+    EstadoPartida dosIntentos() =>
+        apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200));
+
+    test('al principio están libres las cuatro categorías', () {
+      expect(conIntento().categoriasLibres, CategoriaAliado.values);
+    });
+
+    test('no puede haber dos aliados de la misma categoría', () {
+      var s = apply(dosIntentos(), rattata(1));
+      expect(s.categoriasLibres, [
+        CategoriaAliado.barrera,
+        CategoriaAliado.cura,
+        CategoriaAliado.picaro,
+      ]);
+      expect(() => apply(s, rattata(2)), throwsA(isA<ReglaIncumplida>()));
+      s = apply(s, wobbuffet(2));
+      expect(s.aliados.map((a) => a.categoria),
+          [CategoriaAliado.danio, CategoriaAliado.barrera]);
+    });
+
+    test('al caer un aliado su categoría vuelve a estar libre', () {
+      var s = apply(dosIntentos(), rattata(1));
+      s = apply(s, const SinInvocacion());
+      s = apply(s, const AtaqueAliado(slot: 1, dano: 20));
+      s = apply(s, const AtaqueAAliado(jugador: 1, slot: 1, dano: 60));
+      expect(s.aliados, isEmpty);
+      expect(s.categoriasLibres, CategoriaAliado.values);
+    });
+
+    test('el aliado guarda su categoría', () {
+      final s = apply(conIntento(), cleffairy(1));
+      expect(s.aliadoEn(1)!.categoria, CategoriaAliado.cura);
+    });
+  });
+
+  group('efectos de aliados (D-13)', () {
+    AliadoInvocado chansey(int slot, {String? scriptId, EfectosAliado? efectos}) =>
+        AliadoInvocado(
+          slot: slot,
+          categoria: CategoriaAliado.cura,
+          nombre: 'Chansey',
+          hp: 120,
+          efectos: efectos ?? EfectosAliado.programa,
+          scriptId: scriptId,
+        );
+
+    test('el programa ejecuta el efecto al final del turno del jefe', () {
+      var s = apply(conIntento(), chansey(1, scriptId: 'cura-al-final'),
+          scripts: scriptsDePrueba);
+      expect(s.jefe!.hp, 2400);
+      s = todosActuan(s, dano: 0);
+      s = apply(s, const FinTurnoJefe(), scripts: scriptsDePrueba);
+      expect(s.jefe!.hp, 2450);
+      expect(s.curacionJefe, 50);
+    });
+
+    test('el programa ejecuta el efecto al entrar', () {
+      final s = apply(conIntento(), chansey(1, scriptId: 'cura-al-entrar'),
+          scripts: scriptsDePrueba);
+      expect(s.jefe!.hp, 2450);
+    });
+
+    test('con efectos del jugador el programa no hace nada', () {
+      var s = apply(conIntento(), chansey(1, efectos: EfectosAliado.jugador));
+      s = todosActuan(s, dano: 0);
+      s = apply(s, const FinTurnoJefe(), scripts: scriptsDePrueba);
+      expect(s.jefe!.hp, 2400);
+    });
+
+    test('un script que no existe se rechaza', () {
+      expect(
+        () => apply(conIntento(), chansey(1, scriptId: 'no-existe'),
+            scripts: scriptsDePrueba),
+        throwsA(isA<ReglaIncumplida>()),
+      );
+      // El catálogo de scripts de verdad está vacío por ahora.
+      expect(
+        () => apply(conIntento(), chansey(1, scriptId: 'cura-al-final')),
+        throwsA(isA<ReglaIncumplida>()),
+      );
+    });
+
+    test('efectos del programa sin scriptId se rechazan', () {
+      expect(
+        () => apply(conIntento(), chansey(1), scripts: scriptsDePrueba),
+        throwsA(isA<ReglaIncumplida>()),
+      );
+    });
+
+    test('efectos del jugador con scriptId se rechazan', () {
+      expect(
+        () => apply(
+          conIntento(),
+          chansey(1, scriptId: 'cura-al-final', efectos: EfectosAliado.jugador),
+          scripts: scriptsDePrueba,
+        ),
+        throwsA(isA<ReglaIncumplida>()),
+      );
+    });
+
+    test('un script no puede terminar la partida', () {
+      expect(
+        () => apply(conIntento(), chansey(1, scriptId: 'termina'),
+            scripts: scriptsDePrueba),
+        throwsA(isA<ReglaIncumplida>()),
+      );
     });
   });
 }
