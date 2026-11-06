@@ -45,8 +45,9 @@ Marcado como **propuesta de prueba**: el GDD define los ataques por nivel y las 
 - HP: el de referencia del nivel: Nv1 2382 · Nv2 4313 · Nv3 4411 · Nv4 5205 (o el de la carta si usas una real, anotándolo).
 - Ataques por nivel (ranura 1 / 2 / 3): Nv1 30/60/120 · Nv2 40/80/160 · Nv3 60/100/200 · Nv4 80/120/240.
 - Máximo de ataques por turno: Nv1 2 · Nv2 3 · Nv3 4 · Nv4 5.
-- Mazo de jefe sugerido para empezar: 10 cartas con 5 de ranura 1, 3 de ranura 2 y 2 de ranura 3; objetivo de cada ataque (todos / uno elegido / uno al azar) repartido como prefieras, **pero anótalo** para poder repetirlo.
-- Sin curación ni aliados en la sesión 1. Se añaden en la sesión 2 si el flujo base se entiende, porque aún no están calibrados (GDD §9).
+- Mazo de jefe, como en el juego oficial (confirmado). Composición sugerida para empezar: 10 cartas con 5 de ranura 1, 3 de ranura 2 y 2 de ranura 3; objetivo de cada ataque (todos / uno elegido / uno al azar) repartido como prefieras, **pero anótalo** para poder repetirlo.
+- Sin aliados en la sesión 1. Se añaden en la sesión 2 si el flujo base se entiende, porque aún no están calibrados (GDD §9).
+- **Aliados (borrador, aún no está en el GDD):** cada jefe tiene 4 aliados, uno por categoría: Daño, Barrera, Cura y Pícaro, cada uno centrado en una forma de molestar a los jugadores (ejemplo: Rattata, Mr. Mime, Chansey y Scyther). Al invocar, un dado decide el slot y otro la categoría; el asistente no deja repetir un slot ni una categoría que ya estén en uso. Para probarlo en papel, usa dos dados y repite la tirada si sale un valor ocupado.
 
 Si el mazo sugerido da una partida claramente demasiado fácil o difícil, no lo ajustes sobre la marcha: anótalo y cambia una sola cosa en la partida siguiente.
 
