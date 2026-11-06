@@ -94,7 +94,7 @@ class ControladorEnvios extends Notifier<EstadoEnvios> {
         state = state.copiarCon(partidaEncolada: null);
       }
     });
-    unawaited(Future.microtask(_recargar));
+    unawaited(Future.microtask(_arrancar));
     return const EstadoEnvios();
   }
 
@@ -130,6 +130,7 @@ class ControladorEnvios extends Notifier<EstadoEnvios> {
     _cancelarReintento?.call();
     _cancelarReintento = null;
     state = state.copiarCon(enviando: true);
+    String? aviso;
     try {
       final api = ref.read(clienteApiProvider);
       for (final envio in await _cola.pendientes()) {
@@ -141,7 +142,8 @@ class ControladorEnvios extends Notifier<EstadoEnvios> {
           case ResultadoEnvio.rechazada:
             final motivo = respuesta.mensaje ?? 'El servidor la ha rechazado.';
             await _cola.rechazar(envio.partidaId, motivo);
-            state = state.copiarCon(mensaje: 'Partida rechazada: $motivo');
+            aviso = 'Partida rechazada: $motivo';
+            state = state.copiarCon(mensaje: aviso);
           case ResultadoEnvio.sesionCaducada:
             await ref.read(sesionProvider.notifier).cerrarSesion();
             state = state.copiarCon(
@@ -161,7 +163,8 @@ class ControladorEnvios extends Notifier<EstadoEnvios> {
             return;
         }
       }
-      state = state.copiarCon(mensaje: null);
+      // Todo lo pendiente se ha enviado; solo queda el aviso de un rechazo.
+      state = state.copiarCon(mensaje: aviso);
     } finally {
       _procesando = false;
       if (_vivo) {
@@ -169,6 +172,14 @@ class ControladorEnvios extends Notifier<EstadoEnvios> {
         if (_vivo) state = state.copiarCon(enviando: false);
       }
     }
+  }
+
+  // Al crearse cuenta lo que hay en la cola y, si ya hay sesión (la leyó antes
+  // el controlador de sesión), envía lo pendiente. Si la sesión llega después,
+  // lo hace el listener de `build`.
+  Future<void> _arrancar() async {
+    await _recargar();
+    if (_vivo) await procesar();
   }
 
   /// Olvida las partidas rechazadas.
