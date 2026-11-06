@@ -258,3 +258,63 @@ test('un resumen v1 con campos de la v2 no es válido', async (t) => {
   const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: mezcla });
   assert.strictEqual(res.estado, 400);
 });
+
+// Una partida v1 con aliado, pasada a v3 (categoría en cada aliado y los dos
+// campos de estados del resumen, que en la v1 no existían).
+function v3ConAliado() {
+  const partida = JSON.parse(JSON.stringify(ejemplo('validos', 'derrota-con-aliado-y-abandono')));
+  partida.version = 3;
+  partida.partidaId = 'ejemplo-v3-con-aliado';
+  for (const e of partida.eventos) {
+    if (e.tipo === 'aliadoInvocado') e.categoria = 'danio';
+  }
+  for (const j of partida.resumen.jugadores) {
+    j.estadosAplicados = 0;
+    j.bonoEstados = 0;
+  }
+  return partida;
+}
+
+test('una partida v3 con aliados por categoría se guarda tal cual llegó', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const partida = v3ConAliado();
+  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: partida });
+  assert.strictEqual(res.estado, 201, JSON.stringify(res.json));
+  const detalle = await llamar('GET', `/partidas/${partida.partidaId}`, { usuario: ANA });
+  assert.strictEqual(detalle.json.registro.version, 3);
+  assert.strictEqual(detalle.json.registro.eventos.find((e) => e.tipo === 'aliadoInvocado').categoria, 'danio');
+});
+
+test('las partidas v1, v2 y v3 conviven', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const v1 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'victoria-2-jugadores') });
+  const v2 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'victoria-por-estados', 2) });
+  const v3 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'derrota-con-veneno-y-abandono', 3) });
+  assert.deepStrictEqual([v1.estado, v2.estado, v3.estado], [201, 201, 201]);
+});
+
+test('un aliado v3 sin categoría o con una desconocida se rechaza', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const sin = v3ConAliado();
+  delete sin.eventos.find((e) => e.tipo === 'aliadoInvocado').categoria;
+  const a = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: sin });
+  assert.strictEqual(a.estado, 400);
+  assert.strictEqual(a.json.error, 'estructura_invalida');
+
+  const rara = v3ConAliado();
+  rara.eventos.find((e) => e.tipo === 'aliadoInvocado').categoria = 'tanque';
+  const b = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: rara });
+  assert.strictEqual(b.estado, 400);
+});
+
+test('el mensaje de versión no soportada lista las tres versiones', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...v3ConAliado(), version: 4 } });
+  assert.strictEqual(res.estado, 400);
+  assert.strictEqual(res.json.error, 'version_no_soportada');
+  assert.match(res.json.mensaje ?? JSON.stringify(res.json), /1, 2 y 3/);
+});
