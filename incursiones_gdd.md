@@ -222,6 +222,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | `docs/D-01-setup.md` | Orden del setup, 2 Pokémon en todos los niveles, casos límite |
 | `docs/D-02-dano-maximo.md` | Qué cuenta para X y quién lo introduce |
 | `docs/D-03-sistema-de-poder.md` | Fórmula de poder, calibración y simulador |
+| `contrato/README.md` | Formato JSON versionado del registro de partida (T-07) |
 | `docs/D-06-curacion-del-jefe.md` | Curación del jefe, final de partida y daño para los puntos |
 | `docs/D-04-aliados.md` | Slots, invocación, bloqueo y objetivo de los aliados |
 | `docs/D-05-carta-de-animo.md` | Cheer, KO, promoción desde la banca |

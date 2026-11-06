@@ -31,11 +31,15 @@ final class ElegirJefe extends Evento {
   /// Cada cuántos HP perdidos hay un intento de invocación. null: no invoca.
   final int? invocacionCadaHp;
 
+  /// Id del jefe en el catálogo (`catalog/bosses`), si viene de él.
+  final String? jefeId;
+
   const ElegirJefe({
     required this.nombre,
     required this.nivel,
     required this.hp,
     this.invocacionCadaHp,
+    this.jefeId,
   });
 }
 

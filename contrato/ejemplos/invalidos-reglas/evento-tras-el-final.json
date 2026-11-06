@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "partidaId": "ejemplo-evento-tras-el-final",
+  "eventos": [
+    { "tipo": "configurarJugadores", "jugadores": [ { "nombre": "Ana", "ataqueMaximo": 100 } ] },
+    { "tipo": "elegirJefe", "nombre": "Jefe", "nivel": 1, "hp": 100 },
+    { "tipo": "turnoJugador", "jugador": 0, "dano": 100 },
+    { "tipo": "turnoJugador", "jugador": 0, "dano": 10 }
+  ]
+}

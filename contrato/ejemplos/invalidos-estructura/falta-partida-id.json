@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "eventos": [
+    { "tipo": "configurarJugadores", "jugadores": [ { "nombre": "Ana", "ataqueMaximo": 100 } ] }
+  ]
+}

@@ -7,3 +7,14 @@ class ReglaIncumplida implements Exception {
   @override
   String toString() => 'ReglaIncumplida: $mensaje';
 }
+
+/// Se lanza cuando un registro de partida (JSON) no cumple el contrato:
+/// versión no soportada, estructura incorrecta o eventos que rompen las reglas.
+class RegistroInvalido implements Exception {
+  final String mensaje;
+
+  const RegistroInvalido(this.mensaje);
+
+  @override
+  String toString() => 'RegistroInvalido: $mensaje';
+}

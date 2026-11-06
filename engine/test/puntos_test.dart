@@ -212,7 +212,7 @@ void main() {
       expect(p.danoTotal, 1000);
       expect(p.puntosTotal, 316);
       expect([for (final j in p.jugadores) j.puntos], [174, 142]);
-      expect(p.toJson()['puntos_total'], 316);
+      expect(p.toJson()['puntosTotal'], 316);
     });
   });
 }

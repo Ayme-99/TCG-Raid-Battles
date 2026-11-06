@@ -1,0 +1,5 @@
+{
+  "version": 99,
+  "partidaId": "ejemplo-version-futura",
+  "eventos": [ { "tipo": "finTurnoJefe" } ]
+}

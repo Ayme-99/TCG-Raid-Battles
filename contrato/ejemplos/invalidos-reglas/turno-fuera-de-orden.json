@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "partidaId": "ejemplo-turno-fuera-de-orden",
+  "eventos": [
+    { "tipo": "configurarJugadores", "jugadores": [
+      { "nombre": "Ana", "ataqueMaximo": 100 },
+      { "nombre": "Bea", "ataqueMaximo": 100 }
+    ] },
+    { "tipo": "elegirJefe", "nombre": "Jefe", "nivel": 1, "hp": 500 },
+    { "tipo": "turnoJugador", "jugador": 1, "dano": 50 }
+  ]
+}
