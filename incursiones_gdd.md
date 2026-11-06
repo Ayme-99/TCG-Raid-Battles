@@ -160,7 +160,8 @@ Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO
 | Efecto de las cartas de ataque del jefe | Física: el asistente solo registra el resultado que le dicta el jugador |
 | Cartas de ánimo (efecto) | Física: el asistente solo registra cuál salió |
 | Objetivo aleatorio (ataque del jefe y de aliados) | Física (dado o moneda real): el asistente registra el resultado |
-| Estados alterados | Física |
+| Estados alterados de los Pokémon de los jugadores | Física |
+| Veneno y quemadura del jefe (D-12) | **Asistente virtual** (daño en el chequeo y moneda automática) |
 | Registro / historial de partida | Asistente virtual |
 | Puntos y desbloqueos | Asistente virtual → backend |
 
