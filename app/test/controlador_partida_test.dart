@@ -21,7 +21,7 @@ ControladorPartida controlador(ProviderContainer c) =>
 void preparar(ProviderContainer c) {
   final p = controlador(c);
   expect(
-    p.registrar(ConfigurarJugadores([
+    p.registrar(const ConfigurarJugadores([
       ConfigJugador(nombre: 'Ana', ataqueMaximo: 100),
       ConfigJugador(nombre: 'Bea', ataqueMaximo: 100),
     ])),
