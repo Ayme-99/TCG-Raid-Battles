@@ -75,8 +75,9 @@ void main() {
     expect(h.partida.estado.fase, Fase.terminada);
     h = h.deshacer();
     expect(h.partida.estado.fase, isNot(Fase.terminada));
-    h = h.aplicar(TurnoJugador(jugador: 0, dano: 1));
-    expect(h.partida.estado.fase, isNot(Fase.terminada));
+    expect(h.partida.estado.fase, Fase.turnoJefe);
+    h = h.aplicar(const FinTurnoJefe());
+    expect(h.partida.estado.fase, Fase.turnoJugadores);
   });
 
   test('en 60 partidas aleatorias deshacer y rehacer es la identidad', () {
