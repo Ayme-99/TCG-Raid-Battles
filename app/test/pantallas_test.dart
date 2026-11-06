@@ -55,7 +55,7 @@ void main() {
     expect(find.text('Nivel 1 (X = 200)'), findsOneWidget);
     expect(c.read(estadoProvider).fase, Fase.eleccionJefe);
 
-    await escribir(tester, 'jefe-nombre', 'Mewtwo');
+    await tester.enterText(find.byKey(const Key('jefe-nombre')), 'Mewtwo');
     await escribir(tester, 'jefe-hp', '300');
     await tocar(tester, 'elegir-jefe');
 
