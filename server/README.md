@@ -6,7 +6,7 @@ Es un **módulo Express** (no un servidor): `crearRouter(...)` devuelve un route
 
 ## Qué valida
 
-1. **Estructura**, con el esquema de la versión que declara el registro (1 o 2; [`../contrato/`](../contrato/README.md)): `400 estructura_invalida` o `400 version_no_soportada`. Las dos versiones conviven y el registro se guarda tal cual llegó.
+1. **Estructura**, con el esquema de la versión que declara el registro (1, 2 o 3; [`../contrato/`](../contrato/README.md)): `400 estructura_invalida` o `400 version_no_soportada`. Las versiones conviven y el registro se guarda tal cual llegó.
 2. **Que el usuario juega en la partida**: su cuenta debe estar en `cuentas` (`403 no_participas`).
 3. **Coherencia del resumen** (`src/coherencia.js`): el nivel y el jefe son los del registro, el resultado cuadra con el daño y el abandono, `puntosTotal` sale de la fórmula de D-10, el reparto por puesto y los abonos cuadran con las cuentas y, en la versión 2, las aplicaciones de estados de cada jugador (se recuentan a partir de los eventos) y su bono de D-12 (`422 resumen_incoherente`, con la lista de motivos).
 4. **Que las cuentas existen** (`422 cuenta_desconocida`).
