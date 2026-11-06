@@ -1,5 +1,6 @@
 import 'errores.dart';
 import 'estado.dart';
+import 'reglas.dart';
 
 /// Reglas de puntos y desbloqueos (D-10, `docs/D-10-sistema-de-puntos.md`).
 ///
@@ -64,6 +65,27 @@ int puntosTotales({
   return (danoTotal * tope + 2 * hpJefe) ~/ (4 * hpJefe) + 1;
 }
 
+/// Bono de estados de un jugador (D-12): `tope del nivel ÷ 100 × min(n, 3)`
+/// en victoria y una cuarta parte (mitades hacia arriba) en derrota. Va fuera
+/// del total del equipo y no cambia los puestos.
+int bonoEstados({
+  required int nivel,
+  required int aplicaciones,
+  required Resultado resultado,
+}) {
+  final tope = topeVictoriaPorNivel[nivel];
+  if (tope == null) {
+    throw ReglaIncumplida('el nivel $nivel no existe');
+  }
+  if (aplicaciones < 0) {
+    throw const ReglaIncumplida('las aplicaciones no pueden ser negativas');
+  }
+  final contables =
+      aplicaciones < topeAplicacionesBono ? aplicaciones : topeAplicacionesBono;
+  final completo = tope ~/ 100 * contables;
+  return resultado == Resultado.victoria ? completo : (completo + 2) ~/ 4;
+}
+
 /// Si una cuenta con [puntosAcumulados] puede jugar un jefe de ese nivel que
 /// requiere desbloqueo.
 bool jefeDesbloqueado(int puntosAcumulados, int nivelJefe) {
@@ -90,6 +112,11 @@ class PuntosJugador {
   /// Puntos que le corresponden por el reparto.
   final int puntos;
 
+  /// Veces que aplicó un estado que el jefe no tenía y bono que le da (D-12).
+  /// El bono se suma a [puntos] y queda fuera del total del equipo.
+  final int estadosAplicados;
+  final int bonoEstados;
+
   /// Si se le abonan: los invitados ocupan puesto pero no cobran.
   final bool abonado;
 
@@ -101,11 +128,13 @@ class PuntosJugador {
     required this.puesto,
     required this.porcentaje,
     required this.puntos,
+    this.estadosAplicados = 0,
+    this.bonoEstados = 0,
     required this.abonado,
   });
 
-  /// Lo que se suma a la cuenta del jugador.
-  int get puntosAbonados => abonado ? puntos : 0;
+  /// Lo que se suma a la cuenta del jugador: reparto más bono de estados.
+  int get puntosAbonados => abonado ? puntos + bonoEstados : 0;
 
   Map<String, Object?> toJson() => {
         'asiento': asiento,
@@ -115,6 +144,8 @@ class PuntosJugador {
         'puesto': puesto,
         'porcentaje': porcentaje,
         'puntos': puntos,
+        'estadosAplicados': estadosAplicados,
+        'bonoEstados': bonoEstados,
         'abonado': abonado,
       };
 }
@@ -195,6 +226,12 @@ PuntosPartida calcularPuntos(
       puesto: i + 1,
       porcentaje: porcentajes[i],
       puntos: partes[i],
+      estadosAplicados: estado.estadosAplicados[j.asiento],
+      bonoEstados: bonoEstados(
+        nivel: jefe.nivel,
+        aplicaciones: estado.estadosAplicados[j.asiento],
+        resultado: estado.resultado!,
+      ),
       abonado: asientosConCuenta?.contains(j.asiento) ?? true,
     ));
   }

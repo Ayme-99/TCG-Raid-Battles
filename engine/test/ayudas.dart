@@ -63,6 +63,15 @@ List<Evento> partidaAleatoria(
     if (v.isNotEmpty) aplica(PokemonKo(v[azar.nextInt(v.length)]));
   }
 
+  void estadoAlAzar() {
+    final v = vivos();
+    if (v.isEmpty) return;
+    aplica(AplicarEstadoJefe(
+      jugador: v[azar.nextInt(v.length)],
+      estado: azar.nextBool() ? EstadoDelJefe.veneno : EstadoDelJefe.quemadura,
+    ));
+  }
+
   final n = 1 + azar.nextInt(4);
   aplica(ConfigurarJugadores([
     for (var i = 0; i < n; i++)
@@ -126,6 +135,7 @@ List<Evento> partidaAleatoria(
           dano: s.estaBloqueado(j) ? 0 : azar.nextInt(120),
         ));
       }
+      if (!s.terminada && azar.nextInt(5) == 0) estadoAlAzar();
       if (!s.terminada && azar.nextInt(6) == 0) koAlAzar();
     } else if (s.fase == Fase.turnoJefe) {
       if (azar.nextInt(3) == 0) aplica(CuracionJefe(azar.nextInt(300)));
@@ -149,7 +159,13 @@ List<Evento> partidaAleatoria(
       while (!s.terminada && azar.nextInt(3) == 0) {
         koAlAzar();
       }
-      if (!s.terminada) aplica(const FinTurnoJefe());
+      if (!s.terminada && azar.nextInt(5) == 0) estadoAlAzar();
+      if (!s.terminada) {
+        // Con el jefe quemado, la app tira la moneda y la registra.
+        aplica(FinTurnoJefe(
+          monedaQuemadura: s.jefe!.quemado ? azar.nextBool() : null,
+        ));
+      }
     }
   }
   return eventos;

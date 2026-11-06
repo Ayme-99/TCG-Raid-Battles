@@ -10,9 +10,13 @@ void _comprobar(EstadoPartida s, String donde) {
   final jefe = s.jefe;
   if (jefe != null) {
     expect(jefe.hp, inInclusiveRange(0, jefe.hpMaximo), reason: donde);
-    expect(s.danoPorJugador.fold<int>(0, (a, b) => a + b) - s.curacionJefe,
+    expect(
+        s.danoPorJugador.fold<int>(0, (a, b) => a + b) +
+            s.danoEstados -
+            s.curacionJefe,
         jefe.hpMaximo - jefe.hp,
-        reason: '$donde: daño menos curación debe ser el HP perdido');
+        reason: '$donde: daño (jugadores y estados) menos curación debe ser '
+            'el HP perdido');
   }
   for (final j in s.jugadores) {
     expect(j.pokemonVivos, inInclusiveRange(0, 2), reason: donde);
