@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import '../envios/botones_cuenta.dart';
+import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
 import 'fin_partida.dart';
@@ -20,6 +22,10 @@ class PantallaPartida extends ConsumerWidget {
     final estado = ref.watch(estadoProvider);
     final puedeDeshacer = ref.watch(puedeDeshacerProvider);
     final puedeRehacer = ref.watch(puedeRehacerProvider);
+    // Una vez guardados los resultados ya no se puede deshacer: el servidor
+    // ya tiene esa partida.
+    final bloqueada = estado.terminada &&
+        ref.watch(enviosProvider.select((e) => e.partidaEncolada != null));
     final enJuego =
         estado.fase == Fase.turnoJugadores || estado.fase == Fase.turnoJefe;
     return Scaffold(
@@ -30,7 +36,7 @@ class PantallaPartida extends ConsumerWidget {
             key: const Key('deshacer'),
             tooltip: 'Deshacer',
             icon: const Icon(Icons.undo),
-            onPressed: puedeDeshacer
+            onPressed: puedeDeshacer && !bloqueada
                 ? () => ref.read(partidaProvider.notifier).deshacer()
                 : null,
           ),
@@ -38,10 +44,12 @@ class PantallaPartida extends ConsumerWidget {
             key: const Key('rehacer'),
             tooltip: 'Rehacer',
             icon: const Icon(Icons.redo),
-            onPressed: puedeRehacer
+            onPressed: puedeRehacer && !bloqueada
                 ? () => ref.read(partidaProvider.notifier).rehacer()
                 : null,
           ),
+          const BotonEnvios(),
+          const BotonCuenta(),
           if (enJuego)
             IconButton(
               key: const Key('abandonar'),

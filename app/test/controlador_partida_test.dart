@@ -5,8 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import 'ayudas.dart';
+
 ProviderContainer crear() {
   final c = ProviderContainer(overrides: [
+    ...sobrescribir(),
     generadorIdProvider.overrideWithValue(() => 'partida-de-prueba'),
     relojProvider.overrideWithValue(() => DateTime.utc(2026, 11, 6, 12)),
   ]);
@@ -150,5 +153,31 @@ void main() {
     final ids = {for (var i = 0; i < 50; i++) generarIdPartida()};
     expect(ids.length, 50);
     expect(ids.every((id) => id.length <= 64), isTrue);
+  });
+
+  test('el registro de la misma partida es idéntico hasta que cambian los eventos',
+      () {
+    var n = 0;
+    final c = ProviderContainer(overrides: [
+      ...sobrescribir(),
+      generadorIdProvider.overrideWithValue(() => 'id-${++n}'),
+      relojProvider.overrideWithValue(() => DateTime.utc(2026, 11, 6, 12, n)),
+    ]);
+    addTearDown(c.dispose);
+    final p = controlador(c);
+    preparar(c);
+
+    final a = p.registro().toJson();
+    final b = p.registro().toJson();
+    expect(b, a);
+    expect(a['partidaId'], 'id-1');
+
+    // Cambia el registro: ya es otra partida a efectos del servidor.
+    expect(p.registrar(const TurnoJugador(jugador: 0, dano: 10)), isNull);
+    expect(p.registro().toJson()['partidaId'], 'id-2');
+
+    // Deshacer también la cambia.
+    p.deshacer();
+    expect(p.registro().toJson()['partidaId'], 'id-3');
   });
 }
