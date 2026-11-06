@@ -1,0 +1,68 @@
+{
+  "version": 2,
+  "partidaId": "ejemplo-derrota-veneno-abandono",
+  "cuentas": [
+    "usuario-ana"
+  ],
+  "eventos": [
+    {
+      "tipo": "configurarJugadores",
+      "jugadores": [
+        {
+          "nombre": "Ana",
+          "ataqueMaximo": 100
+        }
+      ]
+    },
+    {
+      "tipo": "elegirJefe",
+      "jefeId": "ejemplo-nv1",
+      "nombre": "Jefe de ejemplo",
+      "nivel": 1,
+      "hp": 400
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 50
+    },
+    {
+      "tipo": "aplicarEstadoJefe",
+      "jugador": 0,
+      "estado": "veneno"
+    },
+    {
+      "tipo": "ataqueJefe",
+      "ranura": 1,
+      "dano": 10
+    },
+    {
+      "tipo": "finTurnoJefe"
+    },
+    {
+      "tipo": "abandonar"
+    }
+  ],
+  "resumen": {
+    "jefeId": "ejemplo-nv1",
+    "nivel": 1,
+    "resultado": "derrota",
+    "danoTotal": 60,
+    "coeficienteY": 7.5,
+    "puntosTotal": 114,
+    "jugadores": [
+      {
+        "asiento": 0,
+        "nombre": "Ana",
+        "dano": 50,
+        "pokemonPerdidos": 0,
+        "puesto": 1,
+        "porcentaje": 100,
+        "puntos": 114,
+        "estadosAplicados": 1,
+        "bonoEstados": 8,
+        "abonado": true
+      }
+    ]
+  }
+}

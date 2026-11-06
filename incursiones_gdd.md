@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.3 (especificación del motor)
+**Versión:** 1.4 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -103,7 +103,9 @@ Detalle en `docs/D-05-carta-de-animo.md`.
 
 ### 4.3 Estados alterados
 
-Dormido, paralizado, envenenado y quemado solo afectan al Pokémon Activo, nunca a la Banca. Se resuelven en la mesa; el asistente no los modela.
+Dormido, paralizado, envenenado y quemado solo afectan al Pokémon Activo, nunca a la Banca. En los Pokémon de los jugadores se resuelven en la mesa; el asistente no los modela.
+
+**Estados del jefe (D-12, `docs/D-12-estados-del-jefe.md`).** El asistente sí lleva el veneno y la quemadura del jefe. El **veneno** es permanente y hace 10 de daño en cada chequeo. La **quemadura** hace 20 y, después del daño, se tira una moneda automática: cara la quita, cruz la mantiene. El chequeo ocurre una vez por ronda, al cerrar el turno del jefe (después de los ataques de los aliados). Si deja al jefe a 0 HP, victoria. El daño de los estados baja el HP del jefe pero no se atribuye a ningún jugador; a cambio, quien aplica estados cobra un bono de puntos (§7).
 
 ### 4.4 Aliados del jefe
 
@@ -141,7 +143,7 @@ El jefe puede curarse sin límite de veces, sin pasar nunca de su HP máximo ini
 
 No existe el empate: o gana el equipo o pierde (abandonar cuenta como derrota).
 
-**Orden de comprobación (D-08, `docs/D-08-orden-fin-de-partida.md`).** El fin de partida se evalúa tras cada evento registrado y la primera condición que se cumple termina la partida: a partir de ahí no se acepta ningún evento más, así que no puede acabar a la vez en victoria y derrota. Si un mismo efecto deja al jefe a 0 HP y elimina al último Pokémon de la mesa (retroceso, veneno, quemadura), **gana la victoria**: la mesa registra primero el daño al jefe y después los KO de los jugadores. El daño al jefe fuera de turno se registra como daño del jugador que lo causó y cuenta para sus puntos.
+**Orden de comprobación (D-08, `docs/D-08-orden-fin-de-partida.md`).** El fin de partida se evalúa tras cada evento registrado y la primera condición que se cumple termina la partida: a partir de ahí no se acepta ningún evento más, así que no puede acabar a la vez en victoria y derrota. Si un mismo efecto deja al jefe a 0 HP y elimina al último Pokémon de la mesa (retroceso, veneno, quemadura), **gana la victoria**: la mesa registra primero el daño al jefe y después los KO de los jugadores. El daño de veneno y quemadura sobre el jefe no se atribuye a ningún jugador (D-12).
 
 Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO con 4 jugadores). No se adopta el límite oficial de 4 KO.
 
@@ -158,7 +160,8 @@ Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO
 | Efecto de las cartas de ataque del jefe | Física: el asistente solo registra el resultado que le dicta el jugador |
 | Cartas de ánimo (efecto) | Física: el asistente solo registra cuál salió |
 | Objetivo aleatorio (ataque del jefe y de aliados) | Física (dado o moneda real): el asistente registra el resultado |
-| Estados alterados | Física |
+| Estados alterados de los Pokémon de los jugadores | Física |
+| Veneno y quemadura del jefe (D-12) | **Asistente virtual** (daño en el chequeo y moneda automática) |
 | Registro / historial de partida | Asistente virtual |
 | Puntos y desbloqueos | Asistente virtual → backend |
 
@@ -173,6 +176,7 @@ Detalle en `docs/D-10-sistema-de-puntos.md`. Cifras en `balance/tablas/`.
 - **Reparto**: 1 jugador 100 % · 2 jugadores 55 / 45 · 3 jugadores 40 / 33 / 27 · 4 jugadores 27 / 25 / 25 / 23 (los intermedios van primero a quien no perdió Pokémon, luego por daño; empate: menos Pokémon perdidos, luego al azar).
 - **Desbloqueos**: los puntos de una cuenta se acumulan y no se gastan. Un jefe nuevo se desbloquea al llegar a su coste: Nv1 10 000 · Nv2 20 000 · Nv3 30 000 · Nv4 40 000. Los 7 jefes de lanzamiento están disponibles desde el principio.
 - El daño hecho a los aliados no cuenta para los puntos.
+- **Bono de estados** (D-12): cada jugador que aplica veneno o quemadura al jefe cobra un bono individual, fuera del total del equipo, `tope del nivel ÷ 100 × min(n, 3)` con `n` = veces que ha aplicado un estado que el jefe no tenía. En derrota (o abandono) se divide entre 4. No cambia los puestos. Los invitados no lo cobran.
 
 ---
 
@@ -253,3 +257,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.1 | D-07 cerrada: la invocación de aliados la define cada jefe (umbral de HP perdidos, moneda y dado de slot, lista de aliados); se intenta en cuanto el HP del jefe cruza un umbral, cada umbral una sola vez, y el aliado ataca al entrar y al final del turno del jefe contra el dueño de su slot. Las habilidades de aliados son pasivas. El exceso de daño a un aliado se pierde. Ver `docs/D-04-aliados.md` §3, §6 y §7. |
 | v1.2 | D-06 cerrada: la curación del jefe sigue sin límite y sin tope de rondas (toda partida acaba por KO o abandono); abandonar cuenta como derrota y no existe el empate; los puntos de una derrota usan la vida perdida por el jefe (neto), no el daño bruto. Se añade `docs/D-06-curacion-del-jefe.md`. |
 | v1.3 | D-08 cerrada: el fin de partida se evalúa tras cada evento registrado; si un efecto deja al jefe a 0 HP y elimina al último Pokémon de la mesa a la vez, gana la victoria (se registra primero el daño al jefe); el daño al jefe fuera de turno cuenta como daño del jugador que lo causó. Propuesta abierta: veneno y quemadura como estado en el asistente. |
+| v1.4 | D-12 cerrada: el asistente lleva los estados del jefe (veneno permanente de 10, quemadura de 20 con moneda automática para quitarla) con chequeo al cerrar la ronda; su daño no se atribuye a ningún jugador y se sustituye por un bono individual de puntos de `tope ÷ 100 × min(n, 3)` (÷ 4 en derrota), fuera del total del equipo. Sustituye la decisión de D-08 sobre el daño de estados. |

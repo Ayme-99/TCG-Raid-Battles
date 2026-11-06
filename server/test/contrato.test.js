@@ -9,36 +9,50 @@ const Ajv2020 = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
 
 const contrato = path.join(__dirname, '..', '..', 'contrato');
-const ajv = new Ajv2020({ allErrors: true, strict: true });
-addFormats(ajv);
-const validar = ajv.compile(
-  JSON.parse(fs.readFileSync(path.join(contrato, 'partida.v1.schema.json'), 'utf8')),
-);
 
-function ejemplos(carpeta) {
-  const dir = path.join(contrato, 'ejemplos', carpeta);
+function compilar(version) {
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
+  return ajv.compile(
+    JSON.parse(fs.readFileSync(path.join(contrato, `partida.v${version}.schema.json`), 'utf8')),
+  );
+}
+
+function ejemplos(version, carpeta) {
+  const dir = path.join(contrato, 'ejemplos', `v${version}`, carpeta);
   return fs.readdirSync(dir).filter((f) => f.endsWith('.json')).map((f) => ({
     nombre: f,
     json: JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')),
   }));
 }
 
-for (const { nombre, json } of ejemplos('validos')) {
-  test(`válido: ${nombre}`, () => {
-    assert.ok(validar(json), JSON.stringify(validar.errors));
-  });
+for (const version of [1, 2]) {
+  const validar = compilar(version);
+
+  for (const { nombre, json } of ejemplos(version, 'validos')) {
+    test(`v${version} válido: ${nombre}`, () => {
+      assert.ok(validar(json), JSON.stringify(validar.errors));
+    });
+  }
+
+  for (const { nombre, json } of ejemplos(version, 'invalidos-estructura')) {
+    test(`v${version} inválido de estructura: ${nombre}`, () => {
+      assert.strictEqual(validar(json), false);
+    });
+  }
+
+  // Estos ejemplos tienen la estructura correcta: los rechaza el motor porque
+  // rompen las reglas del juego, no el esquema.
+  for (const { nombre, json } of ejemplos(version, 'invalidos-reglas')) {
+    test(`v${version} estructura válida, reglas incumplidas: ${nombre}`, () => {
+      assert.ok(validar(json), JSON.stringify(validar.errors));
+    });
+  }
 }
 
-for (const { nombre, json } of ejemplos('invalidos-estructura')) {
-  test(`inválido de estructura: ${nombre}`, () => {
-    assert.strictEqual(validar(json), false);
-  });
-}
-
-// Estos ejemplos tienen la estructura correcta: los rechaza el motor porque
-// rompen las reglas del juego, no el esquema.
-for (const { nombre, json } of ejemplos('invalidos-reglas')) {
-  test(`estructura válida, reglas incumplidas: ${nombre}`, () => {
-    assert.ok(validar(json), JSON.stringify(validar.errors));
-  });
-}
+test('cada esquema solo acepta su versión', () => {
+  const v1 = compilar(1);
+  const v2 = compilar(2);
+  for (const { json } of ejemplos(1, 'validos')) assert.strictEqual(v2(json), false);
+  for (const { json } of ejemplos(2, 'validos')) assert.strictEqual(v1(json), false);
+});

@@ -28,5 +28,14 @@ int ataqueParaX(int impreso) => impreso.clamp(0, topeAtaqueX).toInt();
 /// Ranuras de ataque del jefe (1, 2 o 3).
 const int ranurasAtaqueJefe = 3;
 
+/// Daño del veneno del jefe en cada chequeo (D-12). Provisional hasta T-17.
+const int danoVeneno = 10;
+
+/// Daño de la quemadura del jefe en cada chequeo (D-12). Provisional.
+const int danoQuemadura = 20;
+
+/// Aplicaciones de estados que cuentan para el bono de puntos (D-12).
+const int topeAplicacionesBono = 3;
+
 /// Cartas de ánimo oficiales (numeradas 1 a 5).
 const int cartasAnimoTotal = 5;

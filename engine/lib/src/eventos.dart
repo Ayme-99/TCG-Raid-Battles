@@ -85,9 +85,29 @@ final class CartaAnimoRobada extends Evento {
   const CartaAnimoRobada({required this.jugador, required this.carta});
 }
 
-/// Termina el turno del jefe y empieza la ronda siguiente.
+/// Estados alterados que el asistente lleva en el jefe (D-12).
+enum EstadoDelJefe { veneno, quemadura }
+
+/// Un jugador deja al jefe con un estado alterado. Si el jefe ya lo tenía no
+/// cambia nada y no cuenta para el bono de puntos.
+final class AplicarEstadoJefe extends Evento {
+  final int jugador;
+  final EstadoDelJefe estado;
+
+  const AplicarEstadoJefe({required this.jugador, required this.estado});
+}
+
+/// Termina el turno del jefe y empieza la ronda siguiente. Antes se hace el
+/// chequeo de estados del jefe (D-12): veneno, quemadura y, si está quemado,
+/// la moneda.
 final class FinTurnoJefe extends Evento {
-  const FinTurnoJefe();
+  /// Resultado de la moneda de la quemadura: true = cara (se quita la
+  /// quemadura), false = cruz (se mantiene). Obligatorio si el jefe está
+  /// quemado y no se admite si no lo está. La app la tira y la registra para
+  /// que reproducir el registro dé siempre el mismo resultado.
+  final bool? monedaQuemadura;
+
+  const FinTurnoJefe({this.monedaQuemadura});
 }
 
 /// La mesa abandona la partida: termina en derrota con el daño hecho hasta

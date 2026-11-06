@@ -1,6 +1,6 @@
 # D-08 · Orden de comprobación del fin de partida con daño fuera de turno
 
-Estado: **cerrada** en lo que sigue hasta «Propuesta abierta». Issue #45.
+Estado: **cerrada**. Issue #45.
 
 ## Problema
 
@@ -10,7 +10,7 @@ La victoria y la derrota se comprueban tras cada daño al jefe y tras cada KO, p
 
 1. **Si el jefe cae, gana la victoria.** El daño al jefe se resuelve antes que el retroceso o cualquier efecto sobre los propios Pokémon. Si el jefe llega a 0 HP, la partida termina en victoria y el KO que viniera después ya no cuenta. Es el mismo orden del juego de cartas (primero el defensor, luego el atacante).
 2. **El fin de partida se evalúa tras cada evento registrado**, como hasta ahora. No hay un «cierre de chequeo» que agrupe efectos.
-3. **El daño al jefe fuera de turno** (veneno o quemadura que han puesto los jugadores) se registra como daño del jugador que lo causó, con el evento de turno que ya existe. Cuenta para sus puntos. No hay evento nuevo.
+3. ~~El daño de veneno o quemadura sobre el jefe se registraba como daño del jugador que lo causó.~~ **Sustituida por D-12**: ese daño no se atribuye a ningún jugador y se premia con un bono de puntos.
 
 ## Cómo lo garantiza el motor
 
@@ -27,12 +27,6 @@ La victoria y la derrota se comprueban tras cada daño al jefe y tras cada KO, p
 | El último Pokémon cae y el jefe sigue con HP | KO | Derrota |
 | El jefe cae después de que el último Pokémon ya haya caído | (ya terminó) | Derrota |
 
-## Propuesta abierta: veneno y quemadura como estado
+## Veneno y quemadura
 
-Comentario de Ayme durante esta decisión, pendiente de confirmar antes de llevarlo al GDD (hoy §4.3 dice que el asistente no modela los estados):
-
-- Los estados se llevarían en el asistente como un estado del Pokémon.
-- La **quemadura** tira la moneda al final del turno, como en el juego real.
-- El **veneno** es permanente y se contabiliza de forma automática.
-
-Falta decidir si esto vale solo para el jefe o también para los Pokémon de los jugadores, quién tira la moneda en el asistente y cómo se atribuye el daño de un estado a un jugador para los puntos. Cuando se confirme, se abre como decisión aparte (propuesta: D-12) y se implementa en el motor.
+Cerrado en `D-12-estados-del-jefe.md`: el asistente lleva los estados del jefe, el chequeo termina la partida en victoria si deja al jefe a 0 HP y su daño no se atribuye a ningún jugador.

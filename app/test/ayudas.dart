@@ -1,0 +1,66 @@
+import 'dart:convert';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:incursiones_app/almacen/almacen.dart';
+import 'package:incursiones_app/cuenta/cliente_api.dart';
+import 'package:incursiones_app/cuenta/sesion.dart';
+import 'package:incursiones_app/envios/controlador_envios.dart';
+
+const sesionDePrueba = Sesion(
+  token: 'token-de-prueba',
+  username: 'ana',
+  userId: '64b000000000000000000001',
+);
+
+/// Almacén con la sesión de Ana ya iniciada.
+AlmacenMemoria almacenConSesion() =>
+    AlmacenMemoria()..datos['sesion'] = jsonEncode(sesionDePrueba.toJson());
+
+/// Un reintento que la app ha programado y que el test dispara a mano.
+class Reintento {
+  Reintento(this.espera, this.accion);
+
+  final Duration espera;
+  final void Function() accion;
+}
+
+/// Respuesta del servidor falso: la función recibe cada petición.
+typedef Servidor = Future<http.Response> Function(http.Request peticion);
+
+/// Servidor que guarda todo (201) y apunta las peticiones.
+Servidor servidorQueGuarda([List<http.Request>? peticiones]) =>
+    (peticion) async {
+      peticiones?.add(peticion);
+      return http.Response('{"partidaId":"x"}', 201);
+    };
+
+/// Todo lo que cambia respecto a la app real: almacén en memoria, servidor
+/// falso y reintentos que no esperan de verdad.
+List<Override> sobrescribir({
+  Almacen? almacen,
+  Servidor? servidor,
+  List<Reintento>? reintentos,
+}) {
+  return [
+    almacenProvider.overrideWithValue(almacen ?? AlmacenMemoria()),
+    clienteApiProvider.overrideWithValue(
+      ClienteApi(
+        base: 'http://prueba/api',
+        cliente: MockClient(servidor ?? servidorQueGuarda()),
+      ),
+    ),
+    programadorProvider.overrideWithValue((espera, accion) {
+      reintentos?.add(Reintento(espera, accion));
+      return () {};
+    }),
+  ];
+}
+
+/// Deja correr las tareas asíncronas pendientes (red falsa y almacén).
+Future<void> asentar() async {
+  for (var i = 0; i < 30; i++) {
+    await Future<void>.delayed(Duration.zero);
+  }
+}
