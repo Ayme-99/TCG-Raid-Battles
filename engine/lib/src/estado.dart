@@ -142,6 +142,10 @@ class EstadoPartida {
 
   /// Daño aplicado al jefe por cada jugador (por asiento), para los puntos.
   final List<int> danoPorJugador;
+
+  /// Curación efectiva acumulada del jefe (lo que subió de verdad, sin pasar
+  /// del máximo). El daño bruto menos esta cifra es la vida que ha perdido.
+  final int curacionJefe;
   final Resultado? resultado;
 
   EstadoPartida({
@@ -158,6 +162,7 @@ class EstadoPartida {
     required List<RegistroCartaAnimo> cartasAnimo,
     required this.ataquesJefeEnTurno,
     required List<int> danoPorJugador,
+    required this.curacionJefe,
     required this.resultado,
   })  : jugadores = _fija(jugadores),
         orden = _fija(orden),
@@ -181,6 +186,7 @@ class EstadoPartida {
         cartasAnimo: const [],
         ataquesJefeEnTurno: 0,
         danoPorJugador: const [],
+        curacionJefe: 0,
         resultado: null,
       );
 
@@ -207,6 +213,7 @@ class EstadoPartida {
     List<RegistroCartaAnimo>? cartasAnimo,
     int? ataquesJefeEnTurno,
     List<int>? danoPorJugador,
+    int? curacionJefe,
     Resultado? resultado,
   }) =>
       EstadoPartida(
@@ -224,6 +231,7 @@ class EstadoPartida {
         cartasAnimo: cartasAnimo ?? this.cartasAnimo,
         ataquesJefeEnTurno: ataquesJefeEnTurno ?? this.ataquesJefeEnTurno,
         danoPorJugador: danoPorJugador ?? this.danoPorJugador,
+        curacionJefe: curacionJefe ?? this.curacionJefe,
         resultado: resultado ?? this.resultado,
       );
 
@@ -242,6 +250,7 @@ class EstadoPartida {
         'cartasAnimo': [for (final c in cartasAnimo) c.toJson()],
         'ataquesJefeEnTurno': ataquesJefeEnTurno,
         'danoPorJugador': danoPorJugador,
+        'curacionJefe': curacionJefe,
         'resultado': resultado?.name,
       };
 }

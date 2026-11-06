@@ -42,6 +42,7 @@ List<Evento> _partidaAleatoria(int semilla) {
       aplica(TurnoJugador(jugador: s.jugadorActual!, dano: azar.nextInt(120)));
       if (!s.terminada && azar.nextInt(6) == 0) koAlAzar();
     } else if (s.fase == Fase.turnoJefe) {
+      if (azar.nextInt(3) == 0) aplica(CuracionJefe(azar.nextInt(300)));
       for (var k = 0; k < 1 + azar.nextInt(3); k++) {
         final v = vivos();
         aplica(AtaqueJefe(
@@ -63,9 +64,9 @@ void _comprobar(EstadoPartida s, String donde) {
   final jefe = s.jefe;
   if (jefe != null) {
     expect(jefe.hp, inInclusiveRange(0, jefe.hpMaximo), reason: donde);
-    expect(s.danoPorJugador.fold<int>(0, (a, b) => a + b),
+    expect(s.danoPorJugador.fold<int>(0, (a, b) => a + b) - s.curacionJefe,
         jefe.hpMaximo - jefe.hp,
-        reason: '$donde: el daño por jugador debe sumar el HP perdido');
+        reason: '$donde: daño menos curación debe ser el HP perdido');
   }
   for (final j in s.jugadores) {
     expect(j.pokemonVivos, inInclusiveRange(0, 2), reason: donde);
