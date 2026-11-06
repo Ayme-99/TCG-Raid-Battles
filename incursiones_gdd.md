@@ -70,8 +70,8 @@ INICIO
             - Si la carta cura al jefe: sube su HP sin pasar del HP máximo
             - Al final de su turno, cada aliado vivo usa su único ataque
               contra el dueño de su slot (si está eliminado, contra un
-              jugador activo al azar). Los aliados que entraron este turno ya
-              atacaron al entrar y no repiten
+              jugador activo al azar), incluidos los que ya atacaron al
+              entrar durante el turno de jugadores
             - Los jugadores aplican el daño a sus Pokémon en mesa
             - Si un Pokémon cae KO, se registra en el asistente
             - Si un jugador se queda sin Pokémon → queda ELIMINADO
