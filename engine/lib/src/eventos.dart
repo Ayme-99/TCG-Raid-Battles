@@ -83,3 +83,10 @@ final class FinTurnoJefe extends Evento {
 final class Abandonar extends Evento {
   const Abandonar();
 }
+
+/// El jefe se cura [cantidad] (carta del jefe, aliado curandero...).
+/// El motor registra lo que sube de verdad, sin pasar del HP máximo.
+final class CuracionJefe extends Evento {
+  final int cantidad;
+  const CuracionJefe(this.cantidad);
+}

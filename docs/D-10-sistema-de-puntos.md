@@ -17,7 +17,7 @@ Estado: **propuesta v2 para validar** (2026-11-05). Issue #10.
 1. Cada nivel tiene un **tope de puntos por victoria** (`balance/tablas/puntos_niveles.csv`): Nv1 = 3000, Nv2 = 6000, Nv3 = 9000, Nv4 = 15000. Mantienen la proporción de dificultad de D-03 y son cifras grandes para no tener decimales.
 2. Cada jefe tiene un coeficiente **Y = tope de victoria de su nivel ÷ vida del jefe**. Con los jefes de referencia: Nv1 1,2594; Nv2 1,3911; Nv3 2,0403; Nv4 2,8818.
 3. **Victoria**: puntos = X × Y, con X el daño hecho (la vida del jefe), es decir el tope del nivel.
-4. **Derrota**: el coeficiente baja a **Y ÷ 4**, es decir, solo se lleva una cuarta parte. Puntos = `round(X × Y ÷ 4) + 1`. Perder sin hacer nada da 1 punto.
+4. **Derrota**: el coeficiente baja a **Y ÷ 4**, es decir, solo se lleva una cuarta parte. Puntos = `round(X × Y ÷ 4) + 1`, con X = vida perdida por el jefe (neto, descontando lo que se haya curado; D-06). Perder sin hacer nada da 1 punto.
 5. El total se reparte entre los jugadores con la tabla de §3. Cada jugador recibe `floor(total × porcentaje)` y el resto por redondeo va al primer puesto.
 6. **Cuentas e invitados**: el reparto se calcula siempre con todos los jugadores de la mesa. Después, solo se abonan los puntos de los jugadores con cuenta. La parte de un invitado no se abona a nadie. El host recibe la suya (ver pregunta abierta 1).
 7. **Qué cuenta como daño de un jugador**: el de sus ataques, incluido el daño extra que aporten las cartas de ánimo (D-05). El daño de un aliado invocado se atribuye al jugador que lo invocó (propuesta).

@@ -16,6 +16,7 @@ EstadoPartida apply(EstadoPartida estado, Evento evento) {
     PokemonKo ev => _pokemonKo(estado, ev),
     CartaAnimoRobada ev => _cartaAnimo(estado, ev),
     FinTurnoJefe() => _finTurnoJefe(estado),
+    CuracionJefe ev => _curacionJefe(estado, ev),
     Abandonar() => _abandonar(estado),
   };
 }
@@ -284,5 +285,21 @@ EstadoPartida _abandonar(EstadoPartida e) {
     resultado: Resultado.derrota,
     prioridad: const [],
     cartasAnimoPendientes: const [],
+  );
+}
+
+EstadoPartida _curacionJefe(EstadoPartida e, CuracionJefe ev) {
+  if (e.fase != Fase.turnoJefe && e.fase != Fase.turnoJugadores) {
+    _error('CuracionJefe no es válido en la fase ${e.fase.name}');
+  }
+  if (ev.cantidad < 0) {
+    _error('la curación no puede ser negativa');
+  }
+  final jefe = e.jefe!;
+  final falta = jefe.hpMaximo - jefe.hp;
+  final efectiva = ev.cantidad < falta ? ev.cantidad : falta;
+  return e.copiarCon(
+    jefe: jefe.conHp(jefe.hp + efectiva),
+    curacionJefe: e.curacionJefe + efectiva,
   );
 }

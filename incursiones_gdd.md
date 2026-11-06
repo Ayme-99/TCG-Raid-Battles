@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.1 (especificación del motor)
+**Versión:** 1.2 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -122,7 +122,12 @@ Detalle en `docs/D-04-aliados.md`.
 
 ### 4.5 Curación del jefe
 
-El jefe puede curarse sin límite de veces, sin pasar nunca de su HP máximo inicial.
+El jefe puede curarse sin límite de veces, sin pasar nunca de su HP máximo inicial (D-06, `docs/D-06-curacion-del-jefe.md`).
+
+- **No hay tope de rondas ni de curación.** Toda partida termina porque el jefe ataca en cada turno y los jugadores casi no pueden curarse (solo con cartas de ánimo), así que si el jefe se cura más de lo que le dañan, el equipo acaba perdiendo.
+- Si la mesa no quiere seguir, **abandona** y cuenta como derrota (§5).
+- El asistente registra la curación efectiva: lo que sube de verdad, sin pasar del máximo. Una curación a vida completa registra 0.
+- Para los puntos solo cuenta la **vida perdida por el jefe** (HP máximo − HP actual), no el daño bruto (§7).
 
 ---
 
@@ -132,6 +137,9 @@ El jefe puede curarse sin límite de veces, sin pasar nunca de su HP máximo ini
 |---|---|---|
 | HP del jefe llega a 0 | **Victoria** | Tras cada daño de un jugador (inmediata) |
 | Todos los jugadores eliminados | **Derrota** | Tras cada KO registrado |
+| La mesa abandona | **Derrota** | En cualquier momento de la partida en curso |
+
+No existe el empate: o gana el equipo o pierde (abandonar cuenta como derrota).
 
 Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO con 4 jugadores). No se adopta el límite oficial de 4 KO.
 
@@ -159,7 +167,7 @@ Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO
 Detalle en `docs/D-10-sistema-de-puntos.md`. Cifras en `balance/tablas/`.
 
 - Los puntos son **individuales**: cada partida genera un total para el equipo que se reparte según lo aportado en el combate (el daño hecho por la fuente de cada jugador: ataques, daño extra de las cartas de ánimo y aliados que invoca).
-- **Victoria**: el total es el tope del nivel (3000 / 6000 / 9000 / 15000). **Derrota**: `round(daño total × Y ÷ 4) + 1`, con Y = tope del nivel ÷ HP del jefe (perder sin hacer nada da 1 punto).
+- **Victoria**: el total es el tope del nivel (3000 / 6000 / 9000 / 15000). **Derrota** (también al abandonar): `round(vida perdida por el jefe × Y ÷ 4) + 1`, con Y = tope del nivel ÷ HP del jefe (perder sin hacer nada da 1 punto).
 - **Reparto**: 1 jugador 100 % · 2 jugadores 55 / 45 · 3 jugadores 40 / 33 / 27 · 4 jugadores 27 / 25 / 25 / 23 (los intermedios van primero a quien no perdió Pokémon, luego por daño; empate: menos Pokémon perdidos, luego al azar).
 - **Desbloqueos**: los puntos de una cuenta se acumulan y no se gastan. Un jefe nuevo se desbloquea al llegar a su coste: Nv1 10 000 · Nv2 20 000 · Nv3 30 000 · Nv4 40 000. Los 7 jefes de lanzamiento están disponibles desde el principio.
 - El daño hecho a los aliados no cuenta para los puntos.
@@ -214,6 +222,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | `docs/D-01-setup.md` | Orden del setup, 2 Pokémon en todos los niveles, casos límite |
 | `docs/D-02-dano-maximo.md` | Qué cuenta para X y quién lo introduce |
 | `docs/D-03-sistema-de-poder.md` | Fórmula de poder, calibración y simulador |
+| `docs/D-06-curacion-del-jefe.md` | Curación del jefe, final de partida y daño para los puntos |
 | `docs/D-04-aliados.md` | Slots, invocación, bloqueo y objetivo de los aliados |
 | `docs/D-05-carta-de-animo.md` | Cheer, KO, promoción desde la banca |
 | `docs/D-10-sistema-de-puntos.md` | Puntos, reparto, desbloqueos y modelo de datos |
@@ -239,3 +248,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v0.12 | D-11 cerrada: Incursiones usa las mismas cuentas que Deck Tracker (solo guarda el id de usuario), el host necesita cuenta, los demás jugadores se unen con su cuenta por código de sala, QR o enlace de invitación, los invitados se guardan con nombre de mesa sin abonar, y se puede jugar sin conexión y guardar al reconectar. Se añade `docs/D-11-identidad-jugadores.md`. |
 | v1.0 | T-02: el GDD pasa a ser la especificación del motor. Consolida D-01, D-02, D-04, D-05, D-10 y D-11 en un solo documento sin contradicciones: se eliminan las secciones de decisiones pendientes y el estado «implementado» del motor (§6.1 antiguo), se añaden las reglas detalladas (§4), los puntos (§7), la identidad (§8), la tabla de valores provisionales (§9) y el índice de documentos de apoyo (§11). |
 | v1.1 | D-07 cerrada: la invocación de aliados la define cada jefe (umbral de HP perdidos, moneda y dado de slot, lista de aliados); se intenta en cuanto el HP del jefe cruza un umbral, cada umbral una sola vez, y el aliado ataca al entrar y al final del turno del jefe contra el dueño de su slot. Las habilidades de aliados son pasivas. El exceso de daño a un aliado se pierde. Ver `docs/D-04-aliados.md` §3, §6 y §7. |
+| v1.2 | D-06 cerrada: la curación del jefe sigue sin límite y sin tope de rondas (toda partida acaba por KO o abandono); abandonar cuenta como derrota y no existe el empate; los puntos de una derrota usan la vida perdida por el jefe (neto), no el daño bruto. Se añade `docs/D-06-curacion-del-jefe.md`. |

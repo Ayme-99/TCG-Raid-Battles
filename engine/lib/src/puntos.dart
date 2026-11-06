@@ -123,6 +123,7 @@ class PuntosJugador {
 class PuntosPartida {
   final int nivel;
   final Resultado resultado;
+  /// Vida perdida por el jefe (neto, descontando curaciones).
   final int danoTotal;
   final double coeficienteY;
   final int puntosTotal;
@@ -167,7 +168,9 @@ PuntosPartida calcularPuntos(
     );
   }
   final jefe = estado.jefe!;
-  final danoTotal = estado.danoPorJugador.fold<int>(0, (a, b) => a + b);
+  // Para el total cuenta la vida que ha perdido el jefe (neto), no el daño
+  // bruto: un jefe que se cura no regala puntos (D-06).
+  final danoTotal = jefe.hpMaximo - jefe.hp;
   final total = puntosTotales(
     nivel: jefe.nivel,
     hpJefe: jefe.hpMaximo,
