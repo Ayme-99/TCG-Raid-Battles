@@ -1,16 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:incursiones_app/almacen/almacen.dart';
+import 'package:incursiones_app/cuenta/controlador_sesion.dart';
 import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import 'ayudas.dart';
+
 /// Pantalla grande para que todo quepa sin tener que desplazar la lista.
-Future<ProviderContainer> abrir(WidgetTester tester) async {
+Future<ProviderContainer> abrir(
+  WidgetTester tester, {
+  AlmacenMemoria? almacen,
+  Servidor? servidor,
+}) async {
   tester.view.physicalSize = const Size(1000, 3000);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(const ProviderScope(child: IncursionesApp()));
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: sobrescribir(almacen: almacen, servidor: servidor),
+      child: const IncursionesApp(),
+    ),
+  );
+  await tester.pumpAndSettle();
   return ProviderScope.containerOf(tester.element(find.byType(IncursionesApp)));
 }
 
@@ -109,7 +124,10 @@ void main() {
     expect(find.byKey(const Key('puntos-0')), findsOneWidget);
     expect(find.byKey(const Key('puntos-1')), findsOneWidget);
 
+    // Sin guardar los resultados pide confirmación antes de descartarlos.
     await tocar(tester, 'nueva-partida');
+    expect(find.text('¿Empezar sin guardar?'), findsOneWidget);
+    await tocar(tester, 'descartar-confirmar');
     expect(c.read(estadoProvider).fase, Fase.preparacion);
   });
 
@@ -230,5 +248,108 @@ void main() {
 
     expect(c.read(estadoProvider).resultado, Resultado.derrota);
     expect(find.text('Derrota'), findsOneWidget);
+  });
+
+  group('guardar los resultados', () {
+    Future<void> ganar(WidgetTester tester) async {
+      await prepararPartida(tester, hp: 100);
+      await turno(tester, '100');
+    }
+
+    testWidgets('sin sesión pide iniciar sesión y no deja guardar',
+        (tester) async {
+      await abrir(tester);
+      await ganar(tester);
+      expect(find.byKey(const Key('iniciar-sesion')), findsOneWidget);
+      expect(find.byKey(const Key('guardar-resultados')), findsNothing);
+    });
+
+    testWidgets('iniciar sesión desde la barra y guardar la partida',
+        (tester) async {
+      final peticiones = <http.Request>[];
+      await abrir(
+        tester,
+        servidor: (p) async {
+          peticiones.add(p);
+          if (p.url.path.endsWith('/auth/login')) {
+            return http.Response(
+              '{"token":"t","username":"ana","userId":"u1"}',
+              200,
+            );
+          }
+          return http.Response('{}', 201);
+        },
+      );
+      await ganar(tester);
+
+      await tocar(tester, 'iniciar-sesion');
+      await tester.enterText(find.byKey(const Key('login-usuario')), 'ana');
+      await tester.enterText(find.byKey(const Key('login-contrasena')), 'secreto');
+      await tocar(tester, 'login-entrar');
+
+      // Vuelve a la partida, ya con la sesión.
+      expect(find.byKey(const Key('guardar-resultados')), findsOneWidget);
+      // Los demás jugadores cuentan como invitados.
+      expect(find.textContaining('(invitado)'), findsOneWidget);
+
+      await tocar(tester, 'guardar-resultados');
+      expect(find.byKey(const Key('estado-envio')), findsOneWidget);
+      expect(find.textContaining('Resultados guardados'), findsOneWidget);
+      expect(peticiones.last.url.path, endsWith('/incursiones/partidas'));
+    });
+
+    testWidgets('un login incorrecto enseña el error y no inicia sesión',
+        (tester) async {
+      await abrir(
+        tester,
+        servidor: (_) async => http.Response('{"error":"Credenciales inválidas"}', 401),
+      );
+      await tocar(tester, 'cuenta');
+      await tester.enterText(find.byKey(const Key('login-usuario')), 'ana');
+      await tester.enterText(find.byKey(const Key('login-contrasena')), 'mal');
+      await tocar(tester, 'login-entrar');
+      expect(find.byKey(const Key('login-error')), findsOneWidget);
+      expect(find.textContaining('incorrectos'), findsOneWidget);
+    });
+
+    testWidgets('después de guardar ya no se puede deshacer', (tester) async {
+      await abrir(tester, almacen: almacenConSesion());
+      await ganar(tester);
+      IconButton deshacer() =>
+          tester.widget<IconButton>(find.byKey(const Key('deshacer')));
+      expect(deshacer().onPressed, isNotNull);
+
+      await tocar(tester, 'guardar-resultados');
+      expect(deshacer().onPressed, isNull);
+
+      // Guardada: nueva partida sin confirmación.
+      await tocar(tester, 'nueva-partida');
+      expect(find.text('Nueva partida'), findsWidgets);
+      expect(find.byKey(const Key('configurar')), findsOneWidget);
+    });
+
+    testWidgets('sin conexión queda pendiente y lo avisa en la barra',
+        (tester) async {
+      await abrir(
+        tester,
+        almacen: almacenConSesion(),
+        servidor: (_) async => throw http.ClientException('sin red'),
+      );
+      await ganar(tester);
+      await tocar(tester, 'guardar-resultados');
+
+      expect(find.textContaining('pendiente de enviar'), findsOneWidget);
+      expect(find.byKey(const Key('envios')), findsOneWidget);
+
+      await tocar(tester, 'envios');
+      expect(find.text('Pendientes de enviar: 1'), findsOneWidget);
+    });
+
+    testWidgets('cerrar sesión desde la barra', (tester) async {
+      final c = await abrir(tester, almacen: almacenConSesion());
+      await tocar(tester, 'cuenta');
+      await tocar(tester, 'cerrar-sesion');
+      expect(c.read(sesionActualProvider), isNull);
+    });
   });
 }

@@ -10,12 +10,17 @@ import '../partida/controlador_partida.dart';
 bool registrar(BuildContext context, WidgetRef ref, Evento evento) {
   final error = ref.read(partidaProvider.notifier).registrar(evento);
   if (error != null) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(error)));
+    registrarAviso(context, error);
     return false;
   }
   return true;
+}
+
+/// Muestra un aviso breve en la parte inferior.
+void registrarAviso(BuildContext context, String mensaje) {
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(mensaje)));
 }
 
 /// Campo de texto que solo admite dígitos.
