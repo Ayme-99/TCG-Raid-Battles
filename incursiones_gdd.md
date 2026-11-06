@@ -1,10 +1,10 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.0 (especificación del motor)
+**Versión:** 1.1 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
-Este documento es la fuente de verdad del diseño. Recoge todas las decisiones cerradas (D-01 a D-05, D-10 y D-11) y marca en §9 lo que sigue siendo provisional hasta los playtests (T-17). El detalle y la justificación de cada decisión están en `docs/`.
+Este documento es la fuente de verdad del diseño. Recoge todas las decisiones cerradas (D-01 a D-05, D-07 en lo que toca a aliados, D-10 y D-11) y marca en §9 lo que sigue siendo provisional hasta los playtests (T-17). El detalle y la justificación de cada decisión están en `docs/`.
 
 ---
 
@@ -57,6 +57,8 @@ INICIO
               - Un jugador con aliado vivo en su slot no puede dañar al
                 jefe hasta debilitarlo
               - Introduce a mano el daño hecho al jefe; el asistente lo resta
+              - Si el HP del jefe cruza un umbral de invocación (§4.4):
+                intento de invocación en ese mismo momento
               - Si HP del jefe ≤ 0 → FIN: VICTORIA (inmediata)
       └─ TURNO DEL JEFE
             - Se revela una carta del jefe (física)
@@ -66,12 +68,10 @@ INICIO
                 · Un jugador elegido
                 · Un jugador al azar (dado físico, resultado a mano)
             - Si la carta cura al jefe: sube su HP sin pasar del HP máximo
-            - Si la carta invoca un aliado: se coloca en el slot libre de un
-              jugador activo (si no hay ninguno libre, no tiene efecto). No
-              ataca este turno
-            - Cada aliado vivo (no invocado este turno) usa su único ataque:
-              el objetivo se tira entre los jugadores activos (moneda con 2,
-              dado de 3 con 3, dado de 4 con 4; con 1 no hay tirada)
+            - Al final de su turno, cada aliado vivo usa su único ataque
+              contra el dueño de su slot (si está eliminado, contra un
+              jugador activo al azar). Los aliados que entraron este turno ya
+              atacaron al entrar y no repiten
             - Los jugadores aplican el daño a sus Pokémon en mesa
             - Si un Pokémon cae KO, se registra en el asistente
             - Si un jugador se queda sin Pokémon → queda ELIMINADO
@@ -110,10 +110,13 @@ Dormido, paralizado, envenenado y quemado solo afectan al Pokémon Activo, nunca
 Detalle en `docs/D-04-aliados.md`.
 
 - **Un slot por jugador** (hasta 4; con 3 jugadores, 3 slots; con 2, 2). Un aliado como máximo por slot, solo en slots de jugadores activos.
-- Un aliado tiene HP propio (independiente del jefe), un único ataque y a veces una habilidad. No ataca el turno en que se invoca.
+- Un aliado tiene HP propio (independiente del jefe), a lo sumo un ataque y a veces una habilidad. Hay aliados sin ataque (solo habilidad) y las habilidades son **pasivas**: una vez en juego se mantienen mientras el aliado siga en el combate.
+- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y su lista de aliados); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: moneda, y si sale cara, un dado del tamaño del número de slots elige el slot (se repite si el slot está ocupado o su jugador eliminado; si no hay slot libre, no se tira). El aliado sale al azar de la lista del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que empezará a bloquear.
+- **Entrada**: al entrar, el aliado usa su ataque y/o su habilidad contra el dueño de su slot (salvo que su texto diga otra cosa) y no vuelve a atacar hasta el final del turno del jefe.
+- **Exceso de daño**: si un jugador hace a un aliado más daño del que le queda, el exceso se pierde (no pasa al jefe ni a otro aliado).
 - **Bloqueo**: mientras un jugador tiene un aliado vivo en su slot, debe debilitarlo antes de dañar al jefe. El resto puede seguir dañando al jefe.
 - **Ayuda**: cualquier jugador activo puede atacar a cualquier aliado, opcionalmente y en lugar de atacar al jefe, para quitar los aliados que estorban a un compañero.
-- **Objetivo del aliado**: al atacar, se tira entre los jugadores activos (moneda / dado de 3 / dado de 4). Con un solo jugador activo, ataca a ese jugador.
+- **Objetivo del aliado**: el dueño de su slot, siempre. Si ese jugador está eliminado, se tira entre los jugadores activos (moneda / dado de 3 / dado de 4); con un solo jugador activo, ataca a ese jugador.
 - Si el dueño de un slot queda eliminado, su aliado **sigue vivo y atacando**, pero ya no bloquea a nadie.
 - Las **habilidades** de los aliados (reducir daño al jefe, aumentar el daño del jefe, forzar a la banca al atacante...) se resuelven en la mesa; el asistente no las computa.
 
@@ -184,6 +187,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | Cartas de ánimo: una por KO y máximo 3 cartas distintas por partida | Adoptado del juego oficial, sin confirmar |
 | Efectos de las cartas de ánimo (curas, +50) | No están en el simulador: la partida real será algo más fácil que lo calibrado |
 | Topes y costes de puntos (3000 / 6000 / 9000 / 15000; 10 000 a 40 000) | Calibrados para desbloquear en ≈ 17 / 22 / 29 / 36 partidas con un grupo de 4 |
+| Invocación de aliados (umbral de HP, probabilidad y lista por jefe; vida y daño de cada aliado) | Todo propuesta sin calibrar; los aliados aún no están en el simulador |
 | Jugar con 1-2 jugadores | Más difícil; se acepta |
 
 ---
@@ -210,7 +214,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | `docs/D-01-setup.md` | Orden del setup, 2 Pokémon en todos los niveles, casos límite |
 | `docs/D-02-dano-maximo.md` | Qué cuenta para X y quién lo introduce |
 | `docs/D-03-sistema-de-poder.md` | Fórmula de poder, calibración y simulador |
-| `docs/D-04-aliados.md` | Slots, bloqueo y objetivo de los aliados |
+| `docs/D-04-aliados.md` | Slots, invocación, bloqueo y objetivo de los aliados |
 | `docs/D-05-carta-de-animo.md` | Cheer, KO, promoción desde la banca |
 | `docs/D-10-sistema-de-puntos.md` | Puntos, reparto, desbloqueos y modelo de datos |
 | `docs/D-11-identidad-jugadores.md` | Cuentas, unirse a una partida, modo sin conexión |
@@ -234,3 +238,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v0.11 | D-05 cerrada: la carta de ánimo da prioridad de turno y un efecto de las 5 cartas oficiales de Cheer (resuelto en la mesa, ampliable), el Pokémon KO no revive, la banca asciende automáticamente (solo hay un Pokémon en la banca) y con varios KO a la vez se actúa por orden de asiento. Se añade `docs/D-05-carta-de-animo.md`. |
 | v0.12 | D-11 cerrada: Incursiones usa las mismas cuentas que Deck Tracker (solo guarda el id de usuario), el host necesita cuenta, los demás jugadores se unen con su cuenta por código de sala, QR o enlace de invitación, los invitados se guardan con nombre de mesa sin abonar, y se puede jugar sin conexión y guardar al reconectar. Se añade `docs/D-11-identidad-jugadores.md`. |
 | v1.0 | T-02: el GDD pasa a ser la especificación del motor. Consolida D-01, D-02, D-04, D-05, D-10 y D-11 en un solo documento sin contradicciones: se eliminan las secciones de decisiones pendientes y el estado «implementado» del motor (§6.1 antiguo), se añaden las reglas detalladas (§4), los puntos (§7), la identidad (§8), la tabla de valores provisionales (§9) y el índice de documentos de apoyo (§11). |
+| v1.1 | D-07 cerrada: la invocación de aliados la define cada jefe (umbral de HP perdidos, moneda y dado de slot, lista de aliados); se intenta en cuanto el HP del jefe cruza un umbral, cada umbral una sola vez, y el aliado ataca al entrar y al final del turno del jefe contra el dueño de su slot. Las habilidades de aliados son pasivas. El exceso de daño a un aliado se pierde. Ver `docs/D-04-aliados.md` §3, §6 y §7. |
