@@ -47,6 +47,8 @@ Atacar a un aliado sustituye el ataque contra el jefe. Si el daño supera la vid
 
 ## 7. Cómo y cuándo se invoca un aliado
 
+> D-13 cambia §7.3 (el aliado ya no sale al azar de una lista: un dado elige la categoría) y §7.4/§7.5 (los efectos los aplica el programa o el jugador según la carta). Ver `docs/D-13-aliados-por-categoria.md`.
+
 La invocación no depende del texto de las cartas del jefe (todos tienen 3 ataques y, si fuera una carta, podría no salir nunca) y **no todos los jefes tienen que invocar**.
 
 ### 7.1 Qué define cada jefe
