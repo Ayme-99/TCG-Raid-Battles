@@ -1,4 +1,4 @@
-# Contrato del registro de partida (versión 1)
+# Contrato del registro de partida (versión 2)
 
 Formato JSON con el que la app guarda una partida y la envía al backend. Una partida es **el registro de sus eventos**: el estado se reconstruye reproduciéndolos con el motor (`engine/`). Decisión de T-07 (issue #41).
 
@@ -6,10 +6,9 @@ Formato JSON con el que la app guarda una partida y la envía al backend. Una pa
 
 | Archivo | Qué es |
 |---|---|
-| `partida.v1.schema.json` | Esquema JSON (draft 2020-12) de la versión 1. Es el que usa el backend para validar. |
-| `ejemplos/validos/` | Registros correctos (terminados y en curso). |
-| `ejemplos/invalidos-estructura/` | Registros que **el esquema rechaza** (versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta, campo desconocido). |
-| `ejemplos/invalidos-reglas/` | Registros con estructura correcta que **solo el motor rechaza** porque incumplen las reglas (turno fuera de orden, eventos tras el final, cuentas que no coinciden con los jugadores). |
+| `partida.v2.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
+| `partida.v1.schema.json` | Esquema de la versión 1, que se conserva: hay partidas guardadas con ese formato. |
+| `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
 
 Los ejemplos válidos están probados por los dos lados: el motor los lee y los vuelve a escribir igual (`engine/test/registro_test.dart`) y el esquema los acepta (`server/test/contrato.test.js`). El CI ejecuta ambos.
 
@@ -17,7 +16,7 @@ Los ejemplos válidos están probados por los dos lados: el motor los lee y los 
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "partidaId": "id generado por el cliente",
   "creadaEn": "2026-11-06T09:30:00Z",
   "cuentas": ["usuario-ana", null],
@@ -28,7 +27,7 @@ Los ejemplos válidos están probados por los dos lados: el motor los lee y los 
 
 | Campo | Obligatorio | Descripción |
 |---|---|---|
-| `version` | sí | Entero. Hoy, `1`. |
+| `version` | sí | Entero. Hoy, `2`. |
 | `partidaId` | sí | De 1 a 64 caracteres, generado por el cliente. Una partida se guarda una sola vez con este id (así los reintentos de red no la duplican, D-11). |
 | `creadaEn` | no | Fecha ISO 8601. |
 | `cuentas` | no | Un elemento por jugador, por asiento: el id de cuenta (el id de usuario de Deck Tracker, D-11) o `null` si es un invitado. Si falta, se asume que todos cobran. |
@@ -52,12 +51,15 @@ Cada evento es un objeto con un campo `tipo`. Los campos marcados con `?` son op
 | `sinInvocacion` | — | Intento de invocación sin aliado |
 | `aliadoInvocado` | `slot`, `nombre`, `hp`, `ataqueNombre?`, `ataqueDano?`, `habilidad?` | Intento de invocación con aliado |
 | `ataqueAliado` | `slot`, `dano`, `objetivo?` | Ataque de un aliado (al entrar y al final del turno del jefe) |
-| `finTurnoJefe` | — | Cierra la ronda |
+| `aplicarEstadoJefe` | `jugador`, `estado` (`veneno` o `quemadura`) | Un jugador deja al jefe con un estado alterado (D-12) |
+| `finTurnoJefe` | `monedaQuemadura?` | Cierra la ronda; antes se hace el chequeo de estados del jefe |
+
+`monedaQuemadura` es `true` (cara: quita la quemadura) o `false` (cruz), y va **si y solo si el jefe está quemado**: la app tira la moneda y la registra, así reproducir el registro da siempre el mismo resultado. Aplicar un estado que el jefe ya tiene no cambia nada (D-12).
 | `abandonar` | — | La mesa abandona: derrota |
 
 ## Resumen
 
-Se escribe al cerrar la partida y **se conserva tal cual**: cambios futuros en las tablas de puntos no reescriben el historial (D-10 §5). Contiene `jefeId?`, `nivel`, `resultado` (`victoria` o `derrota`), `danoTotal` (vida perdida por el jefe, neto de curaciones, D-06), `coeficienteY`, `puntosTotal` y `jugadores`, ordenados por puesto, con `asiento`, `nombre`, `dano`, `pokemonPerdidos`, `puesto`, `porcentaje`, `puntos` y `abonado` (los invitados ocupan puesto pero no se les abona).
+Se escribe al cerrar la partida y **se conserva tal cual**: cambios futuros en las tablas de puntos no reescriben el historial (D-10 §5). Contiene `jefeId?`, `nivel`, `resultado` (`victoria` o `derrota`), `danoTotal` (vida perdida por el jefe, neto de curaciones, D-06), `coeficienteY`, `puntosTotal` y `jugadores`, ordenados por puesto, con `asiento`, `nombre`, `dano`, `pokemonPerdidos`, `puesto`, `porcentaje`, `puntos` (la parte del reparto), `estadosAplicados`, `bonoEstados` y `abonado` (los invitados ocupan puesto pero no se les abona). Lo que se abona a una cuenta es `puntos + bonoEstados`; el bono (D-12) queda fuera de `puntosTotal`.
 
 ### Relación con el guardado de D-10 §5
 
@@ -67,6 +69,13 @@ Se escribe al cerrar la partida y **se conserva tal cual**: cambios futuros en l
 | `partida_jugadores` | Una fila por `resumen.jugadores`: `jugador_id` = `cuentas[asiento]` (`null` = invitado), `dano`, `pokemon_perdidos`, `puesto`, `porcentaje`, `puntos` |
 
 El backend guarda además el registro completo (los eventos) para poder repetir o auditar la partida.
+
+## Versiones
+
+| Versión | Cambios |
+|---|---|
+| 1 | Formato inicial (T-07). |
+| 2 | Estados del jefe (D-12): evento `aplicarEstadoJefe`, campo `monedaQuemadura` en `finTurnoJefe` y, en cada jugador del resumen, `estadosAplicados` y `bonoEstados`. Migración 1 → 2: el resumen de las partidas antiguas recibe esos dos campos a 0. |
 
 ## Versionado y compatibilidad
 

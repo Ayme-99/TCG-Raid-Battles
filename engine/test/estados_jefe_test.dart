@@ -66,7 +66,7 @@ void main() {
       var s = aplicar(enTurnoDelJefe(), 0, EstadoDelJefe.veneno);
       s = apply(s, const FinTurnoJefe());
       expect(s.jefe!.hp, 1000 - 100 - danoVeneno);
-      expect(s.danoPorJugador, [100, 0, 0].sublist(0, 1));
+      expect(s.danoPorJugador, [100]);
       expect(s.fase, Fase.turnoJugadores);
       expect(s.jefe!.envenenado, isTrue); // permanente
     });
@@ -184,10 +184,11 @@ void main() {
       s = apply(s, const TurnoJugador(jugador: 1, dano: 40));
       s = aplicar(s, 1, EstadoDelJefe.quemadura);
       s = apply(s, const FinTurnoJefe(monedaQuemadura: false)); // 30 de chequeo
-      s = apply(s, const TurnoJugador(jugador: 0, dano: 70));
+      s = apply(s, const TurnoJugador(jugador: 0, dano: 40));
       s = apply(s, const TurnoJugador(jugador: 1, dano: 0));
-      s = apply(s, const FinTurnoJefe(monedaQuemadura: false));
+      s = apply(s, const FinTurnoJefe(monedaQuemadura: false)); // remata
       expect(s.resultado, Resultado.victoria);
+      expect(s.danoPorJugador, [100, 40]); // el chequeo no se atribuye
       final p = calcularPuntos(s);
       expect(p.puntosTotal, 3000);
       expect(p.jugadores.map((j) => j.asiento), [0, 1]);
