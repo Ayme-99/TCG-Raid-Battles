@@ -5,3 +5,7 @@
 build/
 .idea/
 *.iml
+
+# Heredado del repo antes de generar las plataformas
+.flutter-plugins
+.packages

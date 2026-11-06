@@ -28,17 +28,21 @@ Partida completa en local, con inicio de sesión y envío de resultados (T-09):
 
 Las pantallas no duplican ninguna regla: toda decisión de juego es del motor, y si rechaza un evento la app muestra el motivo.
 
-## Primera vez en un PC con Flutter
+## Ejecutar la app
 
-Este proyecto no incluye las carpetas de plataforma (`android/`, `windows/`...), porque se generan con Flutter. Una sola vez:
+Las carpetas de plataforma (`android/`, `windows/`, `web/`) ya están en el repo, generadas con:
+
+```
+flutter create . --org dev.ayme99 --project-name incursiones_app --platforms=android,windows,web
+```
+
+(No hace falta repetirlo. Si algún día se añade otra plataforma, se ejecuta con ella y se revisa que no toque `lib/` ni `test/`.)
 
 ```
 cd app
-flutter create . --org dev.ayme99 --project-name incursiones_app --platforms=android,windows,web
-git status        # revisa que no haya tocado lib/ ni test/; si lo hizo: git checkout -- lib test
 flutter pub get
 flutter test
-flutter run
+flutter run -d windows     # o: -d chrome, o un móvil Android conectado
 ```
 
-La versión web (`flutter run -d chrome`) funciona igual, pero **sin conexión no funciona**: la cola offline de envío (T-09) es solo para Android y Windows. El CI compila la web en cada cambio (`flutter build web`).
+La versión web funciona igual, pero **sin conexión no funciona**: la cola de envío de resultados vive en el navegador. El CI compila la web en cada cambio (`flutter build web`).
