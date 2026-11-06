@@ -77,3 +77,9 @@ final class CartaAnimoRobada extends Evento {
 final class FinTurnoJefe extends Evento {
   const FinTurnoJefe();
 }
+
+/// La mesa abandona la partida: termina en derrota con el daño hecho hasta
+/// ese momento. Un empate no existe: o gana el equipo o pierde.
+final class Abandonar extends Evento {
+  const Abandonar();
+}
