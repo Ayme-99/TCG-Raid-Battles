@@ -182,3 +182,79 @@ test('el detalle de una partida es solo para quien jugó en ella', async (t) => 
   const noExiste = await llamar('GET', '/partidas/nada', { usuario: ANA });
   assert.strictEqual(noExiste.estado, 404);
 });
+
+test('una partida v2 abona el reparto y el bono de estados', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const victoria = ejemplo('validos', 'victoria-por-estados', 2);
+  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: victoria });
+  assert.strictEqual(res.estado, 201);
+  assert.strictEqual(res.json.tusPuntos, 1650 + 30);
+  const derrota = ejemplo('validos', 'derrota-con-veneno-y-abandono', 2);
+  assert.strictEqual((await llamar('POST', '/partidas', { usuario: ANA, cuerpo: derrota })).json.tusPuntos, 114 + 8);
+
+  const puntos = await llamar('GET', '/me/puntos', { usuario: ANA });
+  assert.strictEqual(puntos.json.puntos, 1680 + 122);
+  const lista = await llamar('GET', '/partidas', { usuario: ANA });
+  const resumen = lista.json.partidas.find((p) => p.partidaId === victoria.partidaId);
+  assert.strictEqual(resumen.misPuntos, 1650);
+  assert.strictEqual(resumen.bonoEstados, 30);
+});
+
+test('un reintento de una partida v2 no suma el bono dos veces', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const partida = ejemplo('validos', 'victoria-por-estados', 2);
+  await llamar('POST', '/partidas', { usuario: ANA, cuerpo: partida });
+  const otra = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: partida });
+  assert.strictEqual(otra.estado, 200);
+  assert.strictEqual((await llamar('GET', '/me/puntos', { usuario: ANA })).json.puntos, 1680);
+});
+
+test('las partidas v1 y v2 conviven', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const v1 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'victoria-2-jugadores') });
+  const v2 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'victoria-por-estados', 2) });
+  assert.deepStrictEqual([v1.estado, v2.estado], [201, 201]);
+  assert.strictEqual(v1.json.tusPuntos, 1650); // la v1 no tiene bono
+  const detalle = await llamar('GET', '/partidas/ejemplo-victoria-2-jugadores', { usuario: ANA });
+  assert.strictEqual(detalle.json.registro.version, 1); // se guarda tal cual llegó
+});
+
+test('rechaza un bono o unas aplicaciones manipulados', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const inflado = ejemplo('validos', 'victoria-por-estados', 2);
+  inflado.resumen.jugadores[0].bonoEstados = 450;
+  const a = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: inflado });
+  assert.strictEqual(a.estado, 422);
+  assert.match(a.json.motivos.join(), /bonoEstados debería ser 30/);
+
+  const sinEstados = ejemplo('validos', 'victoria-por-estados', 2);
+  sinEstados.eventos = sinEstados.eventos.filter((e) => e.tipo !== 'aplicarEstadoJefe');
+  sinEstados.eventos.forEach((e) => { if (e.tipo === 'finTurnoJefe') delete e.monedaQuemadura; });
+  const b = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: sinEstados });
+  assert.strictEqual(b.estado, 422);
+  assert.match(b.json.motivos.join(), /estadosAplicados debería ser 0/);
+  assert.strictEqual((await llamar('GET', '/me/puntos', { usuario: ANA })).json.puntos, 0);
+});
+
+test('los ejemplos v2 inválidos de estructura se rechazan', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  for (const nombre of ['estado-desconocido', 'moneda-no-es-booleano']) {
+    const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('invalidos-estructura', nombre, 2) });
+    assert.strictEqual(res.estado, 400, nombre);
+    assert.strictEqual(res.json.error, 'estructura_invalida', nombre);
+  }
+});
+
+test('un resumen v1 con campos de la v2 no es válido', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const mezcla = ejemplo('validos', 'victoria-2-jugadores');
+  mezcla.resumen.jugadores[0].bonoEstados = 30;
+  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: mezcla });
+  assert.strictEqual(res.estado, 400);
+});

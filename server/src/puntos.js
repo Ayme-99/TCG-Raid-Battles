@@ -23,4 +23,13 @@ function repartir(total, jugadores) {
   return partes;
 }
 
-module.exports = { TOPE_VICTORIA, COSTE_DESBLOQUEO, REPARTO, puntosTotales, repartir };
+// Bono de estados de un jugador (D-12): tope del nivel ÷ 100 × min(n, 3) en
+// victoria y una cuarta parte (mitades hacia arriba) en derrota. Va fuera del
+// total del equipo.
+const TOPE_APLICACIONES_BONO = 3;
+function bonoEstados({ nivel, aplicaciones, resultado }) {
+  const completo = (TOPE_VICTORIA[nivel] / 100) * Math.min(aplicaciones, TOPE_APLICACIONES_BONO);
+  return resultado === 'victoria' ? completo : Math.floor((completo + 2) / 4);
+}
+
+module.exports = { bonoEstados, TOPE_VICTORIA, COSTE_DESBLOQUEO, REPARTO, puntosTotales, repartir };

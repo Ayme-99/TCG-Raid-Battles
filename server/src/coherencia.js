@@ -1,5 +1,28 @@
 'use strict';
-const { TOPE_VICTORIA, REPARTO, puntosTotales, repartir } = require('./puntos');
+const { TOPE_VICTORIA, REPARTO, puntosTotales, repartir, bonoEstados } = require('./puntos');
+
+// Aplicaciones de estados que cuentan para cada asiento (D-12): las que dejan
+// al jefe con un estado que no tenía. El veneno es permanente; la quemadura se
+// quita cuando la moneda sale cara. Sale solo del registro de eventos.
+function aplicacionesContables(eventos, jugadores) {
+  const cuenta = new Array(jugadores).fill(0);
+  let envenenado = false;
+  let quemado = false;
+  for (const e of eventos) {
+    if (e.tipo === 'aplicarEstadoJefe') {
+      if (e.estado === 'veneno' && !envenenado) {
+        envenenado = true;
+        if (e.jugador < jugadores) cuenta[e.jugador] += 1;
+      } else if (e.estado === 'quemadura' && !quemado) {
+        quemado = true;
+        if (e.jugador < jugadores) cuenta[e.jugador] += 1;
+      }
+    } else if (e.tipo === 'finTurnoJefe' && quemado && e.monedaQuemadura === true) {
+      quemado = false;
+    }
+  }
+  return cuenta;
+}
 
 // Comprueba que el resumen de una partida cuadra con su registro y con las
 // reglas de puntos. No reproduce la partida (eso es del motor Dart): solo
@@ -71,6 +94,7 @@ function comprobarCoherencia(registro) {
   const porcentajes = REPARTO[n];
   const partes = repartir(resumen.puntosTotal, n);
   const asientos = new Set();
+  const contables = aplicacionesContables(eventos, n);
   resumen.jugadores.forEach((j, i) => {
     if (j.puesto !== i + 1) motivos.push(`jugadores[${i}]: el puesto debe ser ${i + 1}`);
     if (j.asiento >= n || asientos.has(j.asiento)) {
@@ -86,6 +110,22 @@ function comprobarCoherencia(registro) {
     }
     if (j.puntos !== partes[i]) {
       motivos.push(`jugadores[${i}]: los puntos deberían ser ${partes[i]}, no ${j.puntos}`);
+    }
+    // Versión 2: estados del jefe (D-12). En la 1 no existen y el bono es 0.
+    const aplicadas = j.estadosAplicados ?? 0;
+    const bono = j.bonoEstados ?? 0;
+    if (aplicadas !== contables[j.asiento]) {
+      motivos.push(
+        `jugadores[${i}]: estadosAplicados debería ser ${contables[j.asiento]}, no ${aplicadas}`,
+      );
+    }
+    const bonoEsperado = bonoEstados({
+      nivel: resumen.nivel,
+      aplicaciones: contables[j.asiento],
+      resultado: resumen.resultado,
+    });
+    if (bono !== bonoEsperado) {
+      motivos.push(`jugadores[${i}]: bonoEstados debería ser ${bonoEsperado}, no ${bono}`);
     }
     if (cuentas.length === n) {
       const cobra = cuentas[j.asiento] !== null;
@@ -111,6 +151,8 @@ function abonos(registro) {
       puesto: j.puesto,
       porcentaje: j.porcentaje,
       puntos: j.puntos,
+      estadosAplicados: j.estadosAplicados ?? 0,
+      bonoEstados: j.bonoEstados ?? 0,
       abonado: cuentaId !== null && j.abonado,
     });
   }

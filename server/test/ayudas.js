@@ -4,8 +4,8 @@ const path = require('node:path');
 
 const contrato = path.join(__dirname, '..', '..', 'contrato', 'ejemplos');
 
-function ejemplo(carpeta, nombre) {
-  return JSON.parse(fs.readFileSync(path.join(contrato, 'v1', carpeta, `${nombre}.json`), 'utf8'));
+function ejemplo(carpeta, nombre, version = 1) {
+  return JSON.parse(fs.readFileSync(path.join(contrato, `v${version}`, carpeta, `${nombre}.json`), 'utf8'));
 }
 
 // Copia de un registro con otro partidaId.
