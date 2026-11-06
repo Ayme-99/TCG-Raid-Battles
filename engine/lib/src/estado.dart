@@ -233,6 +233,10 @@ class EstadoPartida {
   /// Daño aplicado al jefe por cada jugador (por asiento), para los puntos.
   final List<int> danoPorJugador;
 
+  /// Daño que el veneno y la quemadura han hecho al jefe (D-12). No se
+  /// atribuye a ningún jugador.
+  final int danoEstados;
+
   /// Veces que cada jugador (por asiento) ha aplicado un estado que el jefe no
   /// tenía; cuentan para el bono de puntos (D-12).
   final List<int> estadosAplicados;
@@ -269,6 +273,7 @@ class EstadoPartida {
     required List<RegistroCartaAnimo> cartasAnimo,
     required this.ataquesJefeEnTurno,
     required List<int> danoPorJugador,
+    required this.danoEstados,
     required List<int> estadosAplicados,
     required this.curacionJefe,
     required List<AliadoEstado> aliados,
@@ -300,6 +305,7 @@ class EstadoPartida {
         cartasAnimo: const [],
         ataquesJefeEnTurno: 0,
         danoPorJugador: const [],
+        danoEstados: 0,
         estadosAplicados: const [],
         curacionJefe: 0,
         aliados: const [],
@@ -355,6 +361,7 @@ class EstadoPartida {
     List<RegistroCartaAnimo>? cartasAnimo,
     int? ataquesJefeEnTurno,
     List<int>? danoPorJugador,
+    int? danoEstados,
     List<int>? estadosAplicados,
     int? curacionJefe,
     List<AliadoEstado>? aliados,
@@ -378,6 +385,7 @@ class EstadoPartida {
         cartasAnimo: cartasAnimo ?? this.cartasAnimo,
         ataquesJefeEnTurno: ataquesJefeEnTurno ?? this.ataquesJefeEnTurno,
         danoPorJugador: danoPorJugador ?? this.danoPorJugador,
+        danoEstados: danoEstados ?? this.danoEstados,
         estadosAplicados: estadosAplicados ?? this.estadosAplicados,
         curacionJefe: curacionJefe ?? this.curacionJefe,
         aliados: aliados ?? this.aliados,
@@ -403,6 +411,7 @@ class EstadoPartida {
         'cartasAnimo': [for (final c in cartasAnimo) c.toJson()],
         'ataquesJefeEnTurno': ataquesJefeEnTurno,
         'danoPorJugador': danoPorJugador,
+        'danoEstados': danoEstados,
         'estadosAplicados': estadosAplicados,
         'curacionJefe': curacionJefe,
         'aliados': [for (final a in aliados) a.toJson()],

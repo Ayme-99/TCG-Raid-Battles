@@ -338,7 +338,10 @@ EstadoPartida _finTurnoJefe(EstadoPartida e, FinTurnoJefe ev) {
   if (dano > 0) {
     final aplicado = dano < jefe.hp ? dano : jefe.hp;
     final nuevoHp = jefe.hp - aplicado;
-    estado = e.copiarCon(jefe: jefe.conHp(nuevoHp));
+    estado = e.copiarCon(
+      jefe: jefe.conHp(nuevoHp),
+      danoEstados: e.danoEstados + aplicado,
+    );
     if (nuevoHp <= 0) {
       return estado.copiarCon(
         fase: Fase.terminada,
