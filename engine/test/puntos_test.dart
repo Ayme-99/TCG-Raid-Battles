@@ -104,19 +104,20 @@ void main() {
       });
     });
 
-    test('ejemplo de D-10 con 4 jugadores (sobre el total del nivel 1)', () {
+    test('ejemplo de D-10 con 4 jugadores (victoria Nv2 = 6000)', () {
       // A 40 %, B 30 % (perdió un Pokémon), C 20 %, D 10 %: C y D, sin
       // pérdidas, ocupan los puestos intermedios y B queda último.
       var s = _victoria([958, 715, 477, 232], bajas: const [1]);
       final p = calcularPuntos(s);
-      expect(p.puntosTotal, 3000);
+      // 4 jugadores con ataque 100: X = 400, nivel 2.
+      expect(p.puntosTotal, 6000);
       final porAsiento = {for (final j in p.jugadores) j.asiento: j};
       expect(porAsiento[0]!.puesto, 1);
       expect(porAsiento[2]!.puesto, 2);
       expect(porAsiento[3]!.puesto, 3);
       expect(porAsiento[1]!.puesto, 4);
       expect([for (final j in p.jugadores) j.porcentaje], [27, 25, 25, 23]);
-      expect([for (final j in p.jugadores) j.puntos], [810, 750, 750, 690]);
+      expect([for (final j in p.jugadores) j.puntos], [1620, 1500, 1500, 1380]);
     });
 
     test('con 1 jugador se lleva todo', () {
