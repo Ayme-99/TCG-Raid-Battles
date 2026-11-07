@@ -306,7 +306,7 @@ test('un aliado v3 sin categoría o con una desconocida se rechaza', async (t) =
   assert.strictEqual(a.json.error, 'estructura_invalida');
 
   const rara = v3ConAliado();
-  rara.eventos.find((e) => e.tipo === 'aliadoInvocado').categoria = 'tanque';
+  rara.eventos.find((e) => e.tipo === 'aliadoInvocado').categoria = 'mago';
   const b = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: rara });
   assert.strictEqual(b.estado, 400);
 });

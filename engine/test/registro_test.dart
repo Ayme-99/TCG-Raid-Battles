@@ -400,7 +400,7 @@ void main() {
         {
           'tipo': 'aliadoInvocado',
           'slot': 0,
-          'categoria': 'tanque',
+          'categoria': 'mago',
           'nombre': 'A',
           'hp': 10,
         },
