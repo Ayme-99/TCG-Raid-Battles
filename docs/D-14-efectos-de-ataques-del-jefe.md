@@ -1,6 +1,6 @@
 # D-14 · Efectos en los ataques del jefe
 
-Estado: **borrador** (2026-11-07). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están Onix, Manectric y Kingdra.
+Estado: **borrador** (2026-11-07). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están los 4 jefes iniciales.
 
 ## Motivación
 
@@ -26,6 +26,9 @@ Los jefes oficiales de Incursión Max llevan efectos en sus ataques (Dredanaw: e
 | `sin_retirada` | jugador | — | turnos | El Pokémon Defensor no puede retirarse |
 | `sin_ataque` | jugador | — | turnos | El Pokémon Defensor no puede atacar |
 | `ignora_efectos` | jugador | — | — | El daño de este ataque no se ve afectado por ningún efecto del Pokémon activo rival |
+| `dano_por_ataque_previo` | programa | HP por ataque | — | Este ataque hace N puntos de daño más por cada ataque que el jefe haya usado antes en este turno |
+| `dano_extra_si` | jugador | HP, condición | — | Texto de la carta (p. ej. «si el Defensor no tiene contadores de daño, +50») |
+| `contador_a_todos` | programa + jugador | contadores | — | Pon N contador(es) de daño sobre todos los Pokémon en juego (menos el jefe) |
 | `autodano` | programa | HP | — | El jefe se hace N puntos de daño |
 | `estado_defensor` | jugador | estado (`paralizado`), `moneda` opcional | — | Lanza una moneda; si sale cara, el Pokémon Defensor pasa a estar paralizado |
 
@@ -55,8 +58,18 @@ Se irán añadiendo (daño a cada Activo, daño a la Banca, moneda) según los j
 | 2 | Pulso Dragón | 100 | Ninguno |
 | 3 | Hidrobomba | 200 | Ninguno (daño plano; se descartó la restricción de no repetirla) |
 
+## Arceus (Nv4)
+
+| Ataque | Nombre | Daño | Efecto |
+|---|---|---|---|
+| 1 | Danza Espada | 40+ | `dano_por_ataque_previo`, `valor: 30`. Texto: «Este ataque hace 30 puntos de daño más por cada ataque que Arceus haya usado antes en este turno.» |
+| 2 | Castigo | 100+ | `dano_extra_si` (condición: el Defensor no tiene contadores de daño, +50). Solo texto: los jugadores aplican el +50 en la mesa |
+| 3 | Sentencia | 240 | `contador_a_todos`, `valor: 1` (10 de daño) |
+
+- **Danza Espada**: la app conoce los ataques anteriores del turno (los registra), así que calcula ella el daño: 40, 70, 100, etc.
+- **Sentencia**: los jugadores ponen el contador en sus Pokémon en la mesa. **Los aliados del jefe también lo reciben**: la app baja 10 HP a cada aliado vivo (`programa`) y, si alguno llega a 0, queda derrotado. Ese daño no se atribuye a ningún jugador.
+
 ## Pendiente
 
-- Cerrar los efectos de Arceus.
 - Idea aparte, fuera de esta tarea: un botón opcional «Lanzar moneda» como utilidad para los jugadores.
 - Después: motor y contrato v5, catálogo y app, simulador y recalibrado de HP.
