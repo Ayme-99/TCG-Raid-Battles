@@ -8,7 +8,9 @@ Sustituye de D-04/D-07 el reparto de aliados por azar de una lista libre (D-04 �
 
 Cada jefe que invoca tiene **4 aliados, uno por categoría**: Daño, Barrera, Cura y Pícaro. Cada categoría está centrada en una manera distinta de molestar a los jugadores. Qué hace exactamente cada aliado lo define su carta (§3).
 
-Ejemplo ilustrativo (no es un jefe real, ni sus números): Daño Rattata, Barrera Mr. Mime, Cura Chansey, Pícaro Scyther.
+Cada jefe tiene sus **propios** 4 aliados. Ejemplo ilustrativo (no es un jefe real, ni sus números): Daño Rattata, Barrera Mr. Mime, Cura Chansey, Pícaro Scyther.
+
+**Pícaro** es la categoría de **control**, la más versátil: aplica estados alterados, modifica la fuerza, pone contadores de daño, etc. Son los **únicos aliados que atacan a la Banca**; el resto solo afecta al Pokémon Activo.
 
 ## 2. Cómo se resuelve un intento de invocación
 
@@ -51,3 +53,9 @@ Las habilidades siguen siendo **pasivas** (D-04 §7.4).
 - Catálogo (T-13): `categoria` por aliado y un aliado por categoría en cada jefe.
 - App: mostrar la categoría del aliado y los efectos automáticos.
 - Simulador: aún no modela aliados.
+
+## 6. Baraja de ataques del jefe (enmienda, v1.6)
+
+- El jefe no tiene mazo de aliados: tiene sus 4 aliados (§1) y una **baraja de ataques**, como el juego oficial. Cada carta dice «Ataque X contra jugador Y».
+- El **máximo de ataques por turno** lo define esa baraja, no una cifra fija. La cifra 2/3/4/5 de las tablas de balance es solo un supuesto del simulador.
+- Se mantiene la mecánica de robar cartas: el objetivo de cada ataque sale de la carta. No existe una regla de objetivo por ranura de ataque.

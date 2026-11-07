@@ -7,13 +7,11 @@
   "ataques": [
     {
       "nombre": "Golpe",
-      "dano": 30,
-      "objetivo": "elegido"
+      "dano": 30
     },
     {
       "nombre": "Barrido",
       "dano": 60,
-      "objetivo": "todos",
       "efecto": "Daña a todos los Pokémon activos"
     }
   ],
