@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
 
@@ -173,9 +174,36 @@ class _PantallaEleccionJefeState extends ConsumerState<PantallaEleccionJefe> {
     );
   }
 
+  void _elegirDelCatalogo(JefeCatalogo jefe) {
+    registrar(
+      context,
+      ref,
+      ElegirJefe(
+        nombre: jefe.nombre,
+        nivel: jefe.nivel,
+        hp: jefe.hp,
+        invocacionCadaHp: jefe.invocacion?.cadaHp,
+        jefeId: jefe.id,
+      ),
+    );
+  }
+
+  String _resumen(JefeCatalogo j) {
+    final ataques = j.ataques.map((a) => a.dano).join('/');
+    final n = j.intentosDeInvocacion;
+    final invoca = n == 0
+        ? 'no invoca'
+        : 'invoca $n aliado${n == 1 ? '' : 's'}'
+            '${j.invocacion!.segura ? ' (seguro)' : ''}';
+    return '${j.hp} HP · ataques $ataques · $invoca';
+  }
+
   @override
   Widget build(BuildContext context) {
     final estado = ref.watch(estadoProvider);
+    final delNivel =
+        (ref.watch(catalogoProvider).valueOrNull ?? Catalogo.vacio)
+            .delNivel(estado.nivel);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -185,8 +213,30 @@ class _PantallaEleccionJefeState extends ConsumerState<PantallaEleccionJefe> {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 4),
-        const Text('Elige un jefe de ese nivel e introduce su carta.'),
+        const Text('Elige un jefe del catálogo o introduce su carta a mano.'),
         const SizedBox(height: 16),
+        if (delNivel.isNotEmpty) ...[
+          Text(
+            'Jefes del catálogo',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          for (final j in delNivel)
+            Card(
+              child: ListTile(
+                key: Key('catalogo-${j.id}'),
+                title: Text(j.nombre),
+                subtitle: Text(_resumen(j)),
+                trailing: const Icon(Icons.play_arrow),
+                onTap: () => _elegirDelCatalogo(j),
+              ),
+            ),
+          const SizedBox(height: 16),
+          Text(
+            'Jefe personalizado',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+        ],
         TextField(
           key: const Key('jefe-nombre'),
           controller: _nombre,
