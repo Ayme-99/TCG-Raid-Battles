@@ -1,0 +1,51 @@
+{
+  "formato": 1,
+  "id": "ejemplo-nv1",
+  "nombre": "Jefe de ejemplo",
+  "nivel": 1,
+  "hp": 1000,
+  "ataques": [
+    {
+      "nombre": "Golpe",
+      "dano": 30,
+      "objetivo": "elegido"
+    },
+    {
+      "nombre": "Barrido",
+      "dano": 60,
+      "objetivo": "todos",
+      "efecto": "Daña a todos los Pokémon activos"
+    },
+    {
+      "nombre": "Embestida",
+      "dano": 120,
+      "objetivo": "aleatorio"
+    }
+  ],
+  "invocacion": {
+    "cadaHp": 300,
+    "tirada": "moneda",
+    "aliados": {
+      "danio": {
+        "nombre": "Rattata",
+        "hp": 60,
+        "ataque": {
+          "nombre": "Placaje",
+          "dano": 20
+        }
+      },
+      "barrera": {
+        "nombre": "Mr. Mime",
+        "hp": 110,
+        "habilidad": "Manto: reduce el daño al jefe (lo aplica el jugador)"
+      },
+      "cura": {
+        "nombre": "Chansey",
+        "hp": 120,
+        "habilidad": "Cura al jefe al final de su turno",
+        "efectos": "programa",
+        "scriptId": "cura-al-final-del-turno"
+      }
+    }
+  }
+}

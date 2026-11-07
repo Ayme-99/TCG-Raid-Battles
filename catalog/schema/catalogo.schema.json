@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ayme-99/TCG-Raid-Battles/catalog/schema/catalogo.schema.json",
+  "title": "Índice del catálogo de jefes",
+  "description": "Qué jefes forman el catálogo y en qué versión está. `version` sube en 1 con cada cambio del contenido (jefe nuevo o modificado).",
+  "type": "object",
+  "required": ["version", "jefes"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "jefes": {
+      "description": "Ids de los jefes, uno por archivo de bosses/.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+    }
+  }
+}
