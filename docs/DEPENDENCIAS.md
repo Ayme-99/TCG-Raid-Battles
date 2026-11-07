@@ -14,7 +14,7 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 | | El índice `catalog/catalogo.json`: sube su `version` en 1 (en cada cambio de contenido) | ❌ (solo comprueba que lista los jefes que existen) |
 | | La hoja de balance: `python3 balance/scripts/generar_hoja.py`, recalcular con LibreOffice y subir `balance/hoja_balance.xlsx` | ✅ `balance/scripts/comprobar_hoja.py` (CI: «Hoja de balance al día») |
 | | `docs/playtests/GUION.md` si cita ese jefe o sus aliados (escrito a mano) | ❌ |
-| | El informe de simulación del jefe en `balance/informes/` (cuando el simulador modele aliados, T-28) | ❌ |
+| | El informe de simulación del jefe: `cd sim && dart run bin/sim_jefes.dart` (escribe `balance/informes/jefes_aliados.csv`; el simulador lee HP, ataques y aliados del catálogo) | ⚠️ el CI solo comprueba que el simulador compila y arranca, no que el informe esté al día |
 | Que un aliado use `programa` y su `scriptId` | El script en `engine/lib/src/scripts_aliado.dart` (`scriptsAliado`) **antes** que el jefe | ✅ `engine/test/catalogo_scripts_test.dart` |
 | El esquema del jefe (`catalog/schema/boss.schema.json`) | El modelo de la app `app/lib/catalogo/catalogo.dart` (lee los campos a mano) | ⚠️ `catalogo_test.dart` falla si falta o cambia un campo que la app lee, pero **no** si añades un campo nuevo que la app ignora |
 | | `catalog/README.md` (ejemplo y descripción de campos) y los ejemplos de `catalog/ejemplos/` | ✅ `server/test/catalogo.test.js` (ejemplos válidos e inválidos) |
@@ -84,7 +84,7 @@ Estos datos viven duplicados. Los que llevan ✅ los compara `engine/test/tablas
 
 El CI (`.github/workflows/ci.yml`) ejecuta: tests del motor (`dart test`), tests de Node del contrato, del servidor y del catálogo (`npm test`), `flutter analyze` + `flutter test` + `flutter build web` de la app, y que la hoja de balance esté al día con el catálogo y las tablas (`comprobar_hoja.py`).
 
-**No** comprueba: el repo `deck-tracker-server`; el simulador (`sim/`); los valores duplicados de la sección 4 sin ✅; que el GDD y los documentos `docs/` coincidan con el código; ni que las listas de versiones escritas a mano en los tests incluyan la versión nueva.
+**No** comprueba: el repo `deck-tracker-server`; los resultados del simulador (`sim/`: el CI solo comprueba que compila y arranca); los valores duplicados de la sección 4 sin ✅; que el GDD y los documentos `docs/` coincidan con el código; ni que las listas de versiones escritas a mano en los tests incluyan la versión nueva.
 
 ## 6. Mantener este documento
 
