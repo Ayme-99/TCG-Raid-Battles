@@ -41,6 +41,17 @@ jobs:
         env:
           MONGO_URL: mongodb://localhost:27017
 
+  hoja:
+    name: Hoja de balance al día
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install openpyxl
+      - run: python3 balance/scripts/comprobar_hoja.py
+
   app:
     name: App (flutter test)
     runs-on: ubuntu-latest

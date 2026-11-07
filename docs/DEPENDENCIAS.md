@@ -12,7 +12,7 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 |---|---|---|
 | Un jefe en `catalog/bosses/*.json` (HP, ataques, aliados, invocación) | La copia de la app: `app/tool/sync_catalogo.sh` (copia a `app/assets/catalogo/`) | ✅ `app/test/catalogo_test.dart` (copia idéntica) |
 | | El índice `catalog/catalogo.json`: sube su `version` en 1 (en cada cambio de contenido) | ❌ (solo comprueba que lista los jefes que existen) |
-| | La hoja de balance: `python3 balance/scripts/generar_hoja.py` y subir `balance/hoja_balance.xlsx` | ❌ |
+| | La hoja de balance: `python3 balance/scripts/generar_hoja.py`, recalcular con LibreOffice y subir `balance/hoja_balance.xlsx` | ✅ `balance/scripts/comprobar_hoja.py` (CI: «Hoja de balance al día») |
 | | `docs/playtests/GUION.md` si cita ese jefe o sus aliados (escrito a mano) | ❌ |
 | | El informe de simulación del jefe en `balance/informes/` (cuando el simulador modele aliados, T-28) | ❌ |
 | Que un aliado use `programa` y su `scriptId` | El script en `engine/lib/src/scripts_aliado.dart` (`scriptsAliado`) **antes** que el jefe | ✅ `engine/test/catalogo_scripts_test.dart` |
@@ -33,7 +33,7 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 | | El simulador `sim/` si usa esa regla | ❌ |
 | Las **tablas de balance** (`balance/tablas/niveles.csv`: X por nivel, HP y ataques de referencia) | `engine/lib/src/reglas.dart` (`umbralNivel2/3/4` = `x_min` de cada nivel) | ✅ `engine/test/tablas_balance_test.dart` |
 | | El GDD (§2: ataques por nivel; §9: valores provisionales) y `docs/D-03-sistema-de-poder.md` | ⚠️ `engine/test/tablas_balance_test.dart` comprueba los ataques por nivel del GDD §2 y de los jefes del catálogo; el resto no |
-| | La hoja de balance (compara contra el «poder de referencia» de `niveles.csv`) | ❌ |
+| | La hoja de balance (compara contra el «poder de referencia» de `niveles.csv`) | ✅ `balance/scripts/comprobar_hoja.py` (CI: «Hoja de balance al día») |
 | Los **puntos** (`balance/tablas/puntos_niveles.csv`, `reparto_puntos.csv`) | `engine/lib/src/puntos.dart` (`topeVictoriaPorNivel`, `costeDesbloqueoPorNivel`, `repartoPorJugadores`) | ✅ `engine/test/tablas_balance_test.dart` (los valores están copiados, no se leen del CSV) |
 | | `docs/D-10-sistema-de-puntos.md` y el GDD | ❌ |
 | Una **versión nueva del contrato** | Servidor, app, repo de Deck Tracker (secciones 2 y 3) | ⚠️ |
@@ -78,13 +78,13 @@ Estos datos viven duplicados. Los que llevan ✅ los compara `engine/test/tablas
 | ✅ Puntos por victoria, coste de desbloqueo y reparto | `balance/tablas/*.csv`, `engine/lib/src/puntos.dart` (`docs/D-10-sistema-de-puntos.md` no se comprueba) |
 | Objetivo de victoria por nivel (75/50/30/15 %) | GDD, `sim/bin/sim_cartas.dart` (`objetivo`) |
 | Daño de veneno y quemadura (10 y 20) | `engine/lib/src/reglas.dart`, GDD §4.3, `docs/D-12-estados-del-jefe.md` |
-| Jefes y aliados iniciales | `catalog/bosses/`, `app/assets/catalogo/`, `docs/playtests/GUION.md`, la hoja de balance |
+| Jefes y aliados iniciales | `catalog/bosses/`, `app/assets/catalogo/` (✅), la hoja de balance (✅), `docs/playtests/GUION.md` (❌) |
 
 ## 5. Qué cubre el CI (y qué no)
 
-El CI (`.github/workflows/ci.yml`) ejecuta: tests del motor (`dart test`), tests de Node del contrato, del servidor y del catálogo (`npm test`), y `flutter analyze` + `flutter test` + `flutter build web` de la app.
+El CI (`.github/workflows/ci.yml`) ejecuta: tests del motor (`dart test`), tests de Node del contrato, del servidor y del catálogo (`npm test`), `flutter analyze` + `flutter test` + `flutter build web` de la app, y que la hoja de balance esté al día con el catálogo y las tablas (`comprobar_hoja.py`).
 
-**No** comprueba: el repo `deck-tracker-server`; que `hoja_balance.xlsx` esté al día; el simulador (`sim/`); los valores duplicados de la sección 4 sin ✅; que el GDD y los documentos `docs/` coincidan con el código; ni que las listas de versiones escritas a mano en los tests incluyan la versión nueva.
+**No** comprueba: el repo `deck-tracker-server`; el simulador (`sim/`); los valores duplicados de la sección 4 sin ✅; que el GDD y los documentos `docs/` coincidan con el código; ni que las listas de versiones escritas a mano en los tests incluyan la versión nueva.
 
 ## 6. Mantener este documento
 
