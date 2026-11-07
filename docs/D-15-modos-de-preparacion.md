@@ -1,6 +1,6 @@
 # D-15 · Modos de preparación de la partida
 
-Estado: **diseño** (2026-11-07). Issue #T-32.
+Estado: **diseño** (2026-11-07). Issue #106 (T-32).
 
 ## Idea
 
