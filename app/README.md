@@ -46,3 +46,7 @@ flutter run -d windows     # o: -d chrome, o un móvil Android conectado
 ```
 
 La versión web funciona igual, pero **sin conexión no funciona**: la cola de envío de resultados vive en el navegador. El CI compila la web en cada cambio (`flutter build web`).
+
+## Catálogo de jefes (T-29)
+
+El catálogo (`../catalog/`) va empaquetado dentro de la app en `assets/catalogo/`, porque Flutter solo incluye archivos de dentro de `app/`. Si cambias un jefe en `catalog/`, copia el catálogo con `tool/sync_catalogo.sh`; `test/catalogo_test.dart` falla si las dos copias no coinciden. En el setup, tras calcular el nivel, la app ofrece los jefes de ese nivel (HP, ataques e invocación) o la entrada a mano. Los 4 aliados de cada jefe ya se leen (`lib/catalogo/catalogo.dart`), pero la pantalla de invocación todavía no los usa (T-27, #74).

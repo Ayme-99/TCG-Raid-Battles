@@ -1,0 +1,54 @@
+{
+  "formato": 1,
+  "id": "kingdra",
+  "nombre": "Kingdra",
+  "nivel": 3,
+  "hp": 4400,
+  "ataques": [
+    {
+      "nombre": "Hidropulso",
+      "dano": 60
+    },
+    {
+      "nombre": "Pulso dragón",
+      "dano": 100
+    },
+    {
+      "nombre": "Hidrobomba",
+      "dano": 200
+    }
+  ],
+  "invocacion": {
+    "cadaHp": 1100,
+    "tirada": "segura",
+    "aliados": {
+      "danio": {
+        "nombre": "Remoraid",
+        "hp": 120,
+        "ataque": {
+          "nombre": "Pistola agua",
+          "dano": 60
+        }
+      },
+      "tanque": {
+        "nombre": "Corsola",
+        "hp": 240,
+        "habilidad": "Mientras esté en juego, el jefe recibe 30 de daño menos por cada ataque de los jugadores (lo aplica el jugador)"
+      },
+      "cura": {
+        "nombre": "Horsea",
+        "hp": 130,
+        "habilidad": "Al final del turno del jefe, el jefe se cura 40 HP (lo aplica el jugador)"
+      },
+      "picaro": {
+        "nombre": "Chinchou",
+        "hp": 120,
+        "ataque": {
+          "nombre": "Supersónico",
+          "dano": 40
+        },
+        "habilidad": "Al entrar, el Pokémon Activo del dueño queda Envenenado (lo aplica el jugador)"
+      }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "formato": 1,
+  "id": "onix",
+  "nombre": "Onix",
+  "nivel": 1,
+  "hp": 2400,
+  "ataques": [
+    {
+      "nombre": "Atizar",
+      "dano": 30
+    },
+    {
+      "nombre": "Tumba de rocas",
+      "dano": 60
+    },
+    {
+      "nombre": "Terremoto",
+      "dano": 120
+    }
+  ],
+  "invocacion": {
+    "cadaHp": 1200,
+    "tirada": "segura",
+    "aliados": {
+      "danio": {
+        "nombre": "Roggenrola",
+        "hp": 60,
+        "ataque": {
+          "nombre": "Pedrada",
+          "dano": 30
+        }
+      },
+      "tanque": {
+        "nombre": "Geodude",
+        "hp": 120,
+        "habilidad": "Mientras esté en juego, el jefe recibe 10 de daño menos por cada ataque de los jugadores (lo aplica el jugador)"
+      },
+      "cura": {
+        "nombre": "Woobat",
+        "hp": 70,
+        "habilidad": "Al final del turno del jefe, el jefe se cura 20 HP (lo aplica el jugador)"
+      },
+      "picaro": {
+        "nombre": "Sableye",
+        "hp": 60,
+        "ataque": {
+          "nombre": "Mirada tétrica",
+          "dano": 20
+        },
+        "habilidad": "Al entrar, pone 1 contador de daño en cada Pokémon de la Banca del dueño (lo aplica el jugador)"
+      }
+    }
+  }
+}

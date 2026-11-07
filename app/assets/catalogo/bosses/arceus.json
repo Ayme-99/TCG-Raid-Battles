@@ -1,0 +1,54 @@
+{
+  "formato": 1,
+  "id": "arceus",
+  "nombre": "Arceus",
+  "nivel": 4,
+  "hp": 5000,
+  "ataques": [
+    {
+      "nombre": "Juicio",
+      "dano": 80
+    },
+    {
+      "nombre": "Ley primigenia",
+      "dano": 120
+    },
+    {
+      "nombre": "Fuerza divina",
+      "dano": 240
+    }
+  ],
+  "invocacion": {
+    "cadaHp": 1000,
+    "tirada": "segura",
+    "aliados": {
+      "danio": {
+        "nombre": "Garchomp",
+        "hp": 150,
+        "ataque": {
+          "nombre": "Garra dragón",
+          "dano": 80
+        }
+      },
+      "tanque": {
+        "nombre": "Bastiodon",
+        "hp": 300,
+        "habilidad": "Mientras esté en juego, el jefe recibe 40 de daño menos por cada ataque de los jugadores (lo aplica el jugador)"
+      },
+      "cura": {
+        "nombre": "Blissey",
+        "hp": 160,
+        "habilidad": "Al final del turno del jefe, el jefe se cura 50 HP (lo aplica el jugador)"
+      },
+      "picaro": {
+        "nombre": "Mismagius",
+        "hp": 150,
+        "ataque": {
+          "nombre": "Bola sombra",
+          "dano": 50
+        },
+        "habilidad": "Al entrar, el Pokémon Activo del dueño queda Quemado y recibe 1 contador de daño (lo aplica el jugador)"
+      }
+    }
+  }
+}
