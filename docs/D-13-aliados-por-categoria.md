@@ -59,3 +59,4 @@ Las habilidades siguen siendo **pasivas** (D-04 §7.4).
 - El jefe no tiene mazo de aliados: tiene sus 4 aliados (§1) y una **baraja de ataques**, como el juego oficial. Cada carta dice «Ataque X contra jugador Y».
 - El **máximo de ataques por turno** lo define esa baraja, no una cifra fija. La cifra 2/3/4/5 de las tablas de balance es solo un supuesto del simulador.
 - Se mantiene la mecánica de robar cartas: el objetivo de cada ataque sale de la carta. No existe una regla de objetivo por ranura de ataque.
+- **La baraja es física.** Los jugadores roban y resuelven las cartas del jefe en la mesa («Usa el ataque X contra el jugador Y»); la app no las modela ni las roba. Solo registra cada ataque resultante (ranura, daño y objetivo), igual que el resto de lo que pasa en la mesa.

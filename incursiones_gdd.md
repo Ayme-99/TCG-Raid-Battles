@@ -35,7 +35,7 @@ Orden (detalle en `docs/D-01-setup.md`):
 | **Nivel** | `X < 400` → Nv1 · `400 ≤ X < 600` → Nv2 · `600 ≤ X < 800` → Nv3 · `X ≥ 800` → Nv4. El valor umbral pertenece al nivel de arriba. Un X menor de 250 se juega como Nv1 (no hay nivel inferior). |
 | **Jefe** | Elegido a mano o al azar dentro del nivel. Es una **carta fija** del catálogo: tiene su propio HP y sus propios ataques; no se escala con los jugadores. El asistente conoce el HP y el daño de cada ataque, pero **no** computa sus efectos de texto. Lanzamiento: 7 jefes (2 en Nv1, 2 en Nv2, 2 en Nv3, 1 en Nv4), todos disponibles desde el principio. |
 | **HP del jefe** | El de su carta. Referencia por nivel (calibrada con 16 cartas reales para un objetivo de victoria de 75 / 50 / 30 / 15 %): **2382 / 4313 / 4411 / 5205** en Nv1 / Nv2 / Nv3 / Nv4. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
-| Ataques del jefe por nivel | Nv1 30/60/120 · Nv2 40/80/160 · Nv3 60/100/200 · Nv4 80/120/240. Los ataques salen de la baraja de ataques del jefe («Ataque X contra jugador Y», como el juego oficial), que también fija el máximo de ataques por turno. |
+| Ataques del jefe por nivel | Nv1 30/60/120 · Nv2 40/80/160 · Nv3 60/100/200 · Nv4 80/120/240. Los ataques salen de la baraja de ataques del jefe («Ataque X contra jugador Y», como el juego oficial), que también fija el máximo de ataques por turno. La baraja es física: la resuelven los jugadores en la mesa y la app solo registra cada ataque. |
 | Menos de 4 jugadores | No se añaden parejas extra. El nivel se autoajusta con X, y los slots de aliados bajan con el número de jugadores (§4.4). |
 
 ---
