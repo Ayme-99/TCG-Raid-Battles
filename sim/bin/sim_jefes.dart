@@ -26,6 +26,7 @@
 // Uso (desde sim/):
 //   dart run bin/sim_jefes.dart
 //   dart run bin/sim_jefes.dart --equipos=20 --partidas=20 --informe=/tmp/j.csv
+//   dart run bin/sim_jefes.dart --calibrar   # HP (en centenas) que da el objetivo
 //
 // Opciones propias:
 //   --jefes=RUTA      carpeta del catálogo (defecto ../catalog)
@@ -67,6 +68,23 @@ class JefeDef {
   final int? cadaHp;
   final bool segura;
   final Map<String, AliadoDef> aliados;
+
+  /// Intentos de invocación a lo largo de la partida (el golpe a 0 HP no da).
+  int get intentos => cadaHp == null ? 0 : (hp + cadaHp! - 1) ~/ cadaHp! - 1;
+
+  /// El mismo jefe con otro HP. Mantiene el número de intentos (y por tanto
+  /// de aliados): `cadaHp` se reparte en tramos iguales redondeando hacia
+  /// arriba, así nunca sale un intento de más.
+  JefeDef conHp(int nuevoHp) => JefeDef(
+        id: id,
+        nombre: nombre,
+        nivel: nivel,
+        hp: nuevoHp,
+        ataques: ataques,
+        cadaHp: cadaHp == null ? null : (nuevoHp + intentos) ~/ (intentos + 1),
+        segura: segura,
+        aliados: aliados,
+      );
 }
 
 Map<String, Object?> _mapa(Object? v) => Map<String, Object?>.from(v as Map);
@@ -310,23 +328,44 @@ MedidaJefe medirJefe(
   );
 }
 
+/// Busca el mayor HP (en centenas) con el que la victoria, con la política
+/// más dura (solo el dueño ataca a su aliado), llega al objetivo del nivel.
+int calibrarJefe(List<List<Pareja>> equipos, JefeDef jefe, Nivel nv, Config c) {
+  var lo = 2; // centenas: 200 HP
+  var hi = 120; // 12000 HP
+  while (lo < hi) {
+    final m = (lo + hi + 1) ~/ 2;
+    final v = medirJefe(equipos, jefe.conHp(m * 100), nv, c, 3, 0).victoria;
+    if (v >= objetivo[jefe.nivel]!) {
+      lo = m;
+    } else {
+      hi = m - 1;
+    }
+  }
+  return lo * 100;
+}
+
 void main(List<String> args) {
   var carpetaJefes = '../catalog';
   var ayuda = 0.5;
   final resto = <String>[];
-  var informe = '../balance/informes/jefes_aliados.csv';
+  String? informeArg;
   for (final a in args) {
     if (a.startsWith('--jefes=')) {
       carpetaJefes = a.substring('--jefes='.length);
     } else if (a.startsWith('--ayuda=')) {
       ayuda = double.parse(a.substring('--ayuda='.length));
     } else if (a.startsWith('--informe=')) {
-      informe = a.substring('--informe='.length);
+      informeArg = a.substring('--informe='.length);
     } else {
       resto.add(a);
     }
   }
   final c = leerArgs(resto);
+  final informe = informeArg ??
+      (c.calibrar
+          ? '../balance/informes/jefes_aliados_calibrado.csv'
+          : '../balance/informes/jefes_aliados.csv');
   final cartas = leerCatalogo(c.catalogo, c.ataques);
   final lista = cartas.values.toList();
   final normales = lista.where((x) => x.sinReglaEspecial).toList();
@@ -358,15 +397,16 @@ void main(List<String> args) {
       stdout.writeln('${jefe.id}  sin equipos de este nivel');
       continue;
     }
+    final medido = c.calibrar ? jefe.conHp(calibrarJefe(eqs, jefe, nv, c)) : jefe;
     for (final e in politicas.entries) {
-      final m = medirJefe(eqs, jefe, nv, c, c.semilla, e.value);
+      final m = medirJefe(eqs, medido, nv, c, c.semilla, e.value);
       stdout.writeln('${jefe.id.padRight(11)} ${jefe.nivel}      '
-          '${jefe.hp.toString().padRight(6)} ${e.key.padRight(12)}  '
+          '${medido.hp.toString().padRight(6)} ${e.key.padRight(12)}  '
           '${(100 * m.victoria).toStringAsFixed(1).padLeft(5)} %    '
           '${(100 * objetivo[jefe.nivel]!).toStringAsFixed(0).padLeft(3)} %     '
           '${m.turnosVictoria.toStringAsFixed(1).padLeft(5)}  '
           '${m.invocados.toStringAsFixed(2)}');
-      filas.add('${jefe.id},${jefe.nivel},${jefe.hp},${e.key},${eqs.length},'
+      filas.add('${jefe.id},${jefe.nivel},${medido.hp},${e.key},${eqs.length},'
           '${c.partidas},${m.victoria.toStringAsFixed(4)},${objetivo[jefe.nivel]},'
           '${m.turnosVictoria.toStringAsFixed(1)},${m.invocados.toStringAsFixed(2)}');
     }
@@ -375,6 +415,10 @@ void main(List<String> args) {
     ..createSync(recursive: true)
     ..writeAsStringSync('${filas.join('\n')}\n');
   stdout.writeln('\nInforme guardado en $informe');
+  if (c.calibrar) {
+    stdout.writeln('HP calibrado (columna "HP"): llévalo a catalog/bosses/*.json '
+        'con su cadaHp; ver docs/DEPENDENCIAS.md.');
+  }
   stdout.writeln('Sin efectos de habilidades de aliados ni veneno/quemadura: '
       'las cifras son una cota optimista para los jugadores.');
 }

@@ -30,7 +30,10 @@ dart run bin/sim_cartas.dart --calibrar   # busca el HP que da 75/50/30/15 %
 ```
 dart run bin/sim_jefes.dart
 dart run bin/sim_jefes.dart --equipos=20 --partidas=20 --informe=/tmp/prueba.csv   # prueba rápida
+dart run bin/sim_jefes.dart --calibrar   # busca el HP que da el objetivo (75/50/30/15 %)
 ```
+
+Con `--calibrar` busca, por jefe, el mayor HP (en centenas) con el que la política `solo-dueno` llega al objetivo del nivel, manteniendo el mismo número de aliados (el `cadaHp` se reparte en tramos iguales), y escribe `balance/informes/jefes_aliados_calibrado.csv`.
 
 **No modela** los efectos de las habilidades de los aliados (Tanque, Cura, Pícaro), ni el veneno y la quemadura del jefe. Las cifras son una cota optimista para los jugadores; la política `solo-dueno` es la más prudente. Los efectos se añadirán cuando se decida cómo los aplican los scripts de aliados (D-13). El CI compila el simulador y lanza una partida mínima, pero **no comprueba que los resultados sean razonables**: eso se mira al leer el informe.
 
