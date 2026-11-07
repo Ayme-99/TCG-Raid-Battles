@@ -1,6 +1,6 @@
 # D-14 · Efectos en los ataques del jefe
 
-Estado: **borrador** (2026-11-07). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están Onix, Manectric y Kingdra (salvo Hidrobomba).
+Estado: **borrador** (2026-11-07). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están Onix, Manectric y Kingdra.
 
 ## Motivación
 
@@ -53,10 +53,10 @@ Se irán añadiendo (daño a cada Activo, daño a la Banca, moneda) según los j
 |---|---|---|---|
 | 1 | Ciclón | 60 | `ignora_efectos` |
 | 2 | Pulso Dragón | 100 | Ninguno |
-| 3 | Hidrobomba | 200 | **Por replantear** (la idea «no usar Hidrobomba 2 veces seguidas en el mismo turno» queda en revisión) |
+| 3 | Hidrobomba | 200 | Ninguno (daño plano; se descartó la restricción de no repetirla) |
 
 ## Pendiente
 
-- Cerrar el efecto de Hidrobomba (Kingdra) y los de Arceus.
+- Cerrar los efectos de Arceus.
 - Idea aparte, fuera de esta tarea: un botón opcional «Lanzar moneda» como utilidad para los jugadores.
 - Después: motor y contrato v5, catálogo y app, simulador y recalibrado de HP.
