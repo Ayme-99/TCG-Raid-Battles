@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
 import 'paneles.dart';
@@ -24,6 +27,7 @@ class PantallaTurnoJefe extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       children: [
         const TarjetaJefe(),
+        const PanelEfectosActivos(),
         const PanelPendientes(),
         _AtaqueJefe(
           key: ValueKey('ataque-${estado.ronda}-${estado.ataquesJefeEnTurno}'),
@@ -116,6 +120,26 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
   int? _objetivo;
   bool _alAzar = false;
 
+  /// Ranura para la que ya se propuso el daño del catálogo.
+  int? _ranuraPropuesta;
+
+  /// Ataque de la carta de catálogo del jefe en la ranura elegida, si el jefe
+  /// viene del catálogo.
+  AtaqueJefeCatalogo? _ataqueCatalogo(EstadoPartida estado) {
+    final catalogo = ref.watch(catalogoProvider).maybeWhen(
+          data: (c) => c,
+          orElse: () => null,
+        );
+    final jefe = estado.jefe;
+    if (catalogo == null || jefe == null) return null;
+    for (final j in catalogo.jefes) {
+      if (j.nombre == jefe.nombre && j.nivel == jefe.nivel) {
+        return j.ataques[_ranura - 1];
+      }
+    }
+    return null;
+  }
+
   @override
   void dispose() {
     _dano.dispose();
@@ -126,6 +150,15 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
   Widget build(BuildContext context) {
     final estado = widget.estado;
     final activos = jugadoresActivos(estado);
+    final ataque = _ataqueCatalogo(estado);
+    final efecto = ataque?.efecto;
+    if (ataque != null && _ranuraPropuesta != _ranura) {
+      // Propone el daño de la carta; la mesa puede cambiarlo.
+      _dano.text = ataque.danoPropuesto(estado.ataquesJefeEnTurno).toString();
+      _ranuraPropuesta = _ranura;
+    }
+    final faltaDefensor =
+        efecto != null && efecto.necesitaDefensor && _objetivo == null;
     return Card(
       color: Theme.of(context).colorScheme.errorContainer,
       child: Padding(
@@ -152,6 +185,16 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                   ),
               ],
             ),
+            if (ataque != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                '${ataque.nombre} · ${ataque.dano}',
+                key: const Key('ataque-catalogo'),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              if (efecto != null)
+                Text(efecto.texto, key: const Key('efecto-ataque')),
+            ],
             const SizedBox(height: 8),
             KeyedSubtree(
               key: const Key('dano-jefe'),
@@ -187,18 +230,40 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
               value: _alAzar,
               onChanged: (v) => setState(() => _alAzar = v ?? false),
             ),
+            if (faltaDefensor)
+              const Text(
+                'Este ataque afecta al Pokémon Defensor: elige el jugador.',
+                key: Key('falta-defensor'),
+              ),
             FilledButton(
               key: const Key('registrar-ataque-jefe'),
-              onPressed: () => registrar(
-                context,
-                ref,
-                AtaqueJefe(
-                  ranura: _ranura,
-                  dano: int.tryParse(_dano.text) ?? 0,
-                  jugador: _objetivo,
-                  alAzar: _alAzar,
-                ),
-              ),
+              onPressed: faltaDefensor
+                  ? null
+                  : () {
+                      // La moneda del ataque la lanza la app y queda en el
+                      // registro (D-14).
+                      final moneda =
+                          efecto != null && efecto.conMoneda ? Random().nextBool() : null;
+                      final aplicado = registrar(
+                        context,
+                        ref,
+                        AtaqueJefe(
+                          ranura: _ranura,
+                          dano: int.tryParse(_dano.text) ?? 0,
+                          jugador: _objetivo,
+                          alAzar: _alAzar,
+                          efecto: efecto?.comoEfecto(moneda: moneda),
+                        ),
+                      );
+                      if (aplicado && moneda != null && context.mounted) {
+                        registrarAviso(
+                          context,
+                          moneda
+                              ? 'Moneda: cara. ${efecto!.texto}'
+                              : 'Moneda: cruz. No pasa nada.',
+                        );
+                      }
+                    },
               child: const Text('Registrar ataque'),
             ),
           ],

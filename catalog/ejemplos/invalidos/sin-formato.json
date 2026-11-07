@@ -11,7 +11,7 @@
     {
       "nombre": "Barrido",
       "dano": 60,
-      "efecto": "Daña a todos los Pokémon activos"
+      "efecto": { "tipo": "contadorATodos", "valor": 1, "texto": "Pon 1 contador de daño en todos los Pokémon en juego" }
     },
     {
       "nombre": "Embestida",

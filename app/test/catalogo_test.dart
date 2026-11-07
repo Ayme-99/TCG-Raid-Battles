@@ -62,6 +62,41 @@ void main() {
           'Plusle');
     });
 
+    test('los ataques traen los efectos de D-14', () async {
+      final c = await Catalogo.cargar(rootBundle);
+      final onix = c.jefes[0].ataques;
+      expect(onix.map((a) => a.nombre), ['Trampa Rocas', 'Lanzarrocas', 'Doble filo']);
+      expect(onix[0].efecto!.tipo, TipoEfectoAtaque.sinRetirada);
+      expect(onix[0].efecto!.duracion, 1);
+      expect(onix[0].efecto!.necesitaDefensor, isTrue);
+      expect(onix[1].efecto, isNull);
+      expect(onix[2].efecto!.tipo, TipoEfectoAtaque.autodano);
+      expect(onix[2].efecto!.valor, 30);
+
+      final onda = c.jefes[1].ataques[0].efecto!;
+      expect(onda.tipo, TipoEfectoAtaque.paralizarDefensor);
+      expect(onda.conMoneda, isTrue);
+      expect(onda.comoEfecto(moneda: true).moneda, isTrue);
+      expect(c.jefes[0].ataques[2].efecto!.comoEfecto(moneda: true).moneda, isNull);
+
+      final arceus = c.jefes[3].ataques;
+      expect(arceus[0].danoPropuesto(0), 40);
+      expect(arceus[0].danoPropuesto(2), 100);
+      expect(arceus[1].danoPropuesto(2), 100);
+      expect(arceus[2].efecto!.tipo, TipoEfectoAtaque.contadorATodos);
+    });
+
+    test('un efecto de ataque desconocido se rechaza', () {
+      final jefe = Map<String, Object?>.from(
+          _json('../catalog/bosses/onix.json') as Map);
+      final ataques = [
+        for (final a in jefe['ataques'] as List) Map<String, Object?>.from(a as Map),
+      ];
+      ataques[0]['efecto'] = {'tipo': 'bailar', 'texto': 'x'};
+      jefe['ataques'] = ataques;
+      expect(() => JefeCatalogo.deJson(jefe), throwsFormatException);
+    });
+
     test('un jefe sin la categoría de un aliado se rechaza', () {
       final jefe = Map<String, Object?>.from(
           _json('../catalog/bosses/onix.json') as Map);
@@ -120,5 +155,26 @@ void main() {
     expect(estado.jefe!.nombre, 'Onix');
     expect(estado.jefe!.hp, 2400);
     expect(estado.jefe!.invocacionCadaHp, 1200);
+
+    // Turno del jefe: la pantalla propone el ataque de la carta y su efecto.
+    final partida = c.read(partidaProvider.notifier);
+    for (final j in estado.orden) {
+      expect(partida.registrar(TurnoJugador(jugador: j, dano: 1)), isNull);
+    }
+    await tester.pumpAndSettle();
+    expect(find.text('Trampa Rocas · 30'), findsOneWidget);
+    expect(find.byKey(const Key('efecto-ataque')), findsOneWidget);
+    expect(find.byKey(const Key('falta-defensor')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('objetivo-0')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('falta-defensor')), findsNothing);
+    await tester.tap(find.byKey(const Key('registrar-ataque-jefe')));
+    await tester.pumpAndSettle();
+
+    final conEfecto = c.read(estadoProvider);
+    expect(conEfecto.efectosActivos.single.tipo, TipoEfectoAtaque.sinRetirada);
+    expect(conEfecto.efectosActivos.single.jugador, 0);
+    expect(find.byKey(const Key('efectos-activos')), findsOneWidget);
   });
 }

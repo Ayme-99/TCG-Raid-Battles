@@ -8,11 +8,77 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 /// un jefe nuevo exige publicar una versión nueva. Los esquemas JSON y el CI
 /// validan los archivos; aquí solo se leen y se rechaza lo que no tenga forma.
 
+/// Efecto de un ataque del jefe (D-14). [texto] es lo que lee la mesa.
+class EfectoAtaqueCatalogo {
+  final TipoEfectoAtaque tipo;
+  final int? valor;
+  final int? duracion;
+
+  /// El ataque lanza una moneda y la lanza la app.
+  final bool conMoneda;
+  final String texto;
+
+  const EfectoAtaqueCatalogo({
+    required this.tipo,
+    required this.texto,
+    this.valor,
+    this.duracion,
+    this.conMoneda = false,
+  });
+
+  /// El efecto tal como se registra en el evento [AtaqueJefe].
+  /// [moneda] es el resultado de la moneda, si el ataque la lleva.
+  EfectoAtaque comoEfecto({bool? moneda}) => EfectoAtaque(
+        tipo: tipo,
+        valor: valor,
+        duracion: duracion,
+        moneda: conMoneda ? moneda : null,
+      );
+
+  /// El efecto necesita saber qué jugador defiende.
+  bool get necesitaDefensor =>
+      tipo == TipoEfectoAtaque.sinRetirada ||
+      tipo == TipoEfectoAtaque.sinAtaque ||
+      tipo == TipoEfectoAtaque.paralizarDefensor;
+
+  factory EfectoAtaqueCatalogo.deJson(Map<String, Object?> m, String id) {
+    final nombreTipo = _texto(m, 'tipo');
+    final tipo = TipoEfectoAtaque.values.where((t) => t.name == nombreTipo);
+    if (tipo.isEmpty) {
+      throw FormatException('$id: efecto de ataque desconocido «$nombreTipo»');
+    }
+    return EfectoAtaqueCatalogo(
+      tipo: tipo.first,
+      texto: _texto(m, 'texto'),
+      valor: m['valor'] == null ? null : _entero(m, 'valor', id),
+      duracion: m['duracion'] == null ? null : _entero(m, 'duracion', id),
+      conMoneda: m['conMoneda'] == true,
+    );
+  }
+}
+
 class AtaqueJefeCatalogo {
   final String nombre;
   final int dano;
+  final EfectoAtaqueCatalogo? efecto;
 
-  const AtaqueJefeCatalogo({required this.nombre, required this.dano});
+  const AtaqueJefeCatalogo({
+    required this.nombre,
+    required this.dano,
+    this.efecto,
+  });
+
+  /// Daño que se propone a la mesa al registrar el ataque: el base y, si el
+  /// ataque suma daño por cada ataque anterior del turno (Danza Espada), lo
+  /// que corresponde a [ataquesPrevios]. El «+» condicionado a la mesa
+  /// (Castigo) lo añaden los jugadores.
+  int danoPropuesto(int ataquesPrevios) {
+    final e = efecto;
+    if (e != null && e.tipo == TipoEfectoAtaque.danoPorAtaquePrevio) {
+      return dano + (e.valor ?? 0) * ataquesPrevios;
+    }
+    return dano;
+  }
 }
 
 class AliadoCatalogo {
@@ -96,12 +162,20 @@ class JefeCatalogo {
       hp: _entero(m, 'hp', id),
       ataques: [
         for (final a in ataques)
-          AtaqueJefeCatalogo(
-            nombre: _texto(_mapa(a, '$id ataque'), 'nombre'),
-            dano: _entero(_mapa(a, '$id ataque'), 'dano', id),
-          ),
+          _ataque(_mapa(a, '$id ataque'), id),
       ],
       invocacion: inv == null ? null : _invocacion(_mapa(inv, '$id invocacion'), id),
+    );
+  }
+
+  static AtaqueJefeCatalogo _ataque(Map<String, Object?> m, String id) {
+    final efecto = m['efecto'];
+    return AtaqueJefeCatalogo(
+      nombre: _texto(m, 'nombre'),
+      dano: _entero(m, 'dano', id),
+      efecto: efecto == null
+          ? null
+          : EfectoAtaqueCatalogo.deJson(_mapa(efecto, '$id efecto'), id),
     );
   }
 

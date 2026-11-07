@@ -53,6 +53,47 @@ class PanelPokemon extends ConsumerWidget {
   }
 }
 
+/// Efectos de los ataques del jefe que siguen activos sobre algún jugador
+/// (D-14). Los aplican los jugadores en la mesa; aquí solo se recuerdan.
+class PanelEfectosActivos extends ConsumerWidget {
+  const PanelEfectosActivos({super.key});
+
+  static String _que(TipoEfectoAtaque tipo) => switch (tipo) {
+        TipoEfectoAtaque.sinRetirada => 'no puede retirarse',
+        TipoEfectoAtaque.sinAtaque => 'no puede atacar',
+        TipoEfectoAtaque.paralizarDefensor => 'está paralizado',
+        _ => tipo.name,
+      };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final estado = ref.watch(estadoProvider);
+    if (estado.efectosActivos.isEmpty) return const SizedBox.shrink();
+    return Card(
+      key: const Key('efectos-activos'),
+      color: Theme.of(context).colorScheme.tertiaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Efectos del jefe activos',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            for (final f in estado.efectosActivos)
+              Text(
+                '${estado.jugadores[f.jugador].nombre} ${_que(f.tipo)} '
+                '(${f.restantes} ${f.restantes == 1 ? 'turno' : 'turnos'})',
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Aplicar veneno o quemadura al jefe (D-12). Solo cuenta para el bono si el
 /// jefe no tenía ya el estado; eso lo decide el motor.
 class PanelEstados extends ConsumerStatefulWidget {

@@ -6,11 +6,15 @@
   "hp": 4400,
   "ataques": [
     {
-      "nombre": "Hidropulso",
-      "dano": 60
+      "nombre": "Ciclón",
+      "dano": 60,
+      "efecto": {
+        "tipo": "ignoraEfectos",
+        "texto": "El daño de este ataque no se ve afectado por ningún efecto en el Pokémon Activo rival."
+      }
     },
     {
-      "nombre": "Pulso dragón",
+      "nombre": "Pulso Dragón",
       "dano": 100
     },
     {
