@@ -286,13 +286,14 @@ test('una partida v3 con aliados por categoría se guarda tal cual llegó', asyn
   assert.strictEqual(detalle.json.registro.eventos.find((e) => e.tipo === 'aliadoInvocado').categoria, 'danio');
 });
 
-test('las partidas v1, v2 y v3 conviven', async (t) => {
+test('las partidas v1, v2, v3 y v4 conviven', async (t) => {
   const { llamar, cerrar } = await arrancar();
   t.after(cerrar);
   const v1 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'victoria-2-jugadores') });
   const v2 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'victoria-por-estados', 2) });
   const v3 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'derrota-con-veneno-y-abandono', 3) });
-  assert.deepStrictEqual([v1.estado, v2.estado, v3.estado], [201, 201, 201]);
+  const v4 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...ejemplo('validos', 'victoria-por-estados', 4), partidaId: 'ejemplo-v4-conviven' } });
+  assert.deepStrictEqual([v1.estado, v2.estado, v3.estado, v4.estado], [201, 201, 201, 201]);
 });
 
 test('un aliado v3 sin categoría o con una desconocida se rechaza', async (t) => {
@@ -310,11 +311,33 @@ test('un aliado v3 sin categoría o con una desconocida se rechaza', async (t) =
   assert.strictEqual(b.estado, 400);
 });
 
-test('el mensaje de versión no soportada lista las tres versiones', async (t) => {
+test('el mensaje de versión no soportada lista las cuatro versiones', async (t) => {
   const { llamar, cerrar } = await arrancar();
   t.after(cerrar);
-  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...v3ConAliado(), version: 4 } });
+  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...v3ConAliado(), version: 5 } });
   assert.strictEqual(res.estado, 400);
   assert.strictEqual(res.json.error, 'version_no_soportada');
-  assert.match(res.json.mensaje ?? JSON.stringify(res.json), /1, 2 y 3/);
+  assert.match(res.json.mensaje ?? JSON.stringify(res.json), /1, 2, 3 y 4/);
+});
+
+// Igual que la v3, pero con la categoría ya renombrada a `tanque` (v4).
+function v4ConAliado(categoria) {
+  const partida = v3ConAliado();
+  partida.version = 4;
+  partida.partidaId = 'ejemplo-v4-con-aliado';
+  partida.eventos.find((e) => e.tipo === 'aliadoInvocado').categoria = categoria;
+  return partida;
+}
+
+test('una partida v4 con un aliado tanque se guarda; con `barrera` se rechaza', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const ok = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: v4ConAliado('tanque') });
+  assert.strictEqual(ok.estado, 201, JSON.stringify(ok.json));
+  const detalle = await llamar('GET', '/partidas/ejemplo-v4-con-aliado', { usuario: ANA });
+  assert.strictEqual(detalle.json.registro.version, 4);
+  const mala = v4ConAliado('barrera');
+  mala.partidaId = 'ejemplo-v4-con-barrera';
+  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: mala });
+  assert.strictEqual(res.estado, 400);
 });

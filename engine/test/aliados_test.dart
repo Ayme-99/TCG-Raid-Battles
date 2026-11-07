@@ -19,7 +19,7 @@ AliadoInvocado rattata(
 
 AliadoInvocado wobbuffet(int slot) => AliadoInvocado(
       slot: slot,
-      categoria: CategoriaAliado.barrera,
+      categoria: CategoriaAliado.tanque,
       nombre: 'Wobbuffet',
       hp: 110,
       habilidad: 'Contraataque (pasiva)',
@@ -208,7 +208,7 @@ void main() {
     test('con los slots ocupados los intentos se pierden', () {
       var s = apply(palkia(), const TurnoJugador(jugador: 0, dano: 1800));
       s = apply(s, rattata(0));
-      s = apply(s, rattata(1, categoria: CategoriaAliado.barrera));
+      s = apply(s, rattata(1, categoria: CategoriaAliado.tanque));
       s = apply(s, rattata(2, categoria: CategoriaAliado.cura));
       expect(s.slotsLibres, isEmpty);
       expect(s.intentosInvocacionPendientes, 0);
@@ -419,14 +419,14 @@ void main() {
     test('no puede haber dos aliados de la misma categoría', () {
       var s = apply(dosIntentos(), rattata(1));
       expect(s.categoriasLibres, [
-        CategoriaAliado.barrera,
+        CategoriaAliado.tanque,
         CategoriaAliado.cura,
         CategoriaAliado.picaro,
       ]);
       expect(() => apply(s, rattata(2)), throwsA(isA<ReglaIncumplida>()));
       s = apply(s, wobbuffet(2));
       expect(s.aliados.map((a) => a.categoria),
-          [CategoriaAliado.danio, CategoriaAliado.barrera]);
+          [CategoriaAliado.danio, CategoriaAliado.tanque]);
     });
 
     test('al caer un aliado su categoría vuelve a estar libre', () {

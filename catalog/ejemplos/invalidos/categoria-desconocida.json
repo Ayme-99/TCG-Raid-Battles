@@ -31,7 +31,7 @@
           "dano": 20
         }
       },
-      "barrera": {
+      "tanque": {
         "nombre": "Mr. Mime",
         "hp": 110,
         "habilidad": "Manto: reduce el daño al jefe (lo aplica el jugador)"
@@ -52,7 +52,7 @@
         },
         "habilidad": "Fuerza al rival a cambiar su Pokémon activo"
       },
-      "tanque": {
+      "barrera": {
         "nombre": "Rattata",
         "hp": 60,
         "ataque": {

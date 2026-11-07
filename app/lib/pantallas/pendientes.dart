@@ -101,7 +101,7 @@ Future<void> atacarConAliado(
 
 String _etiquetaCategoria(CategoriaAliado c) => switch (c) {
       CategoriaAliado.danio => 'Daño',
-      CategoriaAliado.barrera => 'Barrera',
+      CategoriaAliado.tanque => 'Tanque',
       CategoriaAliado.cura => 'Cura',
       CategoriaAliado.picaro => 'Pícaro',
     };
