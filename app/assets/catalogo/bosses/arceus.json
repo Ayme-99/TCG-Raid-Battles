@@ -6,16 +6,31 @@
   "hp": 5000,
   "ataques": [
     {
-      "nombre": "Juicio",
-      "dano": 80
+      "nombre": "Danza Espada",
+      "dano": 40,
+      "efecto": {
+        "tipo": "danoPorAtaquePrevio",
+        "valor": 30,
+        "texto": "Este ataque hace 30 puntos de daño más por cada ataque que Arceus haya usado antes en este turno."
+      }
     },
     {
-      "nombre": "Ley primigenia",
-      "dano": 120
+      "nombre": "Castigo",
+      "dano": 100,
+      "efecto": {
+        "tipo": "danoExtraSi",
+        "valor": 50,
+        "texto": "Si el Pokémon Defensor no tiene contadores de daño, este ataque hace 50 puntos de daño más."
+      }
     },
     {
-      "nombre": "Fuerza divina",
-      "dano": 240
+      "nombre": "Sentencia",
+      "dano": 240,
+      "efecto": {
+        "tipo": "contadorATodos",
+        "valor": 1,
+        "texto": "Pon 1 contador de daño sobre todos los Pokémon en juego (menos Arceus)."
+      }
     }
   ],
   "invocacion": {

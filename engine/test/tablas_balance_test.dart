@@ -72,14 +72,25 @@ void main() {
         final jefe = jsonDecode(File('../catalog/bosses/$id.json').readAsStringSync())
             as Map<String, Object?>;
         final fila = porNivel[jefe['nivel']]!;
-        final danos = [
-          for (final a in jefe['ataques'] as List) (a as Map)['dano'],
+        final ataques = [
+          for (final a in jefe['ataques'] as List) a as Map<String, Object?>,
         ];
-        expect(
-          danos,
-          [_n(fila, 'ataque1'), _n(fila, 'ataque2'), _n(fila, 'ataque3')],
-          reason: '$id: $pista',
-        );
+        final tabla = [_n(fila, 'ataque1'), _n(fila, 'ataque2'), _n(fila, 'ataque3')];
+        for (var i = 0; i < 3; i++) {
+          final efecto = ataques[i]['efecto'] as Map<String, Object?>?;
+          // Los ataques de daño variable («40+», D-14) llevan el daño base, que
+          // no puede pasar del de la tabla; los demás, el de la tabla.
+          final variable = efecto != null &&
+              (efecto['tipo'] == 'danoPorAtaquePrevio' ||
+                  efecto['tipo'] == 'danoExtraSi');
+          final dano = ataques[i]['dano'] as int;
+          if (variable) {
+            expect(dano, lessThanOrEqualTo(tabla[i]),
+                reason: '$id ataque ${i + 1}: $pista');
+          } else {
+            expect(dano, tabla[i], reason: '$id ataque ${i + 1}: $pista');
+          }
+        }
       }
     });
   });

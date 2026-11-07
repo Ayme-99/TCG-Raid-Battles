@@ -21,6 +21,7 @@ class PantallaTurnoJugadores extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       children: [
         const TarjetaJefe(),
+        const PanelEfectosActivos(),
         const PanelPendientes(),
         _Orden(estado: estado),
         if (actual != null)

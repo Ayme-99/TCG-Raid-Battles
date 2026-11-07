@@ -6,16 +6,26 @@
   "hp": 2400,
   "ataques": [
     {
-      "nombre": "Atizar",
-      "dano": 30
+      "nombre": "Trampa Rocas",
+      "dano": 30,
+      "efecto": {
+        "tipo": "sinRetirada",
+        "duracion": 1,
+        "texto": "Durante el próximo turno de los jugadores, el Pokémon Defensor no puede retirarse."
+      }
     },
     {
-      "nombre": "Tumba de rocas",
+      "nombre": "Lanzarrocas",
       "dano": 60
     },
     {
-      "nombre": "Terremoto",
-      "dano": 120
+      "nombre": "Doble filo",
+      "dano": 120,
+      "efecto": {
+        "tipo": "autodano",
+        "valor": 30,
+        "texto": "Onix se hace 30 puntos de daño a sí mismo."
+      }
     }
   ],
   "invocacion": {

@@ -73,7 +73,7 @@ Estos datos viven duplicados. Los que llevan ✅ los compara `engine/test/tablas
 | Dato | Dónde está |
 |---|---|
 | ✅ Umbrales de nivel por X (400/600/800) | `balance/tablas/niveles.csv` (`x_min`), `engine/lib/src/reglas.dart` (el GDD §2 no se comprueba) |
-| ✅ Ataques de cada nivel (30/60/120 …) | `niveles.csv`, GDD §2, cada jefe del catálogo |
+| ✅ Ataques de cada nivel (30/60/120 …) | `niveles.csv`, GDD §2, cada jefe del catálogo (un ataque de daño variable, «40+», lleva su daño base, que no pasa del de la tabla) |
 | HP de referencia por nivel | `niveles.csv`, GDD §9, hoja de balance (se lee del CSV) |
 | ✅ Puntos por victoria, coste de desbloqueo y reparto | `balance/tablas/*.csv`, `engine/lib/src/puntos.dart` (`docs/D-10-sistema-de-puntos.md` no se comprueba) |
 | Objetivo de victoria por nivel (75/50/30/15 %) | GDD, `sim/bin/sim_cartas.dart` (`objetivo`) |

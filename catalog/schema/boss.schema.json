@@ -4,39 +4,117 @@
   "title": "Jefe del catálogo de Incursiones (formato 1)",
   "description": "Un jefe: carta fija con su HP y sus 3 ataques. Si invoca, declara cada cuántos HP perdidos hay un intento y sus 4 aliados, uno por categoría (D-13).",
   "type": "object",
-  "required": ["formato", "id", "nombre", "nivel", "hp", "ataques"],
+  "required": [
+    "formato",
+    "id",
+    "nombre",
+    "nivel",
+    "hp",
+    "ataques"
+  ],
   "additionalProperties": false,
   "properties": {
-    "formato": { "const": 1 },
-    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
-    "nombre": { "type": "string", "minLength": 1 },
-    "nivel": { "type": "integer", "minimum": 1, "maximum": 4 },
-    "hp": { "type": "integer", "minimum": 1 },
+    "formato": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "nombre": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nivel": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4
+    },
+    "hp": {
+      "type": "integer",
+      "minimum": 1
+    },
     "ataques": {
       "description": "Los 3 ataques de la carta; la posición es la ranura (1 a 3).",
       "type": "array",
       "minItems": 3,
       "maxItems": 3,
-      "items": { "$ref": "#/$defs/ataqueJefe" }
+      "items": {
+        "$ref": "#/$defs/ataqueJefe"
+      }
     },
-    "invocacion": { "$ref": "#/$defs/invocacion" },
-    "imagen": { "type": "string", "minLength": 1 }
+    "invocacion": {
+      "$ref": "#/$defs/invocacion"
+    },
+    "imagen": {
+      "type": "string",
+      "minLength": 1
+    }
   },
   "$defs": {
     "ataqueJefe": {
       "type": "object",
-      "required": ["nombre", "dano"],
+      "required": [
+        "nombre",
+        "dano"
+      ],
       "additionalProperties": false,
       "properties": {
-        "nombre": { "type": "string", "minLength": 1 },
-        "dano": { "type": "integer", "minimum": 0 },
-        "efecto": { "type": "string", "minLength": 1 }
+        "nombre": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dano": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "efecto": {
+          "description": "Efecto del ataque (D-14). `tipo` es uno de los tipos del motor (`TipoEfectoAtaque`); `texto` es lo que lee la mesa. `conMoneda`: el ataque lanza moneda (la lanza la app).",
+          "type": "object",
+          "required": [
+            "tipo",
+            "texto"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "tipo": {
+              "enum": [
+                "sinRetirada",
+                "sinAtaque",
+                "paralizarDefensor",
+                "ignoraEfectos",
+                "danoExtraSi",
+                "danoPorAtaquePrevio",
+                "contadorATodos",
+                "autodano"
+              ]
+            },
+            "valor": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "duracion": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "conMoneda": {
+              "type": "boolean"
+            },
+            "texto": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
       }
     },
     "invocacion": {
       "description": "Un jefe sin este bloque nunca invoca (D-04 §7.1).",
       "type": "object",
-      "required": ["cadaHp", "aliados"],
+      "required": [
+        "cadaHp",
+        "aliados"
+      ],
       "additionalProperties": false,
       "properties": {
         "cadaHp": {
@@ -46,52 +124,111 @@
         },
         "tirada": {
           "description": "Cómo se tira el intento. Por defecto, una moneda (cara = invoca). `segura`: sin moneda, cada intento invoca (si hay slot libre).",
-          "enum": ["moneda", "segura"]
+          "enum": [
+            "moneda",
+            "segura"
+          ]
         },
         "aliados": {
           "description": "Un aliado por categoría (D-13).",
           "type": "object",
-          "required": ["danio", "tanque", "cura", "picaro"],
+          "required": [
+            "danio",
+            "tanque",
+            "cura",
+            "picaro"
+          ],
           "additionalProperties": false,
           "properties": {
-            "danio": { "$ref": "#/$defs/aliado" },
-            "tanque": { "$ref": "#/$defs/aliado" },
-            "cura": { "$ref": "#/$defs/aliado" },
-            "picaro": { "$ref": "#/$defs/aliado" }
+            "danio": {
+              "$ref": "#/$defs/aliado"
+            },
+            "tanque": {
+              "$ref": "#/$defs/aliado"
+            },
+            "cura": {
+              "$ref": "#/$defs/aliado"
+            },
+            "picaro": {
+              "$ref": "#/$defs/aliado"
+            }
           }
         }
       }
     },
     "aliado": {
       "type": "object",
-      "required": ["nombre", "hp"],
+      "required": [
+        "nombre",
+        "hp"
+      ],
       "additionalProperties": false,
       "properties": {
-        "nombre": { "type": "string", "minLength": 1 },
-        "hp": { "type": "integer", "minimum": 1 },
+        "nombre": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hp": {
+          "type": "integer",
+          "minimum": 1
+        },
         "ataque": {
           "description": "Ausente: el aliado no ataca (solo habilidad).",
           "type": "object",
-          "required": ["nombre", "dano"],
+          "required": [
+            "nombre",
+            "dano"
+          ],
           "additionalProperties": false,
           "properties": {
-            "nombre": { "type": "string", "minLength": 1 },
-            "dano": { "type": "integer", "minimum": 0 }
+            "nombre": {
+              "type": "string",
+              "minLength": 1
+            },
+            "dano": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         },
-        "habilidad": { "type": "string", "minLength": 1 },
+        "habilidad": {
+          "type": "string",
+          "minLength": 1
+        },
         "efectos": {
           "description": "Quién aplica los efectos de la carta: el jugador (por defecto) o el programa, con el script de scriptId.",
-          "enum": ["jugador", "programa"]
+          "enum": [
+            "jugador",
+            "programa"
+          ]
         },
-        "scriptId": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+        "scriptId": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        }
       },
       "if": {
-        "required": ["efectos"],
-        "properties": { "efectos": { "const": "programa" } }
+        "required": [
+          "efectos"
+        ],
+        "properties": {
+          "efectos": {
+            "const": "programa"
+          }
+        }
       },
-      "then": { "required": ["scriptId"] },
-      "else": { "not": { "required": ["scriptId"] } }
+      "then": {
+        "required": [
+          "scriptId"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "scriptId"
+          ]
+        }
+      }
     }
   }
 }

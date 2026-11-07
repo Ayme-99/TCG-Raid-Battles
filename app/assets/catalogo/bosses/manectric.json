@@ -6,15 +6,25 @@
   "hp": 3600,
   "ataques": [
     {
-      "nombre": "Chispa",
-      "dano": 40
+      "nombre": "Onda trueno",
+      "dano": 40,
+      "efecto": {
+        "tipo": "paralizarDefensor",
+        "conMoneda": true,
+        "texto": "Lanza una moneda. Si sale cara, el Pokémon Defensor pasa a estar paralizado."
+      }
     },
     {
       "nombre": "Colmillo rayo",
-      "dano": 80
+      "dano": 80,
+      "efecto": {
+        "tipo": "sinAtaque",
+        "duracion": 1,
+        "texto": "Durante el próximo turno de los jugadores, el Pokémon Defensor no puede atacar."
+      }
     },
     {
-      "nombre": "Descarga",
+      "nombre": "Trueno",
       "dano": 160
     }
   ],
