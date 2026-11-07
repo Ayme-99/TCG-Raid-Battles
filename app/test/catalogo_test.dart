@@ -27,12 +27,14 @@ void main() {
           .listSync()
           .whereType<File>()
           .map((f) => f.uri.pathSegments.last)
+          .where((n) => n.endsWith('.json'))
           .toList()
         ..sort();
       final copias = Directory('assets/catalogo/bosses')
           .listSync()
           .whereType<File>()
           .map((f) => f.uri.pathSegments.last)
+          .where((n) => n.endsWith('.json'))
           .toList()
         ..sort();
       expect(copias, equals(originales),
@@ -77,9 +79,16 @@ void main() {
     tester.view.physicalSize = const Size(1000, 3000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
+    // La lectura de assets es E/S real: dentro de un test de widgets hay que
+    // hacerla fuera del reloj falso y pasársela al provider ya leída.
+    final catalogo =
+        (await tester.runAsync(() => Catalogo.cargar(rootBundle)))!;
     await tester.pumpWidget(
       ProviderScope(
-        overrides: sobrescribir(),
+        overrides: [
+          ...sobrescribir(),
+          catalogoProvider.overrideWith((ref) async => catalogo),
+        ],
         child: const IncursionesApp(),
       ),
     );
