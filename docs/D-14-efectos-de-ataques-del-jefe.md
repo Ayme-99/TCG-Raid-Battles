@@ -1,6 +1,6 @@
 # D-14 · Efectos en los ataques del jefe
 
-Estado: **borrador** (2026-11-07). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí solo está Onix.
+Estado: **borrador** (2026-11-07). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están Onix y Manectric.
 
 ## Motivación
 
@@ -25,6 +25,7 @@ Los jefes oficiales de Incursión Max llevan efectos en sus ataques (Dredanaw: e
 | `sin_retirada` | jugador | — | turnos | El Pokémon Defensor no puede retirarse |
 | `sin_ataque` | jugador | — | turnos | El Pokémon Defensor no puede atacar |
 | `autodano` | programa | HP | — | El jefe se hace N puntos de daño |
+| `estado_defensor` | jugador | estado (`paralizado`), `moneda` opcional | — | Lanza una moneda; si sale cara, el Pokémon Defensor pasa a estar paralizado |
 
 Se irán añadiendo (daño a cada Activo, daño a la Banca, moneda) según los jefes.
 
@@ -36,7 +37,16 @@ Se irán añadiendo (daño a cada Activo, daño a la Banca, moneda) según los j
 | 2 | Lanzarrocas | 60 | Ninguno |
 | 3 | Doble filo | 120 | `autodano`, `valor: 30` |
 
+## Manectric (Nv2)
+
+| Ataque | Nombre | Daño | Efecto |
+|---|---|---|---|
+| 1 | Onda trueno | 40 | `estado_defensor`: `paralizado`, con `moneda` (cara = paralizado) |
+| 2 | Colmillo rayo | 80 | `sin_ataque`, `duracion: 1` |
+| 3 | Trueno | 160 | Ninguno |
+
 ## Pendiente
 
-- Cerrar los efectos de Manectric, Kingdra y Arceus.
+- Cerrar los efectos de Kingdra y Arceus.
+- Pregunta abierta (Onda trueno): quién lanza la moneda y si la app registra el resultado.
 - Después: motor y contrato v5, catálogo y app, simulador y recalibrado de HP.
