@@ -19,6 +19,10 @@ Los jefes oficiales de Incursión Max llevan efectos en sus ataques (Dredanaw: e
 7. **Combinación de efectos activos**: los efectos de **tipos distintos conviven** (la app muestra un aviso por tipo). Si se repite un tipo que ya está activo, **se renueva** su duración: sigue habiendo un solo aviso.
 8. **Quién lanza la moneda**: si el efecto lo usa el jefe o uno de sus aliados, **la app lanza la moneda**, la registra en el evento (cara o cruz) y muestra el resultado (en Onda trueno: «cara, el Defensor queda paralizado» o «cruz, no pasa nada»). Las monedas de las cartas de los jugadores las lanzan ellos en la mesa, porque la app no gestiona sus ataques.
 
+## Criterio de nivel de los jefes
+
+Nv1 Pokémon Básicos (Onix), Nv2 Pokémon de Fase 1 que no evolucionan más (Manectric), Nv3 Pokémon de Fase 2 (Kingdra), Nv4 Pokémon Míticos y Legendarios (Arceus). Está también en el GDD (§2).
+
 ## Tipos de efecto (primera lista)
 
 | Tipo | Clase | Valor | Duración | Texto en la app |
