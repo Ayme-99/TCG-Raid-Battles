@@ -1,30 +1,98 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Ayme-99/TCG-Raid-Battles/catalog/schema/boss.schema.json",
-  "title": "Jefe de Incursiones (BORRADOR, se cierra en T-13)",
+  "title": "Jefe del catálogo de Incursiones (formato 1)",
+  "description": "Un jefe: carta fija con su HP y sus 3 ataques. Si invoca, declara cada cuántos HP perdidos hay un intento y sus 4 aliados, uno por categoría (D-13).",
   "type": "object",
-  "required": ["id", "nombre", "nivel", "hp", "ataques"],
+  "required": ["formato", "id", "nombre", "nivel", "hp", "ataques"],
   "additionalProperties": false,
   "properties": {
-    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "formato": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
     "nombre": { "type": "string", "minLength": 1 },
     "nivel": { "type": "integer", "minimum": 1, "maximum": 4 },
     "hp": { "type": "integer", "minimum": 1 },
     "ataques": {
+      "description": "Los 3 ataques de la carta; la posición es la ranura (1 a 3).",
       "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "required": ["nombre", "dano", "objetivo"],
-        "additionalProperties": false,
-        "properties": {
-          "nombre": { "type": "string" },
-          "dano": { "type": "integer", "minimum": 0 },
-          "objetivo": { "enum": ["todos", "elegido", "aleatorio"] },
-          "efecto": { "type": "string" }
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "$ref": "#/$defs/ataqueJefe" }
+    },
+    "invocacion": { "$ref": "#/$defs/invocacion" },
+    "imagen": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "ataqueJefe": {
+      "type": "object",
+      "required": ["nombre", "dano", "objetivo"],
+      "additionalProperties": false,
+      "properties": {
+        "nombre": { "type": "string", "minLength": 1 },
+        "dano": { "type": "integer", "minimum": 0 },
+        "objetivo": { "enum": ["todos", "elegido", "aleatorio"] },
+        "efecto": { "type": "string", "minLength": 1 }
+      }
+    },
+    "invocacion": {
+      "description": "Un jefe sin este bloque nunca invoca (D-04 §7.1).",
+      "type": "object",
+      "required": ["cadaHp", "aliados"],
+      "additionalProperties": false,
+      "properties": {
+        "cadaHp": {
+          "description": "Cada cuántos HP perdidos hay un intento de invocación.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "tirada": {
+          "description": "Cómo se tira el intento. Por defecto, una moneda (cara = invoca).",
+          "enum": ["moneda"]
+        },
+        "aliados": {
+          "description": "Un aliado por categoría (D-13).",
+          "type": "object",
+          "required": ["danio", "barrera", "cura", "picaro"],
+          "additionalProperties": false,
+          "properties": {
+            "danio": { "$ref": "#/$defs/aliado" },
+            "barrera": { "$ref": "#/$defs/aliado" },
+            "cura": { "$ref": "#/$defs/aliado" },
+            "picaro": { "$ref": "#/$defs/aliado" }
+          }
         }
       }
     },
-    "imagen": { "type": "string" }
+    "aliado": {
+      "type": "object",
+      "required": ["nombre", "hp"],
+      "additionalProperties": false,
+      "properties": {
+        "nombre": { "type": "string", "minLength": 1 },
+        "hp": { "type": "integer", "minimum": 1 },
+        "ataque": {
+          "description": "Ausente: el aliado no ataca (solo habilidad).",
+          "type": "object",
+          "required": ["nombre", "dano"],
+          "additionalProperties": false,
+          "properties": {
+            "nombre": { "type": "string", "minLength": 1 },
+            "dano": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "habilidad": { "type": "string", "minLength": 1 },
+        "efectos": {
+          "description": "Quién aplica los efectos de la carta: el jugador (por defecto) o el programa, con el script de scriptId.",
+          "enum": ["jugador", "programa"]
+        },
+        "scriptId": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+      },
+      "if": {
+        "required": ["efectos"],
+        "properties": { "efectos": { "const": "programa" } }
+      },
+      "then": { "required": ["scriptId"] },
+      "else": { "not": { "required": ["scriptId"] } }
+    }
   }
 }
