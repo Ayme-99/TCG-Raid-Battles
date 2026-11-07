@@ -34,6 +34,9 @@ const int danoVeneno = 10;
 /// Daño de la quemadura del jefe en cada chequeo (D-12). Provisional.
 const int danoQuemadura = 20;
 
+/// Daño de un contador de daño (efecto `contadorATodos`, D-14).
+const int danoContador = 10;
+
 /// Aplicaciones de estados que cuentan para el bono de puntos (D-12).
 const int topeAplicacionesBono = 3;
 

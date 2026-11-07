@@ -1,6 +1,6 @@
 # D-14 · Efectos en los ataques del jefe
 
-Estado: **borrador** (2026-11-07). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están los 4 jefes iniciales.
+Estado: **motor y contrato v5 hechos** (2026-11-07); catálogo, app y simulador pendientes. Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están los 4 jefes iniciales.
 
 ## Motivación
 
@@ -24,6 +24,8 @@ Los jefes oficiales de Incursión Max llevan efectos en sus ataques (Dredanaw: e
 Nv1 Pokémon Básicos (Onix), Nv2 Pokémon de Fase 1 que no evolucionan más (Manectric), Nv3 Pokémon de Fase 2 (Kingdra), Nv4 Pokémon Míticos y Legendarios (Arceus). Está también en el GDD (§2).
 
 ## Tipos de efecto (primera lista)
+
+En el contrato v5 los tipos van en camelCase: `sinRetirada`, `sinAtaque`, `paralizarDefensor` (antes `estado_defensor`: la parálisis es el único estado y la moneda es un campo aparte), `ignoraEfectos`, `danoExtraSi`, `danoPorAtaquePrevio`, `contadorATodos`, `autodano`. Detalle en `contrato/README.md`.
 
 | Tipo | Clase | Valor | Duración | Texto en la app |
 |---|---|---|---|---|

@@ -52,20 +52,77 @@ final class TurnoJugador extends Evento {
   const TurnoJugador({required this.jugador, required this.dano});
 }
 
+/// Tipos de efecto de un ataque del jefe (D-14).
+enum TipoEfectoAtaque {
+  /// El Defensor no puede retirarse durante [EfectoAtaque.duracion] turnos de
+  /// los jugadores. Necesita `jugador` en el ataque.
+  sinRetirada,
+
+  /// El Defensor no puede atacar durante [EfectoAtaque.duracion] turnos de los
+  /// jugadores. Necesita `jugador` en el ataque.
+  sinAtaque,
+
+  /// El Defensor queda paralizado. Si el ataque lanza moneda,
+  /// [EfectoAtaque.moneda] es el resultado (cara = paralizado). Necesita
+  /// `jugador` en el ataque.
+  paralizarDefensor,
+
+  /// El daño ignora los efectos del Pokémon activo rival. Solo se registra.
+  ignoraEfectos,
+
+  /// Daño extra condicionado a la mesa (por ejemplo, «si el Defensor no tiene
+  /// contadores»). Los jugadores lo aplican; solo se registra.
+  danoExtraSi,
+
+  /// Daño extra por cada ataque anterior del turno del jefe. El daño final ya
+  /// va en [AtaqueJefe.dano]; el efecto solo se registra.
+  danoPorAtaquePrevio,
+
+  /// Pone [EfectoAtaque.valor] contadores de daño en todos los Pokémon en
+  /// juego menos el jefe. El programa los aplica a los aliados del jefe; los
+  /// jugadores los ponen en sus Pokémon en la mesa.
+  contadorATodos,
+
+  /// El jefe se hace [EfectoAtaque.valor] puntos de daño a sí mismo. Se aplica
+  /// después del daño al jugador y no se atribuye a ningún jugador.
+  autodano,
+}
+
+/// Efecto de un ataque del jefe (D-14).
+/// [valor]: cantidad (HP de autodaño, contadores...). [duracion]: turnos de
+/// los jugadores que dura el efecto (1 si no se indica). [moneda]: resultado
+/// de la moneda del ataque (true cara), si la lleva.
+final class EfectoAtaque {
+  final TipoEfectoAtaque tipo;
+  final int? valor;
+  final int? duracion;
+  final bool? moneda;
+
+  const EfectoAtaque({
+    required this.tipo,
+    this.valor,
+    this.duracion,
+    this.moneda,
+  });
+}
+
 /// Ataque del jefe: ranura (1 a 3, solo etiqueta), daño y objetivo.
 /// [jugador] null significa que el ataque va a todos los jugadores.
 /// [alAzar] solo deja constancia de que el objetivo salió de una tirada.
+/// [efecto] es el efecto del ataque, si lo tiene (D-14).
 final class AtaqueJefe extends Evento {
   final int ranura;
   final int dano;
   final int? jugador;
   final bool alAzar;
+  final EfectoAtaque? efecto;
 
   const AtaqueJefe({
     required this.ranura,
     required this.dano,
     this.jugador,
     this.alAzar = false,
+    this.efecto,
   });
 }
 
