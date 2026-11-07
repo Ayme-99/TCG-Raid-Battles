@@ -17,6 +17,19 @@
 //   - Ayuda (opcional): un jugador libre ataca al aliado de un compañero en
 //     vez de al jefe, con la probabilidad --ayuda (0 = solo el dueño).
 //
+// Efectos de los ataques del jefe (D-14), tal como los lee del catálogo:
+//   - danoPorAtaquePrevio: +valor de daño por cada ataque anterior del turno.
+//   - danoExtraSi (Castigo): +valor si el Pokémon que defiende no tiene daño.
+//   - autodano: el jefe pierde valor HP tras el ataque (puede invocar o caer).
+//   - contadorATodos: valor×10 de daño a cada aliado y a cada Pokémon vivo de
+//     los jugadores.
+//   - sinAtaque y paralizarDefensor (con moneda si la lleva): el jugador
+//     que defiende no ataca en su siguiente turno.
+//   - sinRetirada: ese jugador no puede cambiar de Pokémon en su turno.
+//   La duración se toma siempre como 1 turno de los jugadores (la de todos los
+//   jefes actuales); ignoraEfectos no se modela porque los efectos de los
+//   jugadores tampoco.
+//
 // NO modela (el informe lo dice): efectos de las habilidades (Tanque, Cura,
 // Pícaro), veneno ni quemadura del jefe, ni el cambio de Pokémon activo por
 // efectos. Hasta que existan scripts de aliados (D-13), esas habilidades las
@@ -49,6 +62,15 @@ class AliadoDef {
   final int? dano;
 }
 
+/// Ataque de la carta del jefe con el efecto que le interesa al simulador.
+class AtaqueDef {
+  AtaqueDef(this.dano, {this.tipo, this.valor, this.conMoneda = false});
+  final int dano;
+  final String? tipo;
+  final int? valor;
+  final bool conMoneda;
+}
+
 class JefeDef {
   JefeDef({
     required this.id,
@@ -64,7 +86,7 @@ class JefeDef {
   final String nombre;
   final int nivel;
   final int hp;
-  final List<int> ataques;
+  final List<AtaqueDef> ataques;
   final int? cadaHp;
   final bool segura;
   final Map<String, AliadoDef> aliados;
@@ -113,7 +135,19 @@ List<JefeDef> leerJefes(String carpeta) {
       nombre: j['nombre'] as String,
       nivel: j['nivel'] as int,
       hp: j['hp'] as int,
-      ataques: [for (final a in j['ataques'] as List) _mapa(a)['dano'] as int],
+      ataques: [
+        for (final a in j['ataques'] as List)
+          () {
+            final m = _mapa(a);
+            final e = m['efecto'] == null ? null : _mapa(m['efecto']);
+            return AtaqueDef(
+              m['dano'] as int,
+              tipo: e == null ? null : e['tipo'] as String,
+              valor: e == null ? null : e['valor'] as int?,
+              conMoneda: e != null && e['conMoneda'] == true,
+            );
+          }(),
+      ],
       cadaHp: inv == null ? null : inv['cadaHp'] as int,
       segura: inv != null && inv['tirada'] == 'segura',
       aliados: aliados,
@@ -165,6 +199,9 @@ Resultado jugarJefe(
   var hp = jefe.hp;
   var cruzados = 0;
   var invocados = 0;
+  // Efectos del jefe sobre los jugadores durante su próximo turno (D-14).
+  final noAtacan = <int>{};
+  final sinRetirada = <int>{};
 
   // Ataque de un aliado: a su dueño, o a un jugador activo al azar si el
   // dueño está eliminado.
@@ -206,14 +243,36 @@ Resultado jugarJefe(
     atacarAliado(slot, a); // ataque de entrada
   }
 
+  // El jefe pierde [dano] HP y puede dar intentos de invocación. Devuelve
+  // true si cae.
+  bool bajarJefe(int dano) {
+    hp -= dano;
+    if (hp <= 0) return true;
+    final cadaHp = jefe.cadaHp;
+    if (cadaHp != null) {
+      final ahora = (jefe.hp - hp) ~/ cadaHp;
+      while (cruzados < ahora) {
+        cruzados++;
+        invocar();
+      }
+    }
+    return false;
+  }
+
   for (var t = 1; t <= c.maxTurnos; t++) {
     for (var i = 0; i < js.length; i++) {
       final j = js[i];
       if (j.eliminado) continue;
       if (!j.pokes[0].vivo) j.intercambiar();
+      if (noAtacan.contains(i)) {
+        for (final p in j.pokes) {
+          if (p.cd > 0) p.cd--;
+        }
+        continue;
+      }
       var act = j.pokes[0];
       var ch = j.elegir(act);
-      if (ch == null && j.pokes[1].vivo) {
+      if (ch == null && j.pokes[1].vivo && !sinRetirada.contains(i)) {
         j.intercambiar();
         act = j.pokes[0];
         ch = j.elegir(act);
@@ -246,16 +305,7 @@ Resultado jugarJefe(
         a.hp -= ch.dano; // el exceso se pierde
         if (!a.vivo) slots[objetivoAliado] = null;
       } else {
-        hp -= ch.dano;
-        if (hp <= 0) return Resultado(t, invocados);
-        final cadaHp = jefe.cadaHp;
-        if (cadaHp != null) {
-          final ahora = (jefe.hp - hp) ~/ cadaHp;
-          while (cruzados < ahora) {
-            cruzados++;
-            invocar();
-          }
-        }
+        if (bajarJefe(ch.dano)) return Resultado(t, invocados);
       }
       if (ch.cd) act.cd = 2;
       if (ch.gx) j.gxUsado = true;
@@ -263,6 +313,10 @@ Resultado jugarJefe(
         if (p.cd > 0) p.cd--;
       }
     }
+
+    // Los efectos del jefe duran hasta aquí: un turno de los jugadores.
+    noAtacan.clear();
+    sinRetirada.clear();
 
     // Turno del jefe: sus ataques (como en sim_cartas.dart)...
     var k = 1;
@@ -274,7 +328,35 @@ Resultado jugarJefe(
       if (vivos.isEmpty) break;
       final j = vivos[rnd.nextInt(vivos.length)];
       final r = rnd.nextDouble();
-      golpear(j, jefe.ataques[r < 0.4 ? 0 : (r < 0.8 ? 1 : 2)]);
+      final a = jefe.ataques[r < 0.4 ? 0 : (r < 0.8 ? 1 : 2)];
+      var dano = a.dano;
+      if (a.tipo == 'danoPorAtaquePrevio') dano += (a.valor ?? 0) * n;
+      if (a.tipo == 'danoExtraSi') {
+        final defensor = j.pokes[0].vivo ? j.pokes[0] : j.pokes[1];
+        if (defensor.hp == defensor.carta.hp) dano += a.valor ?? 0;
+      }
+      golpear(j, dano);
+      // Efectos del ataque, después del daño al jugador (D-14).
+      if (a.tipo == 'autodano') {
+        if (bajarJefe(a.valor ?? 0)) return Resultado(t, invocados);
+      } else if (a.tipo == 'contadorATodos') {
+        final d = (a.valor ?? 1) * 10;
+        for (var s = 0; s < slots.length; s++) {
+          final al = slots[s];
+          if (al == null) continue;
+          al.hp -= d;
+          if (!al.vivo) slots[s] = null;
+        }
+        for (final x in js) {
+          for (final p in x.pokes) {
+            if (p.vivo) p.hp -= d;
+          }
+        }
+      } else if (a.tipo == 'sinAtaque' || a.tipo == 'paralizarDefensor') {
+        if (!a.conMoneda || rnd.nextBool()) noAtacan.add(js.indexOf(j));
+      } else if (a.tipo == 'sinRetirada') {
+        sinRetirada.add(js.indexOf(j));
+      }
     }
     // ...y, al final, los ataques de los aliados vivos.
     for (var i = 0; i < slots.length; i++) {
