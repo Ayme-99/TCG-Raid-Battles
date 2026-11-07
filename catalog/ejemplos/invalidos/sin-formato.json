@@ -6,19 +6,16 @@
   "ataques": [
     {
       "nombre": "Golpe",
-      "dano": 30,
-      "objetivo": "elegido"
+      "dano": 30
     },
     {
       "nombre": "Barrido",
       "dano": 60,
-      "objetivo": "todos",
       "efecto": "Daña a todos los Pokémon activos"
     },
     {
       "nombre": "Embestida",
-      "dano": 120,
-      "objetivo": "aleatorio"
+      "dano": 120
     }
   ],
   "invocacion": {

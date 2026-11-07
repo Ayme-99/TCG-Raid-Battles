@@ -25,12 +25,11 @@
   "$defs": {
     "ataqueJefe": {
       "type": "object",
-      "required": ["nombre", "dano", "objetivo"],
+      "required": ["nombre", "dano"],
       "additionalProperties": false,
       "properties": {
         "nombre": { "type": "string", "minLength": 1 },
         "dano": { "type": "integer", "minimum": 0 },
-        "objetivo": { "enum": ["todos", "elegido", "aleatorio"] },
         "efecto": { "type": "string", "minLength": 1 }
       }
     },
