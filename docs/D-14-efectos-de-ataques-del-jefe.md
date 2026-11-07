@@ -1,6 +1,6 @@
 # D-14 · Efectos en los ataques del jefe
 
-Estado: **borrador** (2026-11-07). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están Onix y Manectric.
+Estado: **borrador** (2026-11-07). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están Onix, Manectric y Kingdra (salvo Hidrobomba).
 
 ## Motivación
 
@@ -25,6 +25,7 @@ Los jefes oficiales de Incursión Max llevan efectos en sus ataques (Dredanaw: e
 |---|---|---|---|---|
 | `sin_retirada` | jugador | — | turnos | El Pokémon Defensor no puede retirarse |
 | `sin_ataque` | jugador | — | turnos | El Pokémon Defensor no puede atacar |
+| `ignora_efectos` | jugador | — | — | El daño de este ataque no se ve afectado por ningún efecto del Pokémon activo rival |
 | `autodano` | programa | HP | — | El jefe se hace N puntos de daño |
 | `estado_defensor` | jugador | estado (`paralizado`), `moneda` opcional | — | Lanza una moneda; si sale cara, el Pokémon Defensor pasa a estar paralizado |
 
@@ -46,8 +47,16 @@ Se irán añadiendo (daño a cada Activo, daño a la Banca, moneda) según los j
 | 2 | Colmillo rayo | 80 | `sin_ataque`, `duracion: 1` |
 | 3 | Trueno | 160 | Ninguno |
 
+## Kingdra (Nv3)
+
+| Ataque | Nombre | Daño | Efecto |
+|---|---|---|---|
+| 1 | Ciclón | 60 | `ignora_efectos` |
+| 2 | Pulso Dragón | 100 | Ninguno |
+| 3 | Hidrobomba | 200 | **Por replantear** (la idea «no usar Hidrobomba 2 veces seguidas en el mismo turno» queda en revisión) |
+
 ## Pendiente
 
-- Cerrar los efectos de Kingdra y Arceus.
+- Cerrar el efecto de Hidrobomba (Kingdra) y los de Arceus.
 - Idea aparte, fuera de esta tarea: un botón opcional «Lanzar moneda» como utilidad para los jugadores.
 - Después: motor y contrato v5, catálogo y app, simulador y recalibrado de HP.
