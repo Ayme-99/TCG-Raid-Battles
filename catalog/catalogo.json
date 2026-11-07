@@ -1,1 +1,9 @@
-{ "version": 1, "jefes": [] }
+{
+  "version": 2,
+  "jefes": [
+    "onix",
+    "manectric",
+    "kingdra",
+    "arceus"
+  ]
+}

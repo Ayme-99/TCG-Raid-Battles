@@ -47,7 +47,7 @@ Marcado como **propuesta de prueba**: el GDD define los ataques por nivel y las 
 - Máximo de ataques por turno: Nv1 2 · Nv2 3 · Nv3 4 · Nv4 5.
 - Mazo de jefe, como en el juego oficial (confirmado). Composición sugerida para empezar: 10 cartas con 5 de ranura 1, 3 de ranura 2 y 2 de ranura 3; objetivo de cada ataque (todos / uno elegido / uno al azar) repartido como prefieras, **pero anótalo** para poder repetirlo.
 - Sin aliados en la sesión 1. Se añaden en la sesión 2 si el flujo base se entiende, porque aún no están calibrados (GDD §9).
-- **Aliados (D-13):** cada jefe tiene 4 aliados, uno por categoría: Daño, Barrera, Cura y Pícaro (ejemplo: Rattata, Mr. Mime, Chansey y Scyther). Al cruzar un umbral se tira la moneda; si sale cara, un dado elige el slot y otro la categoría, sin repetir un slot ni una categoría en uso (en papel, repite la tirada si sale un valor ocupado). Sin slot libre no hay invocación. Los números de cada aliado están por definir: anota los que uséis.
+- **Aliados (D-13):** cada jefe tiene 4 aliados, uno por categoría: Daño, Tanque, Cura y Pícaro (ejemplo: Rattata, Mr. Mime, Chansey y Scyther). Al cruzar un umbral se tira la moneda; si sale cara, un dado elige el slot y otro la categoría, sin repetir un slot ni una categoría en uso (en papel, repite la tirada si sale un valor ocupado). Sin slot libre no hay invocación. Los números de cada aliado están por definir: anota los que uséis.
 
 Si el mazo sugerido da una partida claramente demasiado fácil o difícil, no lo ajustes sobre la marcha: anótalo y cambia una sola cosa en la partida siguiente.
 

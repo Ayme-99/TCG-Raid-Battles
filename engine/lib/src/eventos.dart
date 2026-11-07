@@ -146,7 +146,7 @@ final class SinInvocacion extends Evento {
 
 /// Categoría de un aliado del jefe (D-13). Cada jefe tiene un aliado por
 /// categoría y no puede haber dos de la misma categoría a la vez.
-enum CategoriaAliado { danio, barrera, cura, picaro }
+enum CategoriaAliado { danio, tanque, cura, picaro }
 
 /// Quién aplica los efectos de la carta de un aliado (D-13).
 enum EfectosAliado {

@@ -45,17 +45,17 @@
           "minimum": 1
         },
         "tirada": {
-          "description": "Cómo se tira el intento. Por defecto, una moneda (cara = invoca).",
-          "enum": ["moneda"]
+          "description": "Cómo se tira el intento. Por defecto, una moneda (cara = invoca). `segura`: sin moneda, cada intento invoca (si hay slot libre).",
+          "enum": ["moneda", "segura"]
         },
         "aliados": {
           "description": "Un aliado por categoría (D-13).",
           "type": "object",
-          "required": ["danio", "barrera", "cura", "picaro"],
+          "required": ["danio", "tanque", "cura", "picaro"],
           "additionalProperties": false,
           "properties": {
             "danio": { "$ref": "#/$defs/aliado" },
-            "barrera": { "$ref": "#/$defs/aliado" },
+            "tanque": { "$ref": "#/$defs/aliado" },
             "cura": { "$ref": "#/$defs/aliado" },
             "picaro": { "$ref": "#/$defs/aliado" }
           }

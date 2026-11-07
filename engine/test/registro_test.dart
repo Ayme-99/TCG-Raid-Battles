@@ -20,12 +20,12 @@ List<(String, Object?)> _ejemplos(String nombre) => [
     ]..sort((a, b) => a.$1.compareTo(b.$1));
 
 void main() {
-  /// Lo que debe salir de migrar a la versión 3 (D-13): los aliados invocados
-  /// reciben una categoría por orden de invocación (danio, barrera, cura,
+  /// Lo que debe salir de migrar a la versión 4 (D-13): los aliados invocados
+  /// reciben una categoría por orden de invocación (danio, tanque, cura,
   /// picaro y vuelta a empezar).
   Map<String, Object?> conCategorias(Map<String, Object?> m) {
     var invocados = 0;
-    m['version'] = 3;
+    m['version'] = 4;
     m['eventos'] = [
       for (final e in m['eventos'] as List)
         if ((e as Map)['tipo'] == 'aliadoInvocado')
@@ -41,12 +41,27 @@ void main() {
   }
 
   /// Lo que debe salir de leer un registro de la versión 2: el mismo registro
-  /// en versión 3, con una categoría en cada aliado invocado.
+  /// en versión 4, con una categoría en cada aliado invocado.
   Object? migradoDeV2(Object? json) =>
       conCategorias(Map<String, Object?>.from(json as Map));
 
+  /// Lo que debe salir de leer un registro de la versión 3: el mismo registro
+  /// en versión 4 con la categoría `barrera` renombrada a `tanque`.
+  Object? migradoDeV3(Object? json) {
+    final m = Map<String, Object?>.from(json as Map);
+    m['version'] = 4;
+    m['eventos'] = [
+      for (final e in m['eventos'] as List)
+        if ((e as Map)['categoria'] == 'barrera')
+          {...Map<String, Object?>.from(e), 'categoria': 'tanque'}
+        else
+          e,
+    ];
+    return m;
+  }
+
   /// Lo que debe salir de leer un registro de la versión 1: el mismo registro
-  /// en versión 3, con el bono de estados a 0 en cada jugador del resumen y
+  /// en versión 4, con el bono de estados a 0 en cada jugador del resumen y
   /// una categoría en cada aliado invocado.
   Object? migradoDeV1(Object? json) {
     final m = Map<String, Object?>.from(json as Map);
@@ -80,7 +95,7 @@ void main() {
     expect(registro.resumen, equals(nuevo.resumen));
   }
 
-  group('ejemplos del contrato v1 (se migran a la versión 3)', () {
+  group('ejemplos del contrato v1 (se migran a la versión 4)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v1/validos'), isNotEmpty);
       expect(_ejemplos('v1/invalidos-estructura'), isNotEmpty);
@@ -88,9 +103,9 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v1/validos')) {
-      test('válido: $nombre se lee, se migra y se escribe en versión 3', () {
+      test('válido: $nombre se lee, se migra y se escribe en versión 4', () {
         final registro = RegistroPartida.deJson(json);
-        expect(registro.version, 3);
+        expect(registro.version, 4);
         expect(registro.toJson(), equals(migradoDeV1(json)));
       });
 
@@ -114,7 +129,7 @@ void main() {
     }
   });
 
-  group('ejemplos del contrato v2 (se migran a la versión 3)', () {
+  group('ejemplos del contrato v2 (se migran a la versión 4)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v2/validos'), isNotEmpty);
       expect(_ejemplos('v2/invalidos-estructura'), isNotEmpty);
@@ -122,7 +137,7 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v2/validos')) {
-      test('válido: $nombre se lee, se migra y se escribe en versión 3', () {
+      test('válido: $nombre se lee, se migra y se escribe en versión 4', () {
         expect(RegistroPartida.deJson(json).toJson(),
             equals(migradoDeV2(json)));
       });
@@ -147,7 +162,7 @@ void main() {
     }
   });
 
-  group('ejemplos del contrato v3', () {
+  group('ejemplos del contrato v3 (se migran a la versión 4)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v3/validos'), isNotEmpty);
       expect(_ejemplos('v3/invalidos-estructura'), isNotEmpty);
@@ -155,8 +170,8 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v3/validos')) {
-      test('válido: $nombre se lee y se vuelve a escribir igual', () {
-        expect(RegistroPartida.deJson(json).toJson(), equals(json));
+      test('válido: $nombre se lee, se migra y se escribe en versión 4', () {
+        expect(RegistroPartida.deJson(json).toJson(), equals(migradoDeV3(json)));
       });
 
       test('válido: $nombre guarda el resumen que calcularía el motor', () {
@@ -172,6 +187,38 @@ void main() {
     }
 
     for (final (nombre, json) in _ejemplos('v3/invalidos-reglas')) {
+      test('reglas incumplidas: $nombre', () {
+        expect(() => RegistroPartida.deJson(json),
+            throwsA(isA<RegistroInvalido>()));
+      });
+    }
+  });
+
+  group('ejemplos del contrato v4', () {
+    test('hay ejemplos de cada tipo', () {
+      expect(_ejemplos('v4/validos'), isNotEmpty);
+      expect(_ejemplos('v4/invalidos-estructura'), isNotEmpty);
+      expect(_ejemplos('v4/invalidos-reglas'), isNotEmpty);
+    });
+
+    for (final (nombre, json) in _ejemplos('v4/validos')) {
+      test('válido: $nombre se lee y se vuelve a escribir igual', () {
+        expect(RegistroPartida.deJson(json).toJson(), equals(json));
+      });
+
+      test('válido: $nombre guarda el resumen que calcularía el motor', () {
+        resumenEsElDelMotor(json);
+      });
+    }
+
+    for (final (nombre, json) in _ejemplos('v4/invalidos-estructura')) {
+      test('inválido de estructura: $nombre', () {
+        expect(() => RegistroPartida.deJson(json),
+            throwsA(isA<RegistroInvalido>()));
+      });
+    }
+
+    for (final (nombre, json) in _ejemplos('v4/invalidos-reglas')) {
       test('reglas incumplidas: $nombre', () {
         expect(() => RegistroPartida.deJson(json),
             throwsA(isA<RegistroInvalido>()));
@@ -273,7 +320,7 @@ void main() {
       const SinInvocacion(),
       const AliadoInvocado(
         slot: 1,
-        categoria: CategoriaAliado.barrera,
+        categoria: CategoriaAliado.tanque,
         nombre: 'Wobbuffet',
         hp: 110,
       ),
@@ -353,7 +400,7 @@ void main() {
         {
           'tipo': 'aliadoInvocado',
           'slot': 0,
-          'categoria': 'tanque',
+          'categoria': 'mago',
           'nombre': 'A',
           'hp': 10,
         },

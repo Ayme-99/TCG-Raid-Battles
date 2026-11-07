@@ -9,11 +9,11 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 3;
+const int versionRegistro = 4;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {1: _v1AV2, 2: _v2AV3};
+    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4};
 
 /// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
 /// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
@@ -45,8 +45,11 @@ Map<String, Object?> _v1AV2(Map<String, Object?> datos) {
 
 /// Versión 3 (D-13): aliados por categoría. Cada `aliadoInvocado` gana
 /// `categoria`. Las partidas antiguas no la tenían, así que se asigna una por
-/// orden de invocación (danio, barrera, cura, picaro y vuelta a empezar):
+/// orden de invocación (danio, barrera, cura, picaro y vuelta a empezar; en
+/// la versión 3 la categoría de tanque aún se llamaba `barrera`):
 /// solo sirve para poder leerlas, no refleja lo que pasó en la mesa.
+const _categoriasV3 = ['danio', 'barrera', 'cura', 'picaro'];
+
 Map<String, Object?> _v2AV3(Map<String, Object?> datos) {
   final resultado = Map<String, Object?>.of(datos);
   resultado['version'] = 3;
@@ -58,9 +61,27 @@ Map<String, Object?> _v2AV3(Map<String, Object?> datos) {
         if (e is Map && e['tipo'] == 'aliadoInvocado' && !e.containsKey('categoria'))
           {
             ...Map<String, Object?>.from(e),
-            'categoria': CategoriaAliado
-                .values[invocados++ % CategoriaAliado.values.length].name,
+            'categoria':
+                _categoriasV3[invocados++ % _categoriasV3.length],
           }
+        else
+          e,
+    ];
+  }
+  return resultado;
+}
+
+/// Versión 4: la categoría `barrera` pasa a llamarse `tanque`. Los aliados ya
+/// invocados en partidas guardadas conservan su efecto; solo cambia el nombre.
+Map<String, Object?> _v3AV4(Map<String, Object?> datos) {
+  final resultado = Map<String, Object?>.of(datos);
+  resultado['version'] = 4;
+  final eventos = datos['eventos'];
+  if (eventos is List) {
+    resultado['eventos'] = [
+      for (final e in eventos)
+        if (e is Map && e['tipo'] == 'aliadoInvocado' && e['categoria'] == 'barrera')
+          {...Map<String, Object?>.from(e), 'categoria': 'tanque'}
         else
           e,
     ];

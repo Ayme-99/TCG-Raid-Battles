@@ -30,7 +30,7 @@
           "dano": 20
         }
       },
-      "barrera": {
+      "tanque": {
         "nombre": "Mr. Mime",
         "hp": 110,
         "habilidad": "Manto: reduce el daño al jefe (lo aplica el jugador)"

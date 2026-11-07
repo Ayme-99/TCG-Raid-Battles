@@ -6,9 +6,9 @@ Sustituye de D-04/D-07 el reparto de aliados por azar de una lista libre (D-04 �
 
 ## 1. Los 4 aliados de un jefe
 
-Cada jefe que invoca tiene **4 aliados, uno por categoría**: Daño, Barrera, Cura y Pícaro. Cada categoría está centrada en una manera distinta de molestar a los jugadores. Qué hace exactamente cada aliado lo define su carta (§3).
+Cada jefe que invoca tiene **4 aliados, uno por categoría**: Daño, Tanque, Cura y Pícaro. Cada categoría está centrada en una manera distinta de molestar a los jugadores. Qué hace exactamente cada aliado lo define su carta (§3).
 
-Cada jefe tiene sus **propios** 4 aliados. Ejemplo ilustrativo (no es un jefe real, ni sus números): Daño Rattata, Barrera Mr. Mime, Cura Chansey, Pícaro Scyther.
+Cada jefe tiene sus **propios** 4 aliados. Ejemplo ilustrativo (no es un jefe real, ni sus números): Daño Rattata, Tanque Mr. Mime, Cura Chansey, Pícaro Scyther.
 
 **Pícaro** es la categoría de **control**, la más versátil: aplica estados alterados, modifica la fuerza, pone contadores de daño, etc. Son los **únicos aliados que atacan a la Banca**; el resto solo afecta al Pokémon Activo.
 
@@ -16,7 +16,7 @@ Cada jefe tiene sus **propios** 4 aliados. Ejemplo ilustrativo (no es un jefe re
 
 El umbral de HP, que cada umbral cuente una vez y la moneda **no cambian** (D-04 §7.1 y §7.2). Después de la moneda:
 
-1. Se tira la **moneda** del jefe. Si no sale cara, no hay aliado.
+1. Si el jefe usa moneda, se tira: si no sale cara, no hay aliado. Los jefes con invocación **segura** (enmienda v1.7) no tiran moneda y este paso siempre sigue.
 2. Si sale cara, el **dado de slot** (moneda con 2 slots, d3 con 3, d4 con 4) elige un slot libre de un jugador activo. **No se repite un slot ocupado ni de un jugador eliminado.**
 3. El **dado de categoría** (d4) elige una de las 4 categorías. **No se repite una categoría que ya esté en uso** por un aliado vivo.
 4. Entra el aliado de esa categoría que figura en la ficha del jefe, en ese slot.

@@ -35,7 +35,7 @@
     {
       "tipo": "aliadoInvocado",
       "slot": 1,
-      "categoria": "tanque",
+      "categoria": "mago",
       "nombre": "Rattata",
       "hp": 60,
       "ataqueNombre": "Placaje",

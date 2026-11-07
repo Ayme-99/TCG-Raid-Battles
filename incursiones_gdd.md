@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.6 (especificación del motor)
+**Versión:** 1.7 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -113,7 +113,7 @@ Detalle en `docs/D-04-aliados.md`.
 
 - **Un slot por jugador** (hasta 4; con 3 jugadores, 3 slots; con 2, 2). Un aliado como máximo por slot, solo en slots de jugadores activos.
 - Un aliado tiene HP propio (independiente del jefe), a lo sumo un ataque y a veces una habilidad. Hay aliados sin ataque (solo habilidad) y las habilidades son **pasivas**: una vez en juego se mantienen mientras el aliado siga en el combate.
-- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y sus 4 aliados, uno por categoría: Daño, Barrera, Cura y Pícaro, D-13); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: moneda, y si sale cara, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay invocación) y un d4 elige la categoría (no se repite una categoría en uso). Entra el aliado de esa categoría de la ficha del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que empezará a bloquear.
+- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y sus 4 aliados, uno por categoría: Daño, Tanque, Cura y Pícaro, D-13); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: si el jefe usa moneda, se tira y solo sigue si sale cara; si su invocación es **segura**, no hay moneda y el intento sigue siempre. Después, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay invocación) y un d4 elige la categoría (no se repite una categoría en uso). Entra el aliado de esa categoría de la ficha del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que empezará a bloquear.
 - **Pícaro**: categoría de control (estados alterados, modificar fuerza, contadores de daño). Sus aliados son los únicos que atacan a la Banca.
 - **Entrada**: al entrar, el aliado usa su ataque y/o su habilidad contra el dueño de su slot (salvo que su texto diga otra cosa) y no vuelve a atacar hasta el final del turno del jefe.
 - **Exceso de daño**: si un jugador hace a un aliado más daño del que le queda, el exceso se pierde (no pasa al jefe ni a otro aliado).
@@ -213,7 +213,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 - **X:** suma del mejor ataque de cada jugador; fija el nivel del jefe.
 - **Ranura de ataque (Attack slot):** Ataque 1/2/3 del jefe; el asistente solo conoce el número, no el efecto.
 - **Carta de ánimo (Cheer):** carta que roba el jugador cuyo Pokémon activo cae KO; le da prioridad en la ronda siguiente y un efecto resuelto en la mesa.
-- **Aliado:** Pokémon invocado por el jefe, uno por slot de jugador y de una de las 4 categorías (Daño, Barrera, Cura, Pícaro). Un único ataque, a veces con habilidad.
+- **Aliado:** Pokémon invocado por el jefe, uno por slot de jugador y de una de las 4 categorías (Daño, Tanque, Cura, Pícaro). Un único ataque, a veces con habilidad.
 - **Habilidad (de aliado):** efecto pasivo que algunos aliados tienen; se resuelve físicamente.
 - **KO (jugador):** un Pokémon del jugador ha sido derrotado. No elimina al jugador hasta agotar todos sus Pokémon.
 - **Eliminado:** jugador sin Pokémon en juego; deja de participar, pero la partida sigue si queda alguno activo.
@@ -262,3 +262,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.4 | D-12 cerrada: el asistente lleva los estados del jefe (veneno permanente de 10, quemadura de 20 con moneda automática para quitarla) con chequeo al cerrar la ronda; su daño no se atribuye a ningún jugador y se sustituye por un bono individual de puntos de `tope ÷ 100 × min(n, 3)` (÷ 4 en derrota), fuera del total del equipo. Sustituye la decisión de D-08 sobre el daño de estados. |
 | v1.5 | D-13 cerrada: cada jefe tiene 4 aliados, uno por categoría (Daño, Barrera, Cura, Pícaro). Tras la moneda, un dado elige el slot y otro la categoría sin repetir valores en uso. Cada carta de aliado indica si sus efectos los aplica el programa (con script) o el jugador. Se añade `docs/D-13-aliados-por-categoria.md`. |
 | v1.6 | Enmienda a D-13: el máximo de ataques por turno lo define la baraja de ataques del jefe («Ataque X contra jugador Y»), no una cifra fija; Pícaro es la categoría de control y sus aliados son los únicos que atacan a la Banca; cada jefe tiene sus 4 aliados propios. |
+| v1.7 | La categoría Barrera pasa a llamarse **Tanque** (contrato v4). Cada jefe puede invocar con moneda o de forma **segura** (sin moneda). Jefes iniciales: Onix (Nv1), Manectric (Nv2), Kingdra (Nv3) y Arceus (Nv4), con invocación segura en el 50 %, 66 %/33 %, 75/50/25 % y 80/60/40/20 % del HP. |

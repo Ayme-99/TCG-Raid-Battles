@@ -1,0 +1,54 @@
+{
+  "formato": 1,
+  "id": "manectric",
+  "nombre": "Manectric",
+  "nivel": 2,
+  "hp": 3600,
+  "ataques": [
+    {
+      "nombre": "Chispa",
+      "dano": 40
+    },
+    {
+      "nombre": "Colmillo rayo",
+      "dano": 80
+    },
+    {
+      "nombre": "Descarga",
+      "dano": 160
+    }
+  ],
+  "invocacion": {
+    "cadaHp": 1200,
+    "tirada": "segura",
+    "aliados": {
+      "danio": {
+        "nombre": "Voltorb",
+        "hp": 90,
+        "ataque": {
+          "nombre": "Chispa eléctrica",
+          "dano": 40
+        }
+      },
+      "tanque": {
+        "nombre": "Wynaut",
+        "hp": 180,
+        "habilidad": "Mientras esté en juego, el jefe recibe 20 de daño menos por cada ataque de los jugadores (lo aplica el jugador)"
+      },
+      "cura": {
+        "nombre": "Minun",
+        "hp": 100,
+        "habilidad": "Al final del turno del jefe, el jefe se cura 30 HP (lo aplica el jugador)"
+      },
+      "picaro": {
+        "nombre": "Plusle",
+        "hp": 90,
+        "ataque": {
+          "nombre": "Cargaeléctrica",
+          "dano": 30
+        },
+        "habilidad": "Al entrar, el Pokémon Activo del dueño queda Paralizado (lo aplica el jugador)"
+      }
+    }
+  }
+}
