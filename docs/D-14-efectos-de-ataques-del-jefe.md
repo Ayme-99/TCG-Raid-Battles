@@ -15,6 +15,7 @@ Los jefes oficiales de Incursión Max llevan efectos en sus ataques (Dredanaw: e
    - `jugador`: lo aplican los jugadores en la mesa; la app lo muestra y lo recuerda mientras dura (`sin_retirada`, `sin_ataque`, y otros por definir).
 4. **Duración** en turnos de los jugadores. «El próximo turno de los jugadores» es `duracion: 1`: el aviso se muestra hasta que termina ese turno.
 5. **Autodaño (`autodano`)**: baja el HP del jefe en el momento del ataque. No se atribuye a ningún jugador (igual que los estados, D-12), pero cuenta para el daño total del equipo. Puede cruzar umbrales de invocación y, si deja al jefe a 0 HP, la partida termina en victoria.
+6. **Orden del autodaño**: se aplica **después** del daño al jugador. Si cruza un umbral de invocación, el aliado entra y **ataca en ese momento** (de entrada, como cualquier aliado). Así, tras su propio autodaño, el jefe puede curarse con la entrada de un aliado de cura, o el aliado puede rematar al jugador que acaba de recibir el ataque.
 
 ## Tipos de efecto (primera lista)
 
@@ -37,5 +38,5 @@ Se irán añadiendo (daño a cada Activo, daño a la Banca, moneda) según los j
 ## Pendiente
 
 - Cerrar los efectos de Manectric, Kingdra y Arceus.
-- Preguntas abiertas: si el autodaño aplica antes o después del daño al jugador; y si varios efectos activos a la vez se acumulan en la app.
+- Pregunta abierta: cómo se combinan varios efectos activos a la vez (distintos tipos, o el mismo tipo repetido).
 - Después: motor y contrato v5, catálogo y app, simulador y recalibrado de HP.
