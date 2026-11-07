@@ -17,6 +17,7 @@ Los jefes oficiales de Incursión Max llevan efectos en sus ataques (Dredanaw: e
 5. **Autodaño (`autodano`)**: baja el HP del jefe en el momento del ataque. No se atribuye a ningún jugador (igual que los estados, D-12), pero cuenta para el daño total del equipo. Puede cruzar umbrales de invocación y, si deja al jefe a 0 HP, la partida termina en victoria.
 6. **Orden del autodaño**: se aplica **después** del daño al jugador. Si cruza un umbral de invocación, el aliado entra y **ataca en ese momento** (de entrada, como cualquier aliado). Así, tras su propio autodaño, el jefe puede curarse con la entrada de un aliado de cura, o el aliado puede rematar al jugador que acaba de recibir el ataque.
 7. **Combinación de efectos activos**: los efectos de **tipos distintos conviven** (la app muestra un aviso por tipo). Si se repite un tipo que ya está activo, **se renueva** su duración: sigue habiendo un solo aviso.
+8. **Quién lanza la moneda**: si el efecto lo usa el jefe o uno de sus aliados, **la app lanza la moneda**, la registra en el evento (cara o cruz) y muestra el resultado (en Onda trueno: «cara, el Defensor queda paralizado» o «cruz, no pasa nada»). Las monedas de las cartas de los jugadores las lanzan ellos en la mesa, porque la app no gestiona sus ataques.
 
 ## Tipos de efecto (primera lista)
 
@@ -48,5 +49,5 @@ Se irán añadiendo (daño a cada Activo, daño a la Banca, moneda) según los j
 ## Pendiente
 
 - Cerrar los efectos de Kingdra y Arceus.
-- Pregunta abierta (Onda trueno): quién lanza la moneda y si la app registra el resultado.
+- Idea aparte, fuera de esta tarea: un botón opcional «Lanzar moneda» como utilidad para los jugadores.
 - Después: motor y contrato v5, catálogo y app, simulador y recalibrado de HP.
