@@ -3,7 +3,7 @@
   "id": "kingdra",
   "nombre": "Kingdra",
   "nivel": 3,
-  "hp": 4400,
+  "hp": 3000,
   "ataques": [
     {
       "nombre": "Ciclón",
@@ -23,7 +23,7 @@
     }
   ],
   "invocacion": {
-    "cadaHp": 1100,
+    "cadaHp": 750,
     "tirada": "segura",
     "aliados": {
       "danio": {
