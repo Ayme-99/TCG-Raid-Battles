@@ -54,8 +54,9 @@ Las habilidades siguen siendo **pasivas** (D-04 §7.4).
 - App: mostrar la categoría del aliado y los efectos automáticos.
 - Simulador: aún no modela aliados.
 
-## 6. Baraja de ataques del jefe (enmienda, v1.6)
+## 7. Baraja de ataques del jefe (enmienda, v1.6)
 
 - El jefe no tiene mazo de aliados: tiene sus 4 aliados (§1) y una **baraja de ataques**, como el juego oficial. Cada carta dice «Ataque X contra jugador Y».
 - El **máximo de ataques por turno** lo define esa baraja, no una cifra fija. La cifra 2/3/4/5 de las tablas de balance es solo un supuesto del simulador.
 - Se mantiene la mecánica de robar cartas: el objetivo de cada ataque sale de la carta. No existe una regla de objetivo por ranura de ataque.
+- **Qué lleva la app (v1.8):** el jefe y sus aliados (HP, daño recibido y ataques que hacen). Los Pokémon de los jugadores (cartas, contadores de daño, ataques y efectos) y la baraja de ataques del jefe se gestionan en la mesa; a la app solo le llegan el daño que los jugadores hacen al jefe y los KO, y cada ataque que sale se registra.
