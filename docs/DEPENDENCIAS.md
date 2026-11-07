@@ -31,10 +31,10 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 | | El GDD `incursiones_gdd.md` (sube la versión, añade fila al historial) y el documento `docs/D-xx` de esa decisión | ❌ |
 | | `docs/playtests/GUION.md` si la regla cambia cómo se juega en mesa | ❌ |
 | | El simulador `sim/` si usa esa regla | ❌ |
-| Las **tablas de balance** (`balance/tablas/niveles.csv`: X por nivel, HP y ataques de referencia) | `engine/lib/src/reglas.dart` (`umbralNivel2/3/4` = `x_min` de cada nivel) | ❌ |
-| | El GDD (§2: ataques por nivel; §9: valores provisionales) y `docs/D-03-sistema-de-poder.md` | ❌ |
+| Las **tablas de balance** (`balance/tablas/niveles.csv`: X por nivel, HP y ataques de referencia) | `engine/lib/src/reglas.dart` (`umbralNivel2/3/4` = `x_min` de cada nivel) | ✅ `engine/test/tablas_balance_test.dart` |
+| | El GDD (§2: ataques por nivel; §9: valores provisionales) y `docs/D-03-sistema-de-poder.md` | ⚠️ `engine/test/tablas_balance_test.dart` comprueba los ataques por nivel del GDD §2 y de los jefes del catálogo; el resto no |
 | | La hoja de balance (compara contra el «poder de referencia» de `niveles.csv`) | ❌ |
-| Los **puntos** (`balance/tablas/puntos_niveles.csv`, `reparto_puntos.csv`) | `engine/lib/src/puntos.dart` (`topeVictoriaPorNivel`, `costeDesbloqueoPorNivel`, `repartoPorJugadores`) | ❌ (los valores están copiados, no se leen del CSV) |
+| Los **puntos** (`balance/tablas/puntos_niveles.csv`, `reparto_puntos.csv`) | `engine/lib/src/puntos.dart` (`topeVictoriaPorNivel`, `costeDesbloqueoPorNivel`, `repartoPorJugadores`) | ✅ `engine/test/tablas_balance_test.dart` (los valores están copiados, no se leen del CSV) |
 | | `docs/D-10-sistema-de-puntos.md` y el GDD | ❌ |
 | Una **versión nueva del contrato** | Servidor, app, repo de Deck Tracker (secciones 2 y 3) | ⚠️ |
 | El **módulo del servidor** `server/src/` | Regenerar y desplegar en **deck-tracker-server** (sección 3) | ❌ (el repo externo no tiene CI) |
@@ -68,14 +68,14 @@ Regla del proyecto: no se crean ramas, commits ni PRs en los repos de Deck Track
 
 ## 4. Datos copiados a mano en varios sitios
 
-Estos datos viven duplicados y **ningún test** compara las copias. Si cambias uno, cambia todos:
+Estos datos viven duplicados. Los que llevan ✅ los compara `engine/test/tablas_balance_test.dart`; del resto no te avisa nadie. Si cambias uno, cambia todos:
 
 | Dato | Dónde está |
 |---|---|
-| Umbrales de nivel por X (400/600/800) | `balance/tablas/niveles.csv` (`x_min`), `engine/lib/src/reglas.dart`, GDD §2 |
-| Ataques de cada nivel (30/60/120 …) | `niveles.csv`, GDD §2, cada jefe del catálogo |
+| ✅ Umbrales de nivel por X (400/600/800) | `balance/tablas/niveles.csv` (`x_min`), `engine/lib/src/reglas.dart` (el GDD §2 no se comprueba) |
+| ✅ Ataques de cada nivel (30/60/120 …) | `niveles.csv`, GDD §2, cada jefe del catálogo |
 | HP de referencia por nivel | `niveles.csv`, GDD §9, hoja de balance (se lee del CSV) |
-| Puntos por victoria, coste de desbloqueo y reparto | `balance/tablas/*.csv`, `engine/lib/src/puntos.dart`, `docs/D-10-sistema-de-puntos.md` |
+| ✅ Puntos por victoria, coste de desbloqueo y reparto | `balance/tablas/*.csv`, `engine/lib/src/puntos.dart` (`docs/D-10-sistema-de-puntos.md` no se comprueba) |
 | Objetivo de victoria por nivel (75/50/30/15 %) | GDD, `sim/bin/sim_cartas.dart` (`objetivo`) |
 | Daño de veneno y quemadura (10 y 20) | `engine/lib/src/reglas.dart`, GDD §4.3, `docs/D-12-estados-del-jefe.md` |
 | Jefes y aliados iniciales | `catalog/bosses/`, `app/assets/catalogo/`, `docs/playtests/GUION.md`, la hoja de balance |
@@ -84,7 +84,7 @@ Estos datos viven duplicados y **ningún test** compara las copias. Si cambias u
 
 El CI (`.github/workflows/ci.yml`) ejecuta: tests del motor (`dart test`), tests de Node del contrato, del servidor y del catálogo (`npm test`), y `flutter analyze` + `flutter test` + `flutter build web` de la app.
 
-**No** comprueba: el repo `deck-tracker-server`; que `hoja_balance.xlsx` esté al día; el simulador (`sim/`); los valores duplicados de la sección 4; que el GDD y los documentos `docs/` coincidan con el código; ni que las listas de versiones escritas a mano en los tests incluyan la versión nueva.
+**No** comprueba: el repo `deck-tracker-server`; que `hoja_balance.xlsx` esté al día; el simulador (`sim/`); los valores duplicados de la sección 4 sin ✅; que el GDD y los documentos `docs/` coincidan con el código; ni que las listas de versiones escritas a mano en los tests incluyan la versión nueva.
 
 ## 6. Mantener este documento
 
