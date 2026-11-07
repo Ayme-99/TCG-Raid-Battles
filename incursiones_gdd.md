@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.7 (especificación del motor)
+**Versión:** 1.8 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -84,6 +84,8 @@ FIN (VICTORIA / DERROTA)
 ---
 
 ## 4. Reglas detalladas
+
+> **Qué gestiona la app y qué se resuelve en la mesa.** La app lleva la cuenta del jefe y de sus aliados: su HP, el daño que reciben y los ataques que hacen. Los Pokémon de los jugadores (sus cartas, contadores de daño, ataques y efectos) se gestionan en la mesa; a la app solo le llega el daño que hacen al jefe y los KO. La baraja de ataques del jefe es física: la app no tiene sus cartas, solo registra cada ataque que sale. Los aliados invocados también los lleva la app (HP y bloqueo), aunque los efectos de sus habilidades los aplique el jugador o un script según la carta (D-13).
 
 ### 4.1 Pokémon, KO y eliminación
 
@@ -263,3 +265,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.5 | D-13 cerrada: cada jefe tiene 4 aliados, uno por categoría (Daño, Barrera, Cura, Pícaro). Tras la moneda, un dado elige el slot y otro la categoría sin repetir valores en uso. Cada carta de aliado indica si sus efectos los aplica el programa (con script) o el jugador. Se añade `docs/D-13-aliados-por-categoria.md`. |
 | v1.6 | Enmienda a D-13: el máximo de ataques por turno lo define la baraja de ataques del jefe («Ataque X contra jugador Y»), no una cifra fija; Pícaro es la categoría de control y sus aliados son los únicos que atacan a la Banca; cada jefe tiene sus 4 aliados propios. |
 | v1.7 | La categoría Barrera pasa a llamarse **Tanque** (contrato v4). Cada jefe puede invocar con moneda o de forma **segura** (sin moneda). Jefes iniciales: Onix (Nv1), Manectric (Nv2), Kingdra (Nv3) y Arceus (Nv4), con invocación segura en el 50 %, 66 %/33 %, 75/50/25 % y 80/60/40/20 % del HP. |
+| v1.8 | Se deja escrito qué gestiona la app (el jefe y sus aliados: HP, daño recibido y ataques que hacen) y qué se resuelve en la mesa (Pokémon de los jugadores y baraja de ataques del jefe). |
