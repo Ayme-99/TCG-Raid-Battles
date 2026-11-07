@@ -191,6 +191,7 @@ EstadoPartida _avanzarTurno(EstadoPartida e, int desde) {
       fase: Fase.turnoJefe,
       turnoActual: e.orden.length,
       ataquesJefeEnTurno: 0,
+      efectosActivos: _caducarEfectos(e.efectosActivos),
     );
   }
   return e.copiarCon(turnoActual: i);
@@ -256,8 +257,110 @@ EstadoPartida _ataqueJefe(EstadoPartida e, AtaqueJefe ev) {
   if (objetivo != null) {
     _exigeJugador(e, objetivo);
   }
-  return e.copiarCon(ataquesJefeEnTurno: e.ataquesJefeEnTurno + 1);
+  final efecto = ev.efecto;
+  if (efecto != null) _validarEfecto(ev, efecto);
+  final conAtaque = e.copiarCon(ataquesJefeEnTurno: e.ataquesJefeEnTurno + 1);
+  return efecto == null ? conAtaque : _aplicarEfecto(conAtaque, ev, efecto);
 }
+
+/// Comprueba que el efecto trae lo que su tipo necesita (D-14).
+void _validarEfecto(AtaqueJefe ev, EfectoAtaque ef) {
+  final tipo = ef.tipo.name;
+  if (ef.valor != null && ef.valor! < 1) {
+    _error('el efecto $tipo: el valor debe ser como mínimo 1');
+  }
+  if (ef.duracion != null && ef.duracion! < 1) {
+    _error('el efecto $tipo: la duración debe ser como mínimo 1');
+  }
+  switch (ef.tipo) {
+    case TipoEfectoAtaque.autodano:
+    case TipoEfectoAtaque.contadorATodos:
+      if (ef.valor == null) _error('el efecto $tipo necesita un valor');
+    case TipoEfectoAtaque.sinRetirada:
+    case TipoEfectoAtaque.sinAtaque:
+    case TipoEfectoAtaque.paralizarDefensor:
+      if (ev.jugador == null) {
+        _error('el efecto $tipo necesita el jugador que defiende');
+      }
+    case TipoEfectoAtaque.ignoraEfectos:
+    case TipoEfectoAtaque.danoExtraSi:
+    case TipoEfectoAtaque.danoPorAtaquePrevio:
+      break;
+  }
+}
+
+/// Aplica el efecto de un ataque del jefe (D-14). Lo que cae en la mesa lo
+/// resuelven los jugadores; aquí solo lo que lleva el programa.
+EstadoPartida _aplicarEfecto(EstadoPartida e, AtaqueJefe ev, EfectoAtaque ef) {
+  switch (ef.tipo) {
+    case TipoEfectoAtaque.autodano:
+      // Después del daño al jugador. No se atribuye a nadie; puede cruzar
+      // umbrales de invocación y, a 0 HP, termina la partida en victoria.
+      final jefe = e.jefe!;
+      final aplicado = ef.valor! < jefe.hp ? ef.valor! : jefe.hp;
+      final nuevoHp = jefe.hp - aplicado;
+      final conDano = e.copiarCon(
+        jefe: jefe.conHp(nuevoHp),
+        danoEstados: e.danoEstados + aplicado,
+      );
+      if (nuevoHp <= 0) {
+        return conDano.copiarCon(
+          fase: Fase.terminada,
+          resultado: Resultado.victoria,
+        );
+      }
+      return _cruzarUmbrales(conDano);
+    case TipoEfectoAtaque.contadorATodos:
+      // Los aliados del jefe reciben los contadores; sin atribuir a nadie.
+      final dano = ef.valor! * danoContador;
+      final vivos = <AliadoEstado>[];
+      var derrotados = 0;
+      for (final a in e.aliados) {
+        final restante = a.hp - dano;
+        if (restante > 0) {
+          vivos.add(a.copiarCon(hp: restante));
+        } else {
+          derrotados++;
+        }
+      }
+      return e.copiarCon(
+        aliados: vivos,
+        aliadosDerrotados: e.aliadosDerrotados + derrotados,
+      );
+    case TipoEfectoAtaque.sinRetirada:
+    case TipoEfectoAtaque.sinAtaque:
+    case TipoEfectoAtaque.paralizarDefensor:
+      // Cruz en la moneda: no pasa nada.
+      if (ef.moneda == false) return e;
+      final nuevo = EfectoActivo(
+        tipo: ef.tipo,
+        jugador: ev.jugador!,
+        restantes: ef.duracion ?? 1,
+      );
+      return e.copiarCon(efectosActivos: [
+        // Repetir el mismo efecto sobre el mismo jugador renueva su duración.
+        for (final a in e.efectosActivos)
+          if (a.tipo != nuevo.tipo || a.jugador != nuevo.jugador) a,
+        nuevo,
+      ]);
+    case TipoEfectoAtaque.ignoraEfectos:
+    case TipoEfectoAtaque.danoExtraSi:
+    case TipoEfectoAtaque.danoPorAtaquePrevio:
+      return e;
+  }
+}
+
+/// Al terminar el turno de los jugadores, a cada efecto le queda un turno
+/// menos y los que llegan a 0 desaparecen.
+List<EfectoActivo> _caducarEfectos(List<EfectoActivo> efectos) => [
+      for (final f in efectos)
+        if (f.restantes > 1)
+          EfectoActivo(
+            tipo: f.tipo,
+            jugador: f.jugador,
+            restantes: f.restantes - 1,
+          ),
+    ];
 
 EstadoPartida _pokemonKo(EstadoPartida e, PokemonKo ev) {
   if (e.fase != Fase.turnoJefe && e.fase != Fase.turnoJugadores) {

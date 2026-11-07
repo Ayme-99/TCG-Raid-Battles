@@ -41,14 +41,14 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 
 ## 2. Checklist: subir la versión del contrato
 
-Cualquier cambio del formato sube la versión (`contrato/README.md`, «Versionado»). Pasos, con el contrato v4 (PR #83) como ejemplo:
+Cualquier cambio del formato sube la versión (`contrato/README.md`, «Versionado»). Pasos, con el contrato v4 (PR #83) y el v5 (efectos de ataque, D-14) como ejemplo:
 
 1. **Esquema:** copia `contrato/partida.vN.schema.json` a `partida.vN+1.schema.json` y cambia `$id`, `version: { const: N+1 }` y lo que cambie. **No toques los esquemas antiguos**: hay partidas guardadas con ellos.
 2. **Ejemplos:** copia `contrato/ejemplos/vN/` a `vN+1/` (`validos/`, `invalidos-estructura/`, `invalidos-reglas/`) y pon `"version": N+1`. Revisa que los ejemplos inválidos lo siguen siendo con el esquema nuevo (en la v4, un valor inválido de la v3 pasó a ser válido).
 3. **Motor** (`engine/lib/src/registro.dart`): sube `versionRegistro`, añade la función de migración `_vNAVN+1` a `_migraciones` y adapta la lectura/escritura JSON. Una migración vieja **no debe usar los enums actuales** (usa literales, como `_categoriasV3`), o dejará de escribir el formato de su versión.
 4. **Tests del motor** (`engine/test/registro_test.dart`): añade el grupo «ejemplos del contrato vN+1», adapta las migraciones esperadas y cambia los `expect(registro.version, …)`.
 5. **Servidor** (`server/src/esquema.js`): añade la versión a `VERSIONES_SOPORTADAS` y cambia el esquema que busca `CARPETA_CONTRATO`.
-6. **Tests del servidor:** añade la versión a las listas **escritas a mano** de `server/test/contrato.test.js` (el bucle `[1, 2, 3, 4]` y el mapa `validadores`) y a `server/test/router.test.js` (versión futura, lista de versiones, partida de la versión nueva). Si no la añades, el CI sigue en verde y esa versión queda sin probar.
+6. **Tests del servidor:** añade la versión a las listas **escritas a mano** de `server/test/contrato.test.js` (el bucle `[1, 2, 3, 4, 5]` y el mapa `validadores`) y a `server/test/router.test.js` (versión futura, lista de versiones, partida de la versión nueva). Si no la añades, el CI sigue en verde y esa versión queda sin probar.
 7. **Documentación:** `contrato/README.md` (título, tabla de archivos, ejemplo, historial de versiones) y `server/README.md`.
 8. **App:** no tiene número de versión propio; usa `versionRegistro` del motor. Revisa los textos y las pantallas que muestren el valor que haya cambiado.
 9. **Servidor externo:** sección 3.

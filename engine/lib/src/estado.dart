@@ -217,6 +217,26 @@ List<T> _fija<T>(List<T> lista) => List<T>.unmodifiable(lista);
 /// Estado completo e inmutable de una partida.
 ///
 /// Solo cambia al aplicar un evento con `apply` (ver `motor.dart`).
+/// Efecto de un ataque del jefe que sigue activo sobre un jugador (D-14).
+/// [restantes] son los turnos de los jugadores que le quedan.
+class EfectoActivo {
+  final TipoEfectoAtaque tipo;
+  final int jugador;
+  final int restantes;
+
+  const EfectoActivo({
+    required this.tipo,
+    required this.jugador,
+    required this.restantes,
+  });
+
+  Map<String, Object?> toJson() => {
+        'tipo': tipo.name,
+        'jugador': jugador,
+        'restantes': restantes,
+      };
+}
+
 class EstadoPartida {
   final Fase fase;
   final List<JugadorEstado> jugadores;
@@ -250,8 +270,8 @@ class EstadoPartida {
   /// Daño aplicado al jefe por cada jugador (por asiento), para los puntos.
   final List<int> danoPorJugador;
 
-  /// Daño que el veneno y la quemadura han hecho al jefe (D-12). No se
-  /// atribuye a ningún jugador.
+  /// Daño que el veneno, la quemadura (D-12) y su propio autodaño (D-14) han
+  /// hecho al jefe. No se atribuye a ningún jugador.
   final int danoEstados;
 
   /// Veces que cada jugador (por asiento) ha aplicado un estado que el jefe no
@@ -276,6 +296,9 @@ class EstadoPartida {
   final int intentosInvocacionPendientes;
   final Resultado? resultado;
 
+  /// Efectos de ataques del jefe que siguen activos sobre algún jugador.
+  final List<EfectoActivo> efectosActivos;
+
   EstadoPartida({
     required this.fase,
     required List<JugadorEstado> jugadores,
@@ -298,6 +321,7 @@ class EstadoPartida {
     required this.umbralesCruzados,
     required this.intentosInvocacionPendientes,
     required this.resultado,
+    List<EfectoActivo>? efectosActivos,
   })  : jugadores = _fija(jugadores),
         orden = _fija(orden),
         prioridad = _fija(prioridad),
@@ -305,7 +329,8 @@ class EstadoPartida {
         cartasAnimo = _fija(cartasAnimo),
         danoPorJugador = _fija(danoPorJugador),
         estadosAplicados = _fija(estadosAplicados),
-        aliados = _fija(aliados);
+        aliados = _fija(aliados),
+        efectosActivos = _fija(efectosActivos ?? const <EfectoActivo>[]);
 
   /// Estado de una partida recién creada, sin jugadores.
   factory EstadoPartida.inicial() => EstadoPartida(
@@ -392,6 +417,7 @@ class EstadoPartida {
     int? umbralesCruzados,
     int? intentosInvocacionPendientes,
     Resultado? resultado,
+    List<EfectoActivo>? efectosActivos,
   }) =>
       EstadoPartida(
         fase: fase ?? this.fase,
@@ -417,6 +443,7 @@ class EstadoPartida {
         intentosInvocacionPendientes:
             intentosInvocacionPendientes ?? this.intentosInvocacionPendientes,
         resultado: resultado ?? this.resultado,
+        efectosActivos: efectosActivos ?? this.efectosActivos,
       );
 
   /// Representación simple, útil para comparar estados en los tests.
@@ -442,5 +469,6 @@ class EstadoPartida {
         'umbralesCruzados': umbralesCruzados,
         'intentosInvocacionPendientes': intentosInvocacionPendientes,
         'resultado': resultado?.name,
+        'efectosActivos': [for (final f in efectosActivos) f.toJson()],
       };
 }

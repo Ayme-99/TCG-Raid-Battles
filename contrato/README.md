@@ -1,4 +1,4 @@
-# Contrato del registro de partida (versión 4)
+# Contrato del registro de partida (versión 5)
 
 > Para subir la versión del contrato, sigue el checklist de [`docs/DEPENDENCIAS.md`](../docs/DEPENDENCIAS.md) (motor, servidor, repo externo).
 
@@ -8,10 +8,9 @@ Formato JSON con el que la app guarda una partida y la envía al backend. Una pa
 
 | Archivo | Qué es |
 |---|---|
-| `partida.v4.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
-| `partida.v3.schema.json` | Esquema de la versión 3, que se conserva. |
-| `partida.v2.schema.json`, `partida.v1.schema.json` | Esquemas de las versiones 1 y 2, que se conservan: hay partidas guardadas con esos formatos. |
-| `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
+| `partida.v5.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
+| `partida.v4.schema.json`, `partida.v3.schema.json`, `partida.v2.schema.json`, `partida.v1.schema.json` | Esquemas de las versiones 1 a 4, que se conservan: hay partidas guardadas con esos formatos. |
+| `ejemplos/v5/`, `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
 
 Los ejemplos válidos están probados por los dos lados: el motor los lee y los vuelve a escribir igual (`engine/test/registro_test.dart`) y el esquema los acepta (`server/test/contrato.test.js`). El CI ejecuta ambos.
 
@@ -19,7 +18,7 @@ Los ejemplos válidos están probados por los dos lados: el motor los lee y los 
 
 ```json
 {
-  "version": 4,
+  "version": 5,
   "partidaId": "id generado por el cliente",
   "creadaEn": "2026-11-06T09:30:00Z",
   "cuentas": ["usuario-ana", null],
@@ -30,7 +29,7 @@ Los ejemplos válidos están probados por los dos lados: el motor los lee y los 
 
 | Campo | Obligatorio | Descripción |
 |---|---|---|
-| `version` | sí | Entero. Hoy, `3`. |
+| `version` | sí | Entero. Hoy, `5`. |
 | `partidaId` | sí | De 1 a 64 caracteres, generado por el cliente. Una partida se guarda una sola vez con este id (así los reintentos de red no la duplican, D-11). |
 | `creadaEn` | no | Fecha ISO 8601. |
 | `cuentas` | no | Un elemento por jugador, por asiento: el id de cuenta (el id de usuario de Deck Tracker, D-11) o `null` si es un invitado. Si falta, se asume que todos cobran. |
@@ -47,7 +46,7 @@ Cada evento es un objeto con un campo `tipo`. Los campos marcados con `?` son op
 | `elegirJefe` | `nombre`, `nivel` (1-4), `hp`, `jefeId?`, `invocacionCadaHp?` | Setup: empieza la ronda 1 |
 | `turnoJugador` | `jugador`, `dano` (≥ 0) | Turno de un jugador contra el jefe (0 si pasa) |
 | `ataqueAAliado` | `jugador`, `slot`, `dano` | Un jugador ataca a un aliado en lugar de al jefe |
-| `ataqueJefe` | `ranura` (1-3), `dano`, `jugador?`, `alAzar?` | Ataque del jefe (sin `jugador`: a todos) |
+| `ataqueJefe` | `ranura` (1-3), `dano`, `jugador?`, `alAzar?`, `efecto?` | Ataque del jefe (sin `jugador`: a todos). `efecto` es el de D-14 (ver más abajo) |
 | `pokemonKo` | `jugador` | Cae un Pokémon de un jugador |
 | `cartaAnimoRobada` | `jugador`, `carta` (1-5) | Un jugador con prioridad roba carta de ánimo |
 | `curacionJefe` | `cantidad` | El jefe se cura (el motor topa al HP máximo) |
@@ -59,6 +58,17 @@ Cada evento es un objeto con un campo `tipo`. Los campos marcados con `?` son op
 
 `monedaQuemadura` es `true` (cara: quita la quemadura) o `false` (cruz), y va **si y solo si el jefe está quemado**: la app tira la moneda y la registra, así reproducir el registro da siempre el mismo resultado. Aplicar un estado que el jefe ya tiene no cambia nada (D-12).
 | `abandonar` | — | La mesa abandona: derrota |
+
+### Efecto de un ataque del jefe (versión 5, D-14)
+
+`efecto` es un objeto `{tipo, valor?, duracion?, moneda?}`. `valor` y `duracion` son enteros ≥ 1 (la duración se cuenta en turnos de los jugadores y, si falta, es 1); `moneda` es el resultado de la moneda del ataque (`true` cara).
+
+| `tipo` | Qué necesita | Qué hace el motor |
+|---|---|---|
+| `autodano` | `valor` | Baja `valor` HP al jefe después del daño al jugador, sin atribuirlo a nadie; puede cruzar umbrales de invocación o dar la victoria |
+| `contadorATodos` | `valor` (contadores) | Baja `valor × 10` HP a cada aliado del jefe (los derrotados se retiran); los Pokémon de los jugadores los resuelve la mesa |
+| `sinRetirada`, `sinAtaque`, `paralizarDefensor` | `jugador` en el ataque | Deja un efecto activo sobre ese jugador hasta que pasen `duracion` turnos de los jugadores. Repetir el mismo tipo sobre el mismo jugador renueva la duración; con `moneda: false` no se aplica |
+| `ignoraEfectos`, `danoExtraSi`, `danoPorAtaquePrevio` | — | Solo se registran: lo resuelve la mesa (en `danoPorAtaquePrevio`, el `dano` del evento ya es el final) |
 
 ## Resumen
 
@@ -81,6 +91,7 @@ El backend guarda además el registro completo (los eventos) para poder repetir 
 | 2 | Estados del jefe (D-12): evento `aplicarEstadoJefe`, campo `monedaQuemadura` en `finTurnoJefe` y, en cada jugador del resumen, `estadosAplicados` y `bonoEstados`. Migración 1 → 2: el resumen de las partidas antiguas recibe esos dos campos a 0. |
 | 3 | Aliados por categoría (D-13): `aliadoInvocado` gana `categoria` (obligatoria), `efectos` y `scriptId`. Migración 2 → 3: las partidas antiguas no tenían categoría, así que cada aliado invocado recibe una por orden de invocación (`danio`, `barrera`, `cura`, `picaro` y vuelta a empezar). Solo sirve para poder leerlas, no refleja lo que pasó en la mesa. |
 | 4 | La categoría `barrera` pasa a llamarse `tanque`. Migración 3 → 4: los aliados `barrera` de las partidas guardadas pasan a `tanque`. |
+| 5 | Efectos en los ataques del jefe (D-14): `ataqueJefe` gana el campo opcional `efecto`. Migración 4 → 5: solo cambia la versión (los eventos antiguos siguen siendo válidos). |
 
 `categoria` y `slot` salen de los dos dados de la invocación (D-13): no se repite un slot ocupado ni una categoría con un aliado vivo. `efectos` dice quién aplica los efectos de la carta del aliado: el jugador (no se escribe) o el programa, que ejecuta el script `scriptId` (obligatorio con `programa`, no admitido con `jugador`; el motor rechaza un script que no conoce).
 

@@ -9,11 +9,11 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 4;
+const int versionRegistro = 5;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4};
+    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5};
 
 /// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
 /// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
@@ -89,6 +89,15 @@ Map<String, Object?> _v3AV4(Map<String, Object?> datos) {
   return resultado;
 }
 
+/// Versión 5 (D-14): `ataqueJefe` gana el campo opcional `efecto`. Los
+/// registros de la versión 4 siguen siendo válidos tal cual: solo cambia la
+/// versión.
+Map<String, Object?> _v4AV5(Map<String, Object?> datos) {
+  final resultado = Map<String, Object?>.of(datos);
+  resultado['version'] = 5;
+  return resultado;
+}
+
 // ---------------------------------------------------------------------------
 // Eventos <-> JSON
 // ---------------------------------------------------------------------------
@@ -123,6 +132,7 @@ Map<String, Object?> eventoAJson(Evento evento) {
         'dano': ev.dano,
         if (ev.jugador != null) 'jugador': ev.jugador,
         if (ev.alAzar) 'alAzar': true,
+        if (ev.efecto != null) 'efecto': _efectoAJson(ev.efecto!),
       },
     PokemonKo ev => {'tipo': 'pokemonKo', 'jugador': ev.jugador},
     CartaAnimoRobada ev => {
@@ -200,12 +210,15 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
         dano: c.entero('dano', min: 0),
       );
     case 'ataqueJefe':
-      c.permitir({'tipo', 'ranura', 'dano', 'jugador', 'alAzar'});
+      c.permitir({'tipo', 'ranura', 'dano', 'jugador', 'alAzar', 'efecto'});
       return AtaqueJefe(
         ranura: c.entero('ranura', min: 1, max: 3),
         dano: c.entero('dano', min: 0),
         jugador: c.enteroOpt('jugador', min: 0, max: 3),
         alAzar: c.booleano('alAzar'),
+        efecto: c.datos.containsKey('efecto')
+            ? _efectoDeJson(c.datos['efecto'], '$ruta.efecto')
+            : null,
       );
     case 'pokemonKo':
       c.permitir({'tipo', 'jugador'});
@@ -277,6 +290,24 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
     default:
       return c.falla('tipo de evento desconocido «$tipo»');
   }
+}
+
+Map<String, Object?> _efectoAJson(EfectoAtaque ef) => {
+      'tipo': ef.tipo.name,
+      if (ef.valor != null) 'valor': ef.valor,
+      if (ef.duracion != null) 'duracion': ef.duracion,
+      if (ef.moneda != null) 'moneda': ef.moneda,
+    };
+
+EfectoAtaque _efectoDeJson(Object? json, String ruta) {
+  final c = _Campos.de(json, ruta);
+  c.permitir({'tipo', 'valor', 'duracion', 'moneda'});
+  return EfectoAtaque(
+    tipo: c.enumerado('tipo', TipoEfectoAtaque.values),
+    valor: c.enteroOpt('valor', min: 1),
+    duracion: c.enteroOpt('duracion', min: 1),
+    moneda: c.booleanoOpt('moneda'),
+  );
 }
 
 ConfigJugador _configJugador(Object? json, String ruta) {
