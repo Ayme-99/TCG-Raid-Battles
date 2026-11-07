@@ -20,6 +20,22 @@ jobs:
       - run: dart pub get
       - run: dart test
 
+  sim:
+    name: Simulador (compila y arranca)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sim
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - run: dart pub get
+      - run: dart analyze bin/sim_jefes.dart
+      # Humo: una partida mínima con todos los jefes del catálogo. No mide nada.
+      - run: dart run bin/sim_jefes.dart --equipos=3 --partidas=3 --informe=/tmp/jefes_aliados.csv
+
   contrato:
     name: Contrato JSON (esquema del backend)
     runs-on: ubuntu-latest

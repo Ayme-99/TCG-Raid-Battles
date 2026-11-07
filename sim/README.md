@@ -22,3 +22,15 @@ reglas de la hoja oficial de Raid Battle. Es el que debe usarse para calibrar lo
 dart run bin/sim_cartas.dart              # mide con los HP de niveles.csv
 dart run bin/sim_cartas.dart --calibrar   # busca el HP que da 75/50/30/15 %
 ```
+
+## Jefes del catálogo con aliados (T-28, primera parte)
+
+`bin/sim_jefes.dart` simula **cada jefe de `catalog/bosses/`** con su HP, sus ataques y su invocación de aliados (umbral, tirada, slot y categoría, ataque de entrada y de final de turno, bloqueo y exceso de daño perdido). Mide dos políticas de los jugadores: `solo-dueno` (solo el dueño del slot ataca a su aliado, la más dura) y `ayuda` (un jugador libre ataca al aliado de un compañero con probabilidad `--ayuda`, 0,5 por defecto, un supuesto sin datos de playtest). Escribe `balance/informes/jefes_aliados.csv`.
+
+```
+dart run bin/sim_jefes.dart
+dart run bin/sim_jefes.dart --equipos=20 --partidas=20 --informe=/tmp/prueba.csv   # prueba rápida
+```
+
+**No modela** los efectos de las habilidades de los aliados (Tanque, Cura, Pícaro), ni el veneno y la quemadura del jefe. Las cifras son una cota optimista para los jugadores; la política `solo-dueno` es la más prudente. Los efectos se añadirán cuando se decida cómo los aplican los scripts de aliados (D-13). El CI compila el simulador y lanza una partida mínima, pero **no comprueba que los resultados sean razonables**: eso se mira al leer el informe.
+

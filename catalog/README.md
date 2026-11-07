@@ -52,5 +52,5 @@ Ver `ejemplos/validos/jefe-con-aliados.json` para un jefe completo.
 1. Crea `bosses/<id>.json` (el `id` en minúsculas, números y guiones).
 2. Añade el id a `catalogo.json` y sube su `version`.
 3. Si algún aliado usa `programa`, el script tiene que existir antes en el motor (`engine/lib/src/scripts_aliado.dart`).
-4. Genera su informe de simulación en `balance/informes/`.
+4. Genera su informe de simulación: `cd sim && dart run bin/sim_jefes.dart` (escribe `balance/informes/jefes_aliados.csv`).
 5. El CI valida el esquema, que el `id` coincida con el nombre del archivo, que el índice liste exactamente los jefes de `bosses/` y que los scripts existan.
