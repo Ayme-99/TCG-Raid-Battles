@@ -32,4 +32,5 @@ Monorepo: motor, simulador, app y backend viven en este repo.
 
 - [`incursiones_gdd.md`](./incursiones_gdd.md) — Game Design Document (fuente de verdad del diseño de juego)
 - [`docs/`](./docs) — playtests y diseño de interfaz
+- [`docs/DEPENDENCIAS.md`](./docs/DEPENDENCIAS.md) — qué hay que tocar en otro sitio cuando cambias algo (catálogo, contrato, balance, servidor externo)
 - Tablero de trabajo: [GitHub Project #10](https://github.com/users/Ayme-99/projects/10)

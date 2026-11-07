@@ -1,5 +1,7 @@
 # catalog/
 
+> Antes de cambiar un jefe o el esquema, mira [`docs/DEPENDENCIAS.md`](../docs/DEPENDENCIAS.md): hay copias en la app y en la hoja de balance.
+
 Catálogo oficial de jefes. Los jefes son **datos**, no código: se añaden editando JSON.
 
 | Ruta | Qué es |
