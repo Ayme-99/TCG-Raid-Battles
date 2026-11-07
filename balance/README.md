@@ -1,5 +1,7 @@
 # balance/
 
+> Qué hay que actualizar cuando cambian las tablas: [`docs/DEPENDENCIAS.md`](../docs/DEPENDENCIAS.md).
+
 Todo lo que sirve para equilibrar los jefes. **Fuente de verdad: archivos de texto versionados**, no una hoja externa.
 
 - `tablas/*.csv`: tablas de la fórmula de poder (HP, daño esperado, rangos por nivel). Se editan en VS Code

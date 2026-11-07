@@ -1,5 +1,7 @@
 # Contrato del registro de partida (versión 4)
 
+> Para subir la versión del contrato, sigue el checklist de [`docs/DEPENDENCIAS.md`](../docs/DEPENDENCIAS.md) (motor, servidor, repo externo).
+
 Formato JSON con el que la app guarda una partida y la envía al backend. Una partida es **el registro de sus eventos**: el estado se reconstruye reproduciéndolos con el motor (`engine/`). Decisión de T-07 (issue #41).
 
 ## Qué hay en esta carpeta

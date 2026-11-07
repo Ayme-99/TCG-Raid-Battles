@@ -4,6 +4,7 @@ Documentación del proyecto.
 
 - [`../incursiones_gdd.md`](../incursiones_gdd.md): Game Design Document (fuente de verdad del diseño de juego).
 - [`../contrato/`](../contrato/README.md): formato JSON versionado del registro de partida (esquema y ejemplos).
+- [`DEPENDENCIAS.md`](./DEPENDENCIAS.md): mapa de qué hay que tocar en otro sitio cuando cambias algo, y qué comprueba el CI.
 - [`playtests/`](./playtests): [guion](./playtests/GUION.md) y notas de cada sesión de prueba en papel. Copia `PLANTILLA.md` por sesión.
 - [`diseno-ui/`](./diseno-ui): bocetos de las pantallas de la tablet (enlaces a Figma o imágenes).
 
