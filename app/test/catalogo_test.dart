@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -242,4 +243,81 @@ void main() {
     expect(find.byKey(const Key('panel-aliados')), findsOneWidget);
     expect(find.textContaining('Tanque · Geodude'), findsOneWidget);
   });
+
+  testWidgets('tirar dados elige slot y categoría libres y rellena el aliado',
+      (tester) async {
+    tester.view.physicalSize = const Size(1000, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final catalogo =
+        (await tester.runAsync(() => Catalogo.cargar(rootBundle)))!;
+    // Dado de slot → segundo slot libre; dado de categoría → tercera libre.
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sobrescribir(),
+          catalogoProvider.overrideWith((ref) async => catalogo),
+          azarProvider.overrideWithValue(_AzarFijo([1, 2])),
+        ],
+        child: const IncursionesApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final c =
+        ProviderScope.containerOf(tester.element(find.byType(IncursionesApp)));
+
+    for (final (clave, texto) in [('ataque-0', '100'), ('ataque-1', '100')]) {
+      await tester.enterText(
+        find.descendant(
+          of: find.byKey(Key(clave)),
+          matching: find.byType(TextField),
+        ),
+        texto,
+      );
+    }
+    await tester.tap(find.byKey(const Key('configurar')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('catalogo-onix')));
+    await tester.pumpAndSettle();
+    expect(
+      c.read(partidaProvider.notifier).registrar(
+            const TurnoJugador(jugador: 0, dano: 1150),
+          ),
+      isNull,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('invocar-aliado')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('tirar-dados')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('resultado-dados')), findsOneWidget);
+    expect(find.textContaining('Dado de slot (moneda): Jugador 2'),
+        findsOneWidget);
+    expect(find.widgetWithText(TextField, 'Woobat'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('aliado-aceptar')));
+    await tester.pumpAndSettle();
+    final aliado = c.read(estadoProvider).aliados.single;
+    expect(aliado.slot, 1);
+    expect(aliado.categoria, CategoriaAliado.cura);
+    expect(aliado.nombre, 'Woobat');
+  });
+}
+
+/// Azar que devuelve valores fijos (módulo el máximo), en orden.
+class _AzarFijo implements Random {
+  _AzarFijo(this._valores);
+
+  final List<int> _valores;
+  var _i = 0;
+
+  @override
+  int nextInt(int max) => _valores[_i++ % _valores.length] % max;
+
+  @override
+  bool nextBool() => true;
+
+  @override
+  double nextDouble() => 0;
 }

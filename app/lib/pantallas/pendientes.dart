@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
@@ -38,15 +40,20 @@ class PanelPendientes extends ConsumerWidget {
                   FilledButton(
                     key: const Key('invocar-aliado'),
                     onPressed: () async {
-                      final evento = await showDialog<AliadoInvocado>(
+                      final evento = await showDialog<Evento>(
                         context: context,
                         builder: (_) => _DialogoAliado(
                           estado: estado,
                           catalogo: ref.read(catalogoProvider).valueOrNull,
+                          azar: ref.read(azarProvider),
                         ),
                       );
                       if (evento == null || !context.mounted) return;
-                      registrar(context, ref, evento);
+                      if (registrar(context, ref, evento) &&
+                          evento is SinInvocacion) {
+                        registrarAviso(
+                            context, 'Salió cruz: no se invoca ningún aliado.');
+                      }
                     },
                     child: const Text('Invocar aliado'),
                   ),
@@ -104,9 +111,16 @@ Future<void> atacarConAliado(
 }
 
 class _DialogoAliado extends StatefulWidget {
-  const _DialogoAliado({required this.estado, this.catalogo});
+  const _DialogoAliado({
+    required this.estado,
+    required this.azar,
+    this.catalogo,
+  });
 
   final EstadoPartida estado;
+
+  /// Origen de las tiradas del botón «Tirar dados».
+  final Random azar;
 
   /// Catálogo empaquetado: si el jefe viene de él, se rellena el aliado de
   /// cada categoría con los datos de su carta.
@@ -136,6 +150,41 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
   void initState() {
     super.initState();
     _rellenar(_categoria);
+  }
+
+  /// Resultado de la última tirada, para enseñarlo.
+  String? _tirada;
+
+  /// Nombre del dado que elige entre [n] valores (D-13): moneda con 2, d3, d4.
+  static String _dado(int n) => n == 2 ? 'moneda' : 'd$n';
+
+  /// Tira la moneda del jefe (si no es de invocación segura), el dado de slot
+  /// y el de categoría (D-13). Cada dado elige con la misma probabilidad entre
+  /// los valores libres, que es lo que da repetir la tirada en la mesa.
+  void _tirarDados() {
+    final e = widget.estado;
+    final jefe = e.jefe;
+    final inv = jefe == null
+        ? null
+        : widget.catalogo?.invocacionDe(jefe.nombre, jefe.nivel);
+    if (inv != null && !inv.segura && !widget.azar.nextBool()) {
+      Navigator.of(context).pop(const SinInvocacion());
+      return;
+    }
+    final slots = e.slotsLibres;
+    final categorias = e.categoriasLibres;
+    if (slots.isEmpty || categorias.isEmpty) return;
+    final slot = slots[widget.azar.nextInt(slots.length)];
+    final categoria = categorias[widget.azar.nextInt(categorias.length)];
+    setState(() {
+      _slot = slot;
+      _categoria = categoria;
+      _rellenar(categoria);
+      _tirada = 'Dado de slot (${_dado(e.jugadores.length)}): '
+          '${e.jugadores[slot].nombre} · '
+          'dado de categoría (d${CategoriaAliado.values.length}): '
+          '${etiquetaCategoria(categoria)}';
+    });
   }
 
   /// Rellena los campos con el aliado del catálogo de esa categoría, si lo hay.
@@ -176,6 +225,18 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            FilledButton.tonalIcon(
+              key: const Key('tirar-dados'),
+              onPressed: _tirarDados,
+              icon: const Icon(Icons.casino),
+              label: const Text('Tirar dados'),
+            ),
+            if (_tirada != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(_tirada!, key: const Key('resultado-dados')),
+              ),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
