@@ -125,6 +125,14 @@ EstadoPartida _curarJefeYAliados(EstadoPartida e, int cantidad) {
 EstadoPartida _chupavidas10(EstadoPartida e, AliadoEstado a) =>
     _curarJefeYAliados(e, 10);
 
+/// Drenadoras: los jugadores ponen un contador de daño (10) en cada Pokémon
+/// Activo y el jefe se cura 10 por cada uno. Se cuenta un contador por jugador
+/// no eliminado.
+EstadoPartida _drenadoras10(EstadoPartida e, AliadoEstado a) {
+  final contadores = e.jugadores.where((j) => !j.eliminado).length;
+  return _curarJefe(e, 10 * contadores);
+}
+
 // Funciones de nivel superior para poder usarlas en un mapa `const`.
 EstadoPartida _cura20(EstadoPartida e, AliadoEstado a) => _curarJefe(e, 20);
 EstadoPartida _cura30(EstadoPartida e, AliadoEstado a) => _curarJefe(e, 30);
@@ -142,6 +150,12 @@ const Map<String, ScriptAliado> scriptsAliado = {
   'cura-jefe-50': ScriptAliado(alFinTurnoJefe: _cura50),
   'chupavidas-10': ScriptAliado(alAtacar: _chupavidas10),
   'foco-energia-10': ScriptAliado(bonusAtaqueJefe: 10, bonusConMoneda: true),
+  'drenadoras-10': ScriptAliado(
+    alEntrar: _drenadoras10,
+    alFinTurnoJefe: _drenadoras10,
+  ),
+  'aullido-20': ScriptAliado(bonusAtaqueJefe: 20),
+  'grunido-10': ScriptAliado(reduccionDano: 10),
   'tanque-jefe-10': ScriptAliado(reduccionDano: 10),
   'tanque-jefe-20': ScriptAliado(reduccionDano: 20),
   'tanque-jefe-30': ScriptAliado(reduccionDano: 30),

@@ -56,11 +56,11 @@ void main() {
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
         expect(j.invocacion!.segura, isTrue);
-        // Onix ya tiene los 6 roles de D-16; los demás jefes, provisionalmente
-        // sin potenciador ni debilitador.
+        // Onix y Manectric ya tienen los 6 roles de D-16; los demás jefes,
+        // provisionalmente sin potenciador ni debilitador.
         expect(
           j.invocacion!.aliados.keys,
-          j.id == 'onix'
+          j.id == 'onix' || j.id == 'manectric'
               ? CategoriaAliado.values
               : [
                   CategoriaAliado.danio,
@@ -80,7 +80,15 @@ void main() {
       expect(cubone.textoParaLaMesa, contains('Foco Energía'));
       expect(c.delNivel(3).single.nombre, 'Kingdra');
       expect(c.delNivel(2).single.invocacion!.aliados[CategoriaAliado.control]!.nombre,
-          'Plusle');
+          'Gulpin');
+      final plusle = c.aliadoDe('Manectric', 2, CategoriaAliado.danio)!;
+      expect(plusle.ataqueDanoAdyacentes, 30);
+      final minun = c.aliadoDe('Manectric', 2, CategoriaAliado.tanque)!;
+      expect(minun.avisoAlCaer, contains('Paralizado'));
+      expect(
+        c.aliadoDe('Manectric', 2, CategoriaAliado.cura)!.scriptId,
+        'drenadoras-10',
+      );
     });
 
     test('los ataques traen los efectos de D-14', () async {

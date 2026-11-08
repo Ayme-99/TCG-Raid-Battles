@@ -3,6 +3,7 @@
   "id": "manectric",
   "nombre": "Manectric",
   "nivel": 2,
+  "mapa": "Ruta 110",
   "hp": 2600,
   "ataques": [
     {
@@ -33,35 +34,55 @@
     "tirada": "segura",
     "aliados": {
       "danio": {
-        "nombre": "Voltorb",
-        "hp": 90,
+        "nombre": "Plusle",
+        "hp": 80,
         "ataque": {
-          "nombre": "Chispa eléctrica",
-          "dano": 40
+          "nombre": "Chispazo",
+          "dano": 30,
+          "danoAdyacentes": 30,
+          "texto": "Este ataque también hace 30 puntos de daño a los Pokémon adyacentes al jugador objetivo."
         }
       },
       "tanque": {
-        "nombre": "Wynaut",
-        "hp": 180,
-        "habilidad": "Mientras esté en juego, el jefe recibe 20 de daño menos por cada ataque de los jugadores (lo aplica la app)",
-        "efectos": "programa",
-        "scriptId": "tanque-jefe-20"
-      },
-      "cura": {
         "nombre": "Minun",
-        "hp": 100,
-        "habilidad": "Al final del turno del jefe, el jefe se cura 30 HP (lo aplica la app)",
-        "efectos": "programa",
-        "scriptId": "cura-jefe-30"
-      },
-      "control": {
-        "nombre": "Plusle",
         "hp": 90,
         "ataque": {
-          "nombre": "Cargaeléctrica",
-          "dano": 30
+          "nombre": "Bola Voltio",
+          "dano": 10
         },
-        "habilidad": "Al entrar, el Pokémon Activo del dueño queda Paralizado (lo aplica el jugador)"
+        "habilidadNombre": "Moflete Estático",
+        "habilidad": "Si este Pokémon queda fuera de combate por el daño de uno de los ataques de los jugadores, el Pokémon atacante pasa a estar Paralizado.",
+        "avisoAlCaer": "Moflete Estático: el Pokémon atacante pasa a estar Paralizado."
+      },
+      "cura": {
+        "nombre": "Oddish",
+        "hp": 60,
+        "habilidadNombre": "Drenadoras",
+        "habilidad": "Cuando Oddish entra en juego y durante el chequeo Pokémon, pon un contador de daño en todos los Pokémon Activos. El jefe se cura 10 HP por cada contador puesto (lo cura la app; los contadores los pone la mesa).",
+        "efectos": "programa",
+        "scriptId": "drenadoras-10"
+      },
+      "control": {
+        "nombre": "Gulpin",
+        "hp": 100,
+        "habilidadNombre": "Tóxico",
+        "habilidad": "Cuando Gulpin entra en juego y al principio de cada turno del jefe, el Pokémon frente a Gulpin pasa a estar Envenenado."
+      },
+      "potenciador": {
+        "nombre": "Poochyena",
+        "hp": 70,
+        "habilidadNombre": "Aullido",
+        "habilidad": "Los ataques del jefe hacen 20 puntos de daño más (lo suma la app).",
+        "efectos": "programa",
+        "scriptId": "aullido-20"
+      },
+      "debilitador": {
+        "nombre": "Zigzagoon",
+        "hp": 50,
+        "habilidadNombre": "Gruñido",
+        "habilidad": "Los ataques de los jugadores hacen 10 puntos de daño menos (lo aplica la app).",
+        "efectos": "programa",
+        "scriptId": "grunido-10"
       }
     }
   }

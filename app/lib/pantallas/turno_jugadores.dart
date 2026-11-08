@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
 import 'paneles.dart';
@@ -116,11 +117,24 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
       etiqueta: 'Daño',
     );
     if (dano == null || !mounted) return;
-    registrar(
+    final aliado = estado.aliadoEn(slot);
+    final aplicado = registrar(
       context,
       ref,
       AtaqueAAliado(jugador: widget.jugador, slot: slot, dano: dano),
     );
+    if (!aplicado || aliado == null || !context.mounted) return;
+    // Derrotado: recordatorio de la carta (p. ej. Moflete Estático).
+    if (ref.read(estadoProvider).aliadoEn(slot) != null) return;
+    final jefe = estado.jefe;
+    final aviso = jefe == null
+        ? null
+        : ref
+            .read(catalogoProvider)
+            .valueOrNull
+            ?.aliadoDe(jefe.nombre, jefe.nivel, aliado.categoria)
+            ?.avisoAlCaer;
+    if (aviso != null) registrarAviso(context, aviso);
   }
 
   @override

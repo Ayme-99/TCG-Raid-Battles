@@ -101,6 +101,13 @@ class AliadoCatalogo {
 
   /// Efecto del ataque, tal como lo lee la mesa.
   final String? ataqueTexto;
+
+  /// Daño que el ataque también hace a los Pokémon de los jugadores
+  /// adyacentes al objetivo (lo aplican los jugadores).
+  final int? ataqueDanoAdyacentes;
+
+  /// Recordatorio al derrotar al aliado con un ataque de los jugadores.
+  final String? avisoAlCaer;
   final String? habilidadNombre;
   final String? habilidad;
   final EfectosAliado efectos;
@@ -114,6 +121,8 @@ class AliadoCatalogo {
     this.ataqueDano,
     this.ataqueMonedas,
     this.ataqueTexto,
+    this.ataqueDanoAdyacentes,
+    this.avisoAlCaer,
     this.habilidadNombre,
     this.habilidad,
     this.efectos = EfectosAliado.jugador,
@@ -236,6 +245,10 @@ class JefeCatalogo {
         ataqueMonedas:
             atm?['monedas'] == null ? null : _entero(atm!, 'monedas', id),
         ataqueTexto: atm?['texto'] as String?,
+        ataqueDanoAdyacentes: atm?['danoAdyacentes'] == null
+            ? null
+            : _entero(atm!, 'danoAdyacentes', id),
+        avisoAlCaer: am['avisoAlCaer'] as String?,
         habilidadNombre: am['habilidadNombre'] as String?,
         habilidad: am['habilidad'] as String?,
         efectos: am['efectos'] == 'programa'
