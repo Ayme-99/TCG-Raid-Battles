@@ -83,10 +83,6 @@ void main() {
     return conCategorias(m);
   }
 
-  /// Lo que debe salir de leer un registro de la versión 4: el mismo registro
-  /// en versión 6 (los eventos no cambian).
-  Object? migradoDeV4(Object? json) => migradoDeV5(json);
-
   /// Lo que debe salir de leer un registro de la versión 5 (D-16): el mismo
   /// registro en versión 6 con la categoría `picaro` renombrada a `control`.
   Object? migradoDeV5(Object? json) {
@@ -101,6 +97,10 @@ void main() {
     ];
     return m;
   }
+
+  /// Lo que debe salir de leer un registro de la versión 4: el mismo registro
+  /// en versión 6 (los eventos no cambian).
+  Object? migradoDeV4(Object? json) => migradoDeV5(json);
 
   void resumenEsElDelMotor(Object? json) {
     final registro = RegistroPartida.deJson(json);
