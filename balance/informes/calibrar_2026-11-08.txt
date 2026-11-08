@@ -1,0 +1,16 @@
+Incursiones · simulador de jefes con aliados (T-28)
+jefes=4 equipos/nivel=150 partidas/equipo=60 ayuda=0.5
+
+jefe        nivel  HP     política      victoria  objetivo  turnos  aliados
+onix        1      2300   solo-dueno     76.3 %     75 %       8.2  0.99
+onix        1      2300   ayuda          77.5 %     75 %       8.3  1.00
+manectric   2      2600   solo-dueno     52.1 %     50 %       9.6  1.93
+manectric   2      2600   ayuda          52.0 %     50 %       9.8  1.93
+kingdra     3      3400   solo-dueno     30.8 %     30 %       8.4  2.72
+kingdra     3      3400   ayuda          31.8 %     30 %       8.6  2.73
+arceus      4      3600   solo-dueno     15.9 %     15 %       7.8  3.21
+arceus      4      3600   ayuda          15.9 %     15 %       8.1  3.20
+
+Informe guardado en ../balance/informes/jefes_aliados_calibrado.csv
+HP calibrado (columna "HP"): llévalo a catalog/bosses/*.json con su cadaHp; ver docs/DEPENDENCIAS.md.
+Sin efectos de habilidades de aliados ni veneno/quemadura: las cifras son una cota optimista para los jugadores.

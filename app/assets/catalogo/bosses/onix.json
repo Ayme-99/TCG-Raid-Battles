@@ -3,7 +3,7 @@
   "id": "onix",
   "nombre": "Onix",
   "nivel": 1,
-  "hp": 1800,
+  "hp": 2300,
   "ataques": [
     {
       "nombre": "Trampa Rocas",
@@ -29,7 +29,7 @@
     }
   ],
   "invocacion": {
-    "cadaHp": 900,
+    "cadaHp": 1150,
     "tirada": "segura",
     "aliados": {
       "danio": {

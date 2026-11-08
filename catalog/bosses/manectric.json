@@ -3,7 +3,7 @@
   "id": "manectric",
   "nombre": "Manectric",
   "nivel": 2,
-  "hp": 2200,
+  "hp": 2600,
   "ataques": [
     {
       "nombre": "Onda trueno",
@@ -29,7 +29,7 @@
     }
   ],
   "invocacion": {
-    "cadaHp": 734,
+    "cadaHp": 867,
     "tirada": "segura",
     "aliados": {
       "danio": {
