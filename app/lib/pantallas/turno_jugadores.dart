@@ -23,6 +23,7 @@ class PantallaTurnoJugadores extends ConsumerWidget {
         const TarjetaJefe(),
         const PanelEfectosActivos(),
         const PanelPendientes(),
+        const PanelAliados(),
         _Orden(estado: estado),
         if (actual != null)
           _TurnoActual(
