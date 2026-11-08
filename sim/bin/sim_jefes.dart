@@ -10,7 +10,7 @@
 //     categoría entre las que no están en uso. Sin slot libre no hay aliado.
 //   - Al entrar, el aliado ataca (si tiene ataque); luego vuelve a atacar al
 //     final del turno del jefe. Daño al Pokémon Activo del dueño de su slot
-//     (si está eliminado, a un jugador activo al azar). El Pícaro ataca a la
+//     (si está eliminado, a un jugador activo al azar). El Control (antes Pícaro) ataca a la
 //     Banca.
 //   - Bloqueo: un jugador con un aliado vivo en su slot debe debilitarlo antes
 //     de dañar al jefe. El exceso de daño al aliado se pierde.
@@ -37,10 +37,23 @@
 //   - cura-jefe-N: al final del turno del jefe (tras los ataques de los
 //     aliados) el jefe se cura N HP sin pasar de su máximo.
 //
-// NO modela (el informe lo dice): el Pícaro (lo aplican los jugadores a sus
-// Pokémon), veneno ni quemadura del jefe, ni el cambio de Pokémon activo por
-// efectos. Por eso las cifras siguen siendo una cota optimista para los
-// jugadores salvo en la política «solo el dueño», que es la más dura.
+//   - tanque-jefe-N: también reduce N el daño que los jugadores hacen a los
+//     aliados (el propio Tanque incluido).
+//   - chupavidas-N: cada vez que el aliado ataca (al entrar y en el turno del
+//     jefe) cura N al jefe y a todos los aliados, sin pasar de su máximo.
+//   - foco-energia-N: cada ataque del jefe hace N más con una moneda (cara).
+// Aliados con ataque de monedas («20×» con 2 monedas): daño = caras × dano.
+//
+// Efectos de la carta que aplican los jugadores (el programa solo los
+// recuerda), modelados como si la mesa los aplicara siempre, por nombre de
+// habilidad: «Tormenta de arena» (control: 10 de daño al Pokémon activo de
+// cada jugador en el chequeo Pokémon, tras el turno del jefe) y «Rencor»
+// (debilitador: los jugadores no repiten ataque dos turnos seguidos).
+//
+// NO modela (el informe lo dice): veneno ni quemadura del jefe, ni el cambio de
+// Pokémon activo por efectos. Por eso las cifras siguen siendo una cota
+// optimista para los jugadores salvo en la política «solo el dueño», que es la
+// más dura.
 //
 // Uso (desde sim/):
 //   dart run bin/sim_jefes.dart
@@ -69,10 +82,15 @@ const categorias = [
 ];
 
 class AliadoDef {
-  AliadoDef(this.nombre, this.hp, this.dano, {this.scriptId});
+  AliadoDef(this.nombre, this.hp, this.dano,
+      {this.scriptId, this.monedas, this.habilidadNombre});
   final String nombre;
   final int hp;
+
+  /// Daño del ataque; con [monedas], daño por cada cara.
   final int? dano;
+  final int? monedas;
+  final String? habilidadNombre;
 
   /// Script del programa de la carta (`cura-jefe-20`, `tanque-jefe-10`...).
   final String? scriptId;
@@ -88,6 +106,18 @@ class AliadoDef {
 
   /// HP que el jefe se cura al final de su turno.
   int get cura => _numero('cura-jefe-');
+
+  /// HP que cura a todos (jefe y aliados) cada vez que ataca.
+  int get chupavidas => _numero('chupavidas-');
+
+  /// Daño extra (con moneda) a cada ataque del jefe.
+  int get focoEnergia => _numero('foco-energia-');
+
+  /// Daño al Pokémon activo de cada jugador en el chequeo Pokémon.
+  int get danoChequeo => habilidadNombre == 'Tormenta de arena' ? 10 : 0;
+
+  /// Los jugadores no repiten ataque en turnos seguidos.
+  bool get rencor => habilidadNombre == 'Rencor';
 }
 
 /// Ataque de la carta del jefe con el efecto que le interesa al simulador.
@@ -159,6 +189,8 @@ List<JefeDef> leerJefes(String carpeta) {
           d['hp'] as int,
           ataque == null ? null : ataque['dano'] as int,
           scriptId: d['efectos'] == 'programa' ? d['scriptId'] as String? : null,
+          monedas: ataque == null ? null : ataque['monedas'] as int?,
+          habilidadNombre: d['habilidadNombre'] as String?,
         );
       }
     }
@@ -186,6 +218,22 @@ List<JefeDef> leerJefes(String carpeta) {
     ));
   }
   return jefes;
+}
+
+/// Como `Jug.elegir`, pero sin repetir el ataque [prohibido] («Rencor»).
+Ataque? elegirSin(Jug j, Poke p, Ataque? prohibido) {
+  if (p.cd > 0) return null;
+  Ataque? mejor;
+  for (final a in p.carta.ataques) {
+    if (a.gx && j.gxUsado) continue;
+    if (identical(a, prohibido)) continue;
+    if (mejor == null ||
+        a.dano > mejor.dano ||
+        (a.dano == mejor.dano && mejor.gx && !a.gx)) {
+      mejor = a;
+    }
+  }
+  return mejor;
 }
 
 class Aliado {
@@ -234,6 +282,17 @@ Resultado jugarJefe(
   // Efectos del jefe sobre los jugadores durante su próximo turno (D-14).
   final noAtacan = <int>{};
   final sinRetirada = <int>{};
+  // Último ataque de cada jugador (para «Rencor»).
+  final ultimo = <int, Ataque?>{};
+
+  // Reducción de daño de los aliados Tanque vivos.
+  int reduccionTanques() {
+    var r = 0;
+    for (final a in slots) {
+      if (a != null) r += a.def.reduccion;
+    }
+    return r;
+  }
 
   // Ataque de un aliado: a su dueño, o a un jugador activo al azar si el
   // dueño está eliminado.
@@ -248,7 +307,24 @@ Resultado jugarJefe(
       if (activos.isEmpty) return;
       objetivo = activos[rnd.nextInt(activos.length)];
     }
-    golpear(js[objetivo], a.def.dano!, banca: a.atacaBanca);
+    var dano = a.def.dano!;
+    final m = a.def.monedas;
+    if (m != null) {
+      var caras = 0;
+      for (var i = 0; i < m; i++) {
+        if (rnd.nextBool()) caras++;
+      }
+      dano *= caras;
+    }
+    golpear(js[objetivo], dano, banca: a.atacaBanca);
+    // Chupavidas: cura al jefe y a todos los aliados vivos.
+    final vida = a.def.chupavidas;
+    if (vida > 0) {
+      hp = min(jefe.hp, hp + vida);
+      for (final x in slots) {
+        if (x != null && x.vivo) x.hp = min(x.def.hp, x.hp + vida);
+      }
+    }
   }
 
   void invocar() {
@@ -302,13 +378,16 @@ Resultado jugarJefe(
         }
         continue;
       }
+      final rencor = slots.any((a) => a != null && a.def.rencor);
+      Ataque? elegir(Poke p) => rencor ? elegirSin(j, p, ultimo[i]) : j.elegir(p);
       var act = j.pokes[0];
-      var ch = j.elegir(act);
+      var ch = elegir(act);
       if (ch == null && j.pokes[1].vivo && !sinRetirada.contains(i)) {
         j.intercambiar();
         act = j.pokes[0];
-        ch = j.elegir(act);
+        ch = elegir(act);
       }
+      ultimo[i] = ch;
       if (ch == null) {
         for (final p in j.pokes) {
           if (p.cd > 0) p.cd--;
@@ -334,15 +413,11 @@ Resultado jugarJefe(
 
       if (objetivoAliado != null) {
         final a = slots[objetivoAliado]!;
-        a.hp -= ch.dano; // el exceso se pierde
+        a.hp -= max(0, ch.dano - reduccionTanques()); // el exceso se pierde
         if (!a.vivo) slots[objetivoAliado] = null;
       } else {
         // Los aliados Tanque vivos restan una cantidad fija a cada ataque.
-        var reduccion = 0;
-        for (final a in slots) {
-          if (a != null) reduccion += a.def.reduccion;
-        }
-        final dano = max(0, ch.dano - reduccion);
+        final dano = max(0, ch.dano - reduccionTanques());
         if (bajarJefe(dano)) return Resultado(t, invocados);
       }
       if (ch.cd) act.cd = 2;
@@ -373,6 +448,11 @@ Resultado jugarJefe(
         final defensor = j.pokes[0].vivo ? j.pokes[0] : j.pokes[1];
         if (defensor.hp == defensor.carta.hp) dano += a.valor ?? 0;
       }
+      // Potenciadores vivos: moneda y, con cara, más daño.
+      for (final al in slots) {
+        final f = al?.def.focoEnergia ?? 0;
+        if (f > 0 && rnd.nextBool()) dano += f;
+      }
       golpear(j, dano);
       // Efectos del ataque, después del daño al jugador (D-14).
       if (a.tipo == 'autodano') {
@@ -400,6 +480,16 @@ Resultado jugarJefe(
     for (var i = 0; i < slots.length; i++) {
       final a = slots[i];
       if (a != null) atacarAliado(i, a);
+    }
+    // Chequeo Pokémon: «Tormenta de arena» daña al activo de cada jugador.
+    for (final al in slots) {
+      final d = al?.def.danoChequeo ?? 0;
+      if (d == 0) continue;
+      for (final x in js) {
+        if (x.eliminado) continue;
+        if (!x.pokes[0].vivo) x.intercambiar();
+        x.pokes[0].hp -= d;
+      }
     }
     // Fin del turno del jefe: los aliados Cura vivos lo curan (D-13).
     for (final a in slots) {
@@ -545,6 +635,7 @@ void main(List<String> args) {
     stdout.writeln('HP calibrado (columna "HP"): llévalo a catalog/bosses/*.json '
         'con su cadaHp; ver docs/DEPENDENCIAS.md.');
   }
-  stdout.writeln('Modela Tanque y Cura (scripts del programa); sin Pícaro ni '
-      'veneno/quemadura: las cifras son una cota optimista para los jugadores.');
+  stdout.writeln('Modela los aliados de Onix (Tanque, Cura, Chupavidas, Foco '
+      'Energía, monedas, Tormenta de arena, Rencor); sin veneno/quemadura: las '
+      'cifras son una cota optimista para los jugadores.');
 }
