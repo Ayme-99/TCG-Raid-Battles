@@ -92,7 +92,16 @@ class AliadoCatalogo {
   final String nombre;
   final int hp;
   final String? ataqueNombre;
+
+  /// Daño del ataque; con [ataqueMonedas], daño por cada cara.
   final int? ataqueDano;
+
+  /// Número de monedas del ataque («20×»). null: el daño es fijo.
+  final int? ataqueMonedas;
+
+  /// Efecto del ataque, tal como lo lee la mesa.
+  final String? ataqueTexto;
+  final String? habilidadNombre;
   final String? habilidad;
   final EfectosAliado efectos;
   final String? scriptId;
@@ -103,10 +112,24 @@ class AliadoCatalogo {
     required this.hp,
     this.ataqueNombre,
     this.ataqueDano,
+    this.ataqueMonedas,
+    this.ataqueTexto,
+    this.habilidadNombre,
     this.habilidad,
     this.efectos = EfectosAliado.jugador,
     this.scriptId,
   });
+
+  /// Texto de la carta que se guarda en el evento y se enseña a la mesa:
+  /// el efecto del ataque y/o la habilidad con su nombre.
+  String? get textoParaLaMesa {
+    final partes = [
+      if (ataqueTexto != null) ataqueTexto!,
+      if (habilidad != null)
+        habilidadNombre == null ? habilidad! : '$habilidadNombre: $habilidad',
+    ];
+    return partes.isEmpty ? null : partes.join(' ');
+  }
 }
 
 class InvocacionCatalogo {
@@ -130,6 +153,9 @@ class JefeCatalogo {
   final String id;
   final String nombre;
   final int nivel;
+
+  /// Mapa o escenario del jefe (informativo).
+  final String? mapa;
   final int hp;
   final List<AtaqueJefeCatalogo> ataques;
 
@@ -142,6 +168,7 @@ class JefeCatalogo {
     required this.nivel,
     required this.hp,
     required this.ataques,
+    this.mapa,
     this.invocacion,
   });
 
@@ -165,6 +192,7 @@ class JefeCatalogo {
       id: id,
       nombre: _texto(m, 'nombre'),
       nivel: _entero(m, 'nivel', id),
+      mapa: m['mapa'] as String?,
       hp: _entero(m, 'hp', id),
       ataques: [
         for (final a in ataques)
@@ -205,6 +233,10 @@ class JefeCatalogo {
         hp: _entero(am, 'hp', id),
         ataqueNombre: atm == null ? null : _texto(atm, 'nombre'),
         ataqueDano: atm == null ? null : _entero(atm, 'dano', id),
+        ataqueMonedas:
+            atm?['monedas'] == null ? null : _entero(atm!, 'monedas', id),
+        ataqueTexto: atm?['texto'] as String?,
+        habilidadNombre: am['habilidadNombre'] as String?,
         habilidad: am['habilidad'] as String?,
         efectos: am['efectos'] == 'programa'
             ? EfectosAliado.programa

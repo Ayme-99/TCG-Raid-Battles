@@ -3,6 +3,7 @@
   "id": "onix",
   "nombre": "Onix",
   "nivel": 1,
+  "mapa": "Túnel Roca",
   "hp": 2300,
   "ataques": [
     {
@@ -33,35 +34,53 @@
     "tirada": "segura",
     "aliados": {
       "danio": {
-        "nombre": "Roggenrola",
-        "hp": 60,
+        "nombre": "Machop",
+        "hp": 70,
         "ataque": {
-          "nombre": "Pedrada",
-          "dano": 30
+          "nombre": "Puño Incremento",
+          "dano": 20,
+          "monedas": 2,
+          "texto": "Lanza dos monedas: este ataque hace 20 puntos de daño por cada cara."
         }
       },
       "tanque": {
         "nombre": "Geodude",
-        "hp": 120,
-        "habilidad": "Mientras esté en juego, el jefe recibe 10 de daño menos por cada ataque de los jugadores (lo aplica la app)",
+        "hp": 90,
+        "habilidadNombre": "Rizo Defensa",
+        "habilidad": "Mientras Geodude esté en juego, el jefe y los aliados reciben 10 puntos de daño menos por los ataques de los jugadores.",
         "efectos": "programa",
         "scriptId": "tanque-jefe-10"
       },
       "cura": {
-        "nombre": "Woobat",
-        "hp": 70,
-        "habilidad": "Al final del turno del jefe, el jefe se cura 20 HP (lo aplica la app)",
+        "nombre": "Zubat",
+        "hp": 50,
+        "ataque": {
+          "nombre": "Chupavidas",
+          "dano": 10,
+          "texto": "Cura 10 puntos de daño al jefe y a los aliados."
+        },
         "efectos": "programa",
-        "scriptId": "cura-jefe-20"
+        "scriptId": "chupavidas-10"
       },
       "control": {
-        "nombre": "Sableye",
+        "nombre": "Rhyhorn",
+        "hp": 100,
+        "habilidadNombre": "Tormenta de arena",
+        "habilidad": "Mientras Rhyhorn esté en juego, durante el chequeo Pokémon, los Pokémon activos de los jugadores reciben 10 puntos de daño."
+      },
+      "potenciador": {
+        "nombre": "Cubone",
         "hp": 60,
-        "ataque": {
-          "nombre": "Mirada tétrica",
-          "dano": 20
-        },
-        "habilidad": "Al entrar, pone 1 contador de daño en cada Pokémon de la Banca del dueño (lo aplica el jugador)"
+        "habilidadNombre": "Foco Energía",
+        "habilidad": "Cada vez que el jefe vaya a atacar, lanza una moneda. Si sale cara, el ataque hace 10 puntos de daño más.",
+        "efectos": "programa",
+        "scriptId": "foco-energia-10"
+      },
+      "debilitador": {
+        "nombre": "Haunter",
+        "hp": 80,
+        "habilidadNombre": "Rencor",
+        "habilidad": "Los Pokémon de los jugadores no pueden usar el mismo ataque 2 turnos seguidos."
       }
     }
   }

@@ -56,14 +56,28 @@ void main() {
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
         expect(j.invocacion!.segura, isTrue);
-        // Provisional (D-16): aún sin potenciador ni debilitador.
-        expect(j.invocacion!.aliados.keys, [
-          CategoriaAliado.danio,
-          CategoriaAliado.tanque,
-          CategoriaAliado.cura,
-          CategoriaAliado.control,
-        ]);
+        // Onix ya tiene los 6 roles de D-16; los demás jefes, provisionalmente
+        // sin potenciador ni debilitador.
+        expect(
+          j.invocacion!.aliados.keys,
+          j.id == 'onix'
+              ? CategoriaAliado.values
+              : [
+                  CategoriaAliado.danio,
+                  CategoriaAliado.tanque,
+                  CategoriaAliado.cura,
+                  CategoriaAliado.control,
+                ],
+        );
       }
+      expect(c.jefes[0].mapa, 'Túnel Roca');
+      final machop = c.aliadoDe('Onix', 1, CategoriaAliado.danio)!;
+      expect(machop.nombre, 'Machop');
+      expect(machop.ataqueMonedas, 2);
+      expect(machop.ataqueDano, 20);
+      final cubone = c.aliadoDe('Onix', 1, CategoriaAliado.potenciador)!;
+      expect(cubone.scriptId, 'foco-energia-10');
+      expect(cubone.textoParaLaMesa, contains('Foco Energía'));
       expect(c.delNivel(3).single.nombre, 'Kingdra');
       expect(c.delNivel(2).single.invocacion!.aliados[CategoriaAliado.control]!.nombre,
           'Plusle');
@@ -233,7 +247,7 @@ void main() {
     await tester.tap(find.byKey(const Key('invocar-aliado')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('aliado-del-catalogo')), findsOneWidget);
-    expect(find.widgetWithText(TextField, 'Roggenrola'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'Machop'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('aliado-categoria-tanque')));
     await tester.pumpAndSettle();
@@ -244,7 +258,7 @@ void main() {
     final aliado = c.read(estadoProvider).aliados.single;
     expect(aliado.nombre, 'Geodude');
     expect(aliado.categoria, CategoriaAliado.tanque);
-    expect(aliado.hp, 120);
+    expect(aliado.hp, 90);
     expect(aliado.habilidad, isNotNull);
     expect(find.byKey(const Key('panel-aliados')), findsOneWidget);
     expect(find.textContaining('Tanque · Geodude'), findsOneWidget);
@@ -300,17 +314,17 @@ void main() {
     expect(find.byKey(const Key('resultado-dados')), findsOneWidget);
     expect(find.textContaining('Dado de slot (moneda): Jugador 2'),
         findsOneWidget);
-    expect(find.widgetWithText(TextField, 'Woobat'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'Zubat'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('aliado-aceptar')));
     await tester.pumpAndSettle();
     final aliado = c.read(estadoProvider).aliados.single;
     expect(aliado.slot, 1);
     expect(aliado.categoria, CategoriaAliado.cura);
-    expect(aliado.nombre, 'Woobat');
+    expect(aliado.nombre, 'Zubat');
     // La cura del jefe la aplica el programa (D-13), no la mesa.
     expect(aliado.efectos, EfectosAliado.programa);
-    expect(aliado.scriptId, 'cura-jefe-20');
+    expect(aliado.scriptId, 'chupavidas-10');
   });
 }
 

@@ -25,10 +25,10 @@ EstadoPartida apply(
     FinTurnoJefe ev => _finTurnoJefe(estado, ev, scripts),
     AplicarEstadoJefe ev => _aplicarEstadoJefe(estado, ev),
     CuracionJefe ev => _curacionJefe(estado, ev),
-    AtaqueAAliado ev => _ataqueAAliado(estado, ev),
+    AtaqueAAliado ev => _ataqueAAliado(estado, ev, scripts),
     SinInvocacion() => _sinInvocacion(estado),
     AliadoInvocado ev => _aliadoInvocado(estado, ev, scripts),
-    AtaqueAliado ev => _ataqueAliado(estado, ev),
+    AtaqueAliado ev => _ataqueAliado(estado, ev, scripts),
     Abandonar() => _abandonar(estado),
   };
 }
@@ -555,7 +555,11 @@ EstadoPartida _curacionJefe(EstadoPartida e, CuracionJefe ev) {
   );
 }
 
-EstadoPartida _ataqueAAliado(EstadoPartida e, AtaqueAAliado ev) {
+EstadoPartida _ataqueAAliado(
+  EstadoPartida e,
+  AtaqueAAliado ev,
+  Map<String, ScriptAliado> scripts,
+) {
   _exigeFase(e, Fase.turnoJugadores, 'AtaqueAAliado');
   _exigeSinPendientes(e, 'AtaqueAAliado');
   _exigeJugador(e, ev.jugador);
@@ -569,8 +573,15 @@ EstadoPartida _ataqueAAliado(EstadoPartida e, AtaqueAAliado ev) {
   if (ev.dano < 0) {
     _error('el daño no puede ser negativo');
   }
-  // El exceso de daño se pierde: no pasa al jefe ni a otro aliado.
-  final restante = aliado.hp - ev.dano;
+  // Los aliados Tanque (D-13) reducen cada ataque de los jugadores también
+  // cuando va contra un aliado. El exceso de daño se pierde: no pasa al jefe
+  // ni a otro aliado.
+  var dano = ev.dano;
+  if (dano > 0) {
+    dano -= reduccionDanoAlJefe(e, scripts);
+    if (dano < 0) dano = 0;
+  }
+  final restante = aliado.hp - dano;
   final aliados = <AliadoEstado>[
     for (final a in e.aliados)
       if (a.slot != ev.slot)
@@ -665,7 +676,11 @@ EstadoPartida _aliadoInvocado(
   return resultado;
 }
 
-EstadoPartida _ataqueAliado(EstadoPartida e, AtaqueAliado ev) {
+EstadoPartida _ataqueAliado(
+  EstadoPartida e,
+  AtaqueAliado ev,
+  Map<String, ScriptAliado> scripts,
+) {
   if (e.fase != Fase.turnoJugadores && e.fase != Fase.turnoJefe) {
     _error('AtaqueAliado no es válido en la fase ${e.fase.name}');
   }
@@ -702,10 +717,19 @@ EstadoPartida _ataqueAliado(EstadoPartida e, AtaqueAliado ev) {
     _error('${aliado.nombre} solo ataca al entrar y al final del turno del '
         'jefe');
   }
-  return e.copiarCon(
+  final resultado = e.copiarCon(
     aliados: [
       for (final a in e.aliados)
         if (a.slot == ev.slot) actualizado else a,
     ],
   );
+  final id = aliado.scriptId;
+  if (aliado.efectos != EfectosAliado.programa || id == null) return resultado;
+  final alAtacar = scripts[id]!.alAtacar;
+  if (alAtacar == null) return resultado;
+  final conEfecto = alAtacar(resultado, actualizado);
+  if (conEfecto.fase != resultado.fase) {
+    _error('el script «$id» no puede terminar la partida');
+  }
+  return conEfecto;
 }
