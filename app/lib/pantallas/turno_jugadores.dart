@@ -143,7 +143,7 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
     if (aplicado && evita && context.mounted) {
       registrarAviso(
         context,
-        '${aliado!.nombre}: moneda en cara, evita el daño.',
+        '${aliado.nombre}: moneda en cara, evita el daño.',
       );
     }
     if (!aplicado || aliado == null || !context.mounted) return;
