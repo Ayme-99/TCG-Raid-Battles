@@ -196,6 +196,14 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
               if (efecto != null)
                 Text(efecto.texto, key: const Key('efecto-ataque')),
             ],
+            for (final b in bonusAtaqueJefeActivos(estado))
+              Text(
+                b.conMoneda
+                    ? '${b.aliado} potencia el ataque: se tira una moneda y, si '
+                        'sale cara, +${b.valor} de daño.'
+                    : '${b.aliado} potencia el ataque: +${b.valor} de daño.',
+                key: const Key('bonus-potenciador'),
+              ),
             const SizedBox(height: 8),
             KeyedSubtree(
               key: const Key('dano-jefe'),
@@ -245,24 +253,43 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                       // registro (D-14).
                       final moneda =
                           efecto != null && efecto.conMoneda ? Random().nextBool() : null;
+                      // Bonus de los aliados Potenciador vivos (D-16): la app
+                      // tira sus monedas y suma el bonus al daño registrado.
+                      final base = int.tryParse(_dano.text) ?? 0;
+                      var total = base;
+                      final partesBonus = <String>[];
+                      for (final b in bonusAtaqueJefeActivos(estado)) {
+                        final cara =
+                            !b.conMoneda || ref.read(azarProvider).nextBool();
+                        if (cara) total += b.valor;
+                        partesBonus.add(
+                          '${b.aliado}: ${cara ? 'cara, +${b.valor}' : 'cruz, sin bonus'}',
+                        );
+                      }
                       final aplicado = registrar(
                         context,
                         ref,
                         AtaqueJefe(
                           ranura: _ranura,
-                          dano: int.tryParse(_dano.text) ?? 0,
+                          dano: total,
                           jugador: _objetivo,
                           alAzar: _alAzar,
                           efecto: efecto?.comoEfecto(moneda: moneda),
                         ),
                       );
-                      if (aplicado && moneda != null && context.mounted) {
-                        registrarAviso(
-                          context,
-                          moneda
-                              ? 'Moneda: cara. ${efecto!.texto}'
-                              : 'Moneda: cruz. No pasa nada.',
-                        );
+                      if (aplicado && context.mounted) {
+                        final avisos = [
+                          if (moneda != null)
+                            moneda
+                                ? 'Moneda: cara. ${efecto!.texto}'
+                                : 'Moneda: cruz. No pasa nada.',
+                          if (partesBonus.isNotEmpty)
+                            'Potenciador (${partesBonus.join(' · ')}). '
+                                'Daño total: $total.',
+                        ];
+                        if (avisos.isNotEmpty) {
+                          registrarAviso(context, avisos.join('\n'));
+                        }
                       }
                     },
               child: const Text('Registrar ataque'),

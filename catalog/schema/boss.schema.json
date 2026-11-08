@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Ayme-99/TCG-Raid-Battles/catalog/schema/boss.schema.json",
   "title": "Jefe del catálogo de Incursiones (formato 1)",
-  "description": "Un jefe: carta fija con su HP y sus 3 ataques. Si invoca, declara cada cuántos HP perdidos hay un intento y sus 4 aliados, uno por categoría (D-13).",
+  "description": "Un jefe: carta fija con su HP y sus 3 ataques. Si invoca, declara cada cuántos HP perdidos hay un intento y sus aliados, uno por categoría (D-13, D-16).",
   "type": "object",
   "required": [
     "formato",
@@ -29,6 +29,11 @@
       "type": "integer",
       "minimum": 1,
       "maximum": 4
+    },
+    "mapa": {
+      "description": "Mapa o escenario del jefe (informativo).",
+      "type": "string",
+      "minLength": 1
     },
     "hp": {
       "type": "integer",
@@ -179,7 +184,7 @@
           "minimum": 1
         },
         "ataque": {
-          "description": "Ausente: el aliado no ataca (solo habilidad).",
+          "description": "Ausente: el aliado no ataca (solo habilidad). Con `monedas`, `dano` es el daño por cada cara de esas monedas (como «20×» en una carta); la app tira las monedas y registra el daño final.",
           "type": "object",
           "required": [
             "nombre",
@@ -194,8 +199,22 @@
             "dano": {
               "type": "integer",
               "minimum": 0
+            },
+            "monedas": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "texto": {
+              "description": "Efecto del ataque, tal como lo lee la mesa.",
+              "type": "string",
+              "minLength": 1
             }
           }
+        },
+        "habilidadNombre": {
+          "description": "Nombre de la habilidad de la carta.",
+          "type": "string",
+          "minLength": 1
         },
         "habilidad": {
           "type": "string",

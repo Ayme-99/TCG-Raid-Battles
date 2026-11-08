@@ -73,8 +73,17 @@ void main() {
   test('un aliado Tanque deja de reducir cuando cae', () {
     var s = todosActuan(conTanque('tanque-jefe-20'), dano: 0);
     s = apply(s, const FinTurnoJefe());
-    s = apply(s, AtaqueAAliado(jugador: s.jugadorActual!, slot: 1, dano: 120));
+    // 140 − 20 de reducción = 120: justo lo que le queda.
+    s = apply(s, AtaqueAAliado(jugador: s.jugadorActual!, slot: 1, dano: 140));
     expect(s.aliados, isEmpty);
     expect(reduccionDanoAlJefe(s), 0);
+  });
+
+  test('el Tanque también reduce el daño que reciben los aliados', () {
+    var s = todosActuan(conTanque('tanque-jefe-20'), dano: 0);
+    s = apply(s, const FinTurnoJefe());
+    // El Tanque (120 HP) es el propio aliado atacado: 50 − 20 = 30 de daño.
+    s = apply(s, AtaqueAAliado(jugador: s.jugadorActual!, slot: 1, dano: 50));
+    expect(s.aliadoEn(1)!.hp, 90);
   });
 }

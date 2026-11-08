@@ -57,3 +57,7 @@ Potenciador y Debilitador se distinguen por a quién afectan: el primero mejora 
 - **App:** chips y d6 animado con las caras de los aliados en el diálogo de invocación; el daño total del ataque con el bonus del Potenciador; etiquetas y avisos de los efectos nuevos.
 - **Simulador y balance:** modelar las categorías nuevas y recalibrar HP y rangos de X. La calibración de hoy (4 categorías) quedaría obsoleta; conviene esperar a este diseño.
 - **GDD:** §4.4, glosario, valores provisionales y D-13.
+
+## 6. Estado de la implementación por jefe
+
+**Onix (hecho, catálogo v4).** Mapa Túnel Roca; Machop (daño, «Puño Incremento» 20× con 2 monedas, que tira la app), Geodude (tanque, 90 HP, «Rizo Defensa»: −10 a los ataques de los jugadores contra el jefe y contra los aliados), Zubat (cura, «Chupavidas» 10: cura 10 al jefe y a todos los aliados), Rhyhorn (control, «Tormenta de arena»: la mesa aplica los 10 al chequeo Pokémon), Cubone (potenciador, «Foco Energía»: antes de cada ataque del jefe la app tira una moneda y, con cara, suma 10 al daño) y Haunter (debilitador, «Rencor»: la mesa aplica la restricción). Regla aplicada: lo que cambia vida o daño del jefe y los aliados lo resuelve el programa; lo que afecta a los Pokémon de los jugadores lo aplica la mesa con el recordatorio de la app. Manectric, Kingdra y Arceus siguen provisionales hasta recibir sus listas.

@@ -22,7 +22,20 @@ class ScriptAliado {
   /// (D-12) y en el orden en que se invocaron los aliados.
   final EfectoAliado? alFinTurnoJefe;
 
-  /// Daño que el jefe recibe de menos por cada ataque de los jugadores
+  /// Justo después de un ataque del aliado (al entrar o al final del turno
+  /// del jefe), con el aliado ya anotado como que ha atacado.
+  final EfectoAliado? alAtacar;
+
+  /// Daño extra que el jefe suma a cada uno de sus ataques mientras el aliado
+  /// siga vivo (D-16, Potenciador). Con [bonusConMoneda] solo se suma si al
+  /// tirar una moneda sale cara. La tirada la hace la app, que ya registra el
+  /// daño final del ataque; el motor no calcula el daño de los ataques del
+  /// jefe.
+  final int bonusAtaqueJefe;
+  final bool bonusConMoneda;
+
+  /// Daño que el jefe y los aliados reciben de menos por cada ataque de los
+  /// jugadores
   /// mientras el aliado siga vivo. Las reducciones de varios aliados se suman
   /// y el daño de un ataque nunca baja de 0.
   final int reduccionDano;
@@ -30,12 +43,45 @@ class ScriptAliado {
   const ScriptAliado({
     this.alEntrar,
     this.alFinTurnoJefe,
+    this.alAtacar,
+    this.bonusAtaqueJefe = 0,
+    this.bonusConMoneda = false,
     this.reduccionDano = 0,
   });
 }
 
-/// Daño que el jefe recibe de menos por cada ataque de los jugadores por los
-/// aliados vivos cuyos efectos aplica el programa (categoría Tanque, D-13).
+/// Bonus de daño que un aliado Potenciador vivo añade a los ataques del jefe.
+class BonusAtaqueJefe {
+  final String aliado;
+  final int valor;
+  final bool conMoneda;
+
+  const BonusAtaqueJefe(this.aliado, this.valor, this.conMoneda);
+}
+
+/// Bonus de los aliados vivos cuyos efectos aplica el programa. La app tira
+/// la moneda de cada uno que la lleve y suma el valor al daño del ataque.
+List<BonusAtaqueJefe> bonusAtaqueJefeActivos(
+  EstadoPartida e, [
+  Map<String, ScriptAliado> scripts = scriptsAliado,
+]) {
+  final bonus = <BonusAtaqueJefe>[];
+  for (final a in e.aliados) {
+    final id = a.scriptId;
+    if (a.efectos != EfectosAliado.programa || id == null) continue;
+    final script = scripts[id];
+    if (script == null || script.bonusAtaqueJefe <= 0) continue;
+    bonus.add(BonusAtaqueJefe(
+      a.nombre,
+      script.bonusAtaqueJefe,
+      script.bonusConMoneda,
+    ));
+  }
+  return bonus;
+}
+
+/// Daño que el jefe y los aliados reciben de menos por cada ataque de los
+/// jugadores por los aliados vivos cuyos efectos aplica el programa (categoría Tanque, D-13).
 int reduccionDanoAlJefe(
   EstadoPartida e, [
   Map<String, ScriptAliado> scripts = scriptsAliado,
@@ -62,6 +108,23 @@ EstadoPartida _curarJefe(EstadoPartida e, int cantidad) {
   );
 }
 
+/// Cura [cantidad] HP al jefe y a cada aliado vivo (el que actúa incluido),
+/// sin pasar del máximo de cada uno.
+EstadoPartida _curarJefeYAliados(EstadoPartida e, int cantidad) {
+  final conJefe = _curarJefe(e, cantidad);
+  return conJefe.copiarCon(
+    aliados: [
+      for (final a in conJefe.aliados)
+        a.copiarCon(
+          hp: a.hp + cantidad < a.hpMaximo ? a.hp + cantidad : a.hpMaximo,
+        ),
+    ],
+  );
+}
+
+EstadoPartida _chupavidas10(EstadoPartida e, AliadoEstado a) =>
+    _curarJefeYAliados(e, 10);
+
 // Funciones de nivel superior para poder usarlas en un mapa `const`.
 EstadoPartida _cura20(EstadoPartida e, AliadoEstado a) => _curarJefe(e, 20);
 EstadoPartida _cura30(EstadoPartida e, AliadoEstado a) => _curarJefe(e, 30);
@@ -70,13 +133,15 @@ EstadoPartida _cura50(EstadoPartida e, AliadoEstado a) => _curarJefe(e, 50);
 
 /// Scripts de aliados disponibles, por identificador. Los de la categoría
 /// Cura curan al jefe al final de su turno (antes del chequeo de estados) y
-/// los de la categoría Tanque reducen el daño que recibe el jefe. Los efectos
+/// los de la categoría Tanque reducen el daño que reciben el jefe y los aliados. Los efectos
 /// que afectan a los Pokémon de los jugadores los siguen aplicando ellos.
 const Map<String, ScriptAliado> scriptsAliado = {
   'cura-jefe-20': ScriptAliado(alFinTurnoJefe: _cura20),
   'cura-jefe-30': ScriptAliado(alFinTurnoJefe: _cura30),
   'cura-jefe-40': ScriptAliado(alFinTurnoJefe: _cura40),
   'cura-jefe-50': ScriptAliado(alFinTurnoJefe: _cura50),
+  'chupavidas-10': ScriptAliado(alAtacar: _chupavidas10),
+  'foco-energia-10': ScriptAliado(bonusAtaqueJefe: 10, bonusConMoneda: true),
   'tanque-jefe-10': ScriptAliado(reduccionDano: 10),
   'tanque-jefe-20': ScriptAliado(reduccionDano: 20),
   'tanque-jefe-30': ScriptAliado(reduccionDano: 30),

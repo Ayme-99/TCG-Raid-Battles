@@ -99,15 +99,39 @@ Future<void> atacarConAliado(
     );
     if (objetivo == null || !context.mounted) return;
   }
-  registrar(
+  // Ataque de daño por monedas («20×», D-13): la app las tira y registra el
+  // daño final. El número de monedas sale de la carta del catálogo.
+  final jefe = estado.jefe;
+  final carta = jefe == null
+      ? null
+      : ref
+          .read(catalogoProvider)
+          .valueOrNull
+          ?.aliadoDe(jefe.nombre, jefe.nivel, aliado.categoria);
+  final monedas = carta != null && carta.nombre == aliado.nombre
+      ? carta.ataqueMonedas
+      : null;
+  var caras = 0;
+  var dano = aliado.ataqueDano ?? 0;
+  if (monedas != null) {
+    final azar = ref.read(azarProvider);
+    for (var i = 0; i < monedas; i++) {
+      if (azar.nextBool()) caras++;
+    }
+    dano = caras * dano;
+  }
+  final aplicado = registrar(
     context,
     ref,
-    AtaqueAliado(
-      slot: aliado.slot,
-      dano: aliado.ataqueDano ?? 0,
-      objetivo: objetivo,
-    ),
+    AtaqueAliado(slot: aliado.slot, dano: dano, objetivo: objetivo),
   );
+  if (aplicado && monedas != null && context.mounted) {
+    registrarAviso(
+      context,
+      '${aliado.ataqueNombre}: $caras de $monedas monedas en cara → '
+      '$dano de daño.',
+    );
+  }
 }
 
 class _DialogoAliado extends StatefulWidget {
@@ -212,7 +236,7 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
     _hp.text = '${a.hp}';
     _ataqueNombre.text = a.ataqueNombre ?? '';
     _ataqueDano.text = a.ataqueDano == null ? '' : '${a.ataqueDano}';
-    _habilidad.text = a.habilidad ?? '';
+    _habilidad.text = a.textoParaLaMesa ?? '';
   }
 
   @override
