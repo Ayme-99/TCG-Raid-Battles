@@ -5,13 +5,13 @@ import 'ayudas.dart';
 
 /// Scripts de los aliados de Manectric (D-16): Drenadoras, Aullido y Gruñido.
 void main() {
-  EstadoPartida conJefe() {
+  EstadoPartida conJefe({int dano = 600}) {
     final s0 = configurar(const [100, 100, 100]);
     var s = apply(
       s0,
       ElegirJefe(nombre: 'Manectric', nivel: s0.nivel, hp: 3000, invocacionCadaHp: 600),
     );
-    return apply(s, const TurnoJugador(jugador: 0, dano: 600));
+    return apply(s, const TurnoJugador(jugador: 0, dano: dano));
   }
 
   AliadoInvocado aliado(CategoriaAliado c, String id, {int slot = 1}) =>
@@ -43,7 +43,7 @@ void main() {
   });
 
   test('Gruñido resta 10 a los ataques contra el jefe y se suma al Tanque', () {
-    var s = apply(conJefe(), aliado(CategoriaAliado.debilitador, 'grunido-10'));
+    var s = apply(conJefe(dano: 1200), aliado(CategoriaAliado.debilitador, 'grunido-10'));
     expect(reduccionDanoAlJefe(s), 10);
     s = apply(s, aliado(CategoriaAliado.tanque, 'tanque-jefe-20', slot: 2));
     expect(reduccionDanoAlJefe(s), 30);
