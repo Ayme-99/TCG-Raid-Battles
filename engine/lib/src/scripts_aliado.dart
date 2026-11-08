@@ -1,4 +1,5 @@
 import 'estado.dart';
+import 'eventos.dart';
 
 /// Efecto de un aliado que ejecuta el programa (D-13). Recibe el estado y el
 /// aliado y devuelve el estado nuevo. Tiene que ser determinista: nada de
