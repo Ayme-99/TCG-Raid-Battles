@@ -48,7 +48,7 @@
         "efectos": "programa",
         "scriptId": "cura-jefe-40"
       },
-      "picaro": {
+      "control": {
         "nombre": "Chinchou",
         "hp": 120,
         "ataque": {

@@ -1,6 +1,6 @@
 # D-13 · Aliados por categoría
 
-Estado: **cerrada** (2026-11-06). Issue #70. Valores y aliados concretos provisionales hasta T-17.
+Estado: **cerrada** (2026-11-06); **ampliada a 6 categorías por D-16** (el Pícaro pasa a llamarse Control y se añaden Potenciador y Debilitador). Issue #70. Valores y aliados concretos provisionales hasta T-17.
 
 Sustituye de D-04/D-07 el reparto de aliados por azar de una lista libre (D-04 §7.3, paso 3) y que las habilidades las resuelva siempre la mesa (D-04 §7.4 y §7.5). El resto de D-04 sigue igual: slots, bloqueo, ayuda, objetivo del aliado, exceso de daño y umbrales.
 

@@ -203,7 +203,27 @@ final class SinInvocacion extends Evento {
 
 /// Categoría de un aliado del jefe (D-13). Cada jefe tiene un aliado por
 /// categoría y no puede haber dos de la misma categoría a la vez.
-enum CategoriaAliado { danio, tanque, cura, picaro }
+enum CategoriaAliado {
+  /// Ataca fuerte: amenaza directa para los jugadores.
+  danio,
+
+  /// Protege al jefe y a su bando (reducción de daño, escudo).
+  tanque,
+
+  /// Curandero: cura al jefe o a otros aliados, quita estados. (El id sigue
+  /// siendo `cura` por compatibilidad con los registros guardados.)
+  cura,
+
+  /// Estados alterados, contadores de daño y limitar las acciones de los
+  /// jugadores. Antes se llamaba Pícaro; es el único que ataca a la Banca.
+  control,
+
+  /// Mejora al jefe y a los aliados (más daño, defensa o velocidad).
+  potenciador,
+
+  /// Reduce al jugador: su daño, su defensa o sus ventajas.
+  debilitador,
+}
 
 /// Quién aplica los efectos de la carta de un aliado (D-13).
 enum EfectosAliado {

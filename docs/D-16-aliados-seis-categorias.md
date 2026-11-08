@@ -52,7 +52,7 @@ Potenciador y Debilitador se distinguen por a quién afectan: el primero mejora 
 ## 5. Trabajo que implica (tareas aparte, tras cerrar este documento)
 
 - **Motor:** `CategoriaAliado` con 6 valores, d6, scripts nuevos (daño de los aliados y del jefe con Potenciador, reducción por jugador, curación de aliados, escudo, efectos de Control con `EfectoActivo`).
-- **Contrato v6:** el enum nuevo. Se hace junto con `modoPreparacion` (#106) para un solo salto de versión, con migración v5 → v6 (las partidas guardadas con `picaro` se leen como `control`).
+- **Contrato v6** (hecho): el enum nuevo con migración v5 → v6 (las partidas guardadas con `picaro` se leen como `control`). `modoPreparacion` (#106) pasa a la v7.
 - **Catálogo y esquema:** 6 aliados por jefe; 2 nuevos por jefe actual.
 - **App:** chips y d6 animado con las caras de los aliados en el diálogo de invocación; el daño total del ataque con el bonus del Potenciador; etiquetas y avisos de los efectos nuevos.
 - **Simulador y balance:** modelar las categorías nuevas y recalibrar HP y rangos de X. La calibración de hoy (4 categorías) quedaría obsoleta; conviene esperar a este diseño.

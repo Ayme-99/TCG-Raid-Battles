@@ -29,14 +29,14 @@ Catálogo oficial de jefes. Los jefes son **datos**, no código: se añaden edit
   "invocacion": {
     "cadaHp": 300,
     "tirada": "moneda",
-    "aliados": { "danio": {}, "tanque": {}, "cura": {}, "picaro": {} }
+    "aliados": { "danio": {}, "tanque": {}, "cura": {}, "control": {} }
   }
 }
 ```
 
 - `ataques`: exactamente 3; la posición es la ranura (1 a 3). El objetivo de cada ataque no se guarda en el catálogo: sale de la carta de la baraja de ataques del jefe («Ataque X contra jugador Y», D-13 §7). `efecto` es opcional (D-14): `{tipo, texto, valor?, duracion?, conMoneda?}`. `tipo` es uno de los tipos del motor (`TipoEfectoAtaque`, ver `contrato/README.md`), `texto` es lo que lee la mesa, `valor` y `duracion` son enteros ≥ 1 y `conMoneda` indica que el ataque lanza moneda (la lanza la app y guarda el resultado en el evento).
 - `invocacion` es opcional: un jefe sin ella nunca invoca (D-04 §7.1). Si está, `cadaHp` es cada cuántos HP perdidos hay un intento y `tirada` es cómo se tira (`moneda`, por defecto, o `segura`: sin moneda, cada intento invoca si hay slot libre).
-- `aliados`: **uno por categoría** (`danio`, `tanque`, `cura`, `picaro`), todas obligatorias (D-13). Cada aliado lleva `nombre`, `hp` y, si los tiene, `ataque` (`nombre` y `dano`) y `habilidad`.
+- `aliados`: **uno por categoría** (`danio`, `tanque`, `cura`, `control`, `potenciador`, `debilitador`; D-13 y D-16). De momento `danio`, `tanque`, `cura` y `control` son obligatorias y las dos últimas opcionales, hasta que cada jefe tenga sus 6 aliados. Cada aliado lleva `nombre`, `hp` y, si los tiene, `ataque` (`nombre` y `dano`) y `habilidad`.
 - Quién aplica los efectos de la carta del aliado: `efectos` es `jugador` (por defecto) o `programa`. Con `programa` hay que indicar `scriptId`; con `jugador` no se admite. Un test del motor (`engine/test/catalogo_scripts_test.dart`) comprueba que ese script existe en el motor.
 
 Ver `ejemplos/validos/jefe-con-aliados.json` para un jefe completo.

@@ -30,7 +30,7 @@ Cada jugador compra un sobre Pokémon, lo abre, elige dos cartas y de ahí sale 
 ## Cambios técnicos (modo 2)
 
 1. **Motor:** `ElegirJefe` hoy exige que el nivel del jefe coincida con el calculado por el daño de los jugadores. En el modo `jefe`, el nivel de la partida es el del jefe y esa comprobación no se aplica.
-2. **Contrato v6:** campo `modoPreparacion` (`equipo`, `jefe`; más adelante `sobres`), para el historial y para analizar el balance por modo. Migración v5 → v6: las partidas antiguas pasan a `equipo`. Servidor y deck-tracker-server, con el checklist de `docs/DEPENDENCIAS.md`.
+2. **Contrato v7:** (la v6 es de D-16, las 6 categorías de aliado) campo `modoPreparacion` (`equipo`, `jefe`; más adelante `sobres`), para el historial y para analizar el balance por modo. Migración v6 → v7: las partidas antiguas pasan a `equipo`. Servidor y deck-tracker-server, con el checklist de `docs/DEPENDENCIAS.md`.
 3. **App:** selector de modo en el setup, rango recomendado en la tarjeta del jefe y aviso de desajuste.
 4. **Simulador:** medir también equipos fuera del rango, porque el balance está calibrado para equipos en el centro de cada nivel (`x_centro`). Es lo que más afecta al porcentaje de victoria en el modo 2.
 

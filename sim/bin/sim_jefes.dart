@@ -59,7 +59,14 @@ import 'dart:math';
 
 import 'sim_cartas.dart' hide Medida, main, medir;
 
-const categorias = ['danio', 'tanque', 'cura', 'picaro'];
+const categorias = [
+  'danio',
+  'tanque',
+  'cura',
+  'control',
+  'potenciador',
+  'debilitador',
+];
 
 class AliadoDef {
   AliadoDef(this.nombre, this.hp, this.dano, {this.scriptId});
@@ -142,6 +149,9 @@ List<JefeDef> leerJefes(String carpeta) {
     if (inv != null) {
       final a = _mapa(inv['aliados']);
       for (final cat in categorias) {
+        // Provisional (D-16): un jefe puede no tener aún potenciador ni
+        // debilitador.
+        if (a[cat] == null) continue;
         final d = _mapa(a[cat]);
         final ataque = d['ataque'] == null ? null : _mapa(d['ataque']);
         aliados[cat] = AliadoDef(
@@ -185,7 +195,7 @@ class Aliado {
   int hp;
   bool get vivo => hp > 0;
   bool get ataca => def.dano != null;
-  bool get atacaBanca => categoria == 'picaro';
+  bool get atacaBanca => categoria == 'control';
 }
 
 class Resultado {
@@ -254,7 +264,7 @@ Resultado jugarJefe(
     };
     final catsLibres = [
       for (final cat in categorias)
-        if (!enUso.contains(cat)) cat,
+        if (jefe.aliados.containsKey(cat) && !enUso.contains(cat)) cat,
     ];
     if (catsLibres.isEmpty) return;
     final slot = libres[rnd.nextInt(libres.length)];

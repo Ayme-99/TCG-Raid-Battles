@@ -26,7 +26,7 @@ function ejemplos(version, carpeta) {
   }));
 }
 
-for (const version of [1, 2, 3, 4, 5]) {
+for (const version of [1, 2, 3, 4, 5, 6]) {
   const validar = compilar(version);
 
   for (const { nombre, json } of ejemplos(version, 'validos')) {
@@ -51,10 +51,10 @@ for (const version of [1, 2, 3, 4, 5]) {
 }
 
 test('cada esquema solo acepta su versión', () => {
-  const validadores = { 1: compilar(1), 2: compilar(2), 3: compilar(3), 4: compilar(4), 5: compilar(5) };
-  for (const version of [1, 2, 3, 4, 5]) {
+  const validadores = { 1: compilar(1), 2: compilar(2), 3: compilar(3), 4: compilar(4), 5: compilar(5), 6: compilar(6) };
+  for (const version of [1, 2, 3, 4, 5, 6]) {
     for (const { json } of ejemplos(version, 'validos')) {
-      for (const otra of [1, 2, 3, 4, 5].filter((v) => v !== version)) {
+      for (const otra of [1, 2, 3, 4, 5, 6].filter((v) => v !== version)) {
         assert.strictEqual(validadores[otra](json), false);
       }
     }

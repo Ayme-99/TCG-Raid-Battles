@@ -54,7 +54,7 @@
         "efectos": "programa",
         "scriptId": "cura-jefe-30"
       },
-      "picaro": {
+      "control": {
         "nombre": "Plusle",
         "hp": 90,
         "ataque": {
