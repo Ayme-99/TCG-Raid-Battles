@@ -2,8 +2,8 @@
 'use strict';
 
 // Copia el módulo del servidor y los esquemas del contrato a una carpeta de
-// otro repo (el backend de Deck Tracker). Uso:
-//   node server/scripts/exportar.js ../deck-tracker-server/src/incursiones
+// otro repo (el backend de TCGMasters). Uso:
+//   node server/scripts/exportar.js ../TCGMasters-server/src/modules/tcg-raid-battles
 // Solo toca los archivos del módulo y `contrato/`; no borra nada más del
 // destino (allí vive, por ejemplo, `montar.js`, que es del host).
 const fs = require('node:fs');

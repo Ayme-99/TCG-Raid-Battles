@@ -14,7 +14,7 @@ Asistente de combate para **Incursiones**, un formato cooperativo casero de Pok�
 - Mecánicas de aliados invocados y curación del jefe
 - Glosario de términos del formato
 
-El desarrollo se retomará cuando termine [deck-tracker-app](#) / [deck-tracker-server](#) (proyecto hermano, en curso).
+El desarrollo se retomará cuando termine [deck-tracker-app](#) / [TCGMasters-server](#) (proyecto hermano, en curso).
 
 ## Planteamiento técnico
 

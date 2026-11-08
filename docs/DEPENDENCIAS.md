@@ -37,7 +37,7 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 | Los **puntos** (`balance/tablas/puntos_niveles.csv`, `reparto_puntos.csv`) | `engine/lib/src/puntos.dart` (`topeVictoriaPorNivel`, `costeDesbloqueoPorNivel`, `repartoPorJugadores`) | ✅ `engine/test/tablas_balance_test.dart` (los valores están copiados, no se leen del CSV) |
 | | `docs/D-10-sistema-de-puntos.md` y el GDD | ❌ |
 | Una **versión nueva del contrato** | Servidor, app, repo de Deck Tracker (secciones 2 y 3) | ⚠️ |
-| El **módulo del servidor** `server/src/` | Regenerar y desplegar en **deck-tracker-server** (sección 3) | ❌ (el repo externo no tiene CI) |
+| El **módulo del servidor** `server/src/` | Regenerar y desplegar en **TCGMasters-server** (sección 3) | ❌ (el repo externo no tiene CI) |
 
 ## 2. Checklist: subir la versión del contrato
 
@@ -54,13 +54,13 @@ Cualquier cambio del formato sube la versión (`contrato/README.md`, «Versionad
 9. **Servidor externo:** sección 3.
 10. **Orden de publicación:** primero el servidor (acepta versiones viejas y nuevas), después la app. Al revés, la app enviaría partidas que el servidor aún rechaza.
 
-## 3. Servidor en Deck Tracker (otro repo)
+## 3. Servidor en TCGMasters (otro repo)
 
-`server/` de este repo se **copia** al repo `Ayme-99/deck-tracker-server` (`src/incursiones/`) y Render lo despliega al fusionar en `main`. Los archivos copiados **no se editan allí**; solo es de ese repo `montar.js` y sus tests.
+`server/` de este repo se **copia** al repo `Ayme-99/TCGMasters-server` (`src/modules/tcg-raid-battles/`) y Render lo despliega al fusionar en `main`. Los archivos copiados **no se editan allí**; solo es de ese repo `montar.js` y sus tests.
 
 1. Fusiona y comprueba el CI en este repo.
-2. En una copia de `deck-tracker-server`, rama nueva desde `main`: `node <este repo>/server/scripts/exportar.js src/incursiones`. Copia los `.js` del módulo y los esquemas `partida.vN.schema.json`.
-3. Si hay versión nueva del contrato: añade `tests/incursiones/partida-vN.json` y sus tests en `tests/incursiones/montar.test.js`.
+2. En una copia de `TCGMasters-server`, rama nueva desde `main`: `node <este repo>/server/scripts/exportar.js src/modules/tcg-raid-battles`. Copia los `.js` del módulo y los esquemas `partida.vN.schema.json`.
+3. Si hay versión nueva del contrato: añade `tests/tcg-raid-battles/partida-vN.json` y sus tests en `tests/tcg-raid-battles/montar.test.js`.
 4. `npx jest` en ese repo (**no tiene CI**: es la única comprobación) y PR.
 5. Al fusionar, Render despliega. Comprueba que el servidor responde y guarda una partida desde la app.
 
@@ -84,7 +84,7 @@ Estos datos viven duplicados. Los que llevan ✅ los compara `engine/test/tablas
 
 El CI (`.github/workflows/ci.yml`) ejecuta: tests del motor (`dart test`), tests de Node del contrato, del servidor y del catálogo (`npm test`), `flutter analyze` + `flutter test` + `flutter build web` de la app, y que la hoja de balance esté al día con el catálogo y las tablas (`comprobar_hoja.py`).
 
-**No** comprueba: el repo `deck-tracker-server`; los resultados del simulador (`sim/`: el CI solo comprueba que compila y arranca); los valores duplicados de la sección 4 sin ✅; que el GDD y los documentos `docs/` coincidan con el código; ni que las listas de versiones escritas a mano en los tests incluyan la versión nueva.
+**No** comprueba: el repo `TCGMasters-server`; los resultados del simulador (`sim/`: el CI solo comprueba que compila y arranca); los valores duplicados de la sección 4 sin ✅; que el GDD y los documentos `docs/` coincidan con el código; ni que las listas de versiones escritas a mano en los tests incluyan la versión nueva.
 
 ## 6. Mantener este documento
 
