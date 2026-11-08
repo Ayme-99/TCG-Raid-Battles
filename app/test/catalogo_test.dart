@@ -154,7 +154,7 @@ void main() {
     expect(estado.fase, Fase.turnoJugadores);
     expect(estado.jefe!.nombre, 'Onix');
     expect(estado.jefe!.hp, 2300);
-    expect(estado.jefe!.invocacionCadaHp, 900);
+    expect(estado.jefe!.invocacionCadaHp, 1150);
 
     // Turno del jefe: la pantalla propone el ataque de la carta y su efecto.
     final partida = c.read(partidaProvider.notifier);
