@@ -34,6 +34,13 @@ class ScriptAliado {
   final int bonusAtaqueJefe;
   final bool bonusConMoneda;
 
+  /// El bonus solo se suma al primer ataque del jefe de cada turno.
+  final bool bonusSoloPrimerAtaque;
+
+  /// Mientras el aliado siga vivo, el jefe no puede sufrir estados (veneno,
+  /// quemadura): se rechaza aplicarlos.
+  final bool bloqueaEstados;
+
   /// Daño que el jefe y los aliados reciben de menos por cada ataque de los
   /// jugadores
   /// mientras el aliado siga vivo. Las reducciones de varios aliados se suman
@@ -46,6 +53,8 @@ class ScriptAliado {
     this.alAtacar,
     this.bonusAtaqueJefe = 0,
     this.bonusConMoneda = false,
+    this.bonusSoloPrimerAtaque = false,
+    this.bloqueaEstados = false,
     this.reduccionDano = 0,
   });
 }
@@ -71,6 +80,7 @@ List<BonusAtaqueJefe> bonusAtaqueJefeActivos(
     if (a.efectos != EfectosAliado.programa || id == null) continue;
     final script = scripts[id];
     if (script == null || script.bonusAtaqueJefe <= 0) continue;
+    if (script.bonusSoloPrimerAtaque && e.ataquesJefeEnTurno > 0) continue;
     bonus.add(BonusAtaqueJefe(
       a.nombre,
       script.bonusAtaqueJefe,
@@ -78,6 +88,20 @@ List<BonusAtaqueJefe> bonusAtaqueJefeActivos(
     ));
   }
   return bonus;
+}
+
+/// El jefe no puede sufrir estados mientras viva un aliado con
+/// `bloqueaEstados` (Velo Sagrado) cuyos efectos aplica el programa.
+bool estadosBloqueados(
+  EstadoPartida e, [
+  Map<String, ScriptAliado> scripts = scriptsAliado,
+]) {
+  for (final a in e.aliados) {
+    final id = a.scriptId;
+    if (a.efectos != EfectosAliado.programa || id == null) continue;
+    if (scripts[id]?.bloqueaEstados ?? false) return true;
+  }
+  return false;
 }
 
 /// Daño que el jefe y los aliados reciben de menos por cada ataque de los
@@ -124,6 +148,13 @@ EstadoPartida _curarJefeYAliados(EstadoPartida e, int cantidad) {
 
 EstadoPartida _chupavidas10(EstadoPartida e, AliadoEstado a) =>
     _curarJefeYAliados(e, 10);
+EstadoPartida _chupavidas30(EstadoPartida e, AliadoEstado a) =>
+    _curarJefeYAliados(e, 30);
+
+/// Velo Sagrado: al entrar se quitan los estados que tuviera el jefe (las
+/// aplicaciones ya contadas para el bono se conservan).
+EstadoPartida _veloSagrado(EstadoPartida e, AliadoEstado a) =>
+    e.copiarCon(jefe: e.jefe!.conEstados(envenenado: false, quemado: false));
 
 /// Drenadoras: los jugadores ponen un contador de daño (10) en cada Pokémon
 /// Activo y el jefe se cura 10 por cada uno. Se cuenta un contador por jugador
@@ -149,6 +180,9 @@ const Map<String, ScriptAliado> scriptsAliado = {
   'cura-jefe-40': ScriptAliado(alFinTurnoJefe: _cura40),
   'cura-jefe-50': ScriptAliado(alFinTurnoJefe: _cura50),
   'chupavidas-10': ScriptAliado(alAtacar: _chupavidas10),
+  'chupavidas-30': ScriptAliado(alAtacar: _chupavidas30),
+  'velo-sagrado': ScriptAliado(alEntrar: _veloSagrado, bloqueaEstados: true),
+  'agilidad-30': ScriptAliado(bonusAtaqueJefe: 30, bonusSoloPrimerAtaque: true),
   'foco-energia-10': ScriptAliado(bonusAtaqueJefe: 10, bonusConMoneda: true),
   'drenadoras-10': ScriptAliado(
     alEntrar: _drenadoras10,

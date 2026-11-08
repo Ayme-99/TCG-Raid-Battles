@@ -209,12 +209,40 @@
               "type": "string",
               "minLength": 1
             },
+            "bonusConMonedas": {
+              "description": "Daño extra con monedas, como «30+» en una carta: la app tira `monedas` monedas y, si salen al menos `carasMinimas` caras, suma `dano` al daño base.",
+              "type": "object",
+              "required": [
+                "monedas",
+                "carasMinimas",
+                "dano"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "monedas": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "carasMinimas": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "dano": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
             "danoAdyacentes": {
               "description": "Daño que el ataque también hace a los Pokémon de los jugadores adyacentes al objetivo; lo aplican los jugadores y la app nombra a los afectados.",
               "type": "integer",
               "minimum": 1
             }
           }
+        },
+        "evitaDanoConMoneda": {
+          "description": "Cada vez que un ataque de los jugadores va a dañar al aliado, la app tira una moneda: con cara se evita ese daño.",
+          "type": "boolean"
         },
         "avisoAlCaer": {
           "description": "Recordatorio que la app enseña a la mesa cuando los jugadores derrotan al aliado con un ataque.",

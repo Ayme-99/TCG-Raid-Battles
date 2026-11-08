@@ -41,7 +41,7 @@ EstadoPartida _aplicar(
     PokemonKo ev => _pokemonKo(estado, ev),
     CartaAnimoRobada ev => _cartaAnimo(estado, ev),
     FinTurnoJefe ev => _finTurnoJefe(estado, ev, scripts),
-    AplicarEstadoJefe ev => _aplicarEstadoJefe(estado, ev),
+    AplicarEstadoJefe ev => _aplicarEstadoJefe(estado, ev, scripts),
     CuracionJefe ev => _curacionJefe(estado, ev),
     AtaqueAAliado ev => _ataqueAAliado(estado, ev, scripts),
     SinInvocacion() => _sinInvocacion(estado),
@@ -538,11 +538,18 @@ EstadoPartida _finTurnoJefe(
   return _empezarRonda(_cruzarUmbrales(estado));
 }
 
-EstadoPartida _aplicarEstadoJefe(EstadoPartida e, AplicarEstadoJefe ev) {
+EstadoPartida _aplicarEstadoJefe(
+  EstadoPartida e,
+  AplicarEstadoJefe ev,
+  Map<String, ScriptAliado> scripts,
+) {
   if (e.fase != Fase.turnoJugadores && e.fase != Fase.turnoJefe) {
     _error('AplicarEstadoJefe no es válido en la fase ${e.fase.name}');
   }
   _exigeJugador(e, ev.jugador);
+  if (estadosBloqueados(e, scripts)) {
+    _error('un aliado (Velo Sagrado) impide que el jefe sufra estados');
+  }
   final jefe = e.jefe!;
   final yaLoTiene = switch (ev.estado) {
     EstadoDelJefe.veneno => jefe.envenenado,

@@ -3,6 +3,7 @@
   "id": "kingdra",
   "nombre": "Kingdra",
   "nivel": 3,
+  "mapa": "Islas Remolino",
   "hp": 3400,
   "ataques": [
     {
@@ -27,35 +28,60 @@
     "tirada": "segura",
     "aliados": {
       "danio": {
-        "nombre": "Remoraid",
-        "hp": 120,
+        "nombre": "Krabby",
+        "hp": 70,
         "ataque": {
-          "nombre": "Pistola agua",
-          "dano": 60
+          "nombre": "Martillazo",
+          "dano": 30,
+          "bonusConMonedas": {
+            "monedas": 2,
+            "carasMinimas": 1,
+            "dano": 50
+          },
+          "texto": "Lanza dos monedas: si sale cara en alguna de ellas, este ataque hace 50 puntos de daño más."
         }
       },
       "tanque": {
-        "nombre": "Corsola",
-        "hp": 240,
-        "habilidad": "Mientras esté en juego, el jefe recibe 30 de daño menos por cada ataque de los jugadores (lo aplica la app)",
+        "nombre": "Seel",
+        "hp": 100,
+        "habilidadNombre": "Velo Sagrado",
+        "habilidad": "Evita que el jefe y los aliados sufran efectos de estado. Al entrar, el jefe pierde los que tuviera (lo aplica la app).",
         "efectos": "programa",
-        "scriptId": "tanque-jefe-30"
+        "scriptId": "velo-sagrado"
       },
       "cura": {
-        "nombre": "Horsea",
-        "hp": 130,
-        "habilidad": "Al final del turno del jefe, el jefe se cura 40 HP (lo aplica la app)",
+        "nombre": "Golbat",
+        "hp": 80,
+        "ataque": {
+          "nombre": "Chupavidas",
+          "dano": 30,
+          "texto": "Cura 30 puntos de daño al jefe y a los aliados."
+        },
+        "habilidadNombre": "Allanamiento",
+        "habilidad": "Los ataques de Golbat no se ven afectados por ningún efecto en el Pokémon Activo del rival.",
         "efectos": "programa",
-        "scriptId": "cura-jefe-40"
+        "scriptId": "chupavidas-30"
       },
       "control": {
-        "nombre": "Chinchou",
-        "hp": 120,
-        "ataque": {
-          "nombre": "Supersónico",
-          "dano": 40
-        },
-        "habilidad": "Al entrar, el Pokémon Activo del dueño queda Envenenado (lo aplica el jugador)"
+        "nombre": "Tentacruel",
+        "hp": 90,
+        "habilidadNombre": "Constricción",
+        "habilidad": "Mientras Tentacruel esté en juego, los jugadores no pueden cambiar el Pokémon Activo por uno de la Banca."
+      },
+      "potenciador": {
+        "nombre": "Horsea",
+        "hp": 60,
+        "habilidadNombre": "Agilidad",
+        "habilidad": "Mientras Horsea esté en juego, el primer ataque del jefe en cada turno hace 30 puntos de daño más (lo suma la app).",
+        "efectos": "programa",
+        "scriptId": "agilidad-30"
+      },
+      "debilitador": {
+        "nombre": "Magikarp",
+        "hp": 50,
+        "habilidadNombre": "Bote",
+        "habilidad": "Cada vez que Magikarp va a recibir daño, se lanza una moneda: si sale cara, se evita ese daño (lo tira la app al atacarlo).",
+        "evitaDanoConMoneda": true
       }
     }
   }

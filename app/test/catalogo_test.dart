@@ -56,11 +56,11 @@ void main() {
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
         expect(j.invocacion!.segura, isTrue);
-        // Onix y Manectric ya tienen los 6 roles de D-16; los demás jefes,
+        // Onix, Manectric y Kingdra ya tienen los 6 roles de D-16; los demás jefes,
         // provisionalmente sin potenciador ni debilitador.
         expect(
           j.invocacion!.aliados.keys,
-          j.id == 'onix' || j.id == 'manectric'
+          j.id == 'onix' || j.id == 'manectric' || j.id == 'kingdra'
               ? CategoriaAliado.values
               : [
                   CategoriaAliado.danio,
@@ -79,6 +79,19 @@ void main() {
       expect(cubone.scriptId, 'foco-energia-10');
       expect(cubone.textoParaLaMesa, contains('Foco Energía'));
       expect(c.delNivel(3).single.nombre, 'Kingdra');
+      expect(c.delNivel(3).single.mapa, 'Islas Remolino');
+      final krabby = c.aliadoDe('Kingdra', 3, CategoriaAliado.danio)!;
+      expect(krabby.ataqueBonusMonedas, 2);
+      expect(krabby.ataqueBonusCaras, 1);
+      expect(krabby.ataqueBonusDano, 50);
+      expect(
+        c.aliadoDe('Kingdra', 3, CategoriaAliado.debilitador)!.evitaDanoConMoneda,
+        isTrue,
+      );
+      expect(
+        c.aliadoDe('Kingdra', 3, CategoriaAliado.tanque)!.scriptId,
+        'velo-sagrado',
+      );
       expect(c.delNivel(2).single.invocacion!.aliados[CategoriaAliado.control]!.nombre,
           'Gulpin');
       final plusle = c.aliadoDe('Manectric', 2, CategoriaAliado.danio)!;

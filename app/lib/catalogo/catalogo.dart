@@ -102,6 +102,15 @@ class AliadoCatalogo {
   /// Efecto del ataque, tal como lo lee la mesa.
   final String? ataqueTexto;
 
+  /// Daño extra con monedas («30+»): se tiran [ataqueBonusMonedas] monedas y,
+  /// con al menos [ataqueBonusCaras] caras, se suman [ataqueBonusDano].
+  final int? ataqueBonusMonedas;
+  final int? ataqueBonusCaras;
+  final int? ataqueBonusDano;
+
+  /// Cada daño de los jugadores al aliado se evita con cara en una moneda.
+  final bool evitaDanoConMoneda;
+
   /// Daño que el ataque también hace a los Pokémon de los jugadores
   /// adyacentes al objetivo (lo aplican los jugadores).
   final int? ataqueDanoAdyacentes;
@@ -121,6 +130,10 @@ class AliadoCatalogo {
     this.ataqueDano,
     this.ataqueMonedas,
     this.ataqueTexto,
+    this.ataqueBonusMonedas,
+    this.ataqueBonusCaras,
+    this.ataqueBonusDano,
+    this.evitaDanoConMoneda = false,
     this.ataqueDanoAdyacentes,
     this.avisoAlCaer,
     this.habilidadNombre,
@@ -245,6 +258,10 @@ class JefeCatalogo {
         ataqueMonedas:
             atm?['monedas'] == null ? null : _entero(atm!, 'monedas', id),
         ataqueTexto: atm?['texto'] as String?,
+        ataqueBonusMonedas: _bonus(atm, 'monedas', id),
+        ataqueBonusCaras: _bonus(atm, 'carasMinimas', id),
+        ataqueBonusDano: _bonus(atm, 'dano', id),
+        evitaDanoConMoneda: am['evitaDanoConMoneda'] == true,
         ataqueDanoAdyacentes: atm?['danoAdyacentes'] == null
             ? null
             : _entero(atm!, 'danoAdyacentes', id),
@@ -341,6 +358,13 @@ String _texto(Map<String, Object?> m, String clave) {
   final v = m[clave];
   if (v is String && v.isNotEmpty) return v;
   throw FormatException('falta el texto «$clave»');
+}
+
+/// Campo de `ataque.bonusConMonedas`, o null si el ataque no lo tiene.
+int? _bonus(Map<String, Object?>? ataque, String clave, String donde) {
+  final b = ataque?['bonusConMonedas'];
+  if (b == null) return null;
+  return _entero(_mapa(b, '$donde bonusConMonedas'), clave, donde);
 }
 
 int _entero(Map<String, Object?> m, String clave, String donde) {
