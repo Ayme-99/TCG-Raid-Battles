@@ -9,7 +9,7 @@ Los jefes oficiales de Incursión Max llevan efectos en sus ataques (Dredanaw: e
 ## Decisiones
 
 1. **Cada ataque del catálogo puede llevar un `efecto` opcional**: `{ tipo, valor?, duracion? }`. Sin `efecto`, es daño plano.
-2. **`AtaqueJefe` registra el efecto aplicado** (contrato **v5**, migración v4 → v5, servidor y deck-tracker-server; ver `docs/DEPENDENCIAS.md`).
+2. **`AtaqueJefe` registra el efecto aplicado** (contrato **v5**, migración v4 → v5, servidor y TCGMasters-server; ver `docs/DEPENDENCIAS.md`).
 3. **Dos clases de efecto**, como en D-13:
    - `programa`: lo aplica la app. Hoy, solo el autodaño del jefe (`autodano`).
    - `jugador`: lo aplican los jugadores en la mesa; la app lo muestra y lo recuerda mientras dura (`sin_retirada`, `sin_ataque`, y otros por definir).
