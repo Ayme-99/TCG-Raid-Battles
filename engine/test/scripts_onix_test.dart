@@ -27,7 +27,7 @@ void main() {
       );
 
   test('Chupavidas cura 10 al jefe y a cada aliado, sin pasar del máximo', () {
-    // Dos intentos: Zubat en el slot 1 y un aliado sin script en el slot 2.
+    // Dos intentos: Zubat en el slot 1 y un Machop sin ataque en el slot 2.
     var s = conDosIntentos();
     expect(s.intentosInvocacionPendientes, 2);
     s = apply(s, zubat(1));
@@ -38,22 +38,25 @@ void main() {
         categoria: CategoriaAliado.danio,
         nombre: 'Machop',
         hp: 70,
-        ataqueNombre: 'Puño Incremento',
-        ataqueDano: 20,
       ),
     );
-    // El jugador 2 hace de dueño del Machop y ataca al Zubat con 25: se queda
-    // en 25 de 50.
-    s = apply(s, AtaqueAAliado(jugador: s.jugadorActual!, slot: 1, dano: 25));
-    expect(s.aliadoEn(1)!.hp, 25);
     final hpJefe = s.jefe!.hp;
-    // Chupavidas al entrar: el jefe sube 10, Zubat pasa de 25 a 35 y el
-    // Machop se queda en su máximo.
+    // Al entrar, Chupavidas cura al jefe; los aliados ya están al máximo.
     s = apply(s, const AtaqueAliado(slot: 1, dano: 10));
     expect(s.jefe!.hp, hpJefe + 10);
     expect(s.curacionJefe, 10);
-    expect(s.aliadoEn(1)!.hp, 35);
+    expect(s.aliadoEn(1)!.hp, 50);
     expect(s.aliadoEn(2)!.hp, 70);
+    // Un jugador daña al Machop (30 → le quedan 40) y, en el turno del jefe,
+    // Chupavidas lo sube 10 y a Zubat no le pasa del máximo.
+    s = apply(s, AtaqueAAliado(jugador: s.jugadorActual!, slot: 2, dano: 30));
+    expect(s.aliadoEn(2)!.hp, 40);
+    s = todosActuan(s, dano: 0);
+    s = apply(s, const AtaqueJefe(ranura: 1, dano: 80));
+    s = apply(s, const AtaqueAliado(slot: 1, dano: 10));
+    expect(s.jefe!.hp, hpJefe + 20);
+    expect(s.aliadoEn(2)!.hp, 50);
+    expect(s.aliadoEn(1)!.hp, 50);
   });
 
   test('Foco Energía figura como bonus activo mientras Cubone vive', () {
