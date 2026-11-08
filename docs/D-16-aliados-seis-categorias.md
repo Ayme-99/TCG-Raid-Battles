@@ -1,6 +1,6 @@
 # D-16 · Aliados con 6 categorías
 
-Estado: **propuesta, abierta** (2026-11-08). Issue #116. Propuesta de Ayme; nada de esto está en el motor, el contrato ni el catálogo.
+Estado: **decisiones tomadas, falta cerrar la probabilidad de las categorías** (2026-11-08). Issue #116. Propuesta de Ayme; nada de esto está en el motor, el contrato ni el catálogo.
 
 Amplía D-13: cada jefe pasa de 4 a **6 aliados, uno por categoría**, para que dos partidas contra el mismo jefe se parezcan menos entre sí. D-04 (slots, bloqueo, ayuda, objetivo del aliado, exceso de daño, umbrales) y el resto de D-13 no cambian.
 
@@ -11,9 +11,9 @@ Amplía D-13: cada jefe pasa de 4 a **6 aliados, uno por categoría**, para que 
 | **Curandero** | Cura PS de otros, quita estados, da curación | Jefe y aliados | Cura (D-13) |
 | **Tanque** | Absorbe daño, protege a los aliados, dificulta que los jugadores dañen al jefe | Jefe y aliados | Tanque (D-13) |
 | **Daño** | Ataca fuerte; amenaza directa para los jugadores | Jugadores | Daño (D-13) |
-| **Control** | Paraliza, duerme, confunde o limita las acciones de los jugadores | Jugadores | parte del Pícaro |
+| **Control** | Paraliza, duerme, confunde o limita las acciones de los jugadores | Jugadores | el Pícaro, con otro nombre |
 | **Potenciador** | Mejora al jefe o a los aliados: más daño, defensa o velocidad | Jefe y aliados | nuevo |
-| **Debilitador** | Reduce el daño, la defensa o las capacidades de los jugadores; les quita ventajas | Jugadores | parte del Pícaro |
+| **Debilitador** | Reduce el daño, la defensa o las capacidades de los jugadores; les quita ventajas | Jugadores | nuevo |
 
 Ejemplos de Ayme: Blissey (Curandero), Steelix (Tanque), Garchomp (Daño), Amoonguss (Control), Ninetales (Potenciador), Absol (Debilitador).
 
@@ -37,19 +37,23 @@ Potenciador y Debilitador se distinguen por a quién afectan: el primero mejora 
 | Potenciador | **Sumar N al daño de los ataques del jefe y/o de los aliados** mientras viva: la app lo suma al daño que propone al registrar el ataque | — |
 | Debilitador | Reducir el daño de **un jugador concreto** (ver pregunta 2) | Quitar ventajas de la mesa (cartas, energías, cartas de ánimo) |
 
-## 4. Preguntas abiertas
+## 4. Decisiones (2026-11-08)
 
-1. **¿Qué pasa con el Pícaro?** Hoy mezcla control, contadores de daño y es el único que ataca a la Banca. Propuesta: desaparece como categoría; sus estados pasan a **Control**, lo que quita ventajas a **Debilitador**. Falta decidir si algún aliado (Control o Debilitador) conserva el ataque a la Banca.
-2. **Tanque frente a Debilitador.** Hoy el Tanque reduce el daño que los jugadores hacen al jefe, que es parecido a lo que haría un Debilitador. Propuesta: el Tanque actúa sobre el jefe y su bando (reducción global, escudo, protege aliados) y el Debilitador sobre **un jugador** (por ejemplo, el dueño de su slot o el que más daño lleva) o sobre sus recursos.
-3. **Alcance del Potenciador.** El daño del jefe sale de una baraja física y el motor no lo calcula. Opciones: la app suma el bonus al daño propuesto al registrar el ataque (el evento guarda el daño final), o solo lo recuerda en pantalla.
-4. **¿Los 6 aliados en todos los jefes?** Propuesta: sí, para que cada ficha sea uniforme. Coste: 24 aliados con los 4 jefes actuales (8 nuevos) y 42 con los 7 de lanzamiento (14 nuevos).
-5. **Probabilidad de cada categoría.** El dado elige con igual probabilidad entre las libres. Con 6 categorías de potencia desigual, el resultado depende más de cuál sale. Propuesta: mantener el dado uniforme y medir la varianza en el simulador antes de tocarlo.
+1. **El Pícaro desaparece: pasa a llamarse Control.** Conserva lo suyo (estados alterados, fuerza, contadores de daño) y sigue siendo el **único que ataca a la Banca**. El Debilitador es una categoría nueva.
+2. **Tanque y Debilitador se separan por a quién actúan:** el Tanque **protege al jefe** (y a su bando); el Debilitador **reduce a los jugadores** (a un jugador concreto o a sus recursos). La reducción global del daño al jefe (`tanque-jefe-N`) sigue siendo del Tanque.
+3. **Potenciador: la app suma el bonus al daño del ataque** (del jefe y/o de los aliados) mientras viva, y **muestra el valor total** al registrar el ataque. El evento guarda el daño final, como con el Tanque. Si el Potenciador cae, deja de sumar.
+4. **Los 6 aliados en todos los jefes.** 8 aliados nuevos con los 4 jefes actuales, 14 con los 7 de lanzamiento.
+5. **El dado de categoría se muestra como un d6 animado** con la cara de cada aliado del jefe en un lado, para que el jugador vea cuál va a aparecer. Es presentación: el resultado lo decide la app (punto siguiente) y las caras de las categorías ya en uso no pueden salir.
+
+## 4 bis. Pendiente: probabilidad de cada categoría
+
+El dado elige hoy con **igual probabilidad entre las categorías libres** (1/6 cada una al empezar). La alternativa es dar más o menos peso a algunas (por ejemplo, que el aliado de Daño salga menos que el Curandero). Propuesta: mantener la probabilidad igual y medir en el simulador cuánto cambia el resultado según la categoría que sale; solo si la diferencia es grande se tocan los pesos.
 
 ## 5. Trabajo que implica (tareas aparte, tras cerrar este documento)
 
 - **Motor:** `CategoriaAliado` con 6 valores, d6, scripts nuevos (daño de los aliados y del jefe con Potenciador, reducción por jugador, curación de aliados, escudo, efectos de Control con `EfectoActivo`).
-- **Contrato v6:** el enum nuevo. Se hace junto con `modoPreparacion` (#106) para un solo salto de versión, con migración v5 → v6 (las partidas guardadas con `picaro` hay que decidir cómo se leen).
+- **Contrato v6:** el enum nuevo. Se hace junto con `modoPreparacion` (#106) para un solo salto de versión, con migración v5 → v6 (las partidas guardadas con `picaro` se leen como `control`).
 - **Catálogo y esquema:** 6 aliados por jefe; 2 nuevos por jefe actual.
-- **App:** chips y d6 en el diálogo de invocación, etiquetas y avisos de los efectos nuevos.
+- **App:** chips y d6 animado con las caras de los aliados en el diálogo de invocación; el daño total del ataque con el bonus del Potenciador; etiquetas y avisos de los efectos nuevos.
 - **Simulador y balance:** modelar las categorías nuevas y recalibrar HP y rangos de X. La calibración de hoy (4 categorías) quedaría obsoleta; conviene esperar a este diseño.
 - **GDD:** §4.4, glosario, valores provisionales y D-13.
