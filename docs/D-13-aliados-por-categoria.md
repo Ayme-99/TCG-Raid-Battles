@@ -35,7 +35,7 @@ Cada carta de aliado indica cómo se aplican sus efectos. Hay dos tipos de carta
 
 Las habilidades siguen siendo **pasivas** (D-04 §7.4).
 
-**Regla de reparto (enmienda 2026-11-08):** lo que cambia la vida del jefe lo resuelve el programa; lo que afecta a los Pokémon de los jugadores lo aplican los jugadores. Por eso los aliados de la categoría **Cura** llevan `efectos: programa` y un script `cura-jefe-N` (N = 20 / 30 / 40 / 50 según el jefe) que cura al jefe al final de su turno, antes del chequeo de estados (D-12) y sin pasar de su HP máximo. Cuenta como curación del jefe (`curacionJefe`). Pendiente de decidir con la misma regla: el Tanque (reduce el daño que recibe el jefe).
+**Regla de reparto (enmienda 2026-11-08):** lo que cambia la vida del jefe lo resuelve el programa; lo que afecta a los Pokémon de los jugadores lo aplican los jugadores. Por eso los aliados de la categoría **Cura** llevan `efectos: programa` y un script `cura-jefe-N` (N = 20 / 30 / 40 / 50 según el jefe) que cura al jefe al final de su turno, antes del chequeo de estados (D-12) y sin pasar de su HP máximo. Cuenta como curación del jefe (`curacionJefe`). Los aliados de la categoría **Tanque** llevan `efectos: programa` y un script `tanque-jefe-N` (N = 10 / 20 / 30 / 40): mientras estén vivos, cada ataque de los jugadores hace N de daño menos al jefe (las reducciones se suman y un ataque no baja de 0). El jugador anota el daño de su ataque; el motor descuenta la reducción y solo cuenta como daño del jugador lo que de verdad resta HP al jefe.
 
 ## 4. Datos que hay que añadir
 

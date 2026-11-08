@@ -43,7 +43,9 @@
       "tanque": {
         "nombre": "Wynaut",
         "hp": 180,
-        "habilidad": "Mientras esté en juego, el jefe recibe 20 de daño menos por cada ataque de los jugadores (lo aplica el jugador)"
+        "habilidad": "Mientras esté en juego, el jefe recibe 20 de daño menos por cada ataque de los jugadores (lo aplica la app)",
+        "efectos": "programa",
+        "scriptId": "tanque-jefe-20"
       },
       "cura": {
         "nombre": "Minun",

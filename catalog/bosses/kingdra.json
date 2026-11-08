@@ -37,7 +37,9 @@
       "tanque": {
         "nombre": "Corsola",
         "hp": 240,
-        "habilidad": "Mientras esté en juego, el jefe recibe 30 de daño menos por cada ataque de los jugadores (lo aplica el jugador)"
+        "habilidad": "Mientras esté en juego, el jefe recibe 30 de daño menos por cada ataque de los jugadores (lo aplica la app)",
+        "efectos": "programa",
+        "scriptId": "tanque-jefe-30"
       },
       "cura": {
         "nombre": "Horsea",

@@ -18,7 +18,7 @@ EstadoPartida apply(
   return switch (evento) {
     ConfigurarJugadores ev => _configurar(estado, ev),
     ElegirJefe ev => _elegirJefe(estado, ev),
-    TurnoJugador ev => _turnoJugador(estado, ev),
+    TurnoJugador ev => _turnoJugador(estado, ev, scripts),
     AtaqueJefe ev => _ataqueJefe(estado, ev),
     PokemonKo ev => _pokemonKo(estado, ev),
     CartaAnimoRobada ev => _cartaAnimo(estado, ev),
@@ -197,7 +197,11 @@ EstadoPartida _avanzarTurno(EstadoPartida e, int desde) {
   return e.copiarCon(turnoActual: i);
 }
 
-EstadoPartida _turnoJugador(EstadoPartida e, TurnoJugador ev) {
+EstadoPartida _turnoJugador(
+  EstadoPartida e,
+  TurnoJugador ev,
+  Map<String, ScriptAliado> scripts,
+) {
   _exigeFase(e, Fase.turnoJugadores, 'TurnoJugador');
   _exigeSinPendientes(e, 'TurnoJugador');
   _exigeJugador(e, ev.jugador);
@@ -212,8 +216,14 @@ EstadoPartida _turnoJugador(EstadoPartida e, TurnoJugador ev) {
         'debe debilitarlo antes de dañar al jefe');
   }
   final jefe = e.jefe!;
-  // El daño que cuenta es el que de verdad resta HP al jefe.
-  final aplicado = ev.dano < jefe.hp ? ev.dano : jefe.hp;
+  // El daño anotado es el del ataque; los aliados Tanque (D-13) le quitan una
+  // cantidad fija y lo que cuenta es el que de verdad resta HP al jefe.
+  var bruto = ev.dano;
+  if (bruto > 0) {
+    bruto -= reduccionDanoAlJefe(e, scripts);
+    if (bruto < 0) bruto = 0;
+  }
+  final aplicado = bruto < jefe.hp ? bruto : jefe.hp;
   final dano = [...e.danoPorJugador];
   dano[ev.jugador] += aplicado;
   final nuevoHp = jefe.hp - aplicado;

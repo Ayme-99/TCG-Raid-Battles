@@ -72,6 +72,16 @@ class PanelAliados extends ConsumerWidget {
               'Aliados del jefe',
               style: Theme.of(context).textTheme.titleMedium,
             ),
+            if (reduccionDanoAlJefe(estado) > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  'Los ataques de los jugadores hacen '
+                  '${reduccionDanoAlJefe(estado)} de daño menos al jefe '
+                  '(lo descuenta la app).',
+                  key: const Key('reduccion-dano'),
+                ),
+              ),
             const SizedBox(height: 8),
             for (final a in estado.aliados)
               Padding(
