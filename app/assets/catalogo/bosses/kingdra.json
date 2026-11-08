@@ -42,7 +42,9 @@
       "cura": {
         "nombre": "Horsea",
         "hp": 130,
-        "habilidad": "Al final del turno del jefe, el jefe se cura 40 HP (lo aplica el jugador)"
+        "habilidad": "Al final del turno del jefe, el jefe se cura 40 HP (lo aplica la app)",
+        "efectos": "programa",
+        "scriptId": "cura-jefe-40"
       },
       "picaro": {
         "nombre": "Chinchou",

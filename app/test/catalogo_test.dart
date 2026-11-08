@@ -302,6 +302,9 @@ void main() {
     expect(aliado.slot, 1);
     expect(aliado.categoria, CategoriaAliado.cura);
     expect(aliado.nombre, 'Woobat');
+    // La cura del jefe la aplica el programa (D-13), no la mesa.
+    expect(aliado.efectos, EfectosAliado.programa);
+    expect(aliado.scriptId, 'cura-jefe-20');
   });
 }
 
