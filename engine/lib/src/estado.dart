@@ -299,6 +299,11 @@ class EstadoPartida {
   /// Efectos de ataques del jefe que siguen activos sobre algún jugador.
   final List<EfectoActivo> efectosActivos;
 
+  /// El último evento fue un ataque de aliado durante el turno de los
+  /// jugadores (o un KO que lo siguió): un KO que llegue ahora lo ha causado
+  /// ese ataque (D-13) y el jugador que aún no ha actuado pierde su turno.
+  final bool koTrasAtaqueAliado;
+
   EstadoPartida({
     required this.fase,
     required List<JugadorEstado> jugadores,
@@ -322,6 +327,7 @@ class EstadoPartida {
     required this.intentosInvocacionPendientes,
     required this.resultado,
     List<EfectoActivo>? efectosActivos,
+    this.koTrasAtaqueAliado = false,
   })  : jugadores = _fija(jugadores),
         orden = _fija(orden),
         prioridad = _fija(prioridad),
@@ -418,6 +424,7 @@ class EstadoPartida {
     int? intentosInvocacionPendientes,
     Resultado? resultado,
     List<EfectoActivo>? efectosActivos,
+    bool? koTrasAtaqueAliado,
   }) =>
       EstadoPartida(
         fase: fase ?? this.fase,
@@ -442,6 +449,7 @@ class EstadoPartida {
         umbralesCruzados: umbralesCruzados ?? this.umbralesCruzados,
         intentosInvocacionPendientes:
             intentosInvocacionPendientes ?? this.intentosInvocacionPendientes,
+        koTrasAtaqueAliado: koTrasAtaqueAliado ?? this.koTrasAtaqueAliado,
         resultado: resultado ?? this.resultado,
         efectosActivos: efectosActivos ?? this.efectosActivos,
       );
@@ -468,6 +476,7 @@ class EstadoPartida {
         'aliadosDerrotados': aliadosDerrotados,
         'umbralesCruzados': umbralesCruzados,
         'intentosInvocacionPendientes': intentosInvocacionPendientes,
+        'koTrasAtaqueAliado': koTrasAtaqueAliado,
         'resultado': resultado?.name,
         'efectosActivos': [for (final f in efectosActivos) f.toJson()],
       };

@@ -15,6 +15,24 @@ EstadoPartida apply(
   Evento evento, {
   Map<String, ScriptAliado> scripts = scriptsAliado,
 }) {
+  final nuevo = _aplicar(estado, evento, scripts);
+  // Un KO justo después de un ataque de aliado en el turno de los jugadores
+  // lo ha causado ese ataque; cualquier otro evento corta la racha.
+  final racha = switch (evento) {
+    AtaqueAliado() => nuevo.fase == Fase.turnoJugadores,
+    PokemonKo() => estado.koTrasAtaqueAliado && nuevo.fase == Fase.turnoJugadores,
+    _ => false,
+  };
+  return racha == nuevo.koTrasAtaqueAliado
+      ? nuevo
+      : nuevo.copiarCon(koTrasAtaqueAliado: racha);
+}
+
+EstadoPartida _aplicar(
+  EstadoPartida estado,
+  Evento evento,
+  Map<String, ScriptAliado> scripts,
+) {
   return switch (evento) {
     ConfigurarJugadores ev => _configurar(estado, ev),
     ElegirJefe ev => _elegirJefe(estado, ev),
@@ -388,6 +406,18 @@ EstadoPartida _pokemonKo(EstadoPartida e, PokemonKo ev) {
     // siguiente (una sola vez, aunque caigan varios).
     if (!nuevo.prioridad.contains(ev.jugador)) {
       nuevo = nuevo.copiarCon(prioridad: [...nuevo.prioridad, ev.jugador]);
+    }
+    // Lo ha dejado KO el ataque de entrada de un aliado (D-13) y todavía no
+    // ha actuado esta ronda: pierde su turno; el Pokémon que sube no ataca
+    // hasta la ronda siguiente.
+    if (e.koTrasAtaqueAliado && nuevo.fase == Fase.turnoJugadores) {
+      final pos = nuevo.orden.indexOf(ev.jugador);
+      if (pos >= nuevo.turnoActual) {
+        nuevo = nuevo.copiarCon(orden: [...nuevo.orden]..removeAt(pos));
+        if (pos == nuevo.turnoActual) {
+          nuevo = _avanzarTurno(nuevo, nuevo.turnoActual);
+        }
+      }
     }
     return nuevo;
   }

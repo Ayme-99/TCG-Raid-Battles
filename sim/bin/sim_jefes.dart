@@ -297,6 +297,9 @@ Resultado jugarJefe(
   // Efectos del jefe sobre los jugadores durante su próximo turno (D-14).
   final noAtacan = <int>{};
   final sinRetirada = <int>{};
+  // Jugador que está actuando y los que han perdido su turno esta ronda.
+  var actual = -1;
+  final perdidos = <int>{};
   // Último ataque de cada jugador (para «Rencor»).
   final ultimo = <int, Ataque?>{};
 
@@ -394,8 +397,16 @@ Resultado jugarJefe(
     final a = Aliado(cat, jefe.aliados[cat]!);
     slots[slot] = a;
     invocados++;
+    // Si el ataque de entrada deja KO al Pokémon de un jugador que aún no ha
+    // actuado esta ronda, ese jugador pierde su turno (D-13).
+    final vivosAntes = [for (final j in js) j.pokes[0].vivo];
     atacarAliado(slot, a); // ataque de entrada
     drenar(a);
+    for (var k = actual + 1; k < js.length; k++) {
+      if (vivosAntes[k] && !js[k].pokes[0].vivo && !js[k].eliminado) {
+        perdidos.add(k);
+      }
+    }
   }
 
   // El jefe pierde [dano] HP y puede dar intentos de invocación. Devuelve
@@ -415,9 +426,18 @@ Resultado jugarJefe(
   }
 
   for (var t = 1; t <= c.maxTurnos; t++) {
+    actual = -1;
     for (var i = 0; i < js.length; i++) {
       final j = js[i];
       if (j.eliminado) continue;
+      actual = i;
+      if (perdidos.remove(i)) {
+        if (!j.pokes[0].vivo) j.intercambiar();
+        for (final p in j.pokes) {
+          if (p.cd > 0) p.cd--;
+        }
+        continue;
+      }
       if (!j.pokes[0].vivo) j.intercambiar();
       if (noAtacan.contains(i)) {
         for (final p in j.pokes) {
@@ -474,6 +494,8 @@ Resultado jugarJefe(
       }
     }
 
+    actual = js.length; // fuera del turno de los jugadores
+    perdidos.clear();
     // Los efectos del jefe duran hasta aquí: un turno de los jugadores.
     noAtacan.clear();
     sinRetirada.clear();
