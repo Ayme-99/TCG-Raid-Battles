@@ -120,6 +120,20 @@ Future<void> atacarConAliado(
     }
     dano = caras * dano;
   }
+  // Daño extra con monedas («30+»): con las caras mínimas se suma el bonus.
+  final bonusMonedas = carta != null && carta.nombre == aliado.nombre
+      ? carta.ataqueBonusMonedas
+      : null;
+  var carasBonus = 0;
+  var conBonus = false;
+  if (bonusMonedas != null) {
+    final azar = ref.read(azarProvider);
+    for (var i = 0; i < bonusMonedas; i++) {
+      if (azar.nextBool()) carasBonus++;
+    }
+    conBonus = carasBonus >= (carta!.ataqueBonusCaras ?? 1);
+    if (conBonus) dano += carta.ataqueBonusDano ?? 0;
+  }
   final aplicado = registrar(
     context,
     ref,
@@ -129,6 +143,10 @@ Future<void> atacarConAliado(
   final avisos = [
     if (monedas != null)
       '${aliado.ataqueNombre}: $caras de $monedas monedas en cara → '
+          '$dano de daño.',
+    if (bonusMonedas != null)
+      '${aliado.ataqueNombre}: $carasBonus de $bonusMonedas monedas en cara → '
+          '${conBonus ? 'bonus de ${carta!.ataqueBonusDano}, ' : 'sin bonus, '}'
           '$dano de daño.',
     if (carta?.ataqueDanoAdyacentes != null)
       () {

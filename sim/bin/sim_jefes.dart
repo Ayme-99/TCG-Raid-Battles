@@ -44,6 +44,9 @@
 //   - foco-energia-N: cada ataque del jefe hace N más con una moneda (cara).
 //   - aullido-N: cada ataque del jefe hace N más (sin moneda).
 //   - grunido-N: como el Tanque, resta N a los ataques de los jugadores.
+//   - agilidad-N: el primer ataque del jefe de cada turno hace N más.
+//   - Krabby («30+»): bonus con monedas; Bote: moneda que evita el daño;
+//     Constricción: los jugadores no cambian de Pokémon salvo por KO.
 //   - drenadoras-N: al entrar y en el chequeo Pokémon, 10 de daño al activo de
 //     cada jugador y el jefe se cura N por cada uno.
 // Aliados con ataque de monedas («20×» con 2 monedas): daño = caras × dano.
@@ -87,7 +90,7 @@ const categorias = [
 
 class AliadoDef {
   AliadoDef(this.nombre, this.hp, this.dano,
-      {this.scriptId, this.monedas, this.habilidadNombre, this.danoAdyacentes});
+      {this.scriptId, this.monedas, this.habilidadNombre, this.danoAdyacentes, this.bonusMonedas, this.evitaConMoneda = false});
   final String nombre;
   final int hp;
 
@@ -95,6 +98,9 @@ class AliadoDef {
   final int? dano;
   final int? monedas;
   final String? habilidadNombre;
+
+  /// Bonus «30+»: (monedas, carasMinimas, dano) del ataque, o null.
+  final (int, int, int)? bonusMonedas;
 
   /// Daño del ataque a los Pokémon de los jugadores adyacentes al objetivo.
   final int? danoAdyacentes;
@@ -120,6 +126,9 @@ class AliadoDef {
   /// Daño extra (con moneda) a cada ataque del jefe.
   int get focoEnergia => _numero('foco-energia-');
 
+  /// Daño fijo al primer ataque del jefe de cada turno (Agilidad).
+  int get agilidad => _numero('agilidad-');
+
   /// Daño fijo (sin moneda) a cada ataque del jefe.
   int get aullido => _numero('aullido-');
 
@@ -129,6 +138,12 @@ class AliadoDef {
 
   /// Daño al Pokémon activo de cada jugador en el chequeo Pokémon.
   int get danoChequeo => habilidadNombre == 'Tormenta de arena' ? 10 : 0;
+
+  /// Los jugadores no pueden cambiar de Pokémon (Constricción).
+  bool get constriccion => habilidadNombre == 'Constricción';
+
+  /// Cada daño de los jugadores se evita con cara (Bote).
+  final bool evitaConMoneda;
 
   /// Los jugadores no repiten ataque en turnos seguidos.
   bool get rencor => habilidadNombre == 'Rencor';
@@ -205,7 +220,15 @@ List<JefeDef> leerJefes(String carpeta) {
           scriptId: d['efectos'] == 'programa' ? d['scriptId'] as String? : null,
           monedas: ataque == null ? null : ataque['monedas'] as int?,
           habilidadNombre: d['habilidadNombre'] as String?,
+          evitaConMoneda: d['evitaDanoConMoneda'] == true,
           danoAdyacentes: ataque == null ? null : ataque['danoAdyacentes'] as int?,
+          bonusMonedas: ataque?['bonusConMonedas'] == null
+              ? null
+              : (
+                  (ataque!['bonusConMonedas'] as Map)['monedas'] as int,
+                  (ataque['bonusConMonedas'] as Map)['carasMinimas'] as int,
+                  (ataque['bonusConMonedas'] as Map)['dano'] as int,
+                ),
         );
       }
     }
@@ -347,6 +370,14 @@ Resultado jugarJefe(
       }
       dano *= caras;
     }
+    final bm = a.def.bonusMonedas;
+    if (bm != null) {
+      var caras = 0;
+      for (var i = 0; i < bm.$1; i++) {
+        if (rnd.nextBool()) caras++;
+      }
+      if (caras >= bm.$2) dano += bm.$3;
+    }
     golpear(js[objetivo], dano, banca: a.atacaBanca);
     // Daño a los jugadores adyacentes (circular, sin eliminados).
     final adj = a.def.danoAdyacentes;
@@ -449,7 +480,11 @@ Resultado jugarJefe(
       Ataque? elegir(Poke p) => rencor ? elegirSin(j, p, ultimo[i]) : j.elegir(p);
       var act = j.pokes[0];
       var ch = elegir(act);
-      if (ch == null && j.pokes[1].vivo && !sinRetirada.contains(i)) {
+      final constriccion = slots.any((a) => a != null && a.def.constriccion);
+      if (ch == null &&
+          j.pokes[1].vivo &&
+          !sinRetirada.contains(i) &&
+          !constriccion) {
         j.intercambiar();
         act = j.pokes[0];
         ch = elegir(act);
@@ -480,7 +515,11 @@ Resultado jugarJefe(
 
       if (objetivoAliado != null) {
         final a = slots[objetivoAliado]!;
-        a.hp -= max(0, ch.dano - reduccionTanques()); // el exceso se pierde
+        // Bote: con cara en la moneda se evita el daño.
+        final evita = a.def.evitaConMoneda && rnd.nextBool();
+        if (!evita) {
+          a.hp -= max(0, ch.dano - reduccionTanques()); // el exceso se pierde
+        }
         if (!a.vivo) slots[objetivoAliado] = null;
       } else {
         // Los aliados Tanque vivos restan una cantidad fija a cada ataque.
@@ -522,6 +561,7 @@ Resultado jugarJefe(
         final f = al?.def.focoEnergia ?? 0;
         if (f > 0 && rnd.nextBool()) dano += f;
         dano += al?.def.aullido ?? 0;
+        if (n == 0) dano += al?.def.agilidad ?? 0;
       }
       golpear(j, dano);
       // Efectos del ataque, después del daño al jugador (D-14).

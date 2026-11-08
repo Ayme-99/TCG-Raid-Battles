@@ -118,11 +118,34 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
     );
     if (dano == null || !mounted) return;
     final aliado = estado.aliadoEn(slot);
+    final jefeCarta = estado.jefe;
+    final cartaAliado = jefeCarta == null || aliado == null
+        ? null
+        : ref
+            .read(catalogoProvider)
+            .valueOrNull
+            ?.aliadoDe(jefeCarta.nombre, jefeCarta.nivel, aliado.categoria);
+    // Bote (Magikarp): moneda al ir a recibir daño; con cara se evita. El
+    // ataque gasta el turno igualmente.
+    final evita = cartaAliado != null &&
+        cartaAliado.nombre == aliado!.nombre &&
+        cartaAliado.evitaDanoConMoneda &&
+        ref.read(azarProvider).nextBool();
     final aplicado = registrar(
       context,
       ref,
-      AtaqueAAliado(jugador: widget.jugador, slot: slot, dano: dano),
+      AtaqueAAliado(
+        jugador: widget.jugador,
+        slot: slot,
+        dano: evita ? 0 : dano,
+      ),
     );
+    if (aplicado && evita && context.mounted) {
+      registrarAviso(
+        context,
+        '${aliado.nombre}: moneda en cara, evita el daño.',
+      );
+    }
     if (!aplicado || aliado == null || !context.mounted) return;
     // Derrotado: recordatorio de la carta (p. ej. Moflete Estático).
     if (ref.read(estadoProvider).aliadoEn(slot) != null) return;
