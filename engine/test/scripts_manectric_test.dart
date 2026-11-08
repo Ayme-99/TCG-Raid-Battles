@@ -11,7 +11,7 @@ void main() {
       s0,
       ElegirJefe(nombre: 'Manectric', nivel: s0.nivel, hp: 3000, invocacionCadaHp: 600),
     );
-    return apply(s, const TurnoJugador(jugador: 0, dano: dano));
+    return apply(s, TurnoJugador(jugador: 0, dano: dano));
   }
 
   AliadoInvocado aliado(CategoriaAliado c, String id, {int slot = 1}) =>
