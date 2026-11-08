@@ -410,7 +410,11 @@ EstadoPartida _pokemonKo(EstadoPartida e, PokemonKo ev) {
     // Lo ha dejado KO el ataque de entrada de un aliado (D-13) y todavía no
     // ha actuado esta ronda: pierde su turno; el Pokémon que sube no ataca
     // hasta la ronda siguiente.
-    if (e.koTrasAtaqueAliado && nuevo.fase == Fase.turnoJugadores) {
+    // También cuenta si la mesa marca el KO antes de registrar el ataque de
+    // entrada (aún pendiente): en ese intervalo nada más puede haberlo causado.
+    final porAliado =
+        e.koTrasAtaqueAliado || e.entradasPendientes.isNotEmpty;
+    if (porAliado && nuevo.fase == Fase.turnoJugadores) {
       final pos = nuevo.orden.indexOf(ev.jugador);
       if (pos >= nuevo.turnoActual) {
         nuevo = nuevo.copiarCon(orden: [...nuevo.orden]..removeAt(pos));
