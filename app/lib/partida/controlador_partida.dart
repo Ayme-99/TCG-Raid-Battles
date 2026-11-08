@@ -104,6 +104,9 @@ final generadorIdProvider = Provider<String Function()>((ref) => generarIdPartid
 /// Reloj de la app, para poder fijarlo en los tests.
 final relojProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 
+/// Azar de la app (dados de invocación y monedas), para fijarlo en los tests.
+final azarProvider = Provider<Random>((ref) => Random.secure());
+
 /// 32 caracteres hexadecimales aleatorios (16 bytes), bien por debajo de los
 /// 64 que admite el contrato.
 String generarIdPartida() {

@@ -226,11 +226,13 @@ class Catalogo {
   /// Aliado de la carta del catálogo del jefe [nombre] de ese [nivel] en la
   /// [categoria] dada. null si el jefe no viene del catálogo, no invoca o no
   /// tiene aliado en esa categoría.
-  AliadoCatalogo? aliadoDe(String nombre, int nivel, CategoriaAliado categoria) {
+  AliadoCatalogo? aliadoDe(String nombre, int nivel, CategoriaAliado categoria) =>
+      invocacionDe(nombre, nivel)?.aliados[categoria];
+
+  /// Invocación de la carta del catálogo del jefe [nombre] de ese [nivel].
+  InvocacionCatalogo? invocacionDe(String nombre, int nivel) {
     for (final j in jefes) {
-      if (j.nombre == nombre && j.nivel == nivel) {
-        return j.invocacion?.aliados[categoria];
-      }
+      if (j.nombre == nombre && j.nivel == nivel) return j.invocacion;
     }
     return null;
   }
