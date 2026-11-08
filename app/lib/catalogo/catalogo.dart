@@ -223,6 +223,18 @@ class Catalogo {
   List<JefeCatalogo> delNivel(int nivel) =>
       [for (final j in jefes) if (j.nivel == nivel) j];
 
+  /// Aliado de la carta del catálogo del jefe [nombre] de ese [nivel] en la
+  /// [categoria] dada. null si el jefe no viene del catálogo, no invoca o no
+  /// tiene aliado en esa categoría.
+  AliadoCatalogo? aliadoDe(String nombre, int nivel, CategoriaAliado categoria) {
+    for (final j in jefes) {
+      if (j.nombre == nombre && j.nivel == nivel) {
+        return j.invocacion?.aliados[categoria];
+      }
+    }
+    return null;
+  }
+
   static const _raiz = 'assets/catalogo';
 
   /// Lee el índice y cada jefe que lista. Lanza [FormatException] si algo no

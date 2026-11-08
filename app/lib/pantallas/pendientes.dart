@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
 
@@ -39,7 +40,10 @@ class PanelPendientes extends ConsumerWidget {
                     onPressed: () async {
                       final evento = await showDialog<AliadoInvocado>(
                         context: context,
-                        builder: (_) => _DialogoAliado(estado: estado),
+                        builder: (_) => _DialogoAliado(
+                          estado: estado,
+                          catalogo: ref.read(catalogoProvider).valueOrNull,
+                        ),
                       );
                       if (evento == null || !context.mounted) return;
                       registrar(context, ref, evento);
@@ -99,17 +103,14 @@ Future<void> atacarConAliado(
   );
 }
 
-String _etiquetaCategoria(CategoriaAliado c) => switch (c) {
-      CategoriaAliado.danio => 'Daño',
-      CategoriaAliado.tanque => 'Tanque',
-      CategoriaAliado.cura => 'Cura',
-      CategoriaAliado.picaro => 'Pícaro',
-    };
-
 class _DialogoAliado extends StatefulWidget {
-  const _DialogoAliado({required this.estado});
+  const _DialogoAliado({required this.estado, this.catalogo});
 
   final EstadoPartida estado;
+
+  /// Catálogo empaquetado: si el jefe viene de él, se rellena el aliado de
+  /// cada categoría con los datos de su carta.
+  final Catalogo? catalogo;
 
   @override
   State<_DialogoAliado> createState() => _DialogoAliadoState();
@@ -127,6 +128,31 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
   late CategoriaAliado _categoria = widget.estado.categoriasLibres.isEmpty
       ? CategoriaAliado.danio
       : widget.estado.categoriasLibres.first;
+
+  /// El jefe tiene carta de aliado en el catálogo para la categoría elegida.
+  bool _delCatalogo = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _rellenar(_categoria);
+  }
+
+  /// Rellena los campos con el aliado del catálogo de esa categoría, si lo hay.
+  /// Se pueden editar después por si la carta física es distinta.
+  void _rellenar(CategoriaAliado categoria) {
+    final jefe = widget.estado.jefe;
+    final a = jefe == null
+        ? null
+        : widget.catalogo?.aliadoDe(jefe.nombre, jefe.nivel, categoria);
+    _delCatalogo = a != null;
+    if (a == null) return;
+    _nombre.text = a.nombre;
+    _hp.text = '${a.hp}';
+    _ataqueNombre.text = a.ataqueNombre ?? '';
+    _ataqueDano.text = a.ataqueDano == null ? '' : '${a.ataqueDano}';
+    _habilidad.text = a.habilidad ?? '';
+  }
 
   @override
   void dispose() {
@@ -170,12 +196,25 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
                 for (final c in widget.estado.categoriasLibres)
                   ChoiceChip(
                     key: Key('aliado-categoria-${c.name}'),
-                    label: Text(_etiquetaCategoria(c)),
+                    label: Text(etiquetaCategoria(c)),
                     selected: _categoria == c,
-                    onSelected: (_) => setState(() => _categoria = c),
+                    onSelected: (_) => setState(() {
+                      _categoria = c;
+                      _rellenar(c);
+                    }),
                   ),
               ],
             ),
+            if (_delCatalogo)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  'Datos de la carta del catálogo; edítalos si la carta '
+                  'física es distinta.',
+                  key: const Key('aliado-del-catalogo'),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
             const SizedBox(height: 8),
             TextField(
               key: const Key('aliado-nombre'),

@@ -29,6 +29,7 @@ class PantallaTurnoJefe extends ConsumerWidget {
         const TarjetaJefe(),
         const PanelEfectosActivos(),
         const PanelPendientes(),
+        const PanelAliados(),
         _AtaqueJefe(
           key: ValueKey('ataque-${estado.ronda}-${estado.ataquesJefeEnTurno}'),
           estado: estado,

@@ -177,4 +177,69 @@ void main() {
     expect(conEfecto.efectosActivos.single.jugador, 0);
     expect(find.byKey(const Key('efectos-activos')), findsOneWidget);
   });
+
+  testWidgets('invocar un aliado del catálogo rellena su carta y lo muestra',
+      (tester) async {
+    tester.view.physicalSize = const Size(1000, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final catalogo =
+        (await tester.runAsync(() => Catalogo.cargar(rootBundle)))!;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sobrescribir(),
+          catalogoProvider.overrideWith((ref) async => catalogo),
+        ],
+        child: const IncursionesApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final c =
+        ProviderScope.containerOf(tester.element(find.byType(IncursionesApp)));
+
+    for (final (clave, texto) in [('ataque-0', '100'), ('ataque-1', '100')]) {
+      await tester.enterText(
+        find.descendant(
+          of: find.byKey(Key(clave)),
+          matching: find.byType(TextField),
+        ),
+        texto,
+      );
+    }
+    await tester.tap(find.byKey(const Key('configurar')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('catalogo-onix')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('panel-aliados')), findsNothing);
+
+    // 1150 de daño cruza el primer (y único) umbral de invocación de Onix.
+    expect(
+      c.read(partidaProvider.notifier).registrar(
+            const TurnoJugador(jugador: 0, dano: 1150),
+          ),
+      isNull,
+    );
+    await tester.pumpAndSettle();
+    expect(c.read(estadoProvider).intentosInvocacionPendientes, 1);
+
+    await tester.tap(find.byKey(const Key('invocar-aliado')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('aliado-del-catalogo')), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'Roggenrola'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('aliado-categoria-tanque')));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(TextField, 'Geodude'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('aliado-aceptar')));
+    await tester.pumpAndSettle();
+
+    final aliado = c.read(estadoProvider).aliados.single;
+    expect(aliado.nombre, 'Geodude');
+    expect(aliado.categoria, CategoriaAliado.tanque);
+    expect(aliado.hp, 120);
+    expect(aliado.habilidad, isNotNull);
+    expect(find.byKey(const Key('panel-aliados')), findsOneWidget);
+    expect(find.textContaining('Tanque · Geodude'), findsOneWidget);
+  });
 }

@@ -16,6 +16,14 @@ bool registrar(BuildContext context, WidgetRef ref, Evento evento) {
   return true;
 }
 
+/// Nombre de la categoría de un aliado (D-13) tal como se muestra.
+String etiquetaCategoria(CategoriaAliado c) => switch (c) {
+      CategoriaAliado.danio => 'Daño',
+      CategoriaAliado.tanque => 'Tanque',
+      CategoriaAliado.cura => 'Cura',
+      CategoriaAliado.picaro => 'Pícaro',
+    };
+
 /// Muestra un aviso breve en la parte inferior.
 void registrarAviso(BuildContext context, String mensaje) {
   ScaffoldMessenger.of(context)

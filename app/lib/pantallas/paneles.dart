@@ -53,6 +53,57 @@ class PanelPokemon extends ConsumerWidget {
   }
 }
 
+/// Aliados vivos del jefe: categoría (D-13), dueño del slot, HP y su carta.
+class PanelAliados extends ConsumerWidget {
+  const PanelAliados({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final estado = ref.watch(estadoProvider);
+    if (estado.aliados.isEmpty) return const SizedBox.shrink();
+    return Card(
+      key: const Key('panel-aliados'),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Aliados del jefe',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            for (final a in estado.aliados)
+              Padding(
+                key: Key('aliado-${a.slot}'),
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${etiquetaCategoria(a.categoria)} · ${a.nombre} · '
+                      'slot de ${estado.jugadores[a.slot].nombre} · '
+                      '${a.hp}/${a.hpMaximo} HP',
+                    ),
+                    if (a.tieneAtaque || a.habilidad != null)
+                      Text(
+                        [
+                          if (a.tieneAtaque)
+                            '${a.ataqueNombre ?? 'Ataque'}: ${a.ataqueDano}',
+                          if (a.habilidad != null) a.habilidad!,
+                        ].join(' · '),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Efectos de los ataques del jefe que siguen activos sobre algún jugador
 /// (D-14). Los aplican los jugadores en la mesa; aquí solo se recuerdan.
 class PanelEfectosActivos extends ConsumerWidget {
