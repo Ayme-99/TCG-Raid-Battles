@@ -54,13 +54,13 @@ Cualquier cambio del formato sube la versión (`contrato/README.md`, «Versionad
 9. **Servidor externo:** sección 3.
 10. **Orden de publicación:** primero el servidor (acepta versiones viejas y nuevas), después la app. Al revés, la app enviaría partidas que el servidor aún rechaza.
 
-## 3. Servidor en Deck Tracker (otro repo)
+## 3. Servidor en TCGMasters (otro repo)
 
 `server/` de este repo se **copia** al repo `Ayme-99/TCGMasters-server` (`src/modules/tcg-raid-battles/`) y Render lo despliega al fusionar en `main`. Los archivos copiados **no se editan allí**; solo es de ese repo `montar.js` y sus tests.
 
 1. Fusiona y comprueba el CI en este repo.
 2. En una copia de `TCGMasters-server`, rama nueva desde `main`: `node <este repo>/server/scripts/exportar.js src/modules/tcg-raid-battles`. Copia los `.js` del módulo y los esquemas `partida.vN.schema.json`.
-3. Si hay versión nueva del contrato: añade `tests/incursiones/partida-vN.json` y sus tests en `tests/incursiones/montar.test.js`.
+3. Si hay versión nueva del contrato: añade `tests/tcg-raid-battles/partida-vN.json` y sus tests en `tests/tcg-raid-battles/montar.test.js`.
 4. `npx jest` en ese repo (**no tiene CI**: es la única comprobación) y PR.
 5. Al fusionar, Render despliega. Comprueba que el servidor responde y guarda una partida desde la app.
 
