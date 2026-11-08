@@ -53,7 +53,9 @@
       "cura": {
         "nombre": "Blissey",
         "hp": 160,
-        "habilidad": "Al final del turno del jefe, el jefe se cura 50 HP (lo aplica el jugador)"
+        "habilidad": "Al final del turno del jefe, el jefe se cura 50 HP (lo aplica la app)",
+        "efectos": "programa",
+        "scriptId": "cura-jefe-50"
       },
       "picaro": {
         "nombre": "Mismagius",

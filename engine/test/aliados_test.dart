@@ -484,7 +484,7 @@ void main() {
             scripts: scriptsDePrueba),
         throwsA(isA<ReglaIncumplida>()),
       );
-      // El catálogo de scripts de verdad está vacío por ahora.
+      // Un id que no está en el catálogo de scripts de verdad también se rechaza.
       expect(
         () => apply(conIntento(), chansey(1, scriptId: 'cura-al-final')),
         throwsA(isA<ReglaIncumplida>()),

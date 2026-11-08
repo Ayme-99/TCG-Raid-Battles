@@ -48,7 +48,9 @@
       "cura": {
         "nombre": "Woobat",
         "hp": 70,
-        "habilidad": "Al final del turno del jefe, el jefe se cura 20 HP (lo aplica el jugador)"
+        "habilidad": "Al final del turno del jefe, el jefe se cura 20 HP (lo aplica la app)",
+        "efectos": "programa",
+        "scriptId": "cura-jefe-20"
       },
       "picaro": {
         "nombre": "Sableye",

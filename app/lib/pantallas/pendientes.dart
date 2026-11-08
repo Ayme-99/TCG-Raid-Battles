@@ -146,6 +146,11 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
   /// El jefe tiene carta de aliado en el catálogo para la categoría elegida.
   bool _delCatalogo = false;
 
+  /// Quién aplica los efectos de la carta del catálogo (D-13) y, si es el
+  /// programa, su script. Sin carta del catálogo los aplica el jugador.
+  EfectosAliado _efectos = EfectosAliado.jugador;
+  String? _scriptId;
+
   @override
   void initState() {
     super.initState();
@@ -195,6 +200,8 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
         ? null
         : widget.catalogo?.aliadoDe(jefe.nombre, jefe.nivel, categoria);
     _delCatalogo = a != null;
+    _efectos = a?.efectos ?? EfectosAliado.jugador;
+    _scriptId = a?.scriptId;
     if (a == null) return;
     _nombre.text = a.nombre;
     _hp.text = '${a.hp}';
@@ -323,6 +330,8 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
               ataqueNombre: _opcional(_ataqueNombre),
               ataqueDano: int.tryParse(_ataqueDano.text),
               habilidad: _opcional(_habilidad),
+              efectos: _efectos,
+              scriptId: _scriptId,
             ),
           ),
           child: const Text('Aceptar'),
