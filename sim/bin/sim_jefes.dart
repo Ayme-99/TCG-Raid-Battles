@@ -30,10 +30,16 @@
 //   jefes actuales); ignoraEfectos no se modela porque los efectos de los
 //   jugadores tampoco.
 //
-// NO modela (el informe lo dice): efectos de las habilidades (Tanque, Cura,
-// Pícaro), veneno ni quemadura del jefe, ni el cambio de Pokémon activo por
-// efectos. Hasta que existan scripts de aliados (D-13), esas habilidades las
-// resuelve la mesa. Por eso las cifras son una COTA OPTIMISTA para los
+// Modela los scripts de aliados que aplica el programa (D-13), leídos del
+// `scriptId` del catálogo:
+//   - tanque-jefe-N: mientras el aliado vive, cada ataque de los jugadores al
+//     jefe hace N de daño menos (se suman, mínimo 0; no afecta al autodaño).
+//   - cura-jefe-N: al final del turno del jefe (tras los ataques de los
+//     aliados) el jefe se cura N HP sin pasar de su máximo.
+//
+// NO modela (el informe lo dice): el Pícaro (lo aplican los jugadores a sus
+// Pokémon), veneno ni quemadura del jefe, ni el cambio de Pokémon activo por
+// efectos. Por eso las cifras siguen siendo una cota optimista para los
 // jugadores salvo en la política «solo el dueño», que es la más dura.
 //
 // Uso (desde sim/):
@@ -56,10 +62,25 @@ import 'sim_cartas.dart' hide Medida, main, medir;
 const categorias = ['danio', 'tanque', 'cura', 'picaro'];
 
 class AliadoDef {
-  AliadoDef(this.nombre, this.hp, this.dano);
+  AliadoDef(this.nombre, this.hp, this.dano, {this.scriptId});
   final String nombre;
   final int hp;
   final int? dano;
+
+  /// Script del programa de la carta (`cura-jefe-20`, `tanque-jefe-10`...).
+  final String? scriptId;
+
+  int _numero(String prefijo) {
+    final id = scriptId;
+    if (id == null || !id.startsWith(prefijo)) return 0;
+    return int.parse(id.substring(prefijo.length));
+  }
+
+  /// Daño que el jefe recibe de menos por cada ataque de los jugadores.
+  int get reduccion => _numero('tanque-jefe-');
+
+  /// HP que el jefe se cura al final de su turno.
+  int get cura => _numero('cura-jefe-');
 }
 
 /// Ataque de la carta del jefe con el efecto que le interesa al simulador.
@@ -127,6 +148,7 @@ List<JefeDef> leerJefes(String carpeta) {
           d['nombre'] as String,
           d['hp'] as int,
           ataque == null ? null : ataque['dano'] as int,
+          scriptId: d['efectos'] == 'programa' ? d['scriptId'] as String? : null,
         );
       }
     }
@@ -305,7 +327,13 @@ Resultado jugarJefe(
         a.hp -= ch.dano; // el exceso se pierde
         if (!a.vivo) slots[objetivoAliado] = null;
       } else {
-        if (bajarJefe(ch.dano)) return Resultado(t, invocados);
+        // Los aliados Tanque vivos restan una cantidad fija a cada ataque.
+        var reduccion = 0;
+        for (final a in slots) {
+          if (a != null) reduccion += a.def.reduccion;
+        }
+        final dano = max(0, ch.dano - reduccion);
+        if (bajarJefe(dano)) return Resultado(t, invocados);
       }
       if (ch.cd) act.cd = 2;
       if (ch.gx) j.gxUsado = true;
@@ -362,6 +390,12 @@ Resultado jugarJefe(
     for (var i = 0; i < slots.length; i++) {
       final a = slots[i];
       if (a != null) atacarAliado(i, a);
+    }
+    // Fin del turno del jefe: los aliados Cura vivos lo curan (D-13).
+    for (final a in slots) {
+      if (a != null && a.vivo && a.def.cura > 0) {
+        hp = min(jefe.hp, hp + a.def.cura);
+      }
     }
     if (js.every((j) => j.eliminado)) return Resultado(0, invocados);
   }
@@ -501,6 +535,6 @@ void main(List<String> args) {
     stdout.writeln('HP calibrado (columna "HP"): llévalo a catalog/bosses/*.json '
         'con su cadaHp; ver docs/DEPENDENCIAS.md.');
   }
-  stdout.writeln('Sin efectos de habilidades de aliados ni veneno/quemadura: '
-      'las cifras son una cota optimista para los jugadores.');
+  stdout.writeln('Modela Tanque y Cura (scripts del programa); sin Pícaro ni '
+      'veneno/quemadura: las cifras son una cota optimista para los jugadores.');
 }
