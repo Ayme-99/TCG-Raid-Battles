@@ -208,8 +208,18 @@
               "description": "Efecto del ataque, tal como lo lee la mesa.",
               "type": "string",
               "minLength": 1
+            },
+            "danoAdyacentes": {
+              "description": "Daño que el ataque también hace a los Pokémon de los jugadores adyacentes al objetivo; lo aplican los jugadores y la app nombra a los afectados.",
+              "type": "integer",
+              "minimum": 1
             }
           }
+        },
+        "avisoAlCaer": {
+          "description": "Recordatorio que la app enseña a la mesa cuando los jugadores derrotan al aliado con un ataque.",
+          "type": "string",
+          "minLength": 1
         },
         "habilidadNombre": {
           "description": "Nombre de la habilidad de la carta.",

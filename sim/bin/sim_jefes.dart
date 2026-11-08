@@ -42,6 +42,10 @@
 //   - chupavidas-N: cada vez que el aliado ataca (al entrar y en el turno del
 //     jefe) cura N al jefe y a todos los aliados, sin pasar de su máximo.
 //   - foco-energia-N: cada ataque del jefe hace N más con una moneda (cara).
+//   - aullido-N: cada ataque del jefe hace N más (sin moneda).
+//   - grunido-N: como el Tanque, resta N a los ataques de los jugadores.
+//   - drenadoras-N: al entrar y en el chequeo Pokémon, 10 de daño al activo de
+//     cada jugador y el jefe se cura N por cada uno.
 // Aliados con ataque de monedas («20×» con 2 monedas): daño = caras × dano.
 //
 // Efectos de la carta que aplican los jugadores (el programa solo los
@@ -83,7 +87,7 @@ const categorias = [
 
 class AliadoDef {
   AliadoDef(this.nombre, this.hp, this.dano,
-      {this.scriptId, this.monedas, this.habilidadNombre});
+      {this.scriptId, this.monedas, this.habilidadNombre, this.danoAdyacentes});
   final String nombre;
   final int hp;
 
@@ -91,6 +95,9 @@ class AliadoDef {
   final int? dano;
   final int? monedas;
   final String? habilidadNombre;
+
+  /// Daño del ataque a los Pokémon de los jugadores adyacentes al objetivo.
+  final int? danoAdyacentes;
 
   /// Script del programa de la carta (`cura-jefe-20`, `tanque-jefe-10`...).
   final String? scriptId;
@@ -102,7 +109,7 @@ class AliadoDef {
   }
 
   /// Daño que el jefe recibe de menos por cada ataque de los jugadores.
-  int get reduccion => _numero('tanque-jefe-');
+  int get reduccion => _numero('tanque-jefe-') + _numero('grunido-');
 
   /// HP que el jefe se cura al final de su turno.
   int get cura => _numero('cura-jefe-');
@@ -112,6 +119,13 @@ class AliadoDef {
 
   /// Daño extra (con moneda) a cada ataque del jefe.
   int get focoEnergia => _numero('foco-energia-');
+
+  /// Daño fijo (sin moneda) a cada ataque del jefe.
+  int get aullido => _numero('aullido-');
+
+  /// HP que cura por cada jugador no eliminado (Drenadoras, que además pone
+  /// un contador de 10 en cada Pokémon Activo), al entrar y en el chequeo.
+  int get drenadoras => _numero('drenadoras-');
 
   /// Daño al Pokémon activo de cada jugador en el chequeo Pokémon.
   int get danoChequeo => habilidadNombre == 'Tormenta de arena' ? 10 : 0;
@@ -191,6 +205,7 @@ List<JefeDef> leerJefes(String carpeta) {
           scriptId: d['efectos'] == 'programa' ? d['scriptId'] as String? : null,
           monedas: ataque == null ? null : ataque['monedas'] as int?,
           habilidadNombre: d['habilidadNombre'] as String?,
+          danoAdyacentes: ataque == null ? null : ataque['danoAdyacentes'] as int?,
         );
       }
     }
@@ -294,6 +309,19 @@ Resultado jugarJefe(
     return r;
   }
 
+  // Drenadoras: un contador de 10 en el activo de cada jugador y el jefe se
+  // cura 10 por cada uno.
+  void drenar(Aliado a) {
+    final d = a.def.drenadoras;
+    if (d == 0) return;
+    for (final x in js) {
+      if (x.eliminado) continue;
+      if (!x.pokes[0].vivo) x.intercambiar();
+      x.pokes[0].hp -= 10;
+      hp = min(jefe.hp, hp + d);
+    }
+  }
+
   // Ataque de un aliado: a su dueño, o a un jugador activo al azar si el
   // dueño está eliminado.
   void atacarAliado(int slot, Aliado a) {
@@ -317,6 +345,24 @@ Resultado jugarJefe(
       dano *= caras;
     }
     golpear(js[objetivo], dano, banca: a.atacaBanca);
+    // Daño a los jugadores adyacentes (circular, sin eliminados).
+    final adj = a.def.danoAdyacentes;
+    if (adj != null) {
+      final vivos = [
+        for (var i = 0; i < js.length; i++)
+          if (!js[i].eliminado || i == objetivo) i,
+      ];
+      final pos = vivos.indexOf(objetivo);
+      if (vivos.length > 1) {
+        final vecinos = {
+          vivos[(pos - 1 + vivos.length) % vivos.length],
+          vivos[(pos + 1) % vivos.length],
+        };
+        for (final v in vecinos) {
+          if (!js[v].eliminado) golpear(js[v], adj);
+        }
+      }
+    }
     // Chupavidas: cura al jefe y a todos los aliados vivos.
     final vida = a.def.chupavidas;
     if (vida > 0) {
@@ -349,6 +395,7 @@ Resultado jugarJefe(
     slots[slot] = a;
     invocados++;
     atacarAliado(slot, a); // ataque de entrada
+    drenar(a);
   }
 
   // El jefe pierde [dano] HP y puede dar intentos de invocación. Devuelve
@@ -452,6 +499,7 @@ Resultado jugarJefe(
       for (final al in slots) {
         final f = al?.def.focoEnergia ?? 0;
         if (f > 0 && rnd.nextBool()) dano += f;
+        dano += al?.def.aullido ?? 0;
       }
       golpear(j, dano);
       // Efectos del ataque, después del daño al jugador (D-14).
@@ -483,6 +531,7 @@ Resultado jugarJefe(
     }
     // Chequeo Pokémon: «Tormenta de arena» daña al activo de cada jugador.
     for (final al in slots) {
+      if (al != null) drenar(al);
       final d = al?.def.danoChequeo ?? 0;
       if (d == 0) continue;
       for (final x in js) {

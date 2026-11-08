@@ -125,13 +125,34 @@ Future<void> atacarConAliado(
     ref,
     AtaqueAliado(slot: aliado.slot, dano: dano, objetivo: objetivo),
   );
-  if (aplicado && monedas != null && context.mounted) {
-    registrarAviso(
-      context,
+  if (!aplicado || !context.mounted) return;
+  final avisos = [
+    if (monedas != null)
       '${aliado.ataqueNombre}: $caras de $monedas monedas en cara → '
-      '$dano de daño.',
-    );
-  }
+          '$dano de daño.',
+    if (carta?.ataqueDanoAdyacentes != null)
+      () {
+        final vecinos = jugadoresAdyacentes(estado, objetivo ?? aliado.slot);
+        return '${aliado.ataqueNombre}: ${carta!.ataqueDanoAdyacentes} de daño '
+            'a los Pokémon de los jugadores adyacentes al objetivo: '
+            '${vecinos.isEmpty ? 'ninguno' : vecinos.map((i) => estado.jugadores[i].nombre).join(' y ')}.';
+      }(),
+  ];
+  if (avisos.isNotEmpty) registrarAviso(context, avisos.join('\n'));
+}
+
+/// Asientos adyacentes a [objetivo] en la mesa (circular), sin contar a los
+/// jugadores eliminados ni al propio objetivo.
+List<int> jugadoresAdyacentes(EstadoPartida estado, int objetivo) {
+  final vivos = [
+    for (var i = 0; i < estado.jugadores.length; i++)
+      if (!estado.jugadores[i].eliminado || i == objetivo) i,
+  ];
+  final pos = vivos.indexOf(objetivo);
+  if (pos < 0 || vivos.length < 2) return const [];
+  final anterior = vivos[(pos - 1 + vivos.length) % vivos.length];
+  final siguiente = vivos[(pos + 1) % vivos.length];
+  return {anterior, siguiente}.toList();
 }
 
 class _DialogoAliado extends StatefulWidget {
