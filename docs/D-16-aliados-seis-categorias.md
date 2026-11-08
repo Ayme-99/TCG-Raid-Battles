@@ -1,6 +1,6 @@
 # D-16 · Aliados con 6 categorías
 
-Estado: **decisiones tomadas, falta cerrar la probabilidad de las categorías** (2026-11-08). Issue #116. Propuesta de Ayme; nada de esto está en el motor, el contrato ni el catálogo.
+Estado: **cerrada** (2026-11-08). Issue #116. Propuesta de Ayme; nada de esto está en el motor, el contrato ni el catálogo.
 
 Amplía D-13: cada jefe pasa de 4 a **6 aliados, uno por categoría**, para que dos partidas contra el mismo jefe se parezcan menos entre sí. D-04 (slots, bloqueo, ayuda, objetivo del aliado, exceso de daño, umbrales) y el resto de D-13 no cambian.
 
@@ -45,9 +45,9 @@ Potenciador y Debilitador se distinguen por a quién afectan: el primero mejora 
 4. **Los 6 aliados en todos los jefes.** 8 aliados nuevos con los 4 jefes actuales, 14 con los 7 de lanzamiento.
 5. **El dado de categoría se muestra como un d6 animado** con la cara de cada aliado del jefe en un lado, para que el jugador vea cuál va a aparecer. Es presentación: el resultado lo decide la app (punto siguiente) y las caras de las categorías ya en uso no pueden salir.
 
-## 4 bis. Pendiente: probabilidad de cada categoría
+## 4 bis. Probabilidad de cada categoría
 
-El dado elige hoy con **igual probabilidad entre las categorías libres** (1/6 cada una al empezar). La alternativa es dar más o menos peso a algunas (por ejemplo, que el aliado de Daño salga menos que el Curandero). Propuesta: mantener la probabilidad igual y medir en el simulador cuánto cambia el resultado según la categoría que sale; solo si la diferencia es grande se tocan los pesos.
+**Dado uniforme (decidido):** el dado elige con igual probabilidad entre las categorías libres (1/6 cada una al empezar). No hay pesos por categoría. El simulador medirá la varianza según la categoría que sale; solo si fuera muy grande se reabriría.
 
 ## 5. Trabajo que implica (tareas aparte, tras cerrar este documento)
 
