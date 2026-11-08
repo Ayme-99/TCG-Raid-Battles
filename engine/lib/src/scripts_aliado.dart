@@ -21,7 +21,31 @@ class ScriptAliado {
   /// (D-12) y en el orden en que se invocaron los aliados.
   final EfectoAliado? alFinTurnoJefe;
 
-  const ScriptAliado({this.alEntrar, this.alFinTurnoJefe});
+  /// Daño que el jefe recibe de menos por cada ataque de los jugadores
+  /// mientras el aliado siga vivo. Las reducciones de varios aliados se suman
+  /// y el daño de un ataque nunca baja de 0.
+  final int reduccionDano;
+
+  const ScriptAliado({
+    this.alEntrar,
+    this.alFinTurnoJefe,
+    this.reduccionDano = 0,
+  });
+}
+
+/// Daño que el jefe recibe de menos por cada ataque de los jugadores por los
+/// aliados vivos cuyos efectos aplica el programa (categoría Tanque, D-13).
+int reduccionDanoAlJefe(
+  EstadoPartida e, [
+  Map<String, ScriptAliado> scripts = scriptsAliado,
+]) {
+  var total = 0;
+  for (final a in e.aliados) {
+    final id = a.scriptId;
+    if (a.efectos != EfectosAliado.programa || id == null) continue;
+    total += scripts[id]?.reduccionDano ?? 0;
+  }
+  return total;
 }
 
 /// El jefe se cura [cantidad] HP sin pasar de su máximo. Cuenta como
@@ -44,11 +68,16 @@ EstadoPartida _cura40(EstadoPartida e, AliadoEstado a) => _curarJefe(e, 40);
 EstadoPartida _cura50(EstadoPartida e, AliadoEstado a) => _curarJefe(e, 50);
 
 /// Scripts de aliados disponibles, por identificador. Los de la categoría
-/// Cura curan al jefe al final de su turno (antes del chequeo de estados).
-/// Los efectos de las demás cartas los siguen aplicando los jugadores.
+/// Cura curan al jefe al final de su turno (antes del chequeo de estados) y
+/// los de la categoría Tanque reducen el daño que recibe el jefe. Los efectos
+/// que afectan a los Pokémon de los jugadores los siguen aplicando ellos.
 const Map<String, ScriptAliado> scriptsAliado = {
   'cura-jefe-20': ScriptAliado(alFinTurnoJefe: _cura20),
   'cura-jefe-30': ScriptAliado(alFinTurnoJefe: _cura30),
   'cura-jefe-40': ScriptAliado(alFinTurnoJefe: _cura40),
   'cura-jefe-50': ScriptAliado(alFinTurnoJefe: _cura50),
+  'tanque-jefe-10': ScriptAliado(reduccionDano: 10),
+  'tanque-jefe-20': ScriptAliado(reduccionDano: 20),
+  'tanque-jefe-30': ScriptAliado(reduccionDano: 30),
+  'tanque-jefe-40': ScriptAliado(reduccionDano: 40),
 };
