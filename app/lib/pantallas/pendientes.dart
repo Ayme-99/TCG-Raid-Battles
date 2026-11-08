@@ -177,7 +177,12 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
       return;
     }
     final slots = e.slotsLibres;
-    final categorias = e.categoriasLibres;
+    // Si el jefe viene del catálogo, el dado solo tiene las caras de los
+    // aliados que su carta define (D-16: hasta que tenga los 6).
+    final categorias = [
+      for (final c in e.categoriasLibres)
+        if (inv == null || inv.aliados.containsKey(c)) c,
+    ];
     if (slots.isEmpty || categorias.isEmpty) return;
     final slot = slots[widget.azar.nextInt(slots.length)];
     final categoria = categorias[widget.azar.nextInt(categorias.length)];
@@ -187,7 +192,7 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
       _rellenar(categoria);
       _tirada = 'Dado de slot (${_dado(e.jugadores.length)}): '
           '${e.jugadores[slot].nombre} · '
-          'dado de categoría (d${CategoriaAliado.values.length}): '
+          'dado de categoría (d${inv?.aliados.length ?? CategoriaAliado.values.length}): '
           '${etiquetaCategoria(categoria)}';
     });
   }

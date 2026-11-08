@@ -130,13 +130,13 @@
           ]
         },
         "aliados": {
-          "description": "Un aliado por categoría (D-13).",
+          "description": "Un aliado por categoría (D-13, D-16). Provisional: hasta que cada jefe tenga sus 6 aliados, potenciador y debilitador son opcionales.",
           "type": "object",
           "required": [
             "danio",
             "tanque",
             "cura",
-            "picaro"
+            "control"
           ],
           "additionalProperties": false,
           "properties": {
@@ -149,7 +149,13 @@
             "cura": {
               "$ref": "#/$defs/aliado"
             },
-            "picaro": {
+            "control": {
+              "$ref": "#/$defs/aliado"
+            },
+            "potenciador": {
+              "$ref": "#/$defs/aliado"
+            },
+            "debilitador": {
               "$ref": "#/$defs/aliado"
             }
           }

@@ -54,7 +54,7 @@
         "efectos": "programa",
         "scriptId": "cura-jefe-20"
       },
-      "picaro": {
+      "control": {
         "nombre": "Sableye",
         "hp": 60,
         "ataque": {

@@ -412,7 +412,7 @@ void main() {
     EstadoPartida dosIntentos() =>
         apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200));
 
-    test('al principio están libres las cuatro categorías', () {
+    test('al principio están libres las seis categorías', () {
       expect(conIntento().categoriasLibres, CategoriaAliado.values);
     });
 
@@ -421,7 +421,9 @@ void main() {
       expect(s.categoriasLibres, [
         CategoriaAliado.tanque,
         CategoriaAliado.cura,
-        CategoriaAliado.picaro,
+        CategoriaAliado.control,
+        CategoriaAliado.potenciador,
+        CategoriaAliado.debilitador,
       ]);
       expect(() => apply(s, rattata(2)), throwsA(isA<ReglaIncumplida>()));
       s = apply(s, wobbuffet(2));

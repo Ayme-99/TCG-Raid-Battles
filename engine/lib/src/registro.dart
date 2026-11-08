@@ -9,11 +9,11 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 5;
+const int versionRegistro = 6;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5};
+    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6};
 
 /// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
 /// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
@@ -95,6 +95,26 @@ Map<String, Object?> _v3AV4(Map<String, Object?> datos) {
 Map<String, Object?> _v4AV5(Map<String, Object?> datos) {
   final resultado = Map<String, Object?>.of(datos);
   resultado['version'] = 5;
+  return resultado;
+}
+
+/// Versión 6 (D-16): aliados con 6 categorías. La categoría `picaro` pasa a
+/// llamarse `control` y se añaden `potenciador` y `debilitador`. Los aliados
+/// ya invocados en partidas guardadas conservan su efecto; solo cambia el
+/// nombre.
+Map<String, Object?> _v5AV6(Map<String, Object?> datos) {
+  final resultado = Map<String, Object?>.of(datos);
+  resultado['version'] = 6;
+  final eventos = datos['eventos'];
+  if (eventos is List) {
+    resultado['eventos'] = [
+      for (final e in eventos)
+        if (e is Map && e['categoria'] == 'picaro')
+          {...Map<String, Object?>.from(e), 'categoria': 'control'}
+        else
+          e,
+    ];
+  }
   return resultado;
 }
 

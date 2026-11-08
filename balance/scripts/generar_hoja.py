@@ -19,7 +19,7 @@ from openpyxl.utils import get_column_letter
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 SALIDA = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else RAIZ / 'balance' / 'hoja_balance.xlsx'
 FUENTE = 'Arial'
-CATEGORIAS = ['danio', 'tanque', 'cura', 'picaro']
+CATEGORIAS = ['danio', 'tanque', 'cura', 'control', 'potenciador', 'debilitador']
 
 indice = json.loads((RAIZ / 'catalog' / 'catalogo.json').read_text('utf-8'))
 jefes = [json.loads((RAIZ / 'catalog' / 'bosses' / f'{i}.json').read_text('utf-8')) for i in indice['jefes']]
@@ -160,6 +160,8 @@ for fila_jefe, j in enumerate(jefes, 2):
     if not inv:
         continue
     for cat in CATEGORIAS:
+        if cat not in inv['aliados']:  # provisional (D-16): aún sin potenciador/debilitador
+            continue
         a = inv['aliados'][cat]
         vals = [j['id'], cat, a['nombre'], a['hp'], None, a.get('ataque', {}).get('nombre'),
                 a.get('ataque', {}).get('dano'), a.get('efectos', 'jugador'), a.get('habilidad')]

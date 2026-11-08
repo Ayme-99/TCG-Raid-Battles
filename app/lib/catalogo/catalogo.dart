@@ -81,6 +81,12 @@ class AtaqueJefeCatalogo {
   }
 }
 
+/// Categorías de aliado que un jefe del catálogo puede no tener todavía.
+const _categoriasOpcionales = {
+  CategoriaAliado.potenciador,
+  CategoriaAliado.debilitador,
+};
+
 class AliadoCatalogo {
   final CategoriaAliado categoria;
   final String nombre;
@@ -185,6 +191,9 @@ class JefeCatalogo {
     for (final categoria in CategoriaAliado.values) {
       final a = aliados[categoria.name];
       if (a == null) {
+        // Provisional (D-16): hasta que cada jefe tenga sus 6 aliados, el
+        // potenciador y el debilitador pueden faltar.
+        if (_categoriasOpcionales.contains(categoria)) continue;
         throw FormatException('$id: falta el aliado de ${categoria.name}');
       }
       final am = _mapa(a, '$id ${categoria.name}');

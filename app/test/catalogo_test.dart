@@ -56,10 +56,16 @@ void main() {
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
         expect(j.invocacion!.segura, isTrue);
-        expect(j.invocacion!.aliados.keys, CategoriaAliado.values);
+        // Provisional (D-16): aún sin potenciador ni debilitador.
+        expect(j.invocacion!.aliados.keys, [
+          CategoriaAliado.danio,
+          CategoriaAliado.tanque,
+          CategoriaAliado.cura,
+          CategoriaAliado.control,
+        ]);
       }
       expect(c.delNivel(3).single.nombre, 'Kingdra');
-      expect(c.delNivel(2).single.invocacion!.aliados[CategoriaAliado.picaro]!.nombre,
+      expect(c.delNivel(2).single.invocacion!.aliados[CategoriaAliado.control]!.nombre,
           'Plusle');
     });
 

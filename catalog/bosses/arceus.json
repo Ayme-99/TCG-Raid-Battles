@@ -59,7 +59,7 @@
         "efectos": "programa",
         "scriptId": "cura-jefe-50"
       },
-      "picaro": {
+      "control": {
         "nombre": "Mismagius",
         "hp": 150,
         "ataque": {

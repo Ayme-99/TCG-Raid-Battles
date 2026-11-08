@@ -42,7 +42,7 @@
         "habilidad": "Cura al jefe al final de su turno",
         "efectos": "programa"
       },
-      "picaro": {
+      "control": {
         "nombre": "Scyther",
         "hp": 70,
         "ataque": {

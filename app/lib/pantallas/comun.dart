@@ -20,8 +20,10 @@ bool registrar(BuildContext context, WidgetRef ref, Evento evento) {
 String etiquetaCategoria(CategoriaAliado c) => switch (c) {
       CategoriaAliado.danio => 'Daño',
       CategoriaAliado.tanque => 'Tanque',
-      CategoriaAliado.cura => 'Cura',
-      CategoriaAliado.picaro => 'Pícaro',
+      CategoriaAliado.cura => 'Curandero',
+      CategoriaAliado.control => 'Control',
+      CategoriaAliado.potenciador => 'Potenciador',
+      CategoriaAliado.debilitador => 'Debilitador',
     };
 
 /// Muestra un aviso breve en la parte inferior.

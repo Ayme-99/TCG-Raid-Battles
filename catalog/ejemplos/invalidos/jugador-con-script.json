@@ -44,7 +44,7 @@
         "efectos": "programa",
         "scriptId": "cura-al-final-del-turno"
       },
-      "picaro": {
+      "control": {
         "nombre": "Scyther",
         "hp": 70,
         "ataque": {
