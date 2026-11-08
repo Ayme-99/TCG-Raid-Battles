@@ -29,6 +29,31 @@ void main() {
     return apply(s, const AtaqueAliado(slot: 2, dano: 30));
   }
 
+  test('también si el KO se marca antes de registrar el ataque de entrada', () {
+    final s0 = configurar(const [100, 100, 100]);
+    var s = apply(
+      s0,
+      ElegirJefe(nombre: 'Jefe', nivel: s0.nivel, hp: 3000, invocacionCadaHp: 600),
+    );
+    s = apply(s, const TurnoJugador(jugador: 0, dano: 600));
+    s = apply(
+      s,
+      const AliadoInvocado(
+        slot: 2,
+        categoria: CategoriaAliado.danio,
+        nombre: 'Plusle',
+        hp: 80,
+        ataqueNombre: 'Chispazo',
+        ataqueDano: 30,
+      ),
+    );
+    s = apply(s, const PokemonKo(1));
+    expect(s.jugadorActual, 2);
+    expect(s.orden, [0, 2]);
+    s = apply(s, const AtaqueAliado(slot: 2, dano: 30));
+    expect(s.jugadorActual, 2);
+  });
+
   test('el jugador al que le tocaba pierde su turno y pasa al siguiente', () {
     var s = trasAtaqueDeEntrada();
     expect(s.jugadorActual, 1);
