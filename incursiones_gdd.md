@@ -34,7 +34,7 @@ Orden (detalle en `docs/D-01-setup.md`):
 | Qué número cuenta (`docs/D-02-dano-maximo.md`) | Cada jugador lo introduce a mano y todos lo ven y lo comprueban con la carta física. La mesa acuerda el número caso a caso, **sin tope** (hay cartas de más de 200 de daño). Daño fijo: el impreso. Daño por Energía: solo el base impreso. Los modificadores de la partida no cuentan. |
 | **Nivel** | `X ≤ 400` → Nv1 · `400 < X ≤ 600` → Nv2 · `600 < X ≤ 800` → Nv3 · `X > 800` → Nv4. El valor límite pertenece al nivel de abajo (media máxima por jugador con 4: 100 / 150 / 200 en Nv1-3). Un X menor de 250 se juega como Nv1 (no hay nivel inferior). |
 | **Jefe** | Elegido a mano o al azar dentro del nivel. Es una **carta fija** del catálogo: tiene su propio HP y sus propios ataques; no se escala con los jugadores. El asistente conoce el HP y el daño de cada ataque y computa solo los efectos «de programa» (D-14: autodaño, daño por ataques previos del turno, daño a los aliados); el resto lo aplican los jugadores en la mesa. **Criterio de nivel**: Nv1 Pokémon Básicos, Nv2 Pokémon de Fase 1 que no evolucionan más, Nv3 Pokémon de Fase 2, Nv4 Pokémon Míticos y Legendarios. Lanzamiento: 7 jefes (2 en Nv1, 2 en Nv2, 2 en Nv3, 1 en Nv4), todos disponibles desde el principio. |
-| **HP del jefe** | El de su carta. Referencia por nivel (calibrada con 16 cartas reales para un objetivo de victoria de 75 / 50 / 30 / 15 %): **2382 / 4313 / 4411 / 5205** en Nv1 / Nv2 / Nv3 / Nv4. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
+| **HP del jefe** | El de su carta. HP de los jefes del catálogo, calibrados con el simulador (con sus 6 aliados, D-16) para un objetivo de victoria de 75 / 50 / 30 / 15 %: **Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800** en Nv1 / Nv2 / Nv3 / Nv4. La referencia anterior sin aliados (2382 / 4313 / 4411 / 5205) sigue en `balance/tablas/niveles.csv`. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
 | Ataques del jefe por nivel | Nv1 30/60/120 · Nv2 40/80/160 · Nv3 60/100/200 · Nv4 80/120/240. Los ataques salen de la baraja de ataques del jefe («Ataque X contra jugador Y», como el juego oficial), que también fija el máximo de ataques por turno. |
 | Menos de 4 jugadores | No se añaden parejas extra. El nivel se autoajusta con X, y los slots de aliados bajan con el número de jugadores (§4.4). |
 
@@ -200,7 +200,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 
 | Valor | Estado |
 |---|---|
-| HP del jefe por nivel (2382 / 4313 / 4411 / 5205) | Calibrado con el simulador y 16 cartas reales; falta contrastar con playtests. Saltos entre niveles grandes (Nv1→Nv2) y casi nulos (Nv2≈Nv3): probar otras bandas de X |
+| HP del jefe (2300 / 2600 / 3700 / 3800) | Calibrado con el simulador y 16 cartas reales (con aliados); falta contrastar con playtests. Kingdra y Arceus casi iguales en HP (los separa la amenaza); el 15 % de Arceus parece poco |
 | Tope de 200 por ataque para X | Provisional |
 | Cartas de ánimo: una por KO y máximo 3 cartas distintas por partida | Adoptado del juego oficial, sin confirmar |
 | Efectos de las cartas de ánimo (curas, +50) | No están en el simulador: la partida real será algo más fácil que lo calibrado |
