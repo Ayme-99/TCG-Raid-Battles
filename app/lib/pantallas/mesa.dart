@@ -93,9 +93,9 @@ class Camara {
   /// Cámara que enfoca [foco] con [jugadores] asientos en la fila de abajo.
   factory Camara.de(FocoCamara foco, int jugadores) => switch (foco) {
         FocoGeneral() => const Camara(0, 0, 1),
-        FocoJefe() => Camara(0, 2 * (alturaJefe / 2) - 1, 1.15),
+        FocoJefe() => const Camara(0, 2 * (alturaJefe / 2) - 1, 1.15),
         FocoAliados() =>
-          Camara(0, 2 * (alturaJefe + alturaAliados / 2) - 1, 1.45),
+          const Camara(0, 2 * (alturaJefe + alturaAliados / 2) - 1, 1.45),
         FocoJugador(:final indice) => Camara(
             jugadores <= 1 ? 0 : 2 * (indice + 0.5) / jugadores - 1,
             2 * (alturaJefe + alturaAliados + alturaJugadores / 2) - 1,
@@ -121,7 +121,7 @@ class Camara {
 }
 
 class _CamaraTween extends Tween<Camara> {
-  _CamaraTween({super.begin, super.end});
+  _CamaraTween({super.end});
 
   @override
   Camara lerp(double t) => Camara.lerp(begin!, end!, t);
