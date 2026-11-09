@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
+import 'estilo.dart';
+import 'mapa.dart';
 import 'paneles.dart';
 import 'tarjeta_jefe.dart';
 
@@ -219,18 +221,7 @@ class _Mesa extends StatelessWidget {
             key: const Key('mesa-fondo'),
             behavior: HitTestBehavior.opaque,
             onTap: () => onFoco(const FocoGeneral()),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  colors: [
-                    Color.lerp(tema.colorScheme.primary, Colors.green, 0.5)!
-                        .withValues(alpha: 0.35),
-                    tema.colorScheme.surfaceContainerHighest,
-                  ],
-                  radius: 0.8,
-                ),
-              ),
-            ),
+            child: const CustomPaint(painter: MapaPainter()),
           ),
         ),
         Column(
@@ -301,7 +292,6 @@ class _FilaJugadores extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tema = Theme.of(context);
     final activo =
         estado.fase == Fase.turnoJugadores ? estado.jugadorActual : null;
     return Row(
@@ -314,20 +304,10 @@ class _FilaJugadores extends StatelessWidget {
               onTap: () => onFoco(FocoJugador(i)),
               child: Padding(
                 padding: const EdgeInsets.all(6),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: activo == i
-                        ? tema.colorScheme.primaryContainer
-                        : tema.colorScheme.surface.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: activo == i
-                          ? tema.colorScheme.primary
-                          : tema.colorScheme.outlineVariant,
-                      width: activo == i ? 3 : 1,
-                    ),
-                  ),
-                  child: _Asiento(jugador: estado.jugadores[i]),
+                child: _Asiento(
+                  jugador: estado.jugadores[i],
+                  color: coloresAsiento[i % coloresAsiento.length],
+                  activo: activo == i,
                 ),
               ),
             ),
@@ -337,53 +317,92 @@ class _FilaJugadores extends StatelessWidget {
   }
 }
 
+/// Insignia de un jugador: avatar con su color, nombre y Pokémon vivos. El
+/// jugador activo brilla y sube un poco.
 class _Asiento extends StatelessWidget {
-  const _Asiento({required this.jugador});
+  const _Asiento({
+    required this.jugador,
+    required this.color,
+    required this.activo,
+  });
 
   final JugadorEstado jugador;
+  final Color color;
+  final bool activo;
 
   @override
   Widget build(BuildContext context) {
-    final tema = Theme.of(context);
+    final eliminado = jugador.eliminado;
+    final base = eliminado ? Colors.grey : color;
     final inicial = jugador.nombre.trim().isEmpty
         ? '?'
         : jugador.nombre.trim().substring(0, 1).toUpperCase();
-    return Padding(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      transform: Matrix4.translationValues(0, activo ? -6 : 0, 0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color.lerp(base, Colors.white, 0.35)!, base],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white, width: activo ? 4 : 2),
+        boxShadow: [
+          BoxShadow(
+            color: activo ? Colors.white.withValues(alpha: 0.9) : Colors.black45,
+            blurRadius: activo ? 18 : 6,
+            offset: activo ? Offset.zero : const Offset(0, 4),
+          ),
+        ],
+      ),
       padding: const EdgeInsets.all(6),
       child: FittedBox(
-        child: Column(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             CircleAvatar(
               radius: 22,
-              backgroundColor: jugador.eliminado
-                  ? tema.colorScheme.outlineVariant
-                  : tema.colorScheme.primary,
+              backgroundColor: Colors.white,
               child: Text(
                 inicial,
                 style: TextStyle(
-                  color: tema.colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
+                  color: base,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
             ),
-            const SizedBox(height: 4),
-            Text(jugador.nombre, style: tema.textTheme.titleSmall),
-            const SizedBox(height: 2),
-            Row(
+            const SizedBox(width: 8),
+            Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (var p = 0; p < pokemonPorJugador; p++)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: Icon(
-                      Icons.circle,
-                      size: 12,
-                      color: p < max(0, jugador.pokemonVivos)
-                          ? Colors.redAccent
-                          : tema.colorScheme.outlineVariant,
-                    ),
+                Text(
+                  jugador.nombre,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                    shadows: [Shadow(color: Colors.black54, blurRadius: 3)],
                   ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (var p = 0; p < pokemonPorJugador; p++)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 3, top: 2),
+                        child: Icon(
+                          Icons.catching_pokemon,
+                          size: 16,
+                          color: p < max(0, jugador.pokemonVivos)
+                              ? Colors.white
+                              : Colors.black38,
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ],
