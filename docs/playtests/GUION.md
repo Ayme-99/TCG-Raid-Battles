@@ -64,7 +64,7 @@ Si el mazo sugerido da una partida claramente demasiado fácil o difícil, no lo
 - Cartas de ánimo: una por KO, máximo 3 distintas. ¿Hacen la partida más fácil de lo calibrado? ¿Alguna carta resulta rota?
 - Veneno y quemadura del jefe (D-12): ¿importan o son ruido?
 - Aliados (sesión 2 en adelante): umbral, moneda y dado de slot, y vida y daño de cada aliado.
-- Bloqueo por aliado: ¿frustra o añade decisiones?
+- Aliados sin bloqueo de slot: ¿se ignora al aliado para dañar al jefe o se le ataca primero?
 
 **Sensación de mesa (anótala con tus palabras):**
 - ¿Hay turnos muertos? ¿Alguien deja de decidir?

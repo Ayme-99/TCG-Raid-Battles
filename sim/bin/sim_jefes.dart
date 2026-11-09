@@ -12,8 +12,10 @@
 //     final del turno del jefe. Daño al Pokémon Activo del dueño de su slot
 //     (si está eliminado, a un jugador activo al azar). El Control (antes Pícaro) ataca a la
 //     Banca.
-//   - Bloqueo: un jugador con un aliado vivo en su slot debe debilitarlo antes
-//     de dañar al jefe. El exceso de daño al aliado se pierde.
+//   - Sin bloqueo de slot: el jugador puede ignorar al aliado de su slot y
+//     atacar al jefe (política «solo-jefe»); en «solo-dueno» y «ayuda» ataca
+//     siempre a su aliado. El exceso de daño al aliado se pierde. Un aliado
+//     con Bloqueo (Bronzong) obliga a todos a atacarle y recibe 100 menos.
 //   - Ayuda (opcional): un jugador libre ataca al aliado de un compañero en
 //     vez de al jefe, con la probabilidad --ayuda (0 = solo el dueño).
 //
@@ -138,6 +140,19 @@ class AliadoDef {
 
   /// Daño al Pokémon activo de cada jugador en el chequeo Pokémon.
   int get danoChequeo => habilidadNombre == 'Tormenta de arena' ? 10 : 0;
+
+  /// Los jugadores solo pueden atacar a este aliado (Bloqueo) y este recibe
+  /// N de daño menos de cada ataque.
+  int get bloqueo => _numero('bloqueo-');
+
+  /// Cada uso del ataque, +10 de daño y +10 HP (Envite Ígneo).
+  bool get envite => scriptId == 'envite-igneo-10';
+
+  /// Al entrar: monedas de curación de 100 para el jefe y los aliados (Deseo).
+  bool get deseo => scriptId == 'deseo-100';
+
+  /// Moneda del rival: con cruz, −30 a sus ataques su siguiente turno.
+  bool get fuerzaLunar => scriptId == 'fuerza-lunar-30';
 
   /// Los jugadores no pueden cambiar de Pokémon (Constricción).
   bool get constriccion => habilidadNombre == 'Constricción';
@@ -275,10 +290,16 @@ Ataque? elegirSin(Jug j, Poke p, Ataque? prohibido) {
 }
 
 class Aliado {
-  Aliado(this.categoria, this.def) : hp = def.hp;
+  Aliado(this.categoria, this.def)
+      : hp = def.hp,
+        hpMax = def.hp;
   final String categoria;
   final AliadoDef def;
   int hp;
+  int hpMax;
+
+  /// Veces que ha usado su ataque (Envite Ígneo escala con ellas).
+  int usos = 0;
   bool get vivo => hp > 0;
   bool get ataca => def.dano != null;
   bool get atacaBanca => categoria == 'control';
@@ -310,8 +331,9 @@ Resultado jugarJefe(
   Nivel nv,
   Config c,
   Random rnd,
-  double ayuda,
-) {
+  double ayuda, [
+  double propio = 1.0,
+]) {
   final js = [for (final p in equipo) Jug(p)];
   final slots = List<Aliado?>.filled(js.length, null);
   var hp = jefe.hp;
@@ -323,6 +345,8 @@ Resultado jugarJefe(
   // Jugador que está actuando y los que han perdido su turno esta ronda.
   var actual = -1;
   final perdidos = <int>{};
+  // Reducción pendiente por jugador (Fuerza Lunar).
+  final debilitados = <int, int>{};
   // Último ataque de cada jugador (para «Rencor»).
   final ultimo = <int, Ataque?>{};
 
@@ -362,6 +386,12 @@ Resultado jugarJefe(
       objetivo = activos[rnd.nextInt(activos.length)];
     }
     var dano = a.def.dano!;
+    if (a.def.envite) {
+      dano += 10 * a.usos;
+      a.usos++;
+      a.hpMax += 10;
+      a.hp += 10;
+    }
     final m = a.def.monedas;
     if (m != null) {
       var caras = 0;
@@ -379,6 +409,8 @@ Resultado jugarJefe(
       if (caras >= bm.$2) dano += bm.$3;
     }
     golpear(js[objetivo], dano, banca: a.atacaBanca);
+    // Fuerza Lunar: el rival tira una moneda; con cruz, −30 a su próximo ataque.
+    if (a.def.fuerzaLunar && !rnd.nextBool()) debilitados[objetivo] = 30;
     // Daño a los jugadores adyacentes (circular, sin eliminados).
     final adj = a.def.danoAdyacentes;
     if (adj != null) {
@@ -402,7 +434,7 @@ Resultado jugarJefe(
     if (vida > 0) {
       hp = min(jefe.hp, hp + vida);
       for (final x in slots) {
-        if (x != null && x.vivo) x.hp = min(x.def.hp, x.hp + vida);
+        if (x != null && x.vivo) x.hp = min(x.hpMax, x.hp + vida);
       }
     }
   }
@@ -433,6 +465,25 @@ Resultado jugarJefe(
     final vivosAntes = [for (final j in js) j.pokes[0].vivo];
     atacarAliado(slot, a); // ataque de entrada
     drenar(a);
+    if (a.def.deseo) {
+      // Deseo: el jefe lanza 10 monedas (100 HP por cara), cada aliado una y
+      // cada Pokémon de los jugadores una (los de la mesa).
+      var caras = 0;
+      for (var i = 0; i < 10; i++) {
+        if (rnd.nextBool()) caras++;
+      }
+      hp = min(jefe.hp, hp + 100 * caras);
+      for (final x in slots) {
+        if (x != null && x.vivo && rnd.nextBool()) {
+          x.hp = min(x.hpMax, x.hp + 100);
+        }
+      }
+      for (final j in js) {
+        for (final p in j.pokes) {
+          if (p.vivo && rnd.nextBool()) p.hp = min(p.carta.hp, p.hp + 100);
+        }
+      }
+    }
     for (var k = actual + 1; k < js.length; k++) {
       if (vivosAntes[k] && !js[k].pokes[0].vivo && !js[k].eliminado) {
         perdidos.add(k);
@@ -497,33 +548,45 @@ Resultado jugarJefe(
         continue;
       }
 
-      // A quién ataca: a su aliado si lo tiene delante; si no, quizá ayuda
-      // a un compañero bloqueado; si no, al jefe.
+      // A quién ataca: si hay un aliado con Bloqueo, a él; si no, a su propio
+      // aliado con probabilidad [propio] (el bloqueo de slot ya no existe: el
+      // jugador puede ignorarlo y atacar al jefe); si no tiene aliado, quizá
+      // ayuda a un compañero; si no, al jefe.
       int? objetivoAliado;
-      final propio = slots[i];
-      if (propio != null) {
-        objetivoAliado = i;
+      final propioAliado = slots[i];
+      final bloqueador = slots.indexWhere((x) => x != null && x.def.bloqueo > 0);
+      if (bloqueador != -1) {
+        objetivoAliado = bloqueador;
+      } else if (propioAliado != null) {
+        if (propio >= 1 || (propio > 0 && rnd.nextDouble() < propio)) {
+          objetivoAliado = i;
+        }
       } else if (ayuda > 0 && rnd.nextDouble() < ayuda) {
-        final bloqueantes = [
+        final otros = [
           for (var k = 0; k < js.length; k++)
             if (k != i && slots[k] != null && !js[k].eliminado) k,
         ];
-        if (bloqueantes.isNotEmpty) {
-          objetivoAliado = bloqueantes[rnd.nextInt(bloqueantes.length)];
+        if (otros.isNotEmpty) {
+          objetivoAliado = otros[rnd.nextInt(otros.length)];
         }
       }
+      // Debilitación pendiente (Fuerza Lunar): −N a este ataque.
+      final debil = debilitados.remove(i) ?? 0;
 
       if (objetivoAliado != null) {
         final a = slots[objetivoAliado]!;
         // Bote: con cara en la moneda se evita el daño.
         final evita = a.def.evitaConMoneda && rnd.nextBool();
         if (!evita) {
-          a.hp -= max(0, ch.dano - reduccionTanques()); // el exceso se pierde
+          a.hp -= max(
+            0,
+            ch.dano - reduccionTanques() - a.def.bloqueo - debil,
+          ); // el exceso se pierde
         }
         if (!a.vivo) slots[objetivoAliado] = null;
       } else {
         // Los aliados Tanque vivos restan una cantidad fija a cada ataque.
-        final dano = max(0, ch.dano - reduccionTanques());
+        final dano = max(0, ch.dano - reduccionTanques() - debil);
         if (bajarJefe(dano)) return Resultado(t, invocados);
       }
       if (ch.cd) act.cd = 2;
@@ -626,8 +689,9 @@ MedidaJefe medirJefe(
   Nivel nv,
   Config c,
   int semilla,
-  double ayuda,
-) {
+  double ayuda, [
+  double propio = 1.0,
+]) {
   final rnd = Random(semilla);
   var tasas = 0.0;
   var turnos = 0;
@@ -637,7 +701,7 @@ MedidaJefe medirJefe(
   for (final e in equipos) {
     var w = 0;
     for (var i = 0; i < c.partidas; i++) {
-      final r = jugarJefe(e, jefe, nv, c, rnd, ayuda);
+      final r = jugarJefe(e, jefe, nv, c, rnd, ayuda, propio);
       invocados += r.invocados;
       partidas++;
       if (r.turnoVictoria > 0) {
@@ -716,7 +780,12 @@ void main(List<String> args) {
   final filas = <String>[
     'jefe,nivel,hp,politica,equipos,partidas_por_equipo,victoria,objetivo,turnos_victoria,aliados_invocados',
   ];
-  final politicas = {'solo-dueno': 0.0, 'ayuda': ayuda};
+  // (ayuda, propio): propio = probabilidad de atacar al aliado de su slot.
+  final politicas = {
+    'solo-dueno': (0.0, 1.0),
+    'ayuda': (ayuda, 1.0),
+    'solo-jefe': (0.0, 0.0),
+  };
   for (final jefe in jefes) {
     final nv = niveles.firstWhere((n) => n.nivel == jefe.nivel);
     final eqs = porNivel[jefe.nivel]!;
@@ -726,7 +795,7 @@ void main(List<String> args) {
     }
     final medido = c.calibrar ? jefe.conHp(calibrarJefe(eqs, jefe, nv, c)) : jefe;
     for (final e in politicas.entries) {
-      final m = medirJefe(eqs, medido, nv, c, c.semilla, e.value);
+      final m = medirJefe(eqs, medido, nv, c, c.semilla, e.value.$1, e.value.$2);
       stdout.writeln('${jefe.id.padRight(11)} ${jefe.nivel}      '
           '${medido.hp.toString().padRight(6)} ${e.key.padRight(12)}  '
           '${(100 * m.victoria).toStringAsFixed(1).padLeft(5)} %    '

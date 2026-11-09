@@ -9,11 +9,11 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 6;
+const int versionRegistro = 7;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6};
+    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6, 6: _v6AV7};
 
 /// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
 /// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
@@ -118,6 +118,13 @@ Map<String, Object?> _v5AV6(Map<String, Object?> datos) {
   return resultado;
 }
 
+/// Versión 7 (D-16, Arceus): `aliadoInvocado` puede llevar `monedas` (las
+/// que lanza la app al entrar el aliado, como Deseo) y `ataqueAliado` puede
+/// llevar `moneda` (la del jugador rival, como Fuerza Lunar). Son campos
+/// opcionales: las partidas guardadas se leen igual y solo cambia la versión.
+Map<String, Object?> _v6AV7(Map<String, Object?> datos) =>
+    {...datos, 'version': 7};
+
 // ---------------------------------------------------------------------------
 // Eventos <-> JSON
 // ---------------------------------------------------------------------------
@@ -189,12 +196,14 @@ Map<String, Object?> eventoAJson(Evento evento) {
         if (ev.habilidad != null) 'habilidad': ev.habilidad,
         if (ev.efectos != EfectosAliado.jugador) 'efectos': ev.efectos.name,
         if (ev.scriptId != null) 'scriptId': ev.scriptId,
+        if (ev.monedas != null) 'monedas': ev.monedas,
       },
     AtaqueAliado ev => {
         'tipo': 'ataqueAliado',
         'slot': ev.slot,
         'dano': ev.dano,
         if (ev.objetivo != null) 'objetivo': ev.objetivo,
+        if (ev.moneda != null) 'moneda': ev.moneda,
       },
   };
 }
@@ -286,7 +295,12 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
         'habilidad',
         'efectos',
         'scriptId',
+        'monedas',
       });
+      final monedas = c.listaOpt('monedas');
+      if (monedas != null && monedas.any((m) => m is! bool)) {
+        c.falla('«monedas» debe ser una lista de verdadero o falso');
+      }
       return AliadoInvocado(
         slot: c.entero('slot', min: 0, max: 3),
         categoria: c.enumerado('categoria', CategoriaAliado.values),
@@ -299,13 +313,15 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
             ? EfectosAliado.jugador
             : c.enumerado('efectos', EfectosAliado.values),
         scriptId: c.textoOpt('scriptId'),
+        monedas: monedas?.cast<bool>(),
       );
     case 'ataqueAliado':
-      c.permitir({'tipo', 'slot', 'dano', 'objetivo'});
+      c.permitir({'tipo', 'slot', 'dano', 'objetivo', 'moneda'});
       return AtaqueAliado(
         slot: c.entero('slot', min: 0, max: 3),
         dano: c.entero('dano', min: 0),
         objetivo: c.enteroOpt('objetivo', min: 0, max: 3),
+        moneda: c.booleanoOpt('moneda'),
       );
     default:
       return c.falla('tipo de evento desconocido «$tipo»');

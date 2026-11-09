@@ -49,10 +49,26 @@ class PanelPendientes extends ConsumerWidget {
                         ),
                       );
                       if (evento == null || !context.mounted) return;
+                      final previos = estado.aliados.length;
                       if (registrar(context, ref, evento) &&
                           evento is SinInvocacion) {
                         registrarAviso(
                             context, 'Salió cruz: no se invoca ningún aliado.');
+                      }
+                      if (evento is AliadoInvocado &&
+                          evento.monedas != null &&
+                          context.mounted) {
+                        final m = evento.monedas!;
+                        final jefe = m.take(10).where((c) => c).length;
+                        final aliados =
+                            m.skip(10).where((c) => c).length;
+                        registrarAviso(
+                          context,
+                          'Deseo: $jefe de 10 monedas en cara → el jefe se cura '
+                          '${100 * jefe}. $aliados de ${m.length - 10} aliados '
+                          'se curan 100. Cada jugador lanza una moneda por '
+                          'cada uno de sus Pokémon: con cara, cura 100.',
+                        );
                       }
                     },
                     child: const Text('Invocar aliado'),
@@ -134,13 +150,52 @@ Future<void> atacarConAliado(
     conBonus = carasBonus >= (carta!.ataqueBonusCaras ?? 1);
     if (conBonus) dano += carta.ataqueBonusDano ?? 0;
   }
+  final esDeCarta = carta != null && carta.nombre == aliado.nombre;
+  // Daño que crece con cada uso (Envite Ígneo): 10 + 10 × usos.
+  final escala = esDeCarta ? carta.ataqueEscalaPorUso : null;
+  if (escala != null) dano += escala * aliado.usos;
+  // Daño extra si el defensor ya tenía un estado (Puño Dinámico): lo dicen
+  // los jugadores.
+  final extraEstado = esDeCarta ? carta.ataqueDanoExtraSiEstado : null;
+  if (extraEstado != null) {
+    final conEstado = await _preguntar(
+      context,
+      '${aliado.ataqueNombre}: ¿el Pokémon Defensor ya tenía un estado '
+      'especial?',
+    );
+    if (conEstado == null || !context.mounted) return;
+    if (conEstado) dano += extraEstado;
+  }
+  // Moneda del rival (Fuerza Lunar): la lanza el jugador y la app la anota.
+  bool? monedaRival;
+  if (esDeCarta && carta.ataqueMonedaRival) {
+    monedaRival = await _preguntar(
+      context,
+      '${aliado.ataqueNombre}: ${estado.jugadores[objetivo ?? aliado.slot].nombre} '
+      'lanza una moneda. ¿Sale cara?',
+      si: 'Cara',
+      no: 'Cruz',
+    );
+    if (monedaRival == null || !context.mounted) return;
+  }
   final aplicado = registrar(
     context,
     ref,
-    AtaqueAliado(slot: aliado.slot, dano: dano, objetivo: objetivo),
+    AtaqueAliado(
+      slot: aliado.slot,
+      dano: dano,
+      objetivo: objetivo,
+      moneda: monedaRival,
+    ),
   );
   if (!aplicado || !context.mounted) return;
   final avisos = [
+    if (escala != null)
+      '${aliado.ataqueNombre}: ${aliado.usos} uso(s) previos → $dano de daño.',
+    if (monedaRival == false)
+      '${aliado.ataqueNombre}: cruz. El siguiente ataque de '
+          '${estado.jugadores[objetivo ?? aliado.slot].nombre} hace '
+          '30 puntos de daño menos.',
     if (monedas != null)
       '${aliado.ataqueNombre}: $caras de $monedas monedas en cara → '
           '$dano de daño.',
@@ -158,6 +213,32 @@ Future<void> atacarConAliado(
   ];
   if (avisos.isNotEmpty) registrarAviso(context, avisos.join('\n'));
 }
+
+/// Pregunta sí/no a la mesa. null: se cerró el diálogo sin responder.
+Future<bool?> _preguntar(
+  BuildContext context,
+  String pregunta, {
+  String si = 'Sí',
+  String no = 'No',
+}) =>
+    showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        content: Text(pregunta),
+        actions: [
+          TextButton(
+            key: const Key('pregunta-no'),
+            onPressed: () => Navigator.of(c).pop(false),
+            child: Text(no),
+          ),
+          FilledButton(
+            key: const Key('pregunta-si'),
+            onPressed: () => Navigator.of(c).pop(true),
+            child: Text(si),
+          ),
+        ],
+      ),
+    );
 
 /// Asientos adyacentes a [objetivo] en la mesa (circular), sin contar a los
 /// jugadores eliminados ni al propio objetivo.
@@ -288,6 +369,14 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
     super.dispose();
   }
 
+  /// Deseo (Chingling): 10 monedas del jefe y una por aliado en juego (en
+  /// orden) más la del propio aliado que entra. null si no es Deseo.
+  List<bool>? _monedasDeDeseo() {
+    if (_scriptId != 'deseo-100') return null;
+    final n = 10 + widget.estado.aliados.length + 1;
+    return [for (var i = 0; i < n; i++) widget.azar.nextBool()];
+  }
+
   String? _opcional(TextEditingController c) =>
       c.text.trim().isEmpty ? null : c.text.trim();
 
@@ -400,6 +489,7 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
               habilidad: _opcional(_habilidad),
               efectos: _efectos,
               scriptId: _scriptId,
+              monedas: _monedasDeDeseo(),
             ),
           ),
           child: const Text('Aceptar'),

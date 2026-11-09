@@ -104,12 +104,16 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
 
   Future<void> _atacarAliado() async {
     final estado = widget.estado;
-    final slot = await elegirJugador(
-      context,
-      estado,
-      titulo: '¿Qué aliado ataca? (slot de...)',
-      asientos: [for (final a in estado.aliados) a.slot],
-    );
+    // Bloqueo (Bronzong): solo se puede atacar a ese aliado.
+    final provocador = aliadoProvocador(estado);
+    final slot = provocador != null
+        ? provocador.slot
+        : await elegirJugador(
+            context,
+            estado,
+            titulo: '¿Qué aliado ataca? (slot de...)',
+            asientos: [for (final a in estado.aliados) a.slot],
+          );
     if (slot == null || !mounted) return;
     final dano = await pedirNumero(
       context,
@@ -164,7 +168,8 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
   Widget build(BuildContext context) {
     final estado = widget.estado;
     final nombre = estado.jugadores[widget.jugador].nombre;
-    final bloqueado = estado.estaBloqueado(widget.jugador);
+    final conAliado = estado.aliadoEn(widget.jugador) != null;
+    final provocador = aliadoProvocador(estado);
     return Card(
       color: Theme.of(context).colorScheme.primaryContainer,
       child: Padding(
@@ -177,12 +182,21 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
               key: const Key('turno-de'),
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            if (bloqueado)
+            if (provocador != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  '${provocador.nombre} obliga a atacarle: ataca a ese '
+                  'aliado o pasa el turno sin dañar al jefe.',
+                  key: const Key('aviso-bloqueo'),
+                ),
+              ),
+            if (conAliado)
               const Padding(
                 padding: EdgeInsets.only(top: 4),
                 child: Text(
-                  'Tiene un aliado en su slot: no puede dañar al jefe '
-                  'hasta debilitarlo.',
+                  'Tiene un aliado en su slot: puede atacarlo o ignorarlo y '
+                  'dañar al jefe (el aliado atacará igualmente).',
                 ),
               ),
             const SizedBox(height: 12),

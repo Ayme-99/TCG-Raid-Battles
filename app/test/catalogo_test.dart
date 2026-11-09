@@ -56,21 +56,32 @@ void main() {
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
         expect(j.invocacion!.segura, isTrue);
-        // Onix, Manectric y Kingdra ya tienen los 6 roles de D-16; los demás jefes,
-        // provisionalmente sin potenciador ni debilitador.
-        expect(
-          j.invocacion!.aliados.keys,
-          j.id == 'onix' || j.id == 'manectric' || j.id == 'kingdra'
-              ? CategoriaAliado.values
-              : [
-                  CategoriaAliado.danio,
-                  CategoriaAliado.tanque,
-                  CategoriaAliado.cura,
-                  CategoriaAliado.control,
-                ],
-        );
+        // Los 4 jefes tienen ya los 6 roles de D-16.
+        expect(j.invocacion!.aliados.keys, CategoriaAliado.values);
       }
       expect(c.jefes[0].mapa, 'Túnel Roca');
+      expect(c.jefes[3].mapa, 'Sala Origen');
+      final medicham = c.aliadoDe('Arceus', 4, CategoriaAliado.danio)!;
+      expect(medicham.ataqueDanoExtraSiEstado, 70);
+      expect(medicham.habilidadNombre, 'Energía Pura');
+      expect(
+        c.aliadoDe('Arceus', 4, CategoriaAliado.tanque)!.scriptId,
+        'bloqueo-100',
+      );
+      expect(
+        c.aliadoDe('Arceus', 4, CategoriaAliado.cura)!.scriptId,
+        'deseo-100',
+      );
+      expect(
+        c.aliadoDe('Arceus', 4, CategoriaAliado.control)!.habilidadNombre,
+        'Fijar Blanco',
+      );
+      final solrock = c.aliadoDe('Arceus', 4, CategoriaAliado.potenciador)!;
+      expect(solrock.ataqueEscalaPorUso, 10);
+      expect(solrock.scriptId, 'envite-igneo-10');
+      final lunatone = c.aliadoDe('Arceus', 4, CategoriaAliado.debilitador)!;
+      expect(lunatone.ataqueMonedaRival, isTrue);
+      expect(lunatone.scriptId, 'fuerza-lunar-30');
       final machop = c.aliadoDe('Onix', 1, CategoriaAliado.danio)!;
       expect(machop.nombre, 'Machop');
       expect(machop.ataqueMonedas, 2);

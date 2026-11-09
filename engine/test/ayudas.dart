@@ -134,7 +134,7 @@ List<Evento> partidaAleatoria(
       } else {
         aplica(TurnoJugador(
           jugador: j,
-          dano: s.estaBloqueado(j) ? 0 : azar.nextInt(120),
+          dano: azar.nextInt(120),
         ));
       }
       if (!s.terminada && azar.nextInt(5) == 0) estadoAlAzar();

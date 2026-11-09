@@ -251,6 +251,11 @@ final class AliadoInvocado extends Evento {
   final EfectosAliado efectos;
   final String? scriptId;
 
+  /// Monedas que lanza la app al entrar el aliado, en orden (true = cara),
+  /// para los scripts que las usan (Deseo): el motor es determinista y solo
+  /// reproduce el resultado registrado.
+  final List<bool>? monedas;
+
   const AliadoInvocado({
     required this.slot,
     required this.categoria,
@@ -261,6 +266,7 @@ final class AliadoInvocado extends Evento {
     this.habilidad,
     this.efectos = EfectosAliado.jugador,
     this.scriptId,
+    this.monedas,
   });
 }
 
@@ -272,5 +278,14 @@ final class AtaqueAliado extends Evento {
   final int dano;
   final int? objetivo;
 
-  const AtaqueAliado({required this.slot, required this.dano, this.objetivo});
+  /// Resultado de la moneda que lanza el jugador rival cuando el ataque la
+  /// lleva (Fuerza Lunar): true = cara, false = cruz.
+  final bool? moneda;
+
+  const AtaqueAliado({
+    required this.slot,
+    required this.dano,
+    this.objetivo,
+    this.moneda,
+  });
 }

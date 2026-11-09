@@ -54,8 +54,9 @@ INICIO
               - Juega su turno (ataques sin coste de energía)
               - Ataca al jefe, o a cualquier aliado (cualquier jugador
                 puede atacar a cualquier aliado)
-              - Un jugador con aliado vivo en su slot no puede dañar al
-                jefe hasta debilitarlo
+              - Un jugador con aliado vivo en su slot puede ignorarlo y
+                dañar al jefe (el aliado le ataca igualmente); solo el
+                Bloqueo de un aliado concreto obliga a atacarle
               - Introduce a mano el daño hecho al jefe; el asistente lo resta
               - Si el HP del jefe cruza un umbral de invocación (§4.4):
                 intento de invocación en ese mismo momento
@@ -115,14 +116,14 @@ Detalle en `docs/D-04-aliados.md`.
 
 - **Un slot por jugador** (hasta 4; con 3 jugadores, 3 slots; con 2, 2). Un aliado como máximo por slot, solo en slots de jugadores activos.
 - Un aliado tiene HP propio (independiente del jefe), a lo sumo un ataque y a veces una habilidad. Hay aliados sin ataque (solo habilidad) y las habilidades son **pasivas**: una vez en juego se mantienen mientras el aliado siga en el combate.
-- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y sus 4 aliados, uno por categoría: Daño, Tanque, Cura y Pícaro, D-13); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: si el jefe usa moneda, se tira y solo sigue si sale cara; si su invocación es **segura**, no hay moneda y el intento sigue siempre. Después, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay invocación) y un d4 elige la categoría (no se repite una categoría en uso). Entra el aliado de esa categoría de la ficha del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que empezará a bloquear.
+- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y sus 4 aliados, uno por categoría: Daño, Tanque, Cura y Pícaro, D-13); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: si el jefe usa moneda, se tira y solo sigue si sale cara; si su invocación es **segura**, no hay moneda y el intento sigue siempre. Después, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay invocación) y un d4 elige la categoría (no se repite una categoría en uso). Entra el aliado de esa categoría de la ficha del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que atacará.
 - **Pícaro**: categoría de control (estados alterados, modificar fuerza, contadores de daño). Sus aliados son los únicos que atacan a la Banca.
 - **Entrada**: al entrar, el aliado usa su ataque y/o su habilidad contra el dueño de su slot (salvo que su texto diga otra cosa) y no vuelve a atacar hasta el final del turno del jefe.
 - **Exceso de daño**: si un jugador hace a un aliado más daño del que le queda, el exceso se pierde (no pasa al jefe ni a otro aliado).
-- **Bloqueo**: mientras un jugador tiene un aliado vivo en su slot, debe debilitarlo antes de dañar al jefe. El resto puede seguir dañando al jefe.
+- **Sin bloqueo de slot**: el aliado está obligado a atacar al dueño de su slot, pero este no está obligado a atacarle: puede ignorarlo y dañar al jefe. Solo una habilidad de Bloqueo (Bronzong de Arceus) obliga a todos a atacar a ese aliado.
 - **Ayuda**: cualquier jugador activo puede atacar a cualquier aliado, opcionalmente y en lugar de atacar al jefe, para quitar los aliados que estorban a un compañero.
 - **Objetivo del aliado**: el dueño de su slot, siempre. Si ese jugador está eliminado, se tira entre los jugadores activos (moneda / dado de 3 / dado de 4); con un solo jugador activo, ataca a ese jugador.
-- Si el dueño de un slot queda eliminado, su aliado **sigue vivo y atacando**, pero ya no bloquea a nadie.
+- Si el dueño de un slot queda eliminado, su aliado **sigue vivo y atacando**.
 - Las **habilidades** de los aliados (reducir daño al jefe, aumentar el daño del jefe, forzar a la banca al atacante...) las aplica el **programa** o el **jugador** según indique la carta (D-13). Las del jugador se resuelven en la mesa y el asistente solo las registra.
 
 ### 4.5 Curación del jefe

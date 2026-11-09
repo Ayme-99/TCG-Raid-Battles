@@ -25,7 +25,7 @@ dart run bin/sim_cartas.dart --calibrar   # busca el HP que da 75/50/30/15 %
 
 ## Jefes del catálogo con aliados (T-28, primera parte)
 
-`bin/sim_jefes.dart` simula **cada jefe de `catalog/bosses/`** con su HP, sus ataques y su invocación de aliados (umbral, tirada, slot y categoría, ataque de entrada y de final de turno, bloqueo y exceso de daño perdido). Mide dos políticas de los jugadores: `solo-dueno` (solo el dueño del slot ataca a su aliado, la más dura) y `ayuda` (un jugador libre ataca al aliado de un compañero con probabilidad `--ayuda`, 0,5 por defecto, un supuesto sin datos de playtest). Escribe `balance/informes/jefes_aliados.csv`.
+`bin/sim_jefes.dart` simula **cada jefe de `catalog/bosses/`** con su HP, sus ataques y su invocación de aliados (umbral, tirada, slot y categoría, ataque de entrada y de final de turno, Bloqueo de Bronzong y exceso de daño perdido). Mide tres políticas de los jugadores: `solo-jefe` (todos ignoran a los aliados y dañan al jefe, salvo que Bronzong obligue; el aliado sigue atacando a su dueño), `solo-dueno` (el dueño del slot ataca siempre a su aliado, la más dura) y `ayuda` (un jugador libre ataca al aliado de un compañero con probabilidad `--ayuda`, 0,5 por defecto, un supuesto sin datos de playtest). Escribe `balance/informes/jefes_aliados.csv`.
 
 ```
 dart run bin/sim_jefes.dart

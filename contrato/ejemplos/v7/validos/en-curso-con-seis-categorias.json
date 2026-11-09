@@ -1,0 +1,87 @@
+{
+  "version": 7,
+  "partidaId": "ejemplo-seis-categorias",
+  "cuentas": [
+    "usuario-ana",
+    null
+  ],
+  "eventos": [
+    {
+      "tipo": "configurarJugadores",
+      "jugadores": [
+        {
+          "nombre": "Ana",
+          "ataqueMaximo": 100
+        },
+        {
+          "nombre": "Beto",
+          "ataqueMaximo": 100
+        }
+      ]
+    },
+    {
+      "tipo": "elegirJefe",
+      "jefeId": "ejemplo-nv1",
+      "nombre": "Jefe de ejemplo",
+      "nivel": 1,
+      "hp": 1000,
+      "invocacionCadaHp": 300
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 350
+    },
+    {
+      "tipo": "aliadoInvocado",
+      "slot": 1,
+      "categoria": "potenciador",
+      "nombre": "Ninetales",
+      "hp": 60,
+      "ataqueNombre": "Ascuas",
+      "ataqueDano": 20
+    },
+    {
+      "tipo": "ataqueAliado",
+      "slot": 1,
+      "dano": 20
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
+      "tipo": "ataqueJefe",
+      "ranura": 1,
+      "dano": 30,
+      "jugador": 0
+    },
+    {
+      "tipo": "ataqueAliado",
+      "slot": 1,
+      "dano": 20
+    },
+    {
+      "tipo": "finTurnoJefe"
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 350
+    },
+    {
+      "tipo": "aliadoInvocado",
+      "slot": 0,
+      "categoria": "debilitador",
+      "nombre": "Absol",
+      "hp": 120,
+      "habilidad": "El jugador rival hace 20 de daño menos (lo aplica el jugador)"
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    }
+  ]
+}

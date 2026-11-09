@@ -1,3 +1,4 @@
+import 'errores.dart';
 import 'estado.dart';
 import 'eventos.dart';
 
@@ -13,6 +14,22 @@ typedef EfectoAliado = EstadoPartida Function(
   AliadoEstado aliado,
 );
 
+/// Como [EfectoAliado], pero recibe también el evento de invocación (para leer
+/// las monedas que registró la app).
+typedef EfectoAliadoAlEntrar = EstadoPartida Function(
+  EstadoPartida estado,
+  AliadoEstado aliado,
+  AliadoInvocado evento,
+);
+
+/// Como [EfectoAliado], pero recibe también el evento del ataque (para leer
+/// la moneda que registró la app).
+typedef EfectoAliadoAlAtacar = EstadoPartida Function(
+  EstadoPartida estado,
+  AliadoEstado aliado,
+  AtaqueAliado evento,
+);
+
 /// Los momentos en los que un script puede actuar. Cualquiera puede faltar.
 class ScriptAliado {
   /// Justo después de invocar al aliado.
@@ -25,6 +42,20 @@ class ScriptAliado {
   /// Justo después de un ataque del aliado (al entrar o al final del turno
   /// del jefe), con el aliado ya anotado como que ha atacado.
   final EfectoAliado? alAtacar;
+
+  /// Como [alEntrar], con acceso al evento de invocación.
+  final EfectoAliadoAlEntrar? alEntrarConEvento;
+
+  /// Como [alAtacar], con acceso al evento del ataque.
+  final EfectoAliadoAlAtacar? alAtacarConEvento;
+
+  /// Mientras el aliado siga vivo, los jugadores solo pueden atacarlo a él
+  /// (o pasar el turno con 0 de daño) (Bloqueo).
+  final bool provoca;
+
+  /// Daño que el propio aliado recibe de menos por cada ataque de los
+  /// jugadores, además de las reducciones de otros aliados (Bloqueo).
+  final int reduccionPropia;
 
   /// Daño extra que el jefe suma a cada uno de sus ataques mientras el aliado
   /// siga vivo (D-16, Potenciador). Con [bonusConMoneda] solo se suma si al
@@ -51,6 +82,10 @@ class ScriptAliado {
     this.alEntrar,
     this.alFinTurnoJefe,
     this.alAtacar,
+    this.alEntrarConEvento,
+    this.alAtacarConEvento,
+    this.provoca = false,
+    this.reduccionPropia = 0,
     this.bonusAtaqueJefe = 0,
     this.bonusConMoneda = false,
     this.bonusSoloPrimerAtaque = false,
@@ -119,6 +154,97 @@ int reduccionDanoAlJefe(
   return total;
 }
 
+/// Aliado que obliga a los jugadores a atacarle (Bloqueo), o null.
+AliadoEstado? aliadoProvocador(
+  EstadoPartida e, [
+  Map<String, ScriptAliado> scripts = scriptsAliado,
+]) {
+  for (final a in e.aliados) {
+    final id = a.scriptId;
+    if (a.efectos != EfectosAliado.programa || id == null) continue;
+    if (scripts[id]?.provoca ?? false) return a;
+  }
+  return null;
+}
+
+/// Reducción extra de daño que recibe el aliado [a] por su propia habilidad.
+int reduccionPropiaDe(
+  AliadoEstado a, [
+  Map<String, ScriptAliado> scripts = scriptsAliado,
+]) {
+  final id = a.scriptId;
+  if (a.efectos != EfectosAliado.programa || id == null) return 0;
+  return scripts[id]?.reduccionPropia ?? 0;
+}
+
+/// Sustituye el aliado del slot [slot] por [nuevo].
+EstadoPartida _conAliado(EstadoPartida e, AliadoEstado nuevo) =>
+    e.copiarCon(
+      aliados: [
+        for (final a in e.aliados)
+          if (a.slot == nuevo.slot) nuevo else a,
+      ],
+    );
+
+/// Deseo: el jefe lanza 10 monedas y se cura 100 por cada cara; cada aliado
+/// (el propio incluido, por orden de slot de entrada) lanza una y, con cara,
+/// se cura 100. Las monedas las tira la app y vienen en el evento: primero
+/// las 10 del jefe y después una por aliado en el orden de `aliados`. Los
+/// Pokémon de los jugadores lanzan las suyas en la mesa.
+EstadoPartida _deseo100(
+  EstadoPartida e,
+  AliadoEstado a,
+  AliadoInvocado ev,
+) {
+  final monedas = ev.monedas;
+  final esperadas = 10 + e.aliados.length;
+  if (monedas == null || monedas.length != esperadas) {
+    throw ReglaIncumplida(
+      'Deseo necesita $esperadas monedas (10 del jefe y una por aliado)',
+    );
+  }
+  final carasJefe = monedas.take(10).where((c) => c).length;
+  var r = _curarJefe(e, 100 * carasJefe);
+  r = r.copiarCon(
+    aliados: [
+      for (var i = 0; i < r.aliados.length; i++)
+        if (monedas[10 + i])
+          r.aliados[i].copiarCon(
+            hp: r.aliados[i].hp + 100 < r.aliados[i].hpMaximo
+                ? r.aliados[i].hp + 100
+                : r.aliados[i].hpMaximo,
+          )
+        else
+          r.aliados[i],
+    ],
+  );
+  return r;
+}
+
+/// Envite Ígneo: en cada uso el aliado gana 10 HP (máximo y actual).
+EstadoPartida _enviteIgneo10(EstadoPartida e, AliadoEstado a) => _conAliado(
+      e,
+      a.copiarCon(hpMaximo: a.hpMaximo + 10, hp: a.hp + 10),
+    );
+
+/// Fuerza Lunar: si la moneda del jugador rival sale cruz, sus ataques hacen
+/// 30 puntos menos en el siguiente turno que juegue.
+EstadoPartida _fuerzaLunar30(
+  EstadoPartida e,
+  AliadoEstado a,
+  AtaqueAliado ev,
+) {
+  final moneda = ev.moneda;
+  if (moneda == null) {
+    throw const ReglaIncumplida(
+      'Fuerza Lunar necesita el resultado de la moneda del jugador rival',
+    );
+  }
+  if (moneda) return e;
+  final rival = ev.objetivo ?? a.slot;
+  return e.copiarCon(debilitados: {...e.debilitados, rival: 30});
+}
+
 /// El jefe se cura [cantidad] HP sin pasar de su máximo. Cuenta como
 /// curación del jefe igual que el evento `CuracionJefe` (la resta del daño
 /// total y de los puntos).
@@ -181,6 +307,10 @@ const Map<String, ScriptAliado> scriptsAliado = {
   'cura-jefe-50': ScriptAliado(alFinTurnoJefe: _cura50),
   'chupavidas-10': ScriptAliado(alAtacar: _chupavidas10),
   'chupavidas-30': ScriptAliado(alAtacar: _chupavidas30),
+  'bloqueo-100': ScriptAliado(provoca: true, reduccionPropia: 100),
+  'deseo-100': ScriptAliado(alEntrarConEvento: _deseo100),
+  'envite-igneo-10': ScriptAliado(alAtacar: _enviteIgneo10),
+  'fuerza-lunar-30': ScriptAliado(alAtacarConEvento: _fuerzaLunar30),
   'velo-sagrado': ScriptAliado(alEntrar: _veloSagrado, bloqueaEstados: true),
   'agilidad-30': ScriptAliado(bonusAtaqueJefe: 30, bonusSoloPrimerAtaque: true),
   'foco-energia-10': ScriptAliado(bonusAtaqueJefe: 10, bonusConMoneda: true),
