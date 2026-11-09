@@ -7,6 +7,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
+import 'dado_animado.dart';
 
 /// Lo que hay que resolver antes de seguir: intentos de invocación y ataques
 /// de entrada de los aliados (D-04).
@@ -273,7 +274,17 @@ class _DialogoAliado extends StatefulWidget {
   State<_DialogoAliado> createState() => _DialogoAliadoState();
 }
 
-class _DialogoAliadoState extends State<_DialogoAliado> {
+class _DialogoAliadoState extends State<_DialogoAliado>
+    with SingleTickerProviderStateMixin {
+  /// Duración de la animación de los dados (T-44).
+  static const _duracionDados = Duration(milliseconds: 1100);
+
+  late final AnimationController _anim =
+      AnimationController(vsync: this, duration: _duracionDados);
+
+  /// Tirada que se está enseñando (o ya enseñada), con sus caras.
+  _Tirada? _enCurso;
+
   final _nombre = TextEditingController();
   final _hp = TextEditingController();
   final _ataqueNombre = TextEditingController();
@@ -315,8 +326,13 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
     final inv = jefe == null
         ? null
         : widget.catalogo?.invocacionDe(jefe.nombre, jefe.nivel);
+    if (_anim.isAnimating) return;
     if (inv != null && !inv.segura && !widget.azar.nextBool()) {
-      Navigator.of(context).pop(const SinInvocacion());
+      // Sin aliado: se enseña la moneda y al pararse se cierra el diálogo.
+      setState(() => _enCurso = const _Tirada.sinAliado());
+      _anim.forward(from: 0).whenComplete(() {
+        if (mounted) Navigator.of(context).pop(const SinInvocacion());
+      });
       return;
     }
     final slots = e.slotsLibres;
@@ -329,14 +345,31 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
     if (slots.isEmpty || categorias.isEmpty) return;
     final slot = slots[widget.azar.nextInt(slots.length)];
     final categoria = categorias[widget.azar.nextInt(categorias.length)];
+    final carasCategoria = inv?.aliados.length ?? CategoriaAliado.values.length;
+    final texto = 'Dado de slot (${_dado(e.jugadores.length)}): '
+        '${e.jugadores[slot].nombre} · '
+        'dado de categoría (d$carasCategoria): '
+        '${etiquetaCategoria(categoria)}';
     setState(() {
-      _slot = slot;
-      _categoria = categoria;
-      _rellenar(categoria);
-      _tirada = 'Dado de slot (${_dado(e.jugadores.length)}): '
-          '${e.jugadores[slot].nombre} · '
-          'dado de categoría (d${inv?.aliados.length ?? CategoriaAliado.values.length}): '
-          '${etiquetaCategoria(categoria)}';
+      _tirada = null;
+      _enCurso = _Tirada(
+        carasSlot: e.jugadores.length,
+        valorSlot: slot + 1,
+        etiquetaSlot: e.jugadores[slot].nombre,
+        carasCategoria: carasCategoria,
+        valorCategoria: categorias.indexOf(categoria) + 1,
+        etiquetaCategoria: etiquetaCategoria(categoria),
+      );
+    });
+    // Los campos se rellenan cuando los dados se paran, no antes.
+    _anim.forward(from: 0).whenComplete(() {
+      if (!mounted) return;
+      setState(() {
+        _slot = slot;
+        _categoria = categoria;
+        _rellenar(categoria);
+        _tirada = texto;
+      });
     });
   }
 
@@ -360,6 +393,7 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
 
   @override
   void dispose() {
+    _anim.dispose();
     _nombre.dispose();
     _hp.dispose();
     _ataqueNombre.dispose();
@@ -390,10 +424,39 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
           children: [
             FilledButton.tonalIcon(
               key: const Key('tirar-dados'),
-              onPressed: _tirarDados,
+              onPressed: _anim.isAnimating ? null : _tirarDados,
               icon: const Icon(Icons.casino),
               label: const Text('Tirar dados'),
             ),
+            if (_enCurso != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: _enCurso!.sin
+                    ? DadoAnimado(
+                        animacion: _anim,
+                        caras: 2,
+                        valor: 2,
+                        etiqueta: 'Sin aliado',
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          DadoAnimado(
+                            animacion: _anim,
+                            caras: _enCurso!.carasSlot,
+                            valor: _enCurso!.valorSlot,
+                            etiqueta: _enCurso!.etiquetaSlot,
+                          ),
+                          DadoAnimado(
+                            animacion: _anim,
+                            caras: _enCurso!.carasCategoria,
+                            valor: _enCurso!.valorCategoria,
+                            etiqueta: _enCurso!.etiquetaCategoria,
+                            semilla: 1,
+                          ),
+                        ],
+                      ),
+              ),
             if (_tirada != null)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
@@ -496,4 +559,34 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
       ],
     );
   }
+}
+
+/// Resultado de una tirada ya hecha, con lo que hay que enseñar en los dados.
+class _Tirada {
+  const _Tirada({
+    required this.carasSlot,
+    required this.valorSlot,
+    required this.etiquetaSlot,
+    required this.carasCategoria,
+    required this.valorCategoria,
+    required this.etiquetaCategoria,
+  }) : sin = false;
+
+  /// La moneda del jefe salió en contra: no hay aliado.
+  const _Tirada.sinAliado()
+      : sin = true,
+        carasSlot = 0,
+        valorSlot = 0,
+        etiquetaSlot = '',
+        carasCategoria = 0,
+        valorCategoria = 0,
+        etiquetaCategoria = '';
+
+  final bool sin;
+  final int carasSlot;
+  final int valorSlot;
+  final String etiquetaSlot;
+  final int carasCategoria;
+  final int valorCategoria;
+  final String etiquetaCategoria;
 }

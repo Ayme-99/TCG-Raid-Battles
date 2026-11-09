@@ -342,6 +342,10 @@ void main() {
     await tester.tap(find.byKey(const Key('invocar-aliado')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('tirar-dados')));
+    // T-44: mientras ruedan los dados se ven y todavía no hay resultado.
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const ValueKey('dado-2-0')), findsOneWidget);
+    expect(find.byKey(const Key('resultado-dados')), findsNothing);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('resultado-dados')), findsOneWidget);
     expect(find.textContaining('Dado de slot (moneda): Jugador 2'),
