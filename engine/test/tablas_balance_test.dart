@@ -39,12 +39,13 @@ void main() {
       expect(niveles.map((f) => _n(f, 'nivel')), [1, 2, 3, 4]);
     });
 
-    test('x_min de cada nivel es el umbral del motor', () {
-      final umbrales = {2: umbralNivel2, 3: umbralNivel3, 4: umbralNivel4};
+    test('x_min de cada nivel es el X máximo del anterior + 1', () {
+      final maximos = {1: maxXNivel1, 2: maxXNivel2, 3: maxXNivel3};
       for (final f in niveles) {
         final nivel = _n(f, 'nivel');
         if (nivel == 1) continue; // un X menor de 250 también es Nv1
-        expect(_n(f, 'x_min'), umbrales[nivel], reason: 'nivel $nivel: $pista');
+        expect(_n(f, 'x_min'), maximos[nivel - 1]! + 1,
+            reason: 'nivel $nivel: $pista');
         expect(nivelPorX(_n(f, 'x_min')), nivel, reason: pista);
         expect(nivelPorX(_n(f, 'x_min') - 1), nivel - 1, reason: pista);
       }

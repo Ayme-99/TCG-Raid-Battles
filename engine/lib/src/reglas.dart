@@ -7,23 +7,24 @@ const int pokemonPorJugador = 2;
 const int maxJugadores = 4;
 
 /// Tope del daño de un ataque al calcular X (`docs/D-02-dano-maximo.md`).
-const int topeAtaqueX = 200;
-
-/// Umbrales de X para cada nivel. El valor umbral pertenece al nivel de arriba.
-const int umbralNivel2 = 400;
-const int umbralNivel3 = 600;
-const int umbralNivel4 = 800;
+/// X máximo de cada nivel. El valor límite pertenece al nivel de abajo:
+/// Nv1 `X <= 400`, Nv2 `400 < X <= 600`, Nv3 `600 < X <= 800`, Nv4 `X > 800`.
+/// Con 4 jugadores, la media máxima por jugador es 100 / 150 / 200 en Nv1-3.
+const int maxXNivel1 = 400;
+const int maxXNivel2 = 600;
+const int maxXNivel3 = 800;
 
 /// Nivel del jefe según X. Un X menor de 250 se juega también como Nivel 1.
 int nivelPorX(int x) {
-  if (x >= umbralNivel4) return 4;
-  if (x >= umbralNivel3) return 3;
-  if (x >= umbralNivel2) return 2;
+  if (x > maxXNivel3) return 4;
+  if (x > maxXNivel2) return 3;
+  if (x > maxXNivel1) return 2;
   return 1;
 }
 
-/// Daño que cuenta para X: el introducido, recortado a [0, topeAtaqueX].
-int ataqueParaX(int impreso) => impreso.clamp(0, topeAtaqueX).toInt();
+/// Daño que cuenta para X: el introducido, sin tope superior (hay cartas de
+/// más de 200 de daño) y nunca negativo.
+int ataqueParaX(int impreso) => impreso < 0 ? 0 : impreso;
 
 /// Ranuras de ataque del jefe (1, 2 o 3).
 const int ranurasAtaqueJefe = 3;

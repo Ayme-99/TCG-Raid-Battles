@@ -15,7 +15,7 @@ X = suma, de todos los jugadores, del **daño máximo** del mejor ataque de sus 
 
 ## 3. Qué número cuenta
 
-La mesa acuerda el número de cada jugador, con un **tope de 200 por ataque**. La app solo recibe un entero por jugador y no interpreta el texto de la carta; si se introduce más de 200, la app lo recorta a 200.
+La mesa acuerda el número de cada jugador, **sin tope** (hay cartas de más de 200 de daño; con tope, Nv4 sería inalcanzable). La app solo recibe un entero por jugador, nunca negativo, y no interpreta el texto de la carta.
 
 Criterio para llegar al acuerdo:
 
@@ -23,7 +23,7 @@ Criterio para llegar al acuerdo:
 |---|---|
 | Daño fijo («120») | el impreso |
 | «30+» / «50×» sin tope claro | el impreso, o el valor que acuerde la mesa |
-| Daño por contadores de daño o premios («20× por contador») | el valor que acuerde la mesa, por ejemplo con los contadores a media vida (HP ÷ 20 contadores), sin pasar de 200 |
+| Daño por contadores de daño o premios («20× por contador») | el valor que acuerde la mesa, por ejemplo con los contadores a media vida (HP ÷ 20 contadores) |
 | Daño por Energía (en la partida no hay Energía) | solo el base impreso (Max Burst de Rayquaza VMAX = 20) |
 | Bonus fijo condicional («+20 si…») | la mesa decide si se suma |
 | «No puede atacar el próximo turno» | el daño impreso (la penalización se aplica en la partida, no en X) |
@@ -40,7 +40,7 @@ Los modificadores de la partida (habilidades, cartas de ánimo, debilidad) **no*
 
 - **Un jugador introduce 0** (Pokémon sin ataque con daño): vale; cuenta 0.
 - **Desacuerdo en la mesa**: se usa el número impreso en la carta.
-- **Número mayor de 200**: se recorta a 200. El valor del tope es provisional hasta los playtests (T-17).
+- **Número mayor de 200**: vale tal cual (antes se recortaba a 200; con X > 800 para Nv4 el tope lo haría inalcanzable).
 - **Mesa que usa máximos teóricos más altos que el base**: X sube y el nivel puede subir. La calibración del simulador (D-03 §8.4) usa el daño base, así que los niveles quedan algo más duros de lo medido. Se revisa en T-17 (playtests).
 
 ## 6. Cambios en otros documentos

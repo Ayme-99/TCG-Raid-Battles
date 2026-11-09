@@ -28,7 +28,7 @@ class JugadorEstado {
   final int asiento;
   final String nombre;
 
-  /// Daño de su mejor ataque, ya recortado al tope de X.
+  /// Daño de su mejor ataque (nunca negativo, sin tope superior).
   final int ataqueMaximo;
 
   /// Pokémon que le quedan en juego (2 al empezar).

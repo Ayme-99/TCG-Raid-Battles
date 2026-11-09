@@ -31,7 +31,7 @@ Cada nivel necesita varias partidas para decir algo sobre porcentajes: con 1 sol
 
 Reglas completas en `incursiones_gdd.md` §2-§5. Orden:
 
-1. Cada jugador elige 2 Pokémon y anota el daño de su mejor ataque (tope 200).
+1. Cada jugador elige 2 Pokémon y anota el daño de su mejor ataque (sin tope).
 2. X = suma de esos números por jugador. Nivel: `<400` Nv1 · `400-599` Nv2 · `600-799` Nv3 · `≥800` Nv4 (un X menor de 250 se juega como Nv1).
 3. Se elige el jefe del nivel y se pone su HP.
 4. Ronda: primero los jugadores con KO reciente (roban carta de ánimo), luego el resto por orden de asiento. Cada uno ataca al jefe o a un aliado y dice el daño al asistente.

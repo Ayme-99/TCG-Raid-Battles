@@ -19,7 +19,7 @@ Los jugadores introducen el daño máximo de sus cartas. El nivel sale de `nivel
 ## Modo 2: por jefe
 
 - El jugador elige el jefe en el setup. El nivel de la partida es el del jefe.
-- La tarjeta del jefe muestra el **daño máximo recomendado**: el rango `x_min`–`x_max` de su nivel (por ejemplo, 400–590 en Nv2).
+- La tarjeta del jefe muestra el **daño máximo recomendado**: el rango `x_min`–`x_max` de su nivel (por ejemplo, 401–600 en Nv2).
 - Se pide el daño de los jugadores igual que en el modo 1. Si el equipo queda **fuera del rango**, la app lo avisa («probablemente demasiado difícil» o «probablemente demasiado fácil»), pero se puede jugar igualmente.
 - **Decisión: solo aviso.** No se bloquea la partida ni se cambia la recompensa según el desajuste. Se descartó escalar la recompensa (más puntos por debajo del rango, menos por encima) porque añadiría datos que introducir y complicaría la preparación. Los puntos siguen dependiendo solo del nivel del jefe.
 

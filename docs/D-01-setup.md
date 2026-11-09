@@ -20,10 +20,10 @@ La dificultad del Nv4 sale del jefe (más HP y más ataques por turno), no de da
 
 | X | Nivel |
 |---|---|
-| menor de 400 (incluido menor de 250) | Nv1 |
-| 400 a 599 | Nv2 |
-| 600 a 799 | Nv3 |
-| 800 o más | Nv4 |
+| 400 o menos (incluido menor de 250) | Nv1 |
+| 401 a 600 | Nv2 |
+| 601 a 800 | Nv3 |
+| más de 800 | Nv4 |
 
 4. Se elige el **jefe** del catálogo de ese nivel, a mano o al azar.
 5. Empieza la partida.
