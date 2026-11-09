@@ -4,6 +4,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
+import 'estilo.dart';
 
 /// Pokémon que le quedan a cada jugador y botón para anotar un KO.
 class PanelPokemon extends ConsumerWidget {
@@ -61,16 +62,28 @@ class PanelAliados extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final estado = ref.watch(estadoProvider);
     if (estado.aliados.isEmpty) return const SizedBox.shrink();
-    return Card(
+    return Container(
       key: const Key('panel-aliados'),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1033).withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white70, width: 3),
+        boxShadow: const [
+          BoxShadow(color: Colors.black54, blurRadius: 10, offset: Offset(0, 6)),
+        ],
+      ),
+      child: DefaultTextStyle.merge(
+        style: const TextStyle(color: Colors.white),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Aliados del jefe',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
             if (reduccionDanoAlJefe(estado) > 0)
               Padding(
@@ -84,26 +97,58 @@ class PanelAliados extends ConsumerWidget {
               ),
             const SizedBox(height: 8),
             for (final a in estado.aliados)
-              Padding(
+              Container(
                 key: Key('aliado-${a.slot}'),
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    colorCategoria(a.categoria),
+                    Color.lerp(colorCategoria(a.categoria), Colors.black, 0.5)!,
+                  ]),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: Row(
                   children: [
-                    Text(
-                      '${etiquetaCategoria(a.categoria)} · ${a.nombre} · '
-                      'slot de ${estado.jugadores[a.slot].nombre} · '
-                      '${a.hp}/${a.hpMaximo} HP',
-                    ),
-                    if (a.tieneAtaque || a.habilidad != null)
-                      Text(
-                        [
-                          if (a.tieneAtaque)
-                            '${a.ataqueNombre ?? 'Ataque'}: ${a.ataqueDano}',
-                          if (a.habilidad != null) a.habilidad!,
-                        ].join(' · '),
-                        style: Theme.of(context).textTheme.bodySmall,
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.white,
+                      child: Icon(
+                        iconoCategoria(a.categoria),
+                        color: colorCategoria(a.categoria),
                       ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${etiquetaCategoria(a.categoria)} · ${a.nombre} · '
+                            'slot de ${estado.jugadores[a.slot].nombre} · '
+                            '${a.hp}/${a.hpMaximo} HP',
+                            style: const TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                          if (a.tieneAtaque || a.habilidad != null)
+                            Text(
+                              [
+                                if (a.tieneAtaque)
+                                  '${a.ataqueNombre ?? 'Ataque'}: ${a.ataqueDano}',
+                                if (a.habilidad != null) a.habilidad!,
+                              ].join(' · '),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: Colors.white70),
+                            ),
+                          const SizedBox(height: 4),
+                          BarraVida(
+                            fraccion:
+                                a.hpMaximo == 0 ? 0 : a.hp / a.hpMaximo,
+                            alto: 10,
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
