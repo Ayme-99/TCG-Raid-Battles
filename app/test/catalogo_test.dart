@@ -51,7 +51,7 @@ void main() {
       final c = await Catalogo.cargar(rootBundle);
       expect(c.jefes.map((j) => j.id), ['onix', 'manectric', 'kingdra', 'arceus']);
       expect(c.jefes.map((j) => j.nivel), [1, 2, 3, 4]);
-      expect(c.jefes.map((j) => j.hp), [2200, 2500, 3600, 3800]);
+      expect(c.jefes.map((j) => j.hp), [2300, 2600, 3700, 3800]);
       expect(c.jefes.map((j) => j.intentosDeInvocacion), [1, 2, 3, 4]);
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
@@ -206,8 +206,8 @@ void main() {
     final estado = c.read(estadoProvider);
     expect(estado.fase, Fase.turnoJugadores);
     expect(estado.jefe!.nombre, 'Onix');
-    expect(estado.jefe!.hp, 2200);
-    expect(estado.jefe!.invocacionCadaHp, 1100);
+    expect(estado.jefe!.hp, 2300);
+    expect(estado.jefe!.invocacionCadaHp, 1150);
 
     // Turno del jefe: la pantalla propone el ataque de la carta y su efecto.
     final partida = c.read(partidaProvider.notifier);
