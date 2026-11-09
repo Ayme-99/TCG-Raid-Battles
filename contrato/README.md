@@ -1,4 +1,4 @@
-# Contrato del registro de partida (versión 6)
+# Contrato del registro de partida (versión 7)
 
 > Para subir la versión del contrato, sigue el checklist de [`docs/DEPENDENCIAS.md`](../docs/DEPENDENCIAS.md) (motor, servidor, repo externo).
 
@@ -8,9 +8,9 @@ Formato JSON con el que la app guarda una partida y la envía al backend. Una pa
 
 | Archivo | Qué es |
 |---|---|
-| `partida.v6.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
-| `partida.v5.schema.json`, `partida.v4.schema.json`, `partida.v3.schema.json`, `partida.v2.schema.json`, `partida.v1.schema.json` | Esquemas de las versiones 1 a 5, que se conservan: hay partidas guardadas con esos formatos. |
-| `ejemplos/v6/`, `ejemplos/v5/`, `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
+| `partida.v7.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
+| `partida.v6.schema.json`, `partida.v5.schema.json`, `partida.v4.schema.json`, `partida.v3.schema.json`, `partida.v2.schema.json`, `partida.v1.schema.json` | Esquemas de las versiones 1 a 6, que se conservan: hay partidas guardadas con esos formatos. |
+| `ejemplos/v7/`, `ejemplos/v6/`, `ejemplos/v5/`, `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
 
 Los ejemplos válidos están probados por los dos lados: el motor los lee y los vuelve a escribir igual (`engine/test/registro_test.dart`) y el esquema los acepta (`server/test/contrato.test.js`). El CI ejecuta ambos.
 
@@ -93,6 +93,7 @@ El backend guarda además el registro completo (los eventos) para poder repetir 
 | 4 | La categoría `barrera` pasa a llamarse `tanque`. Migración 3 → 4: los aliados `barrera` de las partidas guardadas pasan a `tanque`. |
 | 5 | Efectos en los ataques del jefe (D-14): `ataqueJefe` gana el campo opcional `efecto`. Migración 4 → 5: solo cambia la versión (los eventos antiguos siguen siendo válidos). |
 | 6 | Aliados con 6 categorías (D-16): `categoria` admite `danio`, `tanque`, `cura` (Curandero), `control`, `potenciador` y `debilitador`. La categoría `picaro` pasa a llamarse `control`. Migración 5 → 6: los aliados `picaro` de las partidas guardadas pasan a `control`. |
+| 7 | Monedas de aliado (D-16, Arceus): `aliadoInvocado` gana `monedas` (lista de booleanos, `true` = cara; las tira la app: Deseo) y `ataqueAliado` gana `moneda` (booleano; la del jugador rival en Fuerza Lunar). Migración 6 → 7: solo cambia la versión. |
 
 `categoria` y `slot` salen de los dos dados de la invocación (D-13): no se repite un slot ocupado ni una categoría con un aliado vivo. `efectos` dice quién aplica los efectos de la carta del aliado: el jugador (no se escribe) o el programa, que ejecuta el script `scriptId` (obligatorio con `programa`, no admitido con `jugador`; el motor rechaza un script que no conoce).
 

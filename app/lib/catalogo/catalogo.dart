@@ -81,12 +81,6 @@ class AtaqueJefeCatalogo {
   }
 }
 
-/// Categorías de aliado que un jefe del catálogo puede no tener todavía.
-const _categoriasOpcionales = {
-  CategoriaAliado.potenciador,
-  CategoriaAliado.debilitador,
-};
-
 class AliadoCatalogo {
   final CategoriaAliado categoria;
   final String nombre;
@@ -115,6 +109,15 @@ class AliadoCatalogo {
   /// adyacentes al objetivo (lo aplican los jugadores).
   final int? ataqueDanoAdyacentes;
 
+  /// Daño extra si el Pokémon Defensor ya tenía un estado especial.
+  final int? ataqueDanoExtraSiEstado;
+
+  /// Daño que se suma al ataque por cada uso anterior (Envite Ígneo).
+  final int? ataqueEscalaPorUso;
+
+  /// El ataque exige una moneda del jugador rival (Fuerza Lunar).
+  final bool ataqueMonedaRival;
+
   /// Recordatorio al derrotar al aliado con un ataque de los jugadores.
   final String? avisoAlCaer;
   final String? habilidadNombre;
@@ -135,6 +138,9 @@ class AliadoCatalogo {
     this.ataqueBonusDano,
     this.evitaDanoConMoneda = false,
     this.ataqueDanoAdyacentes,
+    this.ataqueDanoExtraSiEstado,
+    this.ataqueEscalaPorUso,
+    this.ataqueMonedaRival = false,
     this.avisoAlCaer,
     this.habilidadNombre,
     this.habilidad,
@@ -241,9 +247,6 @@ class JefeCatalogo {
     for (final categoria in CategoriaAliado.values) {
       final a = aliados[categoria.name];
       if (a == null) {
-        // Provisional (D-16): hasta que cada jefe tenga sus 6 aliados, el
-        // potenciador y el debilitador pueden faltar.
-        if (_categoriasOpcionales.contains(categoria)) continue;
         throw FormatException('$id: falta el aliado de ${categoria.name}');
       }
       final am = _mapa(a, '$id ${categoria.name}');
@@ -265,6 +268,13 @@ class JefeCatalogo {
         ataqueDanoAdyacentes: atm?['danoAdyacentes'] == null
             ? null
             : _entero(atm!, 'danoAdyacentes', id),
+        ataqueDanoExtraSiEstado: atm?['danoExtraSiEstado'] == null
+            ? null
+            : _entero(atm!, 'danoExtraSiEstado', id),
+        ataqueEscalaPorUso: atm?['escalaPorUso'] == null
+            ? null
+            : _entero(atm!, 'escalaPorUso', id),
+        ataqueMonedaRival: atm?['monedaRival'] == true,
         avisoAlCaer: am['avisoAlCaer'] as String?,
         habilidadNombre: am['habilidadNombre'] as String?,
         habilidad: am['habilidad'] as String?,

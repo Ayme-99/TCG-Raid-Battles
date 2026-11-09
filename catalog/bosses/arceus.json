@@ -38,36 +38,64 @@
     "tirada": "segura",
     "aliados": {
       "danio": {
-        "nombre": "Garchomp",
-        "hp": 150,
+        "nombre": "Medicham",
+        "hp": 90,
         "ataque": {
-          "nombre": "Garra dragón",
-          "dano": 80
-        }
+          "nombre": "Puño Dinámico",
+          "dano": 70,
+          "texto": "El Pokémon Defensor queda Confundido. Si el Pokémon Defensor ya tenía un estado especial, este ataque hace 70 puntos de daño más.",
+          "danoExtraSiEstado": 70
+        },
+        "habilidadNombre": "Energía Pura",
+        "habilidad": "Los ataques de Medicham no se ven afectados por ningún efecto en el Pokémon Activo rival."
       },
       "tanque": {
-        "nombre": "Bastiodon",
-        "hp": 300,
-        "habilidad": "Mientras esté en juego, el jefe recibe 40 de daño menos por cada ataque de los jugadores (lo aplica la app)",
+        "nombre": "Bronzong",
+        "hp": 100,
+        "habilidadNombre": "Bloqueo",
+        "habilidad": "Mientras Bronzong esté en juego, los jugadores solo pueden atacarle a él (o pasar el turno), y recibe 100 puntos de daño menos de cada ataque (lo aplica la app).",
         "efectos": "programa",
-        "scriptId": "tanque-jefe-40"
+        "scriptId": "bloqueo-100"
       },
       "cura": {
-        "nombre": "Blissey",
-        "hp": 160,
-        "habilidad": "Al final del turno del jefe, el jefe se cura 50 HP (lo aplica la app)",
+        "nombre": "Chingling",
+        "hp": 50,
+        "habilidadNombre": "Deseo",
+        "habilidad": "Al entrar, se lanzan 10 monedas por el jefe (100 HP por cada cara) y una moneda por cada aliado y por cada Pokémon de los jugadores (cara: se curan 100 puntos de daño). Lo tira la app.",
         "efectos": "programa",
-        "scriptId": "cura-jefe-50"
+        "scriptId": "deseo-100"
       },
       "control": {
-        "nombre": "Mismagius",
-        "hp": 150,
+        "nombre": "Nosepass",
+        "hp": 60,
+        "habilidadNombre": "Fijar Blanco",
+        "habilidad": "Cuando Nosepass entra en juego, la primera moneda que lance cada jugador a partir de ese momento será cruz. Aunque Nosepass sea derrotado, el efecto sigue aplicado. (Lo aplican los jugadores en la mesa.)"
+      },
+      "potenciador": {
+        "nombre": "Solrock",
+        "hp": 70,
         "ataque": {
-          "nombre": "Bola sombra",
-          "dano": 50
+          "nombre": "Envite Ígneo",
+          "dano": 10,
+          "texto": "Cada vez que Solrock usa este ataque, hace 10 puntos de daño más y gana 10 HP máximos (y 10 HP actuales).",
+          "escalaPorUso": 10
         },
-        "habilidad": "Al entrar, el Pokémon Activo del dueño queda Quemado y recibe 1 contador de daño (lo aplica el jugador)"
+        "efectos": "programa",
+        "scriptId": "envite-igneo-10"
+      },
+      "debilitador": {
+        "nombre": "Lunatone",
+        "hp": 80,
+        "ataque": {
+          "nombre": "Fuerza Lunar",
+          "dano": 10,
+          "texto": "El rival lanza una moneda: si sale cruz, el siguiente ataque de ese Pokémon hace 30 puntos de daño menos.",
+          "monedaRival": true
+        },
+        "efectos": "programa",
+        "scriptId": "fuerza-lunar-30"
       }
     }
-  }
+  },
+  "mapa": "Sala Origen"
 }

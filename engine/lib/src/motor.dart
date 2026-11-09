@@ -229,23 +229,29 @@ EstadoPartida _turnoJugador(
   if (ev.dano < 0) {
     _error('el daño no puede ser negativo');
   }
-  if (ev.dano > 0 && e.estaBloqueado(ev.jugador)) {
-    _error('el jugador ${ev.jugador} tiene un aliado vivo en su slot: '
-        'debe debilitarlo antes de dañar al jefe');
+  final provocador = aliadoProvocador(e, scripts);
+  if (ev.dano > 0 && provocador != null) {
+    _error('${provocador.nombre} obliga a atacarle: ataca al aliado o pasa el '
+        'turno con 0 de daño');
   }
   final jefe = e.jefe!;
-  // El daño anotado es el del ataque; los aliados Tanque (D-13) le quitan una
-  // cantidad fija y lo que cuenta es el que de verdad resta HP al jefe.
+  // El daño anotado es el del ataque; los aliados Tanque (D-13) y la
+  // debilitación pendiente del jugador (Fuerza Lunar) le quitan una cantidad
+  // fija y lo que cuenta es el que de verdad resta HP al jefe.
   var bruto = ev.dano;
   if (bruto > 0) {
-    bruto -= reduccionDanoAlJefe(e, scripts);
+    bruto -= reduccionDanoAlJefe(e, scripts) + (e.debilitados[ev.jugador] ?? 0);
     if (bruto < 0) bruto = 0;
   }
   final aplicado = bruto < jefe.hp ? bruto : jefe.hp;
   final dano = [...e.danoPorJugador];
   dano[ev.jugador] += aplicado;
   final nuevoHp = jefe.hp - aplicado;
-  final conDano = e.copiarCon(jefe: jefe.conHp(nuevoHp), danoPorJugador: dano);
+  final conDano = e.copiarCon(
+    jefe: jefe.conHp(nuevoHp),
+    danoPorJugador: dano,
+    debilitados: _sinDebilitar(e, ev.jugador),
+  );
   if (nuevoHp <= 0) {
     return conDano.copiarCon(
       fase: Fase.terminada,
@@ -271,6 +277,10 @@ EstadoPartida _cruzarUmbrales(EstadoPartida e) {
         e.intentosInvocacionPendientes + (cruzados - e.umbralesCruzados),
   );
 }
+
+/// La debilitación pendiente del jugador se consume en su turno.
+Map<int, int> _sinDebilitar(EstadoPartida e, int jugador) =>
+    {...e.debilitados}..remove(jugador);
 
 EstadoPartida _ataqueJefe(EstadoPartida e, AtaqueJefe ev) {
   _exigeFase(e, Fase.turnoJefe, 'AtaqueJefe');
@@ -614,12 +624,20 @@ EstadoPartida _ataqueAAliado(
   if (ev.dano < 0) {
     _error('el daño no puede ser negativo');
   }
+  final provocador = aliadoProvocador(e, scripts);
+  if (provocador != null && provocador.slot != ev.slot) {
+    _error('${provocador.nombre} obliga a atacarle: no se puede atacar a '
+        '${aliado.nombre}');
+  }
   // Los aliados Tanque (D-13) reducen cada ataque de los jugadores también
-  // cuando va contra un aliado. El exceso de daño se pierde: no pasa al jefe
-  // ni a otro aliado.
+  // cuando va contra un aliado, y cada aliado puede reducir además lo que
+  // recibe él (Bloqueo) o el jugador estar debilitado (Fuerza Lunar). El
+  // exceso de daño se pierde: no pasa al jefe ni a otro aliado.
   var dano = ev.dano;
   if (dano > 0) {
-    dano -= reduccionDanoAlJefe(e, scripts);
+    dano -= reduccionDanoAlJefe(e, scripts) +
+        reduccionPropiaDe(aliado, scripts) +
+        (e.debilitados[ev.jugador] ?? 0);
     if (dano < 0) dano = 0;
   }
   final restante = aliado.hp - dano;
@@ -633,6 +651,7 @@ EstadoPartida _ataqueAAliado(
   final conDano = e.copiarCon(
     aliados: aliados,
     aliadosDerrotados: e.aliadosDerrotados + (restante > 0 ? 0 : 1),
+    debilitados: _sinDebilitar(e, ev.jugador),
   );
   return _avanzarTurno(conDano, e.turnoActual + 1);
 }
@@ -708,9 +727,12 @@ EstadoPartida _aliadoInvocado(
     intentosInvocacionPendientes: e.intentosInvocacionPendientes - 1,
   );
   if (aliado.efectos != EfectosAliado.programa) return nuevo;
-  final alEntrar = scripts[aliado.scriptId]!.alEntrar;
-  if (alEntrar == null) return nuevo;
-  final resultado = alEntrar(nuevo, aliado);
+  final script = scripts[aliado.scriptId]!;
+  var resultado = nuevo;
+  final alEntrar = script.alEntrar;
+  if (alEntrar != null) resultado = alEntrar(resultado, aliado);
+  final conEvento = script.alEntrarConEvento;
+  if (conEvento != null) resultado = conEvento(resultado, aliado, ev);
   if (resultado.fase != nuevo.fase) {
     _error('el script «${aliado.scriptId}» no puede terminar la partida');
   }
@@ -748,10 +770,13 @@ EstadoPartida _ataqueAliado(
   AliadoEstado actualizado;
   if (!aliado.entradaResuelta) {
     // Ataque al entrar.
-    actualizado = aliado.copiarCon(entradaResuelta: true);
+    actualizado = aliado.copiarCon(entradaResuelta: true, usos: aliado.usos + 1);
   } else if (e.fase == Fase.turnoJefe && !aliado.atacoEnTurnoJefe) {
     // Ataque del final del turno del jefe, una vez por turno.
-    actualizado = aliado.copiarCon(atacoEnTurnoJefe: true);
+    actualizado = aliado.copiarCon(
+      atacoEnTurnoJefe: true,
+      usos: aliado.usos + 1,
+    );
   } else if (e.fase == Fase.turnoJefe) {
     _error('${aliado.nombre} ya ha atacado en este turno del jefe');
   } else {
@@ -766,9 +791,12 @@ EstadoPartida _ataqueAliado(
   );
   final id = aliado.scriptId;
   if (aliado.efectos != EfectosAliado.programa || id == null) return resultado;
-  final alAtacar = scripts[id]!.alAtacar;
-  if (alAtacar == null) return resultado;
-  final conEfecto = alAtacar(resultado, actualizado);
+  final script = scripts[id]!;
+  var conEfecto = resultado;
+  final alAtacar = script.alAtacar;
+  if (alAtacar != null) conEfecto = alAtacar(conEfecto, actualizado);
+  final conEvento = script.alAtacarConEvento;
+  if (conEvento != null) conEfecto = conEvento(conEfecto, actualizado, ev);
   if (conEfecto.fase != resultado.fase) {
     _error('el script «$id» no puede terminar la partida');
   }

@@ -135,13 +135,15 @@
           ]
         },
         "aliados": {
-          "description": "Un aliado por categoría (D-13, D-16). Provisional: hasta que cada jefe tenga sus 6 aliados, potenciador y debilitador son opcionales.",
+          "description": "Un aliado por categoría (D-13, D-16). Los 6 son obligatorios.",
           "type": "object",
           "required": [
             "danio",
             "tanque",
             "cura",
-            "control"
+            "control",
+            "potenciador",
+            "debilitador"
           ],
           "additionalProperties": false,
           "properties": {
@@ -232,6 +234,20 @@
                   "minimum": 1
                 }
               }
+            },
+            "danoExtraSiEstado": {
+              "description": "Daño extra si el Pokémon Defensor ya tenía un estado especial; los jugadores responden sí/no y la app lo suma.",
+              "type": "integer",
+              "minimum": 1
+            },
+            "escalaPorUso": {
+              "description": "Cada vez que el aliado usa el ataque, este hace N puntos de daño más (la app cuenta los usos).",
+              "type": "integer",
+              "minimum": 1
+            },
+            "monedaRival": {
+              "description": "El ataque exige una moneda del jugador rival; la app pregunta su resultado y lo registra en el evento.",
+              "type": "boolean"
             },
             "danoAdyacentes": {
               "description": "Daño que el ataque también hace a los Pokémon de los jugadores adyacentes al objetivo; lo aplican los jugadores y la app nombra a los afectados.",

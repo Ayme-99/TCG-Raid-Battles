@@ -51,6 +51,16 @@
           "dano": 30
         },
         "habilidad": "Fuerza al rival a cambiar su Pokémon activo"
+      },
+      "potenciador": {
+        "nombre": "Machop",
+        "hp": 70,
+        "habilidad": "El jefe hace 10 puntos de daño más (lo aplica el jugador)"
+      },
+      "debilitador": {
+        "nombre": "Zubat",
+        "hp": 50,
+        "habilidad": "Reduce el daño de los jugadores (lo aplica el jugador)"
       }
     }
   }

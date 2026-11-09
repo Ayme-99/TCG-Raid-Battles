@@ -143,6 +143,9 @@ class AliadoEstado {
   /// Ya atacó en el turno del jefe actual.
   final bool atacoEnTurnoJefe;
 
+  /// Veces que ha usado su ataque (al entrar y en turnos del jefe).
+  final int usos;
+
   const AliadoEstado({
     required this.slot,
     required this.categoria,
@@ -156,20 +159,23 @@ class AliadoEstado {
     this.scriptId,
     this.entradaResuelta = false,
     this.atacoEnTurnoJefe = false,
+    this.usos = 0,
   });
 
   bool get tieneAtaque => ataqueDano != null;
 
   AliadoEstado copiarCon({
     int? hp,
+    int? hpMaximo,
     bool? entradaResuelta,
     bool? atacoEnTurnoJefe,
+    int? usos,
   }) =>
       AliadoEstado(
         slot: slot,
         categoria: categoria,
         nombre: nombre,
-        hpMaximo: hpMaximo,
+        hpMaximo: hpMaximo ?? this.hpMaximo,
         hp: hp ?? this.hp,
         ataqueNombre: ataqueNombre,
         ataqueDano: ataqueDano,
@@ -178,6 +184,7 @@ class AliadoEstado {
         scriptId: scriptId,
         entradaResuelta: entradaResuelta ?? this.entradaResuelta,
         atacoEnTurnoJefe: atacoEnTurnoJefe ?? this.atacoEnTurnoJefe,
+        usos: usos ?? this.usos,
       );
 
   Map<String, Object?> toJson() => {
@@ -304,6 +311,10 @@ class EstadoPartida {
   /// ese ataque (D-13) y el jugador que aún no ha actuado pierde su turno.
   final bool koTrasAtaqueAliado;
 
+  /// Reducción de daño pendiente por jugador (Fuerza Lunar): se resta del
+  /// próximo ataque que haga ese jugador y se consume al hacerlo.
+  final Map<int, int> debilitados;
+
   EstadoPartida({
     required this.fase,
     required List<JugadorEstado> jugadores,
@@ -328,6 +339,7 @@ class EstadoPartida {
     required this.resultado,
     List<EfectoActivo>? efectosActivos,
     this.koTrasAtaqueAliado = false,
+    this.debilitados = const {},
   })  : jugadores = _fija(jugadores),
         orden = _fija(orden),
         prioridad = _fija(prioridad),
@@ -391,9 +403,6 @@ class EstadoPartida {
           if (!aliados.any((a) => a.categoria == c)) c,
       ];
 
-  /// Un jugador con un aliado vivo en su slot no puede dañar al jefe.
-  bool estaBloqueado(int jugador) => aliadoEn(jugador) != null;
-
   /// Aliados con ataque que aún no han usado su ataque al entrar.
   List<AliadoEstado> get entradasPendientes => [
         for (final a in aliados)
@@ -425,6 +434,7 @@ class EstadoPartida {
     Resultado? resultado,
     List<EfectoActivo>? efectosActivos,
     bool? koTrasAtaqueAliado,
+    Map<int, int>? debilitados,
   }) =>
       EstadoPartida(
         fase: fase ?? this.fase,
@@ -450,6 +460,7 @@ class EstadoPartida {
         intentosInvocacionPendientes:
             intentosInvocacionPendientes ?? this.intentosInvocacionPendientes,
         koTrasAtaqueAliado: koTrasAtaqueAliado ?? this.koTrasAtaqueAliado,
+        debilitados: debilitados ?? this.debilitados,
         resultado: resultado ?? this.resultado,
         efectosActivos: efectosActivos ?? this.efectosActivos,
       );
@@ -477,6 +488,10 @@ class EstadoPartida {
         'umbralesCruzados': umbralesCruzados,
         'intentosInvocacionPendientes': intentosInvocacionPendientes,
         'koTrasAtaqueAliado': koTrasAtaqueAliado,
+        if (debilitados.isNotEmpty)
+          'debilitados': {
+            for (final k in debilitados.keys) '$k': debilitados[k],
+          },
         'resultado': resultado?.name,
         'efectosActivos': [for (final f in efectosActivos) f.toJson()],
       };

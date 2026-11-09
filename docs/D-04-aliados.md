@@ -8,9 +8,9 @@ Estado: decidido (2026-11-05). Issue #16. Invocación, entrada y exceso de daño
 - Cada slot admite como máximo **1 aliado**.
 - Un aliado solo se coloca en el **slot de un jugador activo (no eliminado) que no tenga ya un aliado**. Lo elige la mesa entre los slots libres. Si no hay ninguno libre, no hay invocación y no se tira ningún dado (§7).
 
-## 2. Bloqueo y ayuda entre jugadores
+## 2. Ayuda entre jugadores (sin bloqueo de slot)
 
-Mientras un jugador tiene un aliado vivo en su slot, ese jugador debe debilitarlo antes de poder dañar al jefe (regla del GDD). El resto de jugadores puede seguir dañando al jefe con normalidad.
+**Revisado (Arceus, v7):** ya no hay bloqueo de slot. El aliado está obligado a atacar al dueño de su slot, pero este puede ignorarlo y dañar al jefe: así se prioriza entre dar al jefe o quitarse los estorbos. Solo la habilidad de Bloqueo (`provoca`, Bronzong) obliga a atacar a un aliado concreto. Los registros antiguos se reproducen igual.
 
 **Cualquier jugador activo puede atacar a cualquier aliado**, no solo al de su slot. Así el equipo puede colaborar para quitar cuanto antes los aliados que molestan a un compañero. Atacar a un aliado es opcional y sustituye al ataque contra el jefe en ese turno.
 
@@ -33,7 +33,7 @@ Con un solo jugador activo no hay tirada: ataca a ese jugador. El jugador de la 
 Cuando un jugador queda eliminado:
 
 - Deja de contar en la tirada del objetivo y como posible slot donde invocar nuevos aliados.
-- Si tenía un aliado vivo en su slot, **el aliado sigue vivo y sigue atacando** (objetivo al azar entre los activos, §3). Ya no bloquea a nadie, porque su dueño no puede dañar al jefe, pero los jugadores activos pueden atacarlo para eliminar su amenaza (regla de §2).
+- Si tenía un aliado vivo en su slot, **el aliado sigue vivo y sigue atacando** (objetivo al azar entre los activos, §3). Los jugadores activos pueden atacarlo para eliminar su amenaza (regla de §2).
 
 ## 5. Casos límite
 
@@ -63,7 +63,7 @@ Un jefe sin estos datos nunca invoca. Ejemplo ilustrativo (no es un jefe real): 
 
 ### 7.2 Cuándo se intenta
 
-- Un intento ocurre **en el momento en que el HP del jefe cruza un umbral**, normalmente durante el turno de un jugador. El aliado puede entrar sobre un jugador que todavía no ha actuado y empezar a bloquearlo.
+- Un intento ocurre **en el momento en que el HP del jefe cruza un umbral**, normalmente durante el turno de un jugador. El aliado puede entrar sobre un jugador que todavía no ha actuado y empezar a atacarlo.
 - **Cada umbral cuenta una sola vez por partida**: si el jefe se cura y vuelve a cruzarlo, no hay intento nuevo. Con Palkia, como mucho cuatro intentos por partida (a 2400, 1800, 1200 y 600).
 - Si un golpe cruza varios umbrales (p. ej. 1200 de daño con umbral cada 600), hay **un intento por umbral**, uno tras otro, y por tanto puede entrar más de un aliado en el mismo turno.
 - El golpe que deja al jefe a 0 HP termina la partida y no genera intentos.

@@ -161,7 +161,6 @@ void main() {
       expect(s.intentosInvocacionPendientes, 0);
       expect(s.aliadoEn(1)!.nombre, 'Rattata');
       expect(s.aliadoEn(1)!.hp, 60);
-      expect(s.estaBloqueado(1), isTrue);
       expect(s.slotsLibres, [0, 2]);
       expect(s.aliadoEn(0), isNull);
     });
@@ -257,12 +256,11 @@ void main() {
       return apply(s, const AtaqueAliado(slot: 1, dano: 20));
     }
 
-    test('el dueño no puede dañar al jefe hasta debilitar a su aliado', () {
+    test('el dueño puede ignorar a su aliado y dañar al jefe', () {
       final s = conRattataEnJ1();
-      expect(() => apply(s, const TurnoJugador(jugador: 1, dano: 100)),
-          throwsA(isA<ReglaIncumplida>()));
-      final pasa = apply(s, const TurnoJugador(jugador: 1, dano: 0));
-      expect(pasa.jefe!.hp, 2400);
+      final pasa = apply(s, const TurnoJugador(jugador: 1, dano: 100));
+      expect(pasa.jefe!.hp, 2300);
+      expect(pasa.aliadoEn(1), isNotNull);
       expect(pasa.jugadorActual, 2);
     });
 
@@ -288,7 +286,6 @@ void main() {
       expect(s.aliadoEn(1), isNull);
       expect(s.aliadosDerrotados, 1);
       expect(s.jefe!.hp, 2400);
-      expect(s.estaBloqueado(1), isFalse);
       expect(s.slotsLibres, [0, 1, 2]);
     });
 
