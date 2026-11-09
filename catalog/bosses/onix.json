@@ -4,7 +4,7 @@
   "nombre": "Onix",
   "nivel": 1,
   "mapa": "Túnel Roca",
-  "hp": 2300,
+  "hp": 2200,
   "ataques": [
     {
       "nombre": "Trampa Rocas",
@@ -30,7 +30,7 @@
     }
   ],
   "invocacion": {
-    "cadaHp": 1150,
+    "cadaHp": 1100,
     "tirada": "segura",
     "aliados": {
       "danio": {

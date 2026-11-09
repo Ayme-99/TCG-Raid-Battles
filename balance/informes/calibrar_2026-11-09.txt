@@ -1,0 +1,11 @@
+Calibración tras Arceus (contrato v7, sin bloqueo de slot). sim_jefes --calibrar, 150 equipos x 60 partidas, ayuda=0.5.
+Objetivo 75/50/30/15 %. Se lleva al catálogo el HP de la política solo-dueno (cadaHp = (HP + intentos) ~/ (intentos + 1)).
+
+jefe       nivel  HP antes -> HP nuevo  solo-dueno  ayuda   solo-jefe
+onix       1      2300 -> 2200          77.7 %      79.2 %  75.4 %
+manectric  2      2600 -> 2500          50.2 %      53.9 %  47.4 %
+kingdra    3      3400 -> 3600          30.7 %      31.5 %  32.7 %
+arceus     4      3600 -> 3800          16.8 %      17.3 %  17.4 %
+
+Con los HP anteriores: onix 74.3, manectric 46.1, kingdra 36.5, arceus 20.1 (solo-dueno).
+Sin modelar: Medicham (+70), Nosepass, veneno/quemadura y estados de aliados (D-17): cota optimista para los jugadores.
