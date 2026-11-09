@@ -16,6 +16,17 @@ void main() {
     return apply(s, TurnoJugador(jugador: 0, dano: dano));
   }
 
+  /// Descarta los intentos de invocación que quedan (no se invoca nada) para
+  /// poder seguir con los turnos.
+  EstadoPartida limpia(EstadoPartida s) {
+    while (s.intentosInvocacionPendientes > 0) {
+      s = apply(s, const SinInvocacion());
+    }
+    return s;
+  }
+
+  EstadoPartida act(EstadoPartida s, Evento ev) => apply(limpia(s), ev);
+
   AliadoInvocado aliado(
     CategoriaAliado c,
     String id, {
@@ -38,7 +49,7 @@ void main() {
   test('el dueño puede ignorar a su aliado y dañar al jefe', () {
     var s = apply(conJefe(), aliado(CategoriaAliado.cura, 'chupavidas-10'));
     final hp0 = s.jefe!.hp;
-    s = apply(s, const TurnoJugador(jugador: 1, dano: 100));
+    s = act(s, const TurnoJugador(jugador: 1, dano: 100));
     expect(s.jefe!.hp, hp0 - 100);
     expect(s.aliadoEn(1), isNotNull);
   });
@@ -49,9 +60,9 @@ void main() {
 
     test('obliga a atacarle: dañar al jefe se rechaza, pasar el turno no', () {
       final s = conBronzong();
-      expect(() => apply(s, const TurnoJugador(jugador: 1, dano: 50)),
+      expect(() => act(s, const TurnoJugador(jugador: 1, dano: 50)),
           throwsA(isA<ReglaIncumplida>()));
-      final pasa = apply(s, const TurnoJugador(jugador: 1, dano: 0));
+      final pasa = act(s, const TurnoJugador(jugador: 1, dano: 0));
       expect(pasa.jugadorActual, 2);
     });
 
@@ -59,25 +70,25 @@ void main() {
       var s = conBronzong();
       s = apply(s, aliado(CategoriaAliado.cura, 'chupavidas-10', slot: 1));
       expect(
-        () => apply(s, const AtaqueAAliado(jugador: 1, slot: 1, dano: 50)),
+        () => act(s, const AtaqueAAliado(jugador: 1, slot: 1, dano: 50)),
         throwsA(isA<ReglaIncumplida>()),
       );
     });
 
     test('recibe 100 de daño menos de cada ataque', () {
       var s = conBronzong();
-      s = apply(s, const AtaqueAAliado(jugador: 1, slot: 2, dano: 150));
+      s = act(s, const AtaqueAAliado(jugador: 1, slot: 2, dano: 150));
       expect(s.aliadoEn(2)!.hp, 50);
-      s = apply(s, const AtaqueAAliado(jugador: 2, slot: 2, dano: 90));
+      s = act(s, const AtaqueAAliado(jugador: 2, slot: 2, dano: 90));
       expect(s.aliadoEn(2)!.hp, 50);
     });
 
     test('al caer, vuelve a poderse dañar al jefe', () {
       var s = conBronzong();
-      s = apply(s, const AtaqueAAliado(jugador: 1, slot: 2, dano: 300));
+      s = act(s, const AtaqueAAliado(jugador: 1, slot: 2, dano: 300));
       expect(s.aliadoEn(2), isNull);
       final hp0 = s.jefe!.hp;
-      s = apply(s, const TurnoJugador(jugador: 2, dano: 60));
+      s = act(s, const TurnoJugador(jugador: 2, dano: 60));
       expect(s.jefe!.hp, hp0 - 60);
     });
   });
@@ -108,7 +119,7 @@ void main() {
     });
 
     test('cada aliado con cara se cura 100 sin pasar de su máximo', () {
-      var s = conJefe();
+      var s = conJefe(dano: 700);
       // Un aliado sin script, para que no haya reducciones de daño.
       s = apply(
         s,
@@ -119,8 +130,10 @@ void main() {
           hp: 300,
         ),
       );
-      s = apply(s, const AtaqueAAliado(jugador: 1, slot: 2, dano: 200));
+      s = act(s, const AtaqueAAliado(jugador: 1, slot: 2, dano: 200));
       expect(s.aliadoEn(2)!.hp, 100);
+      // Otro golpe del jefe cruza el siguiente umbral: nuevo intento.
+      s = apply(s, const TurnoJugador(jugador: 2, dano: 700));
       // Aliados en orden: Control (cara) y Chingling (cruz).
       s = apply(
         s,
@@ -161,7 +174,7 @@ void main() {
     expect(s.aliadoEn(1)!.usos, 1);
     expect(s.aliadoEn(1)!.hpMaximo, 80);
     expect(s.aliadoEn(1)!.hp, 80);
-    s = todosActuan(s, dano: 0);
+    s = todosActuan(limpia(s), dano: 0);
     s = apply(s, const AtaqueAliado(slot: 1, dano: 20));
     expect(s.aliadoEn(1)!.usos, 2);
     expect(s.aliadoEn(1)!.hpMaximo, 90);
@@ -184,7 +197,7 @@ void main() {
       s = apply(s, const AtaqueAliado(slot: 1, dano: 10, moneda: false));
       expect(s.debilitados[1], 30);
       final hp0 = s.jefe!.hp;
-      s = apply(s, const TurnoJugador(jugador: 1, dano: 100));
+      s = act(s, const TurnoJugador(jugador: 1, dano: 100));
       expect(s.jefe!.hp, hp0 - 70);
       expect(s.debilitados, isEmpty);
     });
