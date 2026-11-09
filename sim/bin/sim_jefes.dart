@@ -68,6 +68,7 @@
 //   dart run bin/sim_jefes.dart
 //   dart run bin/sim_jefes.dart --equipos=20 --partidas=20 --informe=/tmp/j.csv
 //   dart run bin/sim_jefes.dart --calibrar   # HP (en centenas) que da el objetivo
+//   dart run bin/sim_jefes.dart --causas     # por qué no se usan todos los intentos
 //
 // Opciones propias:
 //   --jefes=RUTA      carpeta del catálogo (defecto ../catalog)
@@ -306,11 +307,18 @@ class Aliado {
 }
 
 class Resultado {
-  Resultado(this.turnoVictoria, this.invocados);
+  Resultado(this.turnoVictoria, this.invocados,
+      [this.sinSlot = 0, this.sinCategoria = 0]);
 
   /// Turno de la victoria (>0) o 0 si pierden o se agota el tiempo.
   final int turnoVictoria;
   final int invocados;
+
+  /// Intentos de invocación perdidos por no haber ningún slot libre.
+  final int sinSlot;
+
+  /// Intentos perdidos por no quedar ninguna categoría libre.
+  final int sinCategoria;
 }
 
 /// Daño a un jugador: al Activo, o a la Banca si [banca] y está viva.
@@ -339,6 +347,10 @@ Resultado jugarJefe(
   var hp = jefe.hp;
   var cruzados = 0;
   var invocados = 0;
+  var sinSlot = 0;
+  var sinCategoria = 0;
+  Resultado res(int turno) =>
+      Resultado(turno, invocados, sinSlot, sinCategoria);
   // Efectos del jefe sobre los jugadores durante su próximo turno (D-14).
   final noAtacan = <int>{};
   final sinRetirada = <int>{};
@@ -444,7 +456,10 @@ Resultado jugarJefe(
       for (var i = 0; i < js.length; i++)
         if (!js[i].eliminado && slots[i] == null) i,
     ];
-    if (libres.isEmpty) return;
+    if (libres.isEmpty) {
+      sinSlot++;
+      return;
+    }
     if (!jefe.segura && rnd.nextBool() == false) return; // la moneda no salió
     final enUso = {
       for (final a in slots)
@@ -454,7 +469,10 @@ Resultado jugarJefe(
       for (final cat in categorias)
         if (jefe.aliados.containsKey(cat) && !enUso.contains(cat)) cat,
     ];
-    if (catsLibres.isEmpty) return;
+    if (catsLibres.isEmpty) {
+      sinCategoria++;
+      return;
+    }
     final slot = libres[rnd.nextInt(libres.length)];
     final cat = catsLibres[rnd.nextInt(catsLibres.length)];
     final a = Aliado(cat, jefe.aliados[cat]!);
@@ -587,7 +605,7 @@ Resultado jugarJefe(
       } else {
         // Los aliados Tanque vivos restan una cantidad fija a cada ataque.
         final dano = max(0, ch.dano - reduccionTanques() - debil);
-        if (bajarJefe(dano)) return Resultado(t, invocados);
+        if (bajarJefe(dano)) return res(t);
       }
       if (ch.cd) act.cd = 2;
       if (ch.gx) j.gxUsado = true;
@@ -629,7 +647,7 @@ Resultado jugarJefe(
       golpear(j, dano);
       // Efectos del ataque, después del daño al jugador (D-14).
       if (a.tipo == 'autodano') {
-        if (bajarJefe(a.valor ?? 0)) return Resultado(t, invocados);
+        if (bajarJefe(a.valor ?? 0)) return res(t);
       } else if (a.tipo == 'contadorATodos') {
         final d = (a.valor ?? 1) * 10;
         for (var s = 0; s < slots.length; s++) {
@@ -671,16 +689,23 @@ Resultado jugarJefe(
         hp = min(jefe.hp, hp + a.def.cura);
       }
     }
-    if (js.every((j) => j.eliminado)) return Resultado(0, invocados);
+    if (js.every((j) => j.eliminado)) return res(0);
   }
-  return Resultado(0, invocados);
+  return res(0);
 }
 
 class MedidaJefe {
-  MedidaJefe(this.victoria, this.turnosVictoria, this.invocados);
+  MedidaJefe(this.victoria, this.turnosVictoria, this.invocados,
+      [this.sinSlot = 0, this.sinCategoria = 0]);
   final double victoria;
+
+  /// Turno medio de la victoria, contando solo las partidas ganadas.
   final double turnosVictoria;
   final double invocados;
+
+  /// Por partida: intentos perdidos por falta de slot / de categoría.
+  final double sinSlot;
+  final double sinCategoria;
 }
 
 MedidaJefe medirJefe(
@@ -697,12 +722,16 @@ MedidaJefe medirJefe(
   var turnos = 0;
   var victorias = 0;
   var invocados = 0;
+  var sinSlot = 0;
+  var sinCategoria = 0;
   var partidas = 0;
   for (final e in equipos) {
     var w = 0;
     for (var i = 0; i < c.partidas; i++) {
       final r = jugarJefe(e, jefe, nv, c, rnd, ayuda, propio);
       invocados += r.invocados;
+      sinSlot += r.sinSlot;
+      sinCategoria += r.sinCategoria;
       partidas++;
       if (r.turnoVictoria > 0) {
         w++;
@@ -716,6 +745,8 @@ MedidaJefe medirJefe(
     tasas / equipos.length,
     victorias == 0 ? 0 : turnos / victorias,
     invocados / partidas,
+    sinSlot / partidas,
+    sinCategoria / partidas,
   );
 }
 
@@ -741,8 +772,11 @@ void main(List<String> args) {
   var ayuda = 0.5;
   final resto = <String>[];
   String? informeArg;
+  var causas = false;
   for (final a in args) {
-    if (a.startsWith('--jefes=')) {
+    if (a == '--causas') {
+      causas = true;
+    } else if (a.startsWith('--jefes=')) {
       carpetaJefes = a.substring('--jefes='.length);
     } else if (a.startsWith('--ayuda=')) {
       ayuda = double.parse(a.substring('--ayuda='.length));
@@ -786,6 +820,7 @@ void main(List<String> args) {
     'ayuda': (ayuda, 1.0),
     'solo-jefe': (0.0, 0.0),
   };
+  final filasCausas = <String>[];
   for (final jefe in jefes) {
     final nv = niveles.firstWhere((n) => n.nivel == jefe.nivel);
     final eqs = porNivel[jefe.nivel]!;
@@ -802,10 +837,28 @@ void main(List<String> args) {
           '${(100 * objetivo[jefe.nivel]!).toStringAsFixed(0).padLeft(3)} %     '
           '${m.turnosVictoria.toStringAsFixed(1).padLeft(5)}  '
           '${m.invocados.toStringAsFixed(2)}');
+      // Intentos que dan los umbrales; los que faltan hasta el total no
+      // llegaron a cruzarse porque la partida terminó antes.
+      final sinCruzar =
+          medido.intentos - m.invocados - m.sinSlot - m.sinCategoria;
+      filasCausas.add('${jefe.id.padRight(11)} ${e.key.padRight(12)} '
+          '${medido.intentos.toString().padLeft(8)} '
+          '${m.invocados.toStringAsFixed(2).padLeft(9)} '
+          '${m.sinSlot.toStringAsFixed(2).padLeft(8)} '
+          '${m.sinCategoria.toStringAsFixed(2).padLeft(10)} '
+          '${sinCruzar.toStringAsFixed(2).padLeft(10)}');
       filas.add('${jefe.id},${jefe.nivel},${medido.hp},${e.key},${eqs.length},'
           '${c.partidas},${m.victoria.toStringAsFixed(4)},${objetivo[jefe.nivel]},'
           '${m.turnosVictoria.toStringAsFixed(1)},${m.invocados.toStringAsFixed(2)}');
     }
+  }
+  if (causas) {
+    stdout.writeln('\nCausas de los intentos de invocación (media por partida)');
+    stdout.writeln('jefe        política      intentos  invocados  sinSlot  '
+        'sinCategoría  sinCruzar');
+    filasCausas.forEach(stdout.writeln);
+    stdout.writeln('sinCruzar: umbrales que no llegaron a cruzarse porque la '
+        'partida terminó antes (victoria o derrota).');
   }
   File(informe)
     ..createSync(recursive: true)
