@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
+import '../partida/tirada_mesa.dart';
+import 'dados_en_mesa.dart';
 import 'estilo.dart';
 import 'mapa.dart';
 import 'paneles.dart';
@@ -154,7 +156,11 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
       _ultimoAuto = auto;
       _manual = null;
     }
-    final foco = _manual ?? auto;
+    // Mientras ruedan los dados la cámara mira a donde caen.
+    final tirada = ref.watch(tiradaMesaProvider);
+    final foco = tirada != null
+        ? (tirada.sin ? const FocoAliados() : FocoJugador(tirada.asiento))
+        : _manual ?? auto;
     final jugadores = estado.jugadores.length;
     return ClipRect(
       child: LayoutBuilder(
@@ -187,6 +193,7 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
               child: _Mesa(
                 estado: estado,
                 alto: alto,
+                tirada: tirada,
                 onFoco: (f) => setState(() => _manual = f),
               ),
             ),
@@ -198,10 +205,16 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
 }
 
 class _Mesa extends StatelessWidget {
-  const _Mesa({required this.estado, required this.alto, required this.onFoco});
+  const _Mesa({
+    required this.estado,
+    required this.alto,
+    required this.onFoco,
+    this.tirada,
+  });
 
   final EstadoPartida estado;
   final double alto;
+  final TiradaMesa? tirada;
   final void Function(FocoCamara) onFoco;
 
   @override
@@ -259,6 +272,16 @@ class _Mesa extends StatelessWidget {
             ),
           ],
         ),
+        if (tirada != null)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: DadosEnMesa(
+                key: ObjectKey(tirada),
+                tirada: tirada!,
+                asientos: estado.jugadores.length,
+              ),
+            ),
+          ),
       ],
     );
   }

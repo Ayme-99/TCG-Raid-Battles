@@ -342,7 +342,14 @@ void main() {
     await tester.tap(find.byKey(const Key('invocar-aliado')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('tirar-dados')));
+    // T-44: el diálogo se cierra y los dados ruedan sobre la mesa.
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byKey(const Key('resultado-dados')), findsNothing);
+    expect(find.byKey(const ValueKey('dado-mesa-0')), findsOneWidget);
+    expect(find.byKey(const ValueKey('dado-mesa-1')), findsOneWidget);
+    // Al pararse vuelve el diálogo con la tirada puesta.
     await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('dado-mesa-0')), findsNothing);
     expect(find.byKey(const Key('resultado-dados')), findsOneWidget);
     expect(find.textContaining('Dado de slot (moneda): Jugador 2'),
         findsOneWidget);

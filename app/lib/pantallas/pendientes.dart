@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
+import '../partida/tirada_mesa.dart';
 import 'comun.dart';
 
 /// Lo que hay que resolver antes de seguir: intentos de invocación y ataques
@@ -40,14 +42,26 @@ class PanelPendientes extends ConsumerWidget {
                   FilledButton(
                     key: const Key('invocar-aliado'),
                     onPressed: () async {
-                      final evento = await showDialog<Evento>(
-                        context: context,
-                        builder: (_) => _DialogoAliado(
-                          estado: estado,
-                          catalogo: ref.read(catalogoProvider).valueOrNull,
-                          azar: ref.read(azarProvider),
-                        ),
+                      Object? resultado = await _abrirDialogoAliado(
+                        context,
+                        ref,
+                        estado,
                       );
+                      // «Tirar dados»: los dados caen sobre la mesa y, al
+                      // pararse, el diálogo vuelve con el resultado puesto.
+                      while (resultado is _ResultadoTirada) {
+                        await _tirarEnMesa(ref, resultado.mesa);
+                        if (!context.mounted) return;
+                        resultado = resultado.sin
+                            ? const SinInvocacion()
+                            : await _abrirDialogoAliado(
+                                context,
+                                ref,
+                                estado,
+                                inicial: resultado,
+                              );
+                      }
+                      final evento = resultado is Evento ? resultado : null;
                       if (evento == null || !context.mounted) return;
                       if (registrar(context, ref, evento) &&
                           evento is SinInvocacion) {
@@ -253,14 +267,72 @@ List<int> jugadoresAdyacentes(EstadoPartida estado, int objetivo) {
   return {anterior, siguiente}.toList();
 }
 
+/// Resultado de «Tirar dados» (T-44): el diálogo se cierra para que se vea la
+/// mesa, los dados caen sobre ella y luego el diálogo se reabre con esto puesto.
+class _ResultadoTirada {
+  const _ResultadoTirada({
+    required this.mesa,
+    required this.slot,
+    required this.categoria,
+    required this.texto,
+  });
+
+  /// La moneda del jefe salió en contra: no hay aliado.
+  _ResultadoTirada.sinAliado()
+      : mesa = TiradaMesa.sinAliado(),
+        slot = 0,
+        categoria = CategoriaAliado.danio,
+        texto = '';
+
+  final TiradaMesa mesa;
+  final int slot;
+  final CategoriaAliado categoria;
+  final String texto;
+
+  bool get sin => mesa.sin;
+}
+
+Future<Object?> _abrirDialogoAliado(
+  BuildContext context,
+  WidgetRef ref,
+  EstadoPartida estado, {
+  _ResultadoTirada? inicial,
+}) =>
+    showDialog<Object>(
+      context: context,
+      builder: (_) => _DialogoAliado(
+        estado: estado,
+        catalogo: ref.read(catalogoProvider).valueOrNull,
+        azar: ref.read(azarProvider),
+        inicial: inicial,
+      ),
+    );
+
+/// Enseña la tirada sobre la mesa y espera a que los dados paren. Si no
+/// hubiera mesa que la anime, se da por terminada pasado un rato.
+Future<void> _tirarEnMesa(WidgetRef ref, TiradaMesa tirada) async {
+  ref.read(tiradaMesaProvider.notifier).state = tirada;
+  final seguridad =
+      Timer(duracionTirada + const Duration(seconds: 1), tirada.terminar);
+  await tirada.terminada;
+  seguridad.cancel();
+  if (ref.read(tiradaMesaProvider) == tirada) {
+    ref.read(tiradaMesaProvider.notifier).state = null;
+  }
+}
+
 class _DialogoAliado extends StatefulWidget {
   const _DialogoAliado({
     required this.estado,
     required this.azar,
     this.catalogo,
+    this.inicial,
   });
 
   final EstadoPartida estado;
+
+  /// Tirada ya hecha con la que se abre el diálogo (tras ver caer los dados).
+  final _ResultadoTirada? inicial;
 
   /// Origen de las tiradas del botón «Tirar dados».
   final Random azar;
@@ -279,12 +351,12 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
   final _ataqueNombre = TextEditingController();
   final _ataqueDano = TextEditingController();
   final _habilidad = TextEditingController();
-  late int _slot = widget.estado.slotsLibres.isEmpty
-      ? 0
-      : widget.estado.slotsLibres.first;
-  late CategoriaAliado _categoria = widget.estado.categoriasLibres.isEmpty
-      ? CategoriaAliado.danio
-      : widget.estado.categoriasLibres.first;
+  late int _slot = widget.inicial?.slot ??
+      (widget.estado.slotsLibres.isEmpty ? 0 : widget.estado.slotsLibres.first);
+  late CategoriaAliado _categoria = widget.inicial?.categoria ??
+      (widget.estado.categoriasLibres.isEmpty
+          ? CategoriaAliado.danio
+          : widget.estado.categoriasLibres.first);
 
   /// El jefe tiene carta de aliado en el catálogo para la categoría elegida.
   bool _delCatalogo = false;
@@ -298,6 +370,7 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
   void initState() {
     super.initState();
     _rellenar(_categoria);
+    _tirada = widget.inicial?.texto;
   }
 
   /// Resultado de la última tirada, para enseñarlo.
@@ -316,7 +389,7 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
         ? null
         : widget.catalogo?.invocacionDe(jefe.nombre, jefe.nivel);
     if (inv != null && !inv.segura && !widget.azar.nextBool()) {
-      Navigator.of(context).pop(const SinInvocacion());
+      Navigator.of(context).pop(_ResultadoTirada.sinAliado());
       return;
     }
     final slots = e.slotsLibres;
@@ -329,15 +402,25 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
     if (slots.isEmpty || categorias.isEmpty) return;
     final slot = slots[widget.azar.nextInt(slots.length)];
     final categoria = categorias[widget.azar.nextInt(categorias.length)];
-    setState(() {
-      _slot = slot;
-      _categoria = categoria;
-      _rellenar(categoria);
-      _tirada = 'Dado de slot (${_dado(e.jugadores.length)}): '
-          '${e.jugadores[slot].nombre} · '
-          'dado de categoría (d${inv?.aliados.length ?? CategoriaAliado.values.length}): '
-          '${etiquetaCategoria(categoria)}';
-    });
+    final carasCategoria = inv?.aliados.length ?? CategoriaAliado.values.length;
+    // El diálogo se cierra para que se vea la mesa mientras caen los dados.
+    Navigator.of(context).pop(
+      _ResultadoTirada(
+        mesa: TiradaMesa(
+          asiento: slot,
+          carasSlot: e.jugadores.length,
+          valorSlot: slot + 1,
+          carasCategoria: carasCategoria,
+          valorCategoria: categorias.indexOf(categoria) + 1,
+        ),
+        slot: slot,
+        categoria: categoria,
+        texto: 'Dado de slot (${_dado(e.jugadores.length)}): '
+            '${e.jugadores[slot].nombre} · '
+            'dado de categoría (d$carasCategoria): '
+            '${etiquetaCategoria(categoria)}',
+      ),
+    );
   }
 
   /// Rellena los campos con el aliado del catálogo de esa categoría, si lo hay.
