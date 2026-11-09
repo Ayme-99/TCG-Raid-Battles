@@ -1,0 +1,10 @@
+Calibración tras los nuevos límites de X (Nv1 <=400, Nv2 <=600, Nv3 <=800, Nv4 >800; sin tope de 200 por ataque).
+sim_jefes --calibrar, 150 equipos x 60 partidas, ayuda=0.5. Objetivo 75/50/30/15 %. HP de la política solo-dueno.
+
+jefe       nivel  HP antes -> HP nuevo  solo-dueno  ayuda   solo-jefe
+onix       1      2200 -> 2300          76.6 %      77.3 %  72.8 %
+manectric  2      2500 -> 2600          50.4 %      52.9 %  47.0 %
+kingdra    3      3600 -> 3700          32.0 %      33.8 %  35.5 %
+arceus     4      3800 (igual)          15.5 %      16.5 %  17.2 %
+
+Intentos de invocación perdidos por partida acabada antes (solo-dueno): onix 0.00, manectric 0.07, kingdra 0.27, arceus 0.86. Sin slot: solo en solo-jefe (kingdra 0.04, arceus 0.10).
