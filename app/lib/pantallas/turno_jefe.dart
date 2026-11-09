@@ -9,7 +9,7 @@ import '../partida/controlador_partida.dart';
 import 'comun.dart';
 import 'paneles.dart';
 import 'pendientes.dart';
-import 'tarjeta_jefe.dart';
+import 'mesa.dart';
 
 /// Turno del jefe: sus ataques, los ataques de los aliados, KO y estados.
 class PantallaTurnoJefe extends ConsumerWidget {
@@ -23,13 +23,11 @@ class PantallaTurnoJefe extends ConsumerWidget {
       for (final a in estado.aliados)
         if (a.tieneAtaque && !a.atacoEnTurnoJefe) a,
     ];
-    return ListView(
+    final controles = ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const TarjetaJefe(),
         const PanelEfectosActivos(),
         const PanelPendientes(),
-        const PanelAliados(),
         _AtaqueJefe(
           key: ValueKey('ataque-${estado.ronda}-${estado.ataquesJefeEnTurno}'),
           estado: estado,
@@ -97,6 +95,13 @@ class PantallaTurnoJefe extends ConsumerWidget {
           },
           child: const Text('Terminar el turno del jefe'),
         ),
+      ],
+    );
+    // La mesa con cámara arriba y los controles del turno debajo.
+    return Column(
+      children: [
+        const Flexible(flex: 3, child: MesaConCamara()),
+        Expanded(flex: 2, child: controles),
       ],
     );
   }

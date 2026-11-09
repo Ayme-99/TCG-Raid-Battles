@@ -7,7 +7,7 @@ import '../partida/controlador_partida.dart';
 import 'comun.dart';
 import 'paneles.dart';
 import 'pendientes.dart';
-import 'tarjeta_jefe.dart';
+import 'mesa.dart';
 
 /// Turno de los jugadores: orden de la ronda, daño al jefe, ataques a
 /// aliados, cartas de ánimo, estados y KO.
@@ -18,13 +18,11 @@ class PantallaTurnoJugadores extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final estado = ref.watch(estadoProvider);
     final actual = estado.jugadorActual;
-    return ListView(
+    final controles = ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const TarjetaJefe(),
         const PanelEfectosActivos(),
         const PanelPendientes(),
-        const PanelAliados(),
         _Orden(estado: estado),
         if (actual != null)
           _TurnoActual(
@@ -39,6 +37,14 @@ class PantallaTurnoJugadores extends ConsumerWidget {
           jugadorInicial: actual,
         ),
         const PanelPokemon(),
+      ],
+    );
+    // La mesa con cámara arriba (jefe, aliados y jugadores) y los controles
+    // del turno debajo.
+    return Column(
+      children: [
+        const Flexible(flex: 3, child: MesaConCamara()),
+        Expanded(flex: 2, child: controles),
       ],
     );
   }
