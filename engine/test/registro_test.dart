@@ -311,6 +311,8 @@ void main() {
         expect(() => RegistroPartida.deJson(json),
             throwsA(isA<RegistroInvalido>()));
       });
+    }
+  });
 
   group('ejemplos del contrato v7', () {
     test('hay ejemplos de cada tipo', () {

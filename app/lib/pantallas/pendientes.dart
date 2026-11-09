@@ -49,7 +49,6 @@ class PanelPendientes extends ConsumerWidget {
                         ),
                       );
                       if (evento == null || !context.mounted) return;
-                      final previos = estado.aliados.length;
                       if (registrar(context, ref, evento) &&
                           evento is SinInvocacion) {
                         registrarAviso(
