@@ -9,9 +9,10 @@ EstadoPartida _victoria(
   List<int> danos, {
   List<int> bajas = const [],
   int hp = 2382,
+  int ataque = 100,
 }) {
   assert(danos.fold<int>(0, (a, b) => a + b) == hp);
-  var s = empezar(ataques: [for (final _ in danos) 100], hp: hp);
+  var s = empezar(ataques: [for (final _ in danos) ataque], hp: hp);
   for (final a in bajas) {
     s = apply(s, PokemonKo(a));
   }
@@ -107,9 +108,9 @@ void main() {
     test('ejemplo de D-10 con 4 jugadores (victoria Nv2 = 6000)', () {
       // A 40 %, B 30 % (perdió un Pokémon), C 20 %, D 10 %: C y D, sin
       // pérdidas, ocupan los puestos intermedios y B queda último.
-      var s = _victoria([958, 715, 477, 232], bajas: const [1]);
+      var s = _victoria([958, 715, 477, 232], bajas: const [1], ataque: 110);
       final p = calcularPuntos(s);
-      // 4 jugadores con ataque 100: X = 400, nivel 2.
+      // 4 jugadores con ataque 110: X = 440, nivel 2 (X > 400).
       expect(p.puntosTotal, 6000);
       final porAsiento = {for (final j in p.jugadores) j.asiento: j};
       expect(porAsiento[0]!.puesto, 1);

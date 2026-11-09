@@ -1,5 +1,5 @@
 nivel,x_min,x_max,x_centro,hp,ataque1,ataque2,ataque3,max_ataques_turno,amenaza_esperada,poder,estado
-1,250,390,320,2382,30,60,120,2,99,235818,provisional: calibrado con 16 cartas reales (D-03 8.4)
-2,400,590,500,4313,40,80,160,3,166,715958,provisional: calibrado con 16 cartas reales (D-03 8.4)
-3,600,799,700,4411,60,100,200,4,244,1076284,provisional: calibrado con 16 cartas reales (D-03 8.4)
-4,800,,900,5205,80,120,240,5,323,1681215,provisional: calibrado con 16 cartas reales (D-03 8.4)
+1,250,400,320,2382,30,60,120,2,99,235818,provisional: calibrado con 16 cartas reales (D-03 8.4)
+2,401,600,500,4313,40,80,160,3,166,715958,provisional: calibrado con 16 cartas reales (D-03 8.4)
+3,601,800,700,4411,60,100,200,4,244,1076284,provisional: calibrado con 16 cartas reales (D-03 8.4)
+4,801,,900,5205,80,120,240,5,323,1681215,provisional: calibrado con 16 cartas reales (D-03 8.4)

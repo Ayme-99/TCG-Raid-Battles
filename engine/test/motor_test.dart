@@ -17,16 +17,17 @@ void main() {
     test('niveles por X (el umbral pertenece al nivel superior)', () {
       expect(nivelPorX(0), 1);
       expect(nivelPorX(249), 1);
-      expect(nivelPorX(399), 1);
-      expect(nivelPorX(400), 2);
-      expect(nivelPorX(599), 2);
-      expect(nivelPorX(600), 3);
-      expect(nivelPorX(799), 3);
-      expect(nivelPorX(800), 4);
+      expect(nivelPorX(400), 1);
+      expect(nivelPorX(401), 2);
+      expect(nivelPorX(600), 2);
+      expect(nivelPorX(601), 3);
+      expect(nivelPorX(800), 3);
+      expect(nivelPorX(801), 4);
     });
 
     test('el ataque se limita a 200', () {
-      expect(ataqueParaX(350), 200);
+      expect(ataqueParaX(350), 350);
+      expect(ataqueParaX(-5), 0);
       expect(ataqueParaX(90), 90);
     });
   });
@@ -39,14 +40,14 @@ void main() {
       expect(s.fase, Fase.eleccionJefe);
     });
 
-    test('limita el ataque de cada jugador', () {
+    test('no limita el ataque de cada jugador (hay cartas de más de 200)', () {
       final s = apply(
         EstadoPartida.inicial(),
         const ConfigurarJugadores([
           ConfigJugador(nombre: 'A', ataqueMaximo: 500),
         ]),
       );
-      expect(s.x, 200);
+      expect(s.x, 500);
     });
 
     test('el jefe debe ser del nivel de la partida', () {

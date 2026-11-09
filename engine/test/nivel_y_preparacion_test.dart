@@ -7,13 +7,13 @@ void main() {
   group('nivel por X con jugadores reales', () {
     final casos = <String, (List<int>, int, int)>{
       '1 jugador': ([150], 150, 1),
-      '2 jugadores, X=399': ([200, 199], 399, 1),
-      '2 jugadores, X=400': ([200, 200], 400, 2),
-      '3 jugadores, X=599': ([200, 200, 199], 599, 2),
-      '3 jugadores, X=600': ([200, 200, 200], 600, 3),
-      '4 jugadores, X=799': ([200, 200, 200, 199], 799, 3),
-      '4 jugadores, X=800': ([200, 200, 200, 200], 800, 4),
-      'el tope de 200 evita saltar de nivel': ([999, 999], 400, 2),
+      '2 jugadores, X=400': ([200, 200], 400, 1),
+      '2 jugadores, X=401': ([200, 201], 401, 2),
+      '3 jugadores, X=600': ([200, 200, 200], 600, 2),
+      '3 jugadores, X=601': ([200, 200, 201], 601, 3),
+      '4 jugadores, X=800': ([200, 200, 200, 200], 800, 3),
+      '4 jugadores, X=801': ([200, 200, 200, 201], 801, 4),
+      'sin tope: un ataque de 300 cuenta 300': ([300, 300], 600, 2),
     };
     casos.forEach((nombre, caso) {
       test(nombre, () {

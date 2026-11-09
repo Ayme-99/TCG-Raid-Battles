@@ -31,7 +31,7 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 | | El GDD `incursiones_gdd.md` (sube la versión, añade fila al historial) y el documento `docs/D-xx` de esa decisión | ❌ |
 | | `docs/playtests/GUION.md` si la regla cambia cómo se juega en mesa | ❌ |
 | | El simulador `sim/` si usa esa regla | ❌ |
-| Las **tablas de balance** (`balance/tablas/niveles.csv`: X por nivel, HP y ataques de referencia) | `engine/lib/src/reglas.dart` (`umbralNivel2/3/4` = `x_min` de cada nivel) | ✅ `engine/test/tablas_balance_test.dart` |
+| Las **tablas de balance** (`balance/tablas/niveles.csv`: X por nivel, HP y ataques de referencia) | `engine/lib/src/reglas.dart` (`maxXNivel1/2/3` = `x_min` del nivel siguiente − 1) | ✅ `engine/test/tablas_balance_test.dart` |
 | | El GDD (§2: ataques por nivel; §9: valores provisionales) y `docs/D-03-sistema-de-poder.md` | ⚠️ `engine/test/tablas_balance_test.dart` comprueba los ataques por nivel del GDD §2 y de los jefes del catálogo; el resto no |
 | | La hoja de balance (compara contra el «poder de referencia» de `niveles.csv`) | ✅ `balance/scripts/comprobar_hoja.py` (CI: «Hoja de balance al día») |
 | Los **puntos** (`balance/tablas/puntos_niveles.csv`, `reparto_puntos.csv`) | `engine/lib/src/puntos.dart` (`topeVictoriaPorNivel`, `costeDesbloqueoPorNivel`, `repartoPorJugadores`) | ✅ `engine/test/tablas_balance_test.dart` (los valores están copiados, no se leen del CSV) |
@@ -72,7 +72,7 @@ Estos datos viven duplicados. Los que llevan ✅ los compara `engine/test/tablas
 
 | Dato | Dónde está |
 |---|---|
-| ✅ Umbrales de nivel por X (400/600/800) | `balance/tablas/niveles.csv` (`x_min`), `engine/lib/src/reglas.dart` (el GDD §2 no se comprueba) |
+| ✅ Límites de nivel por X (≤400 / ≤600 / ≤800) | `balance/tablas/niveles.csv` (`x_min`), `engine/lib/src/reglas.dart` (el GDD §2 no se comprueba) |
 | ✅ Ataques de cada nivel (30/60/120 …) | `niveles.csv`, GDD §2, cada jefe del catálogo (un ataque de daño variable, «40+», lleva su daño base, que no pasa del de la tabla) |
 | HP de referencia por nivel | `niveles.csv`, GDD §9, hoja de balance (se lee del CSV) |
 | ✅ Puntos por victoria, coste de desbloqueo y reparto | `balance/tablas/*.csv`, `engine/lib/src/puntos.dart` (`docs/D-10-sistema-de-puntos.md` no se comprueba) |
