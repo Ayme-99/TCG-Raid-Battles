@@ -48,42 +48,11 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
         if (a.tieneAtaque && !a.atacoEnTurnoJefe) a,
     ];
     final controles = <Widget>[
-        const PanelEfectosActivos(),
         const PanelPendientes(),
         _AtaqueJefe(
           key: ValueKey('ataque-${estado.ronda}-${estado.ataquesJefeEnTurno}'),
           estado: estado,
         ),
-        if (aliadosPorAtacar.isNotEmpty)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Ataques de los aliados',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      for (final a in aliadosPorAtacar)
-                        FilledButton.tonal(
-                          key: Key('aliado-ataca-${a.slot}'),
-                          onPressed: () =>
-                              atacarConAliado(context, ref, estado, a),
-                          child: Text('${a.nombre} ataca (${a.ataqueDano})'),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        const PanelEstados(),
-        const PanelPokemon(),
         const SizedBox(height: 8),
         FilledButton(
           key: const Key('fin-turno-jefe'),
@@ -118,9 +87,43 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
           child: const Text('Terminar el turno del jefe'),
         ),
     ];
+    // El panel del ataque solo lleva el ataque; lo demás va en «Más acciones».
+    final extras = <Widget>[
+        const PanelEfectosActivos(),
+        if (aliadosPorAtacar.isNotEmpty)
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ataques de los aliados',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      for (final a in aliadosPorAtacar)
+                        FilledButton.tonal(
+                          key: Key('aliado-ataca-${a.slot}'),
+                          onPressed: () =>
+                              atacarConAliado(context, ref, estado, a),
+                          child: Text('${a.nombre} ataca (${a.ataqueDano})'),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        const PanelEstados(),
+        const PanelPokemon(),
+    ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).
-    return DisposicionMesa(controles: controles, lateral: true);
+    return DisposicionMesa(controles: controles, extras: extras, lateral: true);
   }
 }
 

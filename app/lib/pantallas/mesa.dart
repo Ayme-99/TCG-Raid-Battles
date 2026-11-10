@@ -196,7 +196,10 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
               if (widget.extras.isNotEmpty)
                 Positioned(
                   key: const Key('panel-extras'),
-                  right: margen,
+                  // Con el panel del ataque a la derecha, lo demás va a la
+                  // izquierda.
+                  left: widget.lateral && activo == null ? margen : null,
+                  right: widget.lateral && activo == null ? null : margen,
                   top: 72,
                   bottom: alto * alturaJugadores + 4,
                   width: 300,
