@@ -1,10 +1,10 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.8 (especificación del motor)
+**Versión:** 1.10 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
-Este documento es la fuente de verdad del diseño. Recoge todas las decisiones cerradas (D-01 a D-05, D-07 en lo que toca a aliados, D-10 y D-11) y marca en §9 lo que sigue siendo provisional hasta los playtests (T-17). El detalle y la justificación de cada decisión están en `docs/`.
+Este documento es la fuente de verdad del diseño. Recoge todas las decisiones cerradas (D-01 a D-16, salvo D-15, que sigue en diseño) y marca en §9 lo que sigue siendo provisional hasta los playtests (T-17). El detalle y la justificación de cada decisión están en `docs/`.
 
 ---
 
@@ -33,7 +33,7 @@ Orden (detalle en `docs/D-01-setup.md`):
 | **X** | Suma, de todos los jugadores, del daño del mejor ataque de cada jugador (un solo valor por jugador: el mayor entre sus 2 Pokémon). Se calcula una sola vez, en el setup. |
 | Qué número cuenta (`docs/D-02-dano-maximo.md`) | Cada jugador lo introduce a mano y todos lo ven y lo comprueban con la carta física. La mesa acuerda el número caso a caso, **sin tope** (hay cartas de más de 200 de daño). Daño fijo: el impreso. Daño por Energía: solo el base impreso. Los modificadores de la partida no cuentan. |
 | **Nivel** | `X ≤ 400` → Nv1 · `400 < X ≤ 600` → Nv2 · `600 < X ≤ 800` → Nv3 · `X > 800` → Nv4. El valor límite pertenece al nivel de abajo (media máxima por jugador con 4: 100 / 150 / 200 en Nv1-3). Un X menor de 250 se juega como Nv1 (no hay nivel inferior). |
-| **Jefe** | Elegido a mano o al azar dentro del nivel. Es una **carta fija** del catálogo: tiene su propio HP y sus propios ataques; no se escala con los jugadores. El asistente conoce el HP y el daño de cada ataque y computa solo los efectos «de programa» (D-14: autodaño, daño por ataques previos del turno, daño a los aliados); el resto lo aplican los jugadores en la mesa. **Criterio de nivel**: Nv1 Pokémon Básicos, Nv2 Pokémon de Fase 1 que no evolucionan más, Nv3 Pokémon de Fase 2, Nv4 Pokémon Míticos y Legendarios. Lanzamiento: 7 jefes (2 en Nv1, 2 en Nv2, 2 en Nv3, 1 en Nv4), todos disponibles desde el principio. |
+| **Jefe** | Elegido a mano o al azar dentro del nivel. Es una **carta fija** del catálogo: tiene su propio HP y sus propios ataques; no se escala con los jugadores. El asistente conoce el HP y el daño de cada ataque y computa solo los efectos «de programa» (D-14: autodaño, daño por ataques previos del turno, daño a los aliados); el resto lo aplican los jugadores en la mesa. **Criterio de nivel**: Nv1 Pokémon Básicos, Nv2 Pokémon de Fase 1 que no evolucionan más, Nv3 Pokémon de Fase 2, Nv4 Pokémon Míticos y Legendarios. Lanzamiento: 4 jefes, uno por nivel (Onix Nv1, Manectric Nv2, Kingdra Nv3, Arceus Nv4), todos disponibles desde el principio; el catálogo crecerá con más jefes. |
 | **HP del jefe** | El de su carta. HP de los jefes del catálogo, calibrados con el simulador (con sus 6 aliados, D-16) para un objetivo de victoria de 75 / 50 / 30 / 15 %: **Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800** en Nv1 / Nv2 / Nv3 / Nv4. La referencia anterior sin aliados (2382 / 4313 / 4411 / 5205) sigue en `balance/tablas/niveles.csv`. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
 | Ataques del jefe por nivel | Nv1 30/60/120 · Nv2 40/80/160 · Nv3 60/100/200 · Nv4 80/120/240. Los ataques salen de la baraja de ataques del jefe («Ataque X contra jugador Y», como el juego oficial), que también fija el máximo de ataques por turno. |
 | Menos de 4 jugadores | No se añaden parejas extra. El nivel se autoajusta con X, y los slots de aliados bajan con el número de jugadores (§4.4). |
@@ -116,7 +116,7 @@ Detalle en `docs/D-04-aliados.md`.
 
 - **Un slot por jugador** (hasta 4; con 3 jugadores, 3 slots; con 2, 2). Un aliado como máximo por slot, solo en slots de jugadores activos.
 - Un aliado tiene HP propio (independiente del jefe), a lo sumo un ataque y a veces una habilidad. Hay aliados sin ataque (solo habilidad) y las habilidades son **pasivas**: una vez en juego se mantienen mientras el aliado siga en el combate.
-- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y sus 4 aliados, uno por categoría: Daño, Tanque, Cura y Pícaro, D-13); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: si el jefe usa moneda, se tira y solo sigue si sale cara; si su invocación es **segura**, no hay moneda y el intento sigue siempre. Después, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay invocación) y un d4 elige la categoría (no se repite una categoría en uso). Entra el aliado de esa categoría de la ficha del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que atacará.
+- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y sus 6 aliados, uno por categoría: Daño, Tanque, Cura, Control, Potenciador y Debilitador, D-13 y D-16); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: si el jefe usa moneda, se tira y solo sigue si sale cara; si su invocación es **segura**, no hay moneda y el intento sigue siempre. Después, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay invocación) y un d6 elige la categoría (no se repite una categoría en uso). Entra el aliado de esa categoría de la ficha del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que atacará.
 - **Pícaro**: categoría de control (estados alterados, modificar fuerza, contadores de daño). Sus aliados son los únicos que atacan a la Banca.
 - **Entrada**: al entrar, el aliado usa su ataque y/o su habilidad contra el dueño de su slot (salvo que su texto diga otra cosa) y no vuelve a atacar hasta el final del turno del jefe.
 - **Exceso de daño**: si un jugador hace a un aliado más daño del que le queda, el exceso se pierde (no pasa al jefe ni a otro aliado).
@@ -178,7 +178,7 @@ Detalle en `docs/D-10-sistema-de-puntos.md`. Cifras en `balance/tablas/`.
 - Los puntos son **individuales**: cada partida genera un total para el equipo que se reparte según lo aportado en el combate (el daño hecho por la fuente de cada jugador: ataques, daño extra de las cartas de ánimo y aliados que invoca).
 - **Victoria**: el total es el tope del nivel (3000 / 6000 / 9000 / 15000). **Derrota** (también al abandonar): `round(vida perdida por el jefe × Y ÷ 4) + 1`, con Y = tope del nivel ÷ HP del jefe (perder sin hacer nada da 1 punto).
 - **Reparto**: 1 jugador 100 % · 2 jugadores 55 / 45 · 3 jugadores 40 / 33 / 27 · 4 jugadores 27 / 25 / 25 / 23 (los intermedios van primero a quien no perdió Pokémon, luego por daño; empate: menos Pokémon perdidos, luego al azar).
-- **Desbloqueos**: los puntos de una cuenta se acumulan y no se gastan. Un jefe nuevo se desbloquea al llegar a su coste: Nv1 10 000 · Nv2 20 000 · Nv3 30 000 · Nv4 40 000. Los 7 jefes de lanzamiento están disponibles desde el principio.
+- **Desbloqueos**: los puntos de una cuenta se acumulan y no se gastan. Un jefe nuevo se desbloquea al llegar a su coste: Nv1 10 000 · Nv2 20 000 · Nv3 30 000 · Nv4 40 000. Los 4 jefes de lanzamiento están disponibles desde el principio.
 - El daño hecho a los aliados no cuenta para los puntos.
 - **Bono de estados** (D-12): cada jugador que aplica veneno o quemadura al jefe cobra un bono individual, fuera del total del equipo, `tope del nivel ÷ 100 × min(n, 3)` con `n` = veces que ha aplicado un estado que el jefe no tenía. En derrota (o abandono) se divide entre 4. No cambia los puestos. Los invitados no lo cobran.
 
@@ -216,7 +216,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 - **X:** suma del mejor ataque de cada jugador; fija el nivel del jefe.
 - **Ranura de ataque (Attack slot):** Ataque 1/2/3 del jefe; el asistente solo conoce el número, no el efecto.
 - **Carta de ánimo (Cheer):** carta que roba el jugador cuyo Pokémon activo cae KO; le da prioridad en la ronda siguiente y un efecto resuelto en la mesa.
-- **Aliado:** Pokémon invocado por el jefe, uno por slot de jugador y de una de las 4 categorías (Daño, Tanque, Cura, Pícaro). Un único ataque, a veces con habilidad.
+- **Aliado:** Pokémon invocado por el jefe, uno por slot de jugador y de una de las 6 categorías (Daño, Tanque, Cura, Control, Potenciador, Debilitador). Un único ataque, a veces con habilidad.
 - **Habilidad (de aliado):** efecto pasivo que algunos aliados tienen; se resuelve físicamente.
 - **KO (jugador):** un Pokémon del jugador ha sido derrotado. No elimina al jugador hasta agotar todos sus Pokémon.
 - **Eliminado:** jugador sin Pokémon en juego; deja de participar, pero la partida sigue si queda alguno activo.
@@ -238,7 +238,11 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | `docs/D-05-carta-de-animo.md` | Cheer, KO, promoción desde la banca |
 | `docs/D-10-sistema-de-puntos.md` | Puntos, reparto, desbloqueos y modelo de datos |
 | `docs/D-11-identidad-jugadores.md` | Cuentas, unirse a una partida, modo sin conexión |
-| `docs/D-13-aliados-por-categoria.md` | 4 aliados por jefe, invocación con dado de slot y de categoría, efectos del programa o del jugador |
+| `docs/D-12-estados-del-jefe.md` | Veneno y quemadura del jefe, chequeo al cerrar la ronda y bono de puntos |
+| `docs/D-13-aliados-por-categoria.md` | Aliados por categoría, invocación con dado de slot y de categoría, efectos del programa o del jugador |
+| `docs/D-14-efectos-de-ataques-del-jefe.md` | Efectos de los ataques del jefe que computa el programa |
+| `docs/D-15-modos-de-preparacion.md` | Modos de preparación: por equipo, por jefe (en diseño, #106) |
+| `docs/D-16-aliados-seis-categorias.md` | Los aliados pasan de 4 a 6 categorías |
 
 ---
 
@@ -268,3 +272,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.7 | La categoría Barrera pasa a llamarse **Tanque** (contrato v4). Cada jefe puede invocar con moneda o de forma **segura** (sin moneda). Jefes iniciales: Onix (Nv1), Manectric (Nv2), Kingdra (Nv3) y Arceus (Nv4), con invocación segura en el 50 %, 66 %/33 %, 75/50/25 % y 80/60/40/20 % del HP. |
 | v1.8 | Se deja escrito qué gestiona la app (el jefe y sus aliados: HP, daño recibido y ataques que hacen) y qué se resuelve en la mesa (Pokémon de los jugadores y baraja de ataques del jefe). |
 | v1.9 | Criterio de nivel de los jefes (Nv1 Básicos, Nv2 Fase 1 que no evolucionan más, Nv3 Fase 2, Nv4 Míticos y Legendarios). Los ataques del jefe pasan a poder llevar efectos (D-14, contrato v5): la app computa solo los de programa. |
+| v1.10 | Puesta al día del documento: D-16 (6 categorías de aliado: Daño, Tanque, Cura, Control, Potenciador y Debilitador; contrato v6), lanzamiento con 4 jefes (uno por nivel) en lugar de 7, y el índice de §11 con D-12, D-14, D-15 y D-16. D-15 (modos de preparación) sigue en diseño. |

@@ -6,7 +6,7 @@ Es un **módulo Express** (no un servidor): `crearRouter(...)` devuelve un route
 
 ## Qué valida
 
-1. **Estructura**, con el esquema de la versión que declara el registro (1, 2, 3, 4 o 5; [`../contrato/`](../contrato/README.md)): `400 estructura_invalida` o `400 version_no_soportada`. Las versiones conviven y el registro se guarda tal cual llegó.
+1. **Estructura**, con el esquema de la versión que declara el registro (1 a 7; [`../contrato/`](../contrato/README.md)): `400 estructura_invalida` o `400 version_no_soportada`. Las versiones conviven y el registro se guarda tal cual llegó.
 2. **Que el usuario juega en la partida**: su cuenta debe estar en `cuentas` (`403 no_participas`).
 3. **Coherencia del resumen** (`src/coherencia.js`): el nivel y el jefe son los del registro, el resultado cuadra con el daño y el abandono, `puntosTotal` sale de la fórmula de D-10, el reparto por puesto y los abonos cuadran con las cuentas y, en la versión 2, las aplicaciones de estados de cada jugador (se recuentan a partir de los eventos) y su bono de D-12 (`422 resumen_incoherente`, con la lista de motivos).
 4. **Que las cuentas existen** (`422 cuenta_desconocida`).
@@ -55,7 +55,7 @@ app.use('/api/incursiones', crearRouter({
 }));
 ```
 
-El router incluye `express.json` (límite de 1 MB). `express` es una dependencia del host; aquí solo se usa en los tests. Los esquemas se leen de `../contrato/partida.v1.schema.json` y `partida.v2.schema.json`: al montarlo, hay que llevar esa carpeta (`crearValidador(carpeta)` acepta otra ruta) o pasar un `validar` propio.
+El router incluye `express.json` (límite de 1 MB). `express` es una dependencia del host; aquí solo se usa en los tests. Los esquemas se leen de `../contrato/partida.vN.schema.json` (una por versión): al montarlo, hay que llevar esa carpeta (`crearValidador(carpeta)` acepta otra ruta) o pasar un `validar` propio.
 
 ## Tests
 
