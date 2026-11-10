@@ -107,6 +107,9 @@ void main() {
     final estado = c.read(estadoProvider);
     expect(estado.fase, Fase.turnoJefe);
     expect(estado.jefe!.hp, 400);
+    // Primero se roba la carta; después aparece el ataque del jefe.
+    expect(find.byKey(const Key('turno-del-jefe')), findsNothing);
+    await tocar(tester, 'robar-carta-jefe');
     expect(find.byKey(const Key('turno-del-jefe')), findsOneWidget);
   });
 
