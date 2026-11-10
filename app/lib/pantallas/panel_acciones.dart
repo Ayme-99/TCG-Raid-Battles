@@ -71,7 +71,7 @@ class PanelAcciones extends StatelessWidget {
                     children: [
                       Text(
                         titulo,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w900,
                           fontSize: 18,
