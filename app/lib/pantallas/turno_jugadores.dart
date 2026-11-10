@@ -18,9 +18,7 @@ class PantallaTurnoJugadores extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final estado = ref.watch(estadoProvider);
     final actual = estado.jugadorActual;
-    final controles = ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
+    final controles = <Widget>[
         const PanelEfectosActivos(),
         const PanelPendientes(),
         _Orden(estado: estado),
@@ -37,8 +35,7 @@ class PantallaTurnoJugadores extends ConsumerWidget {
           jugadorInicial: actual,
         ),
         const PanelPokemon(),
-      ],
-    );
+    ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).
     return DisposicionMesa(controles: controles);

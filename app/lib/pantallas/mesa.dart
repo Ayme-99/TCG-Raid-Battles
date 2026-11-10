@@ -9,6 +9,7 @@ import '../partida/tirada_mesa.dart';
 import 'dados_en_mesa.dart';
 import 'estilo.dart';
 import 'mapa.dart';
+import 'panel_acciones.dart';
 import 'paneles.dart';
 import 'tarjeta_jefe.dart';
 
@@ -131,31 +132,48 @@ class _CamaraTween extends Tween<Camara> {
   Camara lerp(double t) => Camara.lerp(begin!, end!, t);
 }
 
-/// La mesa a pantalla completa. En pantallas anchas los controles del turno van
-/// en un panel a la derecha; en las estrechas, debajo de la mesa.
-class DisposicionMesa extends StatelessWidget {
+/// La mesa a pantalla completa. En pantallas anchas el panel de acciones flota
+/// sobre la mesa, a la izquierda y encima de la fila de jugadores; en las
+/// estrechas va debajo de la mesa. En los dos casos se puede plegar.
+class DisposicionMesa extends StatefulWidget {
   const DisposicionMesa({super.key, required this.controles});
 
-  /// Ancho a partir del cual los controles pasan a un lado.
-  static const anchoMinimoLateral = 900.0;
+  /// Ancho a partir del cual el panel flota sobre la mesa.
+  static const anchoMinimoFlotante = 1100.0;
   static const anchoPanel = 420.0;
 
-  final Widget controles;
+  final List<Widget> controles;
+
+  @override
+  State<DisposicionMesa> createState() => _DisposicionMesaState();
+}
+
+class _DisposicionMesaState extends State<DisposicionMesa> {
+  bool _abierto = true;
+
+  void _alternar() => setState(() => _abierto = !_abierto);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, caja) {
-        if (caja.maxWidth >= anchoMinimoLateral) {
-          return Row(
+        if (caja.maxWidth >= DisposicionMesa.anchoMinimoFlotante) {
+          final alto = caja.maxHeight;
+          return Stack(
             children: [
-              const Expanded(child: MesaConCamara()),
-              SizedBox(
-                width: anchoPanel,
-                child: Material(
-                  color: Theme.of(context).colorScheme.surface,
-                  elevation: 4,
-                  child: controles,
+              const Positioned.fill(child: MesaConCamara()),
+              Positioned(
+                left: 20,
+                bottom: alto * alturaJugadores + 12,
+                width: DisposicionMesa.anchoPanel,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: alto * 0.56),
+                  child: PanelAcciones(
+                    controles: widget.controles,
+                    abierto: _abierto,
+                    onAlternar: _alternar,
+                    ajustar: true,
+                  ),
                 ),
               ),
             ],
@@ -163,8 +181,30 @@ class DisposicionMesa extends StatelessWidget {
         }
         return Column(
           children: [
-            const Flexible(flex: 3, child: MesaConCamara()),
-            Expanded(flex: 2, child: controles),
+            const Expanded(flex: 3, child: MesaConCamara()),
+            if (_abierto)
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+                  child: PanelAcciones(
+                    controles: widget.controles,
+                    abierto: true,
+                    onAlternar: _alternar,
+                    ajustar: false,
+                  ),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+                child: PanelAcciones(
+                  controles: widget.controles,
+                  abierto: false,
+                  onAlternar: _alternar,
+                  ajustar: true,
+                ),
+              ),
           ],
         );
       },
@@ -286,7 +326,11 @@ class _Mesa extends StatelessWidget {
                 key: const Key('zona-jefe'),
                 behavior: HitTestBehavior.translucent,
                 onTap: () => onFoco(const FocoJefe()),
-                child: const _Zona(ancho: 440, hijo: TarjetaJefe()),
+                child: _Zona(
+                  ancho: 440,
+                  arriba: MediaQuery.of(context).padding.top + 52,
+                  hijo: const TarjetaJefe(),
+                ),
               ),
             ),
             Expanded(
@@ -330,15 +374,18 @@ class _Mesa extends StatelessWidget {
 
 /// Zona de la mesa que escala su contenido para que quepa entera.
 class _Zona extends StatelessWidget {
-  const _Zona({required this.ancho, required this.hijo});
+  const _Zona({required this.ancho, required this.hijo, this.arriba = 0});
 
   final double ancho;
   final Widget hijo;
 
+  /// Espacio reservado arriba (la barra flotante de la partida).
+  final double arriba;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.fromLTRB(8, 8 + arriba, 8, 8),
       child: FittedBox(
         child: SizedBox(width: ancho, child: hijo),
       ),

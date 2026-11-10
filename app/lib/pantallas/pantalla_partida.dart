@@ -28,40 +28,56 @@ class PantallaPartida extends ConsumerWidget {
         ref.watch(enviosProvider.select((e) => e.partidaEncolada != null));
     final enJuego =
         estado.fase == Fase.turnoJugadores || estado.fase == Fase.turnoJefe;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_titulo(estado)),
-        actions: [
-          IconButton(
-            key: const Key('deshacer'),
-            tooltip: 'Deshacer',
-            icon: const Icon(Icons.undo),
-            onPressed: puedeDeshacer && !bloqueada
-                ? () => ref.read(partidaProvider.notifier).deshacer()
-                : null,
-          ),
-          IconButton(
-            key: const Key('rehacer'),
-            tooltip: 'Rehacer',
-            icon: const Icon(Icons.redo),
-            onPressed: puedeRehacer && !bloqueada
-                ? () => ref.read(partidaProvider.notifier).rehacer()
-                : null,
-          ),
-          const BotonEnvios(),
-          const BotonCuenta(),
-          if (enJuego)
-            IconButton(
-              key: const Key('abandonar'),
-              tooltip: 'Abandonar la partida',
-              icon: const Icon(Icons.flag),
-              onPressed: () => _abandonar(context, ref),
-            ),
-        ],
+    final acciones = <Widget>[
+      IconButton(
+        key: const Key('deshacer'),
+        tooltip: 'Deshacer',
+        icon: const Icon(Icons.undo),
+        onPressed: puedeDeshacer && !bloqueada
+            ? () => ref.read(partidaProvider.notifier).deshacer()
+            : null,
       ),
+      IconButton(
+        key: const Key('rehacer'),
+        tooltip: 'Rehacer',
+        icon: const Icon(Icons.redo),
+        onPressed: puedeRehacer && !bloqueada
+            ? () => ref.read(partidaProvider.notifier).rehacer()
+            : null,
+      ),
+      const BotonEnvios(),
+      const BotonCuenta(),
+      if (enJuego)
+        IconButton(
+          key: const Key('abandonar'),
+          tooltip: 'Abandonar la partida',
+          icon: const Icon(Icons.flag),
+          onPressed: () => _abandonar(context, ref),
+        ),
+    ];
+    return Scaffold(
+      // En juego no hay barra: la mesa llena la pantalla y la barra flota.
+      appBar: enJuego
+          ? null
+          : AppBar(title: Text(_titulo(estado)), actions: acciones),
       // La mesa ocupa toda la pantalla; el resto de fases van centradas.
       body: enJuego
-          ? _fase(estado)
+          ? Stack(
+              children: [
+                Positioned.fill(child: _fase(estado)),
+                Positioned(
+                  left: 8,
+                  right: 8,
+                  top: 0,
+                  child: SafeArea(
+                    child: _BarraFlotante(
+                      texto: _banner(estado),
+                      acciones: acciones,
+                    ),
+                  ),
+                ),
+              ],
+            )
           : Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 900),
@@ -69,6 +85,16 @@ class PantallaPartida extends ConsumerWidget {
               ),
             ),
     );
+  }
+
+  String _banner(EstadoPartida estado) {
+    final actual = estado.jugadorActual;
+    final turno = estado.fase == Fase.turnoJefe
+        ? 'Turno del jefe'
+        : actual == null
+            ? 'Turno de los jugadores'
+            : 'Turno de ${estado.jugadores[actual].nombre}';
+    return 'Ronda ${estado.ronda} · $turno';
   }
 
   Widget _fase(EstadoPartida estado) => switch (estado.fase) {
@@ -111,5 +137,67 @@ class PantallaPartida extends ConsumerWidget {
     );
     if (confirmado != true || !context.mounted) return;
     registrar(context, ref, const Abandonar());
+  }
+}
+
+/// Barra de la partida que flota sobre la mesa: ronda y turno a la izquierda,
+/// deshacer, rehacer, envíos, cuenta y abandonar a la derecha.
+class _BarraFlotante extends StatelessWidget {
+  const _BarraFlotante({required this.texto, required this.acciones});
+
+  final String texto;
+  final List<Widget> acciones;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Flexible(
+            child: Container(
+              key: const Key('barra-turno'),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xD91A1033),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: Text(
+                texto,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+          const Spacer(),
+          Theme(
+            data: tema.copyWith(
+              iconButtonTheme: IconButtonThemeData(
+                style: IconButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  disabledForegroundColor: Colors.white38,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xD91A1033),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: acciones),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

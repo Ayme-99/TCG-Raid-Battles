@@ -110,6 +110,27 @@ void main() {
     expect(find.byKey(const Key('mesa')), findsOneWidget);
   });
 
+  testWidgets('en pantalla ancha los controles flotan sobre la mesa',
+      (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ProviderScope(overrides: sobrescribir(), child: const IncursionesApp()),
+    );
+    await tester.pumpAndSettle();
+    await empezar(tester);
+    expect(find.byKey(const Key('mesa')), findsOneWidget);
+    expect(find.byKey(const Key('barra-turno')), findsOneWidget);
+    expect(find.byKey(const Key('panel-acciones')), findsOneWidget);
+    // La mesa llena la pantalla: no hay barra de título.
+    expect(find.byType(AppBar), findsNothing);
+    // El panel se pliega y se despliega.
+    await tocar(tester, 'panel-acciones-toggle');
+    expect(find.byKey(const Key('panel-acciones')), findsOneWidget);
+    expect(find.byKey(const Key('mesa')), findsOneWidget);
+  });
+
   group('Cartas', () {
     test('el id de la carta no lleva tildes, espacios ni «ex»', () {
       expect(idCarta('Onix'), 'onix');
