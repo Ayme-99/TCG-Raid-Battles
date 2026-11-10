@@ -365,7 +365,6 @@ class _Mesa extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tema = Theme.of(context);
     return Stack(
       clipBehavior: Clip.none,
       children: [
