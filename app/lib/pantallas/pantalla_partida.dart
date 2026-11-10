@@ -59,20 +59,25 @@ class PantallaPartida extends ConsumerWidget {
             ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
-          child: switch (estado.fase) {
-            Fase.preparacion => const PantallaJugadores(),
-            Fase.eleccionJefe => const PantallaEleccionJefe(),
-            Fase.turnoJugadores => const PantallaTurnoJugadores(),
-            Fase.turnoJefe => const PantallaTurnoJefe(),
-            Fase.terminada => const PantallaFinPartida(),
-          },
-        ),
-      ),
+      // La mesa ocupa toda la pantalla; el resto de fases van centradas.
+      body: enJuego
+          ? _fase(estado)
+          : Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 900),
+                child: _fase(estado),
+              ),
+            ),
     );
   }
+
+  Widget _fase(EstadoPartida estado) => switch (estado.fase) {
+        Fase.preparacion => const PantallaJugadores(),
+        Fase.eleccionJefe => const PantallaEleccionJefe(),
+        Fase.turnoJugadores => const PantallaTurnoJugadores(),
+        Fase.turnoJefe => const PantallaTurnoJefe(),
+        Fase.terminada => const PantallaFinPartida(),
+      };
 
   String _titulo(EstadoPartida estado) => switch (estado.fase) {
         Fase.preparacion => 'Nueva partida',

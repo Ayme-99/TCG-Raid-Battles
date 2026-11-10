@@ -81,9 +81,9 @@ FocoCamara focoDe(EstadoPartida estado) {
 
 /// Reparto vertical de la mesa: jefe arriba, aliados en medio, jugadores
 /// abajo del todo. Suman 1.
-const alturaJefe = 0.56;
-const alturaAliados = 0.24;
-const alturaJugadores = 0.20;
+const alturaJefe = 0.50;
+const alturaAliados = 0.32;
+const alturaJugadores = 0.18;
 
 /// Punto de la mesa al que apunta la cámara y cuánto se acerca. `ax` y `ay`
 /// van de -1 (izquierda, arriba) a 1 (derecha, abajo).
@@ -129,6 +129,47 @@ class _CamaraTween extends Tween<Camara> {
 
   @override
   Camara lerp(double t) => Camara.lerp(begin!, end!, t);
+}
+
+/// La mesa a pantalla completa. En pantallas anchas los controles del turno van
+/// en un panel a la derecha; en las estrechas, debajo de la mesa.
+class DisposicionMesa extends StatelessWidget {
+  const DisposicionMesa({super.key, required this.controles});
+
+  /// Ancho a partir del cual los controles pasan a un lado.
+  static const anchoMinimoLateral = 900.0;
+  static const anchoPanel = 420.0;
+
+  final Widget controles;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, caja) {
+        if (caja.maxWidth >= anchoMinimoLateral) {
+          return Row(
+            children: [
+              const Expanded(child: MesaConCamara()),
+              SizedBox(
+                width: anchoPanel,
+                child: Material(
+                  color: Theme.of(context).colorScheme.surface,
+                  elevation: 4,
+                  child: controles,
+                ),
+              ),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            const Flexible(flex: 3, child: MesaConCamara()),
+            Expanded(flex: 2, child: controles),
+          ],
+        );
+      },
+    );
+  }
 }
 
 /// La partida vista como a través de una cámara sobre la mesa: el jefe arriba,

@@ -39,14 +39,9 @@ class PantallaTurnoJugadores extends ConsumerWidget {
         const PanelPokemon(),
       ],
     );
-    // La mesa con cámara arriba (jefe, aliados y jugadores) y los controles
-    // del turno debajo.
-    return Column(
-      children: [
-        const Flexible(flex: 3, child: MesaConCamara()),
-        Expanded(flex: 2, child: controles),
-      ],
-    );
+    // La mesa con cámara a pantalla completa y los controles del turno al
+    // lado (o debajo en pantallas estrechas).
+    return DisposicionMesa(controles: controles);
   }
 }
 
