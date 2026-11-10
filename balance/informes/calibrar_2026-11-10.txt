@@ -67,3 +67,16 @@ Pruebas con pocos jugadores (misma fecha)
 
    Con 3 jugadores, mantener 8 Pokémon en mesa deja los tres jefes cerca del objetivo sin tocar su HP. Con 2
    jugadores vale para Onix pero no para Manectric (4 %): haría falta además bajarle el HP (a ~1700).
+
+5) Pokémon por jugador según los jugadores (--pokemon=N), HP del catálogo (2400 / 2700 / 3800 / 3500), solo-dueno,
+   150 equipos x 60 partidas. Entre paréntesis, con el mejor Pokémon de Activo (--mejor-primero).
+
+   caso                      onix (75 %)      manectric (50 %)  kingdra (30 %)   HP que da el objetivo
+   3 jugadores x 3 Pokémon   91,2 % (91,6)    61,8 % (73,6)     51,8 % (60,8)    3100 / 2900 / 4300 (3100 / 3100 / 4400)
+   2 jugadores x 4 Pokémon   64,6 % (67,8)     3,0 % (4,4)      sin equipos      2200 / 1500 (2200 / 1700)
+   1 jugador x 5 Pokémon      0,0 % (0,0)     sin equipos       sin equipos      Onix 600 (700)
+   1 jugador x 6 Pokémon      0,0 % (0,0)     sin equipos       sin equipos      Onix 800 (900)
+
+   3x3 (9 en mesa) queda más fácil que con 4 jugadores; 3+3+2 (8 en mesa, prueba 4) quedaba más cerca del objetivo.
+   Con 1 jugador el problema no es la vida: hace un solo ataque por turno contra un jefe con el HP pensado para
+   cuatro, así que no llega a derrotarlo con 5 ni con 6 Pokémon.
