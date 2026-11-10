@@ -171,7 +171,7 @@ class _BotonFinTurno extends ConsumerWidget {
       registrar(context, ref, FinTurnoJefe(monedaQuemadura: cara));
     }
 
-    final texto = const Text('Terminar el turno del jefe');
+    const texto = Text('Terminar el turno del jefe');
     return destacado
         ? FilledButton(
             key: const Key('fin-turno-jefe'),
