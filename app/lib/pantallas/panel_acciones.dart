@@ -6,11 +6,14 @@ import 'package:flutter/material.dart';
 class PanelAcciones extends StatelessWidget {
   const PanelAcciones({
     super.key,
+    this.titulo = 'Acciones',
     required this.controles,
     required this.abierto,
     required this.onAlternar,
     required this.ajustar,
   });
+
+  final String titulo;
 
   /// Los controles del turno.
   final List<Widget> controles;
@@ -66,8 +69,8 @@ class PanelAcciones extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   child: Row(
                     children: [
-                      const Text(
-                        'Acciones',
+                      Text(
+                        titulo,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w900,

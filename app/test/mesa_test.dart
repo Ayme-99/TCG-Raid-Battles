@@ -126,6 +126,11 @@ void main() {
     expect(find.byKey(const Key('panel-acciones')), findsOneWidget);
     // La mesa llena la pantalla: no hay barra de título.
     expect(find.byType(AppBar), findsNothing);
+    // El bocadillo sale del asiento del jugador que actúa.
+    expect(find.byKey(const Key('pico-bocadillo')), findsOneWidget);
+    final pico = tester.getCenter(find.byKey(const Key('pico-bocadillo'))).dx;
+    final asiento = tester.getCenter(find.byKey(const Key('asiento-0'))).dx;
+    expect((pico - asiento).abs(), lessThan(40));
     // El panel se pliega y se despliega.
     await tocar(tester, 'panel-acciones-toggle');
     expect(find.byKey(const Key('panel-acciones')), findsOneWidget);
