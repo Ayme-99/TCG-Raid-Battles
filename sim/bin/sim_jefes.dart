@@ -68,6 +68,7 @@
 //   dart run bin/sim_jefes.dart
 //   dart run bin/sim_jefes.dart --equipos=20 --partidas=20 --informe=/tmp/j.csv
 //   dart run bin/sim_jefes.dart --jugadores=3   # equipos de 1 a 4 jugadores
+//   dart run bin/sim_jefes.dart --jugadores=2 --mesa8   # 8 Pokémon en mesa (4 por jugador)
 //   dart run bin/sim_jefes.dart --calibrar   # HP (en centenas) que da el objetivo
 //   dart run bin/sim_jefes.dart --causas     # por qué no se usan todos los intentos
 //
@@ -327,8 +328,9 @@ class Resultado {
 
 /// Daño a un jugador: al Activo, o a la Banca si [banca] y está viva.
 void golpear(Jug j, int dano, {bool banca = false}) {
-  if (banca && j.pokes[1].vivo) {
-    j.pokes[1].hp -= dano;
+  final suplente = j.banca;
+  if (banca && suplente != null) {
+    suplente.hp -= dano;
     return;
   }
   if (!j.pokes[0].vivo) j.intercambiar();
@@ -556,7 +558,7 @@ Resultado jugarJefe(
       var ch = elegir(act);
       final constriccion = slots.any((a) => a != null && a.def.constriccion);
       if (ch == null &&
-          j.pokes[1].vivo &&
+          j.banca != null &&
           !sinRetirada.contains(i) &&
           !constriccion) {
         j.intercambiar();
@@ -640,7 +642,7 @@ Resultado jugarJefe(
       var dano = a.dano;
       if (a.tipo == 'danoPorAtaquePrevio') dano += (a.valor ?? 0) * n;
       if (a.tipo == 'danoExtraSi') {
-        final defensor = j.pokes[0].vivo ? j.pokes[0] : j.pokes[1];
+        final defensor = j.pokes[0].vivo ? j.pokes[0] : (j.banca ?? j.pokes[1]);
         if (defensor.hp == defensor.carta.hp) dano += a.valor ?? 0;
       }
       // Potenciadores vivos: moneda y, con cara, más daño.
@@ -774,10 +776,9 @@ int calibrarJefe(List<List<Pareja>> equipos, JefeDef jefe, Nivel nv, Config c) {
   return lo * 100;
 }
 
-/// Equipo de [n] jugadores con parejas de cartas al azar.
-extension on List<Carta> {
-  List<Pareja> parejas(int n) => [for (var i = 0; i < 2 * n; i += 2) Pareja(this[i], this[i + 1])];
-}
+/// Reparte 8 Pokémon entre [n] jugadores lo más igual posible.
+List<int> _reparto8(int n) =>
+    [for (var i = 0; i < n; i++) 8 ~/ n + (i < 8 % n ? 1 : 0)];
 
 void main(List<String> args) {
   var carpetaJefes = '../catalog';
@@ -787,6 +788,7 @@ void main(List<String> args) {
   var causas = false;
   var jugadores = 4;
   var menosAtaques = 0;
+  var mesa8 = false;
   for (final a in args) {
     if (a == '--causas') {
       causas = true;
@@ -794,6 +796,8 @@ void main(List<String> args) {
       carpetaJefes = a.substring('--jefes='.length);
     } else if (a.startsWith('--jugadores=')) {
       jugadores = int.parse(a.substring('--jugadores='.length));
+    } else if (a == '--mesa8') {
+      mesa8 = true;
     } else if (a.startsWith('--menos-ataques=')) {
       menosAtaques = int.parse(a.substring('--menos-ataques='.length));
     } else if (a.startsWith('--ayuda=')) {
@@ -820,22 +824,27 @@ void main(List<String> args) {
   for (final n in niveles) {
     final destino = porNivel[n.nivel]!;
     for (var intento = 0; intento < 200000 && destino.length < c.equipos; intento++) {
-      final e = n.nivel == 1
-          ? [
-              for (var i = 0; i < jugadores; i++)
-                Pareja(
-                  normales[rnd.nextInt(normales.length)],
-                  normales[rnd.nextInt(normales.length)],
-                ),
-            ]
-          : (List<Carta>.from(lista)..shuffle(rnd)).parejas(jugadores);
+      // Pokémon de cada jugador: 2, o con --mesa8 los 8 de la mesa repartidos
+      // (4 jugadores 2+2+2+2, 3 jugadores 3+3+2, 2 jugadores 4+4).
+      final tam = mesa8 ? _reparto8(jugadores) : List.filled(jugadores, 2);
+      final total = tam.fold(0, (x, y) => x + y);
+      final elegidas = n.nivel == 1
+          ? [for (var i = 0; i < total; i++) normales[rnd.nextInt(normales.length)]]
+          : (List<Carta>.from(lista)..shuffle(rnd)).sublist(0, total);
+      var pos = 0;
+      final e = <Pareja>[];
+      for (final t in tam) {
+        final grupo = elegidas.sublist(pos, pos + t);
+        pos += t;
+        e.add(Pareja(grupo[0], grupo[1], grupo.sublist(2)));
+      }
       if (nivelPorX(calcularX(e), niveles) == n.nivel) destino.add(e);
     }
   }
 
   stdout.writeln('Incursiones · simulador de jefes con aliados (T-28)');
   stdout.writeln('jefes=${jefes.length} equipos/nivel=${c.equipos} '
-      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques\n');
+      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques mesa8=$mesa8\n');
   stdout.writeln('jefe        nivel  HP     política      victoria  objetivo  turnos  aliados');
   final filas = <String>[
     'jefe,nivel,hp,politica,equipos,partidas_por_equipo,victoria,objetivo,turnos_victoria,aliados_invocados',
