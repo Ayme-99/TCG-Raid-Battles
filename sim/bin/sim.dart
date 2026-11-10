@@ -22,6 +22,9 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:incursiones_engine/incursiones_engine.dart'
+    show MazoAtaquesJefe;
+
 class Nivel {
   Nivel(this.nivel, this.xCentro, this.hp, this.ataques, this.maxAtaques);
   final int nivel;
@@ -166,6 +169,7 @@ int slotAleatorio(Random rnd) {
 int jugarPartida(Nivel nv, Config c, Random rnd, List<int> turnosYKo) {
   final ataquesJ = repartirX(rnd, nv.xCentro, c.jugadores);
   final jugadores = [for (final a in ataquesJ) crearJugador(rnd, a, c)];
+  final mazo = MazoAtaquesJefe(rnd, jugadores: jugadores.length);
   var hpJefe = nv.hp.toDouble();
   var ko = 0;
 
@@ -181,15 +185,20 @@ int jugarPartida(Nivel nv, Config c, Random rnd, List<int> turnosYKo) {
       turnosYKo[1] = ko;
       return 1;
     }
-    // Turno del jefe: varios ataques, cada uno contra un jugador al azar.
-    final n = numAtaquesJefe(rnd, nv.maxAtaques);
-    for (var i = 0; i < n; i++) {
-      final vivos = jugadores.where((j) => !j.eliminado).toList();
-      if (vivos.isEmpty) break;
-      final objetivo = vivos[rnd.nextInt(vivos.length)];
-      final p = objetivo.activo!;
-      p.hp -= nv.ataques[slotAleatorio(rnd)];
+    // Turno del jefe: roba cartas del mazo real (20 oficiales; según los
+    // jugadores se quitan o se redirigen) hasta que una no diga «roba otra» o
+    // llegue al máximo del nivel.
+    for (var i = 0; i < nv.maxAtaques; i++) {
+      final activos = {
+        for (var k = 0; k < jugadores.length; k++)
+          if (!jugadores[k].eliminado) k,
+      };
+      if (activos.isEmpty) break;
+      final carta = mazo.robar(activos);
+      final p = jugadores[carta.jugador].activo!;
+      p.hp -= nv.ataques[carta.ranura - 1];
       if (!p.vivo) ko++;
+      if (!carta.robaOtra) break;
     }
     final derrota = c.regla == 'oficial'
         ? ko >= 4
