@@ -789,6 +789,7 @@ void main(List<String> args) {
   var jugadores = 4;
   var menosAtaques = 0;
   var mesa8 = false;
+  int? pokemon;
   var mejorPrimero = false;
   for (final a in args) {
     if (a == '--causas') {
@@ -799,6 +800,8 @@ void main(List<String> args) {
       jugadores = int.parse(a.substring('--jugadores='.length));
     } else if (a == '--mejor-primero') {
       mejorPrimero = true;
+    } else if (a.startsWith('--pokemon=')) {
+      pokemon = int.parse(a.substring('--pokemon='.length));
     } else if (a == '--mesa8') {
       mesa8 = true;
     } else if (a.startsWith('--menos-ataques=')) {
@@ -829,7 +832,9 @@ void main(List<String> args) {
     for (var intento = 0; intento < 200000 && destino.length < c.equipos; intento++) {
       // Pokémon de cada jugador: 2, o con --mesa8 los 8 de la mesa repartidos
       // (4 jugadores 2+2+2+2, 3 jugadores 3+3+2, 2 jugadores 4+4).
-      final tam = mesa8 ? _reparto8(jugadores) : List.filled(jugadores, 2);
+      final tam = pokemon != null
+          ? List.filled(jugadores, pokemon)
+          : (mesa8 ? _reparto8(jugadores) : List.filled(jugadores, 2));
       final total = tam.fold(0, (x, y) => x + y);
       final elegidas = n.nivel == 1
           ? [for (var i = 0; i < total; i++) normales[rnd.nextInt(normales.length)]]
@@ -850,7 +855,7 @@ void main(List<String> args) {
 
   stdout.writeln('Incursiones · simulador de jefes con aliados (T-28)');
   stdout.writeln('jefes=${jefes.length} equipos/nivel=${c.equipos} '
-      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques mesa8=$mesa8 mejor-primero=$mejorPrimero\n');
+      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques mesa8=$mesa8 pokemon=$pokemon mejor-primero=$mejorPrimero\n');
   stdout.writeln('jefe        nivel  HP     política      victoria  objetivo  turnos  aliados');
   final filas = <String>[
     'jefe,nivel,hp,politica,equipos,partidas_por_equipo,victoria,objetivo,turnos_victoria,aliados_invocados',
