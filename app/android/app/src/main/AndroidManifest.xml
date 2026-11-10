@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Necesario en release: la app llama al servidor (login y envío de partidas). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="incursiones_app"
+        android:label="Incursiones"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

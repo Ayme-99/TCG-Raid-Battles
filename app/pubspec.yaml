@@ -12,6 +12,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
   http: ^1.2.2
   shared_preferences: ^2.3.2
+  wakelock_plus: ^1.2.8
   incursiones_engine:
     path: ../engine
 
