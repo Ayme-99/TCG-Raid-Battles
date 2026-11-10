@@ -137,6 +137,7 @@ class DisposicionMesa extends ConsumerStatefulWidget {
     super.key,
     required this.controles,
     this.lateral = false,
+    this.extras = const [],
   });
 
   /// Ancho a partir del cual el panel flota sobre la mesa.
@@ -150,12 +151,17 @@ class DisposicionMesa extends ConsumerStatefulWidget {
   /// tapar al jefe (turno del jefe, con la carta ya robada).
   final bool lateral;
 
+  /// Controles secundarios: en pantalla ancha van en un panel aparte,
+  /// plegado, para que el bocadillo no tenga scroll; en estrecha, al final.
+  final List<Widget> extras;
+
   @override
   ConsumerState<DisposicionMesa> createState() => _DisposicionMesaState();
 }
 
 class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
   bool _abierto = true;
+  bool _extrasAbierto = false;
 
   void _alternar() => setState(() => _abierto = !_abierto);
 
@@ -187,6 +193,26 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
           return Stack(
             children: [
               const Positioned.fill(child: MesaConCamara()),
+              if (widget.extras.isNotEmpty)
+                Positioned(
+                  key: const Key('panel-extras'),
+                  right: margen,
+                  top: 72,
+                  bottom: alto * alturaJugadores + 4,
+                  width: 300,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: PanelAcciones(
+                      titulo: 'Más acciones',
+                      prefijoClave: 'panel-extras-interno',
+                      controles: widget.extras,
+                      abierto: _extrasAbierto,
+                      onAlternar: () =>
+                          setState(() => _extrasAbierto = !_extrasAbierto),
+                      ajustar: true,
+                    ),
+                  ),
+                ),
               if (widget.lateral && activo == null)
                 Positioned(
                   key: const Key('panel-lateral'),
@@ -255,7 +281,7 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
                   padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
                   child: PanelAcciones(
                     titulo: titulo,
-                    controles: widget.controles,
+                    controles: [...widget.controles, ...widget.extras],
                     abierto: true,
                     onAlternar: _alternar,
                     ajustar: false,
@@ -267,7 +293,7 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
                 padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
                 child: PanelAcciones(
                   titulo: titulo,
-                  controles: widget.controles,
+                  controles: [...widget.controles, ...widget.extras],
                   abierto: false,
                   onAlternar: _alternar,
                   ajustar: true,

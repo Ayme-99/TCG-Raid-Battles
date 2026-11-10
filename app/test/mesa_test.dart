@@ -135,6 +135,11 @@ void main() {
     final pico = tester.getCenter(find.byKey(const Key('pico-bocadillo'))).dx;
     final asiento = tester.getCenter(find.byKey(const Key('asiento-0'))).dx;
     expect((pico - asiento).abs(), lessThan(40));
+    // Lo secundario va en un panel aparte, plegado: el bocadillo no scrollea.
+    expect(find.byKey(const Key('panel-extras-interno')), findsOneWidget);
+    expect(find.byKey(const Key('ko-0')), findsNothing);
+    await tocar(tester, 'panel-extras-interno-toggle');
+    expect(find.byKey(const Key('ko-0')), findsOneWidget);
     // El panel se pliega y se despliega.
     await tocar(tester, 'panel-acciones-toggle');
     expect(find.byKey(const Key('panel-acciones')), findsOneWidget);

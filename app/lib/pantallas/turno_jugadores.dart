@@ -19,9 +19,7 @@ class PantallaTurnoJugadores extends ConsumerWidget {
     final estado = ref.watch(estadoProvider);
     final actual = estado.jugadorActual;
     final controles = <Widget>[
-        const PanelEfectosActivos(),
         const PanelPendientes(),
-        _Orden(estado: estado),
         if (actual != null)
           _TurnoActual(
             key: ValueKey('turno-${estado.ronda}-${estado.turnoActual}'),
@@ -30,15 +28,20 @@ class PantallaTurnoJugadores extends ConsumerWidget {
           ),
         if (estado.cartasAnimoPendientes.isNotEmpty)
           _CartasAnimo(estado: estado),
-        PanelEstados(
-          key: ValueKey('estados-${estado.ronda}-${estado.turnoActual}'),
-          jugadorInicial: actual,
-        ),
-        const PanelPokemon(),
+    ];
+    // El bocadillo solo lleva lo del turno; el resto va en «Más acciones».
+    final extras = <Widget>[
+      const PanelEfectosActivos(),
+      _Orden(estado: estado),
+      PanelEstados(
+        key: ValueKey('estados-${estado.ronda}-${estado.turnoActual}'),
+        jugadorInicial: actual,
+      ),
+      const PanelPokemon(),
     ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).
-    return DisposicionMesa(controles: controles);
+    return DisposicionMesa(controles: controles, extras: extras);
   }
 }
 

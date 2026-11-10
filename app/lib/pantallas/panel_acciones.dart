@@ -7,6 +7,7 @@ class PanelAcciones extends StatelessWidget {
   const PanelAcciones({
     super.key,
     this.titulo = 'Acciones',
+    this.prefijoClave = 'panel-acciones',
     required this.controles,
     required this.abierto,
     required this.onAlternar,
@@ -14,6 +15,9 @@ class PanelAcciones extends StatelessWidget {
   });
 
   final String titulo;
+
+  /// Prefijo de las claves del panel y de su botón de plegar.
+  final String prefijoClave;
 
   /// Los controles del turno.
   final List<Widget> controles;
@@ -42,7 +46,7 @@ class PanelAcciones extends StatelessWidget {
     return Theme(
       data: _tema,
       child: Container(
-        key: const Key('panel-acciones'),
+        key: Key(prefijoClave),
         decoration: BoxDecoration(
           color: const Color(0xF01A1033),
           borderRadius: BorderRadius.circular(26),
@@ -62,7 +66,7 @@ class PanelAcciones extends StatelessWidget {
             mainAxisSize: ajustar ? MainAxisSize.min : MainAxisSize.max,
             children: [
               InkWell(
-                key: const Key('panel-acciones-toggle'),
+                key: Key('$prefijoClave-toggle'),
                 onTap: onAlternar,
                 child: Padding(
                   padding:
