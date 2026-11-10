@@ -445,7 +445,7 @@ class _Mesa extends StatelessWidget {
                 behavior: HitTestBehavior.translucent,
                 onTap: () => onFoco(const FocoJefe()),
                 child: _Zona(
-                  ancho: 980,
+                  ancho: _EscenaJefe.anchoPara(estado.jugadores.length),
                   arriba: MediaQuery.of(context).padding.top + 52,
                   hijo: _EscenaJefe(slots: estado.jugadores.length),
                 ),
@@ -480,6 +480,14 @@ class _EscenaJefe extends StatelessWidget {
   final int slots;
 
   static const _anchoSlot = 150.0;
+  static const _anchoJefe = 360.0;
+
+  /// Ancho que necesita la escena: el jefe y, a cada lado, los slots de su
+  /// mitad (el lado con más slots manda) con su separación.
+  static double anchoPara(int slots) {
+    final porLado = (slots + 1) ~/ 2;
+    return _anchoJefe + 2 * porLado * (_anchoSlot + 20);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -507,7 +515,7 @@ class _EscenaJefe extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         lado([for (var i = 0; i < izquierda; i++) i], MainAxisAlignment.end),
-        const SizedBox(width: 360, child: TarjetaJefe()),
+        const SizedBox(width: _anchoJefe, child: TarjetaJefe()),
         lado(
           [for (var i = izquierda; i < slots; i++) i],
           MainAxisAlignment.start,
