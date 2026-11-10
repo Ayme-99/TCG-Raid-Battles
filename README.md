@@ -6,15 +6,14 @@ Asistente de combate para **Incursiones**, un formato cooperativo casero de Pok�
 
 ## Estado actual
 
-🚧 **Fase de diseño.** Todavía no hay código de la app — este repo arranca con el [Game Design Document](./incursiones_gdd.md) cerrado, que recoge:
+🎮 **Partida completa jugable** en la app (Flutter: Web, Windows, Android), con motor, simulador de balance y backend:
 
-- Estructura de turno completa (jugadores → jefe → repetir)
-- Cálculo automático del nivel del jefe según la potencia de los jugadores
-- Condiciones de victoria/derrota
-- Mecánicas de aliados invocados y curación del jefe
-- Glosario de términos del formato
+- Estructura de turno completa (jugadores → jefe → repetir), con la mesa a pantalla completa y los controles flotantes.
+- Cálculo automático del nivel del jefe según la potencia de los jugadores.
+- 4 jefes en el catálogo (Onix, Manectric, Kingdra y Arceus), cada uno con 6 aliados.
+- Condiciones de victoria/derrota, curación del jefe, estados, puntos y envío de resultados al servidor.
 
-El desarrollo se retomará cuando termine [deck-tracker-app](#) / [TCGMasters-server](#) (proyecto hermano, en curso).
+Pendiente: playtests en papel (los valores de balance salen del simulador), partida multi-dispositivo y el resto del [tablero](https://github.com/users/Ayme-99/projects/10). El diseño de juego está en el [Game Design Document](./incursiones_gdd.md).
 
 ## Planteamiento técnico
 

@@ -2,20 +2,20 @@
 
 App Flutter para tablet ("tablet en medio de la mesa"). Es una interfaz fina: toda la lógica vive en `engine/`.
 
-## Estado actual (T-10)
+## Estado actual
 
 Partida completa en local, con inicio de sesión y envío de resultados (T-09):
 
 - `lib/partida/controlador_partida.dart`: el controlador (Riverpod). Guarda el `Historial` del motor y expone `registrar(evento)` (devuelve `null` o el motivo del rechazo), `deshacer`, `rehacer`, `nuevaPartida` y `registro(cuentas)`, que genera el JSON del contrato (`contrato/`).
-- `lib/pantallas/`: una sola pantalla (`PantallaPartida`) que cambia según la fase del motor:
+- `lib/pantallas/`: una sola pantalla (`PantallaPartida`) que cambia según la fase del motor. En juego, la **mesa** (`mesa.dart`) ocupa toda la pantalla: cámara 2.5D sobre el jefe, los aliados y los jugadores, con sus cartas (`carta.dart`, imágenes en `assets/cartas/`) y los controles en un bocadillo que sale del asiento del jugador que actúa (`panel_acciones.dart`; por debajo de 1100 px de ancho va plegable bajo la mesa). La cámara se queda en vista general y solo se mueve con eventos (dados, ataques del jefe o de los aliados). Fases:
   - `setup.dart`: jugadores y mejor ataque (calcula X y el nivel) y elección del jefe.
   - `turno_jugadores.dart`: orden de la ronda, daño al jefe, ataque a un aliado, cartas de ánimo, estados y KO.
   - `turno_jefe.dart`: ataques del jefe (ranura, daño, objetivo), ataques de aliados, KO, estados y moneda de la quemadura al cerrar el turno.
   - `fin_partida.dart`: resultado y puntos por jugador (con el bono de estados).
   - `pendientes.dart`: intentos de invocación y ataques de entrada de los aliados, que el motor exige resolver antes de seguir.
-  - La barra superior lleva deshacer, rehacer y abandonar en todas las fases.
+  - Deshacer, rehacer, envíos, cuenta y abandonar van en una barra flotante sobre la mesa (en las demás fases, en la barra superior).
 - El jefe se escribe a mano (nombre, HP, cada cuántos HP invoca) hasta que exista el catálogo versionado (T-13).
-- **El diseño visual es provisional**: espera a los bocetos (T-18). La estructura y los eventos no cambian con el diseño.
+- **El diseño visual sigue evolucionando** (maquetas en curso: #155–#157).
 - `lib/cuenta/`: inicio de sesión con la cuenta de Deck Tracker (`POST /api/auth/login`). Solo iniciar sesión: registrarse se hace en Deck Tracker. El token se guarda en el dispositivo (`shared_preferences`, vía `lib/almacen/`).
 - `lib/envios/`: al terminar la partida, **«Guardar resultados»** mete el registro del contrato en una cola persistente y lo envía a `/api/incursiones/partidas`. El host es siempre el jugador 1 (su cuenta); los demás van como invitados. Hasta guardar se puede deshacer; después no.
   - Sin red, servidor caído o saturado (red, 408, 429, 5xx): se reintenta solo con espera creciente (30 s, 1 min, 2 min... tope 15 min), al abrir la app y al volver la sesión. Mientras tanto la barra superior muestra un icono con las partidas pendientes.
@@ -49,4 +49,4 @@ La versión web funciona igual, pero **sin conexión no funciona**: la cola de e
 
 ## Catálogo de jefes (T-29)
 
-El catálogo (`../catalog/`) va empaquetado dentro de la app en `assets/catalogo/`, porque Flutter solo incluye archivos de dentro de `app/`. Si cambias un jefe en `catalog/`, copia el catálogo con `tool/sync_catalogo.sh`; `test/catalogo_test.dart` falla si las dos copias no coinciden. En el setup, tras calcular el nivel, la app ofrece los jefes de ese nivel (HP, ataques e invocación) o la entrada a mano. Los 4 aliados de cada jefe ya se leen (`lib/catalogo/catalogo.dart`), pero la pantalla de invocación todavía no los usa (T-27, #74).
+El catálogo (`../catalog/`) va empaquetado dentro de la app en `assets/catalogo/`, porque Flutter solo incluye archivos de dentro de `app/`. Si cambias un jefe en `catalog/`, copia el catálogo con `tool/sync_catalogo.sh`; `test/catalogo_test.dart` falla si las dos copias no coinciden. En el setup, tras calcular el nivel, la app ofrece los jefes de ese nivel (HP, ataques e invocación) o la entrada a mano. Los aliados de cada jefe se leen en `lib/catalogo/catalogo.dart` y los usa la pantalla de invocación.
