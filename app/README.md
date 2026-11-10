@@ -23,6 +23,7 @@ Partida completa en local, con inicio de sesión y envío de resultados (T-09):
   - 401: la sesión ha caducado; se cierra y las partidas se conservan hasta volver a iniciar sesión.
   - Enviar dos veces es seguro: el servidor guarda una partida una sola vez por `partidaId`, y el id y la fecha del registro no cambian mientras no cambien los eventos.
   - **En web no hay modo sin conexión**: la cola vive en el navegador y solo sirve mientras la pestaña esté abierta.
+- **Partida en curso** (`lib/partida/persistencia.dart`): el registro de eventos se guarda en el dispositivo tras cada cambio y `main.dart` lo recupera al abrir la app (si ya no es válido, se descarta). Conserva el id de la partida, así que reenviarla es idempotente.
 - Servidor: `https://deck-tracker-server.onrender.com/api`; para otro, `--dart-define=API_URL=http://localhost:5000/api`.
 - `test/`: pruebas del controlador, las pantallas (flujo completo, deshacer, quemadura y moneda, invocación, abandono, login y guardado), el cliente HTTP y la cola de envíos. El CI ejecuta `flutter analyze` y `flutter test`.
 

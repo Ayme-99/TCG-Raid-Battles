@@ -7,16 +7,21 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'almacen/almacen.dart';
 import 'app.dart';
+import 'partida/controlador_partida.dart';
+import 'partida/persistencia.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _registrarErrores();
   _mantenerPantallaEncendida();
   final preferencias = await SharedPreferences.getInstance();
+  final almacen = AlmacenPreferencias(preferencias);
+  final partidaEnCurso = await leerPartidaEnCurso(almacen);
   runApp(
     ProviderScope(
       overrides: [
-        almacenProvider.overrideWithValue(AlmacenPreferencias(preferencias)),
+        almacenProvider.overrideWithValue(almacen),
+        partidaInicialProvider.overrideWithValue(partidaEnCurso),
       ],
       child: const IncursionesApp(),
     ),

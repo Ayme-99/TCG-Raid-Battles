@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import '../almacen/almacen.dart';
 import '../cuenta/controlador_sesion.dart';
+import 'persistencia.dart';
 
 /// Controlador de la partida en curso.
 ///
@@ -19,12 +22,32 @@ class ControladorPartida extends Notifier<Historial> {
   String? _creadaEn;
 
   @override
-  Historial build() => Historial.nuevo();
+  Historial build() {
+    // Si la app se cerró a mitad de partida, se retoma donde estaba.
+    final guardada = ref.read(partidaInicialProvider);
+    _partidaId = guardada?.partidaId;
+    _creadaEn = guardada?.creadaEn;
+    return guardada?.historial ?? Historial.nuevo();
+  }
+
+  /// Guarda la partida en el dispositivo para recuperarla al reabrir la app.
+  /// No espera ni propaga fallos: perder el guardado no debe parar la partida.
+  void _guardar() {
+    unawaited(
+      guardarPartidaEnCurso(
+        ref.read(almacenProvider),
+        eventos: state.partida.eventos,
+        partidaId: _partidaId,
+        creadaEn: _creadaEn,
+      ).catchError((_) {}),
+    );
+  }
 
   /// Empieza una partida nueva y descarta la actual.
   void nuevaPartida() {
     _olvidarIdentidad();
     state = Historial.nuevo();
+    _guardar();
   }
 
   void _olvidarIdentidad() {
@@ -38,6 +61,7 @@ class ControladorPartida extends Notifier<Historial> {
     try {
       state = state.aplicar(evento);
       _olvidarIdentidad();
+      _guardar();
       return null;
     } on ReglaIncumplida catch (e) {
       return e.mensaje;
@@ -48,12 +72,14 @@ class ControladorPartida extends Notifier<Historial> {
   void deshacer() {
     _olvidarIdentidad();
     state = state.deshacer();
+    _guardar();
   }
 
   /// Vuelve a aplicar el último evento deshecho.
   void rehacer() {
     _olvidarIdentidad();
     state = state.rehacer();
+    _guardar();
   }
 
   /// Registro de la partida según el contrato (`contrato/`), con el resumen de
@@ -62,6 +88,9 @@ class ControladorPartida extends Notifier<Historial> {
   RegistroPartida registro({List<String?>? cuentas}) {
     _partidaId ??= ref.read(generadorIdProvider)();
     _creadaEn ??= ref.read(relojProvider)().toUtc().toIso8601String();
+    // La identidad se guarda con la partida: tras reabrir la app, volver a
+    // enviarla lleva el mismo id y el servidor no la cuenta dos veces.
+    _guardar();
     return RegistroPartida.crear(
       partidaId: _partidaId!,
       eventos: state.partida.eventos,
@@ -70,6 +99,10 @@ class ControladorPartida extends Notifier<Historial> {
     );
   }
 }
+
+/// Partida que había en curso al abrir la app (la lee `main.dart` del
+/// almacén antes de arrancar). Sin valor, se empieza una nueva.
+final partidaInicialProvider = Provider<PartidaGuardada?>((ref) => null);
 
 final partidaProvider =
     NotifierProvider<ControladorPartida, Historial>(ControladorPartida.new);
