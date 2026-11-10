@@ -1,0 +1,28 @@
+Calibración con el mazo real de ataques del jefe (T-67): 20 cartas del PDF oficial de Incursión Max
+(ataque 1/2/3, jugador, roba otra), máximo de ataques por turno = nivel + 1 (2/3/4/5).
+Mazo según jugadores: 4 = 20 cartas; 3 = sin las 5 del Jugador 4 (15); 2 = 20, las del 3 van al 1 y las del 4 al 2.
+sim_jefes --calibrar, 150 equipos x 60 partidas, ayuda=0.5. Objetivo 75/50/30/15 %. HP de la política solo-dueno.
+
+4 jugadores
+jefe       nivel  HP antes -> HP nuevo  solo-dueno  ayuda   solo-jefe
+onix       1      2300 -> 2400          77.1 %      79.2 %  73.2 %
+manectric  2      2600 -> 2700          54.4 %      58.8 %  48.8 %
+kingdra    3      3700 -> 3800          31.0 %      32.9 %  34.0 %
+arceus     4      3800 -> 3500          17.7 %      18.0 %  20.9 %
+
+Con esos HP, menos jugadores (solo-dueno; los equipos salen de X de cada nivel con 3 o 2 jugadores)
+jefe       nivel  4 jug.   3 jug.   2 jug.   objetivo
+onix       1      77.1 %   48.6 %    1.2 %   75 %
+manectric  2      54.4 %    9.1 %    0.0 %   50 %
+kingdra    3      31.0 %    4.7 %   (sin equipos)  30 %
+arceus     4      17.7 %   (sin equipos)  (sin equipos)  15 %
+
+HP que daría el objetivo con menos jugadores (--calibrar --jugadores=N)
+jefe       nivel  4 jug.  3 jug.  2 jug.
+onix       1      2400    1800     900
+manectric  2      2700    1700     700
+kingdra    3      3800    2800    (sin equipos)
+arceus     4      3500    (sin equipos)  (sin equipos)
+
+Con 3 y 2 jugadores no hay equipos de Nv4 (3 jugadores) ni de Nv3 y Nv4 (2 jugadores): su X no llega al
+rango. Con 2 jugadores los jefes con el HP de 4 jugadores son casi imposibles de ganar.
