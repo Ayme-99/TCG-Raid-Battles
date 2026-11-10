@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/app.dart';
+import 'package:incursiones_app/pantallas/carta.dart';
 import 'package:incursiones_app/pantallas/mesa.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
@@ -107,5 +108,33 @@ void main() {
     await tester.tapAt(const Offset(5, 400));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('mesa')), findsOneWidget);
+  });
+
+  group('Cartas', () {
+    test('el id de la carta no lleva tildes, espacios ni «ex»', () {
+      expect(idCarta('Onix'), 'onix');
+      expect(idCarta('Kingdra ex'), 'kingdra');
+      expect(idCarta('Mr. Mime'), 'mrmime');
+      expect(idCarta('Pokémon Ñu'), 'pokemonnu');
+      expect(rutaCarta('Manectric'), 'assets/cartas/manectric.webp');
+    });
+
+    testWidgets('sin imagen pinta la alternativa', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Center(
+            child: SizedBox(
+              width: 200,
+              child: CartaImagen(
+                nombre: 'Pokémon que no existe',
+                alternativa: Text('sin carta'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('sin carta'), findsOneWidget);
+    });
   });
 }

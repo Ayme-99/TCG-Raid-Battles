@@ -293,7 +293,7 @@ void main() {
     expect(aliado.hp, 90);
     expect(aliado.habilidad, isNotNull);
     expect(find.byKey(const Key('panel-aliados')), findsOneWidget);
-    expect(find.textContaining('Tanque · Geodude'), findsOneWidget);
+    expect(find.textContaining('Geodude'), findsOneWidget);
   });
 
   testWidgets('tirar dados elige slot y categoría libres y rellena el aliado',

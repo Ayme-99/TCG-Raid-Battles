@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
+import 'carta.dart';
 import 'comun.dart';
 import 'estilo.dart';
 
@@ -54,7 +55,8 @@ class PanelPokemon extends ConsumerWidget {
   }
 }
 
-/// Aliados vivos del jefe: categoría (D-13), dueño del slot, HP y su carta.
+/// Aliados vivos del jefe: su carta (salen como Pokémon salvajes, sin decir la
+/// categoría), el dueño del slot y su vida.
 class PanelAliados extends ConsumerWidget {
   const PanelAliados({super.key});
 
@@ -76,6 +78,7 @@ class PanelAliados extends ConsumerWidget {
       child: DefaultTextStyle.merge(
         style: const TextStyle(color: Colors.white),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -95,64 +98,120 @@ class PanelAliados extends ConsumerWidget {
                   key: const Key('reduccion-dano'),
                 ),
               ),
-            const SizedBox(height: 8),
-            for (final a in estado.aliados)
-              Container(
-                key: Key('aliado-${a.slot}'),
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                    colorCategoria(a.categoria),
-                    Color.lerp(colorCategoria(a.categoria), Colors.black, 0.5)!,
-                  ]),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        iconoCategoria(a.categoria),
-                        color: colorCategoria(a.categoria),
+            const SizedBox(height: 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final a in estado.aliados)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: _CartaAliado(
+                        aliado: a,
+                        dueno: estado.jugadores[a.slot].nombre,
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${etiquetaCategoria(a.categoria)} · ${a.nombre} · '
-                            'slot de ${estado.jugadores[a.slot].nombre} · '
-                            '${a.hp}/${a.hpMaximo} HP',
-                            style: const TextStyle(fontWeight: FontWeight.w800),
-                          ),
-                          if (a.tieneAtaque || a.habilidad != null)
-                            Text(
-                              [
-                                if (a.tieneAtaque)
-                                  '${a.ataqueNombre ?? 'Ataque'}: ${a.ataqueDano}',
-                                if (a.habilidad != null) a.habilidad!,
-                              ].join(' · '),
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: Colors.white70),
-                            ),
-                          const SizedBox(height: 4),
-                          BarraVida(
-                            fraccion:
-                                a.hpMaximo == 0 ? 0 : a.hp / a.hpMaximo,
-                            alto: 10,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                // Siempre 4 huecos para que las cartas no cambien de tamaño.
+                for (var i = estado.aliados.length; i < 4; i++)
+                  const Expanded(child: SizedBox.shrink()),
+              ],
+            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Un aliado: su carta y debajo su dueño y su vida.
+class _CartaAliado extends StatelessWidget {
+  const _CartaAliado({required this.aliado, required this.dueno});
+
+  final AliadoEstado aliado;
+  final String dueno;
+
+  @override
+  Widget build(BuildContext context) {
+    final a = aliado;
+    return Column(
+      key: Key('aliado-${a.slot}'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CartaImagen(
+          nombre: a.nombre,
+          alternativa: _AliadoSinImagen(aliado: a),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '${a.nombre} · $dueno',
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+        ),
+        const SizedBox(height: 3),
+        BarraVida(
+          fraccion: a.hpMaximo == 0 ? 0 : a.hp / a.hpMaximo,
+          alto: 10,
+        ),
+        Text(
+          '${a.hp}/${a.hpMaximo} HP',
+          style: const TextStyle(fontSize: 12),
+        ),
+      ],
+    );
+  }
+}
+
+/// Lo que se ve mientras el aliado no tiene todavía su imagen: su ataque y su
+/// habilidad, sin decir la categoría.
+class _AliadoSinImagen extends StatelessWidget {
+  const _AliadoSinImagen({required this.aliado});
+
+  final AliadoEstado aliado;
+
+  @override
+  Widget build(BuildContext context) {
+    final a = aliado;
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF6D5BA8), Color(0xFF2A1B52)],
+        ),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white, width: 2),
+      ),
+      padding: const EdgeInsets.all(6),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: SizedBox(
+          width: 110,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.catching_pokemon, color: Colors.white, size: 30),
+              const SizedBox(height: 4),
+              if (a.tieneAtaque)
+                Text(
+                  '${a.ataqueNombre ?? 'Ataque'}: ${a.ataqueDano}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              if (a.habilidad != null)
+                Text(
+                  a.habilidad!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white70, fontSize: 10),
+                ),
+            ],
+          ),
         ),
       ),
     );
