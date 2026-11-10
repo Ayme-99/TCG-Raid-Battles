@@ -118,5 +118,6 @@ jobs:
         with:
           sdk: stable
       - run: dart pub get
-      - run: dart run bin/sim_jefes.dart --mesa8 --jugadores=${{ matrix.jugadores }} --equipos=150 --partidas=60 --informe=/tmp/x.csv
-      - run: dart run bin/sim_jefes.dart --mesa8 --calibrar --jugadores=${{ matrix.jugadores }} --equipos=150 --partidas=60 --informe=/tmp/y.csv
+      - run: dart run bin/sim_jefes.dart --mejor-primero --jugadores=${{ matrix.jugadores }} --equipos=150 --partidas=60 --informe=/tmp/w.csv
+      - run: dart run bin/sim_jefes.dart --mesa8 --mejor-primero --jugadores=${{ matrix.jugadores }} --equipos=150 --partidas=60 --informe=/tmp/x.csv
+      - run: dart run bin/sim_jefes.dart --mesa8 --mejor-primero --calibrar --jugadores=${{ matrix.jugadores }} --equipos=150 --partidas=60 --informe=/tmp/y.csv

@@ -789,6 +789,7 @@ void main(List<String> args) {
   var jugadores = 4;
   var menosAtaques = 0;
   var mesa8 = false;
+  var mejorPrimero = false;
   for (final a in args) {
     if (a == '--causas') {
       causas = true;
@@ -796,6 +797,8 @@ void main(List<String> args) {
       carpetaJefes = a.substring('--jefes='.length);
     } else if (a.startsWith('--jugadores=')) {
       jugadores = int.parse(a.substring('--jugadores='.length));
+    } else if (a == '--mejor-primero') {
+      mejorPrimero = true;
     } else if (a == '--mesa8') {
       mesa8 = true;
     } else if (a.startsWith('--menos-ataques=')) {
@@ -835,6 +838,9 @@ void main(List<String> args) {
       final e = <Pareja>[];
       for (final t in tam) {
         final grupo = elegidas.sublist(pos, pos + t);
+        // Con --mejor-primero el jugador saca de Activo su mejor Pokémon y
+        // deja en la Banca los demás, de más a menos daño.
+        if (mejorPrimero) grupo.sort((x, y) => y.mejorBase.compareTo(x.mejorBase));
         pos += t;
         e.add(Pareja(grupo[0], grupo[1], grupo.sublist(2)));
       }
@@ -844,7 +850,7 @@ void main(List<String> args) {
 
   stdout.writeln('Incursiones · simulador de jefes con aliados (T-28)');
   stdout.writeln('jefes=${jefes.length} equipos/nivel=${c.equipos} '
-      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques mesa8=$mesa8\n');
+      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques mesa8=$mesa8 mejor-primero=$mejorPrimero\n');
   stdout.writeln('jefe        nivel  HP     política      victoria  objetivo  turnos  aliados');
   final filas = <String>[
     'jefe,nivel,hp,politica,equipos,partidas_por_equipo,victoria,objetivo,turnos_victoria,aliados_invocados',
