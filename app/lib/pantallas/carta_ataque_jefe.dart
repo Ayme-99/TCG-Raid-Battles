@@ -41,7 +41,9 @@ class CartaAtaqueRobada extends StatelessWidget {
             Container(
               color: _colorRanura[carta.ranura - 1],
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-              child: Row(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
@@ -67,6 +69,7 @@ class CartaAtaqueRobada extends StatelessWidget {
                   ),
                 ],
               ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
@@ -76,14 +79,17 @@ class CartaAtaqueRobada extends StatelessWidget {
                     'contra',
                     style: TextStyle(color: Colors.black54, fontSize: 12),
                   ),
-                  Text(
-                    jugador.toUpperCase(),
-                    key: const Key('carta-objetivo'),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: colorJugador,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      jugador.toUpperCase(),
+                      key: const Key('carta-objetivo'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: colorJugador,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ),
                   Row(
@@ -97,13 +103,18 @@ class CartaAtaqueRobada extends StatelessWidget {
                       ),
                       const Spacer(),
                       if (carta.robaOtra)
-                        const Text(
-                          'Roba una carta más ➜',
-                          key: Key('carta-roba-otra'),
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                        const Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Roba una carta más ➜',
+                              key: Key('carta-roba-otra'),
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ),
                         ),
                     ],
@@ -118,7 +129,9 @@ class CartaAtaqueRobada extends StatelessWidget {
   }
 
   Widget _dorso() {
-    return DecoratedBox(
+    return SizedBox(
+      height: 130,
+      child: DecoratedBox(
       decoration: BoxDecoration(
         color: const Color(0xFF5E35B1),
         borderRadius: BorderRadius.circular(16),
@@ -135,6 +148,7 @@ class CartaAtaqueRobada extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
   }
 
@@ -142,8 +156,7 @@ class CartaAtaqueRobada extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 230,
-        height: 132,
+        width: 250,
         child: TweenAnimationBuilder<double>(
           tween: Tween(begin: 0, end: 1),
           duration: const Duration(milliseconds: 800),
