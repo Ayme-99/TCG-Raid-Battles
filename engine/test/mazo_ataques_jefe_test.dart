@@ -25,7 +25,69 @@ void main() {
     });
 
     test('máximo de ataques por turno según el nivel', () {
-      expect([1, 2, 3, 4].map(maxAtaquesJefePorTurno), [2, 3, 4, 4]);
+      expect([1, 2, 3, 4].map(maxAtaquesJefePorTurno), [2, 3, 4, 5]);
+    });
+  });
+
+  group('Cartas según los jugadores', () {
+    List<int> objetivos(int n) =>
+        cartasAtaqueJefePara(n).map((c) => c.jugador).toList();
+
+    test('4 jugadores: las 20 oficiales', () {
+      expect(cartasAtaqueJefePara(4).map((c) => c.numero),
+          cartasAtaqueJefe.map((c) => c.numero));
+      expect(objetivos(4), [for (var i = 0; i < 20; i++) i % 4]);
+    });
+
+    test('3 jugadores: desaparecen las 5 del Jugador 4', () {
+      final cartas = cartasAtaqueJefePara(3);
+      expect(cartas.length, 15);
+      expect(cartas.map((c) => c.jugador).toSet(), {0, 1, 2});
+      expect(
+        cartas.map((c) => c.numero).toSet().intersection({4, 8, 12, 16, 20}),
+        isEmpty,
+      );
+    });
+
+    test('2 jugadores: 20 cartas; las del 3 van al 1 y las del 4 al 2', () {
+      final cartas = cartasAtaqueJefePara(2);
+      expect(cartas.length, 20);
+      expect(objetivos(2), [for (var i = 0; i < 20; i++) i % 2]);
+      // La carta 20 (ataque 3, Jugador 4) pasa a ser contra el Jugador 2 y
+      // sigue pidiendo robar otra.
+      final c20 = cartas.last;
+      expect((c20.ranura, c20.jugador, c20.robaOtra), (3, 1, true));
+    });
+
+    test('1 jugador: las 20 cartas, todas contra él', () {
+      expect(objetivos(1), List.filled(20, 0));
+    });
+
+    test('el ataque y el robar otra no cambian con los jugadores', () {
+      for (final n in [1, 2, 3, 4]) {
+        for (final c in cartasAtaqueJefePara(n)) {
+          final original = cartasAtaqueJefe[c.numero - 1];
+          expect((c.ranura, c.robaOtra), (original.ranura, original.robaOtra));
+        }
+      }
+    });
+
+    test('número de jugadores fuera de rango', () {
+      expect(() => cartasAtaqueJefePara(0), throwsArgumentError);
+      expect(() => cartasAtaqueJefePara(5), throwsArgumentError);
+    });
+
+    test('el mazo de 3 jugadores tiene 15 cartas y de 2, 20', () {
+      final tres = MazoAtaquesJefe(Random(1), jugadores: 3);
+      for (var i = 0; i < 15; i++) {
+        tres.robar({0, 1, 2});
+      }
+      expect(tres.restantes, 0);
+      final dos = MazoAtaquesJefe(Random(1), jugadores: 2);
+      for (var i = 0; i < 20; i++) {
+        dos.robar({0, 1});
+      }
+      expect(dos.restantes, 0);
     });
   });
 
@@ -56,6 +118,11 @@ void main() {
 
     test('sin jugadores activos falla en vez de bloquearse', () {
       expect(() => MazoAtaquesJefe(Random(1)).robar({}), throwsStateError);
+      // Con 3 jugadores no hay cartas contra el asiento 4.
+      expect(
+        () => MazoAtaquesJefe(Random(1), jugadores: 3).robar({3}),
+        throwsStateError,
+      );
     });
 
     test('la misma semilla da el mismo orden', () {

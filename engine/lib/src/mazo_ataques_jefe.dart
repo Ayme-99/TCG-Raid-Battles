@@ -43,15 +43,42 @@ final List<CartaAtaqueJefe> cartasAtaqueJefe = List.unmodifiable([
     ),
 ]);
 
-/// Máximo de ataques del jefe en un turno según su nivel (Nv1: 2, Nv2: 3,
-/// Nv3: 4). El Nv4 es propio de este formato y usa el mismo tope que el Nv3.
-int maxAtaquesJefePorTurno(int nivel) => nivel <= 1 ? 2 : (nivel == 2 ? 3 : 4);
+/// Máximo de ataques del jefe en un turno según su nivel: nivel + 1 (Nv1: 2,
+/// Nv2: 3, Nv3: 4; el Nv4, propio de este formato, 5, como en D-03).
+int maxAtaquesJefePorTurno(int nivel) => nivel + 1;
+
+/// Las cartas del mazo según los jugadores de la partida:
+///
+/// - 4 jugadores: las 20 del juego oficial.
+/// - 3 jugadores: desaparecen las 5 del Jugador 4 (quedan 15).
+/// - 2 jugadores: siguen las 20; las del Jugador 3 apuntan al Jugador 1 y las
+///   del Jugador 4 al Jugador 2.
+/// - 1 jugador: siguen las 20, todas contra él.
+List<CartaAtaqueJefe> cartasAtaqueJefePara(int jugadores) {
+  if (jugadores < 1 || jugadores > 4) {
+    throw ArgumentError.value(jugadores, 'jugadores', 'debe estar entre 1 y 4');
+  }
+  return [
+    for (final c in cartasAtaqueJefe)
+      if (jugadores == 3 && c.jugador == 3)
+        ...const <CartaAtaqueJefe>[]
+      else
+        CartaAtaqueJefe(
+          numero: c.numero,
+          ranura: c.ranura,
+          jugador: jugadores >= 3 ? c.jugador : c.jugador % jugadores,
+          robaOtra: c.robaOtra,
+        ),
+  ];
+}
 
 /// Mazo de ataques del jefe: se baraja, se roba y, al agotarse, se baraja el
 /// descarte.
 class MazoAtaquesJefe {
-  MazoAtaquesJefe(this._azar) {
-    _mazo.addAll(cartasAtaqueJefe);
+  /// [jugadores]: los de la partida (1 a 4), que deciden las cartas del mazo
+  /// (véase [cartasAtaqueJefePara]).
+  MazoAtaquesJefe(this._azar, {int jugadores = 4}) {
+    _mazo.addAll(cartasAtaqueJefePara(jugadores));
     _mazo.shuffle(_azar);
   }
 
@@ -66,8 +93,8 @@ class MazoAtaquesJefe {
   /// (asientos). La carta que apunta a un jugador que no juega o está
   /// eliminado se descarta sin efecto y se roba otra.
   CartaAtaqueJefe robar(Set<int> jugadoresActivos) {
-    if (!jugadoresActivos.any((j) => j >= 0 && j <= 3)) {
-      throw StateError('no hay ningún jugador al que pueda atacar el jefe');
+    if (!_mazo.followedBy(_descarte).any((c) => jugadoresActivos.contains(c.jugador))) {
+      throw StateError('no hay ninguna carta que apunte a un jugador activo');
     }
     while (true) {
       if (_mazo.isEmpty) {

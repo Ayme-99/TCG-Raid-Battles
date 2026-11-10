@@ -67,6 +67,7 @@
 // Uso (desde sim/):
 //   dart run bin/sim_jefes.dart
 //   dart run bin/sim_jefes.dart --equipos=20 --partidas=20 --informe=/tmp/j.csv
+//   dart run bin/sim_jefes.dart --jugadores=3   # equipos de 1 a 4 jugadores
 //   dart run bin/sim_jefes.dart --calibrar   # HP (en centenas) que da el objetivo
 //   dart run bin/sim_jefes.dart --causas     # por qué no se usan todos los intentos
 //
@@ -79,6 +80,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:incursiones_engine/incursiones_engine.dart'
+    show MazoAtaquesJefe;
 
 import 'sim_cartas.dart' hide Medida, main, medir;
 
@@ -343,6 +347,7 @@ Resultado jugarJefe(
   double propio = 1.0,
 ]) {
   final js = [for (final p in equipo) Jug(p)];
+  final mazo = MazoAtaquesJefe(rnd, jugadores: js.length);
   final slots = List<Aliado?>.filled(js.length, null);
   var hp = jefe.hp;
   var cruzados = 0;
@@ -620,17 +625,18 @@ Resultado jugarJefe(
     noAtacan.clear();
     sinRetirada.clear();
 
-    // Turno del jefe: sus ataques (como en sim_cartas.dart)...
-    var k = 1;
-    while (k < nv.maxAtaques && rnd.nextDouble() < probSeguir) {
-      k++;
-    }
-    for (var n = 0; n < k; n++) {
-      final vivos = js.where((j) => !j.eliminado).toList();
-      if (vivos.isEmpty) break;
-      final j = vivos[rnd.nextInt(vivos.length)];
-      final r = rnd.nextDouble();
-      final a = jefe.ataques[r < 0.4 ? 0 : (r < 0.8 ? 1 : 2)];
+    // Turno del jefe: roba cartas del mazo real (20 cartas oficiales; según
+    // los jugadores se quitan o se redirigen), cada una con su ataque y su
+    // objetivo, y sigue mientras diga «roba otra» hasta el máximo del nivel.
+    for (var n = 0; n < nv.maxAtaques; n++) {
+      final activos = {
+        for (var i = 0; i < js.length; i++)
+          if (!js[i].eliminado) i,
+      };
+      if (activos.isEmpty) break;
+      final carta = mazo.robar(activos);
+      final j = js[carta.jugador];
+      final a = jefe.ataques[carta.ranura - 1];
       var dano = a.dano;
       if (a.tipo == 'danoPorAtaquePrevio') dano += (a.valor ?? 0) * n;
       if (a.tipo == 'danoExtraSi') {
@@ -666,6 +672,7 @@ Resultado jugarJefe(
       } else if (a.tipo == 'sinRetirada') {
         sinRetirada.add(js.indexOf(j));
       }
+      if (!carta.robaOtra) break;
     }
     // ...y, al final, los ataques de los aliados vivos.
     for (var i = 0; i < slots.length; i++) {
@@ -767,17 +774,25 @@ int calibrarJefe(List<List<Pareja>> equipos, JefeDef jefe, Nivel nv, Config c) {
   return lo * 100;
 }
 
+/// Equipo de [n] jugadores con parejas de cartas al azar.
+extension on List<Carta> {
+  List<Pareja> parejas(int n) => [for (var i = 0; i < 2 * n; i += 2) Pareja(this[i], this[i + 1])];
+}
+
 void main(List<String> args) {
   var carpetaJefes = '../catalog';
   var ayuda = 0.5;
   final resto = <String>[];
   String? informeArg;
   var causas = false;
+  var jugadores = 4;
   for (final a in args) {
     if (a == '--causas') {
       causas = true;
     } else if (a.startsWith('--jefes=')) {
       carpetaJefes = a.substring('--jefes='.length);
+    } else if (a.startsWith('--jugadores=')) {
+      jugadores = int.parse(a.substring('--jugadores='.length));
     } else if (a.startsWith('--ayuda=')) {
       ayuda = double.parse(a.substring('--ayuda='.length));
     } else if (a.startsWith('--informe=')) {
@@ -802,14 +817,22 @@ void main(List<String> args) {
   for (final n in niveles) {
     final destino = porNivel[n.nivel]!;
     for (var intento = 0; intento < 200000 && destino.length < c.equipos; intento++) {
-      final e = n.nivel == 1 ? equipoNormales(rnd, normales) : equipoAzar(rnd, lista);
+      final e = n.nivel == 1
+          ? [
+              for (var i = 0; i < jugadores; i++)
+                Pareja(
+                  normales[rnd.nextInt(normales.length)],
+                  normales[rnd.nextInt(normales.length)],
+                ),
+            ]
+          : (List<Carta>.from(lista)..shuffle(rnd)).parejas(jugadores);
       if (nivelPorX(calcularX(e), niveles) == n.nivel) destino.add(e);
     }
   }
 
   stdout.writeln('Incursiones · simulador de jefes con aliados (T-28)');
   stdout.writeln('jefes=${jefes.length} equipos/nivel=${c.equipos} '
-      'partidas/equipo=${c.partidas} ayuda=$ayuda\n');
+      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores\n');
   stdout.writeln('jefe        nivel  HP     política      victoria  objetivo  turnos  aliados');
   final filas = <String>[
     'jefe,nivel,hp,politica,equipos,partidas_por_equipo,victoria,objetivo,turnos_victoria,aliados_invocados',
