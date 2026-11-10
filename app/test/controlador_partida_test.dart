@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:incursiones_app/almacen/almacen.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
+import 'package:incursiones_app/partida/persistencia.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import 'ayudas.dart';
@@ -179,5 +181,82 @@ void main() {
     // Deshacer también la cambia.
     p.deshacer();
     expect(p.registro().toJson()['partidaId'], 'id-3');
+  });
+
+  group('partida en curso', () {
+    ProviderContainer conAlmacen(AlmacenMemoria almacen,
+        {PartidaGuardada? inicial}) {
+      final c = ProviderContainer(overrides: [
+        ...sobrescribir(almacen: almacen),
+        partidaInicialProvider.overrideWithValue(inicial),
+        generadorIdProvider.overrideWithValue(() => 'partida-de-prueba'),
+        relojProvider.overrideWithValue(() => DateTime.utc(2026, 11, 6, 12)),
+      ]);
+      addTearDown(c.dispose);
+      return c;
+    }
+
+    test('se guarda tras cada evento y se recupera al reabrir', () async {
+      final almacen = AlmacenMemoria();
+      final c = conAlmacen(almacen);
+      preparar(c);
+      controlador(c).registrar(const TurnoJugador(jugador: 0, dano: 30));
+      await asentar();
+
+      final guardada = await leerPartidaEnCurso(almacen);
+      expect(guardada, isNotNull);
+      final c2 = conAlmacen(almacen, inicial: guardada);
+      expect(c2.read(estadoProvider).jefe!.hp, 70);
+      expect(c2.read(puedeDeshacerProvider), isTrue);
+    });
+
+    test('deshacer también se guarda', () async {
+      final almacen = AlmacenMemoria();
+      final c = conAlmacen(almacen);
+      preparar(c);
+      controlador(c).registrar(const TurnoJugador(jugador: 0, dano: 30));
+      controlador(c).deshacer();
+      await asentar();
+
+      final c2 =
+          conAlmacen(almacen, inicial: await leerPartidaEnCurso(almacen));
+      expect(c2.read(estadoProvider).jefe!.hp, 100);
+    });
+
+    test('el id y la fecha se conservan para reenviar la misma partida',
+        () async {
+      final almacen = AlmacenMemoria();
+      final c = conAlmacen(almacen);
+      preparar(c);
+      final antes = controlador(c).registro();
+      await asentar();
+
+      final c2 =
+          conAlmacen(almacen, inicial: await leerPartidaEnCurso(almacen));
+      final despues = controlador(c2).registro();
+      expect(despues.partidaId, antes.partidaId);
+      expect(despues.creadaEn, antes.creadaEn);
+    });
+
+    test('una partida nueva borra lo guardado', () async {
+      final almacen = AlmacenMemoria();
+      final c = conAlmacen(almacen);
+      preparar(c);
+      await asentar();
+      expect(almacen.datos, contains(claveEnCurso));
+
+      controlador(c).nuevaPartida();
+      await asentar();
+      expect(almacen.datos, isNot(contains(claveEnCurso)));
+    });
+
+    test('lo guardado que ya no vale se descarta', () async {
+      final almacen = AlmacenMemoria()..datos[claveEnCurso] = '{"eventos": 5}';
+      expect(await leerPartidaEnCurso(almacen), isNull);
+      expect(almacen.datos, isNot(contains(claveEnCurso)));
+
+      almacen.datos[claveEnCurso] = 'esto no es json';
+      expect(await leerPartidaEnCurso(almacen), isNull);
+    });
   });
 }
