@@ -33,6 +33,8 @@ dart run bin/sim_jefes.dart --equipos=20 --partidas=20 --informe=/tmp/prueba.csv
 dart run bin/sim_jefes.dart --calibrar   # busca el HP que da el objetivo (75/50/30/15 %)
 ```
 
+Opciones para probar partidas con menos jugadores (T-67): `--jugadores=N` (equipos de 1 a 4 jugadores; el mazo de ataques del jefe se adapta), `--mesa8` (se mantienen 8 Pokémon en mesa: 3 jugadores 3+3+2, 2 jugadores 4+4), `--mejor-primero` (cada jugador saca de Activo su mejor Pokémon) y `--menos-ataques=K` (quita K ataques por turno al jefe). El jefe roba sus ataques del mazo real de 20 cartas (`MazoAtaquesJefe` del motor).
+
 Con `--causas` añade una tabla que desglosa los intentos de invocación de cada jefe (media por partida): invocados, perdidos por falta de slot o de categoría, y umbrales que no llegaron a cruzarse porque la partida terminó antes.
 
 Con `--calibrar` busca, por jefe, el mayor HP (en centenas) con el que la política `solo-dueno` llega al objetivo del nivel, manteniendo el mismo número de aliados (el `cadaHp` se reparte en tramos iguales), y escribe `balance/informes/jefes_aliados_calibrado.csv`.

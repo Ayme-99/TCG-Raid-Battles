@@ -45,3 +45,25 @@ Pruebas con pocos jugadores (misma fecha)
    Aun suponiendo que las cartas con más daño tienen mucha más vida, con 2 jugadores se gana bastante menos: la
    parte fija de vida de cada Pokémon se pierde al haber la mitad de Pokémon. El modelo abstracto no está calibrado:
    solo sirve para la tendencia.
+
+4) Opción «8 Pokémon en mesa» (--mesa8: 3 jugadores 3+3+2, 2 jugadores 4+4; X = suma del mejor ataque de cada
+   jugador), HP del catálogo (2400 / 2700 / 3800 / 3500), solo-dueno, 150 equipos x 60 partidas.
+
+   Activo al azar (como la calibración de arriba)
+   jefe       objetivo  4 jug.   3 jug. (2 Pokémon -> mesa8)   2 jug. (2 Pokémon -> mesa8)
+   onix       75 %      77,1 %   48,6 % -> 83,8 %               1,2 % -> 64,6 %
+   manectric  50 %      54,4 %    9,1 % -> 32,0 %               0,0 % ->  3,0 %
+   kingdra    30 %      31,0 %    4,7 % -> 24,1 %               (sin equipos)
+   HP que da el objetivo con mesa8: 3 jugadores 2600 / 2300 / 3600; 2 jugadores 2200 / 1500.
+
+   El mejor Pokémon de cada jugador sale de Activo (--mejor-primero)
+   jefe       objetivo  4 jug.   3 jug. (2 Pokémon -> mesa8)   2 jug. (2 Pokémon -> mesa8)
+   onix       75 %      78,3 %   49,7 % -> 86,8 %               1,3 % -> 67,8 %
+   manectric  50 %      61,5 %   10,5 % -> 44,1 %               0,0 % ->  4,4 %
+   kingdra    30 %      35,9 %    4,8 % -> 30,7 %               (sin equipos)
+   arceus     15 %      21,1 %   (sin equipos)                  (sin equipos)
+   HP que da el objetivo con mesa8 y mejor-primero: 4 jugadores 2500 / 2800 / 3900 / 3700;
+   3 jugadores 2700 / 2500 / 3800; 2 jugadores 2200 / 1700.
+
+   Con 3 jugadores, mantener 8 Pokémon en mesa deja los tres jefes cerca del objetivo sin tocar su HP. Con 2
+   jugadores vale para Onix pero no para Manectric (4 %): haría falta además bajarle el HP (a ~1700).
