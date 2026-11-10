@@ -25,3 +25,4 @@ flutter:
   assets:
     - assets/catalogo/
     - assets/catalogo/bosses/
+    - assets/cartas/

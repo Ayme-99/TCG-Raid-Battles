@@ -9,6 +9,7 @@ import '../partida/tirada_mesa.dart';
 import 'dados_en_mesa.dart';
 import 'estilo.dart';
 import 'mapa.dart';
+import 'panel_acciones.dart';
 import 'paneles.dart';
 import 'tarjeta_jefe.dart';
 
@@ -64,26 +65,23 @@ class FocoJugador extends FocoCamara {
 }
 
 /// Lo que es importante mirar ahora mismo según el estado de la partida:
-/// lo que hay por resolver (aliados), el turno del jefe o el del jugador
-/// activo.
+/// lo que hay por resolver (aliados) o el turno del jefe. En el turno de los
+/// jugadores la cámara se queda en la vista general; solo se mueve con los
+/// eventos (dados, ataques del jefe o de los aliados).
 FocoCamara focoDe(EstadoPartida estado) {
   if (estado.intentosInvocacionPendientes > 0 ||
       estado.entradasPendientes.isNotEmpty) {
     return const FocoAliados();
   }
   if (estado.fase == Fase.turnoJefe) return const FocoJefe();
-  final actual = estado.jugadorActual;
-  if (estado.fase == Fase.turnoJugadores && actual != null) {
-    return FocoJugador(actual);
-  }
   return const FocoGeneral();
 }
 
 /// Reparto vertical de la mesa: jefe arriba, aliados en medio, jugadores
 /// abajo del todo. Suman 1.
-const alturaJefe = 0.56;
-const alturaAliados = 0.24;
-const alturaJugadores = 0.20;
+const alturaJefe = 0.50;
+const alturaAliados = 0.32;
+const alturaJugadores = 0.18;
 
 /// Punto de la mesa al que apunta la cámara y cuánto se acerca. `ax` y `ay`
 /// van de -1 (izquierda, arriba) a 1 (derecha, abajo).
@@ -129,6 +127,154 @@ class _CamaraTween extends Tween<Camara> {
 
   @override
   Camara lerp(double t) => Camara.lerp(begin!, end!, t);
+}
+
+/// La mesa a pantalla completa. En pantallas anchas el panel de acciones flota
+/// sobre la mesa, a la izquierda y encima de la fila de jugadores; en las
+/// estrechas va debajo de la mesa. En los dos casos se puede plegar.
+class DisposicionMesa extends ConsumerStatefulWidget {
+  const DisposicionMesa({super.key, required this.controles});
+
+  /// Ancho a partir del cual el panel flota sobre la mesa.
+  static const anchoMinimoFlotante = 1100.0;
+  static const anchoPanel = 420.0;
+  static const altoPico = 14.0;
+
+  final List<Widget> controles;
+
+  @override
+  ConsumerState<DisposicionMesa> createState() => _DisposicionMesaState();
+}
+
+class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
+  bool _abierto = true;
+
+  void _alternar() => setState(() => _abierto = !_abierto);
+
+  @override
+  Widget build(BuildContext context) {
+    final estado = ref.watch(estadoProvider);
+    final activo =
+        estado.fase == Fase.turnoJugadores ? estado.jugadorActual : null;
+    final titulo = activo != null ? 'Tu turno' : 'Acciones';
+    return LayoutBuilder(
+      builder: (context, caja) {
+        if (caja.maxWidth >= DisposicionMesa.anchoMinimoFlotante) {
+          final ancho = caja.maxWidth;
+          final alto = caja.maxHeight;
+          const margen = 12.0;
+          const panel = DisposicionMesa.anchoPanel;
+          // El bocadillo sale del asiento del jugador que actúa; en el turno
+          // del jefe se queda centrado.
+          final n = estado.jugadores.length;
+          final centro = activo != null
+              ? ancho * (activo + 0.5) / n
+              : ancho / 2;
+          final izquierda = (centro - panel / 2)
+              .clamp(margen, max(margen, ancho - panel - margen))
+              .toDouble();
+          final pico = (centro - izquierda - 14)
+              .clamp(26.0, panel - 54.0)
+              .toDouble();
+          return Stack(
+            children: [
+              const Positioned.fill(child: MesaConCamara()),
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeOutCubic,
+                left: izquierda,
+                bottom: alto * alturaJugadores + 4,
+                width: panel,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: alto * 0.56),
+                      child: PanelAcciones(
+                        titulo: titulo,
+                        controles: widget.controles,
+                        abierto: _abierto,
+                        onAlternar: _alternar,
+                        ajustar: true,
+                      ),
+                    ),
+                    if (activo != null)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: pico),
+                          child: const CustomPaint(
+                            key: Key('pico-bocadillo'),
+                            size: Size(28, DisposicionMesa.altoPico),
+                            painter: _PicoPainter(),
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox(height: DisposicionMesa.altoPico),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            const Expanded(flex: 3, child: MesaConCamara()),
+            if (_abierto)
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+                  child: PanelAcciones(
+                    titulo: titulo,
+                    controles: widget.controles,
+                    abierto: true,
+                    onAlternar: _alternar,
+                    ajustar: false,
+                  ),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+                child: PanelAcciones(
+                  titulo: titulo,
+                  controles: widget.controles,
+                  abierto: false,
+                  onAlternar: _alternar,
+                  ajustar: true,
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Pico del bocadillo: un triángulo con el mismo borde blanco que el panel.
+class _PicoPainter extends CustomPainter {
+  const _PicoPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final borde = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..close();
+    canvas.drawPath(borde, Paint()..color = Colors.white);
+    final dentro = Path()
+      ..moveTo(5, 0)
+      ..lineTo(size.width - 5, 0)
+      ..lineTo(size.width / 2, size.height - 6)
+      ..close();
+    canvas.drawPath(dentro, Paint()..color = const Color(0xFF1A1033));
+  }
+
+  @override
+  bool shouldRepaint(_PicoPainter old) => false;
 }
 
 /// La partida vista como a través de una cámara sobre la mesa: el jefe arriba,
@@ -245,7 +391,11 @@ class _Mesa extends StatelessWidget {
                 key: const Key('zona-jefe'),
                 behavior: HitTestBehavior.translucent,
                 onTap: () => onFoco(const FocoJefe()),
-                child: const _Zona(ancho: 440, hijo: TarjetaJefe()),
+                child: _Zona(
+                  ancho: 440,
+                  arriba: MediaQuery.of(context).padding.top + 52,
+                  hijo: const TarjetaJefe(),
+                ),
               ),
             ),
             Expanded(
@@ -289,15 +439,18 @@ class _Mesa extends StatelessWidget {
 
 /// Zona de la mesa que escala su contenido para que quepa entera.
 class _Zona extends StatelessWidget {
-  const _Zona({required this.ancho, required this.hijo});
+  const _Zona({required this.ancho, required this.hijo, this.arriba = 0});
 
   final double ancho;
   final Widget hijo;
 
+  /// Espacio reservado arriba (la barra flotante de la partida).
+  final double arriba;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.fromLTRB(8, 8 + arriba, 8, 8),
       child: FittedBox(
         child: SizedBox(width: ancho, child: hijo),
       ),

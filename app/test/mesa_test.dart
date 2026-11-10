@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/app.dart';
+import 'package:incursiones_app/pantallas/carta.dart';
 import 'package:incursiones_app/pantallas/mesa.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
@@ -87,7 +88,8 @@ void main() {
     // El jefe sigue siendo uno solo (no se duplica entre mesa y controles).
     expect(find.byKey(const Key('hp-jefe')), findsOneWidget);
     final estado = c.read(estadoProvider);
-    expect(focoDe(estado), FocoJugador(estado.jugadorActual!));
+    // En el turno de los jugadores la cámara no se acerca a nadie.
+    expect(focoDe(estado), const FocoGeneral());
   });
 
   testWidgets('la cámara pasa al jefe en su turno y se puede dirigir a mano',
@@ -107,5 +109,59 @@ void main() {
     await tester.tapAt(const Offset(5, 400));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('mesa')), findsOneWidget);
+  });
+
+  testWidgets('en pantalla ancha los controles flotan sobre la mesa',
+      (tester) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ProviderScope(overrides: sobrescribir(), child: const IncursionesApp()),
+    );
+    await tester.pumpAndSettle();
+    await empezar(tester);
+    expect(find.byKey(const Key('mesa')), findsOneWidget);
+    expect(find.byKey(const Key('barra-turno')), findsOneWidget);
+    expect(find.byKey(const Key('panel-acciones')), findsOneWidget);
+    // La mesa llena la pantalla: no hay barra de título.
+    expect(find.byType(AppBar), findsNothing);
+    // El bocadillo sale del asiento del jugador que actúa.
+    expect(find.byKey(const Key('pico-bocadillo')), findsOneWidget);
+    final pico = tester.getCenter(find.byKey(const Key('pico-bocadillo'))).dx;
+    final asiento = tester.getCenter(find.byKey(const Key('asiento-0'))).dx;
+    expect((pico - asiento).abs(), lessThan(40));
+    // El panel se pliega y se despliega.
+    await tocar(tester, 'panel-acciones-toggle');
+    expect(find.byKey(const Key('panel-acciones')), findsOneWidget);
+    expect(find.byKey(const Key('mesa')), findsOneWidget);
+  });
+
+  group('Cartas', () {
+    test('el id de la carta no lleva tildes, espacios ni «ex»', () {
+      expect(idCarta('Onix'), 'onix');
+      expect(idCarta('Kingdra ex'), 'kingdra');
+      expect(idCarta('Mr. Mime'), 'mrmime');
+      expect(idCarta('Pokémon Ñu'), 'pokemonnu');
+      expect(rutaCarta('Manectric'), 'assets/cartas/manectric.webp');
+    });
+
+    testWidgets('sin imagen pinta la alternativa', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Center(
+            child: SizedBox(
+              width: 200,
+              child: CartaImagen(
+                nombre: 'Pokémon que no existe',
+                alternativa: Text('sin carta'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('sin carta'), findsOneWidget);
+    });
   });
 }

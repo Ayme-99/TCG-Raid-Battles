@@ -23,9 +23,7 @@ class PantallaTurnoJefe extends ConsumerWidget {
       for (final a in estado.aliados)
         if (a.tieneAtaque && !a.atacoEnTurnoJefe) a,
     ];
-    final controles = ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
+    final controles = <Widget>[
         const PanelEfectosActivos(),
         const PanelPendientes(),
         _AtaqueJefe(
@@ -95,15 +93,10 @@ class PantallaTurnoJefe extends ConsumerWidget {
           },
           child: const Text('Terminar el turno del jefe'),
         ),
-      ],
-    );
-    // La mesa con cámara arriba y los controles del turno debajo.
-    return Column(
-      children: [
-        const Flexible(flex: 3, child: MesaConCamara()),
-        Expanded(flex: 2, child: controles),
-      ],
-    );
+    ];
+    // La mesa con cámara a pantalla completa y los controles del turno al
+    // lado (o debajo en pantallas estrechas).
+    return DisposicionMesa(controles: controles);
   }
 }
 
