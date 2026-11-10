@@ -4,7 +4,7 @@
   "nombre": "Manectric",
   "nivel": 2,
   "mapa": "Ruta 110",
-  "hp": 2600,
+  "hp": 2700,
   "ataques": [
     {
       "nombre": "Onda trueno",
@@ -30,7 +30,7 @@
     }
   ],
   "invocacion": {
-    "cadaHp": 867,
+    "cadaHp": 900,
     "tirada": "segura",
     "aliados": {
       "danio": {

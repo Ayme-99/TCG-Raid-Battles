@@ -4,7 +4,7 @@
   "nombre": "Kingdra",
   "nivel": 3,
   "mapa": "Islas Remolino",
-  "hp": 3700,
+  "hp": 3800,
   "ataques": [
     {
       "nombre": "Ciclón",
@@ -24,7 +24,7 @@
     }
   ],
   "invocacion": {
-    "cadaHp": 925,
+    "cadaHp": 950,
     "tirada": "segura",
     "aliados": {
       "danio": {

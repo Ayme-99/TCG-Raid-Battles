@@ -51,7 +51,7 @@ void main() {
       final c = await Catalogo.cargar(rootBundle);
       expect(c.jefes.map((j) => j.id), ['onix', 'manectric', 'kingdra', 'arceus']);
       expect(c.jefes.map((j) => j.nivel), [1, 2, 3, 4]);
-      expect(c.jefes.map((j) => j.hp), [2300, 2600, 3700, 3800]);
+      expect(c.jefes.map((j) => j.hp), [2400, 2700, 3800, 3500]);
       expect(c.jefes.map((j) => j.intentosDeInvocacion), [1, 2, 3, 4]);
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
@@ -206,8 +206,8 @@ void main() {
     final estado = c.read(estadoProvider);
     expect(estado.fase, Fase.turnoJugadores);
     expect(estado.jefe!.nombre, 'Onix');
-    expect(estado.jefe!.hp, 2300);
-    expect(estado.jefe!.invocacionCadaHp, 1150);
+    expect(estado.jefe!.hp, 2400);
+    expect(estado.jefe!.invocacionCadaHp, 1200);
 
     // Turno del jefe: la pantalla propone el ataque de la carta y su efecto.
     final partida = c.read(partidaProvider.notifier);
@@ -268,10 +268,10 @@ void main() {
     expect(find.byKey(const Key('aliado-0')), findsNothing);
     expect(find.byKey(const Key('slot-libre-0')), findsOneWidget);
 
-    // 1150 de daño cruza el primer (y único) umbral de invocación de Onix.
+    // 1200 de daño cruza el primer (y único) umbral de invocación de Onix.
     expect(
       c.read(partidaProvider.notifier).registrar(
-            const TurnoJugador(jugador: 0, dano: 1150),
+            const TurnoJugador(jugador: 0, dano: 1200),
           ),
       isNull,
     );
@@ -336,7 +336,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       c.read(partidaProvider.notifier).registrar(
-            const TurnoJugador(jugador: 0, dano: 1150),
+            const TurnoJugador(jugador: 0, dano: 1200),
           ),
       isNull,
     );

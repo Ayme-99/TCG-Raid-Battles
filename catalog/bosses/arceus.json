@@ -3,7 +3,7 @@
   "id": "arceus",
   "nombre": "Arceus",
   "nivel": 4,
-  "hp": 3800,
+  "hp": 3500,
   "ataques": [
     {
       "nombre": "Danza Espada",
@@ -34,7 +34,7 @@
     }
   ],
   "invocacion": {
-    "cadaHp": 760,
+    "cadaHp": 700,
     "tirada": "segura",
     "aliados": {
       "danio": {
