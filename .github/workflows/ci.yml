@@ -99,3 +99,26 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build web --release
+
+  # TEMPORAL (T-67): experimento de balance con menos jugadores.
+  experimento:
+    name: Experimento temporal (menos ataques)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        caso: ["3 1", "3 2", "2 1", "2 2", "2 3"]
+    defaults:
+      run:
+        working-directory: sim
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - run: dart pub get
+      - run: |
+          set -- ${{ matrix.caso }}
+          dart run bin/sim_jefes.dart --jugadores=$1 --menos-ataques=$2 --equipos=150 --partidas=60 --informe=/tmp/x.csv
+          dart run bin/sim_jefes.dart --calibrar --jugadores=$1 --menos-ataques=$2 --equipos=150 --partidas=60 --informe=/tmp/y.csv

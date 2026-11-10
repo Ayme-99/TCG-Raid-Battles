@@ -786,6 +786,7 @@ void main(List<String> args) {
   String? informeArg;
   var causas = false;
   var jugadores = 4;
+  var menosAtaques = 0;
   for (final a in args) {
     if (a == '--causas') {
       causas = true;
@@ -793,6 +794,8 @@ void main(List<String> args) {
       carpetaJefes = a.substring('--jefes='.length);
     } else if (a.startsWith('--jugadores=')) {
       jugadores = int.parse(a.substring('--jugadores='.length));
+    } else if (a.startsWith('--menos-ataques=')) {
+      menosAtaques = int.parse(a.substring('--menos-ataques='.length));
     } else if (a.startsWith('--ayuda=')) {
       ayuda = double.parse(a.substring('--ayuda='.length));
     } else if (a.startsWith('--informe=')) {
@@ -832,7 +835,7 @@ void main(List<String> args) {
 
   stdout.writeln('Incursiones · simulador de jefes con aliados (T-28)');
   stdout.writeln('jefes=${jefes.length} equipos/nivel=${c.equipos} '
-      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores\n');
+      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques\n');
   stdout.writeln('jefe        nivel  HP     política      victoria  objetivo  turnos  aliados');
   final filas = <String>[
     'jefe,nivel,hp,politica,equipos,partidas_por_equipo,victoria,objetivo,turnos_victoria,aliados_invocados',
@@ -845,7 +848,10 @@ void main(List<String> args) {
   };
   final filasCausas = <String>[];
   for (final jefe in jefes) {
-    final nv = niveles.firstWhere((n) => n.nivel == jefe.nivel);
+    final base = niveles.firstWhere((n) => n.nivel == jefe.nivel);
+    // Experimento: quitar ataques por turno al jefe (--menos-ataques=K).
+    final nv = Nivel(base.nivel, base.xMin, base.hp, base.ataques,
+        max(1, base.maxAtaques - menosAtaques));
     final eqs = porNivel[jefe.nivel]!;
     if (eqs.isEmpty) {
       stdout.writeln('${jefe.id}  sin equipos de este nivel');
