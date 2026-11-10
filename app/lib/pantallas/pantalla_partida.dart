@@ -261,11 +261,11 @@ class _BotonHud extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: SizedBox(
         width: 56,
-        height: 48,
+        height: 56,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icono, color: color, size: 22),
+            Icon(icono, color: color, size: 20),
             Text(
               etiqueta,
               style: TextStyle(
