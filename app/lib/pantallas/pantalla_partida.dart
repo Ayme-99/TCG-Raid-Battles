@@ -47,13 +47,27 @@ class PantallaPartida extends ConsumerWidget {
       ),
       const BotonEnvios(),
       const BotonCuenta(),
-      if (enJuego)
-        IconButton(
-          key: const Key('abandonar'),
-          tooltip: 'Abandonar la partida',
-          icon: const Icon(Icons.flag),
-          onPressed: () => _abandonar(context, ref),
-        ),
+    ];
+    // La barra flotante lleva los mismos botones con su nombre debajo.
+    final accionesHud = <Widget>[
+      _BotonHud(
+        key: const Key('deshacer'),
+        icono: Icons.undo,
+        etiqueta: 'Deshacer',
+        onPressed: puedeDeshacer && !bloqueada
+            ? () => ref.read(partidaProvider.notifier).deshacer()
+            : null,
+      ),
+      _BotonHud(
+        key: const Key('rehacer'),
+        icono: Icons.redo,
+        etiqueta: 'Rehacer',
+        onPressed: puedeRehacer && !bloqueada
+            ? () => ref.read(partidaProvider.notifier).rehacer()
+            : null,
+      ),
+      const BotonEnvios(),
+      const BotonCuenta(),
     ];
     return Scaffold(
       // En juego no hay barra: la mesa llena la pantalla y la barra flota.
@@ -72,7 +86,8 @@ class PantallaPartida extends ConsumerWidget {
                   child: SafeArea(
                     child: _BarraFlotante(
                       texto: _banner(estado),
-                      acciones: acciones,
+                      acciones: accionesHud,
+                      onAbandonar: () => _abandonar(context, ref),
                     ),
                   ),
                 ),
@@ -143,10 +158,15 @@ class PantallaPartida extends ConsumerWidget {
 /// Barra de la partida que flota sobre la mesa: ronda y turno a la izquierda,
 /// deshacer, rehacer, envíos, cuenta y abandonar a la derecha.
 class _BarraFlotante extends StatelessWidget {
-  const _BarraFlotante({required this.texto, required this.acciones});
+  const _BarraFlotante({
+    required this.texto,
+    required this.acciones,
+    required this.onAbandonar,
+  });
 
   final String texto;
   final List<Widget> acciones;
+  final VoidCallback onAbandonar;
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +216,66 @@ class _BarraFlotante extends StatelessWidget {
               child: Row(mainAxisSize: MainAxisSize.min, children: acciones),
             ),
           ),
+          const SizedBox(width: 12),
+          // Aparte del resto para no pulsarlo sin querer.
+          OutlinedButton.icon(
+            key: const Key('abandonar'),
+            onPressed: onAbandonar,
+            icon: const Icon(Icons.flag),
+            label: const Text('Abandonar'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFFFF8A80),
+              backgroundColor: const Color(0xD91A1033),
+              side: const BorderSide(color: Color(0xFFFF8A80), width: 3),
+              minimumSize: const Size(0, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+/// Botón de la barra flotante: icono con su nombre debajo.
+class _BotonHud extends StatelessWidget {
+  const _BotonHud({
+    super.key,
+    required this.icono,
+    required this.etiqueta,
+    required this.onPressed,
+  });
+
+  final IconData icono;
+  final String etiqueta;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final activo = onPressed != null;
+    final color = activo ? Colors.white : Colors.white38;
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(12),
+      child: SizedBox(
+        width: 56,
+        height: 48,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icono, color: color, size: 22),
+            Text(
+              etiqueta,
+              style: TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

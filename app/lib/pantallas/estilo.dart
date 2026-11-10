@@ -63,8 +63,11 @@ class BarraVida extends StatelessWidget {
         borderRadius: BorderRadius.circular(alto),
         child: Stack(
           children: [
+            // heightFactor 1: sin él, dentro del Stack el relleno medía 0 de
+            // alto y la barra salía siempre negra.
             FractionallySizedBox(
               widthFactor: f,
+              heightFactor: 1,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(

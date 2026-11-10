@@ -264,7 +264,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('catalogo-onix')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('panel-aliados')), findsNothing);
+    expect(find.byKey(const Key('aliado-0')), findsNothing);
+    expect(find.byKey(const Key('slot-libre-0')), findsOneWidget);
 
     // 1150 de daño cruza el primer (y único) umbral de invocación de Onix.
     expect(
@@ -292,7 +293,8 @@ void main() {
     expect(aliado.categoria, CategoriaAliado.tanque);
     expect(aliado.hp, 90);
     expect(aliado.habilidad, isNotNull);
-    expect(find.byKey(const Key('panel-aliados')), findsOneWidget);
+    expect(find.byKey(const Key('aliado-0')), findsOneWidget);
+    expect(find.byKey(const Key('slot-libre-0')), findsNothing);
     expect(find.textContaining('Geodude'), findsOneWidget);
   });
 

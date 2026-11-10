@@ -385,35 +385,18 @@ class _Mesa extends StatelessWidget {
         ),
         Column(
           children: [
+            // El jefe en el centro, con los slots de aliado a los lados.
             Expanded(
-              flex: (alturaJefe * 100).round(),
+              flex: ((alturaJefe + alturaAliados) * 100).round(),
               child: GestureDetector(
                 key: const Key('zona-jefe'),
                 behavior: HitTestBehavior.translucent,
                 onTap: () => onFoco(const FocoJefe()),
                 child: _Zona(
-                  ancho: 440,
+                  ancho: 980,
                   arriba: MediaQuery.of(context).padding.top + 52,
-                  hijo: const TarjetaJefe(),
+                  hijo: _EscenaJefe(slots: estado.jugadores.length),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: (alturaAliados * 100).round(),
-              child: GestureDetector(
-                key: const Key('zona-aliados'),
-                behavior: HitTestBehavior.translucent,
-                onTap: () => onFoco(const FocoAliados()),
-                child: estado.aliados.isEmpty
-                    ? Center(
-                        child: Text(
-                          'Sin aliados en la mesa',
-                          style: tema.textTheme.labelLarge?.copyWith(
-                            color: tema.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      )
-                    : const _Zona(ancho: 520, hijo: PanelAliados()),
               ),
             ),
             Expanded(
@@ -432,6 +415,51 @@ class _Mesa extends StatelessWidget {
               ),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// El jefe (carta y panel) en el centro y los slots de aliado a los lados: la
+/// primera mitad a su izquierda y el resto a su derecha, uno por jugador.
+class _EscenaJefe extends StatelessWidget {
+  const _EscenaJefe({required this.slots});
+
+  final int slots;
+
+  static const _anchoSlot = 150.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final izquierda = (slots + 1) ~/ 2;
+    Widget lado(Iterable<int> indices, MainAxisAlignment alineacion) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 40),
+            child: Row(
+              mainAxisAlignment: alineacion,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final i in indices)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: SizedBox(
+                      width: _anchoSlot,
+                      child: SlotAliado(slot: i),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        lado([for (var i = 0; i < izquierda; i++) i], MainAxisAlignment.end),
+        const SizedBox(width: 360, child: TarjetaJefe()),
+        lado(
+          [for (var i = izquierda; i < slots; i++) i],
+          MainAxisAlignment.start,
+        ),
       ],
     );
   }

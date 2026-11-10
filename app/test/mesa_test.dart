@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/pantallas/carta.dart';
+import 'package:incursiones_app/pantallas/estilo.dart';
 import 'package:incursiones_app/pantallas/mesa.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
@@ -83,6 +84,9 @@ void main() {
     await empezar(tester);
     expect(find.byKey(const Key('mesa')), findsOneWidget);
     expect(find.byKey(const Key('zona-jefe')), findsOneWidget);
+    // Un slot de aliado por jugador, vacío al empezar, a los lados del jefe.
+    expect(find.byKey(const Key('slot-libre-0')), findsOneWidget);
+    expect(find.byKey(const Key('slot-libre-1')), findsOneWidget);
     expect(find.byKey(const Key('asiento-0')), findsOneWidget);
     expect(find.byKey(const Key('asiento-1')), findsOneWidget);
     // El jefe sigue siendo uno solo (no se duplica entre mesa y controles).
@@ -135,6 +139,21 @@ void main() {
     await tocar(tester, 'panel-acciones-toggle');
     expect(find.byKey(const Key('panel-acciones')), findsOneWidget);
     expect(find.byKey(const Key('mesa')), findsOneWidget);
+  });
+
+  testWidgets('la barra de vida llena tiene relleno visible', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(width: 200, child: BarraVida(fraccion: 1)),
+          ),
+        ),
+      ),
+    );
+    final relleno = tester.getSize(find.byType(FractionallySizedBox).first);
+    expect(relleno.height, greaterThan(10));
+    expect(relleno.width, greaterThan(150));
   });
 
   group('Cartas', () {

@@ -17,98 +17,153 @@ class TarjetaJefe extends ConsumerWidget {
     final jefe = estado.jefe;
     if (jefe == null) return const SizedBox.shrink();
     final color = colorNivel(jefe.nivel);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    final reduccion = reduccionDanoAlJefe(estado);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // La carta del jefe, grande y con el aura de su nivel.
-        Expanded(
-          flex: 5,
-          child: CartaImagen(
+        CartaImagen(
+          nombre: jefe.nombre,
+          brillo: color,
+          alternativa: _CartaSinImagen(
             nombre: jefe.nombre,
-            brillo: color,
-            alternativa: _CartaSinImagen(nombre: jefe.nombre, nivel: jefe.nivel, color: color),
+            nivel: jefe.nivel,
+            color: color,
           ),
         ),
-        const SizedBox(width: 14),
-        // Lo que cambia durante la partida: ronda, vida, estados y curación.
-        Expanded(
-          flex: 4,
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1033).withValues(alpha: 0.85),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.white, width: 3),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black54,
-                  blurRadius: 10,
-                  offset: Offset(0, 6),
+        const SizedBox(height: 12),
+        // Lo que cambia durante la partida: vida, estados y curación.
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1033).withValues(alpha: 0.88),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white, width: 4),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black54,
+                blurRadius: 10,
+                offset: Offset(0, 6),
+              ),
+            ],
+          ),
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(color: Colors.white),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${jefe.nombre} · Nv. ${jefe.nivel}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 22,
+                        ),
+                      ),
+                    ),
+                    if (jefe.envenenado)
+                      const _EtiquetaEstado(
+                        icono: Icons.science,
+                        texto: 'Envenenado',
+                        color: Color(0xFFE1BEE7),
+                      ),
+                    if (jefe.quemado)
+                      const _EtiquetaEstado(
+                        icono: Icons.whatshot,
+                        texto: 'Quemado',
+                        color: Color(0xFFFFCCBC),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                BarraVida(
+                  fraccion: jefe.hpMaximo == 0 ? 0 : jefe.hp / jefe.hpMaximo,
+                  alto: 22,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'HP ${jefe.hp} / ${jefe.hpMaximo}',
+                  key: const Key('hp-jefe'),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                  ),
+                ),
+                if (reduccion > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      'Los jugadores hacen $reduccion de daño menos al jefe '
+                      '(lo descuenta la app).',
+                      key: const Key('reduccion-dano'),
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                const SizedBox(height: 8),
+                ActionChip(
+                  key: const Key('curar-jefe'),
+                  avatar: const Icon(Icons.favorite, color: Colors.green),
+                  label: const Text('Curar al jefe'),
+                  onPressed: () async {
+                    final cantidad = await pedirNumero(
+                      context,
+                      titulo: 'Curar al jefe',
+                      etiqueta: 'HP que recupera',
+                    );
+                    if (cantidad == null || !context.mounted) return;
+                    registrar(context, ref, CuracionJefe(cantidad));
+                  },
                 ),
               ],
-            ),
-            child: DefaultTextStyle.merge(
-              style: const TextStyle(color: Colors.white),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text('Ronda ${estado.ronda}'),
-                  ),
-                  const SizedBox(height: 10),
-                  BarraVida(
-                    fraccion: jefe.hpMaximo == 0 ? 0 : jefe.hp / jefe.hpMaximo,
-                    alto: 22,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'HP ${jefe.hp} / ${jefe.hpMaximo}',
-                    key: const Key('hp-jefe'),
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      if (jefe.envenenado)
-                        const Chip(
-                          avatar: Icon(Icons.science, color: Colors.purple),
-                          label: Text('Envenenado'),
-                        ),
-                      if (jefe.quemado)
-                        const Chip(
-                          avatar: Icon(Icons.whatshot, color: Colors.deepOrange),
-                          label: Text('Quemado'),
-                        ),
-                      ActionChip(
-                        key: const Key('curar-jefe'),
-                        avatar: const Icon(Icons.favorite, color: Colors.green),
-                        label: const Text('Curar al jefe'),
-                        onPressed: () async {
-                          final cantidad = await pedirNumero(
-                            context,
-                            titulo: 'Curar al jefe',
-                            etiqueta: 'HP que recupera',
-                          );
-                          if (cantidad == null || !context.mounted) return;
-                          registrar(context, ref, CuracionJefe(cantidad));
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Estado alterado del jefe, en una etiqueta pequeña junto a su nombre.
+class _EtiquetaEstado extends StatelessWidget {
+  const _EtiquetaEstado({
+    required this.icono,
+    required this.texto,
+    required this.color,
+  });
+
+  final IconData icono;
+  final String texto;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(left: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icono, size: 16, color: const Color(0xFF4A148C)),
+          const SizedBox(width: 4),
+          Text(
+            texto,
+            style: const TextStyle(
+              color: Color(0xFF4A148C),
+              fontWeight: FontWeight.w800,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
