@@ -6,6 +6,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
+import 'carta_ataque_jefe.dart';
 import 'comun.dart';
 import 'paneles.dart';
 import 'pendientes.dart';
@@ -20,23 +21,43 @@ class PantallaTurnoJefe extends ConsumerStatefulWidget {
 }
 
 class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
-  /// Ronda en la que ya se ha robado la carta del jefe.
-  int? _robadaRonda;
+  /// Ronda a la que pertenece lo que sigue; al cambiar de ronda se olvida.
+  int? _ronda;
+
+  /// Carta robada que aún no se ha registrado.
+  CartaAtaqueJefe? _carta;
+
+  /// La última carta registrada decía «Roba una carta más».
+  bool _robaOtra = false;
+
+  void _robar(EstadoPartida estado) {
+    final mazo = ref.read(mazoAtaquesJefeProvider);
+    setState(() {
+      _carta = mazo.robar(jugadoresActivos(estado).toSet());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final estado = ref.watch(estadoProvider);
     final jefe = estado.jefe!;
+    if (_ronda != estado.ronda) {
+      _ronda = estado.ronda;
+      _carta = null;
+      _robaOtra = false;
+    }
+    final registrados = estado.ataquesJefeEnTurno;
+    final maximo = maxAtaquesJefePorTurno(jefe.nivel);
+    final carta = _carta;
     // Lo primero del turno es robar la carta que decide el ataque y el
     // objetivo: hasta entonces solo se muestra ese paso, pequeño.
-    final robada = _robadaRonda == estado.ronda || estado.ataquesJefeEnTurno > 0;
-    if (!robada) {
+    if (carta == null && registrados == 0) {
       return DisposicionMesa(
         controles: [
           const PanelPendientes(),
           FilledButton.icon(
             key: const Key('robar-carta-jefe'),
-            onPressed: () => setState(() => _robadaRonda = estado.ronda),
+            onPressed: () => _robar(estado),
             icon: const Icon(Icons.style),
             label: const Text('Robar carta del jefe'),
           ),
@@ -47,49 +68,34 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
       for (final a in estado.aliados)
         if (a.tieneAtaque && !a.atacoEnTurnoJefe) a,
     ];
+    final debeRobarOtra = carta == null && _robaOtra && registrados < maximo;
     final controles = <Widget>[
-        const PanelPendientes(),
+      const PanelPendientes(),
+      if (carta != null)
         _AtaqueJefe(
-          key: ValueKey('ataque-${estado.ronda}-${estado.ataquesJefeEnTurno}'),
+          key: ValueKey('ataque-${estado.ronda}-$registrados-${carta.numero}'),
           estado: estado,
-        ),
+          carta: carta,
+          onRegistrado: () => setState(() {
+            _robaOtra = carta.robaOtra;
+            _carta = null;
+          }),
+        )
+      else ...[
+        if (debeRobarOtra)
+          FilledButton.icon(
+            key: const Key('robar-carta-jefe'),
+            onPressed: () => _robar(estado),
+            icon: const Icon(Icons.style),
+            label: const Text('Robar otra carta'),
+          ),
         const SizedBox(height: 8),
-        FilledButton(
-          key: const Key('fin-turno-jefe'),
-          onPressed: () async {
-            bool? cara;
-            if (jefe.quemado) {
-              cara = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Moneda de la quemadura'),
-                  content: const Text(
-                    'Tira una moneda. Cara: el jefe deja de estar quemado.',
-                  ),
-                  actions: [
-                    TextButton(
-                      key: const Key('moneda-cruz'),
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text('Cruz'),
-                    ),
-                    FilledButton(
-                      key: const Key('moneda-cara'),
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Cara'),
-                    ),
-                  ],
-                ),
-              );
-              if (cara == null || !context.mounted) return;
-            }
-            registrar(context, ref, FinTurnoJefe(monedaQuemadura: cara));
-          },
-          child: const Text('Terminar el turno del jefe'),
-        ),
+        _BotonFinTurno(jefe: jefe, destacado: !debeRobarOtra),
+      ],
     ];
     // El panel del ataque solo lleva el ataque; lo demás va en «Más acciones».
     final extras = <Widget>[
-        const PanelEfectosActivos(),
+      const PanelEfectosActivos(),
         if (aliadosPorAtacar.isNotEmpty)
           Card(
             child: Padding(
@@ -127,10 +133,74 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
   }
 }
 
+/// Termina el turno del jefe (con la moneda de la quemadura si hace falta).
+class _BotonFinTurno extends ConsumerWidget {
+  const _BotonFinTurno({required this.jefe, required this.destacado});
+
+  final JefeEstado jefe;
+  final bool destacado;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    Future<void> terminar() async {
+      bool? cara;
+      if (jefe.quemado) {
+        cara = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Moneda de la quemadura'),
+            content: const Text(
+              'Tira una moneda. Cara: el jefe deja de estar quemado.',
+            ),
+            actions: [
+              TextButton(
+                key: const Key('moneda-cruz'),
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cruz'),
+              ),
+              FilledButton(
+                key: const Key('moneda-cara'),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Cara'),
+              ),
+            ],
+          ),
+        );
+        if (cara == null || !context.mounted) return;
+      }
+      registrar(context, ref, FinTurnoJefe(monedaQuemadura: cara));
+    }
+
+    final texto = const Text('Terminar el turno del jefe');
+    return destacado
+        ? FilledButton(
+            key: const Key('fin-turno-jefe'),
+            onPressed: terminar,
+            child: texto,
+          )
+        : OutlinedButton(
+            key: const Key('fin-turno-jefe'),
+            onPressed: terminar,
+            child: texto,
+          );
+  }
+}
+
 class _AtaqueJefe extends ConsumerStatefulWidget {
-  const _AtaqueJefe({super.key, required this.estado});
+  const _AtaqueJefe({
+    super.key,
+    required this.estado,
+    required this.carta,
+    required this.onRegistrado,
+  });
 
   final EstadoPartida estado;
+
+  /// Carta robada: dice el ataque y el objetivo.
+  final CartaAtaqueJefe carta;
+
+  /// Se llama cuando el ataque queda registrado.
+  final VoidCallback onRegistrado;
 
   @override
   ConsumerState<_AtaqueJefe> createState() => _AtaqueJefeState();
@@ -138,13 +208,10 @@ class _AtaqueJefe extends ConsumerStatefulWidget {
 
 class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
   final _dano = TextEditingController();
-  late int _ranura = widget.estado.ataquesJefeEnTurno + 1 > ranurasAtaqueJefe
-      ? ranurasAtaqueJefe
-      : widget.estado.ataquesJefeEnTurno + 1;
-
-  /// null: ataca a todos los jugadores.
-  int? _objetivo;
-  bool _alAzar = false;
+  /// Ataque y objetivo salen de la carta robada.
+  late int _ranura = widget.carta.ranura;
+  late int? _objetivo = widget.carta.jugador;
+  bool _alAzar = true;
 
   /// Ranura para la que ya se propuso el daño del catálogo.
   int? _ranuraPropuesta;
@@ -192,27 +259,33 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            CartaAtaqueRobada(
+              key: const Key('carta-ataque-jefe'),
+              carta: widget.carta,
+              jugador: estado.jugadores[widget.carta.jugador].nombre,
+            ),
+            const SizedBox(height: 8),
             Text(
               'Ataque del jefe',
               key: const Key('turno-del-jefe'),
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            Text('Ataques registrados: ${estado.ataquesJefeEnTurno}'),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: [
-                for (var r = 1; r <= ranurasAtaqueJefe; r++)
-                  ChoiceChip(
-                    key: Key('ranura-$r'),
-                    label: Text('Ataque $r'),
-                    selected: _ranura == r,
-                    onSelected: (_) => setState(() => _ranura = r),
-                  ),
-              ],
-            ),
-            if (ataque != null) ...[
-              const SizedBox(height: 8),
+            if (ataque == null) ...[
+              // Jefe sin carta de catálogo: el ataque y el objetivo salen de la
+              // carta robada, pero se pueden corregir y falta el daño.
+              Wrap(
+                spacing: 8,
+                children: [
+                  for (var r = 1; r <= ranurasAtaqueJefe; r++)
+                    ChoiceChip(
+                      key: Key('ranura-$r'),
+                      label: Text('Ataque $r'),
+                      selected: _ranura == r,
+                      onSelected: (_) => setState(() => _ranura = r),
+                    ),
+                ],
+              ),
+            ] else ...[
               Text(
                 '${ataque.nombre} · ${ataque.dano}',
                 key: const Key('ataque-catalogo'),
@@ -229,6 +302,7 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                     : '${b.aliado} potencia el ataque: +${b.valor} de daño.',
                 key: const Key('bonus-potenciador'),
               ),
+            if (ataque == null) ...[
             const SizedBox(height: 8),
             KeyedSubtree(
               key: const Key('dano-jefe'),
@@ -264,6 +338,7 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
               value: _alAzar,
               onChanged: (v) => setState(() => _alAzar = v ?? false),
             ),
+            ],
             if (faltaDefensor)
               const Text(
                 'Este ataque afecta al Pokémon Defensor: elige el jugador.',
@@ -302,6 +377,7 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                           efecto: efecto?.comoEfecto(moneda: moneda),
                         ),
                       );
+                      if (aplicado) widget.onRegistrado();
                       if (aplicado && context.mounted) {
                         final avisos = [
                           if (moneda != null)

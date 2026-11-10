@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.10 (especificación del motor)
+**Versión:** 1.11 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -62,12 +62,13 @@ INICIO
                 intento de invocación en ese mismo momento
               - Si HP del jefe ≤ 0 → FIN: VICTORIA (inmediata)
       └─ TURNO DEL JEFE
-            - Se revela una carta del jefe (física)
-            - El jugador indica al asistente: ranura de ataque (1/2/3, solo
-              etiqueta), daño y objetivo:
-                · Todos los jugadores
-                · Un jugador elegido
-                · Un jugador al azar (dado físico, resultado a mano)
+            - La app roba por el jefe una carta de su mazo de 20 cartas de ataque
+              (animación) y muestra el ataque (1/2/3) y el jugador atacado:
+                · Si la carta dice «Roba una carta más», se roba otra, hasta el
+                  máximo de ataques del nivel (Nv1: 2, Nv2: 3, Nv3 y Nv4: 4)
+                · Una carta que apunta a un jugador que no juega o está
+                  eliminado se descarta sin efecto y se roba otra
+                · Si el mazo se agota, se baraja el descarte
             - Si la carta cura al jefe: sube su HP sin pasar del HP máximo
             - Al final de su turno, cada aliado vivo usa su único ataque
               contra el dueño de su slot (si está eliminado, contra un
@@ -161,9 +162,10 @@ Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO
 | HP del jefe | **Asistente virtual** (único cálculo automático de HP) |
 | Aliados del jefe (HP, slot, si sigue vivo) | Asistente virtual |
 | Efecto de las habilidades de los aliados | Física: el asistente solo puede registrar en el log cuál se usó |
-| Efecto de las cartas de ataque del jefe | Física: el asistente solo registra el resultado que le dicta el jugador |
+| Mazo de ataques del jefe (qué ataque y contra quién) | **Asistente virtual** (v1.11): baraja, roba y muestra la carta |
+| Efecto de las cartas de ataque del jefe | Física: el asistente propone el daño del catálogo y registra el resultado |
 | Cartas de ánimo (efecto) | Física: el asistente solo registra cuál salió |
-| Objetivo aleatorio (ataque del jefe y de aliados) | Física (dado o moneda real): el asistente registra el resultado |
+| Objetivo aleatorio (ataque de aliados) | Física (dado o moneda real): el asistente registra el resultado |
 | Estados alterados de los Pokémon de los jugadores | Física |
 | Veneno y quemadura del jefe (D-12) | **Asistente virtual** (daño en el chequeo y moneda automática) |
 | Registro / historial de partida | Asistente virtual |
@@ -273,3 +275,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.8 | Se deja escrito qué gestiona la app (el jefe y sus aliados: HP, daño recibido y ataques que hacen) y qué se resuelve en la mesa (Pokémon de los jugadores y baraja de ataques del jefe). |
 | v1.9 | Criterio de nivel de los jefes (Nv1 Básicos, Nv2 Fase 1 que no evolucionan más, Nv3 Fase 2, Nv4 Míticos y Legendarios). Los ataques del jefe pasan a poder llevar efectos (D-14, contrato v5): la app computa solo los de programa. |
 | v1.10 | Puesta al día del documento: D-16 (6 categorías de aliado: Daño, Tanque, Cura, Control, Potenciador y Debilitador; contrato v6), lanzamiento con 4 jefes (uno por nivel) en lugar de 7, y el índice de §11 con D-12, D-14, D-15 y D-16. D-15 (modos de preparación) sigue en diseño. |
+| v1.11 | El jefe roba de un mazo de 20 cartas de ataque que lleva la app (las del PDF oficial de Incursión Max): cada carta dice el ataque, el jugador atacado y si se roba otra. Máximo de ataques por turno según el nivel (Nv1: 2, Nv2: 3, Nv3 y Nv4: 4). Las cartas que apuntan a un jugador que no juega o está eliminado se descartan. Deja de ser física la carta del jefe. |

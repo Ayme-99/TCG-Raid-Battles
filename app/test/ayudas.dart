@@ -7,6 +7,8 @@ import 'package:incursiones_app/almacen/almacen.dart';
 import 'package:incursiones_app/cuenta/cliente_api.dart';
 import 'package:incursiones_app/cuenta/sesion.dart';
 import 'package:incursiones_app/envios/controlador_envios.dart';
+import 'package:incursiones_app/partida/controlador_partida.dart';
+import 'package:incursiones_engine/incursiones_engine.dart';
 
 const sesionDePrueba = Sesion(
   token: 'token-de-prueba',
@@ -36,14 +38,36 @@ Servidor servidorQueGuarda([List<http.Request>? peticiones]) =>
       return http.Response('{"partidaId":"x"}', 201);
     };
 
+/// Mazo del jefe que saca siempre las mismas cartas, en orden y en bucle.
+/// Por defecto: ataque 1 contra el jugador 1, sin robar otra.
+class MazoFijo implements MazoAtaquesJefe {
+  MazoFijo([
+    this.cartas = const [
+      CartaAtaqueJefe(numero: 1, ranura: 1, jugador: 0, robaOtra: false),
+    ],
+  ]);
+
+  final List<CartaAtaqueJefe> cartas;
+  int _siguiente = 0;
+
+  @override
+  int get restantes => cartas.length;
+
+  @override
+  CartaAtaqueJefe robar(Set<int> jugadoresActivos) =>
+      cartas[_siguiente++ % cartas.length];
+}
+
 /// Todo lo que cambia respecto a la app real: almacén en memoria, servidor
 /// falso y reintentos que no esperan de verdad.
 List<Override> sobrescribir({
   Almacen? almacen,
   Servidor? servidor,
   List<Reintento>? reintentos,
+  MazoAtaquesJefe? mazo,
 }) {
   return [
+    mazoAtaquesJefeProvider.overrideWithValue(mazo ?? MazoFijo()),
     almacenProvider.overrideWithValue(almacen ?? AlmacenMemoria()),
     clienteApiProvider.overrideWithValue(
       ClienteApi(

@@ -15,13 +15,14 @@ Future<ProviderContainer> abrir(
   WidgetTester tester, {
   AlmacenMemoria? almacen,
   Servidor? servidor,
+  MazoAtaquesJefe? mazo,
 }) async {
   tester.view.physicalSize = const Size(1000, 3000);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: sobrescribir(almacen: almacen, servidor: servidor),
+      overrides: sobrescribir(almacen: almacen, servidor: servidor, mazo: mazo),
       child: const IncursionesApp(),
     ),
   );
@@ -177,6 +178,35 @@ void main() {
     expect(c.read(estadoProvider).cartasAnimo.single.carta, 3);
   });
 
+  testWidgets('la carta que roba otra obliga a robar hasta el máximo del nivel',
+      (tester) async {
+    final c = await abrir(
+      tester,
+      mazo: MazoFijo(const [
+        CartaAtaqueJefe(numero: 5, ranura: 1, jugador: 0, robaOtra: true),
+        CartaAtaqueJefe(numero: 14, ranura: 2, jugador: 1, robaOtra: false),
+      ]),
+    );
+    await prepararPartida(tester, hp: 500);
+    await turno(tester, '0');
+    await turno(tester, '0');
+
+    // Primera carta: ataque 1 contra el jugador 1, y manda robar otra.
+    await tocar(tester, 'robar-carta-jefe');
+    expect(find.byKey(const Key('carta-roba-otra')), findsOneWidget);
+    await tocar(tester, 'registrar-ataque-jefe');
+    expect(c.read(estadoProvider).ataquesJefeEnTurno, 1);
+    expect(find.text('Robar otra carta'), findsOneWidget);
+
+    // Segunda: ataque 2 contra el jugador 2, y ya no pide más.
+    await tocar(tester, 'robar-carta-jefe');
+    expect(find.byKey(const Key('carta-roba-otra')), findsNothing);
+    await tocar(tester, 'registrar-ataque-jefe');
+    expect(c.read(estadoProvider).ataquesJefeEnTurno, 2);
+    expect(find.text('Robar otra carta'), findsNothing);
+    expect(find.byKey(const Key('fin-turno-jefe')), findsOneWidget);
+  });
+
   testWidgets('la quemadura pide la moneda al terminar el turno del jefe',
       (tester) async {
     final c = await abrir(tester);
@@ -187,6 +217,7 @@ void main() {
     await turno(tester, '0');
 
     await tocar(tester, 'robar-carta-jefe');
+    await tocar(tester, 'registrar-ataque-jefe');
     await tocar(tester, 'fin-turno-jefe');
     expect(find.text('Moneda de la quemadura'), findsOneWidget);
     await tocar(tester, 'moneda-cara');

@@ -140,6 +140,12 @@ final relojProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 /// Azar de la app (dados de invocación y monedas), para fijarlo en los tests.
 final azarProvider = Provider<Random>((ref) => Random.secure());
 
+/// Mazo de ataques del jefe (20 cartas). Se sustituye en los tests para
+/// fijar qué carta sale.
+final mazoAtaquesJefeProvider = Provider<MazoAtaquesJefe>(
+  (ref) => MazoAtaquesJefe(ref.watch(azarProvider)),
+);
+
 /// 32 caracteres hexadecimales aleatorios (16 bytes), bien por debajo de los
 /// 64 que admite el contrato.
 String generarIdPartida() {

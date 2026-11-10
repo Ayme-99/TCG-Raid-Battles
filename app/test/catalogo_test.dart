@@ -219,10 +219,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Trampa Rocas · 30'), findsOneWidget);
     expect(find.byKey(const Key('efecto-ataque')), findsOneWidget);
-    expect(find.byKey(const Key('falta-defensor')), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('objetivo-0')));
-    await tester.pumpAndSettle();
+    // La carta robada ya dice el ataque y el objetivo (Jugador 1).
+    expect(find.byKey(const Key('carta-ataque-jefe')), findsOneWidget);
+    expect(find.text('JUGADOR 1'), findsOneWidget);
     expect(find.byKey(const Key('falta-defensor')), findsNothing);
     await tester.tap(find.byKey(const Key('registrar-ataque-jefe')));
     await tester.pumpAndSettle();
