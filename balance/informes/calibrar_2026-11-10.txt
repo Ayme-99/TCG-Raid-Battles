@@ -26,3 +26,22 @@ arceus     4      3500    (sin equipos)  (sin equipos)
 
 Con 3 y 2 jugadores no hay equipos de Nv4 (3 jugadores) ni de Nv3 y Nv4 (2 jugadores): su X no llega al
 rango. Con 2 jugadores los jefes con el HP de 4 jugadores son casi imposibles de ganar.
+
+Pruebas con pocos jugadores (misma fecha)
+
+1) Equipos de las 16 cartas de prueba (sim_jefes, --jugadores=N), X dentro del rango del nivel: a igual X, los Pokémon
+   de 2 jugadores tienen solo ~11 % más de vida media (221 frente a 199) y hay la mitad: la vida total del equipo
+   cae ~44 % (884 frente a 1590) mientras el jefe sigue haciendo los mismos ataques por turno.
+
+2) Quitar ataques por turno al jefe (--menos-ataques=K), HP del catálogo, solo-dueno:
+   3 jugadores, -1: Onix 87,5 % / Manectric 31,7 % / Kingdra 11,1 %.  3 jugadores, -2: 87,5 / 90,0 / 32,8.
+   2 jugadores, -1: Onix 30,1 % / Manectric 0,2 %.  2 jugadores, -2 o más (1 ataque): 30,1 / 27,5.
+   El máximo de ataques es un número entero pequeño: el ajuste es brusco y con 2 jugadores no basta.
+
+3) Modelo abstracto (sim.dart, vida = base + factor x ataque, el reparto de X entre jugadores como dice el baremo),
+   victoria con el HP de niveles.csv (Nv1 / Nv2 / Nv3 / Nv4):
+   factor 1,0:  4 jugadores 65,5 / 0,1 / 8,7 / 8,3 %   2 jugadores 2,1 / 0,0 / 0,3 / 1,1 %
+   factor 1,5:  4 jugadores 100 / 23,6 / 91,5 / 94,2 %  2 jugadores 70,6 / 0,2 / 43,4 / 59,5 %
+   Aun suponiendo que las cartas con más daño tienen mucha más vida, con 2 jugadores se gana bastante menos: la
+   parte fija de vida de cada Pokémon se pierde al haber la mitad de Pokémon. El modelo abstracto no está calibrado:
+   solo sirve para la tendencia.
