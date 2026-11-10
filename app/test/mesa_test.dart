@@ -88,7 +88,8 @@ void main() {
     // El jefe sigue siendo uno solo (no se duplica entre mesa y controles).
     expect(find.byKey(const Key('hp-jefe')), findsOneWidget);
     final estado = c.read(estadoProvider);
-    expect(focoDe(estado), FocoJugador(estado.jugadorActual!));
+    // En el turno de los jugadores la cámara no se acerca a nadie.
+    expect(focoDe(estado), const FocoGeneral());
   });
 
   testWidgets('la cámara pasa al jefe en su turno y se puede dirigir a mano',

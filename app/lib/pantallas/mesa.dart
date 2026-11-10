@@ -65,18 +65,15 @@ class FocoJugador extends FocoCamara {
 }
 
 /// Lo que es importante mirar ahora mismo según el estado de la partida:
-/// lo que hay por resolver (aliados), el turno del jefe o el del jugador
-/// activo.
+/// lo que hay por resolver (aliados) o el turno del jefe. En el turno de los
+/// jugadores la cámara se queda en la vista general; solo se mueve con los
+/// eventos (dados, ataques del jefe o de los aliados).
 FocoCamara focoDe(EstadoPartida estado) {
   if (estado.intentosInvocacionPendientes > 0 ||
       estado.entradasPendientes.isNotEmpty) {
     return const FocoAliados();
   }
   if (estado.fase == Fase.turnoJefe) return const FocoJefe();
-  final actual = estado.jugadorActual;
-  if (estado.fase == Fase.turnoJugadores && actual != null) {
-    return FocoJugador(actual);
-  }
   return const FocoGeneral();
 }
 
