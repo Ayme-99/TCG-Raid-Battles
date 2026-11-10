@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,13 +17,17 @@ Future<ProviderContainer> abrir(
   WidgetTester tester, {
   AlmacenMemoria? almacen,
   Servidor? servidor,
+  Random? azar,
 }) async {
   tester.view.physicalSize = const Size(1000, 3000);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: sobrescribir(almacen: almacen, servidor: servidor),
+      overrides: [
+        ...sobrescribir(almacen: almacen, servidor: servidor),
+        if (azar != null) azarProvider.overrideWithValue(azar),
+      ],
       child: const IncursionesApp(),
     ),
   );
@@ -208,9 +214,9 @@ void main() {
     expect(c.read(estadoProvider).fase, Fase.turnoJefe);
   });
 
-  testWidgets('invocar un aliado bloquea los turnos hasta resolverlo',
+  testWidgets('un jefe a mano: salen los dados y se piden los datos del aliado',
       (tester) async {
-    final c = await abrir(tester);
+    final c = await abrir(tester, azar: _AzarFijo([0, 2]));
     await escribir(tester, 'ataque-0', '100');
     await escribir(tester, 'ataque-1', '100');
     await tocar(tester, 'configurar');
@@ -222,8 +228,11 @@ void main() {
     await turno(tester, '100');
     expect(c.read(estadoProvider).intentosInvocacionPendientes, 1);
 
-    await tocar(tester, 'invocar-aliado');
-    await tocar(tester, 'aliado-categoria-cura');
+    // Sin botón de invocar: los dados salen solos y, al pararse, el diálogo
+    // pide los datos del aliado que ha salido (slot 0, categoría cura).
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('invocar-aliado')), findsNothing);
+    expect(find.byKey(const Key('resultado-dados')), findsOneWidget);
     await tester.enterText(find.byKey(const Key('aliado-nombre')), 'Pikachu');
     await tester.enterText(
       find.descendant(
@@ -354,4 +363,21 @@ void main() {
       expect(c.read(sesionActualProvider), isNull);
     });
   });
+}
+
+/// Azar que devuelve valores fijos (módulo el máximo), en orden.
+class _AzarFijo implements Random {
+  _AzarFijo(this._valores);
+
+  final List<int> _valores;
+  var _i = 0;
+
+  @override
+  int nextInt(int max) => _valores[_i++ % _valores.length] % max;
+
+  @override
+  bool nextBool() => true;
+
+  @override
+  double nextDouble() => 0;
 }
