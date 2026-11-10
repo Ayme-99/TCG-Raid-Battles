@@ -12,13 +12,37 @@ import 'pendientes.dart';
 import 'mesa.dart';
 
 /// Turno del jefe: sus ataques, los ataques de los aliados, KO y estados.
-class PantallaTurnoJefe extends ConsumerWidget {
+class PantallaTurnoJefe extends ConsumerStatefulWidget {
   const PantallaTurnoJefe({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PantallaTurnoJefe> createState() => _PantallaTurnoJefeState();
+}
+
+class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
+  /// Ronda en la que ya se ha robado la carta del jefe.
+  int? _robadaRonda;
+
+  @override
+  Widget build(BuildContext context) {
     final estado = ref.watch(estadoProvider);
     final jefe = estado.jefe!;
+    // Lo primero del turno es robar la carta que decide el ataque y el
+    // objetivo: hasta entonces solo se muestra ese paso, pequeño.
+    final robada = _robadaRonda == estado.ronda || estado.ataquesJefeEnTurno > 0;
+    if (!robada) {
+      return DisposicionMesa(
+        controles: [
+          const PanelPendientes(),
+          FilledButton.icon(
+            key: const Key('robar-carta-jefe'),
+            onPressed: () => setState(() => _robadaRonda = estado.ronda),
+            icon: const Icon(Icons.style),
+            label: const Text('Robar carta del jefe'),
+          ),
+        ],
+      );
+    }
     final aliadosPorAtacar = [
       for (final a in estado.aliados)
         if (a.tieneAtaque && !a.atacoEnTurnoJefe) a,
@@ -96,7 +120,7 @@ class PantallaTurnoJefe extends ConsumerWidget {
     ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).
-    return DisposicionMesa(controles: controles);
+    return DisposicionMesa(controles: controles, lateral: true);
   }
 }
 

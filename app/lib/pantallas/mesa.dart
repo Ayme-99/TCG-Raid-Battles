@@ -133,7 +133,11 @@ class _CamaraTween extends Tween<Camara> {
 /// sobre la mesa, a la izquierda y encima de la fila de jugadores; en las
 /// estrechas va debajo de la mesa. En los dos casos se puede plegar.
 class DisposicionMesa extends ConsumerStatefulWidget {
-  const DisposicionMesa({super.key, required this.controles});
+  const DisposicionMesa({
+    super.key,
+    required this.controles,
+    this.lateral = false,
+  });
 
   /// Ancho a partir del cual el panel flota sobre la mesa.
   static const anchoMinimoFlotante = 1100.0;
@@ -141,6 +145,10 @@ class DisposicionMesa extends ConsumerStatefulWidget {
   static const altoPico = 14.0;
 
   final List<Widget> controles;
+
+  /// El panel va pegado al borde derecho en vez de sobre el centro, para no
+  /// tapar al jefe (turno del jefe, con la carta ya robada).
+  final bool lateral;
 
   @override
   ConsumerState<DisposicionMesa> createState() => _DisposicionMesaState();
@@ -179,7 +187,26 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
           return Stack(
             children: [
               const Positioned.fill(child: MesaConCamara()),
-              AnimatedPositioned(
+              if (widget.lateral && activo == null)
+                Positioned(
+                  key: const Key('panel-lateral'),
+                  right: margen,
+                  top: 72,
+                  bottom: alto * alturaJugadores + 4,
+                  width: panel,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: PanelAcciones(
+                      titulo: titulo,
+                      controles: widget.controles,
+                      abierto: _abierto,
+                      onAlternar: _alternar,
+                      ajustar: true,
+                    ),
+                  ),
+                )
+              else
+                AnimatedPositioned(
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeOutCubic,
                 left: izquierda,

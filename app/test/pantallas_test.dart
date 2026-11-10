@@ -152,6 +152,7 @@ void main() {
     await turno(tester, '0');
     await turno(tester, '0');
 
+    await tocar(tester, 'robar-carta-jefe');
     await escribir(tester, 'dano-jefe', '80');
     await tocar(tester, 'objetivo-1');
     await tocar(tester, 'registrar-ataque-jefe');
@@ -182,6 +183,7 @@ void main() {
     await turno(tester, '0');
     await turno(tester, '0');
 
+    await tocar(tester, 'robar-carta-jefe');
     await tocar(tester, 'fin-turno-jefe');
     expect(find.text('Moneda de la quemadura'), findsOneWidget);
     await tocar(tester, 'moneda-cara');

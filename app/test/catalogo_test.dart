@@ -215,6 +215,8 @@ void main() {
       expect(partida.registrar(TurnoJugador(jugador: j, dano: 1)), isNull);
     }
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('robar-carta-jefe')));
+    await tester.pumpAndSettle();
     expect(find.text('Trampa Rocas · 30'), findsOneWidget);
     expect(find.byKey(const Key('efecto-ataque')), findsOneWidget);
     expect(find.byKey(const Key('falta-defensor')), findsOneWidget);
