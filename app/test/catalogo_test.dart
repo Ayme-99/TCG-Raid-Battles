@@ -108,7 +108,7 @@ void main() {
       final plusle = c.aliadoDe('Manectric', 2, CategoriaAliado.danio)!;
       expect(plusle.ataqueDanoAdyacentes, 30);
       final minun = c.aliadoDe('Manectric', 2, CategoriaAliado.tanque)!;
-      expect(minun.avisoAlCaer, contains('Paralizado'));
+      expect(minun.avisoAliadoCaido, contains('Paralizado'));
       expect(
         c.aliadoDe('Manectric', 2, CategoriaAliado.cura)!.scriptId,
         'drenadoras-10',

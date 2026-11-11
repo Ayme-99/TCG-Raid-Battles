@@ -15,3 +15,19 @@ id,nombre,tipo_carta,expansion,numero,hp,ataque1,dano1,ataque2,dano2,notas
 14,Charizard VMAX,VMAX,Darkness Ablaze,20/189,330,Claw Slash,100,G-Max Wildfire,300,G-Max Wildfire descarta 2 Energías (se ignora)
 15,Charizard ex,ex,Obsidian Flames,125/197,330,Burning Darkness,180,,,Suma 30 por cada Premio robado por el rival (en la raid solo base); Tera
 16,Mega Charizard X ex,Mega ex,Phantasmal Flames,13/94,360,Inferno X,90,,,Inferno X es 90× Energías descartadas (en la raid solo base)
+17,Mewtwo,Básico,Scarlet & Violet Promos,052,130,Reflective Barrier,20,Psyslash,130,Reflective Barrier devuelve el daño recibido como contadores (se ignora)
+18,Mew,Básico,Celebrations,11/25,60,Psyshot,30,,,Habilidad Mysterious Tail inaplicable
+19,Venusaur,Fase 2,Pokémon GO,3/78,180,Solar Beam,130,,,Habilidad Loopy Lasso inaplicable; un solo ataque
+20,Dragonite,Fase 2,Sun & Moon,96/149,160,Dragon Wave,130,Giant Tail,200,Dragon Wave descarta Energías (se ignora); Giant Tail necesita moneda (cruz = nada)
+21,Xerneas-EX,EX,XY,97/146,170,Break Through,60,X Blast,140,Break Through hace 30 al banquillo rival (se ignora); X Blast no puede usarse el turno siguiente
+22,Venusaur-EX,EX,Evolutions,1/108,180,Poison Powder,60,Jungle Hammer,90,Poison Powder envenena (condición aplicable); Jungle Hammer cura 30 al atacante
+23,Blastoise & Piplup-GX,TAG TEAM-GX,Cosmic Eclipse,38/236,270,Splash Maker,150,Bubble Launcher-GX,100+,Splash Maker cura con Energías (se ignora); Bubble Launcher-GX paraliza y suma 150 con 3 Energías extra (solo base); GX una vez por partida
+24,Mewtwo & Mew-GX,TAG TEAM-GX,Unified Minds,71/236,270,Miraculous Duo-GX,200,,,Solo tiene ataque GX (una vez por partida); habilidad Perfection inaplicable
+25,Lugia V,V,Silver Tempest,138/195,220,Aero Dive,130,,,Read the Wind no hace daño; Aero Dive descarta Estadio (se ignora)
+26,Pikachu V,V,Vivid Voltage,43/185,190,Thunderbolt,200,,,Charge no hace daño; Thunderbolt descarta las Energías (se ignora)
+27,Umbreon VMAX,VMAX,Evolving Skies,95/203,310,Max Darkness,160,,,Habilidad Dark Signal inaplicable
+28,Gengar VMAX,VMAX,Fusion Strike,157/264,320,Fear and Panic,60,G-Max Swallow Up,250,Fear and Panic es 60× por V y GX del rival (solo base); G-Max Swallow Up no puede atacar el turno siguiente
+29,Pikachu ex,ex,Surging Sparks,57/191,200,Topaz Bolt,300,,,Descarta 3 Energías (se ignora); habilidad Resolute Heart inaplicable
+30,Gardevoir ex,ex,Scarlet & Violet,86/198,310,Miracle Force,190,,,Cura condiciones especiales; habilidad Psychic Embrace inaplicable
+31,Mega Lucario ex,Mega ex,Mega Evolution,77/132,340,Aura Jab,130,Mega Brave,270,Aura Jab reparte Energías (se ignora); Mega Brave no puede usarse el turno siguiente
+32,Mega Venusaur ex,Mega ex,Mega Evolution,3/132,380,Jungle Dump,240,,,Cura 30 al atacante; habilidad Solar Transfer inaplicable

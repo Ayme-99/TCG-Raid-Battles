@@ -265,6 +265,11 @@
           "type": "string",
           "minLength": 1
         },
+        "avisoAliadoCaido": {
+          "description": "Aura: mientras este aliado está en juego, la app enseña este recordatorio cada vez que los jugadores derrotan con un ataque a cualquier aliado (incluido él).",
+          "type": "string",
+          "minLength": 1
+        },
         "habilidadNombre": {
           "description": "Nombre de la habilidad de la carta.",
           "type": "string",

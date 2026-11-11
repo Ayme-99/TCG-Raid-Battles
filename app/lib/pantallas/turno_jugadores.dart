@@ -152,17 +152,28 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
       );
     }
     if (!aplicado || aliado == null || !context.mounted) return;
-    // Derrotado: recordatorio de la carta (p. ej. Moflete Estático).
+    // Derrotado: recordatorios de la carta caída y auras de otros aliados
+    // que estaban en juego (Moflete Estático).
     if (ref.read(estadoProvider).aliadoEn(slot) != null) return;
     final jefe = estado.jefe;
-    final aviso = jefe == null
-        ? null
-        : ref
-            .read(catalogoProvider)
-            .valueOrNull
-            ?.aliadoDe(jefe.nombre, jefe.nivel, aliado.categoria)
-            ?.avisoAlCaer;
-    if (aviso != null) registrarAviso(context, aviso);
+    final catalogo = ref.read(catalogoProvider).valueOrNull;
+    if (jefe == null || catalogo == null) return;
+    final avisos = <String>[
+      if (catalogo
+              .aliadoDe(jefe.nombre, jefe.nivel, aliado.categoria)
+              ?.avisoAlCaer
+          case final a?)
+        a,
+      for (final enJuego in estado.aliados)
+        if (catalogo
+                .aliadoDe(jefe.nombre, jefe.nivel, enJuego.categoria)
+                ?.avisoAliadoCaido
+            case final a?)
+          a,
+    ];
+    for (final a in avisos) {
+      registrarAviso(context, a);
+    }
   }
 
   @override

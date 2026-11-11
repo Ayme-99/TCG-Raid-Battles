@@ -51,8 +51,8 @@
           "dano": 10
         },
         "habilidadNombre": "Moflete Estático",
-        "habilidad": "Si este Pokémon queda fuera de combate por el daño de uno de los ataques de los jugadores, el Pokémon atacante pasa a estar Paralizado.",
-        "avisoAlCaer": "Moflete Estático: el Pokémon atacante pasa a estar Paralizado."
+        "habilidad": "Mientras este Pokémon esté en juego, cada vez que un Pokémon Aliado (incluido él) queda Fuera de Combate por el daño de un ataque de los jugadores, el Pokémon atacante pasa a estar Paralizado.",
+        "avisoAliadoCaido": "Moflete Estático: el Pokémon atacante pasa a estar Paralizado."
       },
       "cura": {
         "nombre": "Oddish",

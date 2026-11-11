@@ -74,7 +74,7 @@ Efectos de los ataques del jefe (D-14):
 | Categoría | Aliado | HP | Ataque | Habilidad |
 |---|---|---|---|---|
 | Daño | Plusle | 80 | **Chispazo** 30: Este ataque también hace 30 puntos de daño a los Pokémon adyacentes al jugador objetivo. | — |
-| Tanque | Minun | 90 | **Bola Voltio** 10 | **Moflete Estático**: Si este Pokémon queda fuera de combate por el daño de uno de los ataques de los jugadores, el Pokémon atacante pasa a estar Paralizado. |
+| Tanque | Minun | 90 | **Bola Voltio** 10 | **Moflete Estático**: Mientras este Pokémon esté en juego, cada vez que un Pokémon Aliado (incluido él) queda Fuera de Combate por el daño de un ataque de los jugadores, el Pokémon atacante pasa a estar Paralizado. |
 | Cura | Oddish | 60 | — | **Drenadoras**: Cuando Oddish entra en juego y durante el chequeo Pokémon, pon un contador de daño en todos los Pokémon Activos. El jefe se cura 10 HP por cada contador puesto (lo cura la app; los contadores los pone la mesa). |
 | Control | Gulpin | 100 | — | **Tóxico**: Cuando Gulpin entra en juego y al principio de cada turno del jefe, el Pokémon frente a Gulpin pasa a estar Envenenado. |
 | Potenciador | Poochyena | 70 | — | **Aullido**: Los ataques del jefe hacen 20 puntos de daño más (lo suma la app). |

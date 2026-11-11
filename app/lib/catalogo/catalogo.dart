@@ -120,6 +120,10 @@ class AliadoCatalogo {
 
   /// Recordatorio al derrotar al aliado con un ataque de los jugadores.
   final String? avisoAlCaer;
+
+  /// Aura: recordatorio cuando cae cualquier aliado mientras este está en
+  /// juego (Moflete Estático).
+  final String? avisoAliadoCaido;
   final String? habilidadNombre;
   final String? habilidad;
   final EfectosAliado efectos;
@@ -142,6 +146,7 @@ class AliadoCatalogo {
     this.ataqueEscalaPorUso,
     this.ataqueMonedaRival = false,
     this.avisoAlCaer,
+    this.avisoAliadoCaido,
     this.habilidadNombre,
     this.habilidad,
     this.efectos = EfectosAliado.jugador,
@@ -276,6 +281,7 @@ class JefeCatalogo {
             : _entero(atm!, 'escalaPorUso', id),
         ataqueMonedaRival: atm?['monedaRival'] == true,
         avisoAlCaer: am['avisoAlCaer'] as String?,
+        avisoAliadoCaido: am['avisoAliadoCaido'] as String?,
         habilidadNombre: am['habilidadNombre'] as String?,
         habilidad: am['habilidad'] as String?,
         efectos: am['efectos'] == 'programa'
