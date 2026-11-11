@@ -198,7 +198,7 @@ void main() {
 
     expect(find.byKey(const Key('catalogo-onix')), findsOneWidget);
     expect(find.byKey(const Key('catalogo-manectric')), findsNothing);
-    expect(find.textContaining('invoca 1 aliado (seguro)'), findsOneWidget);
+    expect(find.textContaining('invoca 2 aliados (seguro)'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('catalogo-onix')));
     await tester.pumpAndSettle();
