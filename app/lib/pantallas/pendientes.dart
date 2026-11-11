@@ -34,7 +34,7 @@ class PanelPendientes extends ConsumerWidget {
             ),
             if (intentos > 0) ...[
               const SizedBox(height: 8),
-              Text('El jefe llama a un aliado'),
+              const Text('El jefe llama a un aliado'),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -276,13 +276,6 @@ class _ResultadoTirada {
     required this.categoria,
     required this.texto,
   });
-
-  /// La moneda del jefe salió en contra: no hay aliado.
-  _ResultadoTirada.sinAliado()
-      : mesa = TiradaMesa.sinAliado(),
-        slot = 0,
-        categoria = CategoriaAliado.danio,
-        texto = '';
 
   final TiradaMesa mesa;
   final int slot;
