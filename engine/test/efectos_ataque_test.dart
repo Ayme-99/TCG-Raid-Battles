@@ -48,14 +48,14 @@ void main() {
       expect(n.resultado, Resultado.victoria);
     });
 
-    test('puede cruzar un umbral de invocación', () {
+    test('perder HP ya no genera intentos de invocación', () {
       final s = turnoJefe(cadaHp: 500);
       expect(s.intentosInvocacionPendientes, 0);
       final n = apply(
         s,
         ataque(const EfectoAtaque(tipo: TipoEfectoAtaque.autodano, valor: 510)),
       );
-      expect(n.intentosInvocacionPendientes, 1);
+      expect(n.intentosInvocacionPendientes, 0);
     });
   });
 
@@ -67,7 +67,7 @@ void main() {
         s,
         ElegirJefe(nombre: 'Jefe', nivel: s.nivel, hp: 1000, invocacionCadaHp: 500),
       );
-      s = apply(s, const TurnoJugador(jugador: 0, dano: 600));
+      s = conIntentos(apply(s, const TurnoJugador(jugador: 0, dano: 600)));
       s = apply(
         s,
         const AliadoInvocado(

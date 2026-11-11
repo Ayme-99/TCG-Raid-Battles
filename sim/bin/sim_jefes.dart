@@ -3,9 +3,9 @@
 // Reutiliza los equipos de cartas reales y las reglas de sim_cartas.dart
 // (D-03) y añade lo que ese simulador no modela, tal como lo define el GDD §4.4
 // y D-13:
-//   - Invocación por umbral: cada vez que el jefe pierde `cadaHp` HP hay un
-//     intento (el golpe que lo deja a 0 HP no da ninguno). Con tirada
-//     `segura` no hay moneda; con `moneda` solo sigue si sale cara.
+//   - Llamada de aliados estilo Sol y Luna (T-69): al empezar su turno, desde
+//     la ronda 2, si no hay ningún aliado en juego y no ha llamado ya
+//     nivel + 1 veces, el jefe llama a uno. Sin moneda ni umbrales de HP.
 //   - Un dado elige el slot entre los libres de jugadores activos y otro la
 //     categoría entre las que no están en uso. Sin slot libre no hay aliado.
 //   - Al entrar, el aliado ataca (si tiene ataque); luego vuelve a atacar al
@@ -199,19 +199,17 @@ class JefeDef {
   final bool segura;
   final Map<String, AliadoDef> aliados;
 
-  /// Intentos de invocación a lo largo de la partida (el golpe a 0 HP no da).
-  int get intentos => cadaHp == null ? 0 : (hp + cadaHp! - 1) ~/ cadaHp! - 1;
+  /// Llamadas de aliado posibles a lo largo de la partida (T-69): nivel + 1.
+  int get intentos => cadaHp == null ? 0 : nivel + 1;
 
-  /// El mismo jefe con otro HP. Mantiene el número de intentos (y por tanto
-  /// de aliados): `cadaHp` se reparte en tramos iguales redondeando hacia
-  /// arriba, así nunca sale un intento de más.
+  /// El mismo jefe con otro HP (las llamadas no dependen del HP).
   JefeDef conHp(int nuevoHp) => JefeDef(
         id: id,
         nombre: nombre,
         nivel: nivel,
         hp: nuevoHp,
         ataques: ataques,
-        cadaHp: cadaHp == null ? null : (nuevoHp + intentos) ~/ (intentos + 1),
+        cadaHp: cadaHp,
         segura: segura,
         aliados: aliados,
       );
@@ -352,7 +350,7 @@ Resultado jugarJefe(
   final mazo = MazoAtaquesJefe(rnd, jugadores: js.length);
   final slots = List<Aliado?>.filled(js.length, null);
   var hp = jefe.hp;
-  var cruzados = 0;
+  var llamadas = 0;
   var invocados = 0;
   var sinSlot = 0;
   var sinCategoria = 0;
@@ -467,7 +465,6 @@ Resultado jugarJefe(
       sinSlot++;
       return;
     }
-    if (!jefe.segura && rnd.nextBool() == false) return; // la moneda no salió
     final enUso = {
       for (final a in slots)
         if (a != null) a.categoria,
@@ -516,19 +513,11 @@ Resultado jugarJefe(
     }
   }
 
-  // El jefe pierde [dano] HP y puede dar intentos de invocación. Devuelve
+  // El jefe pierde [dano] HP. Devuelve
   // true si cae.
   bool bajarJefe(int dano) {
     hp -= dano;
     if (hp <= 0) return true;
-    final cadaHp = jefe.cadaHp;
-    if (cadaHp != null) {
-      final ahora = (jefe.hp - hp) ~/ cadaHp;
-      while (cruzados < ahora) {
-        cruzados++;
-        invocar();
-      }
-    }
     return false;
   }
 
@@ -626,6 +615,16 @@ Resultado jugarJefe(
     // Los efectos del jefe duran hasta aquí: un turno de los jugadores.
     noAtacan.clear();
     sinRetirada.clear();
+
+    // Llamada de aliado (T-69): desde su segundo turno, si no hay ninguno en
+    // juego y le quedan llamadas.
+    if (t >= 2 &&
+        jefe.cadaHp != null &&
+        llamadas < jefe.intentos &&
+        slots.every((a) => a == null)) {
+      llamadas++;
+      invocar();
+    }
 
     // Turno del jefe: roba cartas del mazo real (20 cartas oficiales; según
     // los jugadores se quitan o se redirigen), cada una con su ataque y su
@@ -886,8 +885,8 @@ void main(List<String> args) {
           '${(100 * objetivo[jefe.nivel]!).toStringAsFixed(0).padLeft(3)} %     '
           '${m.turnosVictoria.toStringAsFixed(1).padLeft(5)}  '
           '${m.invocados.toStringAsFixed(2)}');
-      // Intentos que dan los umbrales; los que faltan hasta el total no
-      // llegaron a cruzarse porque la partida terminó antes.
+      // Llamadas posibles; las que faltan hasta el total no llegaron a
+      // hacerse porque la partida terminó antes.
       final sinCruzar =
           medido.intentos - m.invocados - m.sinSlot - m.sinCategoria;
       filasCausas.add('${jefe.id.padRight(11)} ${e.key.padRight(12)} '
@@ -902,11 +901,11 @@ void main(List<String> args) {
     }
   }
   if (causas) {
-    stdout.writeln('\nCausas de los intentos de invocación (media por partida)');
+    stdout.writeln('\nCausas de las llamadas de aliado (media por partida)');
     stdout.writeln('jefe        política      intentos  invocados  sinSlot  '
         'sinCategoría  sinCruzar');
     filasCausas.forEach(stdout.writeln);
-    stdout.writeln('sinCruzar: umbrales que no llegaron a cruzarse porque la '
+    stdout.writeln('sinCruzar: llamadas que no llegaron a hacerse porque la '
         'partida terminó antes (victoria o derrota).');
   }
   File(informe)

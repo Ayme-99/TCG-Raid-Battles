@@ -42,9 +42,10 @@ EstadoPartida palkia({int cada = 600, int hp = 3000}) {
   );
 }
 
-/// El jugador 0 baja a Palkia a 2400 y salta el primer intento.
+/// El jugador 0 baja a Palkia a 2400 y hay un intento de invocación pendiente
+/// (inyectado: la llamada real sale del turno del jefe, ver T-69 abajo).
 EstadoPartida conIntento() =>
-    apply(palkia(), const TurnoJugador(jugador: 0, dano: 600));
+    conIntentos(apply(palkia(), const TurnoJugador(jugador: 0, dano: 600)));
 
 // Efectos de aliado de prueba (D-13). Son funciones de nivel superior para
 // poder usarlas en un mapa `const`.
@@ -71,55 +72,90 @@ const scriptsDePrueba = {
 };
 
 void main() {
-  group('umbrales de invocación', () {
-    test('sin cruzar el umbral no hay intento', () {
-      final s = apply(palkia(), const TurnoJugador(jugador: 0, dano: 599));
+  group('llamada de aliados (Sol y Luna, T-69)', () {
+    /// Termina la ronda: todos actúan sin dañar al jefe y se cierra su turno.
+    EstadoPartida cierraRonda(EstadoPartida s) =>
+        apply(todosActuan(s, dano: 0), const FinTurnoJefe());
+
+    test('en su primer turno el jefe no llama', () {
+      final s = todosActuan(palkia(), dano: 0);
+      expect(s.fase, Fase.turnoJefe);
       expect(s.intentosInvocacionPendientes, 0);
-      expect(s.umbralesCruzados, 0);
+      expect(s.llamadasAliado, 0);
     });
 
-    test('llegar justo al umbral cuenta como cruzarlo', () {
-      final s = conIntento();
-      expect(s.jefe!.hp, 2400);
+    test('en su segundo turno el jefe llama a un aliado', () {
+      final s = todosActuan(cierraRonda(palkia()), dano: 0);
+      expect(s.fase, Fase.turnoJefe);
+      expect(s.ronda, 2);
       expect(s.intentosInvocacionPendientes, 1);
-      expect(s.umbralesCruzados, 1);
+      expect(s.llamadasAliado, 1);
     });
 
-    test('un golpe de 1200 cruza dos umbrales: dos intentos', () {
-      final s = apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200));
-      expect(s.intentosInvocacionPendientes, 2);
-    });
-
-    test('como mucho cuatro intentos con 3000 HP y umbral de 600', () {
+    test('perder HP no genera intentos', () {
       final s = apply(palkia(), const TurnoJugador(jugador: 0, dano: 2900));
-      expect(s.intentosInvocacionPendientes, 4);
+      expect(s.intentosInvocacionPendientes, 0);
+      expect(s.llamadasAliado, 0);
     });
 
-    test('un jefe sin umbral nunca invoca', () {
-      final s = apply(empezar(hp: 3000), const TurnoJugador(jugador: 0, dano: 2000));
+    test('hay que resolver la llamada antes de que el jefe ataque', () {
+      final s = todosActuan(cierraRonda(palkia()), dano: 0);
+      expect(() => apply(s, const AtaqueJefe(ranura: 1, dano: 10)),
+          throwsA(isA<ReglaIncumplida>()));
+      expect(() => apply(s, const FinTurnoJefe()),
+          throwsA(isA<ReglaIncumplida>()));
+    });
+
+    test('un jefe sin ficha de invocación nunca llama', () {
+      var s = empezar(hp: 3000);
+      s = cierraRonda(s);
+      s = todosActuan(s, dano: 0);
       expect(s.intentosInvocacionPendientes, 0);
     });
 
-    test('cada umbral cuenta una sola vez aunque el jefe se cure', () {
-      var s = conIntento();
+    test('con un aliado en juego no hay llamada nueva', () {
+      var s = todosActuan(cierraRonda(palkia()), dano: 0);
+      s = apply(s, rattata(1));
+      s = apply(s, const AtaqueAliado(slot: 1, dano: 20));
+      s = apply(s, const AtaqueJefe(ranura: 1, dano: 10));
+      s = apply(s, const AtaqueAliado(slot: 1, dano: 20));
+      s = cierraRonda(s);
+      s = todosActuan(s, dano: 0);
+      expect(s.aliadoEn(1), isNotNull);
+      expect(s.intentosInvocacionPendientes, 0);
+      expect(s.llamadasAliado, 1);
+    });
+
+    test('el turno siguiente a caer el aliado, el jefe llama otro', () {
+      var s = todosActuan(cierraRonda(palkia()), dano: 0);
+      s = apply(s, rattata(1));
+      s = apply(s, const AtaqueAliado(slot: 1, dano: 20));
+      s = apply(s, const AtaqueJefe(ranura: 1, dano: 10));
+      s = apply(s, const AtaqueAliado(slot: 1, dano: 20));
+      s = apply(s, const FinTurnoJefe());
+      // Ronda 3: el jugador 0 derriba al aliado (60 HP) y todos terminan.
+      s = apply(s, const AtaqueAAliado(jugador: 0, slot: 1, dano: 500));
+      expect(s.aliados, isEmpty);
+      s = todosActuan(s, dano: 0);
+      expect(s.fase, Fase.turnoJefe);
+      expect(s.intentosInvocacionPendientes, 1);
+      expect(s.llamadasAliado, 2);
+    });
+
+    test('como mucho nivel + 1 llamadas por partida', () {
+      var s = palkia();
+      expect(maxLlamadasAliado(s.nivel), s.nivel + 1);
+      s = s.copiarCon(llamadasAliado: maxLlamadasAliado(s.nivel));
+      s = todosActuan(cierraRonda(s), dano: 0);
+      expect(s.ronda, 2);
+      expect(s.intentosInvocacionPendientes, 0);
+    });
+
+    test('SinInvocacion no devuelve la llamada: se cuenta igualmente', () {
+      var s = todosActuan(cierraRonda(palkia()), dano: 0);
       s = apply(s, const SinInvocacion());
-      s = apply(s, const CuracionJefe(600));
-      expect(s.jefe!.hp, 3000);
-      s = apply(s, const TurnoJugador(jugador: 1, dano: 600));
       expect(s.intentosInvocacionPendientes, 0);
-      expect(s.umbralesCruzados, 1);
-    });
-
-    test('el golpe que mata al jefe no genera intentos', () {
-      final s = apply(
-        apply(
-          configurar(const [100]),
-          const ElegirJefe(nombre: 'J', nivel: 1, hp: 100, invocacionCadaHp: 50),
-        ),
-        const TurnoJugador(jugador: 0, dano: 100),
-      );
-      expect(s.resultado, Resultado.victoria);
-      expect(s.intentosInvocacionPendientes, 0);
+      expect(s.llamadasAliado, 1);
     });
 
     test('los HP entre intentos deben ser mayores que 0', () {
@@ -169,9 +205,9 @@ void main() {
       var s = conIntento();
       expect(() => apply(s, rattata(7)), throwsA(isA<ReglaIncumplida>()));
       s = apply(s, wobbuffet(0));
-      s = apply(
-        palkia(),
-        const TurnoJugador(jugador: 0, dano: 1200),
+      s = conIntentos(
+        apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200)),
+        2,
       );
       s = apply(s, rattata(2));
       expect(() => apply(s, cleffairy(2)), throwsA(isA<ReglaIncumplida>()));
@@ -197,7 +233,8 @@ void main() {
     });
 
     test('dos intentos seguidos pueden dar dos aliados distintos', () {
-      var s = apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200));
+      var s = conIntentos(
+          apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200)), 2);
       s = apply(s, rattata(1));
       s = apply(s, wobbuffet(2));
       expect(s.aliados.map((a) => a.slot), [1, 2]);
@@ -205,7 +242,8 @@ void main() {
     });
 
     test('con los slots ocupados los intentos se pierden', () {
-      var s = apply(palkia(), const TurnoJugador(jugador: 0, dano: 1800));
+      var s = conIntentos(
+          apply(palkia(), const TurnoJugador(jugador: 0, dano: 1800)), 3);
       s = apply(s, rattata(0));
       s = apply(s, rattata(1, categoria: CategoriaAliado.tanque));
       s = apply(s, rattata(2, categoria: CategoriaAliado.cura));
@@ -298,7 +336,8 @@ void main() {
 
     test('un compañero puede liberar al bloqueado antes de que actúe', () {
       // Palkia cae a 1200 y entra un aliado en el slot 2, que aún no ha actuado.
-      var s = apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200));
+      var s = conIntentos(
+          apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200)), 2);
       s = apply(s, const SinInvocacion());
       s = apply(s, rattata(2));
       s = apply(s, const AtaqueAliado(slot: 2, dano: 20));
@@ -406,8 +445,8 @@ void main() {
 
   group('categorías de aliado (D-13)', () {
     // Dos intentos de golpe: Palkia baja a 1800.
-    EstadoPartida dosIntentos() =>
-        apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200));
+    EstadoPartida dosIntentos() => conIntentos(
+        apply(palkia(), const TurnoJugador(jugador: 0, dano: 1200)), 2);
 
     test('al principio están libres las seis categorías', () {
       expect(conIntento().categoriasLibres, CategoriaAliado.values);

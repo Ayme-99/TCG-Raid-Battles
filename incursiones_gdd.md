@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.12 (especificación del motor)
+**Versión:** 1.13 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -58,8 +58,6 @@ INICIO
                 dañar al jefe (el aliado le ataca igualmente); solo el
                 Bloqueo de un aliado concreto obliga a atacarle
               - Introduce a mano el daño hecho al jefe; el asistente lo resta
-              - Si el HP del jefe cruza un umbral de invocación (§4.4):
-                intento de invocación en ese mismo momento
               - Si HP del jefe ≤ 0 → FIN: VICTORIA (inmediata)
       └─ TURNO DEL JEFE
             - La app roba por el jefe una carta de su mazo de 20 cartas de ataque
@@ -117,7 +115,7 @@ Detalle en `docs/D-04-aliados.md`.
 
 - **Un slot por jugador** (hasta 4; con 3 jugadores, 3 slots; con 2, 2). Un aliado como máximo por slot, solo en slots de jugadores activos.
 - Un aliado tiene HP propio (independiente del jefe), a lo sumo un ataque y a veces una habilidad. Hay aliados sin ataque (solo habilidad) y las habilidades son **pasivas**: una vez en juego se mantienen mientras el aliado siga en el combate.
-- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y sus 6 aliados, uno por categoría: Daño, Tanque, Cura, Control, Potenciador y Debilitador, D-13 y D-16); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: si el jefe usa moneda, se tira y solo sigue si sale cara; si su invocación es **segura**, no hay moneda y el intento sigue siempre. Después, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay invocación) y un d6 elige la categoría (no se repite una categoría en uso). Entra el aliado de esa categoría de la ficha del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que atacará.
+- **Llamada de aliados (estilo Pokémon dominante de Sol y Luna, T-69)**: la define cada jefe en su ficha (si llama o no y sus 6 aliados, uno por categoría: Daño, Tanque, Cura, Control, Potenciador y Debilitador, D-13 y D-16); un jefe sin esos datos nunca llama. El jefe llama a un aliado **al empezar su segundo turno de combate, o al empezar el turno siguiente a que su aliado anterior quede derrotado**; nunca hay más de uno en juego y llama como máximo **nivel + 1** veces por partida (2 a Nv1, 3 a Nv2, y así). La llamada **no depende de monedas, de objetos ni de estados**: siempre se hace. Después, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay aliado, y cuenta como llamada) y un d6 elige la categoría. Entra el aliado de esa categoría de la ficha del jefe. El HP del jefe ya no influye en la llamada.
 - **Pícaro**: categoría de control (estados alterados, modificar fuerza, contadores de daño). Sus aliados son los únicos que atacan a la Banca.
 - **Entrada**: al entrar, el aliado usa su ataque y/o su habilidad contra el dueño de su slot (salvo que su texto diga otra cosa) y no vuelve a atacar hasta el final del turno del jefe.
 - **Exceso de daño**: si un jugador hace a un aliado más daño del que le queda, el exceso se pierde (no pasa al jefe ni a otro aliado).
@@ -277,3 +275,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.10 | Puesta al día del documento: D-16 (6 categorías de aliado: Daño, Tanque, Cura, Control, Potenciador y Debilitador; contrato v6), lanzamiento con 4 jefes (uno por nivel) en lugar de 7, y el índice de §11 con D-12, D-14, D-15 y D-16. D-15 (modos de preparación) sigue en diseño. |
 | v1.11 | El jefe roba de un mazo de 20 cartas de ataque que lleva la app (las del PDF oficial de Incursión Max): cada carta dice el ataque, el jugador atacado y si se roba otra. Máximo de ataques por turno según el nivel (Nv1: 2, Nv2: 3, Nv3 y Nv4: 4). Las cartas que apuntan a un jugador que no juega o está eliminado se descartan. Deja de ser física la carta del jefe. HP de los jefes recalibrados con ese mazo (4 jugadores): Onix 2400 / Manectric 2700 / Kingdra 3800 / Arceus 3500. |
 | v1.12 | Catálogo de prueba de 32 cartas (4 por tipo). Minun (Manectric): Moflete Estático pasa a ser un aura, mientras esté en juego, cada aliado derrotado por un ataque de los jugadores paraliza al Pokémon atacante. HP de los jefes recalibrados (4 jugadores): Onix 2200 / Manectric 2700 / Kingdra 3800 / Arceus 3900. |
+| v1.13 | Llamada de aliados estilo Sol y Luna (T-69): el jefe llama a un aliado al empezar su segundo turno o el turno siguiente a que caiga el anterior, uno cada vez, máximo nivel + 1 llamadas, sin moneda ni umbrales de HP; los dados siguen eligiendo slot y categoría. Los HP de los jefes no cambian. |

@@ -6,14 +6,17 @@ import 'ayudas.dart';
 /// Scripts de los aliados de Arceus (D-16): Bloqueo, Deseo, Envite Ígneo y
 /// Fuerza Lunar. Sin bloqueo de slot: el dueño puede ignorar a su aliado.
 void main() {
-  /// Con 1300 de daño se cruzan dos umbrales (3000 y 2400): dos intentos.
+  /// Con 1300 de daño quedan dos intentos de invocación pendientes.
   EstadoPartida conJefe({int dano = 1300}) {
     final s0 = configurar(const [100, 100, 100]);
     var s = apply(
       s0,
       ElegirJefe(nombre: 'Arceus', nivel: s0.nivel, hp: 3600, invocacionCadaHp: 600),
     );
-    return apply(s, TurnoJugador(jugador: 0, dano: dano));
+    return conIntentos(
+      apply(s, TurnoJugador(jugador: 0, dano: dano)),
+      dano ~/ 600,
+    );
   }
 
   /// Descarta los intentos de invocación que quedan (no se invoca nada) para
@@ -132,8 +135,8 @@ void main() {
       );
       s = act(s, const AtaqueAAliado(jugador: 1, slot: 2, dano: 200));
       expect(s.aliadoEn(2)!.hp, 100);
-      // Otro golpe del jefe cruza el siguiente umbral: nuevo intento.
-      s = apply(s, const TurnoJugador(jugador: 2, dano: 700));
+      // Nuevo intento de invocación.
+      s = conIntentos(apply(s, const TurnoJugador(jugador: 2, dano: 700)));
       // Aliados en orden: Control (cara) y Chingling (cruz).
       s = apply(
         s,

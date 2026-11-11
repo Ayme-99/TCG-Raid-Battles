@@ -21,6 +21,14 @@ EstadoPartida empezar({
   return apply(s, ElegirJefe(nombre: 'Jefe', nivel: s.nivel, hp: hp));
 }
 
+/// Deja [n] intentos de invocación pendientes sin pasar por el turno del jefe
+/// (T-69: la llamada sale de `_llamarAliado`; los tests de aliados la
+/// inyectan para probar solo cómo se resuelve el intento).
+EstadoPartida conIntentos(EstadoPartida s, [int n = 1]) => s.copiarCon(
+      intentosInvocacionPendientes: s.intentosInvocacionPendientes + n,
+      llamadasAliado: s.llamadasAliado + n,
+    );
+
 /// Hace actuar a todos los jugadores que quedan en la ronda, sin tocar al
 /// jefe más de lo que indique [dano]. Termina en el turno del jefe.
 EstadoPartida todosActuan(EstadoPartida s, {int dano = 1}) {

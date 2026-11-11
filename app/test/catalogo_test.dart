@@ -52,7 +52,7 @@ void main() {
       expect(c.jefes.map((j) => j.id), ['onix', 'manectric', 'kingdra', 'arceus']);
       expect(c.jefes.map((j) => j.nivel), [1, 2, 3, 4]);
       expect(c.jefes.map((j) => j.hp), [2200, 2700, 3800, 3900]);
-      expect(c.jefes.map((j) => j.intentosDeInvocacion), [1, 2, 3, 5]);
+      expect(c.jefes.map((j) => j.intentosDeInvocacion), [2, 3, 4, 5]);
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
         expect(j.invocacion!.segura, isTrue);
@@ -268,13 +268,8 @@ void main() {
     expect(find.byKey(const Key('aliado-0')), findsNothing);
     expect(find.byKey(const Key('slot-libre-0')), findsOneWidget);
 
-    // 1200 de daño cruza el primer (y único) umbral de invocación de Onix.
-    expect(
-      c.read(partidaProvider.notifier).registrar(
-            const TurnoJugador(jugador: 0, dano: 1200),
-          ),
-      isNull,
-    );
+    // Onix llama a su primer aliado al empezar su turno de la ronda 2.
+    llegarALaLlamadaDelJefe(c);
     await tester.pumpAndSettle();
     expect(c.read(estadoProvider).intentosInvocacionPendientes, 1);
 
@@ -334,12 +329,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('catalogo-onix')));
     await tester.pumpAndSettle();
-    expect(
-      c.read(partidaProvider.notifier).registrar(
-            const TurnoJugador(jugador: 0, dano: 1200),
-          ),
-      isNull,
-    );
+    llegarALaLlamadaDelJefe(c);
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('invocar-aliado')));

@@ -244,7 +244,7 @@ void main() {
     expect(c.read(estadoProvider).fase, Fase.turnoJefe);
   });
 
-  testWidgets('invocar un aliado bloquea los turnos hasta resolverlo',
+  testWidgets('la llamada del jefe se resuelve invocando un aliado',
       (tester) async {
     final c = await abrir(tester);
     await escribir(tester, 'ataque-0', '100');
@@ -254,8 +254,9 @@ void main() {
     await escribir(tester, 'jefe-invocacion', '100');
     await tocar(tester, 'elegir-jefe');
 
-    // 100 de daño cruza el primer umbral de invocación.
-    await turno(tester, '100');
+    // El jefe llama a su primer aliado en el turno de la ronda 2.
+    llegarALaLlamadaDelJefe(c);
+    await tester.pumpAndSettle();
     expect(c.read(estadoProvider).intentosInvocacionPendientes, 1);
 
     await tocar(tester, 'invocar-aliado');
@@ -275,7 +276,7 @@ void main() {
     expect(estado.aliados.single.nombre, 'Pikachu');
     expect(estado.aliados.single.slot, 0);
     expect(estado.aliados.single.categoria, CategoriaAliado.cura);
-    expect(find.text('Turno de Jugador 2'), findsOneWidget);
+    expect(estado.fase, Fase.turnoJefe);
   });
 
   testWidgets('abandonar termina la partida en derrota', (tester) async {

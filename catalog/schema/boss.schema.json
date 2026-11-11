@@ -123,7 +123,7 @@
       "additionalProperties": false,
       "properties": {
         "cadaHp": {
-          "description": "Cada cuántos HP perdidos hay un intento de invocación.",
+          "description": "OBSOLETO desde T-69 (el jefe llama a un aliado por turnos, no por HP perdidos): se conserva por compatibilidad; solo cuenta que el jefe tenga `invocacion`.",
           "type": "integer",
           "minimum": 1
         },

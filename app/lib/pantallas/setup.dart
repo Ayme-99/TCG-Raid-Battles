@@ -255,7 +255,7 @@ class _PantallaEleccionJefeState extends ConsumerState<PantallaEleccionJefe> {
           key: const Key('jefe-invocacion'),
           child: CampoNumero(
             controlador: _invocacion,
-            etiqueta: 'Invoca un aliado cada ... HP perdidos (vacío: nunca)',
+            etiqueta: 'Llama a aliados (cualquier número; vacío o 0: nunca)',
           ),
         ),
         const SizedBox(height: 24),

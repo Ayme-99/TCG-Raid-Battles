@@ -195,8 +195,8 @@ final class AtaqueAAliado extends Evento {
   });
 }
 
-/// La mesa resuelve un intento de invocación sin aliado (la moneda no salió
-/// cara o no quedan slots libres).
+/// La mesa resuelve un intento de invocación sin aliado (no quedan slots
+/// libres). Desde T-69 la llamada ya no depende de una moneda.
 final class SinInvocacion extends Evento {
   const SinInvocacion();
 }

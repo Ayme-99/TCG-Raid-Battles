@@ -68,7 +68,8 @@ class JefeEstado {
   final int hpMaximo;
   final int hp;
 
-  /// Cada cuántos HP perdidos hay un intento de invocar un aliado (D-04 §7).
+  /// Obsoleto desde T-69: el valor ya no se usa (los aliados se llaman por
+  /// turnos, no por HP perdidos). Solo indica que el jefe llama aliados.
   /// null: el jefe nunca invoca.
   final int? invocacionCadaHp;
 
@@ -295,9 +296,9 @@ class EstadoPartida {
   /// Aliados derrotados en la partida (para estadísticas).
   final int aliadosDerrotados;
 
-  /// Umbrales de invocación ya cruzados. Cada umbral cuenta una sola vez
-  /// por partida aunque el jefe se cure y vuelva a cruzarlo.
-  final int umbralesCruzados;
+  /// Llamadas de aliado que el jefe ya ha hecho (Sol y Luna, T-69): cuenta
+  /// cada intento de invocación generado. El máximo es el nivel más uno.
+  final int llamadasAliado;
 
   /// Intentos de invocación que la mesa aún tiene que resolver.
   final int intentosInvocacionPendientes;
@@ -334,7 +335,7 @@ class EstadoPartida {
     required this.curacionJefe,
     required List<AliadoEstado> aliados,
     required this.aliadosDerrotados,
-    required this.umbralesCruzados,
+    required this.llamadasAliado,
     required this.intentosInvocacionPendientes,
     required this.resultado,
     List<EfectoActivo>? efectosActivos,
@@ -370,7 +371,7 @@ class EstadoPartida {
         curacionJefe: 0,
         aliados: const [],
         aliadosDerrotados: 0,
-        umbralesCruzados: 0,
+        llamadasAliado: 0,
         intentosInvocacionPendientes: 0,
         resultado: null,
       );
@@ -429,7 +430,7 @@ class EstadoPartida {
     int? curacionJefe,
     List<AliadoEstado>? aliados,
     int? aliadosDerrotados,
-    int? umbralesCruzados,
+    int? llamadasAliado,
     int? intentosInvocacionPendientes,
     Resultado? resultado,
     List<EfectoActivo>? efectosActivos,
@@ -456,7 +457,7 @@ class EstadoPartida {
         curacionJefe: curacionJefe ?? this.curacionJefe,
         aliados: aliados ?? this.aliados,
         aliadosDerrotados: aliadosDerrotados ?? this.aliadosDerrotados,
-        umbralesCruzados: umbralesCruzados ?? this.umbralesCruzados,
+        llamadasAliado: llamadasAliado ?? this.llamadasAliado,
         intentosInvocacionPendientes:
             intentosInvocacionPendientes ?? this.intentosInvocacionPendientes,
         koTrasAtaqueAliado: koTrasAtaqueAliado ?? this.koTrasAtaqueAliado,
@@ -485,7 +486,7 @@ class EstadoPartida {
         'curacionJefe': curacionJefe,
         'aliados': [for (final a in aliados) a.toJson()],
         'aliadosDerrotados': aliadosDerrotados,
-        'umbralesCruzados': umbralesCruzados,
+        'llamadasAliado': llamadasAliado,
         'intentosInvocacionPendientes': intentosInvocacionPendientes,
         'koTrasAtaqueAliado': koTrasAtaqueAliado,
         if (debilitados.isNotEmpty)

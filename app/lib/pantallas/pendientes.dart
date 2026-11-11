@@ -34,7 +34,7 @@ class PanelPendientes extends ConsumerWidget {
             ),
             if (intentos > 0) ...[
               const SizedBox(height: 8),
-              Text('Intentos de invocación: $intentos'),
+              Text('El jefe llama a un aliado'),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -65,8 +65,8 @@ class PanelPendientes extends ConsumerWidget {
                       if (evento == null || !context.mounted) return;
                       if (registrar(context, ref, evento) &&
                           evento is SinInvocacion) {
-                        registrarAviso(
-                            context, 'Salió cruz: no se invoca ningún aliado.');
+                        registrarAviso(context,
+                            'No hay hueco libre: no se llama a ningún aliado.');
                       }
                       if (evento is AliadoInvocado &&
                           evento.monedas != null &&
@@ -379,8 +379,8 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
   /// Nombre del dado que elige entre [n] valores (D-13): moneda con 2, d3, d4.
   static String _dado(int n) => n == 2 ? 'moneda' : 'd$n';
 
-  /// Tira la moneda del jefe (si no es de invocación segura), el dado de slot
-  /// y el de categoría (D-13). Cada dado elige con la misma probabilidad entre
+  /// Tira el dado de slot y el de categoría (D-13); la llamada del jefe ya no
+  /// depende de una moneda (T-69). Cada dado elige con la misma probabilidad entre
   /// los valores libres, que es lo que da repetir la tirada en la mesa.
   void _tirarDados() {
     final e = widget.estado;
@@ -388,10 +388,6 @@ class _DialogoAliadoState extends State<_DialogoAliado> {
     final inv = jefe == null
         ? null
         : widget.catalogo?.invocacionDe(jefe.nombre, jefe.nivel);
-    if (inv != null && !inv.segura && !widget.azar.nextBool()) {
-      Navigator.of(context).pop(_ResultadoTirada.sinAliado());
-      return;
-    }
     final slots = e.slotsLibres;
     // Si el jefe viene del catálogo, el dado solo tiene las caras de los
     // aliados que su carta define (D-16: hasta que tenga los 6).

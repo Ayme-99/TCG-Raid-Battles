@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "partidaId": "invalido-categoria-repetida",
+  "version": 5,
+  "partidaId": "invalido-llamada-con-aliado-en-juego",
   "cuentas": [
     "usuario-ana",
     null
@@ -33,6 +33,30 @@
       "dano": 350
     },
     {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
+      "tipo": "ataqueJefe",
+      "ranura": 1,
+      "dano": 30,
+      "jugador": 0
+    },
+    {
+      "tipo": "finTurnoJefe"
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 350
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
       "tipo": "aliadoInvocado",
       "slot": 1,
       "categoria": "danio",
@@ -45,11 +69,6 @@
       "tipo": "ataqueAliado",
       "slot": 1,
       "dano": 20
-    },
-    {
-      "tipo": "turnoJugador",
-      "jugador": 1,
-      "dano": 0
     },
     {
       "tipo": "ataqueJefe",
@@ -68,20 +87,20 @@
     {
       "tipo": "turnoJugador",
       "jugador": 0,
-      "dano": 350
-    },
-    {
-      "tipo": "aliadoInvocado",
-      "slot": 0,
-      "categoria": "danio",
-      "nombre": "Chansey",
-      "hp": 120,
-      "habilidad": "Cura al jefe al final de su turno (la aplica el jugador)"
+      "dano": 100
     },
     {
       "tipo": "turnoJugador",
       "jugador": 1,
       "dano": 0
+    },
+    {
+      "tipo": "aliadoInvocado",
+      "slot": 0,
+      "categoria": "cura",
+      "nombre": "Chansey",
+      "hp": 120,
+      "habilidad": "Cura al jefe al final de su turno (la aplica el jugador)"
     }
   ]
 }

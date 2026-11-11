@@ -166,7 +166,7 @@ class AliadoCatalogo {
 }
 
 class InvocacionCatalogo {
-  /// Cada cuántos HP perdidos hay un intento de invocación.
+  /// Obsoleto (T-69): la llamada ya no depende de los HP perdidos.
   final int cadaHp;
 
   /// `true`: sin moneda, cada intento invoca si hay slot libre.
@@ -205,13 +205,9 @@ class JefeCatalogo {
     this.invocacion,
   });
 
-  /// Cuántos umbrales de invocación tiene a lo largo de la partida: el golpe
-  /// que lo deja a 0 HP no da ninguno.
-  int get intentosDeInvocacion {
-    final inv = invocacion;
-    if (inv == null) return 0;
-    return (hp + inv.cadaHp - 1) ~/ inv.cadaHp - 1;
-  }
+  /// Cuántos aliados puede llamar a lo largo de la partida (T-69): su nivel
+  /// más uno, uno cada vez.
+  int get intentosDeInvocacion => invocacion == null ? 0 : nivel + 1;
 
   factory JefeCatalogo.deJson(Object? json) {
     final m = _mapa(json, 'jefe');

@@ -88,3 +88,21 @@ Future<void> asentar() async {
     await Future<void>.delayed(Duration.zero);
   }
 }
+
+/// Lleva una partida de 2 jugadores hasta el turno del jefe de la ronda 2,
+/// que es cuando llama a su primer aliado (T-69): deja un intento de
+/// invocación por resolver.
+void llegarALaLlamadaDelJefe(ProviderContainer c) {
+  final partida = c.read(partidaProvider.notifier);
+  for (final e in const <Evento>[
+    TurnoJugador(jugador: 0, dano: 100),
+    TurnoJugador(jugador: 1, dano: 0),
+    AtaqueJefe(ranura: 1, dano: 0),
+    FinTurnoJefe(),
+    TurnoJugador(jugador: 0, dano: 0),
+    TurnoJugador(jugador: 1, dano: 0),
+  ]) {
+    final error = partida.registrar(e);
+    if (error != null) throw StateError('$e: $error');
+  }
+}

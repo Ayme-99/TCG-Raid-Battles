@@ -33,6 +33,30 @@
       "dano": 350
     },
     {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
+      "tipo": "ataqueJefe",
+      "ranura": 1,
+      "dano": 30,
+      "jugador": 0
+    },
+    {
+      "tipo": "finTurnoJefe"
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 350
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
       "tipo": "aliadoInvocado",
       "slot": 1,
       "categoria": "cura",
@@ -54,11 +78,6 @@
         false,
         true
       ]
-    },
-    {
-      "tipo": "turnoJugador",
-      "jugador": 1,
-      "dano": 0
     }
   ]
 }

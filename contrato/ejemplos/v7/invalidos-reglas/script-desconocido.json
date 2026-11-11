@@ -33,6 +33,30 @@
       "dano": 350
     },
     {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
+      "tipo": "ataqueJefe",
+      "ranura": 1,
+      "dano": 30,
+      "jugador": 0
+    },
+    {
+      "tipo": "finTurnoJefe"
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 350
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
       "tipo": "aliadoInvocado",
       "slot": 1,
       "categoria": "danio",
@@ -45,11 +69,6 @@
       "tipo": "ataqueAliado",
       "slot": 1,
       "dano": 20
-    },
-    {
-      "tipo": "turnoJugador",
-      "jugador": 1,
-      "dano": 0
     },
     {
       "tipo": "ataqueJefe",
@@ -68,7 +87,13 @@
     {
       "tipo": "turnoJugador",
       "jugador": 0,
-      "dano": 350
+      "dano": 100
+    },
+    {
+      "tipo": "ataqueAAliado",
+      "jugador": 1,
+      "slot": 1,
+      "dano": 60
     },
     {
       "tipo": "aliadoInvocado",
@@ -79,11 +104,6 @@
       "habilidad": "Cura al jefe al final de su turno (la aplica el jugador)",
       "efectos": "programa",
       "scriptId": "no-existe"
-    },
-    {
-      "tipo": "turnoJugador",
-      "jugador": 1,
-      "dano": 0
     }
   ]
 }

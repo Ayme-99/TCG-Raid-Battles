@@ -141,7 +141,7 @@ void main() {
       expect(s.resultado, Resultado.victoria);
     });
 
-    test('el chequeo puede cruzar un umbral de invocación', () {
+    test('el chequeo ya no genera intentos de invocación', () {
       var s = apply(configurar([100]), ElegirJefe(
         nombre: 'Jefe', nivel: 1, hp: 1000, invocacionCadaHp: 95,
       ));
@@ -149,10 +149,7 @@ void main() {
       s = aplicar(s, 0, EstadoDelJefe.veneno);
       expect(s.intentosInvocacionPendientes, 0);
       s = apply(s, const FinTurnoJefe()); // 90 + 10 = 100 perdidos
-      expect(s.intentosInvocacionPendientes, 1);
-      expect(() => apply(s, const TurnoJugador(jugador: 0, dano: 1)),
-          throwsA(isA<ReglaIncumplida>()));
-      s = apply(s, const SinInvocacion());
+      expect(s.intentosInvocacionPendientes, 0);
       expect(() => apply(s, const TurnoJugador(jugador: 0, dano: 1)),
           returnsNormally);
     });
