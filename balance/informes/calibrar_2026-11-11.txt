@@ -1,0 +1,13 @@
+Calibración con 32 cartas de prueba (T-68, 4 por tipo) y Minun con aura (no modelada: la parálisis no entra en el simulador).
+sim_jefes --calibrar, 150 equipos x 60 partidas, ayuda=0.5, mazo real de ataques del jefe. Objetivo 75/50/30/15 %. Política solo-dueno.
+
+HP del catálogo anterior (2 cartas por tipo) con las 32 cartas, 4 jugadores
+onix 2400: 66,6 %   manectric 2700: 51,7 %   kingdra 3800: 32,9 %   arceus 3500: 26,2 %
+
+HP calibrados con 32 cartas
+jugadores  onix  manectric  kingdra  arceus
+4          2200  2700       3800     3900   (75,9 / 51,7 / 32,9 / 15,7 %)
+3          1700  1800       3100     3000
+2           900   800       (sin equipos) (sin equipos)
+
+sim_cartas --calibrar (modelo abstracto, 32 cartas): Nv1 2244 / Nv2 4296 / Nv3 4642 / Nv4 5471 (X 220-400 / 450-600 / 610-800 / 810-1110).

@@ -3,7 +3,7 @@
   "id": "arceus",
   "nombre": "Arceus",
   "nivel": 4,
-  "hp": 3500,
+  "hp": 3900,
   "ataques": [
     {
       "nombre": "Danza Espada",

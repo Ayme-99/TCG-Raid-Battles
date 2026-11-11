@@ -182,3 +182,8 @@ Validación (2026-11-05): `sim/bin/sim_cartas.dart` (Dart, mismo modelo que el p
 - Bulbapedia, *Raid Battle (TCG)*: reglas, umbrales de X, mazo de ataques, Cheer, límite de KO. https://bulbapedia.bulbagarden.net/wiki/Raid_Battle_(TCG)
 - Serebii, *Raid Battles in Pokémon TCG*, carta Drednaw VMAX (HP y daño por nivel): https://serebii.net/card/raidbattles/002.shtml
 - Página oficial: https://tcg.pokemon.com/en-us/raid-battle/
+
+### 8.5 Catálogo de prueba de 32 cartas (4 por categoría) — 11-nov-2026
+
+Se añadieron 16 cartas (`balance/tablas/cartas_prueba.csv`, ahora 32): Mewtwo (promo SV) y Mew (Celebrations) como Básico; Venusaur (Pokémon GO) y Dragonite (Sun & Moon) como Fase 2; Xerneas-EX y Venusaur-EX; Blastoise & Piplup-GX y Mewtwo & Mew-GX; Lugia V y Pikachu V; Umbreon VMAX y Gengar VMAX; Pikachu ex y Gardevoir ex; Mega Lucario ex y Mega Venusaur ex. Con los HP anteriores, 4 jugadores daba 66,6 / 51,7 / 32,9 / 26,2 %. Recalibrado (4 jugadores): Onix 2200 / Manectric 2700 / Kingdra 3800 / Arceus 3900 (informe `balance/informes/calibrar_2026-11-11.txt`).
+

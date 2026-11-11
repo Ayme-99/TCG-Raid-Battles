@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.11 (especificación del motor)
+**Versión:** 1.12 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -34,7 +34,7 @@ Orden (detalle en `docs/D-01-setup.md`):
 | Qué número cuenta (`docs/D-02-dano-maximo.md`) | Cada jugador lo introduce a mano y todos lo ven y lo comprueban con la carta física. La mesa acuerda el número caso a caso, **sin tope** (hay cartas de más de 200 de daño). Daño fijo: el impreso. Daño por Energía: solo el base impreso. Los modificadores de la partida no cuentan. |
 | **Nivel** | `X ≤ 400` → Nv1 · `400 < X ≤ 600` → Nv2 · `600 < X ≤ 800` → Nv3 · `X > 800` → Nv4. El valor límite pertenece al nivel de abajo (media máxima por jugador con 4: 100 / 150 / 200 en Nv1-3). Un X menor de 250 se juega como Nv1 (no hay nivel inferior). |
 | **Jefe** | Elegido a mano o al azar dentro del nivel. Es una **carta fija** del catálogo: tiene su propio HP y sus propios ataques; no se escala con los jugadores. El asistente conoce el HP y el daño de cada ataque y computa solo los efectos «de programa» (D-14: autodaño, daño por ataques previos del turno, daño a los aliados); el resto lo aplican los jugadores en la mesa. **Criterio de nivel**: Nv1 Pokémon Básicos, Nv2 Pokémon de Fase 1 que no evolucionan más, Nv3 Pokémon de Fase 2, Nv4 Pokémon Míticos y Legendarios. Lanzamiento: 4 jefes, uno por nivel (Onix Nv1, Manectric Nv2, Kingdra Nv3, Arceus Nv4), todos disponibles desde el principio; el catálogo crecerá con más jefes. |
-| **HP del jefe** | El de su carta. HP de los jefes del catálogo, calibrados con el simulador (con sus 6 aliados, D-16) para un objetivo de victoria de 75 / 50 / 30 / 15 %: **Onix 2400 / Manectric 2700 / Kingdra 3800 / Arceus 3500** en Nv1 / Nv2 / Nv3 / Nv4. La referencia anterior sin aliados (2382 / 4313 / 4411 / 5205) sigue en `balance/tablas/niveles.csv`. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
+| **HP del jefe** | El de su carta. HP de los jefes del catálogo, calibrados con el simulador (con sus 6 aliados, D-16) para un objetivo de victoria de 75 / 50 / 30 / 15 %: **Onix 2200 / Manectric 2700 / Kingdra 3800 / Arceus 3900** en Nv1 / Nv2 / Nv3 / Nv4. La referencia anterior sin aliados (2382 / 4313 / 4411 / 5205) sigue en `balance/tablas/niveles.csv`. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
 | Ataques del jefe por nivel | Nv1 30/60/120 · Nv2 40/80/160 · Nv3 60/100/200 · Nv4 80/120/240. Los ataques salen de la baraja de ataques del jefe («Ataque X contra jugador Y», como el juego oficial), que también fija el máximo de ataques por turno. |
 | Menos de 4 jugadores | No se añaden parejas extra. El nivel se autoajusta con X, y los slots de aliados bajan con el número de jugadores (§4.4). |
 
@@ -202,7 +202,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 
 | Valor | Estado |
 |---|---|
-| HP del jefe (2400 / 2700 / 3800 / 3500) | Calibrado con el simulador y 16 cartas reales (con aliados); falta contrastar con playtests. Kingdra y Arceus casi iguales en HP (los separa la amenaza); el 15 % de Arceus parece poco |
+| HP del jefe (2200 / 2700 / 3800 / 3900) | Calibrado con el simulador y 32 cartas reales (con aliados); falta contrastar con playtests. Kingdra y Arceus casi iguales en HP (los separa la amenaza); el 15 % de Arceus parece poco |
 | Tope de 200 por ataque para X | Provisional |
 | Cartas de ánimo: una por KO y máximo 3 cartas distintas por partida | Adoptado del juego oficial, sin confirmar |
 | Efectos de las cartas de ánimo (curas, +50) | No están en el simulador: la partida real será algo más fácil que lo calibrado |
@@ -276,3 +276,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.9 | Criterio de nivel de los jefes (Nv1 Básicos, Nv2 Fase 1 que no evolucionan más, Nv3 Fase 2, Nv4 Míticos y Legendarios). Los ataques del jefe pasan a poder llevar efectos (D-14, contrato v5): la app computa solo los de programa. |
 | v1.10 | Puesta al día del documento: D-16 (6 categorías de aliado: Daño, Tanque, Cura, Control, Potenciador y Debilitador; contrato v6), lanzamiento con 4 jefes (uno por nivel) en lugar de 7, y el índice de §11 con D-12, D-14, D-15 y D-16. D-15 (modos de preparación) sigue en diseño. |
 | v1.11 | El jefe roba de un mazo de 20 cartas de ataque que lleva la app (las del PDF oficial de Incursión Max): cada carta dice el ataque, el jugador atacado y si se roba otra. Máximo de ataques por turno según el nivel (Nv1: 2, Nv2: 3, Nv3 y Nv4: 4). Las cartas que apuntan a un jugador que no juega o está eliminado se descartan. Deja de ser física la carta del jefe. HP de los jefes recalibrados con ese mazo (4 jugadores): Onix 2400 / Manectric 2700 / Kingdra 3800 / Arceus 3500. |
+| v1.12 | Catálogo de prueba de 32 cartas (4 por tipo). Minun (Manectric): Moflete Estático pasa a ser un aura, mientras esté en juego, cada aliado derrotado por un ataque de los jugadores paraliza al Pokémon atacante. HP de los jefes recalibrados (4 jugadores): Onix 2200 / Manectric 2700 / Kingdra 3800 / Arceus 3900. |
