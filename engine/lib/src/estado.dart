@@ -222,6 +222,29 @@ class RegistroCartaAnimo {
 
 List<T> _fija<T>(List<T> lista) => List<T>.unmodifiable(lista);
 
+/// Efecto de un aliado que sigue aplicado el resto de la partida aunque el
+/// aliado quede fuera de combate (Fijar Blanco). Lo resuelve la mesa; el
+/// asistente lo recuerda.
+class EfectoPermanente {
+  /// Script que lo dejó (no se repite).
+  final String scriptId;
+
+  /// Aliado que lo dejó.
+  final String origen;
+
+  /// Texto de la carta, tal como lo lee la mesa.
+  final String? texto;
+
+  const EfectoPermanente({
+    required this.scriptId,
+    required this.origen,
+    this.texto,
+  });
+
+  Map<String, Object?> toJson() =>
+      {'scriptId': scriptId, 'origen': origen, 'texto': texto};
+}
+
 /// Estado completo e inmutable de una partida.
 ///
 /// Solo cambia al aplicar un evento con `apply` (ver `motor.dart`).
@@ -316,6 +339,9 @@ class EstadoPartida {
   /// próximo ataque que haga ese jugador y se consume al hacerlo.
   final Map<int, int> debilitados;
 
+  /// Efectos de aliados que duran el resto de la partida (Fijar Blanco).
+  final List<EfectoPermanente> efectosPermanentes;
+
   EstadoPartida({
     required this.fase,
     required List<JugadorEstado> jugadores,
@@ -341,7 +367,10 @@ class EstadoPartida {
     List<EfectoActivo>? efectosActivos,
     this.koTrasAtaqueAliado = false,
     this.debilitados = const {},
+    List<EfectoPermanente>? efectosPermanentes,
   })  : jugadores = _fija(jugadores),
+        efectosPermanentes =
+            _fija(efectosPermanentes ?? const <EfectoPermanente>[]),
         orden = _fija(orden),
         prioridad = _fija(prioridad),
         cartasAnimoPendientes = _fija(cartasAnimoPendientes),
@@ -436,6 +465,7 @@ class EstadoPartida {
     List<EfectoActivo>? efectosActivos,
     bool? koTrasAtaqueAliado,
     Map<int, int>? debilitados,
+    List<EfectoPermanente>? efectosPermanentes,
   }) =>
       EstadoPartida(
         fase: fase ?? this.fase,
@@ -462,6 +492,7 @@ class EstadoPartida {
             intentosInvocacionPendientes ?? this.intentosInvocacionPendientes,
         koTrasAtaqueAliado: koTrasAtaqueAliado ?? this.koTrasAtaqueAliado,
         debilitados: debilitados ?? this.debilitados,
+        efectosPermanentes: efectosPermanentes ?? this.efectosPermanentes,
         resultado: resultado ?? this.resultado,
         efectosActivos: efectosActivos ?? this.efectosActivos,
       );
@@ -493,6 +524,10 @@ class EstadoPartida {
           'debilitados': {
             for (final k in debilitados.keys) '$k': debilitados[k],
           },
+        if (efectosPermanentes.isNotEmpty)
+          'efectosPermanentes': [
+            for (final f in efectosPermanentes) f.toJson(),
+          ],
         'resultado': resultado?.name,
         'efectosActivos': [for (final f in efectosActivos) f.toJson()],
       };

@@ -26,12 +26,87 @@ String etiquetaCategoria(CategoriaAliado c) => switch (c) {
       CategoriaAliado.debilitador => 'Debilitador',
     };
 
-/// Muestra un aviso breve en la parte inferior.
+/// Muestra un aviso breve en la parte inferior. Un aviso de varias líneas se
+/// queda más tiempo para que dé tiempo a leerlo.
 void registrarAviso(BuildContext context, String mensaje) {
+  final lineas = '\n'.allMatches(mensaje).length + 1;
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(mensaje)));
+    ..showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        duration: Duration(seconds: 4 + 2 * (lineas - 1)),
+      ),
+    );
 }
+
+/// Varios avisos a la vez, en uno solo (un aviso nuevo tapa al anterior).
+void registrarAvisos(BuildContext context, Iterable<String> mensajes) {
+  final lista = mensajes.toList();
+  if (lista.isNotEmpty) registrarAviso(context, lista.join('\n'));
+}
+
+/// Algo que la mesa tiene que hacer con sus cartas (poner contadores, lanzar
+/// monedas...): se queda en pantalla hasta que alguien pulsa «Hecho».
+Future<void> avisarMesa(
+  BuildContext context, {
+  required String titulo,
+  required List<String> lineas,
+}) {
+  if (lineas.isEmpty) return Future.value();
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (c) => AlertDialog(
+      key: const Key('aviso-mesa'),
+      title: Text(titulo),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final l in lineas)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(l),
+            ),
+        ],
+      ),
+      actions: [
+        FilledButton(
+          key: const Key('aviso-mesa-hecho'),
+          onPressed: () => Navigator.of(c).pop(),
+          child: const Text('Hecho'),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Pregunta sí/no a la mesa. null: se cerró el diálogo sin responder.
+Future<bool?> preguntarMesa(
+  BuildContext context,
+  String pregunta, {
+  String si = 'Sí',
+  String no = 'No',
+}) =>
+    showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        content: Text(pregunta),
+        actions: [
+          TextButton(
+            key: const Key('pregunta-no'),
+            onPressed: () => Navigator.of(c).pop(false),
+            child: Text(no),
+          ),
+          FilledButton(
+            key: const Key('pregunta-si'),
+            onPressed: () => Navigator.of(c).pop(true),
+            child: Text(si),
+          ),
+        ],
+      ),
+    );
 
 /// Campo de texto que solo admite dígitos.
 class CampoNumero extends StatelessWidget {

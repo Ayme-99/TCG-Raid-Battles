@@ -102,7 +102,7 @@ wn.row_dimensions[1].height = 48
 # --- Jefes -----------------------------------------------------------------
 wj = wb.create_sheet('Jefes')
 cabecera(wj, 1, ['Jefe', 'Nombre', 'Nivel', 'HP', 'Ataque 1', 'Ataque 2', 'Ataque 3', 'Ataque medio',
-                 'Tirada', 'Cada (HP perdidos)', 'Intentos de invocación', 'Amenaza esperada del nivel',
+                 'Llama aliados', 'Nº de carta', 'Llamadas de aliado (nivel + 1)', 'Amenaza esperada del nivel',
                  'Poder (HP × amenaza)', 'Poder objetivo del nivel (1,5 × x²)', 'Poder / objetivo', 'Poder de referencia del nivel', 'Poder / referencia', 'Estado'])
 for r, j in enumerate(jefes, 2):
     inv = j.get('invocacion')
@@ -111,10 +111,13 @@ for r, j in enumerate(jefes, 2):
         cel = wj.cell(row=r, column=c, value=v)
         cel.font = AZUL
     wj.cell(row=r, column=8, value=f'=AVERAGE(E{r}:G{r})').number_format = '0.0'
-    wj.cell(row=r, column=9, value=(inv or {}).get('tirada', 'moneda') if inv else 'no invoca').font = AZUL
+    # T-69: el jefe llama a un aliado por turnos, hasta nivel + 1 veces; el HP
+    # ya no influye (`cadaHp` y `tirada` del JSON están obsoletos).
+    wj.cell(row=r, column=9, value='sí' if inv else 'no').font = AZUL
+    if j.get('numero') is not None:
+        wj.cell(row=r, column=10, value=j['numero']).font = AZUL
     if inv:
-        wj.cell(row=r, column=10, value=inv['cadaHp']).font = AZUL
-        wj.cell(row=r, column=11, value=f'=ROUNDUP(D{r}/J{r},0)-1')
+        wj.cell(row=r, column=11, value=f'=C{r}+1')
     else:
         wj.cell(row=r, column=11, value=0).font = AZUL
     rng = f'Niveles!$A$2:$A${ultimo_nivel}'
@@ -132,28 +135,10 @@ fin = len(jefes) + 1
 wj.conditional_formatting.add(f'R2:R{fin}', FormulaRule(formula=['R2="Revisar"'], fill=PatternFill('solid', bgColor='FFC7CE')))
 wj.conditional_formatting.add(f'R2:R{fin}', FormulaRule(formula=['R2="OK"'], fill=PatternFill('solid', bgColor='C6EFCE')))
 
-# --- Umbrales --------------------------------------------------------------
-wu = wb.create_sheet('Umbrales')
-cabecera(wu, 1, ['Jefe', 'Nº de umbral', 'HP perdidos', 'HP restantes', '% de HP restante'])
-r = 2
-for fila_jefe, j in enumerate(jefes, 2):
-    inv = j.get('invocacion')
-    if not inv:
-        continue
-    intentos = -(-j['hp'] // inv['cadaHp']) - 1
-    for k in range(1, intentos + 1):
-        wu.cell(row=r, column=1, value=f'=Jefes!A{fila_jefe}')
-        wu.cell(row=r, column=2, value=k).font = AZUL
-        wu.cell(row=r, column=3, value=f'=B{r}*Jefes!J{fila_jefe}').number_format = '#,##0'
-        wu.cell(row=r, column=4, value=f'=Jefes!D{fila_jefe}-C{r}').number_format = '#,##0'
-        wu.cell(row=r, column=5, value=f'=D{r}/Jefes!D{fila_jefe}').number_format = '0%'
-        r += 1
-wu.cell(row=r + 1, column=1, value='El golpe que deja al jefe a 0 HP no da umbral (GDD §4.4).').font = Font(name=FUENTE, italic=True)
-anchos(wu, [12, 14, 14, 14, 18])
-
 # --- Aliados ---------------------------------------------------------------
 wa = wb.create_sheet('Aliados')
-cabecera(wa, 1, ['Jefe', 'Categoría', 'Aliado', 'HP', 'HP aliado / HP jefe', 'Ataque', 'Daño', 'Efectos', 'Habilidad'])
+cabecera(wa, 1, ['Jefe', 'Categoría', 'Aliado', 'HP', 'HP aliado / HP jefe', 'Ataque', 'Daño', 'Efectos', 'Habilidad',
+                 'Nº de carta', 'Efecto del ataque', 'Script'])
 r = 2
 for fila_jefe, j in enumerate(jefes, 2):
     inv = j.get('invocacion')
@@ -164,14 +149,16 @@ for fila_jefe, j in enumerate(jefes, 2):
             continue
         a = inv['aliados'][cat]
         vals = [j['id'], cat, a['nombre'], a['hp'], None, a.get('ataque', {}).get('nombre'),
-                a.get('ataque', {}).get('dano'), a.get('efectos', 'jugador'), a.get('habilidad')]
+                a.get('ataque', {}).get('dano'), a.get('efectos', 'jugador'), a.get('habilidad'),
+                a.get('numero'), a.get('ataque', {}).get('texto'), a.get('scriptId')]
         for c, v in enumerate(vals, 1):
             if v is not None:
                 wa.cell(row=r, column=c, value=v).font = AZUL
         wa.cell(row=r, column=5, value=f'=D{r}/Jefes!D{fila_jefe}').number_format = '0.0%'
         wa.cell(row=r, column=9).alignment = Alignment(wrap_text=True, vertical='top')
+        wa.cell(row=r, column=11).alignment = Alignment(wrap_text=True, vertical='top')
         r += 1
-anchos(wa, [12, 10, 14, 8, 14, 18, 8, 10, 80])
+anchos(wa, [12, 10, 14, 8, 14, 18, 8, 10, 80, 8, 60, 18])
 wa.row_dimensions[1].height = 32
 
 for ws in wb.worksheets:

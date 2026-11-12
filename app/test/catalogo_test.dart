@@ -52,6 +52,7 @@ void main() {
       expect(c.jefes.map((j) => j.id), ['onix', 'manectric', 'kingdra', 'arceus']);
       expect(c.jefes.map((j) => j.nivel), [1, 2, 3, 4]);
       expect(c.jefes.map((j) => j.hp), [2200, 2700, 3800, 3900]);
+      expect(c.jefes.map((j) => j.numero), [1, 8, 15, 22]);
       expect(c.jefes.map((j) => j.intentosDeInvocacion), [2, 3, 4, 5]);
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
@@ -109,16 +110,73 @@ void main() {
       expect(plusle.ataqueDanoAdyacentes, 30);
       final minun = c.aliadoDe('Manectric', 2, CategoriaAliado.tanque)!;
       expect(minun.avisoAliadoCaido, contains('Paralizado'));
+      expect(minun.scriptId, 'moflete-estatico');
+      // Tóxico es un ataque sin daño; Magikarp también ataca.
+      final gulpin = c.aliadoDe('Manectric', 2, CategoriaAliado.control)!;
+      expect(gulpin.hp, 100);
+      expect(gulpin.ataqueNombre, 'Tóxico');
+      expect(gulpin.ataqueDano, 0);
+      expect(gulpin.habilidad, isNull);
+      final magikarp = c.aliadoDe('Kingdra', 3, CategoriaAliado.debilitador)!;
+      expect(magikarp.ataqueNombre, 'Salpicadura');
+      expect(magikarp.ataqueDano, 10);
+      expect(medicham.ataqueIgnoraEfectos, isTrue);
+      expect(
+        c.aliadoDe('Arceus', 4, CategoriaAliado.control)!.scriptId,
+        'fijar-blanco',
+      );
       expect(
         c.aliadoDe('Manectric', 2, CategoriaAliado.cura)!.scriptId,
         'drenadoras-10',
       );
     });
 
+    test('las 28 cartas del set están en el catálogo con su número y sus PS',
+        () async {
+      final c = await Catalogo.cargar(rootBundle);
+      final cartas = <int, (String, int)>{};
+      for (final j in c.jefes) {
+        cartas[j.numero!] = (j.nombre, j.hp);
+        for (final a in j.invocacion!.aliados.values) {
+          cartas[a.numero!] = (a.nombre, a.hp);
+        }
+      }
+      expect(cartas, {
+        1: ('Onix', 2200),
+        2: ('Machop', 70),
+        3: ('Geodude', 90),
+        4: ('Zubat', 50),
+        5: ('Rhyhorn', 100),
+        6: ('Cubone', 60),
+        7: ('Haunter', 80),
+        8: ('Manectric', 2700),
+        9: ('Plusle', 80),
+        10: ('Minun', 90),
+        11: ('Oddish', 60),
+        12: ('Gulpin', 100),
+        13: ('Poochyena', 70),
+        14: ('Zigzagoon', 50),
+        15: ('Kingdra', 3800),
+        16: ('Krabby', 70),
+        17: ('Seel', 100),
+        18: ('Golbat', 80),
+        19: ('Tentacruel', 90),
+        20: ('Horsea', 60),
+        21: ('Magikarp', 50),
+        22: ('Arceus', 3900),
+        23: ('Medicham', 90),
+        24: ('Bronzong', 100),
+        25: ('Chingling', 50),
+        26: ('Nosepass', 60),
+        27: ('Solrock', 70),
+        28: ('Lunatone', 80),
+      });
+    });
+
     test('los ataques traen los efectos de D-14', () async {
       final c = await Catalogo.cargar(rootBundle);
       final onix = c.jefes[0].ataques;
-      expect(onix.map((a) => a.nombre), ['Trampa Rocas', 'Lanzarrocas', 'Doble filo']);
+      expect(onix.map((a) => a.nombre), ['Trampa Rocas', 'Lanzarrocas', 'Doble Filo']);
       expect(onix[0].efecto!.tipo, TipoEfectoAtaque.sinRetirada);
       expect(onix[0].efecto!.duracion, 1);
       expect(onix[0].efecto!.necesitaDefensor, isTrue);

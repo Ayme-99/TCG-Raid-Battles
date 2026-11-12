@@ -4,6 +4,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
+import '../partida/recordatorios.dart';
 import 'comun.dart';
 import 'paneles.dart';
 import 'pendientes.dart';
@@ -145,35 +146,27 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
         dano: evita ? 0 : dano,
       ),
     );
-    if (aplicado && evita && context.mounted) {
-      registrarAviso(
-        context,
-        '${aliado.nombre}: moneda en cara, evita el daño.',
-      );
-    }
     if (!aplicado || aliado == null || !context.mounted) return;
-    // Derrotado: recordatorios de la carta caída y auras de otros aliados
-    // que estaban en juego (Moflete Estático).
-    if (ref.read(estadoProvider).aliadoEn(slot) != null) return;
-    final jefe = estado.jefe;
     final catalogo = ref.read(catalogoProvider).valueOrNull;
-    if (jefe == null || catalogo == null) return;
     final avisos = <String>[
-      if (catalogo
-              .aliadoDe(jefe.nombre, jefe.nivel, aliado.categoria)
-              ?.avisoAlCaer
-          case final a?)
-        a,
-      for (final enJuego in estado.aliados)
-        if (catalogo
-                .aliadoDe(jefe.nombre, jefe.nivel, enJuego.categoria)
-                ?.avisoAliadoCaido
-            case final a?)
+      if (evita)
+        '${aliado.nombre}: moneda en cara, se evita todo el daño.'
+      else if (cartaAliado != null &&
+          cartaAliado.nombre == aliado.nombre &&
+          cartaAliado.evitaDanoConMoneda)
+        '${aliado.nombre}: moneda en cruz, recibe el daño.',
+      // Derrotado: recordatorios de la carta caída y auras de los aliados
+      // que estaban en juego, él incluido (Moflete Estático).
+      if (ref.read(estadoProvider).aliadoEn(slot) == null) ...[
+        if (cartaDeAliado(catalogo, estado, aliado)?.avisoAlCaer case final a?)
           a,
+        for (final enJuego in estado.aliados)
+          if (cartaDeAliado(catalogo, estado, enJuego)?.avisoAliadoCaido
+              case final a?)
+            a,
+      ],
     ];
-    for (final a in avisos) {
-      registrarAviso(context, a);
-    }
+    registrarAvisos(context, avisos);
   }
 
   @override
@@ -182,6 +175,11 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
     final nombre = estado.jugadores[widget.jugador].nombre;
     final conAliado = estado.aliadoEn(widget.jugador) != null;
     final provocador = aliadoProvocador(estado);
+    final recordatorios = recordatoriosDeTurno(
+      ref.watch(catalogoProvider).valueOrNull,
+      estado,
+      widget.jugador,
+    );
     return Card(
       color: Theme.of(context).colorScheme.primaryContainer,
       child: Padding(
@@ -201,6 +199,15 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                   '${provocador.nombre} obliga a atacarle: ataca a ese '
                   'aliado o pasa el turno sin dañar al jefe.',
                   key: const Key('aviso-bloqueo'),
+                ),
+              ),
+            if (recordatorios.isNotEmpty)
+              Padding(
+                key: const Key('recordatorios-turno'),
+                padding: const EdgeInsets.only(top: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [for (final r in recordatorios) Text('• $r')],
                 ),
               ),
             if (conAliado)

@@ -84,6 +84,9 @@ class AtaqueJefeCatalogo {
 class AliadoCatalogo {
   final CategoriaAliado categoria;
   final String nombre;
+
+  /// Número de la carta en el set (informativo).
+  final int? numero;
   final int hp;
   final String? ataqueNombre;
 
@@ -118,6 +121,21 @@ class AliadoCatalogo {
   /// El ataque exige una moneda del jugador rival (Fuerza Lunar).
   final bool ataqueMonedaRival;
 
+  /// El daño del ataque no se ve afectado por ningún efecto en el Pokémon
+  /// Defensor (Energía Pura, Allanamiento).
+  final bool ataqueIgnoraEfectos;
+
+  /// Lo que la mesa tiene que hacer cuando el aliado entra en juego.
+  final String? avisoAlEntrar;
+
+  /// Lo que la mesa tiene que hacer en cada Chequeo Pokémon mientras el
+  /// aliado está en juego.
+  final String? avisoChequeo;
+
+  /// Regla que cada jugador tiene que recordar en su turno mientras el aliado
+  /// está en juego (o, si su efecto es permanente, el resto de la partida).
+  final String? avisoTurno;
+
   /// Recordatorio al derrotar al aliado con un ataque de los jugadores.
   final String? avisoAlCaer;
 
@@ -133,6 +151,11 @@ class AliadoCatalogo {
     required this.categoria,
     required this.nombre,
     required this.hp,
+    this.numero,
+    this.ataqueIgnoraEfectos = false,
+    this.avisoAlEntrar,
+    this.avisoChequeo,
+    this.avisoTurno,
     this.ataqueNombre,
     this.ataqueDano,
     this.ataqueMonedas,
@@ -187,6 +210,9 @@ class JefeCatalogo {
   final String nombre;
   final int nivel;
 
+  /// Número de la carta en el set (informativo).
+  final int? numero;
+
   /// Mapa o escenario del jefe (informativo).
   final String? mapa;
   final int hp;
@@ -202,6 +228,7 @@ class JefeCatalogo {
     required this.hp,
     required this.ataques,
     this.mapa,
+    this.numero,
     this.invocacion,
   });
 
@@ -222,6 +249,7 @@ class JefeCatalogo {
       nombre: _texto(m, 'nombre'),
       nivel: _entero(m, 'nivel', id),
       mapa: m['mapa'] as String?,
+      numero: m['numero'] == null ? null : _entero(m, 'numero', id),
       hp: _entero(m, 'hp', id),
       ataques: [
         for (final a in ataques)
@@ -256,6 +284,11 @@ class JefeCatalogo {
       resultado[categoria] = AliadoCatalogo(
         categoria: categoria,
         nombre: _texto(am, 'nombre'),
+        numero: am['numero'] == null ? null : _entero(am, 'numero', id),
+        ataqueIgnoraEfectos: atm?['ignoraEfectos'] == true,
+        avisoAlEntrar: am['avisoAlEntrar'] as String?,
+        avisoChequeo: am['avisoChequeo'] as String?,
+        avisoTurno: am['avisoTurno'] as String?,
         hp: _entero(am, 'hp', id),
         ataqueNombre: atm == null ? null : _texto(atm, 'nombre'),
         ataqueDano: atm == null ? null : _entero(atm, 'dano', id),
@@ -313,9 +346,13 @@ class Catalogo {
       invocacionDe(nombre, nivel)?.aliados[categoria];
 
   /// Invocación de la carta del catálogo del jefe [nombre] de ese [nivel].
-  InvocacionCatalogo? invocacionDe(String nombre, int nivel) {
+  InvocacionCatalogo? invocacionDe(String nombre, int nivel) =>
+      jefeDe(nombre, nivel)?.invocacion;
+
+  /// Carta del catálogo del jefe [nombre] de ese [nivel], o null.
+  JefeCatalogo? jefeDe(String nombre, int nivel) {
     for (final j in jefes) {
-      if (j.nombre == nombre && j.nivel == nivel) return j.invocacion;
+      if (j.nombre == nombre && j.nivel == nivel) return j;
     }
     return null;
   }

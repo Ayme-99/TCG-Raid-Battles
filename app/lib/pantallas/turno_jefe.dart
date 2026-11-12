@@ -6,6 +6,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
+import '../partida/recordatorios.dart';
 import 'carta_ataque_jefe.dart';
 import 'comun.dart';
 import 'paneles.dart';
@@ -30,6 +31,10 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
   /// La última carta registrada decía «Roba una carta más».
   bool _robaOtra = false;
 
+  /// La mesa ya ha hecho el Chequeo Pokémon de este turno (los recordatorios
+  /// de los aliados en juego).
+  bool _chequeoHecho = false;
+
   void _robar(EstadoPartida estado) {
     final mazo = ref.read(mazoAtaquesJefeProvider);
     setState(() {
@@ -45,6 +50,7 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
       _ronda = estado.ronda;
       _carta = null;
       _robaOtra = false;
+      _chequeoHecho = false;
     }
     final registrados = estado.ataquesJefeEnTurno;
     final maximo = maxAtaquesJefePorTurno(jefe.nivel);
@@ -69,6 +75,14 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
         if (a.tieneAtaque && !a.atacoEnTurnoJefe) a,
     ];
     final debeRobarOtra = carta == null && _robaOtra && registrados < maximo;
+    // Cierre del turno, paso a paso (T-70): primero atacan los aliados, luego
+    // la mesa hace el Chequeo Pokémon y solo entonces se termina el turno.
+    // Así los KO que salgan de esos pasos se marcan dentro del turno del jefe.
+    final chequeo = recordatoriosDeChequeo(
+      ref.watch(catalogoProvider).valueOrNull,
+      estado,
+    );
+    final faltaChequeo = chequeo.isNotEmpty && !_chequeoHecho;
     final controles = <Widget>[
       const PanelPendientes(),
       if (carta != null)
@@ -90,40 +104,40 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
             label: const Text('Robar otra carta'),
           ),
         const SizedBox(height: 8),
-        _BotonFinTurno(jefe: jefe, destacado: !debeRobarOtra),
+        if (aliadosPorAtacar.isNotEmpty)
+          for (final a in aliadosPorAtacar)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: FilledButton.tonal(
+                key: Key('aliado-ataca-${a.slot}'),
+                onPressed: () => atacarConAliado(context, ref, estado, a),
+                child: Text('${a.nombre} ataca: ${textoAtaque(a)}'),
+              ),
+            )
+        else if (faltaChequeo)
+          FilledButton.tonal(
+            key: const Key('chequeo-pokemon'),
+            onPressed: () async {
+              await avisarMesa(
+                context,
+                titulo: 'Chequeo Pokémon',
+                lineas: [
+                  ...chequeo,
+                  'Si algún Pokémon queda Fuera de Combate, márcalo antes de '
+                      'terminar el turno del jefe.',
+                ],
+              );
+              if (mounted) setState(() => _chequeoHecho = true);
+            },
+            child: const Text('Chequeo Pokémon'),
+          )
+        else
+          _BotonFinTurno(jefe: jefe, destacado: !debeRobarOtra),
       ],
     ];
     // El panel del ataque solo lleva el ataque; lo demás va en «Más acciones».
     final extras = <Widget>[
       const PanelEfectosActivos(),
-        if (aliadosPorAtacar.isNotEmpty)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Ataques de los aliados',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      for (final a in aliadosPorAtacar)
-                        FilledButton.tonal(
-                          key: Key('aliado-ataca-${a.slot}'),
-                          onPressed: () =>
-                              atacarConAliado(context, ref, estado, a),
-                          child: Text('${a.nombre} ataca (${a.ataqueDano})'),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
         const PanelEstados(),
         const PanelPokemon(),
     ];
@@ -348,14 +362,27 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
               key: const Key('registrar-ataque-jefe'),
               onPressed: faltaDefensor
                   ? null
-                  : () {
+                  : () async {
+                      // Daño extra condicionado a la mesa (Castigo): la app
+                      // pregunta si se cumple y lo suma.
+                      var extra = 0;
+                      if (efecto != null &&
+                          efecto.tipo == TipoEfectoAtaque.danoExtraSi &&
+                          efecto.valor != null) {
+                        final cumple = await preguntarMesa(
+                          context,
+                          '${ataque!.nombre}: ${efecto.texto}\n¿Se cumple?',
+                        );
+                        if (cumple == null || !context.mounted) return;
+                        if (cumple) extra = efecto.valor!;
+                      }
                       // La moneda del ataque la lanza la app y queda en el
                       // registro (D-14).
                       final moneda =
                           efecto != null && efecto.conMoneda ? Random().nextBool() : null;
                       // Bonus de los aliados Potenciador vivos (D-16): la app
                       // tira sus monedas y suma el bonus al daño registrado.
-                      final base = int.tryParse(_dano.text) ?? 0;
+                      final base = (int.tryParse(_dano.text) ?? 0) + extra;
                       var total = base;
                       final partesBonus = <String>[];
                       for (final b in bonusAtaqueJefeActivos(estado)) {
@@ -384,9 +411,12 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                             moneda
                                 ? 'Moneda: cara. ${efecto!.texto}'
                                 : 'Moneda: cruz. No pasa nada.',
+                          if (extra > 0) 'Se cumple: +$extra de daño.',
                           if (partesBonus.isNotEmpty)
                             'Potenciador (${partesBonus.join(' · ')}). '
                                 'Daño total: $total.',
+                          if (extra > 0 && partesBonus.isEmpty)
+                            'Daño total: $total.',
                         ];
                         if (avisos.isNotEmpty) {
                           registrarAviso(context, avisos.join('\n'));

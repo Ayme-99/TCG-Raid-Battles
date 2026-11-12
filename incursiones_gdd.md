@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.13 (especificación del motor)
+**Versión:** 1.14 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -124,6 +124,7 @@ Detalle en `docs/D-04-aliados.md`.
 - **Objetivo del aliado**: el dueño de su slot, siempre. Si ese jugador está eliminado, se tira entre los jugadores activos (moneda / dado de 3 / dado de 4); con un solo jugador activo, ataca a ese jugador.
 - Si el dueño de un slot queda eliminado, su aliado **sigue vivo y atacando**.
 - Las **habilidades** de los aliados (reducir daño al jefe, aumentar el daño del jefe, forzar a la banca al atacante...) las aplica el **programa** o el **jugador** según indique la carta (D-13). Las del jugador se resuelven en la mesa y el asistente solo las registra.
+- **Cierre del turno del jefe (T-70)**: después de los ataques del jefe atacan los aliados que tengan ataque, luego la mesa hace el **Chequeo Pokémon** (efectos de los aliados en juego, como Tormenta de Arena, y después los estados del jefe) y se termina el turno. Los KO que salgan de los ataques de los aliados o del chequeo cuentan como KO del turno del jefe. Qué aplica el programa y qué la mesa con cada carta está en `docs/CARTAS.md`.
 
 ### 4.5 Curación del jefe
 
@@ -276,3 +277,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.11 | El jefe roba de un mazo de 20 cartas de ataque que lleva la app (las del PDF oficial de Incursión Max): cada carta dice el ataque, el jugador atacado y si se roba otra. Máximo de ataques por turno según el nivel (Nv1: 2, Nv2: 3, Nv3 y Nv4: 4). Las cartas que apuntan a un jugador que no juega o está eliminado se descartan. Deja de ser física la carta del jefe. HP de los jefes recalibrados con ese mazo (4 jugadores): Onix 2400 / Manectric 2700 / Kingdra 3800 / Arceus 3500. |
 | v1.12 | Catálogo de prueba de 32 cartas (4 por tipo). Minun (Manectric): Moflete Estático pasa a ser un aura, mientras esté en juego, cada aliado derrotado por un ataque de los jugadores paraliza al Pokémon atacante. HP de los jefes recalibrados (4 jugadores): Onix 2200 / Manectric 2700 / Kingdra 3800 / Arceus 3900. |
 | v1.13 | Llamada de aliados estilo Sol y Luna (T-69): el jefe llama a un aliado al empezar su segundo turno o el turno siguiente a que caiga el anterior, uno cada vez, máximo nivel + 1 llamadas, sin moneda ni umbrales de HP; los dados siguen eligiendo slot y categoría. Los HP de los jefes no cambian. |
+| v1.14 | Las 28 cartas del set en el catálogo, con los textos de las cartas (T-70, `docs/CARTAS.md`): Tóxico (Gulpin) pasa a ser un ataque sin daño y Magikarp gana Salpicadura. Moflete Estático lo aplica el programa (el jugador que deja fuera de combate a un aliado queda Paralizado su siguiente turno) y Fijar Blanco queda apuntado el resto de la partida. Cierre del turno del jefe por pasos: ataques de los aliados, Chequeo Pokémon y fin. El asistente recuerda a la mesa, en su momento, lo que tiene que aplicar a sus Pokémon. Los HP de los jefes no cambian. |

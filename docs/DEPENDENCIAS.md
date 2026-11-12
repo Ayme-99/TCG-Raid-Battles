@@ -14,6 +14,9 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 | | El índice `catalog/catalogo.json`: sube su `version` en 1 (en cada cambio de contenido) | ❌ (solo comprueba que lista los jefes que existen) |
 | | La hoja de balance: `python3 balance/scripts/generar_hoja.py`, recalcular con LibreOffice y subir `balance/hoja_balance.xlsx` | ✅ `balance/scripts/comprobar_hoja.py` (CI: «Hoja de balance al día») |
 | | `docs/playtests/GUION.md` si cita ese jefe o sus aliados (escrito a mano) | ❌ |
+| | `docs/CARTAS.md` (las 28 cartas del set: qué hace la app y qué la mesa con cada una) | ⚠️ `app/test/catalogo_test.dart` comprueba el número, el nombre y los PS de las 28 cartas; los textos no |
+| Una **carta** en PokeCardMaker (texto, PS, ataque o habilidad) | El jefe en `catalog/bosses/*.json` (los textos se copian tal cual) y todo lo de la fila anterior | ❌ (las cartas viven fuera del repo) |
+| Un **recordatorio** de una carta (`avisoAlEntrar`, `avisoChequeo`, `avisoTurno`, `avisoAliadoCaido`) | Nada más: la app los lee del catálogo (`app/lib/partida/recordatorios.dart`) | ✅ `app/test/recordatorios_test.dart` |
 | | El informe de simulación del jefe: `cd sim && dart run bin/sim_jefes.dart` (escribe `balance/informes/jefes_aliados.csv`; el simulador lee HP, ataques y aliados del catálogo) | ⚠️ el CI solo comprueba que el simulador compila y arranca, no que el informe esté al día |
 | Que un aliado use `programa` y su `scriptId` | El script en `engine/lib/src/scripts_aliado.dart` (`scriptsAliado`) **antes** que el jefe | ✅ `engine/test/catalogo_scripts_test.dart` |
 | El esquema del jefe (`catalog/schema/boss.schema.json`) | El modelo de la app `app/lib/catalogo/catalogo.dart` (lee los campos a mano) | ⚠️ `catalogo_test.dart` falla si falta o cambia un campo que la app lee, pero **no** si añades un campo nuevo que la app ignora |

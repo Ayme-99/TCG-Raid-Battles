@@ -211,4 +211,38 @@ void main() {
       expect(s.debilitados, isEmpty);
     });
   });
+
+  group('Fijar Blanco (Nosepass)', () {
+    AliadoInvocado nosepass(CategoriaAliado c, int slot) => AliadoInvocado(
+          slot: slot,
+          categoria: c,
+          nombre: 'Nosepass',
+          hp: 60,
+          habilidad: 'Fijar Blanco: la primera moneda de cada jugador es cruz.',
+          efectos: EfectosAliado.programa,
+          scriptId: 'fijar-blanco',
+        );
+
+    test('deja un efecto que sigue aplicado aunque Nosepass caiga', () {
+      var s = apply(conJefe(), nosepass(CategoriaAliado.control, 1));
+      final f = s.efectosPermanentes.single;
+      expect(f.scriptId, 'fijar-blanco');
+      expect(f.origen, 'Nosepass');
+      expect(f.texto, contains('cruz'));
+      s = act(s, const AtaqueAAliado(jugador: 1, slot: 1, dano: 60));
+      expect(s.aliados, isEmpty);
+      expect(s.efectosPermanentes, hasLength(1));
+    });
+
+    test('no se apunta dos veces', () {
+      var s = apply(conJefe(), nosepass(CategoriaAliado.control, 1));
+      s = apply(s, nosepass(CategoriaAliado.debilitador, 2));
+      expect(s.efectosPermanentes, hasLength(1));
+    });
+
+    test('sin Nosepass no hay efectos permanentes', () {
+      final s = apply(conJefe(), aliado(CategoriaAliado.cura, 'chupavidas-10'));
+      expect(s.efectosPermanentes, isEmpty);
+    });
+  });
 }

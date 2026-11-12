@@ -6,6 +6,7 @@ App Flutter para tablet ("tablet en medio de la mesa"). Es una interfaz fina: to
 
 Partida completa en local, con inicio de sesión y envío de resultados (T-09):
 
+- `lib/partida/recordatorios.dart`: qué hay que recordarle a la mesa y cuándo (al entrar un aliado, en el turno de cada jugador y en el Chequeo Pokémon). Funciones puras sobre el estado del motor y las cartas del catálogo; los textos salen de `avisoAlEntrar`, `avisoChequeo` y `avisoTurno` de cada carta (`docs/CARTAS.md`).
 - `lib/partida/controlador_partida.dart`: el controlador (Riverpod). Guarda el `Historial` del motor y expone `registrar(evento)` (devuelve `null` o el motivo del rechazo), `deshacer`, `rehacer`, `nuevaPartida` y `registro(cuentas)`, que genera el JSON del contrato (`contrato/`).
 - `lib/pantallas/`: una sola pantalla (`PantallaPartida`) que cambia según la fase del motor. En juego, la **mesa** (`mesa.dart`) ocupa toda la pantalla: cámara 2.5D sobre el jefe, los aliados y los jugadores, con sus cartas (`carta.dart`, imágenes en `assets/cartas/`) y los controles en un bocadillo que sale del asiento del jugador que actúa (`panel_acciones.dart`; por debajo de 1100 px de ancho va plegable bajo la mesa). La cámara se queda en vista general y solo se mueve con eventos (dados, ataques del jefe o de los aliados). Fases:
   - `setup.dart`: jugadores y mejor ataque (calcula X y el nivel) y elección del jefe.

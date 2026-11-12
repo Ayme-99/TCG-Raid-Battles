@@ -4,6 +4,8 @@ Estado: **cerrada** (2026-11-08). Issue #116. Propuesta de Ayme; nada de esto es
 
 Amplía D-13: cada jefe pasa de 4 a **6 aliados, uno por categoría**, para que dos partidas contra el mismo jefe se parezcan menos entre sí. D-04 (slots, bloqueo, ayuda, objetivo del aliado, exceso de daño, umbrales) y el resto de D-13 no cambian.
 
+> **T-70:** los textos, PS y ataques vigentes de cada aliado son los de las cartas del set y están en [`CARTAS.md`](./CARTAS.md) y en el catálogo. Lo que sigue es la decisión original y puede no coincidir con las cartas actuales.
+
 ## 1. Las 6 categorías
 
 | Categoría | Qué hace | A quién afecta | Hoy |

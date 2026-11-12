@@ -12,7 +12,7 @@ El simulador lee estas tablas, así que cambiar un CSV y volver a simular es tod
 
 ## Hoja de balance de los jefes (T-31)
 
-`hoja_balance.xlsx` resume los jefes del catálogo: HP, ataques, umbrales de invocación, aliados y su poder (HP × amenaza esperada) frente al de referencia del nivel. Es **solo de lectura**: el JSON de `catalog/` manda. Para cambiar una cifra, edita el JSON y regenera la hoja:
+`hoja_balance.xlsx` resume los jefes del catálogo: HP, ataques, llamadas de aliado, aliados (con el número de su carta) y su poder (HP × amenaza esperada) frente al de referencia del nivel. Es **solo de lectura**: el JSON de `catalog/` manda. Para cambiar una cifra, edita el JSON y regenera la hoja:
 
 ```
 python3 balance/scripts/generar_hoja.py

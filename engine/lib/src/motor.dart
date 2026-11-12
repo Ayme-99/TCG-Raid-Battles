@@ -655,10 +655,28 @@ EstadoPartida _ataqueAAliado(
       else if (restante > 0)
         a.copiarCon(hp: restante),
   ];
+  // Moflete Estático: si el ataque deja fuera de combate a un aliado mientras
+  // el aura está en juego (cuenta también el propio aliado que cae), el
+  // Pokémon atacante queda Paralizado. Dura lo que queda de este turno de los
+  // jugadores y todo el siguiente, que es el que pierde.
+  final paraliza = restante <= 0 && paralizaAlCaerAliado(e, scripts);
   final conDano = e.copiarCon(
     aliados: aliados,
     aliadosDerrotados: e.aliadosDerrotados + (restante > 0 ? 0 : 1),
     debilitados: _sinDebilitar(e, ev.jugador),
+    efectosActivos: !paraliza
+        ? null
+        : [
+            for (final f in e.efectosActivos)
+              if (f.tipo != TipoEfectoAtaque.paralizarDefensor ||
+                  f.jugador != ev.jugador)
+                f,
+            EfectoActivo(
+              tipo: TipoEfectoAtaque.paralizarDefensor,
+              jugador: ev.jugador,
+              restantes: 2,
+            ),
+          ],
   );
   return _avanzarTurno(conDano, e.turnoActual + 1);
 }
@@ -736,6 +754,17 @@ EstadoPartida _aliadoInvocado(
   if (aliado.efectos != EfectosAliado.programa) return nuevo;
   final script = scripts[aliado.scriptId]!;
   var resultado = nuevo;
+  if (script.efectoPermanente &&
+      !nuevo.efectosPermanentes.any((f) => f.scriptId == aliado.scriptId)) {
+    resultado = resultado.copiarCon(efectosPermanentes: [
+      ...nuevo.efectosPermanentes,
+      EfectoPermanente(
+        scriptId: aliado.scriptId!,
+        origen: aliado.nombre,
+        texto: aliado.habilidad,
+      ),
+    ]);
+  }
   final alEntrar = script.alEntrar;
   if (alEntrar != null) resultado = alEntrar(resultado, aliado);
   final conEvento = script.alEntrarConEvento;

@@ -58,6 +58,10 @@
 // habilidad: «Tormenta de arena» (control: 10 de daño al Pokémon activo de
 // cada jugador en el chequeo Pokémon, tras el turno del jefe) y «Rencor»
 // (debilitador: los jugadores no repiten ataque dos turnos seguidos).
+// No se modelan (los resuelve la mesa y no hay Condiciones Especiales de los
+// jugadores en el simulador): Tóxico (Gulpin, ataque sin daño que envenena),
+// la Confusión de Puño Dinámico, Fijar Blanco y la parálisis de Moflete
+// Estático.
 //
 // NO modela (el informe lo dice): veneno ni quemadura del jefe, ni el cambio de
 // Pokémon activo por efectos. Por eso las cifras siguen siendo una cota
@@ -145,7 +149,8 @@ class AliadoDef {
   int get drenadoras => _numero('drenadoras-');
 
   /// Daño al Pokémon activo de cada jugador en el chequeo Pokémon.
-  int get danoChequeo => habilidadNombre == 'Tormenta de arena' ? 10 : 0;
+  int get danoChequeo =>
+      habilidadNombre?.toLowerCase() == 'tormenta de arena' ? 10 : 0;
 
   /// Los jugadores solo pueden atacar a este aliado (Bloqueo) y este recibe
   /// N de daño menos de cada ataque.
