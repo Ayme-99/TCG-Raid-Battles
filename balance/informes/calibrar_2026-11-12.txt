@@ -1,0 +1,11 @@
+Calibración con la llamada de aliados estilo Sol y Luna (T-69). 150 equipos x 60 partidas, ayuda=0.5, política solo-dueno. Objetivo 75/50/30/15 %.
+
+HP del catálogo (Onix 2200 / Manectric 2700 / Kingdra 3800 / Arceus 3900)
+4 jugadores: onix 64,1 %   manectric 38,3 %   kingdra 26,9 %   arceus 13,6 %
+3 jugadores: onix 39,6 %   manectric  6,6 %   kingdra  6,2 %   arceus  0,9 %
+
+HP calibrados con la regla nueva (no aplicados: los HP se quedan como en #177)
+4 jugadores: onix 1900 (77,5)  manectric 2400 (54,2)  kingdra 3700 (30,8)  arceus 3800 (16,6)
+3 jugadores: onix 1500 (77,4)  manectric 1600 (55,1)  kingdra 2900 (33,8)  arceus 3100 (14,7)
+
+Llamadas hechas por partida (4 jugadores, de las posibles): onix 1,80/2  manectric 2,67/3  kingdra 3,25/4  arceus 3,81/5.
