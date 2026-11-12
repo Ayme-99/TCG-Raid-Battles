@@ -80,6 +80,9 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # Fijada: Flutter 3.50 declara obsoleto `package:flutter/material.dart`
+          # y `flutter analyze` falla en toda la app. Se quita al migrar.
+          flutter-version: 3.47.9
           cache: true
       - run: flutter pub get
       - run: flutter analyze
@@ -96,6 +99,9 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # Fijada: Flutter 3.50 declara obsoleto `package:flutter/material.dart`
+          # y `flutter analyze` falla en toda la app. Se quita al migrar.
+          flutter-version: 3.47.9
           cache: true
       - run: flutter pub get
       - run: flutter build web --release
