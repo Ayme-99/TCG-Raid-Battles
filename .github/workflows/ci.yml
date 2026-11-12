@@ -99,3 +99,26 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build web --release
+
+  experimento:
+    name: Experimento temporal (T-69)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        jug: [4, 3]
+    defaults:
+      run:
+        working-directory: sim
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - run: dart pub get
+      - run: |
+          echo "== HP del catalogo, jugadores=${{ matrix.jug }}"
+          dart run bin/sim_jefes.dart --jugadores=${{ matrix.jug }} --equipos=150 --partidas=60 --causas --informe=/tmp/x.csv
+          echo "== calibrar, jugadores=${{ matrix.jug }}"
+          dart run bin/sim_jefes.dart --calibrar --jugadores=${{ matrix.jug }} --equipos=150 --partidas=60 --informe=/tmp/y.csv
