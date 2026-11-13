@@ -68,7 +68,9 @@ class JefeEstado {
   final int hpMaximo;
   final int hp;
 
-  /// Cada cuántos HP perdidos hay un intento de invocar un aliado (D-04 §7).
+  /// Cada cuántos HP perdidos el jefe vuelve a llamar a un aliado (después de
+  /// la primera llamada, que sale al terminar su primer turno). El jefe llama
+  /// como mucho nivel + 1 veces por partida.
   /// null: el jefe nunca invoca.
   final int? invocacionCadaHp;
 
@@ -221,6 +223,29 @@ class RegistroCartaAnimo {
 
 List<T> _fija<T>(List<T> lista) => List<T>.unmodifiable(lista);
 
+/// Efecto de un aliado que sigue aplicado el resto de la partida aunque el
+/// aliado quede fuera de combate (Fijar Blanco). Lo resuelve la mesa; el
+/// asistente lo recuerda.
+class EfectoPermanente {
+  /// Script que lo dejó (no se repite).
+  final String scriptId;
+
+  /// Aliado que lo dejó.
+  final String origen;
+
+  /// Texto de la carta, tal como lo lee la mesa.
+  final String? texto;
+
+  const EfectoPermanente({
+    required this.scriptId,
+    required this.origen,
+    this.texto,
+  });
+
+  Map<String, Object?> toJson() =>
+      {'scriptId': scriptId, 'origen': origen, 'texto': texto};
+}
+
 /// Estado completo e inmutable de una partida.
 ///
 /// Solo cambia al aplicar un evento con `apply` (ver `motor.dart`).
@@ -295,9 +320,10 @@ class EstadoPartida {
   /// Aliados derrotados en la partida (para estadísticas).
   final int aliadosDerrotados;
 
-  /// Umbrales de invocación ya cruzados. Cada umbral cuenta una sola vez
-  /// por partida aunque el jefe se cure y vuelva a cruzarlo.
-  final int umbralesCruzados;
+  /// Llamadas de aliado que el jefe ya ha hecho (T-69/T-71): cuenta cada
+  /// intento de invocación generado, sea por la primera llamada o por un
+  /// umbral de HP. El máximo es el nivel más uno.
+  final int llamadasAliado;
 
   /// Intentos de invocación que la mesa aún tiene que resolver.
   final int intentosInvocacionPendientes;
@@ -314,6 +340,9 @@ class EstadoPartida {
   /// Reducción de daño pendiente por jugador (Fuerza Lunar): se resta del
   /// próximo ataque que haga ese jugador y se consume al hacerlo.
   final Map<int, int> debilitados;
+
+  /// Efectos de aliados que duran el resto de la partida (Fijar Blanco).
+  final List<EfectoPermanente> efectosPermanentes;
 
   EstadoPartida({
     required this.fase,
@@ -334,13 +363,16 @@ class EstadoPartida {
     required this.curacionJefe,
     required List<AliadoEstado> aliados,
     required this.aliadosDerrotados,
-    required this.umbralesCruzados,
+    required this.llamadasAliado,
     required this.intentosInvocacionPendientes,
     required this.resultado,
     List<EfectoActivo>? efectosActivos,
     this.koTrasAtaqueAliado = false,
     this.debilitados = const {},
+    List<EfectoPermanente>? efectosPermanentes,
   })  : jugadores = _fija(jugadores),
+        efectosPermanentes =
+            _fija(efectosPermanentes ?? const <EfectoPermanente>[]),
         orden = _fija(orden),
         prioridad = _fija(prioridad),
         cartasAnimoPendientes = _fija(cartasAnimoPendientes),
@@ -370,7 +402,7 @@ class EstadoPartida {
         curacionJefe: 0,
         aliados: const [],
         aliadosDerrotados: 0,
-        umbralesCruzados: 0,
+        llamadasAliado: 0,
         intentosInvocacionPendientes: 0,
         resultado: null,
       );
@@ -429,12 +461,13 @@ class EstadoPartida {
     int? curacionJefe,
     List<AliadoEstado>? aliados,
     int? aliadosDerrotados,
-    int? umbralesCruzados,
+    int? llamadasAliado,
     int? intentosInvocacionPendientes,
     Resultado? resultado,
     List<EfectoActivo>? efectosActivos,
     bool? koTrasAtaqueAliado,
     Map<int, int>? debilitados,
+    List<EfectoPermanente>? efectosPermanentes,
   }) =>
       EstadoPartida(
         fase: fase ?? this.fase,
@@ -456,11 +489,12 @@ class EstadoPartida {
         curacionJefe: curacionJefe ?? this.curacionJefe,
         aliados: aliados ?? this.aliados,
         aliadosDerrotados: aliadosDerrotados ?? this.aliadosDerrotados,
-        umbralesCruzados: umbralesCruzados ?? this.umbralesCruzados,
+        llamadasAliado: llamadasAliado ?? this.llamadasAliado,
         intentosInvocacionPendientes:
             intentosInvocacionPendientes ?? this.intentosInvocacionPendientes,
         koTrasAtaqueAliado: koTrasAtaqueAliado ?? this.koTrasAtaqueAliado,
         debilitados: debilitados ?? this.debilitados,
+        efectosPermanentes: efectosPermanentes ?? this.efectosPermanentes,
         resultado: resultado ?? this.resultado,
         efectosActivos: efectosActivos ?? this.efectosActivos,
       );
@@ -485,13 +519,17 @@ class EstadoPartida {
         'curacionJefe': curacionJefe,
         'aliados': [for (final a in aliados) a.toJson()],
         'aliadosDerrotados': aliadosDerrotados,
-        'umbralesCruzados': umbralesCruzados,
+        'llamadasAliado': llamadasAliado,
         'intentosInvocacionPendientes': intentosInvocacionPendientes,
         'koTrasAtaqueAliado': koTrasAtaqueAliado,
         if (debilitados.isNotEmpty)
           'debilitados': {
             for (final k in debilitados.keys) '$k': debilitados[k],
           },
+        if (efectosPermanentes.isNotEmpty)
+          'efectosPermanentes': [
+            for (final f in efectosPermanentes) f.toJson(),
+          ],
         'resultado': resultado?.name,
         'efectosActivos': [for (final f in efectosActivos) f.toJson()],
       };

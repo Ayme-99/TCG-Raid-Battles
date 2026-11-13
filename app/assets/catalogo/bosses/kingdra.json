@@ -4,6 +4,7 @@
   "nombre": "Kingdra",
   "nivel": 3,
   "mapa": "Islas Remolino",
+  "numero": 15,
   "hp": 3700,
   "ataques": [
     {
@@ -11,7 +12,7 @@
       "dano": 60,
       "efecto": {
         "tipo": "ignoraEfectos",
-        "texto": "El daño de este ataque no se ve afectado por ningún efecto en el Pokémon Activo rival."
+        "texto": "El daño de este ataque no se ve afectado por ningún efecto en el Pokémon Defensor."
       }
     },
     {
@@ -24,11 +25,12 @@
     }
   ],
   "invocacion": {
-    "cadaHp": 925,
+    "cadaHp": 950,
     "tirada": "segura",
     "aliados": {
       "danio": {
         "nombre": "Krabby",
+        "numero": 16,
         "hp": 70,
         "ataque": {
           "nombre": "Martillazo",
@@ -38,49 +40,61 @@
             "carasMinimas": 1,
             "dano": 50
           },
-          "texto": "Lanza dos monedas: si sale cara en alguna de ellas, este ataque hace 50 puntos de daño más."
+          "texto": "Lanza 2 monedas. Si al menos una sale cara, este ataque hace 50 puntos de daño más."
         }
       },
       "tanque": {
         "nombre": "Seel",
+        "numero": 17,
         "hp": 100,
         "habilidadNombre": "Velo Sagrado",
-        "habilidad": "Evita que el jefe y los aliados sufran efectos de estado. Al entrar, el jefe pierde los que tuviera (lo aplica la app).",
+        "habilidad": "Mientras este Pokémon esté en juego, el jefe y los aliados no pueden pasar a estar afectados por Condiciones Especiales. Cuando este Pokémon entra en juego, les quita todas las Condiciones Especiales.",
+        "avisoTurno": "Velo Sagrado: el jefe y los aliados no pueden recibir Condiciones Especiales.",
         "efectos": "programa",
         "scriptId": "velo-sagrado"
       },
       "cura": {
         "nombre": "Golbat",
+        "numero": 18,
         "hp": 80,
         "ataque": {
           "nombre": "Chupavidas",
           "dano": 30,
+          "ignoraEfectos": true,
           "texto": "Cura 30 puntos de daño al jefe y a los aliados."
         },
         "habilidadNombre": "Allanamiento",
-        "habilidad": "Los ataques de Golbat no se ven afectados por ningún efecto en el Pokémon Activo del rival.",
+        "habilidad": "El daño de los ataques de este Pokémon no se ve afectado por ningún efecto en el Pokémon Defensor.",
         "efectos": "programa",
         "scriptId": "chupavidas-30"
       },
       "control": {
         "nombre": "Tentacruel",
+        "numero": 19,
         "hp": 90,
         "habilidadNombre": "Constricción",
-        "habilidad": "Mientras Tentacruel esté en juego, los jugadores no pueden cambiar el Pokémon Activo por uno de la Banca."
+        "habilidad": "Mientras este Pokémon esté en juego, los jugadores no pueden cambiar su Pokémon Activo por uno de la Banca.",
+        "avisoTurno": "Constricción: no puedes cambiar tu Pokémon Activo por uno de la Banca."
       },
       "potenciador": {
         "nombre": "Horsea",
+        "numero": 20,
         "hp": 60,
         "habilidadNombre": "Agilidad",
-        "habilidad": "Mientras Horsea esté en juego, el primer ataque del jefe en cada turno hace 30 puntos de daño más (lo suma la app).",
+        "habilidad": "Mientras este Pokémon esté en juego, el primer ataque del jefe en cada turno del jefe hace 30 puntos de daño más.",
         "efectos": "programa",
         "scriptId": "agilidad-30"
       },
       "debilitador": {
         "nombre": "Magikarp",
+        "numero": 21,
         "hp": 50,
+        "ataque": {
+          "nombre": "Salpicadura",
+          "dano": 10
+        },
         "habilidadNombre": "Bote",
-        "habilidad": "Cada vez que Magikarp va a recibir daño, se lanza una moneda: si sale cara, se evita ese daño (lo tira la app al atacarlo).",
+        "habilidad": "Cada vez que este Pokémon vaya a recibir daño de un ataque, el jugador atacante lanza 1 moneda. Si sale cara, se evita todo ese daño.",
         "evitaDanoConMoneda": true
       }
     }

@@ -258,23 +258,39 @@ EstadoPartida _turnoJugador(
       resultado: Resultado.victoria,
     );
   }
-  return _avanzarTurno(_cruzarUmbrales(conDano), e.turnoActual + 1);
+  return _avanzarTurno(_llamarAliados(conDano), e.turnoActual + 1);
 }
 
-/// Cuenta los umbrales de invocación que el jefe acaba de cruzar. Cada
-/// umbral cuenta una sola vez por partida y el último (HP 0) no existe.
-EstadoPartida _cruzarUmbrales(EstadoPartida e) {
-  final jefe = e.jefe!;
-  final cada = jefe.invocacionCadaHp;
-  if (cada == null) return e;
-  final maximo = (jefe.hpMaximo - 1) ~/ cada;
+/// Máximo de aliados que el jefe puede llamar en una partida (T-69): el
+/// nivel más uno.
+int maxLlamadasAliado(int nivel) => nivel + 1;
+
+/// Llamadas de aliados del jefe (T-69, corregido en T-71). El jefe llama:
+///  - la primera vez, al terminar su turno de la ronda 1, y
+///  - después, cada vez que su HP baja a un umbral definido (cada
+///    `invocacionCadaHp` HP perdidos; los umbrales ya cruzados cuentan aunque
+///    se cruzaran antes de la primera llamada, y una sola vez por partida).
+/// Como mucho nivel + 1 llamadas por partida. No las frenan monedas, estados
+/// ni objetos, y cada una es un intento que la mesa resuelve con los dados
+/// de slot y de categoría (o sin invocación si no cabe).
+EstadoPartida _llamarAliados(EstadoPartida e) {
+  final jefe = e.jefe;
+  final cada = jefe?.invocacionCadaHp;
+  if (jefe == null || cada == null) return e;
+  // Hasta que no termina el primer turno del jefe no hay primera llamada ni
+  // umbrales que contar.
+  if (e.ronda < 2) return e;
+  final maxUmbrales = (jefe.hpMaximo - 1) ~/ cada;
   var cruzados = (jefe.hpMaximo - jefe.hp) ~/ cada;
-  if (cruzados > maximo) cruzados = maximo;
-  if (cruzados <= e.umbralesCruzados) return e;
+  if (cruzados > maxUmbrales) cruzados = maxUmbrales;
+  var debidas = 1 + cruzados;
+  final tope = maxLlamadasAliado(e.nivel);
+  if (debidas > tope) debidas = tope;
+  if (debidas <= e.llamadasAliado) return e;
   return e.copiarCon(
-    umbralesCruzados: cruzados,
+    llamadasAliado: debidas,
     intentosInvocacionPendientes:
-        e.intentosInvocacionPendientes + (cruzados - e.umbralesCruzados),
+        e.intentosInvocacionPendientes + (debidas - e.llamadasAliado),
   );
 }
 
@@ -332,8 +348,8 @@ void _validarEfecto(AtaqueJefe ev, EfectoAtaque ef) {
 EstadoPartida _aplicarEfecto(EstadoPartida e, AtaqueJefe ev, EfectoAtaque ef) {
   switch (ef.tipo) {
     case TipoEfectoAtaque.autodano:
-      // Después del daño al jugador. No se atribuye a nadie; puede cruzar
-      // umbrales de invocación y, a 0 HP, termina la partida en victoria.
+      // Después del daño al jugador. No se atribuye a nadie; a 0 HP termina
+      // la partida en victoria.
       final jefe = e.jefe!;
       final aplicado = ef.valor! < jefe.hp ? ef.valor! : jefe.hp;
       final nuevoHp = jefe.hp - aplicado;
@@ -347,7 +363,7 @@ EstadoPartida _aplicarEfecto(EstadoPartida e, AtaqueJefe ev, EfectoAtaque ef) {
           resultado: Resultado.victoria,
         );
       }
-      return _cruzarUmbrales(conDano);
+      return _llamarAliados(conDano);
     case TipoEfectoAtaque.contadorATodos:
       // Los aliados del jefe reciben los contadores; sin atribuir a nadie.
       final dano = ef.valor! * danoContador;
@@ -545,7 +561,7 @@ EstadoPartida _finTurnoJefe(
   if (ev.monedaQuemadura == true) {
     estado = estado.copiarCon(jefe: estado.jefe!.conEstados(quemado: false));
   }
-  return _empezarRonda(_cruzarUmbrales(estado));
+  return _llamarAliados(_empezarRonda(estado));
 }
 
 EstadoPartida _aplicarEstadoJefe(
@@ -648,10 +664,28 @@ EstadoPartida _ataqueAAliado(
       else if (restante > 0)
         a.copiarCon(hp: restante),
   ];
+  // Moflete Estático: si el ataque deja fuera de combate a un aliado mientras
+  // el aura está en juego (cuenta también el propio aliado que cae), el
+  // Pokémon atacante queda Paralizado. Dura lo que queda de este turno de los
+  // jugadores y todo el siguiente, que es el que pierde.
+  final paraliza = restante <= 0 && paralizaAlCaerAliado(e, scripts);
   final conDano = e.copiarCon(
     aliados: aliados,
     aliadosDerrotados: e.aliadosDerrotados + (restante > 0 ? 0 : 1),
     debilitados: _sinDebilitar(e, ev.jugador),
+    efectosActivos: !paraliza
+        ? null
+        : [
+            for (final f in e.efectosActivos)
+              if (f.tipo != TipoEfectoAtaque.paralizarDefensor ||
+                  f.jugador != ev.jugador)
+                f,
+            EfectoActivo(
+              tipo: TipoEfectoAtaque.paralizarDefensor,
+              jugador: ev.jugador,
+              restantes: 2,
+            ),
+          ],
   );
   return _avanzarTurno(conDano, e.turnoActual + 1);
 }
@@ -729,6 +763,17 @@ EstadoPartida _aliadoInvocado(
   if (aliado.efectos != EfectosAliado.programa) return nuevo;
   final script = scripts[aliado.scriptId]!;
   var resultado = nuevo;
+  if (script.efectoPermanente &&
+      !nuevo.efectosPermanentes.any((f) => f.scriptId == aliado.scriptId)) {
+    resultado = resultado.copiarCon(efectosPermanentes: [
+      ...nuevo.efectosPermanentes,
+      EfectoPermanente(
+        scriptId: aliado.scriptId!,
+        origen: aliado.nombre,
+        texto: aliado.habilidad,
+      ),
+    ]);
+  }
   final alEntrar = script.alEntrar;
   if (alEntrar != null) resultado = alEntrar(resultado, aliado);
   final conEvento = script.alEntrarConEvento;

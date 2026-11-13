@@ -6,6 +6,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
+import '../partida/recordatorios.dart';
 import '../partida/tirada_mesa.dart';
 import 'comun.dart';
 
@@ -44,7 +45,7 @@ class PanelPendientes extends ConsumerWidget {
               FilledButton.tonal(
                 key: Key('entrada-${a.slot}'),
                 onPressed: () => atacarConAliado(context, ref, estado, a),
-                child: Text('${a.nombre} ataca al entrar (${a.ataqueDano})'),
+                child: Text('${a.nombre} ataca al entrar: ${textoAtaque(a)}'),
               ),
             ],
           ],
@@ -52,6 +53,47 @@ class PanelPendientes extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Nombre y daño del ataque de un aliado, para los botones: «Tóxico» si no
+/// hace daño, «Chupavidas (30)» si lo hace.
+String textoAtaque(AliadoEstado a) {
+  final nombre = a.ataqueNombre ?? 'Ataque';
+  final dano = a.ataqueDano ?? 0;
+  return dano > 0 ? '$nombre ($dano)' : nombre;
+}
+
+/// Lo que la mesa tiene que hacer cuando entra un aliado: el resultado de sus
+/// monedas (Deseo) y los recordatorios de su carta. Se queda en pantalla
+/// hasta que alguien pulsa «Hecho».
+Future<void> avisarEntrada(
+  BuildContext context,
+  WidgetRef ref,
+  AliadoInvocado evento,
+) async {
+  final estado = ref.read(estadoProvider);
+  final catalogo = ref.read(catalogoProvider).valueOrNull;
+  final lineas = <String>[];
+  final m = evento.monedas;
+  if (m != null && m.length >= 10) {
+    final jefe = m.take(10).where((c) => c).length;
+    final aliados = m.skip(10).where((c) => c).length;
+    lineas.add(
+      'Deseo: $jefe de 10 monedas en cara → el jefe se cura ${100 * jefe}. '
+      '$aliados de ${m.length - 10} aliados se curan 100.',
+    );
+    lineas.add(
+      'Cada jugador lanza 1 moneda por cada uno de sus Pokémon: con cara, '
+      'cura 100 puntos de daño a ese Pokémon.',
+    );
+    lineas.addAll(recordatoriosDeMoneda(catalogo, estado));
+  }
+  final aliado = estado.aliadoEn(evento.slot);
+  if (aliado != null) {
+    lineas.addAll(recordatoriosAlEntrar(catalogo, estado, aliado));
+  }
+  if (lineas.isEmpty) return;
+  await avisarMesa(context, titulo: 'Entra ${evento.nombre}', lineas: lineas);
 }
 
 /// Resuelve un intento de invocación pendiente sin que nadie pulse nada: la
@@ -135,17 +177,8 @@ Future<void> resolverInvocacion(BuildContext context, WidgetRef ref) async {
     resultado = await _abrirDialogoAliado(context, ref, estado, inicial: tirada);
   }
   if (resultado is! AliadoInvocado || !context.mounted) return;
-  if (registrar(context, ref, resultado) && resultado.monedas != null) {
-    final m = resultado.monedas!;
-    final jefeCaras = m.take(10).where((c) => c).length;
-    final aliados = m.skip(10).where((c) => c).length;
-    registrarAviso(
-      context,
-      'Deseo: $jefeCaras de 10 monedas en cara → el jefe se cura '
-      '${100 * jefeCaras}. $aliados de ${m.length - 10} aliados '
-      'se curan 100. Cada jugador lanza una moneda por '
-      'cada uno de sus Pokémon: con cara, cura 100.',
-    );
+  if (registrar(context, ref, resultado) && context.mounted) {
+    await avisarEntrada(context, ref, resultado);
   }
 }
 
@@ -210,24 +243,44 @@ Future<void> atacarConAliado(
   // los jugadores.
   final extraEstado = esDeCarta ? carta.ataqueDanoExtraSiEstado : null;
   if (extraEstado != null) {
-    final conEstado = await _preguntar(
+    final conEstado = await preguntarMesa(
       context,
-      '${aliado.ataqueNombre}: ¿el Pokémon Defensor ya tenía un estado '
-      'especial?',
+      '${aliado.ataqueNombre}: ¿el Pokémon Defensor ya tenía una Condición '
+      'Especial?',
     );
     if (conEstado == null || !context.mounted) return;
     if (conEstado) dano += extraEstado;
   }
-  // Moneda del rival (Fuerza Lunar): la lanza el jugador y la app la anota.
+  // Moneda del rival (Fuerza Lunar): la lanza el jugador. Cae en la pantalla;
+  // con Fijar Blanco en juego (la primera moneda de cada jugador es cruz) la
+  // lleva la mesa y la app solo la anota.
   bool? monedaRival;
   if (esDeCarta && carta.ataqueMonedaRival) {
-    monedaRival = await _preguntar(
-      context,
-      '${aliado.ataqueNombre}: ${estado.jugadores[objetivo ?? aliado.slot].nombre} '
-      'lanza una moneda. ¿Sale cara?',
-      si: 'Cara',
-      no: 'Cruz',
+    final fijadas = recordatoriosDeMoneda(
+      ref.read(catalogoProvider).valueOrNull,
+      estado,
     );
+    final rivalNombre = estado.jugadores[objetivo ?? aliado.slot].nombre;
+    if (fijadas.isEmpty) {
+      monedaRival = await lanzarMonedaEnPantalla(
+        context,
+        ref,
+        titulo: '${aliado.nombre}: ${aliado.ataqueNombre}',
+        detalle: '$rivalNombre lanza 1 moneda. Con cruz, el siguiente ataque '
+            'de ese Pokémon hace 30 puntos de daño menos.',
+      );
+    } else {
+      monedaRival = await preguntarMesa(
+        context,
+        [
+          '${aliado.ataqueNombre}: $rivalNombre lanza una moneda. '
+              '¿Sale cara?',
+          ...fijadas,
+        ].join('\n'),
+        si: 'Cara',
+        no: 'Cruz',
+      );
+    }
     if (monedaRival == null || !context.mounted) return;
   }
   final aplicado = registrar(
@@ -241,7 +294,16 @@ Future<void> atacarConAliado(
     ),
   );
   if (!aplicado || !context.mounted) return;
+  final rival = estado.jugadores[objetivo ?? aliado.slot].nombre;
   final avisos = [
+    // Lo primero, qué ataque es, contra quién y con cuánto daño; después, el
+    // texto de la carta y el detalle de las tiradas.
+    '${aliado.nombre} usa ${aliado.ataqueNombre ?? 'su ataque'} contra '
+        '$rival${dano > 0 ? ': $dano de daño.' : '.'}',
+    if (esDeCarta && carta.ataqueTexto != null) carta.ataqueTexto!,
+    if (esDeCarta && carta.ataqueIgnoraEfectos)
+      '${carta.habilidadNombre ?? 'Habilidad'}: el daño no se ve afectado por '
+          'ningún efecto en el Pokémon Defensor.',
     if (escala != null)
       '${aliado.ataqueNombre}: ${aliado.usos} uso(s) previos → $dano de daño.',
     if (monedaRival == false)
@@ -263,34 +325,8 @@ Future<void> atacarConAliado(
             '${vecinos.isEmpty ? 'ninguno' : vecinos.map((i) => estado.jugadores[i].nombre).join(' y ')}.';
       }(),
   ];
-  if (avisos.isNotEmpty) registrarAviso(context, avisos.join('\n'));
+  registrarAvisos(context, avisos);
 }
-
-/// Pregunta sí/no a la mesa. null: se cerró el diálogo sin responder.
-Future<bool?> _preguntar(
-  BuildContext context,
-  String pregunta, {
-  String si = 'Sí',
-  String no = 'No',
-}) =>
-    showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        content: Text(pregunta),
-        actions: [
-          TextButton(
-            key: const Key('pregunta-no'),
-            onPressed: () => Navigator.of(c).pop(false),
-            child: Text(no),
-          ),
-          FilledButton(
-            key: const Key('pregunta-si'),
-            onPressed: () => Navigator.of(c).pop(true),
-            child: Text(si),
-          ),
-        ],
-      ),
-    );
 
 /// Asientos adyacentes a [objetivo] en la mesa (circular), sin contar a los
 /// jugadores eliminados ni al propio objetivo.

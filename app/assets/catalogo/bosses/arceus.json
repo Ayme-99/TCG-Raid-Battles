@@ -3,6 +3,8 @@
   "id": "arceus",
   "nombre": "Arceus",
   "nivel": 4,
+  "mapa": "Sala Origen",
+  "numero": 22,
   "hp": 3800,
   "ataques": [
     {
@@ -11,7 +13,7 @@
       "efecto": {
         "tipo": "danoPorAtaquePrevio",
         "valor": 30,
-        "texto": "Este ataque hace 30 puntos de daño más por cada ataque que Arceus haya usado antes en este turno."
+        "texto": "Este ataque hace 30 puntos de daño más por cada ataque que este Pokémon haya usado antes en este turno."
       }
     },
     {
@@ -29,73 +31,83 @@
       "efecto": {
         "tipo": "contadorATodos",
         "valor": 1,
-        "texto": "Pon 1 contador de daño sobre todos los Pokémon en juego (menos Arceus)."
+        "texto": "Pon 1 contador de daño en cada uno de los demás Pokémon en juego."
       }
     }
   ],
   "invocacion": {
-    "cadaHp": 760,
+    "cadaHp": 700,
     "tirada": "segura",
     "aliados": {
       "danio": {
         "nombre": "Medicham",
+        "numero": 23,
         "hp": 90,
         "ataque": {
           "nombre": "Puño Dinámico",
           "dano": 70,
-          "texto": "El Pokémon Defensor queda Confundido. Si el Pokémon Defensor ya tenía un estado especial, este ataque hace 70 puntos de daño más.",
-          "danoExtraSiEstado": 70
+          "danoExtraSiEstado": 70,
+          "ignoraEfectos": true,
+          "texto": "El Pokémon Defensor pasa a estar Confundido. Si el Pokémon Defensor ya tenía una Condición Especial, este ataque hace 70 puntos de daño más."
         },
         "habilidadNombre": "Energía Pura",
-        "habilidad": "Los ataques de Medicham no se ven afectados por ningún efecto en el Pokémon Activo rival."
+        "habilidad": "El daño de los ataques de este Pokémon no se ve afectado por ningún efecto en el Pokémon Defensor."
       },
       "tanque": {
         "nombre": "Bronzong",
+        "numero": 24,
         "hp": 100,
         "habilidadNombre": "Bloqueo",
-        "habilidad": "Mientras Bronzong esté en juego, los jugadores solo pueden atacarle a él (o pasar el turno), y recibe 100 puntos de daño menos de cada ataque (lo aplica la app).",
+        "habilidad": "Mientras este Pokémon esté en juego, los jugadores solo pueden atacar a este Pokémon o pasar el turno, y los ataques de los jugadores le hacen 100 puntos de daño menos.",
         "efectos": "programa",
         "scriptId": "bloqueo-100"
       },
       "cura": {
         "nombre": "Chingling",
+        "numero": 25,
         "hp": 50,
         "habilidadNombre": "Deseo",
-        "habilidad": "Al entrar, se lanzan 10 monedas por el jefe (100 HP por cada cara) y una moneda por cada aliado y por cada Pokémon de los jugadores (cara: se curan 100 puntos de daño). Lo tira la app.",
+        "habilidad": "Cuando este Pokémon entra en juego, lanza 10 monedas. Cura 100 puntos de daño al jefe por cada cara. Luego, cada aliado y cada Pokémon de los jugadores lanza 1 moneda: si sale cara, cura 100 puntos de daño a ese Pokémon.",
         "efectos": "programa",
         "scriptId": "deseo-100"
       },
       "control": {
         "nombre": "Nosepass",
+        "numero": 26,
         "hp": 60,
         "habilidadNombre": "Fijar Blanco",
-        "habilidad": "Cuando Nosepass entra en juego, la primera moneda que lance cada jugador a partir de ese momento será cruz. Aunque Nosepass sea derrotado, el efecto sigue aplicado. (Lo aplican los jugadores en la mesa.)"
+        "habilidad": "Cuando este Pokémon entra en juego, la primera moneda que lance cada jugador a partir de ese momento es cruz. Aunque este Pokémon quede Fuera de Combate, el efecto sigue aplicado.",
+        "avisoAlEntrar": "Fijar Blanco: a partir de ahora, la primera moneda que lance cada jugador es cruz, aunque Nosepass quede Fuera de Combate.",
+        "efectos": "programa",
+        "scriptId": "fijar-blanco",
+        "avisoTurno": "Fijar Blanco: la primera moneda que lance cada jugador desde que entró Nosepass es cruz."
       },
       "potenciador": {
         "nombre": "Solrock",
+        "numero": 27,
         "hp": 70,
         "ataque": {
           "nombre": "Envite Ígneo",
           "dano": 10,
-          "texto": "Cada vez que Solrock usa este ataque, hace 10 puntos de daño más y gana 10 HP máximos (y 10 HP actuales).",
-          "escalaPorUso": 10
+          "escalaPorUso": 10,
+          "texto": "Este ataque hace 10 puntos de daño más por cada vez que este Pokémon lo haya usado. Cada vez que lo usa, este Pokémon gana 10 HP máximos."
         },
         "efectos": "programa",
         "scriptId": "envite-igneo-10"
       },
       "debilitador": {
         "nombre": "Lunatone",
+        "numero": 28,
         "hp": 80,
         "ataque": {
           "nombre": "Fuerza Lunar",
           "dano": 10,
-          "texto": "El rival lanza una moneda: si sale cruz, el siguiente ataque de ese Pokémon hace 30 puntos de daño menos.",
-          "monedaRival": true
+          "monedaRival": true,
+          "texto": "El rival lanza una moneda: si sale cruz, el siguiente ataque de ese Pokémon hace 30 puntos de daño menos."
         },
         "efectos": "programa",
         "scriptId": "fuerza-lunar-30"
       }
     }
-  },
-  "mapa": "Sala Origen"
+  }
 }

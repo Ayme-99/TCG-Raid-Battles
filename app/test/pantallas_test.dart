@@ -17,6 +17,7 @@ Future<ProviderContainer> abrir(
   WidgetTester tester, {
   AlmacenMemoria? almacen,
   Servidor? servidor,
+  MazoAtaquesJefe? mazo,
   Random? azar,
 }) async {
   tester.view.physicalSize = const Size(1000, 3000);
@@ -25,7 +26,7 @@ Future<ProviderContainer> abrir(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        ...sobrescribir(almacen: almacen, servidor: servidor),
+        ...sobrescribir(almacen: almacen, servidor: servidor, mazo: mazo),
         if (azar != null) azarProvider.overrideWithValue(azar),
       ],
       child: const IncursionesApp(),
@@ -113,6 +114,9 @@ void main() {
     final estado = c.read(estadoProvider);
     expect(estado.fase, Fase.turnoJefe);
     expect(estado.jefe!.hp, 400);
+    // Primero se roba la carta; después aparece el ataque del jefe.
+    expect(find.byKey(const Key('turno-del-jefe')), findsNothing);
+    await tocar(tester, 'robar-carta-jefe');
     expect(find.byKey(const Key('turno-del-jefe')), findsOneWidget);
   });
 
@@ -158,6 +162,7 @@ void main() {
     await turno(tester, '0');
     await turno(tester, '0');
 
+    await tocar(tester, 'robar-carta-jefe');
     await escribir(tester, 'dano-jefe', '80');
     await tocar(tester, 'objetivo-1');
     await tocar(tester, 'registrar-ataque-jefe');
@@ -179,6 +184,35 @@ void main() {
     expect(c.read(estadoProvider).cartasAnimo.single.carta, 3);
   });
 
+  testWidgets('la carta que roba otra obliga a robar hasta el máximo del nivel',
+      (tester) async {
+    final c = await abrir(
+      tester,
+      mazo: MazoFijo(const [
+        CartaAtaqueJefe(numero: 5, ranura: 1, jugador: 0, robaOtra: true),
+        CartaAtaqueJefe(numero: 14, ranura: 2, jugador: 1, robaOtra: false),
+      ]),
+    );
+    await prepararPartida(tester, hp: 500);
+    await turno(tester, '0');
+    await turno(tester, '0');
+
+    // Primera carta: ataque 1 contra el jugador 1, y manda robar otra.
+    await tocar(tester, 'robar-carta-jefe');
+    expect(find.byKey(const Key('carta-roba-otra')), findsOneWidget);
+    await tocar(tester, 'registrar-ataque-jefe');
+    expect(c.read(estadoProvider).ataquesJefeEnTurno, 1);
+    expect(find.text('Robar otra carta'), findsOneWidget);
+
+    // Segunda: ataque 2 contra el jugador 2, y ya no pide más.
+    await tocar(tester, 'robar-carta-jefe');
+    expect(find.byKey(const Key('carta-roba-otra')), findsNothing);
+    await tocar(tester, 'registrar-ataque-jefe');
+    expect(c.read(estadoProvider).ataquesJefeEnTurno, 2);
+    expect(find.text('Robar otra carta'), findsNothing);
+    expect(find.byKey(const Key('fin-turno-jefe')), findsOneWidget);
+  });
+
   testWidgets('la quemadura pide la moneda al terminar el turno del jefe',
       (tester) async {
     final c = await abrir(tester);
@@ -188,6 +222,8 @@ void main() {
     await turno(tester, '0');
     await turno(tester, '0');
 
+    await tocar(tester, 'robar-carta-jefe');
+    await tocar(tester, 'registrar-ataque-jefe');
     await tocar(tester, 'fin-turno-jefe');
     expect(find.text('Moneda de la quemadura'), findsOneWidget);
     await tocar(tester, 'moneda-cara');
@@ -224,10 +260,8 @@ void main() {
     await escribir(tester, 'jefe-invocacion', '100');
     await tocar(tester, 'elegir-jefe');
 
-    // 100 de daño cruza el primer umbral de invocación.
-    await turno(tester, '100');
-    expect(c.read(estadoProvider).intentosInvocacionPendientes, 1);
-
+    // El jefe llama a su primer aliado al terminar su turno de la ronda 1.
+    llegarALaLlamadaDelJefe(c);
     // Sin botón de invocar: los dados salen solos y, al pararse, el diálogo
     // pide los datos del aliado que ha salido (slot 0, categoría cura).
     await tester.pumpAndSettle();
@@ -248,7 +282,8 @@ void main() {
     expect(estado.aliados.single.nombre, 'Pikachu');
     expect(estado.aliados.single.slot, 0);
     expect(estado.aliados.single.categoria, CategoriaAliado.cura);
-    expect(find.text('Turno de Jugador 2'), findsOneWidget);
+    expect(estado.fase, Fase.turnoJugadores);
+    expect(estado.ronda, 2);
   });
 
   testWidgets('abandonar termina la partida en derrota', (tester) async {

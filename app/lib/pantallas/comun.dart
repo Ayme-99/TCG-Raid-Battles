@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,12 +28,199 @@ String etiquetaCategoria(CategoriaAliado c) => switch (c) {
       CategoriaAliado.debilitador => 'Debilitador',
     };
 
-/// Muestra un aviso breve en la parte inferior.
+/// Muestra un aviso breve en la parte inferior. Un aviso de varias líneas se
+/// queda más tiempo para que dé tiempo a leerlo.
 void registrarAviso(BuildContext context, String mensaje) {
+  final lineas = '\n'.allMatches(mensaje).length + 1;
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(mensaje)));
+    ..showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        duration: Duration(seconds: 4 + 2 * (lineas - 1)),
+      ),
+    );
 }
+
+/// Varios avisos a la vez, en uno solo (un aviso nuevo tapa al anterior).
+void registrarAvisos(BuildContext context, Iterable<String> mensajes) {
+  final lista = mensajes.toList();
+  if (lista.isNotEmpty) registrarAviso(context, lista.join('\n'));
+}
+
+/// Algo que la mesa tiene que hacer con sus cartas (poner contadores, lanzar
+/// monedas...): se queda en pantalla hasta que alguien pulsa «Hecho».
+Future<void> avisarMesa(
+  BuildContext context, {
+  required String titulo,
+  required List<String> lineas,
+}) {
+  if (lineas.isEmpty) return Future.value();
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (c) => AlertDialog(
+      key: const Key('aviso-mesa'),
+      title: Text(titulo),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final l in lineas)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(l),
+            ),
+        ],
+      ),
+      actions: [
+        FilledButton(
+          key: const Key('aviso-mesa-hecho'),
+          onPressed: () => Navigator.of(c).pop(),
+          child: const Text('Hecho'),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Lanza una moneda en la pantalla (T-71): el resultado se decide al abrir el
+/// diálogo, la moneda gira y se para en él, y «Continuar» lo devuelve. Es para
+/// las monedas que lanzan los jugadores y que la app puede tirar por ellos.
+/// `true`: cara.
+Future<bool> lanzarMonedaEnPantalla(
+  BuildContext context,
+  WidgetRef ref, {
+  required String titulo,
+  String? detalle,
+}) async {
+  final cara = ref.read(azarProvider).nextBool();
+  await showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (c) => _DialogoMoneda(titulo: titulo, detalle: detalle, cara: cara),
+  );
+  return cara;
+}
+
+class _DialogoMoneda extends StatefulWidget {
+  const _DialogoMoneda({
+    required this.titulo,
+    required this.detalle,
+    required this.cara,
+  });
+
+  final String titulo;
+  final String? detalle;
+  final bool cara;
+
+  @override
+  State<_DialogoMoneda> createState() => _DialogoMonedaState();
+}
+
+class _DialogoMonedaState extends State<_DialogoMoneda>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _giro = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1600),
+  )..addListener(() => setState(() {}));
+
+  @override
+  void initState() {
+    super.initState();
+    _giro.forward();
+  }
+
+  @override
+  void dispose() {
+    _giro.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Tres vueltas y media si sale cruz, tres si sale cara: la moneda se para
+    // con la cara que toca hacia arriba.
+    final vueltas = widget.cara ? 6.0 : 7.0;
+    final angulo = Curves.easeOut.transform(_giro.value) * vueltas * math.pi;
+    final alto = math.max(0.04, math.cos(angulo).abs());
+    final muestraCara = math.cos(angulo) >= 0;
+    final terminada = _giro.isCompleted;
+    final tema = Theme.of(context);
+    return AlertDialog(
+      key: const Key('moneda-en-pantalla'),
+      title: Text(widget.titulo),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.detalle != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text(widget.detalle!),
+            ),
+          Transform.scale(
+            scaleY: alto,
+            child: Container(
+              width: 110,
+              height: 110,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: muestraCara
+                    ? tema.colorScheme.primaryContainer
+                    : tema.colorScheme.secondaryContainer,
+                border: Border.all(color: tema.colorScheme.outline, width: 3),
+              ),
+              child: Text(
+                muestraCara ? 'CARA' : 'CRUZ',
+                style: tema.textTheme.titleLarge,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            terminada ? (widget.cara ? 'Sale cara' : 'Sale cruz') : '...',
+            key: const Key('moneda-resultado'),
+            style: tema.textTheme.titleMedium,
+          ),
+        ],
+      ),
+      actions: [
+        FilledButton(
+          key: const Key('moneda-continuar'),
+          onPressed: terminada ? () => Navigator.of(context).pop() : null,
+          child: const Text('Continuar'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Pregunta sí/no a la mesa. null: se cerró el diálogo sin responder.
+Future<bool?> preguntarMesa(
+  BuildContext context,
+  String pregunta, {
+  String si = 'Sí',
+  String no = 'No',
+}) =>
+    showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        content: Text(pregunta),
+        actions: [
+          TextButton(
+            key: const Key('pregunta-no'),
+            onPressed: () => Navigator.of(c).pop(false),
+            child: Text(no),
+          ),
+          FilledButton(
+            key: const Key('pregunta-si'),
+            onPressed: () => Navigator.of(c).pop(true),
+            child: Text(si),
+          ),
+        ],
+      ),
+    );
 
 /// Campo de texto que solo admite dígitos.
 class CampoNumero extends StatelessWidget {

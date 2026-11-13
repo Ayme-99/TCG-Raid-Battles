@@ -141,17 +141,19 @@ void main() {
       expect(s.resultado, Resultado.victoria);
     });
 
-    test('el chequeo puede cruzar un umbral de invocación', () {
+    test('el chequeo cuenta para los umbrales de invocación', () {
       var s = apply(configurar([100]), ElegirJefe(
         nombre: 'Jefe', nivel: 1, hp: 1000, invocacionCadaHp: 95,
       ));
       s = apply(s, const TurnoJugador(jugador: 0, dano: 90));
       s = aplicar(s, 0, EstadoDelJefe.veneno);
       expect(s.intentosInvocacionPendientes, 0);
-      s = apply(s, const FinTurnoJefe()); // 90 + 10 = 100 perdidos
-      expect(s.intentosInvocacionPendientes, 1);
+      // 90 + 10 = 100 perdidos: un umbral cruzado más la primera llamada.
+      s = apply(s, const FinTurnoJefe());
+      expect(s.intentosInvocacionPendientes, 2);
       expect(() => apply(s, const TurnoJugador(jugador: 0, dano: 1)),
           throwsA(isA<ReglaIncumplida>()));
+      s = apply(s, const SinInvocacion());
       s = apply(s, const SinInvocacion());
       expect(() => apply(s, const TurnoJugador(jugador: 0, dano: 1)),
           returnsNormally);

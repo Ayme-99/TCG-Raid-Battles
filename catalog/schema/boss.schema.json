@@ -35,6 +35,11 @@
       "type": "string",
       "minLength": 1
     },
+    "numero": {
+      "description": "Número de la carta dentro del set (01/28 → 1). Informativo.",
+      "type": "integer",
+      "minimum": 1
+    },
     "hp": {
       "type": "integer",
       "minimum": 1
@@ -123,7 +128,7 @@
       "additionalProperties": false,
       "properties": {
         "cadaHp": {
-          "description": "Cada cuántos HP perdidos hay un intento de invocación.",
+          "description": "OBSOLETO desde T-69 (el jefe llama a un aliado por turnos, no por HP perdidos): se conserva por compatibilidad; solo cuenta que el jefe tenga `invocacion`.",
           "type": "integer",
           "minimum": 1
         },
@@ -181,12 +186,17 @@
           "type": "string",
           "minLength": 1
         },
+        "numero": {
+          "description": "Número de la carta dentro del set (01/28 → 1). Informativo.",
+          "type": "integer",
+          "minimum": 1
+        },
         "hp": {
           "type": "integer",
           "minimum": 1
         },
         "ataque": {
-          "description": "Ausente: el aliado no ataca (solo habilidad). Con `monedas`, `dano` es el daño por cada cara de esas monedas (como «20×» en una carta); la app tira las monedas y registra el daño final.",
+          "description": "Ausente: el aliado no ataca (solo habilidad). Con `monedas`, `dano` es el daño por cada cara de esas monedas (como «20×» en una carta); la app tira las monedas y registra el daño final. Un ataque sin daño (solo efecto) lleva `dano` 0.",
           "type": "object",
           "required": [
             "nombre",
@@ -253,6 +263,10 @@
               "description": "Daño que el ataque también hace a los Pokémon de los jugadores adyacentes al objetivo; lo aplican los jugadores y la app nombra a los afectados.",
               "type": "integer",
               "minimum": 1
+            },
+            "ignoraEfectos": {
+              "description": "El daño del ataque no se ve afectado por ningún efecto en el Pokémon Defensor (habilidad del aliado); la app lo recuerda al atacar.",
+              "type": "boolean"
             }
           }
         },
@@ -262,6 +276,26 @@
         },
         "avisoAlCaer": {
           "description": "Recordatorio que la app enseña a la mesa cuando los jugadores derrotan al aliado con un ataque.",
+          "type": "string",
+          "minLength": 1
+        },
+        "avisoAliadoCaido": {
+          "description": "Aura: mientras este aliado está en juego, la app enseña este recordatorio cada vez que los jugadores derrotan con un ataque a cualquier aliado (incluido él).",
+          "type": "string",
+          "minLength": 1
+        },
+        "avisoAlEntrar": {
+          "description": "Lo que la mesa tiene que hacer cuando el aliado entra en juego: la app lo enseña en un aviso que hay que confirmar.",
+          "type": "string",
+          "minLength": 1
+        },
+        "avisoChequeo": {
+          "description": "Lo que la mesa tiene que hacer en cada Chequeo Pokémon mientras el aliado está en juego: la app lo enseña al terminar el turno del jefe, antes de cerrarlo.",
+          "type": "string",
+          "minLength": 1
+        },
+        "avisoTurno": {
+          "description": "Regla que los jugadores tienen que recordar en su turno mientras el aliado está en juego: la app la enseña en el turno de cada jugador.",
           "type": "string",
           "minLength": 1
         },

@@ -4,19 +4,20 @@
   "nombre": "Manectric",
   "nivel": 2,
   "mapa": "Ruta 110",
+  "numero": 8,
   "hp": 2600,
   "ataques": [
     {
-      "nombre": "Onda trueno",
+      "nombre": "Onda Trueno",
       "dano": 40,
       "efecto": {
         "tipo": "paralizarDefensor",
         "conMoneda": true,
-        "texto": "Lanza una moneda. Si sale cara, el Pokémon Defensor pasa a estar paralizado."
+        "texto": "Lanza 1 moneda. Si sale cara, el Pokémon Defensor pasa a estar Paralizado."
       }
     },
     {
-      "nombre": "Colmillo rayo",
+      "nombre": "Colmillo Rayo",
       "dano": 80,
       "efecto": {
         "tipo": "sinAtaque",
@@ -30,57 +31,70 @@
     }
   ],
   "invocacion": {
-    "cadaHp": 867,
+    "cadaHp": 900,
     "tirada": "segura",
     "aliados": {
       "danio": {
         "nombre": "Plusle",
+        "numero": 9,
         "hp": 80,
         "ataque": {
           "nombre": "Chispazo",
           "dano": 30,
           "danoAdyacentes": 30,
-          "texto": "Este ataque también hace 30 puntos de daño a los Pokémon adyacentes al jugador objetivo."
+          "texto": "Este ataque también hace 30 puntos de daño a los Pokémon Activos de los jugadores adyacentes al jugador objetivo."
         }
       },
       "tanque": {
         "nombre": "Minun",
+        "numero": 10,
         "hp": 90,
         "ataque": {
           "nombre": "Bola Voltio",
           "dano": 10
         },
         "habilidadNombre": "Moflete Estático",
-        "habilidad": "Si este Pokémon queda fuera de combate por el daño de uno de los ataques de los jugadores, el Pokémon atacante pasa a estar Paralizado.",
-        "avisoAlCaer": "Moflete Estático: el Pokémon atacante pasa a estar Paralizado."
+        "habilidad": "Mientras Minun está en juego, cada vez que un Pokémon Aliado queda Fuera de Combate por el daño de un ataque de los jugadores, el Pokémon Atacante pasa a estar Paralizado.",
+        "avisoAliadoCaido": "Moflete Estático: el Pokémon Atacante pasa a estar Paralizado.",
+        "efectos": "programa",
+        "scriptId": "moflete-estatico"
       },
       "cura": {
         "nombre": "Oddish",
+        "numero": 11,
         "hp": 60,
         "habilidadNombre": "Drenadoras",
-        "habilidad": "Cuando Oddish entra en juego y durante el chequeo Pokémon, pon un contador de daño en todos los Pokémon Activos. El jefe se cura 10 HP por cada contador puesto (lo cura la app; los contadores los pone la mesa).",
+        "habilidad": "Cuando este Pokémon entra en juego y durante cada Chequeo Pokémon, pon 1 contador de daño en cada Pokémon Activo de los jugadores. Cura 10 puntos de daño al jefe por cada contador puesto.",
+        "avisoAlEntrar": "Drenadoras: pon 1 contador de daño en cada Pokémon Activo de los jugadores. La app ya ha curado al jefe 10 por cada uno.",
+        "avisoChequeo": "Drenadoras: pon 1 contador de daño en cada Pokémon Activo de los jugadores. La app cura al jefe 10 por cada uno.",
         "efectos": "programa",
         "scriptId": "drenadoras-10"
       },
       "control": {
         "nombre": "Gulpin",
+        "numero": 12,
         "hp": 100,
-        "habilidadNombre": "Tóxico",
-        "habilidad": "Cuando Gulpin entra en juego y al principio de cada turno del jefe, el Pokémon frente a Gulpin pasa a estar Envenenado."
+        "ataque": {
+          "nombre": "Tóxico",
+          "dano": 0,
+          "texto": "El Pokémon Defensor pasa a estar Envenenado."
+        }
       },
       "potenciador": {
         "nombre": "Poochyena",
+        "numero": 13,
         "hp": 70,
         "habilidadNombre": "Aullido",
-        "habilidad": "Los ataques del jefe hacen 20 puntos de daño más (lo suma la app).",
+        "habilidad": "Mientras este Pokémon esté en juego, los ataques del jefe hacen 20 puntos de daño más.",
         "efectos": "programa",
         "scriptId": "aullido-20"
       },
       "debilitador": {
         "nombre": "Zigzagoon",
+        "numero": 14,
         "hp": 50,
         "habilidadNombre": "Gruñido",
-        "habilidad": "Los ataques de los jugadores hacen 10 puntos de daño menos (lo aplica la app).",
+        "habilidad": "Mientras este Pokémon esté en juego, los ataques de los jugadores hacen 10 puntos de daño menos al jefe y a los aliados.",
         "efectos": "programa",
         "scriptId": "grunido-10"
       }

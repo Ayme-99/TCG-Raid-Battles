@@ -52,7 +52,8 @@ void main() {
       expect(c.jefes.map((j) => j.id), ['onix', 'manectric', 'kingdra', 'arceus']);
       expect(c.jefes.map((j) => j.nivel), [1, 2, 3, 4]);
       expect(c.jefes.map((j) => j.hp), [2300, 2600, 3700, 3800]);
-      expect(c.jefes.map((j) => j.intentosDeInvocacion), [1, 2, 3, 4]);
+      expect(c.jefes.map((j) => j.numero), [1, 8, 15, 22]);
+      expect(c.jefes.map((j) => j.intentosDeInvocacion), [2, 3, 4, 5]);
       for (final j in c.jefes) {
         expect(j.ataques, hasLength(3));
         expect(j.invocacion!.segura, isTrue);
@@ -108,17 +109,74 @@ void main() {
       final plusle = c.aliadoDe('Manectric', 2, CategoriaAliado.danio)!;
       expect(plusle.ataqueDanoAdyacentes, 30);
       final minun = c.aliadoDe('Manectric', 2, CategoriaAliado.tanque)!;
-      expect(minun.avisoAlCaer, contains('Paralizado'));
+      expect(minun.avisoAliadoCaido, contains('Paralizado'));
+      expect(minun.scriptId, 'moflete-estatico');
+      // Tóxico es un ataque sin daño; Magikarp también ataca.
+      final gulpin = c.aliadoDe('Manectric', 2, CategoriaAliado.control)!;
+      expect(gulpin.hp, 100);
+      expect(gulpin.ataqueNombre, 'Tóxico');
+      expect(gulpin.ataqueDano, 0);
+      expect(gulpin.habilidad, isNull);
+      final magikarp = c.aliadoDe('Kingdra', 3, CategoriaAliado.debilitador)!;
+      expect(magikarp.ataqueNombre, 'Salpicadura');
+      expect(magikarp.ataqueDano, 10);
+      expect(medicham.ataqueIgnoraEfectos, isTrue);
+      expect(
+        c.aliadoDe('Arceus', 4, CategoriaAliado.control)!.scriptId,
+        'fijar-blanco',
+      );
       expect(
         c.aliadoDe('Manectric', 2, CategoriaAliado.cura)!.scriptId,
         'drenadoras-10',
       );
     });
 
+    test('las 28 cartas del set están en el catálogo con su número y sus PS',
+        () async {
+      final c = await Catalogo.cargar(rootBundle);
+      final cartas = <int, (String, int)>{};
+      for (final j in c.jefes) {
+        cartas[j.numero!] = (j.nombre, j.hp);
+        for (final a in j.invocacion!.aliados.values) {
+          cartas[a.numero!] = (a.nombre, a.hp);
+        }
+      }
+      expect(cartas, {
+        1: ('Onix', 2300),
+        2: ('Machop', 70),
+        3: ('Geodude', 90),
+        4: ('Zubat', 50),
+        5: ('Rhyhorn', 100),
+        6: ('Cubone', 60),
+        7: ('Haunter', 80),
+        8: ('Manectric', 2600),
+        9: ('Plusle', 80),
+        10: ('Minun', 90),
+        11: ('Oddish', 60),
+        12: ('Gulpin', 100),
+        13: ('Poochyena', 70),
+        14: ('Zigzagoon', 50),
+        15: ('Kingdra', 3700),
+        16: ('Krabby', 70),
+        17: ('Seel', 100),
+        18: ('Golbat', 80),
+        19: ('Tentacruel', 90),
+        20: ('Horsea', 60),
+        21: ('Magikarp', 50),
+        22: ('Arceus', 3800),
+        23: ('Medicham', 90),
+        24: ('Bronzong', 100),
+        25: ('Chingling', 50),
+        26: ('Nosepass', 60),
+        27: ('Solrock', 70),
+        28: ('Lunatone', 80),
+      });
+    });
+
     test('los ataques traen los efectos de D-14', () async {
       final c = await Catalogo.cargar(rootBundle);
       final onix = c.jefes[0].ataques;
-      expect(onix.map((a) => a.nombre), ['Trampa Rocas', 'Lanzarrocas', 'Doble filo']);
+      expect(onix.map((a) => a.nombre), ['Trampa Rocas', 'Lanzarrocas', 'Doble Filo']);
       expect(onix[0].efecto!.tipo, TipoEfectoAtaque.sinRetirada);
       expect(onix[0].efecto!.duracion, 1);
       expect(onix[0].efecto!.necesitaDefensor, isTrue);
@@ -198,7 +256,7 @@ void main() {
 
     expect(find.byKey(const Key('catalogo-onix')), findsOneWidget);
     expect(find.byKey(const Key('catalogo-manectric')), findsNothing);
-    expect(find.textContaining('invoca 1 aliado (seguro)'), findsOneWidget);
+    expect(find.textContaining('invoca 2 aliados (seguro)'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('catalogo-onix')));
     await tester.pumpAndSettle();
@@ -207,7 +265,7 @@ void main() {
     expect(estado.fase, Fase.turnoJugadores);
     expect(estado.jefe!.nombre, 'Onix');
     expect(estado.jefe!.hp, 2300);
-    expect(estado.jefe!.invocacionCadaHp, 1150);
+    expect(estado.jefe!.invocacionCadaHp, 1200);
 
     // Turno del jefe: la pantalla propone el ataque de la carta y su efecto.
     final partida = c.read(partidaProvider.notifier);
@@ -215,12 +273,13 @@ void main() {
       expect(partida.registrar(TurnoJugador(jugador: j, dano: 1)), isNull);
     }
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('robar-carta-jefe')));
+    await tester.pumpAndSettle();
     expect(find.text('Trampa Rocas · 30'), findsOneWidget);
     expect(find.byKey(const Key('efecto-ataque')), findsOneWidget);
-    expect(find.byKey(const Key('falta-defensor')), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('objetivo-0')));
-    await tester.pumpAndSettle();
+    // La carta robada ya dice el ataque y el objetivo (Jugador 1).
+    expect(find.byKey(const Key('carta-ataque-jefe')), findsOneWidget);
+    expect(find.text('JUGADOR 1'), findsOneWidget);
     expect(find.byKey(const Key('falta-defensor')), findsNothing);
     await tester.tap(find.byKey(const Key('registrar-ataque-jefe')));
     await tester.pumpAndSettle();
@@ -266,15 +325,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('catalogo-onix')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('panel-aliados')), findsNothing);
+    expect(find.byKey(const Key('aliado-0')), findsNothing);
+    expect(find.byKey(const Key('slot-libre-0')), findsOneWidget);
 
-    // 1150 de daño cruza el primer (y único) umbral de invocación de Onix.
-    expect(
-      c.read(partidaProvider.notifier).registrar(
-            const TurnoJugador(jugador: 0, dano: 1150),
-          ),
-      isNull,
-    );
+    // Onix llama a su primer aliado al terminar su turno de la ronda 1.
+    llegarALaLlamadaDelJefe(c);
     // No hay botón de invocar: los dados caen solos sobre la mesa...
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byKey(const Key('invocar-aliado')), findsNothing);
@@ -290,7 +345,8 @@ void main() {
     expect(aliado.slot, 0);
     expect(aliado.hp, 90);
     expect(aliado.habilidad, isNotNull);
-    expect(find.byKey(const Key('panel-aliados')), findsOneWidget);
+    expect(find.byKey(const Key('aliado-0')), findsOneWidget);
+    expect(find.byKey(const Key('slot-libre-0')), findsNothing);
     expect(find.textContaining('Geodude'), findsOneWidget);
   });
 
@@ -329,12 +385,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('catalogo-onix')));
     await tester.pumpAndSettle();
-    expect(
-      c.read(partidaProvider.notifier).registrar(
-            const TurnoJugador(jugador: 0, dano: 1150),
-          ),
-      isNull,
-    );
+    llegarALaLlamadaDelJefe(c);
     // T-44: los dados ruedan sobre la mesa sin pulsar nada.
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byKey(const ValueKey('dado-mesa-0')), findsOneWidget);

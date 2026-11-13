@@ -55,73 +55,99 @@ class PanelPokemon extends ConsumerWidget {
   }
 }
 
-/// Aliados vivos del jefe: su carta (salen como Pokémon salvajes, sin decir la
-/// categoría), el dueño del slot y su vida.
-class PanelAliados extends ConsumerWidget {
-  const PanelAliados({super.key});
+/// El slot de aliado de un jugador: la carta del aliado si lo hay (salen como
+/// Pokémon salvajes, sin decir la categoría) o un hueco punteado con el color
+/// de su dueño. Los slots rodean al jefe en la mesa.
+class SlotAliado extends ConsumerWidget {
+  const SlotAliado({super.key, required this.slot});
+
+  final int slot;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final estado = ref.watch(estadoProvider);
-    if (estado.aliados.isEmpty) return const SizedBox.shrink();
-    return Container(
-      key: const Key('panel-aliados'),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1033).withValues(alpha: 0.82),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white70, width: 3),
-        boxShadow: const [
-          BoxShadow(color: Colors.black54, blurRadius: 10, offset: Offset(0, 6)),
-        ],
-      ),
-      child: DefaultTextStyle.merge(
-        style: const TextStyle(color: Colors.white),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Aliados del jefe',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                  ),
-            ),
-            if (reduccionDanoAlJefe(estado) > 0)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  'Los ataques de los jugadores hacen '
-                  '${reduccionDanoAlJefe(estado)} de daño menos al jefe '
-                  '(lo descuenta la app).',
-                  key: const Key('reduccion-dano'),
-                ),
+    final aliado = estado.aliados.where((a) => a.slot == slot).firstOrNull;
+    if (aliado != null) {
+      return _CartaAliado(
+        aliado: aliado,
+        dueno: estado.jugadores[slot].nombre,
+      );
+    }
+    final color = coloresAsiento[slot % coloresAsiento.length];
+    final dueno = estado.jugadores[slot];
+    return Column(
+      key: Key('slot-libre-$slot'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AspectRatio(
+          aspectRatio: 480 / 670,
+          child: CustomPaint(
+            painter: _BordePunteado(color),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1033).withValues(alpha: 0.35),
+                borderRadius: BorderRadius.circular(12),
               ),
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final a in estado.aliados)
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: _CartaAliado(
-                        aliado: a,
-                        dueno: estado.jugadores[a.slot].nombre,
-                      ),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    dueno.nombre.isEmpty ? '?' : dueno.nombre[0].toUpperCase(),
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 34,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
-                // Siempre 4 huecos para que las cartas no cambien de tamaño.
-                for (var i = estado.aliados.length; i < 4; i++)
-                  const Expanded(child: SizedBox.shrink()),
-              ],
+                  const Text(
+                    'Slot libre',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
+}
+
+/// Borde de trazos redondeado, para los huecos vacíos.
+class _BordePunteado extends CustomPainter {
+  const _BordePunteado(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final trazo = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+    final camino = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Offset.zero & size,
+          const Radius.circular(12),
+        ),
+      );
+    for (final tramo in camino.computeMetrics()) {
+      var d = 0.0;
+      while (d < tramo.length) {
+        canvas.drawPath(tramo.extractPath(d, d + 9), trazo);
+        d += 15;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_BordePunteado old) => old.color != color;
 }
 
 /// Un aliado: su carta y debajo su dueño y su vida.
@@ -148,16 +174,16 @@ class _CartaAliado extends StatelessWidget {
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
         ),
         const SizedBox(height: 3),
         BarraVida(
           fraccion: a.hpMaximo == 0 ? 0 : a.hp / a.hpMaximo,
-          alto: 10,
+          alto: 12,
         ),
         Text(
           '${a.hp}/${a.hpMaximo} HP',
-          style: const TextStyle(fontSize: 12),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
         ),
       ],
     );

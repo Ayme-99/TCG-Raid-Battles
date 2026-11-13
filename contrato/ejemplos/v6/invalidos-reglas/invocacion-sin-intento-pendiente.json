@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "partidaId": "invalido-categoria-repetida",
+  "partidaId": "invalido-invocacion-sin-intento-pendiente",
   "cuentas": [
     "usuario-ana",
     null
@@ -30,7 +30,21 @@
     {
       "tipo": "turnoJugador",
       "jugador": 0,
-      "dano": 350
+      "dano": 100
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
+      "tipo": "ataqueJefe",
+      "ranura": 1,
+      "dano": 30,
+      "jugador": 0
+    },
+    {
+      "tipo": "finTurnoJefe"
     },
     {
       "tipo": "aliadoInvocado",
@@ -45,6 +59,19 @@
       "tipo": "ataqueAliado",
       "slot": 1,
       "dano": 20
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 350
+    },
+    {
+      "tipo": "aliadoInvocado",
+      "slot": 0,
+      "categoria": "cura",
+      "nombre": "Chansey",
+      "hp": 120,
+      "habilidad": "Cura al jefe al final de su turno (la aplica el jugador)"
     },
     {
       "tipo": "turnoJugador",
@@ -68,20 +95,22 @@
     {
       "tipo": "turnoJugador",
       "jugador": 0,
-      "dano": 350
+      "dano": 100
+    },
+    {
+      "tipo": "ataqueAAliado",
+      "jugador": 1,
+      "slot": 1,
+      "dano": 60
     },
     {
       "tipo": "aliadoInvocado",
-      "slot": 0,
+      "slot": 1,
       "categoria": "danio",
-      "nombre": "Chansey",
-      "hp": 120,
-      "habilidad": "Cura al jefe al final de su turno (la aplica el jugador)"
-    },
-    {
-      "tipo": "turnoJugador",
-      "jugador": 1,
-      "dano": 0
+      "nombre": "Rattata",
+      "hp": 60,
+      "ataqueNombre": "Placaje",
+      "ataqueDano": 20
     }
   ]
 }

@@ -42,64 +42,64 @@ Reglas completas en `incursiones_gdd.md` §2-§5. Orden:
 
 Los 4 jefes iniciales ya están en el catálogo (`catalog/bosses/`). HP calibrado con el simulador (D-16); los dos nuevos aliados por jefe (Potenciador y Debilitador) completan las 6 categorías. Mazo de jefe: como en el juego oficial (es físico: lo llevan los jugadores). Composición sugerida para empezar: 10 cartas con 5 de ranura 1, 3 de ranura 2 y 2 de ranura 3; objetivo (todos / uno elegido / uno al azar) repartido como prefieras, **pero anótalo**.
 
-| Jefe | Nv | HP | Ataques (ranura 1 / 2 / 3) | Máx. ataques/turno | Invocación (invocación segura) |
+| Jefe | Nv | HP | Ataques (ranura 1 / 2 / 3) | Máx. ataques/turno | Llamadas de aliado |
 |---|---|---|---|---|---|
-| Onix (Túnel Roca) | 1 | 2300 | 30 / 60 / 120 | 2 | cada 1150 HP perdidos |
-| Manectric (Ruta 110) | 2 | 2600 | 40 / 80 / 160 | 3 | cada 867 HP perdidos |
-| Kingdra (Islas Remolino) | 3 | 3700 | 60 / 100 / 200 | 4 | cada 925 HP perdidos |
-| Arceus (Sala Origen) | 4 | 3800 | 40 / 100 / 240 | 5 | cada 760 HP perdidos |
+| Onix (Túnel Roca) | 1 | 2300 | 30 / 60 / 120 | 2 | hasta 2 |
+| Manectric (Ruta 110) | 2 | 2600 | 40 / 80 / 160 | 3 | hasta 3 |
+| Kingdra (Islas Remolino) | 3 | 3700 | 60 / 100 / 200 | 4 | hasta 4 |
+| Arceus (Sala Origen) | 4 | 3800 | 40 / 100 / 240 | 5 | hasta 5 |
 
 Efectos de los ataques del jefe (D-14):
 
-- **Onix**: Trampa Rocas (30): Durante el próximo turno de los jugadores, el Pokémon Defensor no puede retirarse.; Lanzarrocas (60); Doble filo (120): Onix se hace 30 puntos de daño a sí mismo.
-- **Manectric**: Onda trueno (40): Lanza una moneda. Si sale cara, el Pokémon Defensor pasa a estar paralizado.; Colmillo rayo (80): Durante el próximo turno de los jugadores, el Pokémon Defensor no puede atacar.; Trueno (160)
-- **Kingdra**: Ciclón (60): El daño de este ataque no se ve afectado por ningún efecto en el Pokémon Activo rival.; Pulso Dragón (100); Hidrobomba (200)
-- **Arceus**: Danza Espada (40): Este ataque hace 30 puntos de daño más por cada ataque que Arceus haya usado antes en este turno.; Castigo (100): Si el Pokémon Defensor no tiene contadores de daño, este ataque hace 50 puntos de daño más.; Sentencia (240): Pon 1 contador de daño sobre todos los Pokémon en juego (menos Arceus).
+- **Onix**: Trampa Rocas (30): Durante el próximo turno de los jugadores el Pokémon Defensor no puede retirarse.; Lanzarrocas (60); Doble Filo (120): Este Pokémon también se hace 30 puntos de daño a sí mismo.
+- **Manectric**: Onda Trueno (40): Lanza 1 moneda. Si sale cara, el Pokémon Defensor pasa a estar Paralizado.; Colmillo Rayo (80): Durante el próximo turno de los jugadores, el Pokémon Defensor no puede atacar.; Trueno (160)
+- **Kingdra**: Ciclón (60): El daño de este ataque no se ve afectado por ningún efecto en el Pokémon Defensor.; Pulso Dragón (100); Hidrobomba (200)
+- **Arceus**: Danza Espada (40): Este ataque hace 30 puntos de daño más por cada ataque que este Pokémon haya usado antes en este turno.; Castigo (100): Si el Pokémon Defensor no tiene contadores de daño, este ataque hace 50 puntos de daño más.; Sentencia (240): Pon 1 contador de daño en cada uno de los demás Pokémon en juego.
 
-**Aliados (D-13, D-16):** al cruzar un umbral de invocación (siempre «segura», sin moneda) un dado de 4 caras elige el slot libre y un dado de 6 elige la categoría (1 Daño · 2 Tanque · 3 Cura · 4 Control · 5 Potenciador · 6 Debilitador). Repite la tirada si sale un slot o una categoría ocupados; sin slot libre no hay invocación. El aliado ataca al entrar y al final de cada turno del jefe. **No hay bloqueo de slot:** el jugador puede ignorar a su aliado y dañar al jefe (salvo con Bronzong, que obliga a atacarle). El daño que sobra sobre el HP de un aliado se pierde.
+**Aliados (D-13, D-16, T-71):** el jefe llama a su primer aliado al terminar su primer turno y a los siguientes cada vez que su HP baja a un valor definido en su ficha (cada umbral, una vez); llama como máximo nivel + 1 veces. Un dado del tamaño del número de jugadores elige el slot libre y un dado de 6 elige la categoría (1 Daño · 2 Tanque · 3 Cura · 4 Control · 5 Potenciador · 6 Debilitador). Sin slot libre no hay aliado (y la llamada cuenta). Los jugadores no tienen por qué saber la categoría: los aliados salen como Pokémon salvajes. Qué hace la app y qué hace la mesa con cada carta: `docs/CARTAS.md`.
 
 ### Onix (Nv1, 2300 HP)
 
 | Categoría | Aliado | HP | Ataque | Habilidad |
 |---|---|---|---|---|
-| Daño | Machop | 70 | **Puño Incremento** 20: Lanza dos monedas: este ataque hace 20 puntos de daño por cada cara. | — |
-| Tanque | Geodude | 90 | — | **Rizo Defensa**: Mientras Geodude esté en juego, el jefe y los aliados reciben 10 puntos de daño menos por los ataques de los jugadores. |
+| Daño | Machop | 70 | **Puño Incremento** 20×: Lanza 2 monedas. Este ataque hace 20 puntos de daño por cada cara. | — |
+| Tanque | Geodude | 90 | — | **Rizo Defensa**: Mientras este Pokémon esté en juego, los ataques de los jugadores hacen 10 puntos de daño menos al jefe y a los aliados. |
 | Cura | Zubat | 50 | **Chupavidas** 10: Cura 10 puntos de daño al jefe y a los aliados. | — |
-| Control | Rhyhorn | 100 | — | **Tormenta de arena**: Mientras Rhyhorn esté en juego, durante el chequeo Pokémon, los Pokémon activos de los jugadores reciben 10 puntos de daño. |
-| Potenciador | Cubone | 60 | — | **Foco Energía**: Cada vez que el jefe vaya a atacar, lanza una moneda. Si sale cara, el ataque hace 10 puntos de daño más. |
-| Debilitador | Haunter | 80 | — | **Rencor**: Los Pokémon de los jugadores no pueden usar el mismo ataque 2 turnos seguidos. |
+| Control | Rhyhorn | 100 | — | **Tormenta de Arena**: Mientras este Pokémon esté en juego, durante el Chequeo Pokémon, pon 1 contador de daño en cada Pokémon Activo de los jugadores. |
+| Potenciador | Cubone | 60 | — | **Foco Energía**: Mientras este Pokémon esté en juego, cada vez que el jefe vaya a atacar, lanza 1 moneda. Si sale cara, ese ataque hace 10 puntos de daño más. |
+| Debilitador | Haunter | 80 | — | **Rencor**: Mientras este Pokémon esté en juego, los Pokémon de los jugadores no pueden usar el mismo ataque en 2 turnos seguidos. |
 
 ### Manectric (Nv2, 2600 HP)
 
 | Categoría | Aliado | HP | Ataque | Habilidad |
 |---|---|---|---|---|
-| Daño | Plusle | 80 | **Chispazo** 30: Este ataque también hace 30 puntos de daño a los Pokémon adyacentes al jugador objetivo. | — |
-| Tanque | Minun | 90 | **Bola Voltio** 10 | **Moflete Estático**: Si este Pokémon queda fuera de combate por el daño de uno de los ataques de los jugadores, el Pokémon atacante pasa a estar Paralizado. |
-| Cura | Oddish | 60 | — | **Drenadoras**: Cuando Oddish entra en juego y durante el chequeo Pokémon, pon un contador de daño en todos los Pokémon Activos. El jefe se cura 10 HP por cada contador puesto (lo cura la app; los contadores los pone la mesa). |
-| Control | Gulpin | 100 | — | **Tóxico**: Cuando Gulpin entra en juego y al principio de cada turno del jefe, el Pokémon frente a Gulpin pasa a estar Envenenado. |
-| Potenciador | Poochyena | 70 | — | **Aullido**: Los ataques del jefe hacen 20 puntos de daño más (lo suma la app). |
-| Debilitador | Zigzagoon | 50 | — | **Gruñido**: Los ataques de los jugadores hacen 10 puntos de daño menos (lo aplica la app). |
+| Daño | Plusle | 80 | **Chispazo** 30: Este ataque también hace 30 puntos de daño a los Pokémon Activos de los jugadores adyacentes al jugador objetivo. | — |
+| Tanque | Minun | 90 | **Bola Voltio** 10 | **Moflete Estático**: Mientras Minun está en juego, cada vez que un Pokémon Aliado queda Fuera de Combate por el daño de un ataque de los jugadores, el Pokémon Atacante pasa a estar Paralizado. |
+| Cura | Oddish | 60 | — | **Drenadoras**: Cuando este Pokémon entra en juego y durante cada Chequeo Pokémon, pon 1 contador de daño en cada Pokémon Activo de los jugadores. Cura 10 puntos de daño al jefe por cada contador puesto. |
+| Control | Gulpin | 100 | **Tóxico**: El Pokémon Defensor pasa a estar Envenenado. | — |
+| Potenciador | Poochyena | 70 | — | **Aullido**: Mientras este Pokémon esté en juego, los ataques del jefe hacen 20 puntos de daño más. |
+| Debilitador | Zigzagoon | 50 | — | **Gruñido**: Mientras este Pokémon esté en juego, los ataques de los jugadores hacen 10 puntos de daño menos al jefe y a los aliados. |
 
 ### Kingdra (Nv3, 3700 HP)
 
 | Categoría | Aliado | HP | Ataque | Habilidad |
 |---|---|---|---|---|
-| Daño | Krabby | 70 | **Martillazo** 30: Lanza dos monedas: si sale cara en alguna de ellas, este ataque hace 50 puntos de daño más. | — |
-| Tanque | Seel | 100 | — | **Velo Sagrado**: Evita que el jefe y los aliados sufran efectos de estado. Al entrar, el jefe pierde los que tuviera (lo aplica la app). |
-| Cura | Golbat | 80 | **Chupavidas** 30: Cura 30 puntos de daño al jefe y a los aliados. | **Allanamiento**: Los ataques de Golbat no se ven afectados por ningún efecto en el Pokémon Activo del rival. |
-| Control | Tentacruel | 90 | — | **Constricción**: Mientras Tentacruel esté en juego, los jugadores no pueden cambiar el Pokémon Activo por uno de la Banca. |
-| Potenciador | Horsea | 60 | — | **Agilidad**: Mientras Horsea esté en juego, el primer ataque del jefe en cada turno hace 30 puntos de daño más (lo suma la app). |
-| Debilitador | Magikarp | 50 | — | **Bote**: Cada vez que Magikarp va a recibir daño, se lanza una moneda: si sale cara, se evita ese daño (lo tira la app al atacarlo). |
+| Daño | Krabby | 70 | **Martillazo** 30+: Lanza 2 monedas. Si al menos una sale cara, este ataque hace 50 puntos de daño más. | — |
+| Tanque | Seel | 100 | — | **Velo Sagrado**: Mientras este Pokémon esté en juego, el jefe y los aliados no pueden pasar a estar afectados por Condiciones Especiales. Cuando este Pokémon entra en juego, les quita todas las Condiciones Especiales. |
+| Cura | Golbat | 80 | **Chupavidas** 30: Cura 30 puntos de daño al jefe y a los aliados. | **Allanamiento**: El daño de los ataques de este Pokémon no se ve afectado por ningún efecto en el Pokémon Defensor. |
+| Control | Tentacruel | 90 | — | **Constricción**: Mientras este Pokémon esté en juego, los jugadores no pueden cambiar su Pokémon Activo por uno de la Banca. |
+| Potenciador | Horsea | 60 | — | **Agilidad**: Mientras este Pokémon esté en juego, el primer ataque del jefe en cada turno del jefe hace 30 puntos de daño más. |
+| Debilitador | Magikarp | 50 | **Salpicadura** 10 | **Bote**: Cada vez que este Pokémon vaya a recibir daño de un ataque, el jugador atacante lanza 1 moneda. Si sale cara, se evita todo ese daño. |
 
 ### Arceus (Nv4, 3800 HP)
 
 | Categoría | Aliado | HP | Ataque | Habilidad |
 |---|---|---|---|---|
-| Daño | Medicham | 90 | **Puño Dinámico** 70: El Pokémon Defensor queda Confundido. Si el Pokémon Defensor ya tenía un estado especial, este ataque hace 70 puntos de daño más. | **Energía Pura**: Los ataques de Medicham no se ven afectados por ningún efecto en el Pokémon Activo rival. |
-| Tanque | Bronzong | 100 | — | **Bloqueo**: Mientras Bronzong esté en juego, los jugadores solo pueden atacarle a él (o pasar el turno), y recibe 100 puntos de daño menos de cada ataque (lo aplica la app). |
-| Cura | Chingling | 50 | — | **Deseo**: Al entrar, se lanzan 10 monedas por el jefe (100 HP por cada cara) y una moneda por cada aliado y por cada Pokémon de los jugadores (cara: se curan 100 puntos de daño). Lo tira la app. |
-| Control | Nosepass | 60 | — | **Fijar Blanco**: Cuando Nosepass entra en juego, la primera moneda que lance cada jugador a partir de ese momento será cruz. Aunque Nosepass sea derrotado, el efecto sigue aplicado. (Lo aplican los jugadores en la mesa.) |
-| Potenciador | Solrock | 70 | **Envite Ígneo** 10: Cada vez que Solrock usa este ataque, hace 10 puntos de daño más y gana 10 HP máximos (y 10 HP actuales). | — |
+| Daño | Medicham | 90 | **Puño Dinámico** 70+: El Pokémon Defensor pasa a estar Confundido. Si el Pokémon Defensor ya tenía una Condición Especial, este ataque hace 70 puntos de daño más. | **Energía Pura**: El daño de los ataques de este Pokémon no se ve afectado por ningún efecto en el Pokémon Defensor. |
+| Tanque | Bronzong | 100 | — | **Bloqueo**: Mientras este Pokémon esté en juego, los jugadores solo pueden atacar a este Pokémon o pasar el turno, y los ataques de los jugadores le hacen 100 puntos de daño menos. |
+| Cura | Chingling | 50 | — | **Deseo**: Cuando este Pokémon entra en juego, lanza 10 monedas. Cura 100 puntos de daño al jefe por cada cara. Luego, cada aliado y cada Pokémon de los jugadores lanza 1 moneda: si sale cara, cura 100 puntos de daño a ese Pokémon. |
+| Control | Nosepass | 60 | — | **Fijar Blanco**: Cuando este Pokémon entra en juego, la primera moneda que lance cada jugador a partir de ese momento es cruz. Aunque este Pokémon quede Fuera de Combate, el efecto sigue aplicado. |
+| Potenciador | Solrock | 70 | **Envite Ígneo** 10+: Este ataque hace 10 puntos de daño más por cada vez que este Pokémon lo haya usado. Cada vez que lo usa, este Pokémon gana 10 HP máximos. | — |
 | Debilitador | Lunatone | 80 | **Fuerza Lunar** 10: El rival lanza una moneda: si sale cruz, el siguiente ataque de ese Pokémon hace 30 puntos de daño menos. | — |
 
 Si el mazo sugerido da una partida claramente demasiado fácil o difícil, no lo ajustes sobre la marcha: anótalo y cambia una sola cosa en la partida siguiente.
@@ -116,7 +116,7 @@ Si el mazo sugerido da una partida claramente demasiado fácil o difícil, no lo
 - X sin tope por ataque: ¿algún equipo supera 800 (Nv4) sin discutir el número?
 - Cartas de ánimo: una por KO, máximo 3 distintas. ¿Hacen la partida más fácil de lo calibrado? ¿Alguna carta resulta rota?
 - Veneno y quemadura del jefe (D-12): ¿importan o son ruido?
-- Aliados: umbral, dado de slot y de categoría, y si cada aliado se siente útil o abusivo (Bloqueo de Bronzong, Deseo de Chingling, Envite Ígneo de Solrock).
+- Aliados: llamada del jefe, dado de slot y de categoría, y si cada aliado se siente útil o abusivo (Bloqueo de Bronzong, Deseo de Chingling, Envite Ígneo de Solrock).
 - Aliados sin bloqueo de slot: ¿se ignora al aliado para dañar al jefe o se le ataca primero?
 
 **Sensación de mesa (anótala con tus palabras):**

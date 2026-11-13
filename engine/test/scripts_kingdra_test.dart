@@ -12,7 +12,10 @@ void main() {
       s0,
       ElegirJefe(nombre: 'Kingdra', nivel: s0.nivel, hp: 3000, invocacionCadaHp: 600),
     );
-    return apply(s, TurnoJugador(jugador: 0, dano: dano));
+    return conIntentos(
+      apply(s, TurnoJugador(jugador: 0, dano: dano)),
+      dano ~/ 600,
+    );
   }
 
   AliadoInvocado aliado(CategoriaAliado c, String id,

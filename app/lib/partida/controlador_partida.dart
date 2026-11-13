@@ -140,6 +140,20 @@ final relojProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 /// Azar de la app (dados de invocación y monedas), para fijarlo en los tests.
 final azarProvider = Provider<Random>((ref) => Random.secure());
 
+/// Mazo de ataques del jefe (20 cartas). Se sustituye en los tests para
+/// fijar qué carta sale.
+///
+/// Las cartas dependen de cuántos jugadores hay (3 jugadores: sin las del
+/// Jugador 4; 2: las del 3 y el 4 pasan al 1 y al 2), así que el mazo se
+/// rehace cuando cambia ese número.
+final mazoAtaquesJefeProvider = Provider<MazoAtaquesJefe>((ref) {
+  final jugadores = ref.watch(estadoProvider.select((e) => e.jugadores.length));
+  return MazoAtaquesJefe(
+    ref.watch(azarProvider),
+    jugadores: jugadores.clamp(1, 4),
+  );
+});
+
 /// 32 caracteres hexadecimales aleatorios (16 bytes), bien por debajo de los
 /// 64 que admite el contrato.
 String generarIdPartida() {

@@ -12,7 +12,7 @@ void main() {
       s0,
       ElegirJefe(nombre: 'Onix', nivel: s0.nivel, hp: 3000, invocacionCadaHp: 600),
     );
-    return apply(s, const TurnoJugador(jugador: 0, dano: 1200));
+    return conIntentos(apply(s, const TurnoJugador(jugador: 0, dano: 1200)), 2);
   }
 
   AliadoInvocado zubat(int slot) => AliadoInvocado(

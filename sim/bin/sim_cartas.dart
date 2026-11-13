@@ -162,13 +162,17 @@ int nivelPorX(int x, List<Nivel> niveles) {
 }
 
 class Pareja {
-  Pareja(this.a, this.b);
+  /// Los Pokémon de un jugador: dos, o más si hay pocos jugadores y se
+  /// mantienen 8 Pokémon en mesa ([extra]).
+  Pareja(this.a, this.b, [this.extra = const []]);
   final Carta a;
   final Carta b;
+  final List<Carta> extra;
+  List<Carta> get cartas => [a, b, ...extra];
 }
 
 int calcularX(List<Pareja> equipo) =>
-    equipo.fold(0, (s, p) => s + max(p.a.mejorBase, p.b.mejorBase));
+    equipo.fold(0, (s, p) => s + p.cartas.map((c) => c.mejorBase).reduce(max));
 
 List<Pareja> equipoAzar(Random rnd, List<Carta> cartas) {
   final m = List<Carta>.from(cartas)..shuffle(rnd);
@@ -190,15 +194,29 @@ class Poke {
 }
 
 class Jug {
-  Jug(Pareja p) : pokes = [Poke(p.a), Poke(p.b)];
+  Jug(Pareja p) : pokes = [for (final c in p.cartas) Poke(c)];
   final List<Poke> pokes; // pokes[0] = activo
   bool gxUsado = false;
   bool get eliminado => pokes.every((p) => !p.vivo);
 
+  /// Primer Pokémon vivo de la Banca, si lo hay.
+  Poke? get banca {
+    for (var i = 1; i < pokes.length; i++) {
+      if (pokes[i].vivo) return pokes[i];
+    }
+    return null;
+  }
+
+  /// Cambia el Activo por el primer Pokémon vivo de la Banca.
   void intercambiar() {
+    var i = 1;
+    while (i < pokes.length && !pokes[i].vivo) {
+      i++;
+    }
+    if (i >= pokes.length) i = 1;
     final t = pokes[0];
-    pokes[0] = pokes[1];
-    pokes[1] = t;
+    pokes[0] = pokes[i];
+    pokes[i] = t;
   }
 
   Ataque? elegir(Poke p) {

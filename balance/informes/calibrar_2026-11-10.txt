@@ -1,0 +1,82 @@
+Calibración con el mazo real de ataques del jefe (T-67): 20 cartas del PDF oficial de Incursión Max
+(ataque 1/2/3, jugador, roba otra), máximo de ataques por turno = nivel + 1 (2/3/4/5).
+Mazo según jugadores: 4 = 20 cartas; 3 = sin las 5 del Jugador 4 (15); 2 = 20, las del 3 van al 1 y las del 4 al 2.
+sim_jefes --calibrar, 150 equipos x 60 partidas, ayuda=0.5. Objetivo 75/50/30/15 %. HP de la política solo-dueno.
+
+4 jugadores
+jefe       nivel  HP antes -> HP nuevo  solo-dueno  ayuda   solo-jefe
+onix       1      2300 -> 2400          77.1 %      79.2 %  73.2 %
+manectric  2      2600 -> 2700          54.4 %      58.8 %  48.8 %
+kingdra    3      3700 -> 3800          31.0 %      32.9 %  34.0 %
+arceus     4      3800 -> 3500          17.7 %      18.0 %  20.9 %
+
+Con esos HP, menos jugadores (solo-dueno; los equipos salen de X de cada nivel con 3 o 2 jugadores)
+jefe       nivel  4 jug.   3 jug.   2 jug.   objetivo
+onix       1      77.1 %   48.6 %    1.2 %   75 %
+manectric  2      54.4 %    9.1 %    0.0 %   50 %
+kingdra    3      31.0 %    4.7 %   (sin equipos)  30 %
+arceus     4      17.7 %   (sin equipos)  (sin equipos)  15 %
+
+HP que daría el objetivo con menos jugadores (--calibrar --jugadores=N)
+jefe       nivel  4 jug.  3 jug.  2 jug.
+onix       1      2400    1800     900
+manectric  2      2700    1700     700
+kingdra    3      3800    2800    (sin equipos)
+arceus     4      3500    (sin equipos)  (sin equipos)
+
+Con 3 y 2 jugadores no hay equipos de Nv4 (3 jugadores) ni de Nv3 y Nv4 (2 jugadores): su X no llega al
+rango. Con 2 jugadores los jefes con el HP de 4 jugadores son casi imposibles de ganar.
+
+Pruebas con pocos jugadores (misma fecha)
+
+1) Equipos de las 16 cartas de prueba (sim_jefes, --jugadores=N), X dentro del rango del nivel: a igual X, los Pokémon
+   de 2 jugadores tienen solo ~11 % más de vida media (221 frente a 199) y hay la mitad: la vida total del equipo
+   cae ~44 % (884 frente a 1590) mientras el jefe sigue haciendo los mismos ataques por turno.
+
+2) Quitar ataques por turno al jefe (--menos-ataques=K), HP del catálogo, solo-dueno:
+   3 jugadores, -1: Onix 87,5 % / Manectric 31,7 % / Kingdra 11,1 %.  3 jugadores, -2: 87,5 / 90,0 / 32,8.
+   2 jugadores, -1: Onix 30,1 % / Manectric 0,2 %.  2 jugadores, -2 o más (1 ataque): 30,1 / 27,5.
+   El máximo de ataques es un número entero pequeño: el ajuste es brusco y con 2 jugadores no basta.
+
+3) Modelo abstracto (sim.dart, vida = base + factor x ataque, el reparto de X entre jugadores como dice el baremo),
+   victoria con el HP de niveles.csv (Nv1 / Nv2 / Nv3 / Nv4):
+   factor 1,0:  4 jugadores 65,5 / 0,1 / 8,7 / 8,3 %   2 jugadores 2,1 / 0,0 / 0,3 / 1,1 %
+   factor 1,5:  4 jugadores 100 / 23,6 / 91,5 / 94,2 %  2 jugadores 70,6 / 0,2 / 43,4 / 59,5 %
+   Aun suponiendo que las cartas con más daño tienen mucha más vida, con 2 jugadores se gana bastante menos: la
+   parte fija de vida de cada Pokémon se pierde al haber la mitad de Pokémon. El modelo abstracto no está calibrado:
+   solo sirve para la tendencia.
+
+4) Opción «8 Pokémon en mesa» (--mesa8: 3 jugadores 3+3+2, 2 jugadores 4+4; X = suma del mejor ataque de cada
+   jugador), HP del catálogo (2400 / 2700 / 3800 / 3500), solo-dueno, 150 equipos x 60 partidas.
+
+   Activo al azar (como la calibración de arriba)
+   jefe       objetivo  4 jug.   3 jug. (2 Pokémon -> mesa8)   2 jug. (2 Pokémon -> mesa8)
+   onix       75 %      77,1 %   48,6 % -> 83,8 %               1,2 % -> 64,6 %
+   manectric  50 %      54,4 %    9,1 % -> 32,0 %               0,0 % ->  3,0 %
+   kingdra    30 %      31,0 %    4,7 % -> 24,1 %               (sin equipos)
+   HP que da el objetivo con mesa8: 3 jugadores 2600 / 2300 / 3600; 2 jugadores 2200 / 1500.
+
+   El mejor Pokémon de cada jugador sale de Activo (--mejor-primero)
+   jefe       objetivo  4 jug.   3 jug. (2 Pokémon -> mesa8)   2 jug. (2 Pokémon -> mesa8)
+   onix       75 %      78,3 %   49,7 % -> 86,8 %               1,3 % -> 67,8 %
+   manectric  50 %      61,5 %   10,5 % -> 44,1 %               0,0 % ->  4,4 %
+   kingdra    30 %      35,9 %    4,8 % -> 30,7 %               (sin equipos)
+   arceus     15 %      21,1 %   (sin equipos)                  (sin equipos)
+   HP que da el objetivo con mesa8 y mejor-primero: 4 jugadores 2500 / 2800 / 3900 / 3700;
+   3 jugadores 2700 / 2500 / 3800; 2 jugadores 2200 / 1700.
+
+   Con 3 jugadores, mantener 8 Pokémon en mesa deja los tres jefes cerca del objetivo sin tocar su HP. Con 2
+   jugadores vale para Onix pero no para Manectric (4 %): haría falta además bajarle el HP (a ~1700).
+
+5) Pokémon por jugador según los jugadores (--pokemon=N), HP del catálogo (2400 / 2700 / 3800 / 3500), solo-dueno,
+   150 equipos x 60 partidas. Entre paréntesis, con el mejor Pokémon de Activo (--mejor-primero).
+
+   caso                      onix (75 %)      manectric (50 %)  kingdra (30 %)   HP que da el objetivo
+   3 jugadores x 3 Pokémon   91,2 % (91,6)    61,8 % (73,6)     51,8 % (60,8)    3100 / 2900 / 4300 (3100 / 3100 / 4400)
+   2 jugadores x 4 Pokémon   64,6 % (67,8)     3,0 % (4,4)      sin equipos      2200 / 1500 (2200 / 1700)
+   1 jugador x 5 Pokémon      0,0 % (0,0)     sin equipos       sin equipos      Onix 600 (700)
+   1 jugador x 6 Pokémon      0,0 % (0,0)     sin equipos       sin equipos      Onix 800 (900)
+
+   3x3 (9 en mesa) queda más fácil que con 4 jugadores; 3+3+2 (8 en mesa, prueba 4) quedaba más cerca del objetivo.
+   Con 1 jugador el problema no es la vida: hace un solo ataque por turno contra un jefe con el HP pensado para
+   cuatro, así que no llega a derrotarlo con 5 ni con 6 Pokémon.

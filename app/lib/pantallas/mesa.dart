@@ -134,7 +134,12 @@ class _CamaraTween extends Tween<Camara> {
 /// sobre la mesa, a la izquierda y encima de la fila de jugadores; en las
 /// estrechas va debajo de la mesa. En los dos casos se puede plegar.
 class DisposicionMesa extends ConsumerStatefulWidget {
-  const DisposicionMesa({super.key, required this.controles});
+  const DisposicionMesa({
+    super.key,
+    required this.controles,
+    this.lateral = false,
+    this.extras = const [],
+  });
 
   /// Ancho a partir del cual el panel flota sobre la mesa.
   static const anchoMinimoFlotante = 1100.0;
@@ -143,12 +148,21 @@ class DisposicionMesa extends ConsumerStatefulWidget {
 
   final List<Widget> controles;
 
+  /// El panel va pegado al borde derecho en vez de sobre el centro, para no
+  /// tapar al jefe (turno del jefe, con la carta ya robada).
+  final bool lateral;
+
+  /// Controles secundarios: en pantalla ancha van en un panel aparte,
+  /// plegado, para que el bocadillo no tenga scroll; en estrecha, al final.
+  final List<Widget> extras;
+
   @override
   ConsumerState<DisposicionMesa> createState() => _DisposicionMesaState();
 }
 
 class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
   bool _abierto = true;
+  bool _extrasAbierto = false;
   bool _resolviendo = false;
 
   void _alternar() => setState(() => _abierto = !_abierto);
@@ -215,7 +229,49 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
           return Stack(
             children: [
               const Positioned.fill(child: MesaConCamara()),
-              AnimatedPositioned(
+              if (widget.extras.isNotEmpty)
+                Positioned(
+                  key: const Key('panel-extras'),
+                  // Con el panel del ataque a la derecha, lo demás va a la
+                  // izquierda.
+                  left: widget.lateral && activo == null ? margen : null,
+                  right: widget.lateral && activo == null ? null : margen,
+                  top: 72,
+                  bottom: alto * alturaJugadores + 4,
+                  width: 300,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: PanelAcciones(
+                      titulo: 'Más acciones',
+                      prefijoClave: 'panel-extras-interno',
+                      controles: widget.extras,
+                      abierto: _extrasAbierto,
+                      onAlternar: () =>
+                          setState(() => _extrasAbierto = !_extrasAbierto),
+                      ajustar: true,
+                    ),
+                  ),
+                ),
+              if (widget.lateral && activo == null)
+                Positioned(
+                  key: const Key('panel-lateral'),
+                  right: margen,
+                  top: 72,
+                  bottom: alto * alturaJugadores + 4,
+                  width: panel,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: PanelAcciones(
+                      titulo: titulo,
+                      controles: widget.controles,
+                      abierto: _abierto,
+                      onAlternar: _alternar,
+                      ajustar: true,
+                    ),
+                  ),
+                )
+              else
+                AnimatedPositioned(
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeOutCubic,
                 left: izquierda,
@@ -264,7 +320,7 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
                   padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
                   child: PanelAcciones(
                     titulo: titulo,
-                    controles: widget.controles,
+                    controles: [...widget.controles, ...widget.extras],
                     abierto: true,
                     onAlternar: _alternar,
                     ajustar: false,
@@ -276,7 +332,7 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
                 padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
                 child: PanelAcciones(
                   titulo: titulo,
-                  controles: widget.controles,
+                  controles: [...widget.controles, ...widget.extras],
                   abierto: false,
                   onAlternar: _alternar,
                   ajustar: true,
@@ -401,7 +457,6 @@ class _Mesa extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tema = Theme.of(context);
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -421,35 +476,18 @@ class _Mesa extends StatelessWidget {
         ),
         Column(
           children: [
+            // El jefe en el centro, con los slots de aliado a los lados.
             Expanded(
-              flex: (alturaJefe * 100).round(),
+              flex: ((alturaJefe + alturaAliados) * 100).round(),
               child: GestureDetector(
                 key: const Key('zona-jefe'),
                 behavior: HitTestBehavior.translucent,
                 onTap: () => onFoco(const FocoJefe()),
                 child: _Zona(
-                  ancho: 440,
+                  ancho: _EscenaJefe.anchoPara(estado.jugadores.length),
                   arriba: MediaQuery.of(context).padding.top + 52,
-                  hijo: const TarjetaJefe(),
+                  hijo: _EscenaJefe(slots: estado.jugadores.length),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: (alturaAliados * 100).round(),
-              child: GestureDetector(
-                key: const Key('zona-aliados'),
-                behavior: HitTestBehavior.translucent,
-                onTap: () => onFoco(const FocoAliados()),
-                child: estado.aliados.isEmpty
-                    ? Center(
-                        child: Text(
-                          'Sin aliados en la mesa',
-                          style: tema.textTheme.labelLarge?.copyWith(
-                            color: tema.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      )
-                    : const _Zona(ancho: 520, hijo: PanelAliados()),
               ),
             ),
             Expanded(
@@ -468,6 +506,59 @@ class _Mesa extends StatelessWidget {
               ),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// El jefe (carta y panel) en el centro y los slots de aliado a los lados: la
+/// primera mitad a su izquierda y el resto a su derecha, uno por jugador.
+class _EscenaJefe extends StatelessWidget {
+  const _EscenaJefe({required this.slots});
+
+  final int slots;
+
+  static const _anchoSlot = 150.0;
+  static const _anchoJefe = 360.0;
+
+  /// Ancho que necesita la escena: el jefe y, a cada lado, los slots de su
+  /// mitad (el lado con más slots manda) con su separación.
+  static double anchoPara(int slots) {
+    final porLado = (slots + 1) ~/ 2;
+    return _anchoJefe + 2 * porLado * (_anchoSlot + 20);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final izquierda = (slots + 1) ~/ 2;
+    Widget lado(Iterable<int> indices, MainAxisAlignment alineacion) => Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 40),
+            child: Row(
+              mainAxisAlignment: alineacion,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final i in indices)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: SizedBox(
+                      width: _anchoSlot,
+                      child: SlotAliado(slot: i),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        lado([for (var i = 0; i < izquierda; i++) i], MainAxisAlignment.end),
+        const SizedBox(width: _anchoJefe, child: TarjetaJefe()),
+        lado(
+          [for (var i = izquierda; i < slots; i++) i],
+          MainAxisAlignment.start,
+        ),
       ],
     );
   }

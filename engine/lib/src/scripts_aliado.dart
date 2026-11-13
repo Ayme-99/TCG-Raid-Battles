@@ -78,6 +78,17 @@ class ScriptAliado {
   /// y el daño de un ataque nunca baja de 0.
   final int reduccionDano;
 
+  /// Aura (Moflete Estático): mientras el aliado está en juego, cada vez que
+  /// un ataque de los jugadores deja fuera de combate a un aliado (él
+  /// incluido), el Pokémon atacante queda Paralizado. El motor lo anota como
+  /// efecto activo sobre ese jugador durante su siguiente turno.
+  final bool paralizaAlCaerAliado;
+
+  /// Al entrar deja un efecto que sigue aplicado el resto de la partida,
+  /// aunque el aliado caiga (Fijar Blanco). Lo resuelve la mesa; el motor lo
+  /// guarda en `efectosPermanentes` para que el asistente lo recuerde.
+  final bool efectoPermanente;
+
   const ScriptAliado({
     this.alEntrar,
     this.alFinTurnoJefe,
@@ -91,6 +102,8 @@ class ScriptAliado {
     this.bonusSoloPrimerAtaque = false,
     this.bloqueaEstados = false,
     this.reduccionDano = 0,
+    this.paralizaAlCaerAliado = false,
+    this.efectoPermanente = false,
   });
 }
 
@@ -153,6 +166,31 @@ int reduccionDanoAlJefe(
   }
   return total;
 }
+
+/// Hay en juego un aliado con el aura de Moflete Estático: el jugador que
+/// deje fuera de combate a un aliado con un ataque queda Paralizado.
+bool paralizaAlCaerAliado(
+  EstadoPartida e, [
+  Map<String, ScriptAliado> scripts = scriptsAliado,
+]) {
+  for (final a in e.aliados) {
+    final id = a.scriptId;
+    if (a.efectos != EfectosAliado.programa || id == null) continue;
+    if (scripts[id]?.paralizaAlCaerAliado ?? false) return true;
+  }
+  return false;
+}
+
+/// Daño que se resta al próximo ataque del jugador [jugador], vaya contra el
+/// jefe o contra un aliado: las reducciones de los aliados en juego (Rizo
+/// Defensa, Gruñido) más su debilitación pendiente (Fuerza Lunar). No incluye
+/// la reducción propia de un aliado (Bloqueo), que depende del objetivo.
+int reduccionParaJugador(
+  EstadoPartida e,
+  int jugador, [
+  Map<String, ScriptAliado> scripts = scriptsAliado,
+]) =>
+    reduccionDanoAlJefe(e, scripts) + (e.debilitados[jugador] ?? 0);
 
 /// Aliado que obliga a los jugadores a atacarle (Bloqueo), o null.
 AliadoEstado? aliadoProvocador(
@@ -320,6 +358,8 @@ const Map<String, ScriptAliado> scriptsAliado = {
   ),
   'aullido-20': ScriptAliado(bonusAtaqueJefe: 20),
   'grunido-10': ScriptAliado(reduccionDano: 10),
+  'moflete-estatico': ScriptAliado(paralizaAlCaerAliado: true),
+  'fijar-blanco': ScriptAliado(efectoPermanente: true),
   'tanque-jefe-10': ScriptAliado(reduccionDano: 10),
   'tanque-jefe-20': ScriptAliado(reduccionDano: 20),
   'tanque-jefe-30': ScriptAliado(reduccionDano: 30),

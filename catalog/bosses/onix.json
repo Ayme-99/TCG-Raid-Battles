@@ -4,6 +4,7 @@
   "nombre": "Onix",
   "nivel": 1,
   "mapa": "Túnel Roca",
+  "numero": 1,
   "hp": 2300,
   "ataques": [
     {
@@ -12,7 +13,7 @@
       "efecto": {
         "tipo": "sinRetirada",
         "duracion": 1,
-        "texto": "Durante el próximo turno de los jugadores, el Pokémon Defensor no puede retirarse."
+        "texto": "Durante el próximo turno de los jugadores el Pokémon Defensor no puede retirarse."
       }
     },
     {
@@ -20,39 +21,42 @@
       "dano": 60
     },
     {
-      "nombre": "Doble filo",
+      "nombre": "Doble Filo",
       "dano": 120,
       "efecto": {
         "tipo": "autodano",
         "valor": 30,
-        "texto": "Onix se hace 30 puntos de daño a sí mismo."
+        "texto": "Este Pokémon también se hace 30 puntos de daño a sí mismo."
       }
     }
   ],
   "invocacion": {
-    "cadaHp": 1150,
+    "cadaHp": 1200,
     "tirada": "segura",
     "aliados": {
       "danio": {
         "nombre": "Machop",
+        "numero": 2,
         "hp": 70,
         "ataque": {
           "nombre": "Puño Incremento",
           "dano": 20,
           "monedas": 2,
-          "texto": "Lanza dos monedas: este ataque hace 20 puntos de daño por cada cara."
+          "texto": "Lanza 2 monedas. Este ataque hace 20 puntos de daño por cada cara."
         }
       },
       "tanque": {
         "nombre": "Geodude",
+        "numero": 3,
         "hp": 90,
         "habilidadNombre": "Rizo Defensa",
-        "habilidad": "Mientras Geodude esté en juego, el jefe y los aliados reciben 10 puntos de daño menos por los ataques de los jugadores.",
+        "habilidad": "Mientras este Pokémon esté en juego, los ataques de los jugadores hacen 10 puntos de daño menos al jefe y a los aliados.",
         "efectos": "programa",
         "scriptId": "tanque-jefe-10"
       },
       "cura": {
         "nombre": "Zubat",
+        "numero": 4,
         "hp": 50,
         "ataque": {
           "nombre": "Chupavidas",
@@ -64,23 +68,28 @@
       },
       "control": {
         "nombre": "Rhyhorn",
+        "numero": 5,
         "hp": 100,
-        "habilidadNombre": "Tormenta de arena",
-        "habilidad": "Mientras Rhyhorn esté en juego, durante el chequeo Pokémon, los Pokémon activos de los jugadores reciben 10 puntos de daño."
+        "habilidadNombre": "Tormenta de Arena",
+        "habilidad": "Mientras este Pokémon esté en juego, durante el Chequeo Pokémon, pon 1 contador de daño en cada Pokémon Activo de los jugadores.",
+        "avisoChequeo": "Tormenta de Arena: pon 1 contador de daño en cada Pokémon Activo de los jugadores."
       },
       "potenciador": {
         "nombre": "Cubone",
+        "numero": 6,
         "hp": 60,
         "habilidadNombre": "Foco Energía",
-        "habilidad": "Cada vez que el jefe vaya a atacar, lanza una moneda. Si sale cara, el ataque hace 10 puntos de daño más.",
+        "habilidad": "Mientras este Pokémon esté en juego, cada vez que el jefe vaya a atacar, lanza 1 moneda. Si sale cara, ese ataque hace 10 puntos de daño más.",
         "efectos": "programa",
         "scriptId": "foco-energia-10"
       },
       "debilitador": {
         "nombre": "Haunter",
+        "numero": 7,
         "hp": 80,
         "habilidadNombre": "Rencor",
-        "habilidad": "Los Pokémon de los jugadores no pueden usar el mismo ataque 2 turnos seguidos."
+        "habilidad": "Mientras este Pokémon esté en juego, los Pokémon de los jugadores no pueden usar el mismo ataque en 2 turnos seguidos.",
+        "avisoTurno": "Rencor: tu Pokémon no puede usar el mismo ataque que usó en su turno anterior."
       }
     }
   }

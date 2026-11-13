@@ -3,9 +3,9 @@
 // Reutiliza los equipos de cartas reales y las reglas de sim_cartas.dart
 // (D-03) y añade lo que ese simulador no modela, tal como lo define el GDD §4.4
 // y D-13:
-//   - Invocación por umbral: cada vez que el jefe pierde `cadaHp` HP hay un
-//     intento (el golpe que lo deja a 0 HP no da ninguno). Con tirada
-//     `segura` no hay moneda; con `moneda` solo sigue si sale cara.
+//   - Llamada de aliados (T-69/T-71): la primera al terminar el turno del jefe
+//     de la ronda 1 y las siguientes cada vez que su HP baja a un umbral
+//     (cada `cadaHp` HP perdidos), hasta nivel + 1 llamadas. Sin moneda.
 //   - Un dado elige el slot entre los libres de jugadores activos y otro la
 //     categoría entre las que no están en uso. Sin slot libre no hay aliado.
 //   - Al entrar, el aliado ataca (si tiene ataque); luego vuelve a atacar al
@@ -58,6 +58,10 @@
 // habilidad: «Tormenta de arena» (control: 10 de daño al Pokémon activo de
 // cada jugador en el chequeo Pokémon, tras el turno del jefe) y «Rencor»
 // (debilitador: los jugadores no repiten ataque dos turnos seguidos).
+// No se modelan (los resuelve la mesa y no hay Condiciones Especiales de los
+// jugadores en el simulador): Tóxico (Gulpin, ataque sin daño que envenena),
+// la Confusión de Puño Dinámico, Fijar Blanco y la parálisis de Moflete
+// Estático.
 //
 // NO modela (el informe lo dice): veneno ni quemadura del jefe, ni el cambio de
 // Pokémon activo por efectos. Por eso las cifras siguen siendo una cota
@@ -67,6 +71,8 @@
 // Uso (desde sim/):
 //   dart run bin/sim_jefes.dart
 //   dart run bin/sim_jefes.dart --equipos=20 --partidas=20 --informe=/tmp/j.csv
+//   dart run bin/sim_jefes.dart --jugadores=3   # equipos de 1 a 4 jugadores
+//   dart run bin/sim_jefes.dart --jugadores=2 --mesa8   # 8 Pokémon en mesa (4 por jugador)
 //   dart run bin/sim_jefes.dart --calibrar   # HP (en centenas) que da el objetivo
 //   dart run bin/sim_jefes.dart --causas     # por qué no se usan todos los intentos
 //
@@ -79,6 +85,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:incursiones_engine/incursiones_engine.dart'
+    show MazoAtaquesJefe;
 
 import 'sim_cartas.dart' hide Medida, main, medir;
 
@@ -140,7 +149,8 @@ class AliadoDef {
   int get drenadoras => _numero('drenadoras-');
 
   /// Daño al Pokémon activo de cada jugador en el chequeo Pokémon.
-  int get danoChequeo => habilidadNombre == 'Tormenta de arena' ? 10 : 0;
+  int get danoChequeo =>
+      habilidadNombre?.toLowerCase() == 'tormenta de arena' ? 10 : 0;
 
   /// Los jugadores solo pueden atacar a este aliado (Bloqueo) y este recibe
   /// N de daño menos de cada ataque.
@@ -194,19 +204,19 @@ class JefeDef {
   final bool segura;
   final Map<String, AliadoDef> aliados;
 
-  /// Intentos de invocación a lo largo de la partida (el golpe a 0 HP no da).
-  int get intentos => cadaHp == null ? 0 : (hp + cadaHp! - 1) ~/ cadaHp! - 1;
+  /// Llamadas de aliado posibles a lo largo de la partida (T-69): nivel + 1.
+  int get intentos => cadaHp == null ? 0 : nivel + 1;
 
-  /// El mismo jefe con otro HP. Mantiene el número de intentos (y por tanto
-  /// de aliados): `cadaHp` se reparte en tramos iguales redondeando hacia
-  /// arriba, así nunca sale un intento de más.
+  /// El mismo jefe con otro HP. Mantiene el número de llamadas por umbral
+  /// (nivel, además de la primera): `cadaHp` se reparte en tramos iguales
+  /// redondeando hacia abajo.
   JefeDef conHp(int nuevoHp) => JefeDef(
         id: id,
         nombre: nombre,
         nivel: nivel,
         hp: nuevoHp,
         ataques: ataques,
-        cadaHp: cadaHp == null ? null : (nuevoHp + intentos) ~/ (intentos + 1),
+        cadaHp: cadaHp == null ? null : (nuevoHp + nivel) ~/ (nivel + 1),
         segura: segura,
         aliados: aliados,
       );
@@ -323,8 +333,9 @@ class Resultado {
 
 /// Daño a un jugador: al Activo, o a la Banca si [banca] y está viva.
 void golpear(Jug j, int dano, {bool banca = false}) {
-  if (banca && j.pokes[1].vivo) {
-    j.pokes[1].hp -= dano;
+  final suplente = j.banca;
+  if (banca && suplente != null) {
+    suplente.hp -= dano;
     return;
   }
   if (!j.pokes[0].vivo) j.intercambiar();
@@ -343,9 +354,13 @@ Resultado jugarJefe(
   double propio = 1.0,
 ]) {
   final js = [for (final p in equipo) Jug(p)];
+  final mazo = MazoAtaquesJefe(rnd, jugadores: js.length);
   final slots = List<Aliado?>.filled(js.length, null);
   var hp = jefe.hp;
-  var cruzados = 0;
+  var llamadas = 0;
+  // Ronda de la partida (para las llamadas: nada cuenta antes de que acabe el
+  // primer turno del jefe).
+  var ronda = 1;
   var invocados = 0;
   var sinSlot = 0;
   var sinCategoria = 0;
@@ -460,7 +475,6 @@ Resultado jugarJefe(
       sinSlot++;
       return;
     }
-    if (!jefe.segura && rnd.nextBool() == false) return; // la moneda no salió
     final enUso = {
       for (final a in slots)
         if (a != null) a.categoria,
@@ -509,23 +523,33 @@ Resultado jugarJefe(
     }
   }
 
-  // El jefe pierde [dano] HP y puede dar intentos de invocación. Devuelve
-  // true si cae.
+  // Llamadas de aliado debidas (T-71): la primera al acabar el turno del jefe
+  // de la ronda 1 y una por umbral de HP cruzado, hasta nivel + 1 en total.
+  void llamar() {
+    final cada = jefe.cadaHp;
+    if (cada == null || ronda < 2) return;
+    final maxUmbrales = (jefe.hp - 1) ~/ cada;
+    var cruzados = (jefe.hp - hp) ~/ cada;
+    if (cruzados > maxUmbrales) cruzados = maxUmbrales;
+    if (cruzados < 0) cruzados = 0;
+    final debidas = min(1 + cruzados, jefe.intentos);
+    while (llamadas < debidas) {
+      llamadas++;
+      invocar();
+    }
+  }
+
+  // El jefe pierde [dano] HP. Devuelve true si cae; si no, puede llamar a un
+  // aliado al cruzar un umbral de HP.
   bool bajarJefe(int dano) {
     hp -= dano;
     if (hp <= 0) return true;
-    final cadaHp = jefe.cadaHp;
-    if (cadaHp != null) {
-      final ahora = (jefe.hp - hp) ~/ cadaHp;
-      while (cruzados < ahora) {
-        cruzados++;
-        invocar();
-      }
-    }
+    llamar();
     return false;
   }
 
   for (var t = 1; t <= c.maxTurnos; t++) {
+    ronda = t;
     actual = -1;
     for (var i = 0; i < js.length; i++) {
       final j = js[i];
@@ -551,7 +575,7 @@ Resultado jugarJefe(
       var ch = elegir(act);
       final constriccion = slots.any((a) => a != null && a.def.constriccion);
       if (ch == null &&
-          j.pokes[1].vivo &&
+          j.banca != null &&
           !sinRetirada.contains(i) &&
           !constriccion) {
         j.intercambiar();
@@ -620,21 +644,22 @@ Resultado jugarJefe(
     noAtacan.clear();
     sinRetirada.clear();
 
-    // Turno del jefe: sus ataques (como en sim_cartas.dart)...
-    var k = 1;
-    while (k < nv.maxAtaques && rnd.nextDouble() < probSeguir) {
-      k++;
-    }
-    for (var n = 0; n < k; n++) {
-      final vivos = js.where((j) => !j.eliminado).toList();
-      if (vivos.isEmpty) break;
-      final j = vivos[rnd.nextInt(vivos.length)];
-      final r = rnd.nextDouble();
-      final a = jefe.ataques[r < 0.4 ? 0 : (r < 0.8 ? 1 : 2)];
+    // Turno del jefe: roba cartas del mazo real (20 cartas oficiales; según
+    // los jugadores se quitan o se redirigen), cada una con su ataque y su
+    // objetivo, y sigue mientras diga «roba otra» hasta el máximo del nivel.
+    for (var n = 0; n < nv.maxAtaques; n++) {
+      final activos = {
+        for (var i = 0; i < js.length; i++)
+          if (!js[i].eliminado) i,
+      };
+      if (activos.isEmpty) break;
+      final carta = mazo.robar(activos);
+      final j = js[carta.jugador];
+      final a = jefe.ataques[carta.ranura - 1];
       var dano = a.dano;
       if (a.tipo == 'danoPorAtaquePrevio') dano += (a.valor ?? 0) * n;
       if (a.tipo == 'danoExtraSi') {
-        final defensor = j.pokes[0].vivo ? j.pokes[0] : j.pokes[1];
+        final defensor = j.pokes[0].vivo ? j.pokes[0] : (j.banca ?? j.pokes[1]);
         if (defensor.hp == defensor.carta.hp) dano += a.valor ?? 0;
       }
       // Potenciadores vivos: moneda y, con cara, más daño.
@@ -666,6 +691,7 @@ Resultado jugarJefe(
       } else if (a.tipo == 'sinRetirada') {
         sinRetirada.add(js.indexOf(j));
       }
+      if (!carta.robaOtra) break;
     }
     // ...y, al final, los ataques de los aliados vivos.
     for (var i = 0; i < slots.length; i++) {
@@ -690,6 +716,10 @@ Resultado jugarJefe(
       }
     }
     if (js.every((j) => j.eliminado)) return res(0);
+    // Termina el turno del jefe: primera llamada y umbrales ya cruzados. El
+    // aliado entra y ataca al entrar (la ronda siguiente, antes de actuar).
+    ronda = t + 1;
+    llamar();
   }
   return res(0);
 }
@@ -767,17 +797,36 @@ int calibrarJefe(List<List<Pareja>> equipos, JefeDef jefe, Nivel nv, Config c) {
   return lo * 100;
 }
 
+/// Reparte 8 Pokémon entre [n] jugadores lo más igual posible.
+List<int> _reparto8(int n) =>
+    [for (var i = 0; i < n; i++) 8 ~/ n + (i < 8 % n ? 1 : 0)];
+
 void main(List<String> args) {
   var carpetaJefes = '../catalog';
   var ayuda = 0.5;
   final resto = <String>[];
   String? informeArg;
   var causas = false;
+  var jugadores = 4;
+  var menosAtaques = 0;
+  var mesa8 = false;
+  int? pokemon;
+  var mejorPrimero = false;
   for (final a in args) {
     if (a == '--causas') {
       causas = true;
     } else if (a.startsWith('--jefes=')) {
       carpetaJefes = a.substring('--jefes='.length);
+    } else if (a.startsWith('--jugadores=')) {
+      jugadores = int.parse(a.substring('--jugadores='.length));
+    } else if (a == '--mejor-primero') {
+      mejorPrimero = true;
+    } else if (a.startsWith('--pokemon=')) {
+      pokemon = int.parse(a.substring('--pokemon='.length));
+    } else if (a == '--mesa8') {
+      mesa8 = true;
+    } else if (a.startsWith('--menos-ataques=')) {
+      menosAtaques = int.parse(a.substring('--menos-ataques='.length));
     } else if (a.startsWith('--ayuda=')) {
       ayuda = double.parse(a.substring('--ayuda='.length));
     } else if (a.startsWith('--informe=')) {
@@ -802,14 +851,32 @@ void main(List<String> args) {
   for (final n in niveles) {
     final destino = porNivel[n.nivel]!;
     for (var intento = 0; intento < 200000 && destino.length < c.equipos; intento++) {
-      final e = n.nivel == 1 ? equipoNormales(rnd, normales) : equipoAzar(rnd, lista);
+      // Pokémon de cada jugador: 2, o con --mesa8 los 8 de la mesa repartidos
+      // (4 jugadores 2+2+2+2, 3 jugadores 3+3+2, 2 jugadores 4+4).
+      final tam = pokemon != null
+          ? List.filled(jugadores, pokemon)
+          : (mesa8 ? _reparto8(jugadores) : List.filled(jugadores, 2));
+      final total = tam.fold(0, (x, y) => x + y);
+      final elegidas = n.nivel == 1
+          ? [for (var i = 0; i < total; i++) normales[rnd.nextInt(normales.length)]]
+          : (List<Carta>.from(lista)..shuffle(rnd)).sublist(0, total);
+      var pos = 0;
+      final e = <Pareja>[];
+      for (final t in tam) {
+        final grupo = elegidas.sublist(pos, pos + t);
+        // Con --mejor-primero el jugador saca de Activo su mejor Pokémon y
+        // deja en la Banca los demás, de más a menos daño.
+        if (mejorPrimero) grupo.sort((x, y) => y.mejorBase.compareTo(x.mejorBase));
+        pos += t;
+        e.add(Pareja(grupo[0], grupo[1], grupo.sublist(2)));
+      }
       if (nivelPorX(calcularX(e), niveles) == n.nivel) destino.add(e);
     }
   }
 
   stdout.writeln('Incursiones · simulador de jefes con aliados (T-28)');
   stdout.writeln('jefes=${jefes.length} equipos/nivel=${c.equipos} '
-      'partidas/equipo=${c.partidas} ayuda=$ayuda\n');
+      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques mesa8=$mesa8 pokemon=$pokemon mejor-primero=$mejorPrimero\n');
   stdout.writeln('jefe        nivel  HP     política      victoria  objetivo  turnos  aliados');
   final filas = <String>[
     'jefe,nivel,hp,politica,equipos,partidas_por_equipo,victoria,objetivo,turnos_victoria,aliados_invocados',
@@ -822,7 +889,10 @@ void main(List<String> args) {
   };
   final filasCausas = <String>[];
   for (final jefe in jefes) {
-    final nv = niveles.firstWhere((n) => n.nivel == jefe.nivel);
+    final base = niveles.firstWhere((n) => n.nivel == jefe.nivel);
+    // Experimento: quitar ataques por turno al jefe (--menos-ataques=K).
+    final nv = Nivel(base.nivel, base.xMin, base.hp, base.ataques,
+        max(1, base.maxAtaques - menosAtaques));
     final eqs = porNivel[jefe.nivel]!;
     if (eqs.isEmpty) {
       stdout.writeln('${jefe.id}  sin equipos de este nivel');
@@ -837,8 +907,8 @@ void main(List<String> args) {
           '${(100 * objetivo[jefe.nivel]!).toStringAsFixed(0).padLeft(3)} %     '
           '${m.turnosVictoria.toStringAsFixed(1).padLeft(5)}  '
           '${m.invocados.toStringAsFixed(2)}');
-      // Intentos que dan los umbrales; los que faltan hasta el total no
-      // llegaron a cruzarse porque la partida terminó antes.
+      // Llamadas posibles; las que faltan hasta el total no llegaron a
+      // hacerse porque la partida terminó antes.
       final sinCruzar =
           medido.intentos - m.invocados - m.sinSlot - m.sinCategoria;
       filasCausas.add('${jefe.id.padRight(11)} ${e.key.padRight(12)} '
@@ -853,11 +923,11 @@ void main(List<String> args) {
     }
   }
   if (causas) {
-    stdout.writeln('\nCausas de los intentos de invocación (media por partida)');
+    stdout.writeln('\nCausas de las llamadas de aliado (media por partida)');
     stdout.writeln('jefe        política      intentos  invocados  sinSlot  '
         'sinCategoría  sinCruzar');
     filasCausas.forEach(stdout.writeln);
-    stdout.writeln('sinCruzar: umbrales que no llegaron a cruzarse porque la '
+    stdout.writeln('sinCruzar: llamadas que no llegaron a hacerse porque la '
         'partida terminó antes (victoria o derrota).');
   }
   File(informe)

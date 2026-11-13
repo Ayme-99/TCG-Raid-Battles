@@ -4,6 +4,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
+import '../partida/recordatorios.dart';
 import 'comun.dart';
 import 'paneles.dart';
 import 'pendientes.dart';
@@ -19,9 +20,7 @@ class PantallaTurnoJugadores extends ConsumerWidget {
     final estado = ref.watch(estadoProvider);
     final actual = estado.jugadorActual;
     final controles = <Widget>[
-        const PanelEfectosActivos(),
         const PanelPendientes(),
-        _Orden(estado: estado),
         if (actual != null)
           _TurnoActual(
             key: ValueKey('turno-${estado.ronda}-${estado.turnoActual}'),
@@ -30,15 +29,20 @@ class PantallaTurnoJugadores extends ConsumerWidget {
           ),
         if (estado.cartasAnimoPendientes.isNotEmpty)
           _CartasAnimo(estado: estado),
-        PanelEstados(
-          key: ValueKey('estados-${estado.ronda}-${estado.turnoActual}'),
-          jugadorInicial: actual,
-        ),
-        const PanelPokemon(),
+    ];
+    // El bocadillo solo lleva lo del turno; el resto va en «Más acciones».
+    final extras = <Widget>[
+      const PanelEfectosActivos(),
+      _Orden(estado: estado),
+      PanelEstados(
+        key: ValueKey('estados-${estado.ronda}-${estado.turnoActual}'),
+        jugadorInicial: actual,
+      ),
+      const PanelPokemon(),
     ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).
-    return DisposicionMesa(controles: controles);
+    return DisposicionMesa(controles: controles, extras: extras);
   }
 }
 
@@ -127,12 +131,42 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
             .read(catalogoProvider)
             .valueOrNull
             ?.aliadoDe(jefeCarta.nombre, jefeCarta.nivel, aliado.categoria);
-    // Bote (Magikarp): moneda al ir a recibir daño; con cara se evita. El
+    // Bote (Magikarp): el jugador atacante lanza 1 moneda y, con cara, se evita
+    // todo el daño. La moneda cae en la pantalla; si Fijar Blanco está en
+    // juego, la primera moneda de cada jugador es cruz y la lleva la mesa. El
     // ataque gasta el turno igualmente.
-    final evita = cartaAliado != null &&
+    final conBote = cartaAliado != null &&
         cartaAliado.nombre == aliado!.nombre &&
-        cartaAliado.evitaDanoConMoneda &&
-        ref.read(azarProvider).nextBool();
+        cartaAliado.evitaDanoConMoneda;
+    var evita = false;
+    if (conBote) {
+      final nombreAliado = aliado.nombre;
+      final nombreJugador = estado.jugadores[widget.jugador].nombre;
+      final fijadas =
+          recordatoriosDeMoneda(ref.read(catalogoProvider).valueOrNull, estado);
+      if (fijadas.isEmpty) {
+        evita = await lanzarMonedaEnPantalla(
+          context,
+          ref,
+          titulo: '$nombreAliado: Bote',
+          detalle: '$nombreJugador lanza 1 moneda. Con cara, se evita todo el '
+              'daño a $nombreAliado.',
+        );
+      } else {
+        final cara = await preguntarMesa(
+          context,
+          [
+            '$nombreAliado: Bote. $nombreJugador lanza 1 moneda. ¿Sale cara?',
+            ...fijadas,
+          ].join('\n'),
+          si: 'Cara',
+          no: 'Cruz',
+        );
+        if (cara == null) return;
+        evita = cara;
+      }
+      if (!mounted) return;
+    }
     final aplicado = registrar(
       context,
       ref,
@@ -142,24 +176,25 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
         dano: evita ? 0 : dano,
       ),
     );
-    if (aplicado && evita && context.mounted) {
-      registrarAviso(
-        context,
-        '${aliado.nombre}: moneda en cara, evita el daño.',
-      );
-    }
     if (!aplicado || aliado == null || !context.mounted) return;
-    // Derrotado: recordatorio de la carta (p. ej. Moflete Estático).
-    if (ref.read(estadoProvider).aliadoEn(slot) != null) return;
-    final jefe = estado.jefe;
-    final aviso = jefe == null
-        ? null
-        : ref
-            .read(catalogoProvider)
-            .valueOrNull
-            ?.aliadoDe(jefe.nombre, jefe.nivel, aliado.categoria)
-            ?.avisoAlCaer;
-    if (aviso != null) registrarAviso(context, aviso);
+    final catalogo = ref.read(catalogoProvider).valueOrNull;
+    final avisos = <String>[
+      if (conBote && evita)
+        '${aliado.nombre}: moneda en cara, se evita todo el daño.'
+      else if (conBote)
+        '${aliado.nombre}: moneda en cruz, recibe el daño.',
+      // Derrotado: recordatorios de la carta caída y auras de los aliados
+      // que estaban en juego, él incluido (Moflete Estático).
+      if (ref.read(estadoProvider).aliadoEn(slot) == null) ...[
+        if (cartaDeAliado(catalogo, estado, aliado)?.avisoAlCaer case final a?)
+          a,
+        for (final enJuego in estado.aliados)
+          if (cartaDeAliado(catalogo, estado, enJuego)?.avisoAliadoCaido
+              case final a?)
+            a,
+      ],
+    ];
+    registrarAvisos(context, avisos);
   }
 
   @override
@@ -168,6 +203,11 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
     final nombre = estado.jugadores[widget.jugador].nombre;
     final conAliado = estado.aliadoEn(widget.jugador) != null;
     final provocador = aliadoProvocador(estado);
+    final recordatorios = recordatoriosDeTurno(
+      ref.watch(catalogoProvider).valueOrNull,
+      estado,
+      widget.jugador,
+    );
     return Card(
       color: Theme.of(context).colorScheme.primaryContainer,
       child: Padding(
@@ -187,6 +227,15 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                   '${provocador.nombre} obliga a atacarle: ataca a ese '
                   'aliado o pasa el turno sin dañar al jefe.',
                   key: const Key('aviso-bloqueo'),
+                ),
+              ),
+            if (recordatorios.isNotEmpty)
+              Padding(
+                key: const Key('recordatorios-turno'),
+                padding: const EdgeInsets.only(top: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [for (final r in recordatorios) Text('• $r')],
                 ),
               ),
             if (conAliado)

@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.10 (especificación del motor)
+**Versión:** 1.15 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -34,7 +34,7 @@ Orden (detalle en `docs/D-01-setup.md`):
 | Qué número cuenta (`docs/D-02-dano-maximo.md`) | Cada jugador lo introduce a mano y todos lo ven y lo comprueban con la carta física. La mesa acuerda el número caso a caso, **sin tope** (hay cartas de más de 200 de daño). Daño fijo: el impreso. Daño por Energía: solo el base impreso. Los modificadores de la partida no cuentan. |
 | **Nivel** | `X ≤ 400` → Nv1 · `400 < X ≤ 600` → Nv2 · `600 < X ≤ 800` → Nv3 · `X > 800` → Nv4. El valor límite pertenece al nivel de abajo (media máxima por jugador con 4: 100 / 150 / 200 en Nv1-3). Un X menor de 250 se juega como Nv1 (no hay nivel inferior). |
 | **Jefe** | Elegido a mano o al azar dentro del nivel. Es una **carta fija** del catálogo: tiene su propio HP y sus propios ataques; no se escala con los jugadores. El asistente conoce el HP y el daño de cada ataque y computa solo los efectos «de programa» (D-14: autodaño, daño por ataques previos del turno, daño a los aliados); el resto lo aplican los jugadores en la mesa. **Criterio de nivel**: Nv1 Pokémon Básicos, Nv2 Pokémon de Fase 1 que no evolucionan más, Nv3 Pokémon de Fase 2, Nv4 Pokémon Míticos y Legendarios. Lanzamiento: 4 jefes, uno por nivel (Onix Nv1, Manectric Nv2, Kingdra Nv3, Arceus Nv4), todos disponibles desde el principio; el catálogo crecerá con más jefes. |
-| **HP del jefe** | El de su carta. HP de los jefes del catálogo, calibrados con el simulador (con sus 6 aliados, D-16) para un objetivo de victoria de 75 / 50 / 30 / 15 %: **Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800** en Nv1 / Nv2 / Nv3 / Nv4. La referencia anterior sin aliados (2382 / 4313 / 4411 / 5205) sigue en `balance/tablas/niveles.csv`. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
+| **HP del jefe** | El de su carta. HP de los jefes del catálogo, calibrados con el simulador (con sus 6 aliados, D-16) para un objetivo de victoria de 75 / 50 / 30 / 15 %: **Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800** en Nv1 / Nv2 / Nv3 / Nv4 (T-71: son los PS de las cartas; la calibración de T-68 daba 2200 / 2700 / 3800 / 3900). La referencia anterior sin aliados (2382 / 4313 / 4411 / 5205) sigue en `balance/tablas/niveles.csv`. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
 | Ataques del jefe por nivel | Nv1 30/60/120 · Nv2 40/80/160 · Nv3 60/100/200 · Nv4 80/120/240. Los ataques salen de la baraja de ataques del jefe («Ataque X contra jugador Y», como el juego oficial), que también fija el máximo de ataques por turno. |
 | Menos de 4 jugadores | No se añaden parejas extra. El nivel se autoajusta con X, y los slots de aliados bajan con el número de jugadores (§4.4). |
 
@@ -58,16 +58,15 @@ INICIO
                 dañar al jefe (el aliado le ataca igualmente); solo el
                 Bloqueo de un aliado concreto obliga a atacarle
               - Introduce a mano el daño hecho al jefe; el asistente lo resta
-              - Si el HP del jefe cruza un umbral de invocación (§4.4):
-                intento de invocación en ese mismo momento
               - Si HP del jefe ≤ 0 → FIN: VICTORIA (inmediata)
       └─ TURNO DEL JEFE
-            - Se revela una carta del jefe (física)
-            - El jugador indica al asistente: ranura de ataque (1/2/3, solo
-              etiqueta), daño y objetivo:
-                · Todos los jugadores
-                · Un jugador elegido
-                · Un jugador al azar (dado físico, resultado a mano)
+            - La app roba por el jefe una carta de su mazo de 20 cartas de ataque
+              (animación) y muestra el ataque (1/2/3) y el jugador atacado:
+                · Si la carta dice «Roba una carta más», se roba otra, hasta el
+                  máximo de ataques del nivel (Nv1: 2, Nv2: 3, Nv3 y Nv4: 4)
+                · Una carta que apunta a un jugador que no juega o está
+                  eliminado se descarta sin efecto y se roba otra
+                · Si el mazo se agota, se baraja el descarte
             - Si la carta cura al jefe: sube su HP sin pasar del HP máximo
             - Al final de su turno, cada aliado vivo usa su único ataque
               contra el dueño de su slot (si está eliminado, contra un
@@ -116,7 +115,7 @@ Detalle en `docs/D-04-aliados.md`.
 
 - **Un slot por jugador** (hasta 4; con 3 jugadores, 3 slots; con 2, 2). Un aliado como máximo por slot, solo en slots de jugadores activos.
 - Un aliado tiene HP propio (independiente del jefe), a lo sumo un ataque y a veces una habilidad. Hay aliados sin ataque (solo habilidad) y las habilidades son **pasivas**: una vez en juego se mantienen mientras el aliado siga en el combate.
-- **Invocación**: la define cada jefe en su ficha (cada cuántos HP perdidos hay un intento, cómo se tira y sus 6 aliados, uno por categoría: Daño, Tanque, Cura, Control, Potenciador y Debilitador, D-13 y D-16); un jefe sin esos datos nunca invoca. Cada vez que el HP del jefe cruza un umbral se hace un intento: si el jefe usa moneda, se tira y solo sigue si sale cara; si su invocación es **segura**, no hay moneda y el intento sigue siempre. Después, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay invocación) y un d6 elige la categoría (no se repite una categoría en uso). Entra el aliado de esa categoría de la ficha del jefe. Cada umbral cuenta una sola vez por partida aunque el jefe se cure y vuelva a cruzarlo; un golpe que cruza varios umbrales hace varios intentos, uno tras otro; el golpe que mata al jefe no hace ninguno. El aliado puede entrar durante el turno de un jugador, incluso encima de uno que aún no ha actuado, al que atacará.
+- **Llamada de aliados (estilo Pokémon dominante de Sol y Luna, T-69; corregida en T-71)**: la define cada jefe en su ficha (si llama o no y sus 6 aliados, uno por categoría: Daño, Tanque, Cura, Control, Potenciador y Debilitador, D-13 y D-16); un jefe sin esos datos nunca llama. El jefe llama a un aliado **cuando termina su turno por primera vez** (final de la ronda 1) y **después cada vez que su HP baja a un valor definido en su ficha** (`cadaHp` HP perdidos entre llamadas); cada umbral cuenta una sola vez aunque el jefe se cure, y los ya cruzados antes de la primera llamada se suman a ella. Llama como máximo **nivel + 1** veces por partida (2 a Nv1, 3 a Nv2, y así). La llamada **no depende de monedas, de objetos ni de estados**: siempre se hace. Después, un dado del tamaño del número de slots elige el slot (no se repite un slot ocupado ni de un jugador eliminado; si no hay slot libre, no hay aliado, y cuenta como llamada) y un d6 elige la categoría. Entra el aliado de esa categoría de la ficha del jefe y ataca al entrar; después ataca al final de cada turno del jefe.
 - **Pícaro**: categoría de control (estados alterados, modificar fuerza, contadores de daño). Sus aliados son los únicos que atacan a la Banca.
 - **Entrada**: al entrar, el aliado usa su ataque y/o su habilidad contra el dueño de su slot (salvo que su texto diga otra cosa) y no vuelve a atacar hasta el final del turno del jefe.
 - **Exceso de daño**: si un jugador hace a un aliado más daño del que le queda, el exceso se pierde (no pasa al jefe ni a otro aliado).
@@ -125,6 +124,7 @@ Detalle en `docs/D-04-aliados.md`.
 - **Objetivo del aliado**: el dueño de su slot, siempre. Si ese jugador está eliminado, se tira entre los jugadores activos (moneda / dado de 3 / dado de 4); con un solo jugador activo, ataca a ese jugador.
 - Si el dueño de un slot queda eliminado, su aliado **sigue vivo y atacando**.
 - Las **habilidades** de los aliados (reducir daño al jefe, aumentar el daño del jefe, forzar a la banca al atacante...) las aplica el **programa** o el **jugador** según indique la carta (D-13). Las del jugador se resuelven en la mesa y el asistente solo las registra.
+- **Cierre del turno del jefe (T-70)**: después de los ataques del jefe atacan los aliados que tengan ataque, luego la mesa hace el **Chequeo Pokémon** (efectos de los aliados en juego, como Tormenta de Arena, y después los estados del jefe) y se termina el turno. Los KO que salgan de los ataques de los aliados o del chequeo cuentan como KO del turno del jefe. Qué aplica el programa y qué la mesa con cada carta está en `docs/CARTAS.md`.
 
 ### 4.5 Curación del jefe
 
@@ -161,9 +161,10 @@ Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO
 | HP del jefe | **Asistente virtual** (único cálculo automático de HP) |
 | Aliados del jefe (HP, slot, si sigue vivo) | Asistente virtual |
 | Efecto de las habilidades de los aliados | Física: el asistente solo puede registrar en el log cuál se usó |
-| Efecto de las cartas de ataque del jefe | Física: el asistente solo registra el resultado que le dicta el jugador |
+| Mazo de ataques del jefe (qué ataque y contra quién) | **Asistente virtual** (v1.11): baraja, roba y muestra la carta |
+| Efecto de las cartas de ataque del jefe | Física: el asistente propone el daño del catálogo y registra el resultado |
 | Cartas de ánimo (efecto) | Física: el asistente solo registra cuál salió |
-| Objetivo aleatorio (ataque del jefe y de aliados) | Física (dado o moneda real): el asistente registra el resultado |
+| Objetivo aleatorio (ataque de aliados) | Física (dado o moneda real): el asistente registra el resultado |
 | Estados alterados de los Pokémon de los jugadores | Física |
 | Veneno y quemadura del jefe (D-12) | **Asistente virtual** (daño en el chequeo y moneda automática) |
 | Registro / historial de partida | Asistente virtual |
@@ -200,7 +201,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 
 | Valor | Estado |
 |---|---|
-| HP del jefe (2300 / 2600 / 3700 / 3800) | Calibrado con el simulador y 16 cartas reales (con aliados); falta contrastar con playtests. Kingdra y Arceus casi iguales en HP (los separa la amenaza); el 15 % de Arceus parece poco |
+| HP del jefe (2300 / 2600 / 3700 / 3800) | Son los PS de las cartas (T-71); la calibración con el simulador y 32 cartas reales daba 2200 / 2700 / 3800 / 3900. Falta contrastar con playtests y recalibrar con la llamada de T-71 |
 | Tope de 200 por ataque para X | Provisional |
 | Cartas de ánimo: una por KO y máximo 3 cartas distintas por partida | Adoptado del juego oficial, sin confirmar |
 | Efectos de las cartas de ánimo (curas, +50) | No están en el simulador: la partida real será algo más fácil que lo calibrado |
@@ -273,3 +274,8 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.8 | Se deja escrito qué gestiona la app (el jefe y sus aliados: HP, daño recibido y ataques que hacen) y qué se resuelve en la mesa (Pokémon de los jugadores y baraja de ataques del jefe). |
 | v1.9 | Criterio de nivel de los jefes (Nv1 Básicos, Nv2 Fase 1 que no evolucionan más, Nv3 Fase 2, Nv4 Míticos y Legendarios). Los ataques del jefe pasan a poder llevar efectos (D-14, contrato v5): la app computa solo los de programa. |
 | v1.10 | Puesta al día del documento: D-16 (6 categorías de aliado: Daño, Tanque, Cura, Control, Potenciador y Debilitador; contrato v6), lanzamiento con 4 jefes (uno por nivel) en lugar de 7, y el índice de §11 con D-12, D-14, D-15 y D-16. D-15 (modos de preparación) sigue en diseño. |
+| v1.11 | El jefe roba de un mazo de 20 cartas de ataque que lleva la app (las del PDF oficial de Incursión Max): cada carta dice el ataque, el jugador atacado y si se roba otra. Máximo de ataques por turno según el nivel (Nv1: 2, Nv2: 3, Nv3 y Nv4: 4). Las cartas que apuntan a un jugador que no juega o está eliminado se descartan. Deja de ser física la carta del jefe. HP de los jefes recalibrados con ese mazo (4 jugadores): Onix 2400 / Manectric 2700 / Kingdra 3800 / Arceus 3500. |
+| v1.12 | Catálogo de prueba de 32 cartas (4 por tipo). Minun (Manectric): Moflete Estático pasa a ser un aura, mientras esté en juego, cada aliado derrotado por un ataque de los jugadores paraliza al Pokémon atacante. HP de los jefes recalibrados (4 jugadores): Onix 2200 / Manectric 2700 / Kingdra 3800 / Arceus 3900. |
+| v1.13 | Llamada de aliados estilo Sol y Luna (T-69): el jefe llama a un aliado al empezar su segundo turno o el turno siguiente a que caiga el anterior, uno cada vez, máximo nivel + 1 llamadas, sin moneda ni umbrales de HP; los dados siguen eligiendo slot y categoría. Los HP de los jefes no cambian. |
+| v1.14 | Las 28 cartas del set en el catálogo, con los textos de las cartas (T-70, `docs/CARTAS.md`): Tóxico (Gulpin) pasa a ser un ataque sin daño y Magikarp gana Salpicadura. Moflete Estático lo aplica el programa (el jugador que deja fuera de combate a un aliado queda Paralizado su siguiente turno) y Fijar Blanco queda apuntado el resto de la partida. Cierre del turno del jefe por pasos: ataques de los aliados, Chequeo Pokémon y fin. El asistente recuerda a la mesa, en su momento, lo que tiene que aplicar a sus Pokémon. Los HP de los jefes no cambian. |
+| v1.15 | Corrige la llamada de aliados (T-71): el jefe llama a su primer aliado al terminar su primer turno y a los siguientes cuando su HP baja a los valores definidos en su ficha (`cadaHp`), hasta nivel + 1 llamadas; vuelven los umbrales de HP y se acaba el doble ataque de entrada en el mismo turno. HP de los jefes como en las cartas: Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800. Las monedas que lanzan los jugadores (Bote, Fuerza Lunar) caen en la pantalla. |
