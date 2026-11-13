@@ -11,6 +11,7 @@ import 'estilo.dart';
 import 'mapa.dart';
 import 'panel_acciones.dart';
 import 'paneles.dart';
+import 'pendientes.dart';
 import 'tarjeta_jefe.dart';
 
 /// Hacia dónde mira la cámara de la mesa (T-47).
@@ -162,11 +163,46 @@ class DisposicionMesa extends ConsumerStatefulWidget {
 class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
   bool _abierto = true;
   bool _extrasAbierto = false;
+  bool _resolviendo = false;
 
   void _alternar() => setState(() => _abierto = !_abierto);
 
   @override
+  void initState() {
+    super.initState();
+    // Una partida retomada puede tener un intento de invocación sin resolver.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _resolverInvocaciones());
+  }
+
+  /// Mientras haya intentos de invocación, tira los dados sobre la mesa y
+  /// registra el resultado, de uno en uno. No hay botón: sale solo.
+  Future<void> _resolverInvocaciones() async {
+    if (_resolviendo) return;
+    _resolviendo = true;
+    try {
+      while (mounted) {
+        final antes = ref.read(estadoProvider).intentosInvocacionPendientes;
+        if (antes == 0) break;
+        await resolverInvocacion(context, ref);
+        if (!mounted) break;
+        // Si el motor no ha aceptado nada, no se insiste.
+        if (ref.read(estadoProvider).intentosInvocacionPendientes >= antes) {
+          break;
+        }
+      }
+    } finally {
+      _resolviendo = false;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    ref.listen(
+      estadoProvider.select((e) => e.intentosInvocacionPendientes),
+      (_, intentos) {
+        if (intentos > 0) _resolverInvocaciones();
+      },
+    );
     final estado = ref.watch(estadoProvider);
     final activo =
         estado.fase == Fase.turnoJugadores ? estado.jugadorActual : null;
