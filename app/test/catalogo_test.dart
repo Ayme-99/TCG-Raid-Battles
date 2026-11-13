@@ -231,7 +231,7 @@ void main() {
     expect(find.byKey(const Key('efectos-activos')), findsOneWidget);
   });
 
-  testWidgets('invocar un aliado del catálogo rellena su carta y lo muestra',
+  testWidgets('al cruzar el umbral los dados salen solos y entra el aliado del catálogo',
       (tester) async {
     tester.view.physicalSize = const Size(1000, 3000);
     tester.view.devicePixelRatio = 1.0;
@@ -243,6 +243,8 @@ void main() {
         overrides: [
           ...sobrescribir(),
           catalogoProvider.overrideWith((ref) async => catalogo),
+          // Dado de slot → primer slot; dado de categoría → la segunda.
+          azarProvider.overrideWithValue(_AzarFijo([0, 1])),
         ],
         child: const IncursionesApp(),
       ),
@@ -273,30 +275,26 @@ void main() {
           ),
       isNull,
     );
+    // No hay botón de invocar: los dados caen solos sobre la mesa...
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byKey(const Key('invocar-aliado')), findsNothing);
+    expect(find.byKey(const ValueKey('dado-mesa-0')), findsOneWidget);
+    // ...y al pararse entra el aliado que ha salido, sin diálogo.
     await tester.pumpAndSettle();
-    expect(c.read(estadoProvider).intentosInvocacionPendientes, 1);
-
-    await tester.tap(find.byKey(const Key('invocar-aliado')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('aliado-del-catalogo')), findsOneWidget);
-    expect(find.widgetWithText(TextField, 'Machop'), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('aliado-categoria-tanque')));
-    await tester.pumpAndSettle();
-    expect(find.widgetWithText(TextField, 'Geodude'), findsOneWidget);
-    await tester.tap(find.byKey(const Key('aliado-aceptar')));
-    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('aliado-aceptar')), findsNothing);
+    expect(c.read(estadoProvider).intentosInvocacionPendientes, 0);
 
     final aliado = c.read(estadoProvider).aliados.single;
     expect(aliado.nombre, 'Geodude');
     expect(aliado.categoria, CategoriaAliado.tanque);
+    expect(aliado.slot, 0);
     expect(aliado.hp, 90);
     expect(aliado.habilidad, isNotNull);
     expect(find.byKey(const Key('panel-aliados')), findsOneWidget);
     expect(find.textContaining('Geodude'), findsOneWidget);
   });
 
-  testWidgets('tirar dados elige slot y categoría libres y rellena el aliado',
+  testWidgets('los dados eligen slot y categoría libres y entra su aliado',
       (tester) async {
     tester.view.physicalSize = const Size(1000, 3000);
     tester.view.devicePixelRatio = 1.0;
@@ -337,26 +335,14 @@ void main() {
           ),
       isNull,
     );
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('invocar-aliado')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('tirar-dados')));
-    // T-44: el diálogo se cierra y los dados ruedan sobre la mesa.
+    // T-44: los dados ruedan sobre la mesa sin pulsar nada.
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byKey(const Key('resultado-dados')), findsNothing);
     expect(find.byKey(const ValueKey('dado-mesa-0')), findsOneWidget);
     expect(find.byKey(const ValueKey('dado-mesa-1')), findsOneWidget);
-    // Al pararse vuelve el diálogo con la tirada puesta.
+    // Al pararse el aliado entra directamente.
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('dado-mesa-0')), findsNothing);
-    expect(find.byKey(const Key('resultado-dados')), findsOneWidget);
-    expect(find.textContaining('Dado de slot (moneda): Jugador 2'),
-        findsOneWidget);
-    expect(find.widgetWithText(TextField, 'Zubat'), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('aliado-aceptar')));
-    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('aliado-aceptar')), findsNothing);
     final aliado = c.read(estadoProvider).aliados.single;
     expect(aliado.slot, 1);
     expect(aliado.categoria, CategoriaAliado.cura);
