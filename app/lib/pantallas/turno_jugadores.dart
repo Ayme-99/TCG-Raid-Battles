@@ -140,7 +140,7 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
         cartaAliado.evitaDanoConMoneda;
     var evita = false;
     if (conBote) {
-      final nombreAliado = aliado!.nombre;
+      final nombreAliado = aliado.nombre;
       final nombreJugador = estado.jugadores[widget.jugador].nombre;
       final fijadas =
           recordatoriosDeMoneda(ref.read(catalogoProvider).valueOrNull, estado);
