@@ -83,11 +83,6 @@
     },
     {
       "tipo": "turnoJugador",
-      "jugador": 1,
-      "dano": 0
-    },
-    {
-      "tipo": "turnoJugador",
       "jugador": 0,
       "dano": 100
     },

@@ -48,7 +48,7 @@ Cada evento es un objeto con un campo `tipo`. Los campos marcados con `?` son op
 | `ataqueAAliado` | `jugador`, `slot`, `dano` | Un jugador ataca a un aliado en lugar de al jefe |
 | `ataqueJefe` | `ranura` (1-3), `dano`, `jugador?`, `alAzar?`, `efecto?` | Ataque del jefe (sin `jugador`: a todos). `efecto` es el de D-14 (ver más abajo) |
 | `pokemonKo` | `jugador` | Cae un Pokémon de un jugador |
-| `cartaAnimoRobada` | `jugador`, `carta` (1-5) | Un jugador con prioridad roba carta de ánimo |
+| `cartaAnimoRobada` | `jugador`, `carta` (1-5) | Un jugador KO roba carta de ánimo en el turno que se sienta (la app ya no lo pide; el motor lo acepta) |
 | `curacionJefe` | `cantidad` | El jefe se cura (el motor topa al HP máximo) |
 | `sinInvocacion` | — | Intento de invocación sin aliado |
 | `aliadoInvocado` | `slot`, `categoria` (`danio`, `tanque`, `cura` o `picaro`), `nombre`, `hp`, `ataqueNombre?`, `ataqueDano?`, `habilidad?`, `efectos?` (`jugador`, por defecto, o `programa`), `scriptId?` | Intento de invocación con aliado (D-13) |

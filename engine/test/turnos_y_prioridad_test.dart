@@ -120,29 +120,75 @@ void main() {
       expect(s.cartasAnimoPendientes, isEmpty);
     });
 
-    test('varios KO actúan primero y por orden de asiento', () {
+    test('varios KO se sientan el turno siguiente', () {
       var s = todosActuan(empezar());
       s = aplicarTodos(s, const [PokemonKo(2), PokemonKo(0), FinTurnoJefe()]);
-      expect(s.orden, [0, 2, 1]);
+      expect(s.orden, [1]);
+      expect(s.jugadorActual, 1);
       expect(s.cartasAnimoPendientes, [0, 2]);
     });
 
-    test('la prioridad dura una sola ronda', () {
+    test('el turno sentado dura una sola ronda', () {
       var s = todosActuan(empezar());
       s = aplicarTodos(s, const [PokemonKo(1), FinTurnoJefe()]);
-      expect(s.orden, [1, 0, 2]);
+      expect(s.orden, [0, 2]);
       s = apply(todosActuan(s), const FinTurnoJefe());
       expect(s.orden, [0, 1, 2]);
       expect(s.ronda, 3);
     });
 
-    test('un KO durante el turno de jugadores también da prioridad', () {
+    test('un KO durante el turno de jugadores también se sienta el siguiente',
+        () {
       var s = empezar();
       s = apply(s, const TurnoJugador(jugador: 0, dano: 5));
       s = apply(s, const PokemonKo(1));
       expect(s.jugadorActual, 1);
       s = apply(todosActuan(s), const FinTurnoJefe());
-      expect(s.orden, [1, 0, 2]);
+      expect(s.orden, [0, 2]);
+    });
+
+    test('si todos los que siguen en juego están KO, salta al turno del jefe',
+        () {
+      var s = todosActuan(empezar(ataques: const [100, 100]));
+      s = aplicarTodos(s, const [PokemonKo(0), PokemonKo(1), FinTurnoJefe()]);
+      expect(s.ronda, 2);
+      expect(s.fase, Fase.turnoJefe);
+      expect(s.jugadorActual, isNull);
+    });
+
+    test('un jugador KO no puede actuar su turno sentado', () {
+      var s = todosActuan(empezar());
+      s = aplicarTodos(s, const [PokemonKo(1), FinTurnoJefe()]);
+      expect(
+        () => apply(s, const TurnoJugador(jugador: 1, dano: 10)),
+        throwsA(isA<ReglaIncumplida>()),
+      );
+    });
+
+    test('el ataque del jefe contra un jugador KO falla', () {
+      var s = todosActuan(empezar());
+      s = apply(s, const PokemonKo(1));
+      // En el mismo turno del jefe y durante todo el de la ronda siguiente.
+      expect(
+        () => apply(s, const AtaqueJefe(ranura: 1, dano: 10, jugador: 1)),
+        throwsA(isA<ReglaIncumplida>()),
+      );
+      s = apply(s, const FinTurnoJefe());
+      s = todosActuan(s);
+      expect(
+        () => apply(s, const AtaqueJefe(ranura: 1, dano: 10, jugador: 1)),
+        throwsA(isA<ReglaIncumplida>()),
+      );
+      expect(
+        () => apply(s, const AtaqueJefe(ranura: 1, dano: 10, jugador: 0)),
+        returnsNormally,
+      );
+      // Pasada esa ronda vuelve a poder recibirlo.
+      s = todosActuan(apply(s, const FinTurnoJefe()));
+      expect(
+        () => apply(s, const AtaqueJefe(ranura: 1, dano: 10, jugador: 1)),
+        returnsNormally,
+      );
     });
 
     test('un jugador con el banquillo KO no gana dos prioridades', () {
@@ -200,6 +246,45 @@ void main() {
       ]);
       expect(s.cartasAnimo.length, 2);
       expect(s.cartasAnimo.map((c) => c.ronda), [2, 3]);
+    });
+  });
+
+  group('ataques de aliados contra un jugador KO', () {
+    EstadoPartida conAliadoEnSlotKo() {
+      final s0 = configurar(const [100, 100, 100]);
+      var s = apply(
+        s0,
+        ElegirJefe(nombre: 'Jefe', nivel: s0.nivel, hp: 3000, invocacionCadaHp: 600),
+      );
+      s = conIntentos(apply(s, const TurnoJugador(jugador: 0, dano: 10)));
+      s = apply(s, const PokemonKo(0));
+      return apply(
+        s,
+        const AliadoInvocado(
+          slot: 0,
+          categoria: CategoriaAliado.danio,
+          nombre: 'Plusle',
+          hp: 80,
+          ataqueNombre: 'Chispazo',
+          ataqueDano: 30,
+        ),
+      );
+    }
+
+    test('el ataque de entrada falla: se resuelve pero no cuenta como uso', () {
+      var s = conAliadoEnSlotKo();
+      expect(s.entradasPendientes, hasLength(1));
+      s = apply(s, const AtaqueAliado(slot: 0, dano: 0));
+      final a = s.aliadoEn(0)!;
+      expect(s.entradasPendientes, isEmpty);
+      expect(a.entradaResuelta, isTrue);
+      expect(a.usos, 0);
+    });
+
+    test('contra un jugador que no está KO el ataque cuenta como uso', () {
+      var s = conAliadoEnSlotKo();
+      s = apply(s, const AtaqueAliado(slot: 0, dano: 30, objetivo: 1));
+      expect(s.aliadoEn(0)!.usos, 1);
     });
   });
 

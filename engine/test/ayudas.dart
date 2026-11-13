@@ -155,11 +155,15 @@ List<Evento> partidaAleatoria(
     } else if (s.fase == Fase.turnoJefe) {
       if (azar.nextInt(3) == 0) aplica(CuracionJefe(azar.nextInt(300)));
       for (var k = 0; k < 1 + azar.nextInt(3); k++) {
-        final v = vivos();
+        // El ataque contra un jugador KO falla: el jefe solo apunta a quien
+        // puede recibirlo.
+        final v = [for (final a in vivos()) if (!s.enKo(a)) a];
         aplica(AtaqueJefe(
           ranura: 1 + azar.nextInt(3),
           dano: azar.nextInt(250),
-          jugador: azar.nextBool() ? null : v[azar.nextInt(v.length)],
+          jugador: v.isEmpty || azar.nextBool()
+              ? null
+              : v[azar.nextInt(v.length)],
         ));
       }
       for (final a in List.of(s.aliados)) {

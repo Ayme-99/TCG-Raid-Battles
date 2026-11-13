@@ -64,11 +64,11 @@ void main() {
       () => apply(s, const TurnoJugador(jugador: 1, dano: 10)),
       throwsA(isA<ReglaIncumplida>()),
     );
-    // Sigue ganando prioridad para la ronda siguiente.
-    expect(s.prioridad, [1]);
+    // Ese turno perdido es el que se sienta: la ronda siguiente actúa normal.
+    expect(s.prioridad, isEmpty);
     s = todosActuan(s, dano: 0);
     s = apply(s, const FinTurnoJefe());
-    expect(s.orden, [1, 0, 2]);
+    expect(s.orden, [0, 1, 2]);
   });
 
   test('un jugador que aún no ha actuado y no es el actual también lo pierde', () {

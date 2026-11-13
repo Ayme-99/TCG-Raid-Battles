@@ -48,7 +48,7 @@ INICIO
       └─ TURNO DE JUGADORES (bucle)
             Orden de actuación cada ronda:
               1º) Jugadores cuyo Pokémon activo cayó KO y siguen en juego
-                  (roban carta de ánimo; varios a la vez: por orden de asiento)
+                  (se sientan el turno: solo roban carta de ánimo)
               2º) Resto de jugadores, por orden de asiento (J1..J4)
             Por cada jugador activo, en ese orden:
               - Juega su turno (ataques sin coste de energía)
@@ -98,8 +98,9 @@ FIN (VICTORIA / DERROTA)
 
 Detalle en `docs/D-05-carta-de-animo.md`.
 
-- El jugador cuyo Pokémon activo cae KO (y al que le queda otro Pokémon) **actúa primero en la ronda siguiente y roba una carta de ánimo**. Si cae el último Pokémon, queda eliminado y no roba.
-- Con varios KO a la vez, actúan por orden de asiento. Un KO da prioridad una sola vez.
+- El jugador cuyo Pokémon activo cae KO (y al que le queda otro Pokémon) **se sienta su siguiente turno: no ataca ni se retira, solo roba una carta de ánimo** (la carta se roba en la mesa; la app no la gestiona, TODO). Si cae el último Pokémon, queda eliminado y no roba.
+- Mientras está KO (desde la caída hasta el final de la ronda siguiente), **los ataques del jefe y de sus aliados contra él fallan**: la carta del jefe se descarta y se roba otra; el ataque del aliado se omite.
+- Si todos los jugadores en juego están KO, el jefe no ataca ese turno. Un KO se sienta una sola vez, aunque caigan varios Pokémon.
 - Las cartas son las **5 oficiales de Cheer** y se resuelven en la mesa (el asistente no computa su efecto, solo puede registrar cuál salió): doble daño a un Pokémon, curar 80 a cada Pokémon, curar todo a 1 Pokémon, el jefe solo juega una carta el próximo turno, +50 de daño a todos los Pokémon de los jugadores.
 - El sistema está abierto a nuevas cartas y mecánicas según se desarrolle el juego.
 

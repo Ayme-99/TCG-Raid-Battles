@@ -200,6 +200,23 @@ Future<void> atacarConAliado(
     );
     if (objetivo == null || !context.mounted) return;
   }
+  // Contra un jugador KO el ataque falla: se omite (sin tiradas ni daño).
+  final blanco = objetivo ?? aliado.slot;
+  if (estado.enKo(blanco)) {
+    final omitido = registrar(
+      context,
+      ref,
+      AtaqueAliado(slot: aliado.slot, dano: 0, objetivo: objetivo),
+    );
+    if (omitido && context.mounted) {
+      registrarAviso(
+        context,
+        '${aliado.nombre}: ${estado.jugadores[blanco].nombre} está KO, el '
+        'ataque falla.',
+      );
+    }
+    return;
+  }
   // Ataque de daño por monedas («20×», D-13): la app las tira y registra el
   // daño final. El número de monedas sale de la carta del catálogo.
   final jefe = estado.jefe;
