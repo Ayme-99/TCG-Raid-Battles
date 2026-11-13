@@ -189,7 +189,8 @@ class AliadoCatalogo {
 }
 
 class InvocacionCatalogo {
-  /// Obsoleto (T-69): la llamada ya no depende de los HP perdidos.
+  /// Cada cuántos HP perdidos el jefe vuelve a llamar a un aliado, después de
+  /// la primera llamada (que sale al terminar su primer turno).
   final int cadaHp;
 
   /// `true`: sin moneda, cada intento invoca si hay slot libre.
@@ -232,8 +233,8 @@ class JefeCatalogo {
     this.invocacion,
   });
 
-  /// Cuántos aliados puede llamar a lo largo de la partida (T-69): su nivel
-  /// más uno, uno cada vez.
+  /// Cuántos aliados puede llamar a lo largo de la partida (T-69/T-71): su
+  /// nivel más uno.
   int get intentosDeInvocacion => invocacion == null ? 0 : nivel + 1;
 
   factory JefeCatalogo.deJson(Object? json) {

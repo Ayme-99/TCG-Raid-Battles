@@ -5,7 +5,7 @@
   "nivel": 1,
   "mapa": "Túnel Roca",
   "numero": 1,
-  "hp": 2200,
+  "hp": 2300,
   "ataques": [
     {
       "nombre": "Trampa Rocas",

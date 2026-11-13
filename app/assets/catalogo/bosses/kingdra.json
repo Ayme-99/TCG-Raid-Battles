@@ -5,7 +5,7 @@
   "nivel": 3,
   "mapa": "Islas Remolino",
   "numero": 15,
-  "hp": 3800,
+  "hp": 3700,
   "ataques": [
     {
       "nombre": "Ciclón",

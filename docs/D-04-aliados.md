@@ -47,7 +47,7 @@ Atacar a un aliado sustituye el ataque contra el jefe. Si el daño supera la vid
 
 ## 7. Cómo y cuándo se invoca un aliado
 
-> **T-69 (GDD v1.13) cambia §7.1–§7.3:** la invocación pasa a ser una *llamada* al estilo de los Pokémon dominantes de Sol y Luna. El jefe llama a un aliado al empezar su segundo turno de combate, o al empezar el turno siguiente a que el anterior quede derrotado; nunca hay más de uno en juego y llama como máximo nivel + 1 veces por partida; no hay moneda ni umbrales de HP (el HP del jefe ya no influye). Los dados siguen eligiendo slot y categoría; si no hay slot libre, la llamada se pierde pero cuenta. `cadaHp` y `tirada` del catálogo quedan obsoletos: solo importa que el jefe tenga `invocacion` con sus aliados. Lo que sigue describe la regla anterior.
+> **T-69 y T-71 (GDD v1.13 y v1.15) cambian §7.1–§7.3:** la invocación pasa a ser una *llamada* al estilo de los Pokémon dominantes de Sol y Luna. El jefe llama a su primer aliado **al terminar su primer turno** y a los siguientes **cuando su HP baja a los valores definidos en su ficha** (`cadaHp` HP perdidos entre llamadas, cada umbral una sola vez; los ya cruzados antes de la primera llamada se suman a ella); llama como máximo nivel + 1 veces por partida; no hay moneda. Los dados siguen eligiendo slot y categoría; si no hay slot libre, la llamada se pierde pero cuenta. `tirada` del catálogo queda obsoleto: solo importa que el jefe tenga `invocacion` con sus aliados. Lo que sigue describe la regla anterior (§7.2 y §7.3 siguen valiendo para los umbrales).
 
 > D-13 cambia §7.3 (el aliado ya no sale al azar de una lista: un dado elige la categoría) y §7.4/§7.5 (los efectos los aplica el programa o el jugador según la carta). Ver `docs/D-13-aliados-por-categoria.md`.
 

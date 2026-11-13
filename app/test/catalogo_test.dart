@@ -51,7 +51,7 @@ void main() {
       final c = await Catalogo.cargar(rootBundle);
       expect(c.jefes.map((j) => j.id), ['onix', 'manectric', 'kingdra', 'arceus']);
       expect(c.jefes.map((j) => j.nivel), [1, 2, 3, 4]);
-      expect(c.jefes.map((j) => j.hp), [2200, 2700, 3800, 3900]);
+      expect(c.jefes.map((j) => j.hp), [2300, 2600, 3700, 3800]);
       expect(c.jefes.map((j) => j.numero), [1, 8, 15, 22]);
       expect(c.jefes.map((j) => j.intentosDeInvocacion), [2, 3, 4, 5]);
       for (final j in c.jefes) {
@@ -142,28 +142,28 @@ void main() {
         }
       }
       expect(cartas, {
-        1: ('Onix', 2200),
+        1: ('Onix', 2300),
         2: ('Machop', 70),
         3: ('Geodude', 90),
         4: ('Zubat', 50),
         5: ('Rhyhorn', 100),
         6: ('Cubone', 60),
         7: ('Haunter', 80),
-        8: ('Manectric', 2700),
+        8: ('Manectric', 2600),
         9: ('Plusle', 80),
         10: ('Minun', 90),
         11: ('Oddish', 60),
         12: ('Gulpin', 100),
         13: ('Poochyena', 70),
         14: ('Zigzagoon', 50),
-        15: ('Kingdra', 3800),
+        15: ('Kingdra', 3700),
         16: ('Krabby', 70),
         17: ('Seel', 100),
         18: ('Golbat', 80),
         19: ('Tentacruel', 90),
         20: ('Horsea', 60),
         21: ('Magikarp', 50),
-        22: ('Arceus', 3900),
+        22: ('Arceus', 3800),
         23: ('Medicham', 90),
         24: ('Bronzong', 100),
         25: ('Chingling', 50),
@@ -264,7 +264,7 @@ void main() {
     final estado = c.read(estadoProvider);
     expect(estado.fase, Fase.turnoJugadores);
     expect(estado.jefe!.nombre, 'Onix');
-    expect(estado.jefe!.hp, 2200);
+    expect(estado.jefe!.hp, 2300);
     expect(estado.jefe!.invocacionCadaHp, 1200);
 
     // Turno del jefe: la pantalla propone el ataque de la carta y su efecto.
@@ -326,7 +326,7 @@ void main() {
     expect(find.byKey(const Key('aliado-0')), findsNothing);
     expect(find.byKey(const Key('slot-libre-0')), findsOneWidget);
 
-    // Onix llama a su primer aliado al empezar su turno de la ronda 2.
+    // Onix llama a su primer aliado al terminar su turno de la ronda 1.
     llegarALaLlamadaDelJefe(c);
     await tester.pumpAndSettle();
     expect(c.read(estadoProvider).intentosInvocacionPendientes, 1);

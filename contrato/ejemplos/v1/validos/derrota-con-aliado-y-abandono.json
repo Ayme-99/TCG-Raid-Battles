@@ -61,6 +61,22 @@
       "tipo": "finTurnoJefe"
     },
     {
+      "tipo": "aliadoInvocado",
+      "slot": 1,
+      "nombre": "Rattata",
+      "hp": 60,
+      "ataqueNombre": "Placaje",
+      "ataqueDano": 20
+    },
+    {
+      "tipo": "sinInvocacion"
+    },
+    {
+      "tipo": "ataqueAliado",
+      "slot": 1,
+      "dano": 20
+    },
+    {
       "tipo": "cartaAnimoRobada",
       "jugador": 1,
       "carta": 4
@@ -79,19 +95,6 @@
       "tipo": "turnoJugador",
       "jugador": 2,
       "dano": 100
-    },
-    {
-      "tipo": "aliadoInvocado",
-      "slot": 1,
-      "nombre": "Rattata",
-      "hp": 60,
-      "ataqueNombre": "Placaje",
-      "ataqueDano": 20
-    },
-    {
-      "tipo": "ataqueAliado",
-      "slot": 1,
-      "dano": 20
     },
     {
       "tipo": "curacionJefe",

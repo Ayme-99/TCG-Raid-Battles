@@ -22,12 +22,17 @@ EstadoPartida empezar({
 }
 
 /// Deja [n] intentos de invocación pendientes sin pasar por el turno del jefe
-/// (T-69: la llamada sale de `_llamarAliado`; los tests de aliados la
-/// inyectan para probar solo cómo se resuelve el intento).
-EstadoPartida conIntentos(EstadoPartida s, [int n = 1]) => s.copiarCon(
-      intentosInvocacionPendientes: s.intentosInvocacionPendientes + n,
-      llamadasAliado: s.llamadasAliado + n,
-    );
+/// (T-69/T-71: la llamada sale de `_llamarAliados`; los tests de aliados la
+/// inyectan para probar solo cómo se resuelve el intento). Las llamadas
+/// quedan agotadas: el jefe no hace ninguna más durante el test.
+EstadoPartida conIntentos(EstadoPartida s, [int n = 1]) {
+  final hechas = s.llamadasAliado + n;
+  final tope = maxLlamadasAliado(s.nivel);
+  return s.copiarCon(
+    intentosInvocacionPendientes: s.intentosInvocacionPendientes + n,
+    llamadasAliado: hechas > tope ? hechas : tope,
+  );
+}
 
 /// Hace actuar a todos los jugadores que quedan en la ronda, sin tocar al
 /// jefe más de lo que indique [dano]. Termina en el turno del jefe.

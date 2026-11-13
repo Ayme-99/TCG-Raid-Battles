@@ -68,8 +68,9 @@ class JefeEstado {
   final int hpMaximo;
   final int hp;
 
-  /// Obsoleto desde T-69: el valor ya no se usa (los aliados se llaman por
-  /// turnos, no por HP perdidos). Solo indica que el jefe llama aliados.
+  /// Cada cuántos HP perdidos el jefe vuelve a llamar a un aliado (después de
+  /// la primera llamada, que sale al terminar su primer turno). El jefe llama
+  /// como mucho nivel + 1 veces por partida.
   /// null: el jefe nunca invoca.
   final int? invocacionCadaHp;
 
@@ -319,8 +320,9 @@ class EstadoPartida {
   /// Aliados derrotados en la partida (para estadísticas).
   final int aliadosDerrotados;
 
-  /// Llamadas de aliado que el jefe ya ha hecho (Sol y Luna, T-69): cuenta
-  /// cada intento de invocación generado. El máximo es el nivel más uno.
+  /// Llamadas de aliado que el jefe ya ha hecho (T-69/T-71): cuenta cada
+  /// intento de invocación generado, sea por la primera llamada o por un
+  /// umbral de HP. El máximo es el nivel más uno.
   final int llamadasAliado;
 
   /// Intentos de invocación que la mesa aún tiene que resolver.

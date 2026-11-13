@@ -111,8 +111,8 @@ for r, j in enumerate(jefes, 2):
         cel = wj.cell(row=r, column=c, value=v)
         cel.font = AZUL
     wj.cell(row=r, column=8, value=f'=AVERAGE(E{r}:G{r})').number_format = '0.0'
-    # T-69: el jefe llama a un aliado por turnos, hasta nivel + 1 veces; el HP
-    # ya no influye (`cadaHp` y `tirada` del JSON están obsoletos).
+    # T-71: el jefe llama a un aliado al terminar su primer turno y después al
+    # bajar su HP a cada umbral (`cadaHp` del JSON), hasta nivel + 1 llamadas.
     wj.cell(row=r, column=9, value='sí' if inv else 'no').font = AZUL
     if j.get('numero') is not None:
         wj.cell(row=r, column=10, value=j['numero']).font = AZUL

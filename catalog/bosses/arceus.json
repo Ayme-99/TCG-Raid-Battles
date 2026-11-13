@@ -5,7 +5,7 @@
   "nivel": 4,
   "mapa": "Sala Origen",
   "numero": 22,
-  "hp": 3900,
+  "hp": 3800,
   "ataques": [
     {
       "nombre": "Danza Espada",

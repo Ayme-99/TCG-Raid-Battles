@@ -30,7 +30,7 @@
     {
       "tipo": "turnoJugador",
       "jugador": 0,
-      "dano": 350
+      "dano": 100
     },
     {
       "tipo": "turnoJugador",
@@ -47,16 +47,6 @@
       "tipo": "finTurnoJefe"
     },
     {
-      "tipo": "turnoJugador",
-      "jugador": 0,
-      "dano": 350
-    },
-    {
-      "tipo": "turnoJugador",
-      "jugador": 1,
-      "dano": 0
-    },
-    {
       "tipo": "aliadoInvocado",
       "slot": 1,
       "categoria": "danio",
@@ -69,6 +59,26 @@
       "tipo": "ataqueAliado",
       "slot": 1,
       "dano": 20
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 350
+    },
+    {
+      "tipo": "aliadoInvocado",
+      "slot": 0,
+      "categoria": "cura",
+      "nombre": "Chansey",
+      "hp": 120,
+      "habilidad": "Cura al jefe al final de su turno (la aplica el jugador)",
+      "efectos": "programa",
+      "scriptId": "no-existe"
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
     },
     {
       "tipo": "ataqueJefe",
@@ -94,16 +104,6 @@
       "jugador": 1,
       "slot": 1,
       "dano": 60
-    },
-    {
-      "tipo": "aliadoInvocado",
-      "slot": 0,
-      "categoria": "cura",
-      "nombre": "Chansey",
-      "hp": 120,
-      "habilidad": "Cura al jefe al final de su turno (la aplica el jugador)",
-      "efectos": "programa",
-      "scriptId": "no-existe"
     }
   ]
 }

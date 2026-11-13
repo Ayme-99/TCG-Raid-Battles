@@ -131,12 +131,42 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
             .read(catalogoProvider)
             .valueOrNull
             ?.aliadoDe(jefeCarta.nombre, jefeCarta.nivel, aliado.categoria);
-    // Bote (Magikarp): moneda al ir a recibir daño; con cara se evita. El
+    // Bote (Magikarp): el jugador atacante lanza 1 moneda y, con cara, se evita
+    // todo el daño. La moneda cae en la pantalla; si Fijar Blanco está en
+    // juego, la primera moneda de cada jugador es cruz y la lleva la mesa. El
     // ataque gasta el turno igualmente.
-    final evita = cartaAliado != null &&
+    final conBote = cartaAliado != null &&
         cartaAliado.nombre == aliado!.nombre &&
-        cartaAliado.evitaDanoConMoneda &&
-        ref.read(azarProvider).nextBool();
+        cartaAliado.evitaDanoConMoneda;
+    var evita = false;
+    if (conBote) {
+      final nombreAliado = aliado!.nombre;
+      final nombreJugador = estado.jugadores[widget.jugador].nombre;
+      final fijadas =
+          recordatoriosDeMoneda(ref.read(catalogoProvider).valueOrNull, estado);
+      if (fijadas.isEmpty) {
+        evita = await lanzarMonedaEnPantalla(
+          context,
+          ref,
+          titulo: '$nombreAliado: Bote',
+          detalle: '$nombreJugador lanza 1 moneda. Con cara, se evita todo el '
+              'daño a $nombreAliado.',
+        );
+      } else {
+        final cara = await preguntarMesa(
+          context,
+          [
+            '$nombreAliado: Bote. $nombreJugador lanza 1 moneda. ¿Sale cara?',
+            ...fijadas,
+          ].join('\n'),
+          si: 'Cara',
+          no: 'Cruz',
+        );
+        if (cara == null) return;
+        evita = cara;
+      }
+      if (!mounted) return;
+    }
     final aplicado = registrar(
       context,
       ref,
@@ -149,11 +179,9 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
     if (!aplicado || aliado == null || !context.mounted) return;
     final catalogo = ref.read(catalogoProvider).valueOrNull;
     final avisos = <String>[
-      if (evita)
+      if (conBote && evita)
         '${aliado.nombre}: moneda en cara, se evita todo el daño.'
-      else if (cartaAliado != null &&
-          cartaAliado.nombre == aliado.nombre &&
-          cartaAliado.evitaDanoConMoneda)
+      else if (conBote)
         '${aliado.nombre}: moneda en cruz, recibe el daño.',
       // Derrotado: recordatorios de la carta caída y auras de los aliados
       // que estaban en juego, él incluido (Moflete Estático).

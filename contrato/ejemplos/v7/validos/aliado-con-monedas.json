@@ -30,7 +30,7 @@
     {
       "tipo": "turnoJugador",
       "jugador": 0,
-      "dano": 350
+      "dano": 100
     },
     {
       "tipo": "turnoJugador",
@@ -45,16 +45,6 @@
     },
     {
       "tipo": "finTurnoJefe"
-    },
-    {
-      "tipo": "turnoJugador",
-      "jugador": 0,
-      "dano": 350
-    },
-    {
-      "tipo": "turnoJugador",
-      "jugador": 1,
-      "dano": 0
     },
     {
       "tipo": "aliadoInvocado",

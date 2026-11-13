@@ -44,10 +44,10 @@ Los 4 jefes iniciales ya están en el catálogo (`catalog/bosses/`). HP calibrad
 
 | Jefe | Nv | HP | Ataques (ranura 1 / 2 / 3) | Máx. ataques/turno | Llamadas de aliado |
 |---|---|---|---|---|---|
-| Onix (Túnel Roca) | 1 | 2200 | 30 / 60 / 120 | 2 | hasta 2 |
-| Manectric (Ruta 110) | 2 | 2700 | 40 / 80 / 160 | 3 | hasta 3 |
-| Kingdra (Islas Remolino) | 3 | 3800 | 60 / 100 / 200 | 4 | hasta 4 |
-| Arceus (Sala Origen) | 4 | 3900 | 40 / 100 / 240 | 5 | hasta 5 |
+| Onix (Túnel Roca) | 1 | 2300 | 30 / 60 / 120 | 2 | hasta 2 |
+| Manectric (Ruta 110) | 2 | 2600 | 40 / 80 / 160 | 3 | hasta 3 |
+| Kingdra (Islas Remolino) | 3 | 3700 | 60 / 100 / 200 | 4 | hasta 4 |
+| Arceus (Sala Origen) | 4 | 3800 | 40 / 100 / 240 | 5 | hasta 5 |
 
 Efectos de los ataques del jefe (D-14):
 
@@ -56,9 +56,9 @@ Efectos de los ataques del jefe (D-14):
 - **Kingdra**: Ciclón (60): El daño de este ataque no se ve afectado por ningún efecto en el Pokémon Defensor.; Pulso Dragón (100); Hidrobomba (200)
 - **Arceus**: Danza Espada (40): Este ataque hace 30 puntos de daño más por cada ataque que este Pokémon haya usado antes en este turno.; Castigo (100): Si el Pokémon Defensor no tiene contadores de daño, este ataque hace 50 puntos de daño más.; Sentencia (240): Pon 1 contador de daño en cada uno de los demás Pokémon en juego.
 
-**Aliados (D-13, D-16, T-69):** el jefe llama a un aliado al empezar su segundo turno, o al empezar el turno siguiente a que caiga el anterior; nunca hay más de uno en juego y llama como máximo nivel + 1 veces. Un dado del tamaño del número de jugadores elige el slot libre y un dado de 6 elige la categoría (1 Daño · 2 Tanque · 3 Cura · 4 Control · 5 Potenciador · 6 Debilitador). Sin slot libre no hay aliado (y la llamada cuenta). Los jugadores no tienen por qué saber la categoría: los aliados salen como Pokémon salvajes. Qué hace la app y qué hace la mesa con cada carta: `docs/CARTAS.md`.
+**Aliados (D-13, D-16, T-71):** el jefe llama a su primer aliado al terminar su primer turno y a los siguientes cada vez que su HP baja a un valor definido en su ficha (cada umbral, una vez); llama como máximo nivel + 1 veces. Un dado del tamaño del número de jugadores elige el slot libre y un dado de 6 elige la categoría (1 Daño · 2 Tanque · 3 Cura · 4 Control · 5 Potenciador · 6 Debilitador). Sin slot libre no hay aliado (y la llamada cuenta). Los jugadores no tienen por qué saber la categoría: los aliados salen como Pokémon salvajes. Qué hace la app y qué hace la mesa con cada carta: `docs/CARTAS.md`.
 
-### Onix (Nv1, 2200 HP)
+### Onix (Nv1, 2300 HP)
 
 | Categoría | Aliado | HP | Ataque | Habilidad |
 |---|---|---|---|---|
@@ -69,7 +69,7 @@ Efectos de los ataques del jefe (D-14):
 | Potenciador | Cubone | 60 | — | **Foco Energía**: Mientras este Pokémon esté en juego, cada vez que el jefe vaya a atacar, lanza 1 moneda. Si sale cara, ese ataque hace 10 puntos de daño más. |
 | Debilitador | Haunter | 80 | — | **Rencor**: Mientras este Pokémon esté en juego, los Pokémon de los jugadores no pueden usar el mismo ataque en 2 turnos seguidos. |
 
-### Manectric (Nv2, 2700 HP)
+### Manectric (Nv2, 2600 HP)
 
 | Categoría | Aliado | HP | Ataque | Habilidad |
 |---|---|---|---|---|
@@ -80,7 +80,7 @@ Efectos de los ataques del jefe (D-14):
 | Potenciador | Poochyena | 70 | — | **Aullido**: Mientras este Pokémon esté en juego, los ataques del jefe hacen 20 puntos de daño más. |
 | Debilitador | Zigzagoon | 50 | — | **Gruñido**: Mientras este Pokémon esté en juego, los ataques de los jugadores hacen 10 puntos de daño menos al jefe y a los aliados. |
 
-### Kingdra (Nv3, 3800 HP)
+### Kingdra (Nv3, 3700 HP)
 
 | Categoría | Aliado | HP | Ataque | Habilidad |
 |---|---|---|---|---|
@@ -91,7 +91,7 @@ Efectos de los ataques del jefe (D-14):
 | Potenciador | Horsea | 60 | — | **Agilidad**: Mientras este Pokémon esté en juego, el primer ataque del jefe en cada turno del jefe hace 30 puntos de daño más. |
 | Debilitador | Magikarp | 50 | **Salpicadura** 10 | **Bote**: Cada vez que este Pokémon vaya a recibir daño de un ataque, el jugador atacante lanza 1 moneda. Si sale cara, se evita todo ese daño. |
 
-### Arceus (Nv4, 3900 HP)
+### Arceus (Nv4, 3800 HP)
 
 | Categoría | Aliado | HP | Ataque | Habilidad |
 |---|---|---|---|---|

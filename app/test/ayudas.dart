@@ -89,20 +89,31 @@ Future<void> asentar() async {
   }
 }
 
-/// Lleva una partida de 2 jugadores hasta el turno del jefe de la ronda 2,
-/// que es cuando llama a su primer aliado (T-69): deja un intento de
-/// invocación por resolver.
+/// Lleva una partida de 2 jugadores hasta el final del turno del jefe de la
+/// ronda 1, que es cuando llama a su primer aliado (T-71): deja un intento de
+/// invocación por resolver al empezar la ronda 2. El daño (50) no llega a
+/// ningún umbral de HP de los jefes de los tests.
 void llegarALaLlamadaDelJefe(ProviderContainer c) {
   final partida = c.read(partidaProvider.notifier);
   for (final e in const <Evento>[
-    TurnoJugador(jugador: 0, dano: 100),
+    TurnoJugador(jugador: 0, dano: 50),
     TurnoJugador(jugador: 1, dano: 0),
     AtaqueJefe(ranura: 1, dano: 0),
     FinTurnoJefe(),
-    TurnoJugador(jugador: 0, dano: 0),
-    TurnoJugador(jugador: 1, dano: 0),
   ]) {
     final error = partida.registrar(e);
     if (error != null) throw StateError('$e: $error');
+  }
+}
+
+/// Hace actuar, sin daño, a los jugadores que quedan en el turno de la ronda.
+void jugadoresActuanSinDano(ProviderContainer c) {
+  final partida = c.read(partidaProvider.notifier);
+  var estado = c.read(estadoProvider);
+  while (estado.fase == Fase.turnoJugadores) {
+    final error =
+        partida.registrar(TurnoJugador(jugador: estado.jugadorActual!, dano: 0));
+    if (error != null) throw StateError('turno de jugador: $error');
+    estado = c.read(estadoProvider);
   }
 }

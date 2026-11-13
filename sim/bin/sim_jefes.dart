@@ -3,9 +3,9 @@
 // Reutiliza los equipos de cartas reales y las reglas de sim_cartas.dart
 // (D-03) y añade lo que ese simulador no modela, tal como lo define el GDD §4.4
 // y D-13:
-//   - Llamada de aliados estilo Sol y Luna (T-69): al empezar su turno, desde
-//     la ronda 2, si no hay ningún aliado en juego y no ha llamado ya
-//     nivel + 1 veces, el jefe llama a uno. Sin moneda ni umbrales de HP.
+//   - Llamada de aliados (T-69/T-71): la primera al terminar el turno del jefe
+//     de la ronda 1 y las siguientes cada vez que su HP baja a un umbral
+//     (cada `cadaHp` HP perdidos), hasta nivel + 1 llamadas. Sin moneda.
 //   - Un dado elige el slot entre los libres de jugadores activos y otro la
 //     categoría entre las que no están en uso. Sin slot libre no hay aliado.
 //   - Al entrar, el aliado ataca (si tiene ataque); luego vuelve a atacar al
@@ -207,14 +207,16 @@ class JefeDef {
   /// Llamadas de aliado posibles a lo largo de la partida (T-69): nivel + 1.
   int get intentos => cadaHp == null ? 0 : nivel + 1;
 
-  /// El mismo jefe con otro HP (las llamadas no dependen del HP).
+  /// El mismo jefe con otro HP. Mantiene el número de llamadas por umbral
+  /// (nivel, además de la primera): `cadaHp` se reparte en tramos iguales
+  /// redondeando hacia abajo.
   JefeDef conHp(int nuevoHp) => JefeDef(
         id: id,
         nombre: nombre,
         nivel: nivel,
         hp: nuevoHp,
         ataques: ataques,
-        cadaHp: cadaHp,
+        cadaHp: cadaHp == null ? null : (nuevoHp + nivel) ~/ (nivel + 1),
         segura: segura,
         aliados: aliados,
       );
@@ -356,6 +358,9 @@ Resultado jugarJefe(
   final slots = List<Aliado?>.filled(js.length, null);
   var hp = jefe.hp;
   var llamadas = 0;
+  // Ronda de la partida (para las llamadas: nada cuenta antes de que acabe el
+  // primer turno del jefe).
+  var ronda = 1;
   var invocados = 0;
   var sinSlot = 0;
   var sinCategoria = 0;
@@ -518,15 +523,33 @@ Resultado jugarJefe(
     }
   }
 
-  // El jefe pierde [dano] HP. Devuelve
-  // true si cae.
+  // Llamadas de aliado debidas (T-71): la primera al acabar el turno del jefe
+  // de la ronda 1 y una por umbral de HP cruzado, hasta nivel + 1 en total.
+  void llamar() {
+    final cada = jefe.cadaHp;
+    if (cada == null || ronda < 2) return;
+    final maxUmbrales = (jefe.hp - 1) ~/ cada;
+    var cruzados = (jefe.hp - hp) ~/ cada;
+    if (cruzados > maxUmbrales) cruzados = maxUmbrales;
+    if (cruzados < 0) cruzados = 0;
+    final debidas = min(1 + cruzados, jefe.intentos);
+    while (llamadas < debidas) {
+      llamadas++;
+      invocar();
+    }
+  }
+
+  // El jefe pierde [dano] HP. Devuelve true si cae; si no, puede llamar a un
+  // aliado al cruzar un umbral de HP.
   bool bajarJefe(int dano) {
     hp -= dano;
     if (hp <= 0) return true;
+    llamar();
     return false;
   }
 
   for (var t = 1; t <= c.maxTurnos; t++) {
+    ronda = t;
     actual = -1;
     for (var i = 0; i < js.length; i++) {
       final j = js[i];
@@ -621,16 +644,6 @@ Resultado jugarJefe(
     noAtacan.clear();
     sinRetirada.clear();
 
-    // Llamada de aliado (T-69): desde su segundo turno, si no hay ninguno en
-    // juego y le quedan llamadas.
-    if (t >= 2 &&
-        jefe.cadaHp != null &&
-        llamadas < jefe.intentos &&
-        slots.every((a) => a == null)) {
-      llamadas++;
-      invocar();
-    }
-
     // Turno del jefe: roba cartas del mazo real (20 cartas oficiales; según
     // los jugadores se quitan o se redirigen), cada una con su ataque y su
     // objetivo, y sigue mientras diga «roba otra» hasta el máximo del nivel.
@@ -703,6 +716,10 @@ Resultado jugarJefe(
       }
     }
     if (js.every((j) => j.eliminado)) return res(0);
+    // Termina el turno del jefe: primera llamada y umbrales ya cruzados. El
+    // aliado entra y ataca al entrar (la ronda siguiente, antes de actuar).
+    ronda = t + 1;
+    llamar();
   }
   return res(0);
 }

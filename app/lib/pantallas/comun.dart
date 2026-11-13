@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -80,6 +82,118 @@ Future<void> avisarMesa(
       ],
     ),
   );
+}
+
+/// Lanza una moneda en la pantalla (T-71): el resultado se decide al abrir el
+/// diálogo, la moneda gira y se para en él, y «Continuar» lo devuelve. Es para
+/// las monedas que lanzan los jugadores y que la app puede tirar por ellos.
+/// `true`: cara.
+Future<bool> lanzarMonedaEnPantalla(
+  BuildContext context,
+  WidgetRef ref, {
+  required String titulo,
+  String? detalle,
+}) async {
+  final cara = ref.read(azarProvider).nextBool();
+  await showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (c) => _DialogoMoneda(titulo: titulo, detalle: detalle, cara: cara),
+  );
+  return cara;
+}
+
+class _DialogoMoneda extends StatefulWidget {
+  const _DialogoMoneda({
+    required this.titulo,
+    required this.detalle,
+    required this.cara,
+  });
+
+  final String titulo;
+  final String? detalle;
+  final bool cara;
+
+  @override
+  State<_DialogoMoneda> createState() => _DialogoMonedaState();
+}
+
+class _DialogoMonedaState extends State<_DialogoMoneda>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _giro = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1600),
+  )..addListener(() => setState(() {}));
+
+  @override
+  void initState() {
+    super.initState();
+    _giro.forward();
+  }
+
+  @override
+  void dispose() {
+    _giro.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Tres vueltas y media si sale cruz, tres si sale cara: la moneda se para
+    // con la cara que toca hacia arriba.
+    final vueltas = widget.cara ? 6.0 : 7.0;
+    final angulo = Curves.easeOut.transform(_giro.value) * vueltas * math.pi;
+    final alto = math.max(0.04, math.cos(angulo).abs());
+    final muestraCara = math.cos(angulo) >= 0;
+    final terminada = _giro.isCompleted;
+    final tema = Theme.of(context);
+    return AlertDialog(
+      key: const Key('moneda-en-pantalla'),
+      title: Text(widget.titulo),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.detalle != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text(widget.detalle!),
+            ),
+          Transform.scale(
+            scaleY: alto,
+            child: Container(
+              width: 110,
+              height: 110,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: muestraCara
+                    ? tema.colorScheme.primaryContainer
+                    : tema.colorScheme.secondaryContainer,
+                border: Border.all(color: tema.colorScheme.outline, width: 3),
+              ),
+              child: Text(
+                muestraCara ? 'CARA' : 'CRUZ',
+                style: tema.textTheme.titleLarge,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            terminada ? (widget.cara ? 'Sale cara' : 'Sale cruz') : '...',
+            key: const Key('moneda-resultado'),
+            style: tema.textTheme.titleMedium,
+          ),
+        ],
+      ),
+      actions: [
+        FilledButton(
+          key: const Key('moneda-continuar'),
+          onPressed: terminada ? () => Navigator.of(context).pop() : null,
+          child: const Text('Continuar'),
+        ),
+      ],
+    );
+  }
 }
 
 /// Pregunta sí/no a la mesa. null: se cerró el diálogo sin responder.

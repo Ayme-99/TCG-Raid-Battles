@@ -215,6 +215,7 @@ void main() {
           habilidad: 'Tormenta de Arena',
         ),
       );
+      jugadoresActuanSinDano(c);
       await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const Key('robar-carta-jefe')));
@@ -252,6 +253,11 @@ void main() {
           efectos: EfectosAliado.programa,
           scriptId: 'tanque-jefe-10',
         ),
+      ]) {
+        registrar(c, e);
+      }
+      jugadoresActuanSinDano(c);
+      for (final e in const <Evento>[
         AtaqueJefe(ranura: 1, dano: 0),
         FinTurnoJefe(),
       ]) {

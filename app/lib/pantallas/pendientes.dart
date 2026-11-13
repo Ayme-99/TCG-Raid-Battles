@@ -210,24 +210,36 @@ Future<void> atacarConAliado(
     if (conEstado == null || !context.mounted) return;
     if (conEstado) dano += extraEstado;
   }
-  // Moneda del rival (Fuerza Lunar): la lanza el jugador y la app la anota.
+  // Moneda del rival (Fuerza Lunar): la lanza el jugador. Cae en la pantalla;
+  // con Fijar Blanco en juego (la primera moneda de cada jugador es cruz) la
+  // lleva la mesa y la app solo la anota.
   bool? monedaRival;
   if (esDeCarta && carta.ataqueMonedaRival) {
     final fijadas = recordatoriosDeMoneda(
       ref.read(catalogoProvider).valueOrNull,
       estado,
     );
-    monedaRival = await preguntarMesa(
-      context,
-      [
-        '${aliado.ataqueNombre}: '
-            '${estado.jugadores[objetivo ?? aliado.slot].nombre} lanza una '
-            'moneda. ¿Sale cara?',
-        ...fijadas,
-      ].join('\n'),
-      si: 'Cara',
-      no: 'Cruz',
-    );
+    final rivalNombre = estado.jugadores[objetivo ?? aliado.slot].nombre;
+    if (fijadas.isEmpty) {
+      monedaRival = await lanzarMonedaEnPantalla(
+        context,
+        ref,
+        titulo: '${aliado.nombre}: ${aliado.ataqueNombre}',
+        detalle: '$rivalNombre lanza 1 moneda. Con cruz, el siguiente ataque '
+            'de ese Pokémon hace 30 puntos de daño menos.',
+      );
+    } else {
+      monedaRival = await preguntarMesa(
+        context,
+        [
+          '${aliado.ataqueNombre}: $rivalNombre lanza una moneda. '
+              '¿Sale cara?',
+          ...fijadas,
+        ].join('\n'),
+        si: 'Cara',
+        no: 'Cruz',
+      );
+    }
     if (monedaRival == null || !context.mounted) return;
   }
   final aplicado = registrar(
