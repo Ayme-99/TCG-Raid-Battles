@@ -94,6 +94,7 @@ Future<void> avisarEntrada(
   }
   if (lineas.isEmpty) return;
   await avisarMesa(context, titulo: 'Entra ${evento.nombre}', lineas: lineas);
+}
 
 /// Resuelve un intento de invocación pendiente sin que nadie pulse nada: la
 /// moneda del jefe (si no es de invocación segura), el dado de slot y el de
