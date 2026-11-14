@@ -33,7 +33,7 @@ La dificultad del Nv4 sale del jefe (más HP y más ataques por turno), no de da
 - **Valores justo en el umbral**: el umbral inferior pertenece al nivel de arriba (X = 400 es Nv2, X = 600 es Nv3, X = 800 es Nv4).
 - **X menor de 250**: se juega como Nv1. El juego oficial pone un jefe más duro, pero aquí no existe nivel inferior al Nv1. En el simulador, equipos con X entre 190 y 390 dan ≈ 75 % de victoria en Nv1.
 - **Cambiar Pokémon después de ver el nivel**: no se permite. Una vez mostrado el nivel, los Pokémon quedan fijados, para que nadie ajuste su X a un nivel concreto. Qué cuenta como daño y cómo se evita la manipulación se cierra en `docs/D-02-dano-maximo.md`.
-- **Menos de 4 jugadores**: el formato está pensado para 3-4 jugadores (GDD v0.6). Si juegan menos, se mantiene el criterio del GDD y no se añaden parejas extra; la regla de aliados con menos jugadores está en `docs/D-04-aliados.md`.
+- **Menos de 4 jugadores**: el formato está pensado para 3-4 jugadores (GDD v0.6). Decidido el 2026-11-14 (GDD v1.17): con **3 jugadores, cada uno usa 3 Pokémon** (9 en mesa) y los PS no cambian (algo más fácil que con 4); con 2 y con 1 jugador sigue sin decidir (propuesta: 4 y 5 o 6 Pokémon cada uno); la regla de aliados con menos jugadores está en `docs/D-04-aliados.md`.
 - **Jugador eliminado**: no cambia X ni el nivel durante la partida; X se calcula una sola vez, en el setup.
 
 ## 5. Cambios en otros documentos
