@@ -9,11 +9,11 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 9;
+const int versionRegistro = 10;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6, 6: _v6AV7, 7: _v7AV8, 8: _v8AV9};
+    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6, 6: _v6AV7, 7: _v7AV8, 8: _v8AV9, 9: _v9AV10};
 
 /// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
 /// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
@@ -138,6 +138,13 @@ Map<String, Object?> _v7AV8(Map<String, Object?> datos) =>
 Map<String, Object?> _v8AV9(Map<String, Object?> datos) =>
     {...datos, 'version': 9};
 
+/// Versión 10 (T-43, D-17): estados en los aliados. Evento nuevo
+/// `aplicarEstadoAliado` y campo opcional `monedasQuemaduraAliados` en
+/// `finTurnoJefe`. Son valores nuevos: las partidas guardadas se leen igual y
+/// solo cambia la versión.
+Map<String, Object?> _v9AV10(Map<String, Object?> datos) =>
+    {...datos, 'version': 10};
+
 // ---------------------------------------------------------------------------
 // Eventos <-> JSON
 // ---------------------------------------------------------------------------
@@ -183,6 +190,17 @@ Map<String, Object?> eventoAJson(Evento evento) {
     FinTurnoJefe ev => {
         'tipo': 'finTurnoJefe',
         if (ev.monedaQuemadura != null) 'monedaQuemadura': ev.monedaQuemadura,
+        if (ev.monedasQuemaduraAliados != null)
+          'monedasQuemaduraAliados': [
+            for (final m in ev.monedasQuemaduraAliados!)
+              {'slot': m.slot, 'cara': m.cara},
+          ],
+      },
+    AplicarEstadoAliado ev => {
+        'tipo': 'aplicarEstadoAliado',
+        'jugador': ev.jugador,
+        'slot': ev.slot,
+        'estado': ev.estado.name,
       },
     AplicarEstadoJefe ev => {
         'tipo': 'aplicarEstadoJefe',
@@ -278,8 +296,25 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
         carta: c.entero('carta', min: 1, max: 5),
       );
     case 'finTurnoJefe':
-      c.permitir({'tipo', 'monedaQuemadura'});
-      return FinTurnoJefe(monedaQuemadura: c.booleanoOpt('monedaQuemadura'));
+      c.permitir({'tipo', 'monedaQuemadura', 'monedasQuemaduraAliados'});
+      final monedasAliados = c.listaOpt('monedasQuemaduraAliados');
+      return FinTurnoJefe(
+        monedaQuemadura: c.booleanoOpt('monedaQuemadura'),
+        monedasQuemaduraAliados: monedasAliados == null
+            ? null
+            : [
+                for (var i = 0; i < monedasAliados.length; i++)
+                  _monedaQuemaduraAliado(
+                      monedasAliados[i], '$ruta.monedasQuemaduraAliados[$i]'),
+              ],
+      );
+    case 'aplicarEstadoAliado':
+      c.permitir({'tipo', 'jugador', 'slot', 'estado'});
+      return AplicarEstadoAliado(
+        jugador: c.entero('jugador', min: 0, max: 3),
+        slot: c.entero('slot', min: 0, max: 3),
+        estado: c.enumerado('estado', EstadoDelJefe.values),
+      );
     case 'aplicarEstadoJefe':
       c.permitir({'tipo', 'jugador', 'estado'});
       return AplicarEstadoJefe(
@@ -375,6 +410,16 @@ EfectoAtaque _efectoDeJson(Object? json, String ruta) {
     valor: c.enteroOpt('valor', min: 1),
     duracion: c.enteroOpt('duracion', min: 1),
     moneda: c.booleanoOpt('moneda'),
+  );
+}
+
+MonedaQuemaduraAliado _monedaQuemaduraAliado(Object? json, String ruta) {
+  final c = _Campos.de(json, ruta);
+  c.permitir({'slot', 'cara'});
+  if (c.datos['cara'] is! bool) c.falla('«cara» debe ser verdadero o falso');
+  return MonedaQuemaduraAliado(
+    slot: c.entero('slot', min: 0, max: 3),
+    cara: c.datos['cara'] as bool,
   );
 }
 

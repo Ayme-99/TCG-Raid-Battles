@@ -1,13 +1,15 @@
 'use strict';
 const { TOPE_VICTORIA, REPARTO, puntosTotales, repartir, bonoEstados } = require('./puntos');
 
-// Aplicaciones de estados que cuentan para cada asiento (D-12): las que dejan
-// al jefe con un estado que no tenía. El veneno es permanente; la quemadura se
+// Aplicaciones de estados que cuentan para cada asiento (D-12, D-17): las que
+// dejan al jefe o a un aliado con un estado que no tenía. El veneno es permanente; la quemadura se
 // quita cuando la moneda sale cara. Sale solo del registro de eventos.
 function aplicacionesContables(eventos, jugadores) {
   const cuenta = new Array(jugadores).fill(0);
   let envenenado = false;
   let quemado = false;
+  // Estados de los aliados por slot (D-17). Un aliado nuevo empieza limpio.
+  const aliados = new Map();
   for (const e of eventos) {
     if (e.tipo === 'aplicarEstadoJefe') {
       if (e.estado === 'veneno' && !envenenado) {
@@ -17,8 +19,22 @@ function aplicacionesContables(eventos, jugadores) {
         quemado = true;
         if (e.jugador < jugadores) cuenta[e.jugador] += 1;
       }
-    } else if (e.tipo === 'finTurnoJefe' && quemado && e.monedaQuemadura === true) {
-      quemado = false;
+    } else if (e.tipo === 'aliadoInvocado') {
+      aliados.set(e.slot, { envenenado: false, quemado: false });
+    } else if (e.tipo === 'aplicarEstadoAliado') {
+      const a = aliados.get(e.slot);
+      if (!a) continue;
+      const campo = e.estado === 'veneno' ? 'envenenado' : 'quemado';
+      if (!a[campo]) {
+        a[campo] = true;
+        if (e.jugador < jugadores) cuenta[e.jugador] += 1;
+      }
+    } else if (e.tipo === 'finTurnoJefe') {
+      if (quemado && e.monedaQuemadura === true) quemado = false;
+      for (const m of e.monedasQuemaduraAliados ?? []) {
+        const a = aliados.get(m.slot);
+        if (a && m.cara === true) a.quemado = false;
+      }
     }
   }
   return cuenta;
@@ -159,4 +175,4 @@ function abonos(registro) {
   return salida;
 }
 
-module.exports = { comprobarCoherencia, abonos };
+module.exports = { comprobarCoherencia, abonos, aplicacionesContables };

@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.17 (especificación del motor)
+**Versión:** 1.18 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -282,3 +282,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.15 | Corrige la llamada de aliados (T-71): el jefe llama a su primer aliado al terminar su primer turno y a los siguientes cuando su HP baja a los valores definidos en su ficha (`cadaHp`), hasta nivel + 1 llamadas; vuelven los umbrales de HP y se acaba el doble ataque de entrada en el mismo turno. HP de los jefes como en las cartas: Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800. Las monedas que lanzan los jugadores (Bote, Fuerza Lunar) caen en la pantalla. |
 | v1.16 | El jugador con un Pokémon KO se sienta su turno (solo roba carta de ánimo, fuera de la app) y los ataques del jefe o de un aliado contra él fallan (T-72). Daño por efectos (T-59, contrato v8): un rebote («si el Defensor queda KO, el jefe se hace N de daño») se atribuye al jugador que recibió el ataque, cuenta para su daño y puede dar la victoria; un efecto también puede dañar a un aliado, que sale de la mesa a 0 HP. |
 | v1.17 | Con 3 jugadores, cada uno usa 3 Pokémon (9 en mesa) y los PS de los jefes no cambian; se acepta que sea algo más fácil que con 4 jugadores. Las cartas de ánimo (D-05) quedan fijadas en las 5 oficiales y el simulador las modela (#189). Motor, contrato v9 y app lo implementan (#194). |
+| v1.18 | Los aliados pueden quedar Envenenados o Quemados (D-17). Motor, contrato v10 y app lo implementan (#196). |

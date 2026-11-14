@@ -1,4 +1,4 @@
-# Contrato del registro de partida (versión 9)
+# Contrato del registro de partida (versión 10)
 
 > Para subir la versión del contrato, sigue el checklist de [`docs/DEPENDENCIAS.md`](../docs/DEPENDENCIAS.md) (motor, servidor, repo externo).
 
@@ -8,9 +8,9 @@ Formato JSON con el que la app guarda una partida y la envía al backend. Una pa
 
 | Archivo | Qué es |
 |---|---|
-| `partida.v9.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
+| `partida.v10.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
 | `partida.v7.schema.json`, `partida.v6.schema.json`, `partida.v5.schema.json`, `partida.v4.schema.json`, `partida.v3.schema.json`, `partida.v2.schema.json`, `partida.v1.schema.json` | Esquemas de las versiones 1 a 7, que se conservan: hay partidas guardadas con esos formatos. |
-| `ejemplos/v9/`, `ejemplos/v8/`, `ejemplos/v7/`, `ejemplos/v6/`, `ejemplos/v5/`, `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
+| `ejemplos/v10/`, `ejemplos/v9/`, `ejemplos/v8/`, `ejemplos/v7/`, `ejemplos/v6/`, `ejemplos/v5/`, `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
 
 Los ejemplos válidos están probados por los dos lados: el motor los lee y los vuelve a escribir igual (`engine/test/registro_test.dart`) y el esquema los acepta (`server/test/contrato.test.js`). El CI ejecuta ambos.
 

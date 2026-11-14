@@ -42,6 +42,7 @@ EstadoPartida _aplicar(
     CartaAnimoRobada ev => _cartaAnimo(estado, ev),
     FinTurnoJefe ev => _finTurnoJefe(estado, ev, scripts),
     AplicarEstadoJefe ev => _aplicarEstadoJefe(estado, ev, scripts),
+    AplicarEstadoAliado ev => _aplicarEstadoAliado(estado, ev, scripts),
     CuracionJefe ev => _curacionJefe(estado, ev),
     DanoDeEfecto ev => _danoDeEfecto(estado, ev),
     AtaqueAAliado ev => _ataqueAAliado(estado, ev, scripts),
@@ -561,6 +562,30 @@ EstadoPartida _finTurnoJefe(
   // atribuirse a ningún jugador. Si lo dejan a 0 HP, victoria.
   // Antes, los efectos de los aliados que aplica el programa (D-13).
   var estado = _ejecutarScripts(e, scripts, (s) => s.alFinTurnoJefe);
+  // Aliados quemados: hace falta la moneda de cada uno (D-17).
+  final quemados = {
+    for (final a in estado.aliados)
+      if (a.quemado) a.slot,
+  };
+  final monedas = <int, bool>{};
+  for (final m in ev.monedasQuemaduraAliados ?? const <MonedaQuemaduraAliado>[]) {
+    if (monedas.containsKey(m.slot)) {
+      _error('FinTurnoJefe: hay dos monedas para el aliado del slot ${m.slot}');
+    }
+    monedas[m.slot] = m.cara;
+  }
+  for (final slot in quemados) {
+    if (!monedas.containsKey(slot)) {
+      _error('el aliado del slot $slot está quemado: FinTurnoJefe necesita el '
+          'resultado de su moneda');
+    }
+  }
+  for (final slot in monedas.keys) {
+    if (!quemados.contains(slot)) {
+      _error('el aliado del slot $slot no está quemado: no hay moneda que '
+          'registrar');
+    }
+  }
   final jefeActual = estado.jefe!;
   final dano = (jefeActual.envenenado ? danoVeneno : 0) +
       (jefeActual.quemado ? danoQuemadura : 0);
@@ -582,7 +607,77 @@ EstadoPartida _finTurnoJefe(
   if (ev.monedaQuemadura == true) {
     estado = estado.copiarCon(jefe: estado.jefe!.conEstados(quemado: false));
   }
+  // Chequeo de los aliados (D-17), por orden de slot: su daño no se atribuye
+  // a nadie y un aliado a 0 HP sale de la mesa. La moneda de la quemadura
+  // se aplica después del daño, como en el jefe.
+  if (estado.aliados.any((a) => a.envenenado || a.quemado)) {
+    final aliados = <AliadoEstado>[];
+    var derrotados = 0;
+    final ordenados = [...estado.aliados]
+      ..sort((a, b) => a.slot.compareTo(b.slot));
+    for (final a in ordenados) {
+      final dano = (a.envenenado ? danoVeneno : 0) +
+          (a.quemado ? danoQuemadura : 0);
+      if (dano == 0) {
+        aliados.add(a);
+        continue;
+      }
+      final hp = a.hp - dano;
+      if (hp <= 0) {
+        derrotados++;
+        continue;
+      }
+      aliados.add(a.copiarCon(
+        hp: hp,
+        quemado: a.quemado && monedas[a.slot] == true ? false : null,
+      ));
+    }
+    estado = estado.copiarCon(
+      aliados: aliados,
+      aliadosDerrotados: estado.aliadosDerrotados + derrotados,
+    );
+  }
   return _llamarAliados(_empezarRonda(estado));
+}
+
+EstadoPartida _aplicarEstadoAliado(
+  EstadoPartida e,
+  AplicarEstadoAliado ev,
+  Map<String, ScriptAliado> scripts,
+) {
+  if (e.fase != Fase.turnoJugadores && e.fase != Fase.turnoJefe) {
+    _error('AplicarEstadoAliado no es válido en la fase ${e.fase.name}');
+  }
+  _exigeJugador(e, ev.jugador);
+  if (estadosBloqueados(e, scripts)) {
+    _error('un aliado (Velo Sagrado) impide que el jefe y los aliados sufran '
+        'estados');
+  }
+  final aliado = e.aliadoEn(ev.slot);
+  if (aliado == null) {
+    _error('no hay ningún aliado en el slot ${ev.slot}');
+  }
+  final yaLoTiene = switch (ev.estado) {
+    EstadoDelJefe.veneno => aliado.envenenado,
+    EstadoDelJefe.quemadura => aliado.quemado,
+  };
+  // Aplicar un estado que ya tiene no cambia nada ni cuenta (D-12, D-17).
+  if (yaLoTiene) return e;
+  final aplicados = [...e.estadosAplicados];
+  aplicados[ev.jugador] += 1;
+  return e.copiarCon(
+    aliados: [
+      for (final a in e.aliados)
+        if (a.slot != ev.slot)
+          a
+        else
+          switch (ev.estado) {
+            EstadoDelJefe.veneno => a.copiarCon(envenenado: true),
+            EstadoDelJefe.quemadura => a.copiarCon(quemado: true),
+          },
+    ],
+    estadosAplicados: aplicados,
+  );
 }
 
 EstadoPartida _aplicarEstadoJefe(

@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { comprobarCoherencia, abonos } = require('../src/coherencia');
+const { comprobarCoherencia, abonos, aplicacionesContables } = require('../src/coherencia');
 const { puntosTotales, repartir } = require('../src/puntos');
 const { ejemplo } = require('./ayudas');
 
@@ -108,4 +108,18 @@ test('una quemadura quitada por la moneda vuelve a contar; si se mantiene, no', 
   r.eventos.find((e) => e.tipo === 'finTurnoJefe').monedaQuemadura = false;
   const motivos = comprobarCoherencia(r).join();
   assert.match(motivos, /estadosAplicados debería ser 1, no 2/);
+});
+
+test('las aplicaciones de estados a aliados cuentan (v10, D-17)', () => {
+  const eventos = [
+    { tipo: 'aliadoInvocado', slot: 1 },
+    { tipo: 'aplicarEstadoAliado', jugador: 1, slot: 1, estado: 'veneno' },
+    { tipo: 'aplicarEstadoAliado', jugador: 2, slot: 1, estado: 'veneno' }, // ya lo tenía
+    { tipo: 'aplicarEstadoAliado', jugador: 0, slot: 1, estado: 'quemadura' },
+    { tipo: 'finTurnoJefe', monedasQuemaduraAliados: [{ slot: 1, cara: true }] },
+    { tipo: 'aplicarEstadoAliado', jugador: 2, slot: 1, estado: 'quemadura' }, // la cara la quitó
+    { tipo: 'aliadoInvocado', slot: 1 }, // aliado nuevo, limpio
+    { tipo: 'aplicarEstadoAliado', jugador: 2, slot: 1, estado: 'veneno' },
+  ];
+  assert.deepStrictEqual(aplicacionesContables(eventos, 3), [1, 1, 2]);
 });
