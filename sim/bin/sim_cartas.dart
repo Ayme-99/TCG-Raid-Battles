@@ -65,6 +65,10 @@ class Config {
   String ataques = '../balance/tablas/ataques_prueba.csv';
   String tabla = '../balance/tablas/niveles.csv';
   String informe = '../balance/informes/d03_cartas.csv';
+
+  /// Cartas de ánimo (D-05, 1 a 5) que puede robar el jugador KO al sentarse.
+  /// Vacío = no se modelan (lo que asumían las calibraciones anteriores).
+  List<int> animo = const [];
 }
 
 const double probSeguir = 0.65;

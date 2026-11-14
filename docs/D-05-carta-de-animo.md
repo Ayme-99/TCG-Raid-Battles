@@ -16,7 +16,7 @@ La base son las **5 cartas oficiales de Cheer**, que se resuelven en la mesa (el
 
 El sistema está abierto: según se desarrolle el juego se podrán añadir cartas y mecánicas nuevas.
 
-Pendiente de playtest (T-17): el simulador no modela estos efectos (las curas y el +50 hacen la partida algo más fácil de lo calibrado), y se adopta de forma provisional el resto de la regla oficial (una carta por KO, máximo 3 cartas distintas por partida).
+Pendiente de playtest (T-17): el simulador los modela solo con `--animo=...` (#189; por defecto no, y entonces las curas y el +50 hacen la partida algo más fácil de lo calibrado), y se adopta de forma provisional el resto de la regla oficial (una carta por KO, máximo 3 cartas distintas por partida).
 
 ## 2. Pokémon KO: no revive
 
