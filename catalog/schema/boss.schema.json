@@ -96,7 +96,8 @@
                 "danoExtraSi",
                 "danoPorAtaquePrevio",
                 "contadorATodos",
-                "autodano"
+                "autodano",
+                "autodanoSiKo"
               ]
             },
             "valor": {

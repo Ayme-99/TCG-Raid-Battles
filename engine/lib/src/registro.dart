@@ -9,11 +9,11 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 7;
+const int versionRegistro = 8;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6, 6: _v6AV7};
+    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6, 6: _v6AV7, 7: _v7AV8};
 
 /// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
 /// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
@@ -125,6 +125,12 @@ Map<String, Object?> _v5AV6(Map<String, Object?> datos) {
 Map<String, Object?> _v6AV7(Map<String, Object?> datos) =>
     {...datos, 'version': 7};
 
+/// Versión 8 (T-59): evento nuevo `danoDeEfecto` y efecto de ataque
+/// `autodanoSiKo`. Son valores nuevos: las partidas guardadas se leen igual y
+/// solo cambia la versión.
+Map<String, Object?> _v7AV8(Map<String, Object?> datos) =>
+    {...datos, 'version': 8};
+
 // ---------------------------------------------------------------------------
 // Eventos <-> JSON
 // ---------------------------------------------------------------------------
@@ -178,6 +184,12 @@ Map<String, Object?> eventoAJson(Evento evento) {
       },
     Abandonar() => {'tipo': 'abandonar'},
     CuracionJefe ev => {'tipo': 'curacionJefe', 'cantidad': ev.cantidad},
+    DanoDeEfecto ev => {
+        'tipo': 'danoDeEfecto',
+        'puntos': ev.puntos,
+        if (ev.jugador != null) 'jugador': ev.jugador,
+        if (ev.slot != null) 'slot': ev.slot,
+      },
     AtaqueAAliado ev => {
         'tipo': 'ataqueAAliado',
         'jugador': ev.jugador,
@@ -273,6 +285,19 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
     case 'curacionJefe':
       c.permitir({'tipo', 'cantidad'});
       return CuracionJefe(c.entero('cantidad', min: 0));
+    case 'danoDeEfecto':
+      c.permitir({'tipo', 'puntos', 'jugador', 'slot'});
+      final jugador = c.enteroOpt('jugador', min: 0, max: 3);
+      final slot = c.enteroOpt('slot', min: 0, max: 3);
+      if ((jugador == null) == (slot == null)) {
+        c.falla('indica «jugador» (daño al jefe) o «slot» (daño a un aliado), '
+            'uno solo');
+      }
+      return DanoDeEfecto(
+        puntos: c.entero('puntos', min: 1),
+        jugador: jugador,
+        slot: slot,
+      );
     case 'ataqueAAliado':
       c.permitir({'tipo', 'jugador', 'slot', 'dano'});
       return AtaqueAAliado(

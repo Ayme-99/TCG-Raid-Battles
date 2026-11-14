@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.15 (especificación del motor)
+**Versión:** 1.16 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -280,3 +280,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.13 | Llamada de aliados estilo Sol y Luna (T-69): el jefe llama a un aliado al empezar su segundo turno o el turno siguiente a que caiga el anterior, uno cada vez, máximo nivel + 1 llamadas, sin moneda ni umbrales de HP; los dados siguen eligiendo slot y categoría. Los HP de los jefes no cambian. |
 | v1.14 | Las 28 cartas del set en el catálogo, con los textos de las cartas (T-70, `docs/CARTAS.md`): Tóxico (Gulpin) pasa a ser un ataque sin daño y Magikarp gana Salpicadura. Moflete Estático lo aplica el programa (el jugador que deja fuera de combate a un aliado queda Paralizado su siguiente turno) y Fijar Blanco queda apuntado el resto de la partida. Cierre del turno del jefe por pasos: ataques de los aliados, Chequeo Pokémon y fin. El asistente recuerda a la mesa, en su momento, lo que tiene que aplicar a sus Pokémon. Los HP de los jefes no cambian. |
 | v1.15 | Corrige la llamada de aliados (T-71): el jefe llama a su primer aliado al terminar su primer turno y a los siguientes cuando su HP baja a los valores definidos en su ficha (`cadaHp`), hasta nivel + 1 llamadas; vuelven los umbrales de HP y se acaba el doble ataque de entrada en el mismo turno. HP de los jefes como en las cartas: Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800. Las monedas que lanzan los jugadores (Bote, Fuerza Lunar) caen en la pantalla. |
+| v1.16 | El jugador con un Pokémon KO se sienta su turno (solo roba carta de ánimo, fuera de la app) y los ataques del jefe o de un aliado contra él fallan (T-72). Daño por efectos (T-59, contrato v8): un rebote («si el Defensor queda KO, el jefe se hace N de daño») se atribuye al jugador que recibió el ataque, cuenta para su daño y puede dar la victoria; un efecto también puede dañar a un aliado, que sale de la mesa a 0 HP. |

@@ -44,7 +44,7 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 
 ## 2. Checklist: subir la versión del contrato
 
-Cualquier cambio del formato sube la versión (`contrato/README.md`, «Versionado»). Pasos, con el contrato v4 (PR #83), el v5 (efectos de ataque, D-14) el v6 (6 categorías de aliado, D-16) y el v7 (monedas de aliado) como ejemplo:
+Cualquier cambio del formato sube la versión (`contrato/README.md`, «Versionado»). Pasos, con el contrato v4 (PR #83), el v5 (efectos de ataque, D-14) el v6 (6 categorías de aliado, D-16) y el v7 (monedas de aliado) y el v8 (daño por efectos, T-59) como ejemplo:
 
 1. **Esquema:** copia `contrato/partida.vN.schema.json` a `partida.vN+1.schema.json` y cambia `$id`, `version: { const: N+1 }` y lo que cambie. **No toques los esquemas antiguos**: hay partidas guardadas con ellos.
 2. **Ejemplos:** copia `contrato/ejemplos/vN/` a `vN+1/` (`validos/`, `invalidos-estructura/`, `invalidos-reglas/`) y pon `"version": N+1`. Revisa que los ejemplos inválidos lo siguen siendo con el esquema nuevo (en la v4, un valor inválido de la v3 pasó a ser válido).

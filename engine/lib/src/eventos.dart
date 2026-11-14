@@ -86,6 +86,12 @@ enum TipoEfectoAtaque {
   /// El jefe se hace [EfectoAtaque.valor] puntos de daño a sí mismo. Se aplica
   /// después del daño al jugador y no se atribuye a ningún jugador.
   autodano,
+
+  /// Rebote: si el ataque deja KO al Pokémon Defensor, el atacante (el jefe)
+  /// se hace [EfectoAtaque.valor] puntos de daño. Necesita `jugador` en el
+  /// ataque. El motor solo lo registra: la mesa dice si hubo KO y entonces se
+  /// registran `PokemonKo` y `DanoDeEfecto` (T-59).
+  autodanoSiKo,
 }
 
 /// Efecto de un ataque del jefe (D-14).
@@ -124,6 +130,19 @@ final class AtaqueJefe extends Evento {
     this.alAzar = false,
     this.efecto,
   });
+}
+
+/// Daño que un efecto (rebote, contadores) hace al jefe o a un aliado (T-59).
+/// Con [jugador] va al jefe y se atribuye a ese jugador (el defensor del
+/// ataque): cuenta para su daño y para los umbrales de llamada, y puede dar la
+/// victoria. Con [slot] va a ese aliado, sin atribuir a nadie; a 0 HP sale de
+/// la mesa y libera el slot. Se indica exactamente uno de los dos.
+final class DanoDeEfecto extends Evento {
+  final int puntos;
+  final int? jugador;
+  final int? slot;
+
+  const DanoDeEfecto({required this.puntos, this.jugador, this.slot});
 }
 
 /// Un Pokémon de un jugador cae KO.

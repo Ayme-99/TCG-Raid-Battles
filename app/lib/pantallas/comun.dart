@@ -247,6 +247,48 @@ class CampoNumero extends StatelessWidget {
   }
 }
 
+/// Rebote del jefe (T-59): tras un ataque con el efecto `autodanoSiKo`, la
+/// mesa dice si el Defensor quedó KO. Si es así se registran el KO y el daño
+/// que el jefe se hace, atribuido a ese jugador. Debe llamarse justo después de
+/// registrar el ataque, antes de cualquier espera, para que [context] siga
+/// montado.
+void preguntarRebote(
+  BuildContext context,
+  WidgetRef ref, {
+  required int jugador,
+  required int puntos,
+}) {
+  final nombre = ref.read(estadoProvider).jugadores[jugador].nombre;
+  showDialog<void>(
+    context: context,
+    builder: (dialogo) => AlertDialog(
+      key: const Key('dialogo-rebote'),
+      title: const Text('Rebote'),
+      content: Text(
+        '¿El Pokémon Defensor de $nombre ha quedado Fuera de Combate? Si es '
+        'así, el jefe se hace $puntos de daño (se atribuye a $nombre).',
+      ),
+      actions: [
+        TextButton(
+          key: const Key('rebote-no'),
+          onPressed: () => Navigator.of(dialogo).pop(),
+          child: const Text('No'),
+        ),
+        FilledButton(
+          key: const Key('rebote-si'),
+          onPressed: () {
+            if (registrar(dialogo, ref, PokemonKo(jugador))) {
+              registrar(dialogo, ref, DanoDeEfecto(puntos: puntos, jugador: jugador));
+            }
+            Navigator.of(dialogo).pop();
+          },
+          child: const Text('Sí, hay KO'),
+        ),
+      ],
+    ),
+  );
+}
+
 /// Pide un número entero (≥ 0) en un diálogo. Devuelve `null` si se cancela.
 Future<int?> pedirNumero(
   BuildContext context, {

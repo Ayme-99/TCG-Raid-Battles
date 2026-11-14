@@ -36,6 +36,7 @@ En el contrato v5 los tipos van en camelCase: `sinRetirada`, `sinAtaque`, `paral
 | `dano_extra_si` | jugador | HP, condición | — | Texto de la carta (p. ej. «si el Defensor no tiene contadores de daño, +50») |
 | `contador_a_todos` | programa + jugador | contadores | — | Pon N contador(es) de daño sobre todos los Pokémon en juego (menos el jefe) |
 | `autodano` | programa | HP | — | El jefe se hace N puntos de daño |
+| `autodanoSiKo` | mesa | HP | jugador | Rebote (T-59): si el Defensor queda KO, el jefe se hace N puntos de daño, atribuidos al defensor. La app pregunta tras registrar el ataque y registra `pokemonKo` + `danoDeEfecto` |
 | `estado_defensor` | jugador | estado (`paralizado`), `moneda` opcional | — | Lanza una moneda; si sale cara, el Pokémon Defensor pasa a estar paralizado |
 
 Se irán añadiendo (daño a cada Activo, daño a la Banca, moneda) según los jefes.

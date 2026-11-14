@@ -39,6 +39,7 @@ class PantallaTurnoJugadores extends ConsumerWidget {
         jugadorInicial: actual,
       ),
       const PanelPokemon(),
+      const PanelDanoDeEfecto(),
     ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).

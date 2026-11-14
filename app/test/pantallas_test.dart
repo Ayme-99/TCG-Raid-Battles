@@ -183,6 +183,34 @@ void main() {
     expect(estado.enKo(1), isFalse);
   });
 
+  testWidgets('el daño por efecto al jefe se atribuye al jugador elegido',
+      (tester) async {
+    final c = await abrir(tester);
+    await prepararPartida(tester, hp: 500);
+
+    // En pantalla estrecha el panel va al final de la lista de acciones.
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('dano-efecto')),
+      300,
+      scrollable: find.descendant(
+        of: find.byKey(const Key('panel-acciones')),
+        matching: find.byType(Scrollable),
+      ).first,
+    );
+    await tocar(tester, 'dano-efecto');
+    await tocar(tester, 'dano-efecto-jugador-1');
+    await escribir(tester, 'dano-efecto-puntos', '60');
+    // El botón se activa al reconstruirse con el número escrito.
+    await tester.pump();
+    await tocar(tester, 'dano-efecto-confirmar');
+
+    final estado = c.read(estadoProvider);
+    expect(estado.jefe!.hp, 440);
+    expect(estado.fase, Fase.turnoJugadores);
+    expect(estado.danoPorJugador[1], 60);
+    expect(estado.danoPorJugador[0], 0);
+  });
+
   testWidgets('la carta que roba otra obliga a robar hasta el máximo del nivel',
       (tester) async {
     final c = await abrir(
