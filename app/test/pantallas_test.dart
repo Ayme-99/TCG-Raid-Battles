@@ -196,7 +196,7 @@ void main() {
       scrollable: find.descendant(
         of: find.byKey(const Key('panel-acciones')),
         matching: find.byType(Scrollable),
-      ),
+      ).first,
     );
     await tocar(tester, 'dano-efecto');
     await tocar(tester, 'dano-efecto-jugador-1');
