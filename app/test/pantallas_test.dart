@@ -189,6 +189,8 @@ void main() {
     final c = await abrir(tester);
     await prepararPartida(tester, hp: 500);
 
+    // El panel vive en «Más acciones», plegado por defecto.
+    await tocar(tester, 'panel-extras-interno-toggle');
     await tocar(tester, 'dano-efecto');
     await tocar(tester, 'dano-efecto-jugador-1');
     await escribir(tester, 'dano-efecto-puntos', '60');
