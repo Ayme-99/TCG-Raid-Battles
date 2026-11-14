@@ -115,15 +115,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {jug: 3, pok: 2, cal: 1}
-          - {jug: 3, pok: 3, cal: 1}
-          - {jug: 2, pok: 2, cal: 1}
-          - {jug: 2, pok: 3, cal: 0}
-          - {jug: 2, pok: 4, cal: 1}
-          - {jug: 1, pok: 2, cal: 1}
-          - {jug: 1, pok: 4, cal: 0}
-          - {jug: 1, pok: 5, cal: 1}
-          - {jug: 1, pok: 6, cal: 1}
+          - {jug: 3, extra: '--mesa8', cal: 1}
     defaults:
       run:
         working-directory: sim
@@ -134,9 +126,9 @@ jobs:
           sdk: stable
       - run: dart pub get
       - run: |
-          echo "== HP del catalogo, jugadores=${{ matrix.jug }} pokemon=${{ matrix.pok }}"
-          dart run bin/sim_jefes.dart --jugadores=${{ matrix.jug }} --pokemon=${{ matrix.pok }} --equipos=150 --partidas=60 --informe=/tmp/x.csv
+          echo "== HP del catalogo, jugadores=${{ matrix.jug }} ${{ matrix.extra }}"
+          dart run bin/sim_jefes.dart --jugadores=${{ matrix.jug }} ${{ matrix.extra }} --equipos=150 --partidas=60 --informe=/tmp/x.csv
           if [ "${{ matrix.cal }}" = "1" ]; then
-            echo "== calibrar, jugadores=${{ matrix.jug }} pokemon=${{ matrix.pok }}"
-            dart run bin/sim_jefes.dart --calibrar --jugadores=${{ matrix.jug }} --pokemon=${{ matrix.pok }} --equipos=150 --partidas=60 --informe=/tmp/y.csv
+            echo "== calibrar, jugadores=${{ matrix.jug }} ${{ matrix.extra }}"
+            dart run bin/sim_jefes.dart --calibrar --jugadores=${{ matrix.jug }} ${{ matrix.extra }} --equipos=150 --partidas=60 --informe=/tmp/y.csv
           fi
