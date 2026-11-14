@@ -75,10 +75,14 @@
 //   dart run bin/sim_jefes.dart --jugadores=2 --mesa8   # 8 Pokémon en mesa (4 por jugador)
 //   dart run bin/sim_jefes.dart --calibrar   # HP (en centenas) que da el objetivo
 //   dart run bin/sim_jefes.dart --causas     # por qué no se usan todos los intentos
+//   dart run bin/sim_jefes.dart --animo=no    # sin cartas de ánimo (modelo anterior)
 //
 // Opciones propias:
 //   --jefes=RUTA      carpeta del catálogo (defecto ../catalog)
 //   --ayuda=P         probabilidad de ayuda en la política «ayuda» (0.5)
+//   --animo=LISTA     cartas de ánimo (D-05) que puede robar el jugador KO al
+//                     sentarse: «todas» (por defecto), «no» o números 1 a 5
+//                     separados por comas. Ver robarAnimo en jugarJefe.
 // Y las de sim_cartas.dart: --equipos --partidas --max-turnos --semilla
 //   --catalogo --ataques --tabla --informe (aquí, defecto
 //   ../balance/informes/jefes_aliados.csv).
@@ -377,10 +381,56 @@ Resultado jugarJefe(
   // sus aliados contra ellos fallan, igual que contra quien acaba de caer KO.
   final sentados = <int>{};
   bool enKo(int i) => !js[i].pokes[0].vivo || sentados.contains(i);
+  // Cartas de ánimo (D-05): el jugador que se sienta roba una de las de
+  // [Config.animo] (máximo 3 distintas por partida) en su posición del orden y
+  // su efecto «este turno» alcanza a quien actúa después en la ronda.
+  final animoVistas = <int>{};
+  var animoMas = 0; // +N al daño de los ataques de los jugadores (carta 5)
+  var animoDoble = false; // el siguiente ataque hace doble daño (carta 1)
+  var jefeUnaCarta = false; // el jefe juega una sola carta (carta 4)
   // Reducción pendiente por jugador (Fuerza Lunar).
   final debilitados = <int, int>{};
   // Último ataque de cada jugador (para «Rencor»).
   final ultimo = <int, Ataque?>{};
+
+  // El jugador KO que se sienta roba su carta de ánimo (D-05 §1).
+  void robarAnimo() {
+    if (c.animo.isEmpty) return;
+    var carta = c.animo[rnd.nextInt(c.animo.length)];
+    if (animoVistas.length >= 3 && !animoVistas.contains(carta)) {
+      final vistas = c.animo.where(animoVistas.contains).toList();
+      carta = vistas[rnd.nextInt(vistas.length)];
+    }
+    animoVistas.add(carta);
+    switch (carta) {
+      case 1:
+        animoDoble = true;
+      case 2:
+        for (final x in js) {
+          for (final p in x.pokes) {
+            if (p.vivo) p.hp = min(p.carta.hp, p.hp + 80);
+          }
+        }
+      case 3:
+        {
+          // Cura todo el daño del Pokémon más dañado.
+          Poke? peor;
+          for (final x in js) {
+            for (final p in x.pokes) {
+              if (p.vivo &&
+                  (peor == null || p.carta.hp - p.hp > peor.carta.hp - peor.hp)) {
+                peor = p;
+              }
+            }
+          }
+          if (peor != null) peor.hp = peor.carta.hp;
+        }
+      case 4:
+        jefeUnaCarta = true;
+      case 5:
+        animoMas = 50;
+    }
+  }
 
   // Reducción de daño de los aliados Tanque vivos.
   int reduccionTanques() {
@@ -559,6 +609,9 @@ Resultado jugarJefe(
     ronda = t;
     actual = -1;
     sentados.clear();
+    animoMas = 0;
+    animoDoble = false;
+    jefeUnaCarta = false;
     for (var i = 0; i < js.length; i++) {
       final j = js[i];
       if (j.eliminado) continue;
@@ -568,6 +621,7 @@ Resultado jugarJefe(
       if (perdidos.remove(i) || !j.pokes[0].vivo) {
         sentados.add(i);
         if (!j.pokes[0].vivo) j.intercambiar();
+        robarAnimo();
         for (final p in j.pokes) {
           if (p.cd > 0) p.cd--;
         }
@@ -625,6 +679,16 @@ Resultado jugarJefe(
       }
       // Debilitación pendiente (Fuerza Lunar): −N a este ataque.
       final debil = debilitados.remove(i) ?? 0;
+      // Cartas de ánimo: doble daño (carta 1) y luego +50 (carta 5), solo a los
+      // ataques que hacen daño.
+      var danoAtaque = ch.dano;
+      if (danoAtaque > 0) {
+        if (animoDoble) {
+          danoAtaque *= 2;
+          animoDoble = false;
+        }
+        danoAtaque += animoMas;
+      }
 
       if (objetivoAliado != null) {
         final a = slots[objetivoAliado]!;
@@ -633,13 +697,13 @@ Resultado jugarJefe(
         if (!evita) {
           a.hp -= max(
             0,
-            ch.dano - reduccionTanques() - a.def.bloqueo - debil,
+            danoAtaque - reduccionTanques() - a.def.bloqueo - debil,
           ); // el exceso se pierde
         }
         if (!a.vivo) slots[objetivoAliado] = null;
       } else {
         // Los aliados Tanque vivos restan una cantidad fija a cada ataque.
-        final dano = max(0, ch.dano - reduccionTanques() - debil);
+        final dano = max(0, danoAtaque - reduccionTanques() - debil);
         if (bajarJefe(dano)) return res(t);
       }
       if (ch.cd) act.cd = 2;
@@ -658,7 +722,7 @@ Resultado jugarJefe(
     // Turno del jefe: roba cartas del mazo real (20 cartas oficiales; según
     // los jugadores se quitan o se redirigen), cada una con su ataque y su
     // objetivo, y sigue mientras diga «roba otra» hasta el máximo del nivel.
-    for (var n = 0; n < nv.maxAtaques; n++) {
+    for (var n = 0; n < (jefeUnaCarta ? 1 : nv.maxAtaques); n++) {
       final activos = {
         for (var i = 0; i < js.length; i++)
           if (!js[i].eliminado && !enKo(i)) i,
@@ -813,6 +877,18 @@ int calibrarJefe(List<List<Pareja>> equipos, JefeDef jefe, Nivel nv, Config c) {
 List<int> _reparto8(int n) =>
     [for (var i = 0; i < n; i++) 8 ~/ n + (i < 8 % n ? 1 : 0)];
 
+/// «todas» o una lista de cartas de ánimo (1 a 5) separadas por comas.
+List<int> _leerAnimo(String texto) {
+  if (texto == 'todas') return [1, 2, 3, 4, 5];
+  if (texto == 'no') return [];
+  final cartas = [for (final t in texto.split(',')) int.parse(t.trim())];
+  if (cartas.isEmpty || cartas.any((k) => k < 1 || k > 5)) {
+    throw FormatException(
+        '--animo: usa «todas», «no» o números de 1 a 5', texto);
+  }
+  return cartas.toSet().toList()..sort();
+}
+
 void main(List<String> args) {
   var carpetaJefes = '../catalog';
   var ayuda = 0.5;
@@ -824,6 +900,7 @@ void main(List<String> args) {
   var mesa8 = false;
   int? pokemon;
   var mejorPrimero = false;
+  var animo = <int>[1, 2, 3, 4, 5];
   for (final a in args) {
     if (a == '--causas') {
       causas = true;
@@ -839,6 +916,8 @@ void main(List<String> args) {
       mesa8 = true;
     } else if (a.startsWith('--menos-ataques=')) {
       menosAtaques = int.parse(a.substring('--menos-ataques='.length));
+    } else if (a.startsWith('--animo=')) {
+      animo = _leerAnimo(a.substring('--animo='.length));
     } else if (a.startsWith('--ayuda=')) {
       ayuda = double.parse(a.substring('--ayuda='.length));
     } else if (a.startsWith('--informe=')) {
@@ -847,7 +926,7 @@ void main(List<String> args) {
       resto.add(a);
     }
   }
-  final c = leerArgs(resto);
+  final c = leerArgs(resto)..animo = animo;
   final informe = informeArg ??
       (c.calibrar
           ? '../balance/informes/jefes_aliados_calibrado.csv'
@@ -888,7 +967,7 @@ void main(List<String> args) {
 
   stdout.writeln('Incursiones · simulador de jefes con aliados (T-28)');
   stdout.writeln('jefes=${jefes.length} equipos/nivel=${c.equipos} '
-      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques mesa8=$mesa8 pokemon=$pokemon mejor-primero=$mejorPrimero\n');
+      'partidas/equipo=${c.partidas} ayuda=$ayuda jugadores=$jugadores menos-ataques=$menosAtaques mesa8=$mesa8 pokemon=$pokemon mejor-primero=$mejorPrimero animo=${animo.isEmpty ? 'no' : animo.join(',')}\n');
   stdout.writeln('jefe        nivel  HP     política      victoria  objetivo  turnos  aliados');
   final filas = <String>[
     'jefe,nivel,hp,politica,equipos,partidas_por_equipo,victoria,objetivo,turnos_victoria,aliados_invocados',

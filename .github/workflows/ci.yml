@@ -36,6 +36,7 @@ jobs:
       # Humo: una partida mínima con todos los jefes del catálogo. No mide nada.
       - run: dart run bin/sim_jefes.dart --equipos=3 --partidas=3 --informe=/tmp/jefes_aliados.csv
       - run: dart run bin/sim_jefes.dart --calibrar --equipos=3 --partidas=3 --informe=/tmp/jefes_calibrado.csv
+      - run: dart run bin/sim_jefes.dart --animo=no --equipos=3 --partidas=3 --informe=/tmp/jefes_sin_animo.csv
 
   contrato:
     name: Contrato JSON (esquema del backend)

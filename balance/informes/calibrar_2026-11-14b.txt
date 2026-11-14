@@ -1,0 +1,19 @@
+Calibración con las cartas de ánimo modeladas (#189, `--animo`). 150 equipos x 60 partidas, ayuda=0.5, política solo-dueno. Objetivo 75/50/30/15 %.
+Las 5 cartas oficiales de D-05 (máx. 3 distintas por partida, una por KO). Se roban en la posición del jugador en el orden; el doble daño va al siguiente ataque con daño. Informe sin cartas: calibrar_2026-11-14.txt.
+
+PS del catálogo (Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800), cartas 1 a 5
+4 jugadores: onix 66,0 %   manectric 59,1 %   kingdra 35,5 %   arceus 18,2 %   (sin cartas: 48,7 / 39,3 / 15,3 / 5,5)
+3 jugadores: onix 39,0 %   manectric 15,1 %   kingdra  9,8 %   arceus  2,2 %   (sin cartas: 24,7 /  6,8 /  2,6 / 0,2)
+
+PS calibrados con las cartas (no aplicados)
+4 jugadores: onix 2000 (77,8)  manectric 2700 (53,2)  kingdra 3800 (32,0)  arceus 3900 (16,5)
+3 jugadores: onix 1500 (78,7)  manectric 1700 (54,9)  kingdra 2900 (30,8)  arceus 2900 (15,1)
+
+Una sola carta (4 jugadores, PS del catálogo; si solo existiera esa carta)
+carta 1 doble daño a un Pokémon:        60,0 / 50,1 / 25,1 / 10,3 %
+carta 2 cura 80 a todos:                68,8 / 62,9 / 38,3 / 16,6 %
+carta 3 cura todo el daño de 1 Pokémon: 68,1 / 59,7 / 39,6 / 18,9 %
+carta 4 el jefe juega una sola carta:   66,3 / 65,5 / 46,2 / 30,2 %
+carta 5 +50 de daño a los ataques:      61,2 / 47,3 / 21,3 /  8,1 %
+
+Lectura: con las 5 cartas los PS de las cartas casi cuadran con el objetivo a 4 jugadores (Onix queda 9 puntos corto). A 3 jugadores siguen siendo muy duros. La carta 4 es la más fuerte; la 5, la más débil.

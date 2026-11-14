@@ -14,9 +14,9 @@ La base son las **5 cartas oficiales de Cheer**, que se resuelven en la mesa (el
 4. El jefe no puede jugar más de una carta el próximo turno.
 5. Los ataques de todos los Pokémon de los jugadores hacen 50 más de daño este turno.
 
-El sistema está abierto: según se desarrolle el juego se podrán añadir cartas y mecánicas nuevas.
+Decidido (2026-11-14): se quedan estas 5 cartas, una de cada, con la misma probabilidad. El sistema sigue abierto: según se desarrolle el juego se podrán añadir cartas y mecánicas nuevas.
 
-Pendiente de playtest (T-17): el simulador no modela estos efectos (las curas y el +50 hacen la partida algo más fácil de lo calibrado), y se adopta de forma provisional el resto de la regla oficial (una carta por KO, máximo 3 cartas distintas por partida).
+Pendiente de playtest (T-17): el simulador los modela por defecto (#189; `--animo=no` los quita) con las simplificaciones de `sim/README.md`. Sin ellos, el KO de T-72 sale mucho más duro (`balance/informes/calibrar_2026-11-14.txt`), y se adopta de forma provisional el resto de la regla oficial (una carta por KO, máximo 3 cartas distintas por partida).
 
 ## 2. Pokémon KO: no revive
 
