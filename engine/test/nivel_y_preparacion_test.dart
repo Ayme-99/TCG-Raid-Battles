@@ -35,7 +35,19 @@ void main() {
       final s = configurar([10, 20, 30]);
       expect([for (final j in s.jugadores) j.nombre], ['J0', 'J1', 'J2']);
       expect([for (final j in s.jugadores) j.asiento], [0, 1, 2]);
-      expect(s.jugadores.every((j) => j.pokemonVivos == 2), isTrue);
+      expect(s.jugadores.every((j) => j.pokemonVivos == 3), isTrue);
+    });
+
+    test('con 3 jugadores cada uno lleva 3 Pokémon; con 1, 2 y 4, dos', () {
+      for (final n in [1, 2, 3, 4]) {
+        final s = configurar(List.filled(n, 100));
+        final esperados = n == 3 ? 3 : 2;
+        expect(pokemonPorJugadorSegun(n), esperados);
+        expect(s.jugadores.every((j) => j.pokemonTotal == esperados), isTrue,
+            reason: '$n jugadores');
+        expect(s.jugadores.every((j) => j.pokemonVivos == esperados), isTrue);
+        expect(s.jugadores.every((j) => j.pokemonPerdidos == 0), isTrue);
+      }
     });
 
     test('rechaza 0 jugadores', () {

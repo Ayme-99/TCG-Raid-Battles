@@ -693,7 +693,7 @@ class _Asiento extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    for (var p = 0; p < pokemonPorJugador; p++)
+                    for (var p = 0; p < jugador.pokemonTotal; p++)
                       Padding(
                         padding: const EdgeInsets.only(right: 3, top: 2),
                         child: Icon(

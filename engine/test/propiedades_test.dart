@@ -19,7 +19,7 @@ void _comprobar(EstadoPartida s, String donde) {
             'el HP perdido');
   }
   for (final j in s.jugadores) {
-    expect(j.pokemonVivos, inInclusiveRange(0, 2), reason: donde);
+    expect(j.pokemonVivos, inInclusiveRange(0, j.pokemonTotal), reason: donde);
   }
   for (final a in [...s.prioridad, ...s.cartasAnimoPendientes]) {
     expect(s.jugadores[a].eliminado, isFalse, reason: '$donde: asiento $a');

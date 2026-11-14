@@ -6,16 +6,18 @@ import 'ayudas.dart';
 void main() {
   abandonarTests();
   group('eliminación de jugadores', () {
-    test('un solo KO deja al jugador en juego con un Pokémon', () {
+    test('un solo KO deja al jugador en juego con sus otros Pokémon', () {
       var s = todosActuan(empezar());
       s = apply(s, const PokemonKo(1));
-      expect(s.jugadores[1].pokemonVivos, 1);
+      expect(s.jugadores[1].pokemonVivos, 2);
       expect(s.jugadores[1].eliminado, isFalse);
     });
 
-    test('dos KO eliminan al jugador y no vuelve a actuar', () {
+    test('tres KO (todos sus Pokémon) eliminan al jugador y no vuelve a actuar',
+        () {
       var s = todosActuan(empezar());
-      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1), FinTurnoJefe()]);
+      s = aplicarTodos(s,
+          const [PokemonKo(1), PokemonKo(1), PokemonKo(1), FinTurnoJefe()]);
       expect(s.jugadores[1].eliminado, isTrue);
       expect(s.orden, [0, 2]);
       expect(s.prioridad, isEmpty);
@@ -24,7 +26,7 @@ void main() {
 
     test('un jugador eliminado no puede recibir más KO', () {
       var s = todosActuan(empezar());
-      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1)]);
+      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1), PokemonKo(1)]);
       expect(() => apply(s, const PokemonKo(1)),
           throwsA(isA<ReglaIncumplida>()));
     });
@@ -33,7 +35,7 @@ void main() {
       var s = todosActuan(empezar());
       s = apply(s, const PokemonKo(0));
       s = apply(apply(s, const FinTurnoJefe()), const CartaAnimoRobada(jugador: 0, carta: 1));
-      expect(s.jugadores[0].pokemonVivos, 1);
+      expect(s.jugadores[0].pokemonVivos, 2);
       expect(s.jugadores[0].pokemonPerdidos, 1);
     });
 
@@ -41,7 +43,7 @@ void main() {
       var s = empezar();
       s = apply(s, const TurnoJugador(jugador: 0, dano: 1));
       expect(s.jugadorActual, 1);
-      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1)]);
+      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1), PokemonKo(1)]);
       expect(s.fase, Fase.turnoJugadores);
       expect(s.jugadorActual, 2);
     });
@@ -56,7 +58,7 @@ void main() {
     test('eliminar a un jugador que ya actuó no altera el turno', () {
       var s = empezar();
       s = apply(s, const TurnoJugador(jugador: 0, dano: 1));
-      s = aplicarTodos(s, const [PokemonKo(0), PokemonKo(0)]);
+      s = aplicarTodos(s, const [PokemonKo(0), PokemonKo(0), PokemonKo(0)]);
       expect(s.jugadorActual, 1);
       s = todosActuan(s);
       expect(s.fase, Fase.turnoJefe);
@@ -94,7 +96,7 @@ void main() {
     test('puede ganar el último de la ronda tras varios KO', () {
       var s = empezar(hp: 100);
       s = apply(s, const TurnoJugador(jugador: 0, dano: 30));
-      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1)]);
+      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1), PokemonKo(1)]);
       s = apply(s, const TurnoJugador(jugador: 2, dano: 70));
       expect(s.resultado, Resultado.victoria);
       expect(s.danoPorJugador, [30, 0, 70]);

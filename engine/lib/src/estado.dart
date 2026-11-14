@@ -31,25 +31,30 @@ class JugadorEstado {
   /// Daño de su mejor ataque (nunca negativo, sin tope superior).
   final int ataqueMaximo;
 
-  /// Pokémon que le quedan en juego (2 al empezar).
+  /// Pokémon con los que empezó (2, o 3 si juegan 3 jugadores).
+  final int pokemonTotal;
+
+  /// Pokémon que le quedan en juego (todos al empezar).
   final int pokemonVivos;
 
   const JugadorEstado({
     required this.asiento,
     required this.nombre,
     required this.ataqueMaximo,
-    this.pokemonVivos = pokemonPorJugador,
-  });
+    this.pokemonTotal = 2,
+    int? pokemonVivos,
+  }) : pokemonVivos = pokemonVivos ?? pokemonTotal;
 
   /// Un jugador queda eliminado solo cuando no le queda ningún Pokémon.
   bool get eliminado => pokemonVivos <= 0;
 
-  int get pokemonPerdidos => pokemonPorJugador - pokemonVivos;
+  int get pokemonPerdidos => pokemonTotal - pokemonVivos;
 
   JugadorEstado conPokemonVivos(int vivos) => JugadorEstado(
         asiento: asiento,
         nombre: nombre,
         ataqueMaximo: ataqueMaximo,
+        pokemonTotal: pokemonTotal,
         pokemonVivos: vivos,
       );
 
@@ -57,6 +62,7 @@ class JugadorEstado {
         'asiento': asiento,
         'nombre': nombre,
         'ataqueMaximo': ataqueMaximo,
+        'pokemonTotal': pokemonTotal,
         'pokemonVivos': pokemonVivos,
       };
 }
