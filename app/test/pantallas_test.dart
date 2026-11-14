@@ -192,7 +192,14 @@ void main() {
     await turno(tester, '0');
 
     // En pantalla estrecha el panel va al final de la lista de acciones.
-    await tester.scrollUntilVisible(find.byKey(const Key('dano-efecto')), 300);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('dano-efecto')),
+      300,
+      scrollable: find.descendant(
+        of: find.byKey(const Key('panel-acciones')),
+        matching: find.byType(Scrollable),
+      ),
+    );
     await tocar(tester, 'dano-efecto');
     await tocar(tester, 'dano-efecto-jugador-1');
     await escribir(tester, 'dano-efecto-puntos', '60');
