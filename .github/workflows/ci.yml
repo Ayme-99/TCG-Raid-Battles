@@ -106,3 +106,37 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build web --release
+
+  experimento:
+    name: Experimento temporal (menos jugadores)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {jug: 3, pok: 2, cal: 1}
+          - {jug: 3, pok: 3, cal: 1}
+          - {jug: 2, pok: 2, cal: 1}
+          - {jug: 2, pok: 3, cal: 0}
+          - {jug: 2, pok: 4, cal: 1}
+          - {jug: 1, pok: 2, cal: 1}
+          - {jug: 1, pok: 4, cal: 0}
+          - {jug: 1, pok: 5, cal: 1}
+          - {jug: 1, pok: 6, cal: 1}
+    defaults:
+      run:
+        working-directory: sim
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - run: dart pub get
+      - run: |
+          echo "== HP del catalogo, jugadores=${{ matrix.jug }} pokemon=${{ matrix.pok }}"
+          dart run bin/sim_jefes.dart --jugadores=${{ matrix.jug }} --pokemon=${{ matrix.pok }} --equipos=150 --partidas=60 --informe=/tmp/x.csv
+          if [ "${{ matrix.cal }}" = "1" ]; then
+            echo "== calibrar, jugadores=${{ matrix.jug }} pokemon=${{ matrix.pok }}"
+            dart run bin/sim_jefes.dart --calibrar --jugadores=${{ matrix.jug }} --pokemon=${{ matrix.pok }} --equipos=150 --partidas=60 --informe=/tmp/y.csv
+          fi
