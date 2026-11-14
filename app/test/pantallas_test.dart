@@ -188,9 +188,10 @@ void main() {
       (tester) async {
     final c = await abrir(tester);
     await prepararPartida(tester, hp: 500);
+    await turno(tester, '0');
+    await turno(tester, '0');
 
-    // El panel vive en «Más acciones», plegado por defecto.
-    await tocar(tester, 'panel-extras-interno-toggle');
+    // El panel vive en «Más acciones» del turno del jefe.
     await tocar(tester, 'dano-efecto');
     await tocar(tester, 'dano-efecto-jugador-1');
     await escribir(tester, 'dano-efecto-puntos', '60');
@@ -198,6 +199,7 @@ void main() {
 
     final estado = c.read(estadoProvider);
     expect(estado.jefe!.hp, 440);
+    expect(estado.fase, Fase.turnoJefe);
     expect(estado.danoPorJugador[1], 60);
     expect(estado.danoPorJugador[0], 0);
   });
