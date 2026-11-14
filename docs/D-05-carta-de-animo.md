@@ -4,7 +4,7 @@ Estado: decidido (2026-11-05). Issue #18.
 
 ## 1. Qué es la carta de ánimo
 
-El jugador cuyo Pokémon activo cae KO (y al que le queda otro Pokémon) **actúa primero en la ronda siguiente y roba una carta de ánimo (Cheer)**.
+El jugador cuyo Pokémon activo cae KO (y al que le queda otro Pokémon) **se sienta su siguiente turno y solo roba una carta de ánimo (Cheer)**, como en la carta oficial (T-72). La carta se roba en la mesa: la app ya no la pide (TODO). Mientras está KO, los ataques del jefe (se descarta la carta y se roba otra) y de sus aliados (se omiten) contra él fallan; vale desde la caída hasta el final de la ronda siguiente.
 
 La base son las **5 cartas oficiales de Cheer**, que se resuelven en la mesa (el asistente no computa su efecto, solo puede registrar cuál salió):
 
@@ -33,7 +33,9 @@ Un jugador con un solo Pokémon vivo no tiene banca: si cae, queda eliminado.
 
 ## 4. Orden de turno
 
-Cada ronda actúa primero cualquier jugador cuyo Pokémon activo cayó KO desde su último turno (y que sigue en juego), y después el resto por orden de asiento.
+**Actualización T-72:** ya no hay prioridad. El jugador cuyo Pokémon activo cayó KO se sienta el turno de la ronda siguiente y actúan los demás por orden de asiento. Lo que sigue describe la regla anterior (histórico).
+
+Cada ronda actuaba primero cualquier jugador cuyo Pokémon activo cayó KO desde su último turno (y que sigue en juego), y después el resto por orden de asiento.
 
 - **Varios KO a la vez** (por ejemplo, un ataque del jefe «a todos»): los jugadores con prioridad actúan entre sí **por orden de asiento** (J1, J2, J3, J4), no por el orden en que cayeron.
 - Un jugador solo gana la prioridad una vez por KO: si cae su Pokémon y el nuevo activo vuelve a caer en la misma ronda, no gana una segunda prioridad.

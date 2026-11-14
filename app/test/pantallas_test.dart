@@ -175,13 +175,12 @@ void main() {
     final estado = c.read(estadoProvider);
     expect(estado.fase, Fase.turnoJugadores);
     expect(estado.ronda, 2);
-    // El jugador con un Pokémon KO actúa primero y roba carta de ánimo.
-    expect(estado.orden.first, 0);
-    expect(find.text('Cartas de ánimo por robar'), findsOneWidget);
-
-    await tocar(tester, 'animo-0-3');
-    expect(c.read(estadoProvider).cartasAnimoPendientes, isEmpty);
-    expect(c.read(estadoProvider).cartasAnimo.single.carta, 3);
+    // El jugador con un Pokémon KO se sienta el turno (solo roba carta de
+    // ánimo, fuera de la app) y los ataques contra él fallan.
+    expect(estado.orden, [1]);
+    expect(find.byKey(const Key('sentados-ko')), findsOneWidget);
+    expect(estado.enKo(0), isTrue);
+    expect(estado.enKo(1), isFalse);
   });
 
   testWidgets('la carta que roba otra obliga a robar hasta el máximo del nivel',
