@@ -201,6 +201,8 @@ void main() {
     await tocar(tester, 'dano-efecto');
     await tocar(tester, 'dano-efecto-jugador-1');
     await escribir(tester, 'dano-efecto-puntos', '60');
+    // El botón se activa al reconstruirse con el número escrito.
+    await tester.pump();
     await tocar(tester, 'dano-efecto-confirmar');
 
     final estado = c.read(estadoProvider);
