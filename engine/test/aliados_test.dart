@@ -238,7 +238,7 @@ void main() {
       expect(() => apply(s, cleffairy(2)), throwsA(isA<ReglaIncumplida>()));
 
       var e = conIntento();
-      e = aplicarTodos(e, const [PokemonKo(2), PokemonKo(2)]);
+      e = aplicarTodos(e, const [PokemonKo(2), PokemonKo(2), PokemonKo(2)]);
       expect(() => apply(e, rattata(2)), throwsA(isA<ReglaIncumplida>()));
     });
 
@@ -429,7 +429,7 @@ void main() {
     EstadoPartida conRattataEnJ1Eliminado() {
       var s = apply(conIntento(), rattata(1));
       s = apply(s, const AtaqueAliado(slot: 1, dano: 20));
-      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1)]);
+      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1), PokemonKo(1)]);
       return s;
     }
 

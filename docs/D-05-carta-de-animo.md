@@ -24,9 +24,9 @@ Un Pokémon que cae KO queda fuera de la partida. No se revive al final de la ro
 
 ## 3. Promoción desde la banca
 
-Cada jugador lleva 2 Pokémon (1 activo + 1 banca, D-01). Cuando cae el activo:
+Cada jugador lleva 2 Pokémon (1 activo + 1 banca, D-01); con 3 jugadores, 3 (1 activo + 2 en banca, GDD v1.17, #194). Cuando cae el activo:
 
-- Si el jugador tiene Pokémon en la banca, **ese Pokémon pasa a ser el activo automáticamente**. No hay elección, porque solo hay uno.
+- Si el jugador tiene Pokémon en la banca, **uno de ellos pasa a ser el activo**: con 1 en banca, automáticamente; con 2 (3 jugadores), **lo elige el jugador en la mesa** (la app no lo gestiona, solo cuenta los Pokémon que le quedan).
 - Si no le queda ninguno, el jugador queda **eliminado** y no recibe carta de ánimo.
 
 Un jugador con un solo Pokémon vivo no tiene banca: si cae, queda eliminado.
