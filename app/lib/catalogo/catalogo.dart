@@ -39,7 +39,8 @@ class EfectoAtaqueCatalogo {
   bool get necesitaDefensor =>
       tipo == TipoEfectoAtaque.sinRetirada ||
       tipo == TipoEfectoAtaque.sinAtaque ||
-      tipo == TipoEfectoAtaque.paralizarDefensor;
+      tipo == TipoEfectoAtaque.paralizarDefensor ||
+      tipo == TipoEfectoAtaque.autodanoSiKo;
 
   factory EfectoAtaqueCatalogo.deJson(Map<String, Object?> m, String id) {
     final nombreTipo = _texto(m, 'tipo');

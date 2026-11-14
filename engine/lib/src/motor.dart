@@ -43,6 +43,7 @@ EstadoPartida _aplicar(
     FinTurnoJefe ev => _finTurnoJefe(estado, ev, scripts),
     AplicarEstadoJefe ev => _aplicarEstadoJefe(estado, ev, scripts),
     CuracionJefe ev => _curacionJefe(estado, ev),
+    DanoDeEfecto ev => _danoDeEfecto(estado, ev),
     AtaqueAAliado ev => _ataqueAAliado(estado, ev, scripts),
     SinInvocacion() => _sinInvocacion(estado),
     AliadoInvocado ev => _aliadoInvocado(estado, ev, scripts),
@@ -330,6 +331,11 @@ void _validarEfecto(AtaqueJefe ev, EfectoAtaque ef) {
     case TipoEfectoAtaque.autodano:
     case TipoEfectoAtaque.contadorATodos:
       if (ef.valor == null) _error('el efecto $tipo necesita un valor');
+    case TipoEfectoAtaque.autodanoSiKo:
+      if (ef.valor == null) _error('el efecto $tipo necesita un valor');
+      if (ev.jugador == null) {
+        _error('el efecto $tipo necesita el jugador que defiende');
+      }
     case TipoEfectoAtaque.sinRetirada:
     case TipoEfectoAtaque.sinAtaque:
     case TipoEfectoAtaque.paralizarDefensor:
@@ -400,6 +406,9 @@ EstadoPartida _aplicarEfecto(EstadoPartida e, AtaqueJefe ev, EfectoAtaque ef) {
     case TipoEfectoAtaque.ignoraEfectos:
     case TipoEfectoAtaque.danoExtraSi:
     case TipoEfectoAtaque.danoPorAtaquePrevio:
+    case TipoEfectoAtaque.autodanoSiKo:
+      // Solo se registra: si hay KO, la mesa lo dice y se registran PokemonKo
+      // y DanoDeEfecto.
       return e;
   }
 }
@@ -619,6 +628,58 @@ EstadoPartida _curacionJefe(EstadoPartida e, CuracionJefe ev) {
   return e.copiarCon(
     jefe: jefe.conHp(jefe.hp + efectiva),
     curacionJefe: e.curacionJefe + efectiva,
+  );
+}
+
+/// Daño de un efecto (rebote) al jefe o a un aliado (T-59).
+EstadoPartida _danoDeEfecto(EstadoPartida e, DanoDeEfecto ev) {
+  if (e.fase != Fase.turnoJefe && e.fase != Fase.turnoJugadores) {
+    _error('DanoDeEfecto no es válido en la fase ${e.fase.name}');
+  }
+  if (ev.puntos < 1) {
+    _error('el daño de un efecto debe ser como mínimo 1');
+  }
+  final jugador = ev.jugador;
+  final slot = ev.slot;
+  if ((jugador == null) == (slot == null)) {
+    _error('DanoDeEfecto: indica el jugador (daño al jefe) o el slot (daño a '
+        'un aliado), solo uno');
+  }
+  if (jugador != null) {
+    // Al jefe: se atribuye al jugador que recibió el ataque y puede dar la
+    // victoria.
+    _exigeJugador(e, jugador);
+    final jefe = e.jefe!;
+    final aplicado = ev.puntos < jefe.hp ? ev.puntos : jefe.hp;
+    final dano = [...e.danoPorJugador];
+    dano[jugador] += aplicado;
+    final nuevoHp = jefe.hp - aplicado;
+    final conDano = e.copiarCon(
+      jefe: jefe.conHp(nuevoHp),
+      danoPorJugador: dano,
+    );
+    if (nuevoHp <= 0) {
+      return conDano.copiarCon(
+        fase: Fase.terminada,
+        resultado: Resultado.victoria,
+      );
+    }
+    return _llamarAliados(conDano);
+  }
+  final aliado = e.aliadoEn(slot!);
+  if (aliado == null) {
+    _error('no hay ningún aliado en el slot $slot');
+  }
+  final restante = aliado.hp - ev.puntos;
+  return e.copiarCon(
+    aliados: [
+      for (final a in e.aliados)
+        if (a.slot != slot)
+          a
+        else if (restante > 0)
+          a.copiarCon(hp: restante),
+    ],
+    aliadosDerrotados: e.aliadosDerrotados + (restante > 0 ? 0 : 1),
   );
 }
 

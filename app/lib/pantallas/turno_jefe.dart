@@ -140,6 +140,7 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
       const PanelEfectosActivos(),
         const PanelEstados(),
         const PanelPokemon(),
+        const PanelDanoDeEfecto(),
     ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).
@@ -420,6 +421,17 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                         ];
                         if (avisos.isNotEmpty) {
                           registrarAviso(context, avisos.join('\n'));
+                        }
+                        final defensor = _objetivo;
+                        if (efecto != null &&
+                            efecto.tipo == TipoEfectoAtaque.autodanoSiKo &&
+                            defensor != null) {
+                          preguntarRebote(
+                            context,
+                            ref,
+                            jugador: defensor,
+                            puntos: efecto.valor ?? 0,
+                          );
                         }
                       }
                     },

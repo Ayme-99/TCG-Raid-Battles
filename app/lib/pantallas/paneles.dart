@@ -55,6 +55,158 @@ class PanelPokemon extends ConsumerWidget {
   }
 }
 
+/// Daño que un efecto hace al jefe o a un aliado (rebote, T-59). Al jefe se
+/// atribuye al jugador que recibió el ataque; a un aliado, a nadie.
+class PanelDanoDeEfecto extends ConsumerWidget {
+  const PanelDanoDeEfecto({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Daño por efecto',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Rebote u otro efecto que daña al jefe o a un aliado.',
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              key: const Key('dano-efecto'),
+              onPressed: () async {
+                final evento = await showDialog<DanoDeEfecto>(
+                  context: context,
+                  builder: (_) => const _DialogoDanoDeEfecto(),
+                );
+                if (evento == null || !context.mounted) return;
+                registrar(context, ref, evento);
+              },
+              child: const Text('Registrar daño por efecto'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DialogoDanoDeEfecto extends ConsumerStatefulWidget {
+  const _DialogoDanoDeEfecto();
+
+  @override
+  ConsumerState<_DialogoDanoDeEfecto> createState() =>
+      _DialogoDanoDeEfectoState();
+}
+
+class _DialogoDanoDeEfectoState extends ConsumerState<_DialogoDanoDeEfecto> {
+  final _puntos = TextEditingController();
+
+  /// Slot del aliado dañado; `null` si el daño va al jefe.
+  int? _slot;
+
+  /// Jugador al que se atribuye el daño al jefe.
+  int? _jugador;
+
+  @override
+  void initState() {
+    super.initState();
+    _puntos.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _puntos.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final estado = ref.watch(estadoProvider);
+    final puntos = int.tryParse(_puntos.text) ?? 0;
+    final alJefe = _slot == null;
+    final listo = puntos > 0 && (!alJefe || _jugador != null);
+    return AlertDialog(
+      title: const Text('Daño por efecto'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('¿A quién daña?'),
+            Wrap(
+              spacing: 8,
+              children: [
+                ChoiceChip(
+                  key: const Key('dano-efecto-jefe'),
+                  label: const Text('Al jefe'),
+                  selected: alJefe,
+                  onSelected: (_) => setState(() => _slot = null),
+                ),
+                for (final a in estado.aliados)
+                  ChoiceChip(
+                    key: Key('dano-efecto-aliado-${a.slot}'),
+                    label: Text(a.nombre),
+                    selected: _slot == a.slot,
+                    onSelected: (_) => setState(() => _slot = a.slot),
+                  ),
+              ],
+            ),
+            if (alJefe) ...[
+              const SizedBox(height: 12),
+              const Text('Se atribuye al jugador que recibió el ataque:'),
+              Wrap(
+                spacing: 8,
+                children: [
+                  for (final j in estado.jugadores)
+                    if (!j.eliminado)
+                      ChoiceChip(
+                        key: Key('dano-efecto-jugador-${j.asiento}'),
+                        label: Text(j.nombre),
+                        selected: _jugador == j.asiento,
+                        onSelected: (_) =>
+                            setState(() => _jugador = j.asiento),
+                      ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 12),
+            CampoNumero(
+              key: const Key('dano-efecto-puntos'),
+              controlador: _puntos,
+              etiqueta: 'Puntos de daño',
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          key: const Key('dano-efecto-confirmar'),
+          onPressed: !listo
+              ? null
+              : () => Navigator.of(context).pop(
+                    DanoDeEfecto(
+                      puntos: puntos,
+                      jugador: alJefe ? _jugador : null,
+                      slot: _slot,
+                    ),
+                  ),
+          child: const Text('Registrar'),
+        ),
+      ],
+    );
+  }
+}
+
 /// El slot de aliado de un jugador: la carta del aliado si lo hay (salen como
 /// Pokémon salvajes, sin decir la categoría) o un hueco punteado con el color
 /// de su dueño. Los slots rodean al jefe en la mesa.

@@ -1,4 +1,4 @@
-# Contrato del registro de partida (versión 7)
+# Contrato del registro de partida (versión 8)
 
 > Para subir la versión del contrato, sigue el checklist de [`docs/DEPENDENCIAS.md`](../docs/DEPENDENCIAS.md) (motor, servidor, repo externo).
 
@@ -8,9 +8,9 @@ Formato JSON con el que la app guarda una partida y la envía al backend. Una pa
 
 | Archivo | Qué es |
 |---|---|
-| `partida.v7.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
-| `partida.v6.schema.json`, `partida.v5.schema.json`, `partida.v4.schema.json`, `partida.v3.schema.json`, `partida.v2.schema.json`, `partida.v1.schema.json` | Esquemas de las versiones 1 a 6, que se conservan: hay partidas guardadas con esos formatos. |
-| `ejemplos/v7/`, `ejemplos/v6/`, `ejemplos/v5/`, `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
+| `partida.v8.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
+| `partida.v7.schema.json`, `partida.v6.schema.json`, `partida.v5.schema.json`, `partida.v4.schema.json`, `partida.v3.schema.json`, `partida.v2.schema.json`, `partida.v1.schema.json` | Esquemas de las versiones 1 a 7, que se conservan: hay partidas guardadas con esos formatos. |
+| `ejemplos/v8/`, `ejemplos/v7/`, `ejemplos/v6/`, `ejemplos/v5/`, `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
 
 Los ejemplos válidos están probados por los dos lados: el motor los lee y los vuelve a escribir igual (`engine/test/registro_test.dart`) y el esquema los acepta (`server/test/contrato.test.js`). El CI ejecuta ambos.
 
@@ -48,8 +48,9 @@ Cada evento es un objeto con un campo `tipo`. Los campos marcados con `?` son op
 | `ataqueAAliado` | `jugador`, `slot`, `dano` | Un jugador ataca a un aliado en lugar de al jefe |
 | `ataqueJefe` | `ranura` (1-3), `dano`, `jugador?`, `alAzar?`, `efecto?` | Ataque del jefe (sin `jugador`: a todos). `efecto` es el de D-14 (ver más abajo) |
 | `pokemonKo` | `jugador` | Cae un Pokémon de un jugador |
-| `cartaAnimoRobada` | `jugador`, `carta` (1-5) | Un jugador con prioridad roba carta de ánimo |
+| `cartaAnimoRobada` | `jugador`, `carta` (1-5) | Un jugador KO roba carta de ánimo en el turno que se sienta (la app ya no lo pide; el motor lo acepta) |
 | `curacionJefe` | `cantidad` | El jefe se cura (el motor topa al HP máximo) |
+| `danoDeEfecto` | `puntos` (≥ 1) y `jugador` **o** `slot` (uno solo) | Daño de un efecto (rebote, T-59). Con `jugador`: al jefe, atribuido a ese jugador (el defensor); puede dar la victoria y cruzar umbrales de llamada. Con `slot`: a un aliado, sin atribuir; a 0 HP sale de la mesa |
 | `sinInvocacion` | — | Intento de invocación sin aliado |
 | `aliadoInvocado` | `slot`, `categoria` (`danio`, `tanque`, `cura` o `picaro`), `nombre`, `hp`, `ataqueNombre?`, `ataqueDano?`, `habilidad?`, `efectos?` (`jugador`, por defecto, o `programa`), `scriptId?` | Intento de invocación con aliado (D-13) |
 | `ataqueAliado` | `slot`, `dano`, `objetivo?` | Ataque de un aliado (al entrar y al final del turno del jefe) |
@@ -66,6 +67,7 @@ Cada evento es un objeto con un campo `tipo`. Los campos marcados con `?` son op
 | `tipo` | Qué necesita | Qué hace el motor |
 |---|---|---|
 | `autodano` | `valor` | Baja `valor` HP al jefe después del daño al jugador, sin atribuirlo a nadie; puede cruzar umbrales de invocación o dar la victoria |
+| `autodanoSiKo` | `valor` (HP), `jugador` en el ataque | Rebote (T-59): solo se registra. Si el Defensor queda KO, la mesa registra `pokemonKo` y `danoDeEfecto` (al jefe, atribuido al defensor) |
 | `contadorATodos` | `valor` (contadores) | Baja `valor × 10` HP a cada aliado del jefe (los derrotados se retiran); los Pokémon de los jugadores los resuelve la mesa |
 | `sinRetirada`, `sinAtaque`, `paralizarDefensor` | `jugador` en el ataque | Deja un efecto activo sobre ese jugador hasta que pasen `duracion` turnos de los jugadores. Repetir el mismo tipo sobre el mismo jugador renueva la duración; con `moneda: false` no se aplica |
 | `ignoraEfectos`, `danoExtraSi`, `danoPorAtaquePrevio` | — | Solo se registran: lo resuelve la mesa (en `danoPorAtaquePrevio`, el `dano` del evento ya es el final) |
@@ -94,6 +96,7 @@ El backend guarda además el registro completo (los eventos) para poder repetir 
 | 5 | Efectos en los ataques del jefe (D-14): `ataqueJefe` gana el campo opcional `efecto`. Migración 4 → 5: solo cambia la versión (los eventos antiguos siguen siendo válidos). |
 | 6 | Aliados con 6 categorías (D-16): `categoria` admite `danio`, `tanque`, `cura` (Curandero), `control`, `potenciador` y `debilitador`. La categoría `picaro` pasa a llamarse `control`. Migración 5 → 6: los aliados `picaro` de las partidas guardadas pasan a `control`. |
 | 7 | Monedas de aliado (D-16, Arceus): `aliadoInvocado` gana `monedas` (lista de booleanos, `true` = cara; las tira la app: Deseo) y `ataqueAliado` gana `moneda` (booleano; la del jugador rival en Fuerza Lunar). Migración 6 → 7: solo cambia la versión. |
+| 8 | Daño por efectos (T-59): evento nuevo `danoDeEfecto` y efecto de ataque `autodanoSiKo`. Migración 7 → 8: solo cambia la versión. |
 
 `categoria` y `slot` salen de los dos dados de la invocación (D-13): no se repite un slot ocupado ni una categoría con un aliado vivo. `efectos` dice quién aplica los efectos de la carta del aliado: el jugador (no se escribe) o el programa, que ejecuta el script `scriptId` (obligatorio con `programa`, no admitido con `jugador`; el motor rechaza un script que no conoce).
 

@@ -1,0 +1,12 @@
+{
+  "version": 8,
+  "partidaId": "ejemplo-moneda-no-booleana",
+  "eventos": [
+    {
+      "tipo": "ataqueAliado",
+      "slot": 1,
+      "dano": 10,
+      "moneda": "cruz"
+    }
+  ]
+}
