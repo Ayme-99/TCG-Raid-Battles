@@ -28,7 +28,7 @@ class PantallaTurnoJugadores extends ConsumerWidget {
             jugador: actual,
           ),
         if (estado.cartasAnimoPendientes.isNotEmpty)
-          _CartasAnimo(estado: estado),
+          _SentadosPorKo(estado: estado),
     ];
     // El bocadillo solo lleva lo del turno; el resto va en «Más acciones».
     final extras = <Widget>[
@@ -287,50 +287,28 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
   }
 }
 
-class _CartasAnimo extends ConsumerWidget {
-  const _CartasAnimo({required this.estado});
+/// Quien tuvo un Pokémon KO se sienta este turno: solo roba una carta de
+/// ánimo y los ataques del jefe y de sus aliados contra él fallan.
+// TODO: la carta de ánimo se roba en la mesa; cuando la app vuelva a
+// gestionarla, volver a pedir aquí el número que ha salido.
+class _SentadosPorKo extends StatelessWidget {
+  const _SentadosPorKo({required this.estado});
 
   final EstadoPartida estado;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final nombres = [
+      for (final a in estado.cartasAnimoPendientes) estado.jugadores[a].nombre,
+    ].join(', ');
     return Card(
+      key: const Key('sentados-ko'),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Cartas de ánimo por robar',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const Text(
-              'Quien tuvo un Pokémon KO roba una carta; el efecto se '
-              'resuelve en la mesa. Indica el número que ha salido.',
-            ),
-            for (final a in estado.cartasAnimoPendientes)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Row(
-                  children: [
-                    Expanded(child: Text(estado.jugadores[a].nombre)),
-                    for (var c = 1; c <= cartasAnimoTotal; c++)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: OutlinedButton(
-                          key: Key('animo-$a-$c'),
-                          onPressed: () => registrar(
-                            context,
-                            ref,
-                            CartaAnimoRobada(jugador: a, carta: c),
-                          ),
-                          child: Text('$c'),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-          ],
+        child: Text(
+          'Este turno no actúa por tener un Pokémon KO: $nombres. Solo '
+          'roba una carta de ánimo (en la mesa). Los ataques del jefe y de '
+          'sus aliados contra él fallan.',
         ),
       ),
     );

@@ -38,7 +38,7 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
   void _robar(EstadoPartida estado) {
     final mazo = ref.read(mazoAtaquesJefeProvider);
     setState(() {
-      _carta = mazo.robar(jugadoresActivos(estado).toSet());
+      _carta = mazo.robar(jugadoresObjetivo(estado).toSet());
     });
   }
 
@@ -55,9 +55,12 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
     final registrados = estado.ataquesJefeEnTurno;
     final maximo = maxAtaquesJefePorTurno(jefe.nivel);
     final carta = _carta;
+    // Con todos los jugadores KO los ataques del jefe fallan: no hay carta
+    // que robar y se sigue con el resto del turno.
+    final sinObjetivos = jugadoresObjetivo(estado).isEmpty;
     // Lo primero del turno es robar la carta que decide el ataque y el
     // objetivo: hasta entonces solo se muestra ese paso, pequeño.
-    if (carta == null && registrados == 0) {
+    if (carta == null && registrados == 0 && !sinObjetivos) {
       return DisposicionMesa(
         controles: [
           const PanelPendientes(),
@@ -74,7 +77,8 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
       for (final a in estado.aliados)
         if (a.tieneAtaque && !a.atacoEnTurnoJefe) a,
     ];
-    final debeRobarOtra = carta == null && _robaOtra && registrados < maximo;
+    final debeRobarOtra =
+        carta == null && _robaOtra && registrados < maximo && !sinObjetivos;
     // Cierre del turno, paso a paso (T-70): primero atacan los aliados, luego
     // la mesa hace el Chequeo Pokémon y solo entonces se termina el turno.
     // Así los KO que salgan de esos pasos se marcan dentro del turno del jefe.
@@ -85,6 +89,15 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
     final faltaChequeo = chequeo.isNotEmpty && !_chequeoHecho;
     final controles = <Widget>[
       const PanelPendientes(),
+      if (sinObjetivos && registrados == 0 && carta == null)
+        const Padding(
+          padding: EdgeInsets.only(bottom: 8),
+          key: Key('jefe-sin-objetivos'),
+          child: Text(
+            'Todos los jugadores en juego están KO: los ataques del jefe '
+            'fallan.',
+          ),
+        ),
       if (carta != null)
         _AtaqueJefe(
           key: ValueKey('ataque-${estado.ronda}-$registrados-${carta.numero}'),
@@ -257,7 +270,7 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
   @override
   Widget build(BuildContext context) {
     final estado = widget.estado;
-    final activos = jugadoresActivos(estado);
+    final activos = jugadoresObjetivo(estado);
     final ataque = _ataqueCatalogo(estado);
     final efecto = ataque?.efecto;
     if (ataque != null && _ranuraPropuesta != _ranura) {

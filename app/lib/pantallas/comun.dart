@@ -371,3 +371,11 @@ List<int> jugadoresActivos(EstadoPartida estado) => [
       for (final j in estado.jugadores)
         if (!j.eliminado) j.asiento,
     ];
+
+/// Asientos a los que el jefe puede atacar: los que siguen en juego y no
+/// están KO. Un ataque contra un jugador KO falla: se descarta la carta y se
+/// roba otra.
+List<int> jugadoresObjetivo(EstadoPartida estado) => [
+      for (final a in jugadoresActivos(estado))
+        if (!estado.enKo(a)) a,
+    ];

@@ -152,7 +152,9 @@ final class PokemonKo extends Evento {
   const PokemonKo(this.jugador);
 }
 
-/// El jugador con prioridad roba su carta de ánimo (1 a 5).
+/// El jugador KO roba su carta de ánimo (1 a 5) en el turno que se sienta.
+/// La app ya no lo pide (TODO: la carta se roba en la mesa); el motor sigue
+/// aceptando el registro por compatibilidad con el contrato.
 /// El efecto se resuelve en la mesa; el motor solo lo registra.
 final class CartaAnimoRobada extends Evento {
   final int jugador;
@@ -292,6 +294,8 @@ final class AliadoInvocado extends Evento {
 /// Ataque de un aliado: al entrar y una vez en cada turno del jefe.
 /// [objetivo] null: ataca al dueño de su slot. Si el dueño está eliminado
 /// hay que indicar el jugador activo que salió en la tirada.
+/// Si el objetivo está KO el ataque falla: el evento se acepta, gasta el
+/// ataque del aliado, pero no cuenta como uso ni dispara sus efectos.
 final class AtaqueAliado extends Evento {
   final int slot;
   final int dano;

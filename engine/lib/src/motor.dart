@@ -169,33 +169,36 @@ EstadoPartida _elegirJefe(EstadoPartida e, ElegirJefe ev) {
   return _empezarRonda(conJefe);
 }
 
-/// Prepara la ronda siguiente. Actúan primero los jugadores con KO pendiente
-/// (por orden de asiento) y después el resto (por orden de asiento).
+/// Prepara la ronda siguiente. Los jugadores con un Pokémon KO se sientan
+/// su turno (solo roban carta de ánimo, fuera de la app: TODO); actúan los
+/// demás por orden de asiento. Si no queda nadie que actúe, pasa directo al
+/// turno del jefe.
 EstadoPartida _empezarRonda(EstadoPartida e) {
   final vivos = [
     for (final j in e.jugadores)
       if (!j.eliminado) j.asiento,
   ];
-  final primeros = [
+  final sentados = [
     for (final a in vivos)
       if (e.prioridad.contains(a)) a,
   ];
-  final resto = [
+  final actuan = [
     for (final a in vivos)
       if (!e.prioridad.contains(a)) a,
   ];
-  return e.copiarCon(
+  final nuevo = e.copiarCon(
     fase: Fase.turnoJugadores,
     ronda: e.ronda + 1,
-    orden: [...primeros, ...resto],
+    orden: actuan,
     turnoActual: 0,
     prioridad: const [],
-    cartasAnimoPendientes: primeros,
+    cartasAnimoPendientes: sentados,
     ataquesJefeEnTurno: 0,
     aliados: [
       for (final a in e.aliados) a.copiarCon(atacoEnTurnoJefe: false),
     ],
   );
+  return actuan.isEmpty ? _avanzarTurno(nuevo, 0) : nuevo;
 }
 
 /// Avanza al siguiente jugador que siga en juego. Si ya no quedan,
@@ -311,6 +314,10 @@ EstadoPartida _ataqueJefe(EstadoPartida e, AtaqueJefe ev) {
   final objetivo = ev.jugador;
   if (objetivo != null) {
     _exigeJugador(e, objetivo);
+    if (e.enKo(objetivo)) {
+      _error('el jugador $objetivo está KO: el ataque falla; se descarta la '
+          'carta y se roba otra');
+    }
   }
   final efecto = ev.efecto;
   if (efecto != null) _validarEfecto(ev, efecto);
@@ -437,14 +444,12 @@ EstadoPartida _pokemonKo(EstadoPartida e, PokemonKo ev) {
   var nuevo = e.copiarCon(jugadores: jugadores);
 
   if (vivos > 0) {
-    // Le queda un Pokémon: asciende la banca y gana prioridad la ronda
-    // siguiente (una sola vez, aunque caigan varios).
-    if (!nuevo.prioridad.contains(ev.jugador)) {
-      nuevo = nuevo.copiarCon(prioridad: [...nuevo.prioridad, ev.jugador]);
-    }
+    // Le queda un Pokémon: asciende la banca y el jugador se sienta su
+    // próximo turno (solo roba carta de ánimo).
     // Lo ha dejado KO el ataque de entrada de un aliado (D-13) y todavía no
-    // ha actuado esta ronda: pierde su turno; el Pokémon que sube no ataca
-    // hasta la ronda siguiente.
+    // ha actuado esta ronda: ese turno es el que se sienta, así que no se
+    // sienta también el de la ronda siguiente; el Pokémon que sube no ataca
+    // hasta entonces.
     // También cuenta si la mesa marca el KO antes de registrar el ataque de
     // entrada (aún pendiente): en ese intervalo nada más puede haberlo causado.
     final porAliado =
@@ -456,7 +461,13 @@ EstadoPartida _pokemonKo(EstadoPartida e, PokemonKo ev) {
         if (pos == nuevo.turnoActual) {
           nuevo = _avanzarTurno(nuevo, nuevo.turnoActual);
         }
+        return nuevo;
       }
+    }
+    // Se sienta el turno de la ronda siguiente (una sola vez, aunque caigan
+    // varios).
+    if (!nuevo.prioridad.contains(ev.jugador)) {
+      nuevo = nuevo.copiarCon(prioridad: [...nuevo.prioridad, ev.jugador]);
     }
     return nuevo;
   }
@@ -872,16 +883,20 @@ EstadoPartida _ataqueAliado(
   } else {
     _exigeJugador(e, objetivo);
   }
+  // Contra un jugador KO el ataque falla: se omite (no cuenta como uso ni
+  // dispara los efectos del aliado), pero gasta el turno de ese ataque.
+  final falla = e.enKo(objetivo ?? aliado.slot);
+  final usos = falla ? aliado.usos : aliado.usos + 1;
 
   AliadoEstado actualizado;
   if (!aliado.entradaResuelta) {
     // Ataque al entrar.
-    actualizado = aliado.copiarCon(entradaResuelta: true, usos: aliado.usos + 1);
+    actualizado = aliado.copiarCon(entradaResuelta: true, usos: usos);
   } else if (e.fase == Fase.turnoJefe && !aliado.atacoEnTurnoJefe) {
     // Ataque del final del turno del jefe, una vez por turno.
     actualizado = aliado.copiarCon(
       atacoEnTurnoJefe: true,
-      usos: aliado.usos + 1,
+      usos: usos,
     );
   } else if (e.fase == Fase.turnoJefe) {
     _error('${aliado.nombre} ya ha atacado en este turno del jefe');
@@ -895,6 +910,7 @@ EstadoPartida _ataqueAliado(
         if (a.slot == ev.slot) actualizado else a,
     ],
   );
+  if (falla) return resultado;
   final id = aliado.scriptId;
   if (aliado.efectos != EfectosAliado.programa || id == null) return resultado;
   final script = scripts[id]!;

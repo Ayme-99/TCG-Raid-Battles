@@ -372,6 +372,11 @@ Resultado jugarJefe(
   // Jugador que está actuando y los que han perdido su turno esta ronda.
   var actual = -1;
   final perdidos = <int>{};
+  // Jugadores que se sientan esta ronda por un KO: solo roban carta de ánimo
+  // (fuera de la app). Hasta que acaba la ronda, los ataques del jefe y de
+  // sus aliados contra ellos fallan, igual que contra quien acaba de caer KO.
+  final sentados = <int>{};
+  bool enKo(int i) => !js[i].pokes[0].vivo || sentados.contains(i);
   // Reducción pendiente por jugador (Fuerza Lunar).
   final debilitados = <int, int>{};
   // Último ataque de cada jugador (para «Rencor»).
@@ -412,6 +417,8 @@ Resultado jugarJefe(
       if (activos.isEmpty) return;
       objetivo = activos[rnd.nextInt(activos.length)];
     }
+    // Contra un jugador KO el ataque falla: se omite.
+    if (enKo(objetivo)) return;
     var dano = a.def.dano!;
     if (a.def.envite) {
       dano += 10 * a.usos;
@@ -551,11 +558,15 @@ Resultado jugarJefe(
   for (var t = 1; t <= c.maxTurnos; t++) {
     ronda = t;
     actual = -1;
+    sentados.clear();
     for (var i = 0; i < js.length; i++) {
       final j = js[i];
       if (j.eliminado) continue;
       actual = i;
-      if (perdidos.remove(i)) {
+      // Con un Pokémon KO se sienta el turno (los KO del ataque de entrada de
+      // un aliado antes de actuar pierden ese mismo turno).
+      if (perdidos.remove(i) || !j.pokes[0].vivo) {
+        sentados.add(i);
         if (!j.pokes[0].vivo) j.intercambiar();
         for (final p in j.pokes) {
           if (p.cd > 0) p.cd--;
@@ -650,8 +661,9 @@ Resultado jugarJefe(
     for (var n = 0; n < nv.maxAtaques; n++) {
       final activos = {
         for (var i = 0; i < js.length; i++)
-          if (!js[i].eliminado) i,
+          if (!js[i].eliminado && !enKo(i)) i,
       };
+      // Sin nadie a quien atacar (todos KO), los ataques del jefe fallan.
       if (activos.isEmpty) break;
       final carta = mazo.robar(activos);
       final j = js[carta.jugador];

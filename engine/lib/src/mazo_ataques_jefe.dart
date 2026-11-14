@@ -90,8 +90,8 @@ class MazoAtaquesJefe {
   int get restantes => _mazo.length;
 
   /// Roba la siguiente carta que apunte a uno de los [jugadoresActivos]
-  /// (asientos). La carta que apunta a un jugador que no juega o está
-  /// eliminado se descarta sin efecto y se roba otra.
+  /// (asientos). La carta que apunta a un jugador que no juega, está
+  /// eliminado o está KO se descarta sin efecto y se roba otra.
   CartaAtaqueJefe robar(Set<int> jugadoresActivos) {
     if (!_mazo.followedBy(_descarte).any((c) => jugadoresActivos.contains(c.jugador))) {
       throw StateError('no hay ninguna carta que apunte a un jugador activo');

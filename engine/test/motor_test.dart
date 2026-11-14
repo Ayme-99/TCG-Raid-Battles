@@ -118,7 +118,7 @@ void main() {
       expect(s.resultado, Resultado.derrota);
     });
 
-    test('un KO da prioridad: actúa primero la ronda siguiente', () {
+    test('un KO se sienta el turno siguiente (solo roba carta de ánimo)', () {
       final s = reproducir([
         ..._inicio(),
         const TurnoJugador(jugador: 0, dano: 10),
@@ -127,11 +127,11 @@ void main() {
         const FinTurnoJefe(),
       ]);
       expect(s.ronda, 2);
-      expect(s.orden, [1, 0]);
+      expect(s.orden, [0]);
       expect(s.cartasAnimoPendientes, [1]);
     });
 
-    test('dos KO del mismo jugador dan una sola prioridad y lo eliminan', () {
+    test('dos KO del mismo jugador lo eliminan y no se sienta turno', () {
       final s = reproducir([
         ..._inicio(),
         const TurnoJugador(jugador: 0, dano: 10),
@@ -182,8 +182,7 @@ void main() {
       const PokemonKo(1),
       const FinTurnoJefe(),
       const CartaAnimoRobada(jugador: 1, carta: 1),
-      const TurnoJugador(jugador: 1, dano: 100),
-      const TurnoJugador(jugador: 0, dano: 200),
+      const TurnoJugador(jugador: 0, dano: 300),
     ];
 
     test('la misma lista de eventos da siempre el mismo estado final', () {
