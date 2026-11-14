@@ -1,0 +1,12 @@
+Recalibración tras la regla de KO (T-72: el jugador con un Pokémon KO se sienta la ronda siguiente; los ataques contra un KO fallan) y el daño por efectos (T-59). 150 equipos x 60 partidas, ayuda=0.5, política solo-dueno. Objetivo 75/50/30/15 %.
+
+PS del catálogo (Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800)
+4 jugadores: onix 48,7 %   manectric 39,3 %   kingdra 15,3 %   arceus  5,5 %
+3 jugadores: onix 24,7 %   manectric  6,8 %   kingdra  2,6 %   arceus  0,2 %
+
+PS calibrados con la regla nueva (no aplicados: los PS siguen como en las cartas hasta decidirlo)
+4 jugadores: onix 1700 (79,0)  manectric 2300 (53,7)  kingdra 3200 (30,5)  arceus 3200 (16,2)
+3 jugadores: onix 1300 (79,4)  manectric 1500 (55,3)  kingdra 2500 (29,9)  arceus 2400 (16,0)
+
+Llamadas hechas por partida con los PS del catálogo (4 jugadores, de las posibles): onix 1,97/2  manectric 2,90/3  kingdra 3,49/4  arceus 4,16/5.
+Antes de T-72 (informe 2026-11-12, PS 2200/2700/3800/3900): 64,1 / 38,3 / 26,9 / 13,6 %.
