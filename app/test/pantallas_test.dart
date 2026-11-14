@@ -188,8 +188,6 @@ void main() {
       (tester) async {
     final c = await abrir(tester);
     await prepararPartida(tester, hp: 500);
-    await turno(tester, '0');
-    await turno(tester, '0');
 
     // En pantalla estrecha el panel va al final de la lista de acciones.
     await tester.scrollUntilVisible(
@@ -207,7 +205,7 @@ void main() {
 
     final estado = c.read(estadoProvider);
     expect(estado.jefe!.hp, 440);
-    expect(estado.fase, Fase.turnoJefe);
+    expect(estado.fase, Fase.turnoJugadores);
     expect(estado.danoPorJugador[1], 60);
     expect(estado.danoPorJugador[0], 0);
   });
