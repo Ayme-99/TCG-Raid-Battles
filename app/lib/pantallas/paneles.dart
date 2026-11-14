@@ -452,10 +452,14 @@ class PanelEstados extends ConsumerStatefulWidget {
 class _PanelEstadosState extends ConsumerState<PanelEstados> {
   int? _jugador;
 
+  /// Slot del aliado al que se aplica el estado; null = el jefe.
+  int? _slot;
+
   @override
   Widget build(BuildContext context) {
     final estado = ref.watch(estadoProvider);
     final activos = jugadoresActivos(estado);
+    if (_slot != null && estado.aliadoEn(_slot!) == null) _slot = null;
     var elegido = _jugador ?? widget.jugadorInicial;
     if (elegido == null || !activos.contains(elegido)) {
       elegido = activos.isEmpty ? null : activos.first;
@@ -467,10 +471,32 @@ class _PanelEstadosState extends ConsumerState<PanelEstados> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Estados del jefe',
+              'Estados',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
+            if (estado.aliados.isNotEmpty) ...[
+              const Text('¿A quién se le aplica?'),
+              Wrap(
+                spacing: 8,
+                children: [
+                  ChoiceChip(
+                    key: const Key('estado-objetivo-jefe'),
+                    label: const Text('Jefe'),
+                    selected: _slot == null,
+                    onSelected: (_) => setState(() => _slot = null),
+                  ),
+                  for (final a in estado.aliados)
+                    ChoiceChip(
+                      key: Key('estado-objetivo-${a.slot}'),
+                      label: Text(a.nombre),
+                      selected: _slot == a.slot,
+                      onSelected: (_) => setState(() => _slot = a.slot),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+            ],
             const Text('¿Qué jugador ha aplicado el estado?'),
             Wrap(
               spacing: 8,
@@ -496,7 +522,14 @@ class _PanelEstadosState extends ConsumerState<PanelEstados> {
                         : () => registrar(
                               context,
                               ref,
-                              AplicarEstadoJefe(jugador: elegido!, estado: e),
+                              _slot == null
+                                  ? AplicarEstadoJefe(
+                                      jugador: elegido!, estado: e)
+                                  : AplicarEstadoAliado(
+                                      jugador: elegido!,
+                                      slot: _slot!,
+                                      estado: e,
+                                    ),
                             ),
                     child: Text(
                       e == EstadoDelJefe.veneno

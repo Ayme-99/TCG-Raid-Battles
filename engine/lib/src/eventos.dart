@@ -175,9 +175,32 @@ final class AplicarEstadoJefe extends Evento {
   const AplicarEstadoJefe({required this.jugador, required this.estado});
 }
 
+/// Un jugador deja a un aliado con un estado alterado (D-17). Igual que en el
+/// jefe: si el aliado ya lo tenía no cambia nada y no cuenta para el bono de
+/// puntos. Si el aliado sale de la mesa, pierde sus estados.
+final class AplicarEstadoAliado extends Evento {
+  final int jugador;
+  final int slot;
+  final EstadoDelJefe estado;
+
+  const AplicarEstadoAliado({
+    required this.jugador,
+    required this.slot,
+    required this.estado,
+  });
+}
+
+/// Moneda de la quemadura de un aliado (D-17): [cara] quita la quemadura.
+class MonedaQuemaduraAliado {
+  final int slot;
+  final bool cara;
+
+  const MonedaQuemaduraAliado({required this.slot, required this.cara});
+}
+
 /// Termina el turno del jefe y empieza la ronda siguiente. Antes se hace el
-/// chequeo de estados del jefe (D-12): veneno, quemadura y, si está quemado,
-/// la moneda.
+/// chequeo de estados (D-12 y D-17): el del jefe (veneno, quemadura y, si está
+/// quemado, la moneda) y después el de los aliados, por orden de slot.
 final class FinTurnoJefe extends Evento {
   /// Resultado de la moneda de la quemadura: true = cara (se quita la
   /// quemadura), false = cruz (se mantiene). Obligatorio si el jefe está
@@ -185,7 +208,12 @@ final class FinTurnoJefe extends Evento {
   /// que reproducir el registro dé siempre el mismo resultado.
   final bool? monedaQuemadura;
 
-  const FinTurnoJefe({this.monedaQuemadura});
+  /// Monedas de la quemadura de cada aliado quemado (D-17): una por aliado
+  /// quemado en el chequeo, ni más ni menos. Si el veneno o la quemadura dejan
+  /// al aliado a 0 HP, su moneda no hace nada.
+  final List<MonedaQuemaduraAliado>? monedasQuemaduraAliados;
+
+  const FinTurnoJefe({this.monedaQuemadura, this.monedasQuemaduraAliados});
 }
 
 /// La mesa abandona la partida: termina en derrota con el daño hecho hasta

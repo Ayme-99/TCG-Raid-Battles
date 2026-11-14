@@ -138,7 +138,7 @@ List<BonusAtaqueJefe> bonusAtaqueJefeActivos(
   return bonus;
 }
 
-/// El jefe no puede sufrir estados mientras viva un aliado con
+/// El jefe y los aliados no pueden sufrir estados mientras viva un aliado con
 /// `bloqueaEstados` (Velo Sagrado) cuyos efectos aplica el programa.
 bool estadosBloqueados(
   EstadoPartida e, [
@@ -315,10 +315,15 @@ EstadoPartida _chupavidas10(EstadoPartida e, AliadoEstado a) =>
 EstadoPartida _chupavidas30(EstadoPartida e, AliadoEstado a) =>
     _curarJefeYAliados(e, 30);
 
-/// Velo Sagrado: al entrar se quitan los estados que tuviera el jefe (las
-/// aplicaciones ya contadas para el bono se conservan).
-EstadoPartida _veloSagrado(EstadoPartida e, AliadoEstado a) =>
-    e.copiarCon(jefe: e.jefe!.conEstados(envenenado: false, quemado: false));
+/// Velo Sagrado: al entrar se quitan los estados que tuvieran el jefe y los
+/// aliados (D-17); las aplicaciones ya contadas para el bono se conservan.
+EstadoPartida _veloSagrado(EstadoPartida e, AliadoEstado a) => e.copiarCon(
+      jefe: e.jefe!.conEstados(envenenado: false, quemado: false),
+      aliados: [
+        for (final x in e.aliados)
+          x.copiarCon(envenenado: false, quemado: false),
+      ],
+    );
 
 /// Drenadoras: los jugadores ponen un contador de daño (10) en cada Pokémon
 /// Activo y el jefe se cura 10 por cada uno. Se cuenta un contador por jugador

@@ -1,0 +1,42 @@
+{
+  "version": 10,
+  "partidaId": "ejemplo-dano-de-efecto-a-aliado-inexistente",
+  "eventos": [
+    {
+      "tipo": "configurarJugadores",
+      "jugadores": [
+        {
+          "nombre": "Ana",
+          "ataqueMaximo": 100
+        },
+        {
+          "nombre": "Beto",
+          "ataqueMaximo": 100
+        }
+      ]
+    },
+    {
+      "tipo": "elegirJefe",
+      "jefeId": "ejemplo-nv1",
+      "nombre": "Jefe de ejemplo",
+      "nivel": 1,
+      "hp": 1000,
+      "invocacionCadaHp": 300
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 100
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
+      "tipo": "danoDeEfecto",
+      "puntos": 10,
+      "slot": 1
+    }
+  ]
+}
