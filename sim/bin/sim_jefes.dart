@@ -75,14 +75,14 @@
 //   dart run bin/sim_jefes.dart --jugadores=2 --mesa8   # 8 Pokémon en mesa (4 por jugador)
 //   dart run bin/sim_jefes.dart --calibrar   # HP (en centenas) que da el objetivo
 //   dart run bin/sim_jefes.dart --causas     # por qué no se usan todos los intentos
-//   dart run bin/sim_jefes.dart --animo=todas  # el jugador KO roba cartas de ánimo
+//   dart run bin/sim_jefes.dart --animo=no    # sin cartas de ánimo (modelo anterior)
 //
 // Opciones propias:
 //   --jefes=RUTA      carpeta del catálogo (defecto ../catalog)
 //   --ayuda=P         probabilidad de ayuda en la política «ayuda» (0.5)
 //   --animo=LISTA     cartas de ánimo (D-05) que puede robar el jugador KO al
-//                     sentarse: «todas» o números 1 a 5 separados por comas
-//                     (por defecto ninguna: no se modelan). Ver jugarJefe.
+//                     sentarse: «todas» (por defecto), «no» o números 1 a 5
+//                     separados por comas. Ver robarAnimo en jugarJefe.
 // Y las de sim_cartas.dart: --equipos --partidas --max-turnos --semilla
 //   --catalogo --ataques --tabla --informe (aquí, defecto
 //   ../balance/informes/jefes_aliados.csv).
@@ -880,9 +880,11 @@ List<int> _reparto8(int n) =>
 /// «todas» o una lista de cartas de ánimo (1 a 5) separadas por comas.
 List<int> _leerAnimo(String texto) {
   if (texto == 'todas') return [1, 2, 3, 4, 5];
+  if (texto == 'no') return [];
   final cartas = [for (final t in texto.split(',')) int.parse(t.trim())];
   if (cartas.isEmpty || cartas.any((k) => k < 1 || k > 5)) {
-    throw FormatException('--animo: usa «todas» o números de 1 a 5', texto);
+    throw FormatException(
+        '--animo: usa «todas», «no» o números de 1 a 5', texto);
   }
   return cartas.toSet().toList()..sort();
 }
@@ -898,7 +900,7 @@ void main(List<String> args) {
   var mesa8 = false;
   int? pokemon;
   var mejorPrimero = false;
-  var animo = <int>[];
+  var animo = <int>[1, 2, 3, 4, 5];
   for (final a in args) {
     if (a == '--causas') {
       causas = true;

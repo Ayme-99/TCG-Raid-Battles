@@ -67,7 +67,8 @@ class Config {
   String informe = '../balance/informes/d03_cartas.csv';
 
   /// Cartas de ánimo (D-05, 1 a 5) que puede robar el jugador KO al sentarse.
-  /// Vacío = no se modelan (lo que asumían las calibraciones anteriores).
+  /// Vacío = no se modelan (lo que asumían las calibraciones anteriores al
+  /// 2026-11-14); `sim_jefes.dart` usa las 5 por defecto.
   List<int> animo = const [];
 }
 
