@@ -1,0 +1,22 @@
+Equilibrio con menos de 4 jugadores (#192), con las 5 cartas de ánimo (#189). 150 equipos x 60 partidas, ayuda=0.5, política solo-dueno. Objetivo 75/50/30/15 %.
+«pok» = Pokémon por jugador (--pokemon); «mesa8» = 8 Pokémon en mesa repartidos (--mesa8). Las columnas son Onix / Manectric / Kingdra / Arceus.
+
+Con los PS del catálogo (2300 / 2600 / 3700 / 3800)
+4 jugadores, 2 pok (referencia): 66,0 / 59,1 / 35,5 / 18,2 %
+3 jugadores, 2 pok (6 en mesa):   39,0 / 15,1 /  9,8 /  2,2 %
+3 jugadores, 3 pok (9 en mesa):   86,7 / 75,8 / 51,3 / 28,2 %
+3 jugadores, mesa8 (3+3+2):       75,2 / 44,9 / 29,6 / 13,8 %   <- casi el objetivo
+2 jugadores, 2 pok:                2,2 /  0,0   (solo hay equipos de nivel 1 y 2)
+2 jugadores, 3 pok:               26,9 /  0,8
+2 jugadores, 4 pok (mesa8):       68,3 / 10,3
+1 jugador, 2 / 4 / 5 / 6 pok:      0,0 en todos (solo hay equipos de nivel 1)
+
+PS que darían el objetivo (no aplicados)
+3 jugadores, 2 pok:   1500 / 1700 / 2900 / 2900
+3 jugadores, 3 pok:   2600 / 3100 / 4300 / 4200
+3 jugadores, mesa8:   2200 / 2500 / 3600 / 3700
+2 jugadores, 2 pok:    700 /  700
+2 jugadores, 4 pok:   2100 / 1800
+1 jugador, 2 pok:      200 (el equipo cae al instante); 5 pok: 600; 6 pok: 800
+
+Lectura: con 3 jugadores, repartir 8 Pokémon en mesa (3+3+2) da casi el objetivo sin tocar los PS (75 / 45 / 30 / 14 %). Con 9 (3 cada uno) es demasiado fácil y con 6 demasiado difícil. Con 2 jugadores, 4 cada uno cuadra en Onix pero Manectric sigue muy duro (10 %; haría falta 1800 PS). Con 1 jugador solo hay nivel 1 y, incluso con 6 Pokémon, haría falta un jefe de 800 PS: partida casi siempre perdida. Nota: con 1 o 2 jugadores la suma de X no llega a los niveles altos.
