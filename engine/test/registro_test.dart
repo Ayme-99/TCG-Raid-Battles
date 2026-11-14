@@ -20,12 +20,12 @@ List<(String, Object?)> _ejemplos(String nombre) => [
     ]..sort((a, b) => a.$1.compareTo(b.$1));
 
 void main() {
-  /// Lo que debe salir de migrar a la versión 8 (D-13): los aliados invocados
+  /// Lo que debe salir de migrar a la versión 9 (D-13): los aliados invocados
   /// reciben una categoría por orden de invocación (danio, tanque, cura,
   /// control y vuelta a empezar).
   Map<String, Object?> conCategorias(Map<String, Object?> m) {
     var invocados = 0;
-    m['version'] = 8;
+    m['version'] = 9;
     m['eventos'] = [
       for (final e in m['eventos'] as List)
         if ((e as Map)['tipo'] == 'aliadoInvocado')
@@ -41,15 +41,15 @@ void main() {
   }
 
   /// Lo que debe salir de leer un registro de la versión 2: el mismo registro
-  /// en versión 8, con una categoría en cada aliado invocado.
+  /// en versión 9, con una categoría en cada aliado invocado.
   Object? migradoDeV2(Object? json) =>
       conCategorias(Map<String, Object?>.from(json as Map));
 
   /// Lo que debe salir de leer un registro de la versión 3: el mismo registro
-  /// en versión 8 con la categoría `barrera` renombrada a `tanque`.
+  /// en versión 9 con la categoría `barrera` renombrada a `tanque`.
   Object? migradoDeV3(Object? json) {
     final m = Map<String, Object?>.from(json as Map);
-    m['version'] = 8;
+    m['version'] = 9;
     m['eventos'] = [
       for (final e in m['eventos'] as List)
         if ((e as Map)['categoria'] == 'barrera')
@@ -63,7 +63,7 @@ void main() {
   }
 
   /// Lo que debe salir de leer un registro de la versión 1: el mismo registro
-  /// en versión 8, con el bono de estados a 0 en cada jugador del resumen y
+  /// en versión 9, con el bono de estados a 0 en cada jugador del resumen y
   /// una categoría en cada aliado invocado.
   Object? migradoDeV1(Object? json) {
     final m = Map<String, Object?>.from(json as Map);
@@ -84,10 +84,10 @@ void main() {
   }
 
   /// Lo que debe salir de leer un registro de la versión 5 (D-16): el mismo
-  /// registro en versión 8 con la categoría `picaro` renombrada a `control`.
+  /// registro en versión 9 con la categoría `picaro` renombrada a `control`.
   Object? migradoDeV5(Object? json) {
     final m = Map<String, Object?>.from(json as Map);
-    m['version'] = 8;
+    m['version'] = 9;
     m['eventos'] = [
       for (final e in m['eventos'] as List)
         if ((e as Map)['categoria'] == 'picaro')
@@ -99,7 +99,7 @@ void main() {
   }
 
   /// Lo que debe salir de leer un registro de la versión 4: el mismo registro
-  /// en versión 8 (los eventos no cambian).
+  /// en versión 9 (los eventos no cambian).
   Object? migradoDeV4(Object? json) => migradoDeV5(json);
 
   void resumenEsElDelMotor(Object? json) {
@@ -116,7 +116,7 @@ void main() {
     expect(registro.resumen, equals(nuevo.resumen));
   }
 
-  group('ejemplos del contrato v1 (se migran a la versión 8)', () {
+  group('ejemplos del contrato v1 (se migran a la versión 9)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v1/validos'), isNotEmpty);
       expect(_ejemplos('v1/invalidos-estructura'), isNotEmpty);
@@ -124,9 +124,9 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v1/validos')) {
-      test('válido: $nombre se lee, se migra y se escribe en versión 8', () {
+      test('válido: $nombre se lee, se migra y se escribe en versión 9', () {
         final registro = RegistroPartida.deJson(json);
-        expect(registro.version, 8);
+        expect(registro.version, 9);
         expect(registro.toJson(), equals(migradoDeV1(json)));
       });
 
@@ -150,7 +150,7 @@ void main() {
     }
   });
 
-  group('ejemplos del contrato v2 (se migran a la versión 8)', () {
+  group('ejemplos del contrato v2 (se migran a la versión 9)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v2/validos'), isNotEmpty);
       expect(_ejemplos('v2/invalidos-estructura'), isNotEmpty);
@@ -158,7 +158,7 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v2/validos')) {
-      test('válido: $nombre se lee, se migra y se escribe en versión 8', () {
+      test('válido: $nombre se lee, se migra y se escribe en versión 9', () {
         expect(RegistroPartida.deJson(json).toJson(),
             equals(migradoDeV2(json)));
       });
@@ -183,7 +183,7 @@ void main() {
     }
   });
 
-  group('ejemplos del contrato v3 (se migran a la versión 8)', () {
+  group('ejemplos del contrato v3 (se migran a la versión 9)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v3/validos'), isNotEmpty);
       expect(_ejemplos('v3/invalidos-estructura'), isNotEmpty);
@@ -191,7 +191,7 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v3/validos')) {
-      test('válido: $nombre se lee, se migra y se escribe en versión 8', () {
+      test('válido: $nombre se lee, se migra y se escribe en versión 9', () {
         expect(RegistroPartida.deJson(json).toJson(), equals(migradoDeV3(json)));
       });
 
@@ -215,7 +215,7 @@ void main() {
     }
   });
 
-  group('ejemplos del contrato v4 (se migran a la versión 8)', () {
+  group('ejemplos del contrato v4 (se migran a la versión 9)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v4/validos'), isNotEmpty);
       expect(_ejemplos('v4/invalidos-estructura'), isNotEmpty);
@@ -223,7 +223,7 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v4/validos')) {
-      test('válido: $nombre se lee, se migra y se escribe en versión 8', () {
+      test('válido: $nombre se lee, se migra y se escribe en versión 9', () {
         expect(RegistroPartida.deJson(json).toJson(), equals(migradoDeV4(json)));
       });
 
@@ -247,7 +247,7 @@ void main() {
     }
   });
 
-  group('ejemplos del contrato v5 (se migran a la versión 8)', () {
+  group('ejemplos del contrato v5 (se migran a la versión 9)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v5/validos'), isNotEmpty);
       expect(_ejemplos('v5/invalidos-estructura'), isNotEmpty);
@@ -255,7 +255,7 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v5/validos')) {
-      test('válido: $nombre se lee, se migra y se escribe en versión 8', () {
+      test('válido: $nombre se lee, se migra y se escribe en versión 9', () {
         expect(RegistroPartida.deJson(json).toJson(), equals(migradoDeV5(json)));
       });
 
@@ -279,7 +279,7 @@ void main() {
     }
   });
 
-  group('ejemplos del contrato v6 (se migran a la versión 8)', () {
+  group('ejemplos del contrato v6 (se migran a la versión 9)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v6/validos'), isNotEmpty);
       expect(_ejemplos('v6/invalidos-estructura'), isNotEmpty);
@@ -287,10 +287,10 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v6/validos')) {
-      test('válido: $nombre se lee, se migra y se escribe en versión 8', () {
+      test('válido: $nombre se lee, se migra y se escribe en versión 9', () {
         expect(
           RegistroPartida.deJson(json).toJson(),
-          equals({...Map<String, Object?>.from(json as Map), 'version': 8}),
+          equals({...Map<String, Object?>.from(json as Map), 'version': 9}),
         );
       });
 
@@ -314,7 +314,7 @@ void main() {
     }
   });
 
-  group('ejemplos del contrato v7 (se migran a la versión 8)', () {
+  group('ejemplos del contrato v7 (se migran a la versión 9)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v7/validos'), isNotEmpty);
       expect(_ejemplos('v7/invalidos-estructura'), isNotEmpty);
@@ -322,10 +322,10 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v7/validos')) {
-      test('válido: $nombre se lee, se migra y se escribe en versión 8', () {
+      test('válido: $nombre se lee, se migra y se escribe en versión 9', () {
         expect(
           RegistroPartida.deJson(json).toJson(),
-          equals({...Map<String, Object?>.from(json as Map), 'version': 8}),
+          equals({...Map<String, Object?>.from(json as Map), 'version': 9}),
         );
       });
 
@@ -349,7 +349,7 @@ void main() {
     }
   });
 
-  group('ejemplos del contrato v8', () {
+  group('ejemplos del contrato v8 (se migran a la versión 9)', () {
     test('hay ejemplos de cada tipo', () {
       expect(_ejemplos('v8/validos'), isNotEmpty);
       expect(_ejemplos('v8/invalidos-estructura'), isNotEmpty);
@@ -357,8 +357,11 @@ void main() {
     });
 
     for (final (nombre, json) in _ejemplos('v8/validos')) {
-      test('válido: $nombre se lee y se vuelve a escribir igual', () {
-        expect(RegistroPartida.deJson(json).toJson(), equals(json));
+      test('válido: $nombre se lee, se migra y se escribe en versión 9', () {
+        expect(
+          RegistroPartida.deJson(json).toJson(),
+          equals({...Map<String, Object?>.from(json as Map), 'version': 9}),
+        );
       });
 
       test('válido: $nombre guarda el resumen que calcularía el motor', () {
@@ -374,6 +377,38 @@ void main() {
     }
 
     for (final (nombre, json) in _ejemplos('v8/invalidos-reglas')) {
+      test('reglas incumplidas: $nombre', () {
+        expect(() => RegistroPartida.deJson(json),
+            throwsA(isA<RegistroInvalido>()));
+      });
+    }
+  });
+
+  group('ejemplos del contrato v9', () {
+    test('hay ejemplos de cada tipo', () {
+      expect(_ejemplos('v9/validos'), isNotEmpty);
+      expect(_ejemplos('v9/invalidos-estructura'), isNotEmpty);
+      expect(_ejemplos('v9/invalidos-reglas'), isNotEmpty);
+    });
+
+    for (final (nombre, json) in _ejemplos('v9/validos')) {
+      test('válido: $nombre se lee y se vuelve a escribir igual', () {
+        expect(RegistroPartida.deJson(json).toJson(), equals(json));
+      });
+
+      test('válido: $nombre guarda el resumen que calcularía el motor', () {
+        resumenEsElDelMotor(json);
+      });
+    }
+
+    for (final (nombre, json) in _ejemplos('v9/invalidos-estructura')) {
+      test('inválido de estructura: $nombre', () {
+        expect(() => RegistroPartida.deJson(json),
+            throwsA(isA<RegistroInvalido>()));
+      });
+    }
+
+    for (final (nombre, json) in _ejemplos('v9/invalidos-reglas')) {
       test('reglas incumplidas: $nombre', () {
         expect(() => RegistroPartida.deJson(json),
             throwsA(isA<RegistroInvalido>()));

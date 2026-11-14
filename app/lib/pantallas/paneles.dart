@@ -34,7 +34,7 @@ class PanelPokemon extends ConsumerWidget {
                       child: Text(
                         j.eliminado
                             ? '${j.nombre} · eliminado'
-                            : '${j.nombre} · ${j.pokemonVivos}/$pokemonPorJugador',
+                            : '${j.nombre} · ${j.pokemonVivos}/${j.pokemonTotal}',
                         key: Key('pokemon-${j.asiento}'),
                       ),
                     ),

@@ -132,6 +132,7 @@ EstadoPartida _configurar(EstadoPartida e, ConfigurarJugadores ev) {
       asiento: i,
       nombre: cfg.nombre,
       ataqueMaximo: ataqueParaX(cfg.ataqueMaximo),
+      pokemonTotal: pokemonPorJugadorSegun(n),
     ));
   }
   final x = jugadores.fold<int>(0, (suma, j) => suma + j.ataqueMaximo);

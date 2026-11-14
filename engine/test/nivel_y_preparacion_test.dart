@@ -35,7 +35,7 @@ void main() {
       final s = configurar([10, 20, 30]);
       expect([for (final j in s.jugadores) j.nombre], ['J0', 'J1', 'J2']);
       expect([for (final j in s.jugadores) j.asiento], [0, 1, 2]);
-      expect(s.jugadores.every((j) => j.pokemonVivos == 2), isTrue);
+      expect(s.jugadores.every((j) => j.pokemonVivos == 3), isTrue);
     });
 
     test('rechaza 0 jugadores', () {

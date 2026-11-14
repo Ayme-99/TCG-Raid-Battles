@@ -91,7 +91,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:incursiones_engine/incursiones_engine.dart'
-    show MazoAtaquesJefe;
+    show MazoAtaquesJefe, pokemonPorJugadorSegun;
 
 import 'sim_cartas.dart' hide Medida, main, medir;
 
@@ -946,7 +946,9 @@ void main(List<String> args) {
       // (4 jugadores 2+2+2+2, 3 jugadores 3+3+2, 2 jugadores 4+4).
       final tam = pokemon != null
           ? List.filled(jugadores, pokemon)
-          : (mesa8 ? _reparto8(jugadores) : List.filled(jugadores, 2));
+          : (mesa8
+              ? _reparto8(jugadores)
+              : List.filled(jugadores, pokemonPorJugadorSegun(jugadores)));
       final total = tam.fold(0, (x, y) => x + y);
       final elegidas = n.nivel == 1
           ? [for (var i = 0; i < total; i++) normales[rnd.nextInt(normales.length)]]
