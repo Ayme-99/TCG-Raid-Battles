@@ -489,7 +489,7 @@ class _PanelEstadosState extends ConsumerState<PanelEstados> {
                   for (final a in estado.aliados)
                     ChoiceChip(
                       key: Key('estado-objetivo-${a.slot}'),
-                      label: Text(a.nombre),
+                      label: Text('Aliado ${a.slot + 1}'),
                       selected: _slot == a.slot,
                       onSelected: (_) => setState(() => _slot = a.slot),
                     ),
