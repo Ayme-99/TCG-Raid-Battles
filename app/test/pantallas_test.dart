@@ -168,8 +168,7 @@ void main() {
     await tocar(tester, 'registrar-ataque-jefe');
     expect(c.read(estadoProvider).ataquesJefeEnTurno, 1);
 
-    await tocar(tester, 'menu-jugador-0');
-    await tocar(tester, 'accion-ko');
+    await tocar(tester, 'ko-0');
     expect(c.read(estadoProvider).jugadores[0].pokemonVivos, 1);
 
     await tocar(tester, 'fin-turno-jefe');
