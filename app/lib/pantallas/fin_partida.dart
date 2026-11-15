@@ -7,6 +7,7 @@ import '../cuenta/pantalla_login.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
+import 'setup.dart';
 import 'inicio.dart';
 
 /// Fin de partida: resultado, puntos de cada jugador (D-10, D-12) y guardado
@@ -124,12 +125,18 @@ class PantallaFinPartida extends ConsumerWidget {
       if (descartar != true || !context.mounted) return;
     }
     // Los jugadores se leen antes de descartar la partida.
+    final anterior = ref.read(estadoProvider);
     final jugadores = [
-      for (final j in ref.read(estadoProvider).jugadores)
+      for (final j in anterior.jugadores)
         ConfigJugador(nombre: j.nombre, ataqueMaximo: j.ataqueMaximo),
     ];
     ref.read(partidaProvider.notifier).nuevaPartida();
-    if (revancha) registrar(context, ref, ConfigurarJugadores(jugadores));
+    // Una partida nueva o una revancha conservan el modo de preparación.
+    ref.read(modoPreparacionProvider.notifier).fijar(anterior.modo);
+    ref.read(jefePreelegidoProvider.notifier).fijar(null);
+    if (revancha) {
+      registrar(context, ref, ConfigurarJugadores(jugadores, modo: anterior.modo));
+    }
   }
 }
 

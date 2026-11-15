@@ -228,15 +228,18 @@ class CampoNumero extends StatelessWidget {
     super.key,
     required this.controlador,
     required this.etiqueta,
+    this.onChanged,
   });
 
   final TextEditingController controlador;
   final String etiqueta;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controlador,
+      onChanged: onChanged,
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       decoration: InputDecoration(
