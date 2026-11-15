@@ -7,6 +7,7 @@ import 'package:incursiones_app/almacen/almacen.dart';
 import 'package:incursiones_app/cuenta/cliente_api.dart';
 import 'package:incursiones_app/cuenta/sesion.dart';
 import 'package:incursiones_app/envios/controlador_envios.dart';
+import 'package:incursiones_app/pantallas/inicio.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
@@ -65,8 +66,11 @@ List<Override> sobrescribir({
   Servidor? servidor,
   List<Reintento>? reintentos,
   MazoAtaquesJefe? mazo,
+  bool conInicio = false,
 }) {
   return [
+    // Los tests arrancan ya dentro de la partida, salvo los del inicio.
+    if (!conInicio) enPartidaProvider.overrideWith(() => EnPartida(true)),
     mazoAtaquesJefeProvider.overrideWithValue(mazo ?? MazoFijo()),
     almacenProvider.overrideWithValue(almacen ?? AlmacenMemoria()),
     clienteApiProvider.overrideWithValue(

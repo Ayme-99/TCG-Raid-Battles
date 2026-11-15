@@ -18,34 +18,7 @@ class BotonCuenta extends ConsumerWidget {
       icon: Icon(
         sesion == null ? Icons.account_circle_outlined : Icons.account_circle,
       ),
-      onPressed: () {
-        if (sesion == null) {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => const PantallaLogin()),
-          );
-          return;
-        }
-        showDialog<void>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Sesión de ${sesion.username}'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cerrar'),
-              ),
-              FilledButton(
-                key: const Key('cerrar-sesion'),
-                onPressed: () {
-                  ref.read(sesionProvider.notifier).cerrarSesion();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cerrar sesión'),
-              ),
-            ],
-          ),
-        );
-      },
+      onPressed: () => abrirCuenta(context, ref),
     );
   }
 }
@@ -127,4 +100,36 @@ class _DetalleEnvios extends ConsumerWidget {
       ],
     );
   }
+}
+
+/// Abre el inicio de sesión o, con sesión, el cuadro para verla y cerrarla.
+/// Lo usan el botón de la barra y la pantalla de inicio.
+void abrirCuenta(BuildContext context, WidgetRef ref) {
+  final sesion = ref.read(sesionActualProvider);
+  if (sesion == null) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const PantallaLogin()),
+    );
+    return;
+  }
+  showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Sesión de ${sesion.username}'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cerrar'),
+        ),
+        FilledButton(
+          key: const Key('cerrar-sesion'),
+          onPressed: () {
+            ref.read(sesionProvider.notifier).cerrarSesion();
+            Navigator.of(context).pop();
+          },
+          child: const Text('Cerrar sesión'),
+        ),
+      ],
+    ),
+  );
 }
