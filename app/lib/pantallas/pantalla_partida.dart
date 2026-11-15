@@ -193,28 +193,60 @@ class _BarraFlotante extends StatelessWidget {
       padding: const EdgeInsets.only(top: 8),
       child: Row(
         children: [
-          Flexible(
-            child: Container(
-              key: const Key('barra-turno'),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xD91A1033),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: Text(
-                MediaQuery.sizeOf(context).width < 600 ? textoCorto : texto,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                ),
+          // El chip ocupa todo el hueco libre a la izquierda. Si el texto largo
+          // no cabe, va el corto; si ni ese cabe, no se muestra (la ronda y el
+          // turno ya salen en el panel de acciones) (#214).
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: LayoutBuilder(
+                builder: (context, caja) {
+                  const estilo = TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  );
+                  // Relleno (14 + 14) y borde (2 + 2) del chip.
+                  const extra = 32.0;
+                  final escala = MediaQuery.textScalerOf(context);
+                  bool cabe(String t) {
+                    final medida = TextPainter(
+                      text: TextSpan(text: t, style: estilo),
+                      textDirection: TextDirection.ltr,
+                      textScaler: escala,
+                      maxLines: 1,
+                    )..layout();
+                    return medida.width + extra <= caja.maxWidth;
+                  }
+
+                  final mostrado = cabe(texto)
+                      ? texto
+                      : cabe(textoCorto)
+                          ? textoCorto
+                          : null;
+                  if (mostrado == null) return const SizedBox.shrink();
+                  return Container(
+                    key: const Key('barra-turno'),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xD91A1033),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: Text(
+                      mostrado,
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      style: estilo,
+                    ),
+                  );
+                },
               ),
             ),
           ),
-          const Spacer(),
           Theme(
             data: tema.copyWith(
               iconButtonTheme: IconButtonThemeData(

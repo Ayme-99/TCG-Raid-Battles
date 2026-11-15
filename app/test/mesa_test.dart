@@ -202,17 +202,22 @@ void main() {
     expect(find.byKey(const Key('mesa')), findsOneWidget);
   });
 
-  testWidgets('en móvil estrecho el chip de ronda va en versión corta (#214)',
+  testWidgets('el chip de ronda se adapta al ancho y se oculta si no cabe (#214)',
       (tester) async {
     final c = await abrir(tester);
     await empezar(tester);
     expect(find.text('Ronda 1 · Turno de Jugador 1'), findsOneWidget);
     // Se estrecha ya en partida (el formulario de jugadores no cabe a 380 px).
-    tester.view.physicalSize = const Size(380, 800);
+    tester.view.physicalSize = const Size(480, 800);
     await tester.pumpAndSettle();
     expect(c.read(estadoProvider).ronda, 1);
     expect(find.text('R1 · J1'), findsOneWidget);
     expect(find.text('Ronda 1 · Turno de Jugador 1'), findsNothing);
+    // En un móvil estrecho no hay sitio ni para el corto: no aparece.
+    tester.view.physicalSize = const Size(360, 800);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('barra-turno')), findsNothing);
+    expect(find.byKey(const Key('abandonar')), findsOneWidget);
   });
 
   testWidgets('la barra de vida llena tiene relleno visible', (tester) async {
