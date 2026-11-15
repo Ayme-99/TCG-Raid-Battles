@@ -7,6 +7,7 @@ import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
 import 'fin_partida.dart';
+import 'inicio.dart';
 import 'paneles.dart';
 import 'setup.dart';
 import 'turno_jefe.dart';
@@ -74,7 +75,18 @@ class PantallaPartida extends ConsumerWidget {
       // En juego no hay barra: la mesa llena la pantalla y la barra flota.
       appBar: enJuego
           ? null
-          : AppBar(title: Text(_titulo(estado)), actions: acciones),
+          : AppBar(
+              // Fuera de la mesa también se puede volver al inicio: no se
+              // pierde nada, la partida queda guardada (#235).
+              leading: IconButton(
+                key: const Key('inicio-volver'),
+                tooltip: 'Inicio',
+                icon: const Icon(Icons.home_outlined),
+                onPressed: () => ref.read(enPartidaProvider.notifier).salir(),
+              ),
+              title: Text(_titulo(estado)),
+              actions: acciones,
+            ),
       // La mesa ocupa toda la pantalla; el resto de fases van centradas.
       body: enJuego
           ? Stack(
@@ -142,30 +154,43 @@ class PantallaPartida extends ConsumerWidget {
         Fase.terminada => 'Fin de la partida',
       };
 
+  /// «Abandonar» ofrece dos salidas: Salir (la partida ya está guardada y se
+  /// continúa desde el inicio) o Rendirse (termina en derrota, #235).
   Future<void> _abandonar(BuildContext context, WidgetRef ref) async {
-    final confirmado = await showDialog<bool>(
+    final opcion = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('¿Abandonar la partida?'),
         content: const Text(
-          'Termina en derrota con el daño hecho hasta ahora. '
-          'Si te equivocas, puedes deshacerlo.',
+          'Salir guarda la partida tal como está y podrás continuarla desde '
+          'el inicio. Rendirse la termina en derrota con el daño hecho hasta '
+          'ahora; si te equivocas, puedes deshacerlo.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(context).pop(),
             child: const Text('Seguir jugando'),
+          ),
+          OutlinedButton(
+            key: const Key('abandonar-salir'),
+            onPressed: () => Navigator.of(context).pop('salir'),
+            child: const Text('Salir'),
           ),
           FilledButton(
             key: const Key('abandonar-confirmar'),
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Abandonar'),
+            onPressed: () => Navigator.of(context).pop('rendirse'),
+            child: const Text('Rendirse'),
           ),
         ],
       ),
     );
-    if (confirmado != true || !context.mounted) return;
-    registrar(context, ref, const Abandonar());
+    if (!context.mounted) return;
+    switch (opcion) {
+      case 'salir':
+        ref.read(enPartidaProvider.notifier).salir();
+      case 'rendirse':
+        registrar(context, ref, const Abandonar());
+    }
   }
 }
 
