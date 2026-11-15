@@ -149,3 +149,71 @@ class MapaPainter extends CustomPainter {
   @override
   bool shouldRepaint(MapaPainter old) => old.margen != margen;
 }
+
+/// Nombre del archivo del fondo de un mapa del catálogo: minúsculas, sin
+/// tildes y con guiones («Túnel Roca» → `tunel-roca`).
+String idMapa(String mapa) {
+  const tildes = {
+    'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u', 'ñ': 'n',
+  };
+  final b = StringBuffer();
+  for (final r in mapa.trim().toLowerCase().runes) {
+    final c = String.fromCharCode(r);
+    b.write(tildes[c] ?? c);
+  }
+  return b
+      .toString()
+      .replaceAll(RegExp('[^a-z0-9]+'), '-')
+      .replaceAll(RegExp(r'^-|-$'), '');
+}
+
+/// Mapas que ya tienen su ilustración en `assets/mapas/<id>.webp` (#209) y el
+/// color de sus bordes, que rellena lo que la cámara enseña fuera de la imagen.
+/// Los demás usan el tapete genérico ([MapaPainter]). Añade aquí cada mapa
+/// nuevo; un test comprueba que existe el archivo.
+const fondosDeMapa = <String, Color>{
+  'tunel-roca': Color(0xFF1E2532),
+  'ruta-110': Color(0xFF1D2839),
+  'islas-remolino': Color(0xFF23566C),
+  'sala-origen': Color(0xFF1C1A2E),
+};
+
+/// Fondo de la mesa: la ilustración del mapa del jefe o, si no la tiene, el
+/// tapete genérico. Ocupa el lienzo grande de la mesa (2000 px de margen).
+class FondoMesa extends StatelessWidget {
+  const FondoMesa({super.key, this.mapa});
+
+  /// Campo `mapa` del jefe en el catálogo (null: jefe manual o sin catálogo).
+  final String? mapa;
+
+  @override
+  Widget build(BuildContext context) {
+    final id = mapa == null ? null : idMapa(mapa!);
+    final borde = id == null ? null : fondosDeMapa[id];
+    if (id == null || borde == null) {
+      return const CustomPaint(painter: MapaPainter());
+    }
+    // La imagen cubre la mesa con un poco de sobra para la inclinación de la
+    // cámara; fuera de ella, el color de sus bordes.
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ColoredBox(color: borde),
+        Positioned(
+          left: 1850,
+          right: 1850,
+          top: 1850,
+          bottom: 1850,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset('assets/mapas/$id.webp', fit: BoxFit.cover),
+              // Oscurece un poco para que las cartas destaquen.
+              ColoredBox(color: Colors.black.withValues(alpha: 0.18)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
