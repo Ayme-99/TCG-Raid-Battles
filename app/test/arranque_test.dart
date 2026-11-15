@@ -29,6 +29,10 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('inicio-nueva')));
     await tester.pumpAndSettle();
+    for (final k in ['nueva-siguiente', 'nueva-siguiente', 'nueva-empezar']) {
+      await tester.tap(find.byKey(Key(k)));
+      await tester.pumpAndSettle();
+    }
     expect(find.byKey(const Key('inicio')), findsNothing);
     expect(find.text('Jugadores y su mejor ataque'), findsOneWidget);
   });

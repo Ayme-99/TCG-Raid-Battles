@@ -7,6 +7,7 @@ import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'carta.dart';
+import 'nueva_partida.dart';
 
 /// Si la app está en la partida o en la pantalla de inicio (#232). Al abrir
 /// siempre se ve el inicio; los tests pueden arrancar ya dentro de la partida.
@@ -115,7 +116,17 @@ _Guardada? _partidaGuardada(WidgetRef ref) => _resumen(
       ref.watch(enviosProvider.select((e) => e.partidaEncolada != null)),
     );
 
-Future<void> _nuevaPartida(BuildContext context, WidgetRef ref) async {
+/// Abre el selector de modo y formato (#233). Nada se descarta hasta que se
+/// pulsa «Empezar», así que se puede volver atrás sin perder la partida.
+void _nuevaPartida(BuildContext context, WidgetRef ref) {
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => const PantallaNuevaPartida()),
+  );
+}
+
+/// Último paso del selector: pide confirmar si hay una partida a medias, la
+/// descarta y entra a la partida nueva. Devuelve false si se cancela.
+Future<bool> empezarPartidaNueva(BuildContext context, WidgetRef ref) async {
   final hay = ref.read(partidaProvider).partida.eventos.isNotEmpty;
   final pendiente = _resumen(
     ref.read(partidaProvider),
@@ -143,10 +154,11 @@ Future<void> _nuevaPartida(BuildContext context, WidgetRef ref) async {
         ],
       ),
     );
-    if (descartar != true) return;
+    if (descartar != true) return false;
   }
   if (hay) ref.read(partidaProvider.notifier).nuevaPartida();
   ref.read(enPartidaProvider.notifier).entrar();
+  return true;
 }
 
 void _pokedex(BuildContext context) {

@@ -41,6 +41,16 @@ Future<void> dejarPartidaAMedias(WidgetTester tester, ProviderContainer c) async
   await tester.pumpAndSettle();
 }
 
+/// Recorre los pasos 1 y 2 del selector y pulsa «Empezar» en el 3.
+Future<void> pasarPasos(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('nueva-siguiente')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('nueva-siguiente')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('nueva-empezar')));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   for (final (nombre, tamano) in [
     ('tablet', const Size(1024, 768)),
@@ -81,15 +91,16 @@ void main() {
 
     await tester.tap(find.byKey(const Key('inicio-nueva')));
     await tester.pumpAndSettle();
+    await pasarPasos(tester);
     expect(find.text('¿Empezar una partida nueva?'), findsOneWidget);
 
     // Volver no descarta nada.
     await tester.tap(find.text('Volver'));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('inicio')), findsOneWidget);
+    expect(find.byKey(const Key('nueva-partida')), findsOneWidget);
     expect(c.read(estadoProvider).jefe, isNotNull);
 
-    await tester.tap(find.byKey(const Key('inicio-nueva')));
+    await tester.tap(find.byKey(const Key('nueva-empezar')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('descartar-partida')));
     await tester.pumpAndSettle();
@@ -111,5 +122,68 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('inicio')), findsNothing);
     expect(find.byType(TextField), findsWidgets);
+  });
+
+  for (final (nombre, tamano) in [
+    ('tablet', const Size(1024, 768)),
+    ('móvil', const Size(390, 844)),
+  ]) {
+    testWidgets('el selector de modo recorre tres pasos en $nombre',
+        (tester) async {
+      await abrirInicio(tester, tamano: tamano);
+      await tester.tap(find.byKey(const Key('inicio-nueva')));
+      await tester.pumpAndSettle();
+      expect(find.text('¿Cómo quieres jugar?'), findsOneWidget);
+      expect(find.byKey(const Key('opcion-campana')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('nueva-siguiente')));
+      await tester.pumpAndSettle();
+      expect(find.text('¿Con qué formato?'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('nueva-siguiente')));
+      await tester.pumpAndSettle();
+      expect(find.text('¿Cómo preparas la partida?'), findsOneWidget);
+      expect(find.byKey(const Key('opcion-jefe')), findsOneWidget);
+
+      // Atrás vuelve al paso anterior y, desde el primero, al inicio.
+      await tester.tap(find.byKey(const Key('nueva-atras')));
+      await tester.pumpAndSettle();
+      expect(find.text('¿Con qué formato?'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('nueva-atras')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('nueva-atras')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('inicio')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('en tablet el carril deja volver a un paso hecho',
+      (tester) async {
+    await abrirInicio(tester);
+    await tester.tap(find.byKey(const Key('inicio-nueva')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('nueva-siguiente')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('nueva-siguiente')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('paso-0')));
+    await tester.pumpAndSettle();
+    expect(find.text('¿Cómo quieres jugar?'), findsOneWidget);
+  });
+
+  testWidgets('Elegir jefe primero está bloqueado hasta el modo por jefe',
+      (tester) async {
+    await abrirInicio(tester);
+    await tester.tap(find.byKey(const Key('inicio-nueva')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('nueva-siguiente')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('nueva-siguiente')));
+    await tester.pumpAndSettle();
+    expect(find.text('Próximamente'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('opcion-jefe')));
+    await tester.pumpAndSettle();
+    expect(find.text('¿Cómo preparas la partida?'), findsOneWidget);
   });
 }
