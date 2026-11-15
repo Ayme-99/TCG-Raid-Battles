@@ -7,6 +7,7 @@ import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
 import 'fin_partida.dart';
+import 'paneles.dart';
 import 'setup.dart';
 import 'turno_jefe.dart';
 import 'turno_jugadores.dart';
@@ -86,6 +87,7 @@ class PantallaPartida extends ConsumerWidget {
                   child: SafeArea(
                     child: _BarraFlotante(
                       texto: _banner(estado),
+                      textoCorto: textoCortoBanner(estado),
                       acciones: accionesHud,
                       onAbandonar: () => _abandonar(context, ref),
                     ),
@@ -100,6 +102,18 @@ class PantallaPartida extends ConsumerWidget {
               ),
             ),
     );
+  }
+
+  /// Versión corta del banner para pantallas estrechas: "R1 · J1", "R3 · Jefe".
+  @visibleForTesting
+  static String textoCortoBanner(EstadoPartida estado) {
+    final actual = estado.jugadorActual;
+    final turno = estado.fase == Fase.turnoJefe
+        ? 'Jefe'
+        : actual == null
+            ? 'Jugadores'
+            : etiquetaDueno(estado.jugadores[actual].nombre, actual);
+    return 'R${estado.ronda} · $turno';
   }
 
   String _banner(EstadoPartida estado) {
@@ -160,11 +174,15 @@ class PantallaPartida extends ConsumerWidget {
 class _BarraFlotante extends StatelessWidget {
   const _BarraFlotante({
     required this.texto,
+    required this.textoCorto,
     required this.acciones,
     required this.onAbandonar,
   });
 
   final String texto;
+
+  /// Lo que se muestra cuando la barra es estrecha y el texto largo no cabe.
+  final String textoCorto;
   final List<Widget> acciones;
   final VoidCallback onAbandonar;
 
@@ -185,7 +203,7 @@ class _BarraFlotante extends StatelessWidget {
                 border: Border.all(color: Colors.white, width: 2),
               ),
               child: Text(
-                texto,
+                MediaQuery.sizeOf(context).width < 600 ? textoCorto : texto,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
