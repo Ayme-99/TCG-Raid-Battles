@@ -7,7 +7,7 @@ La app lleva al jefe y a sus aliados (vida, curas, reducciones, monedas del band
 Diferencias con las cartas impresas a día de hoy (T-70):
 
 - **PS de los jefes**: como en las cartas (Onix 2300, Manectric 2600, Kingdra 3700 y Arceus 3800, T-71). La calibración de T-68 daba 2200 / 2700 / 3800 / 3900.
-- **Lote 1 (20 cartas, 15-nov-2026)**: contrastadas con las cartas impresas; coinciden salvo el texto de Lunatone, ya corregido. Faltan 8 por recibir (01, 05, 07, 09, 13, 15, 16, 20).
+- **Las 28 cartas están contrastadas con las impresas (15-nov-2026)**: coinciden con el catálogo salvo el texto de Fuerza Lunar de Lunatone, ya corregido.
 - **Bote (Magikarp)** y **Fuerza Lunar (Lunatone)**: la moneda la lanza el jugador y cae en la pantalla (T-71). Con Fijar Blanco en juego (la primera moneda de cada jugador es cruz) la lleva la mesa y la app pregunta el resultado.
 
 ## Onix — Nv1, Túnel Roca
