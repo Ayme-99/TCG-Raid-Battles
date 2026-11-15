@@ -7,6 +7,7 @@ import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'carta.dart';
+import 'fondo_animado.dart';
 import 'nueva_partida.dart';
 import 'pantalla_pokedex.dart';
 import 'setup.dart';
@@ -53,14 +54,13 @@ class PantallaInicio extends ConsumerWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            menuTitulo
+          FondoAnimado(
+            imagen: menuTitulo
                 ? 'assets/mapas/sala-origen.webp'
                 : 'assets/mapas/ruta-110.webp',
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const ColoredBox(color: _morado),
+            efecto: menuTitulo ? EfectoFondo.luz : EfectoFondo.tormenta,
+            velo: _morado.withValues(alpha: menuTitulo ? 0.35 : 0.45),
           ),
-          ColoredBox(color: _morado.withValues(alpha: menuTitulo ? 0.35 : 0.45)),
           SafeArea(
             child: LayoutBuilder(
               builder: (context, caja) => SingleChildScrollView(
