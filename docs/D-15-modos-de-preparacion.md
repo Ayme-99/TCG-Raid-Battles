@@ -40,7 +40,26 @@ Cada jugador compra un sobre Pokémon, lo abre, elige dos cartas y de ahí sale 
 - `ElegirJefe` solo exige que el nivel coincida con el del equipo en el modo `equipo`. En el modo `jefe` el nivel de la partida pasa a ser el del jefe (`EstadoPartida.nivel`).
 - `rangoXDelNivel(nivel)` y `desajusteDeEquipo(x, nivel)` (`reglas.dart`) dan el rango recomendado y si el equipo queda por debajo (-1), dentro (0) o por encima (1).
 
+## Simulador: equipos fuera del rango (2026-11-15, #246)
+
+`dart run bin/sim_jefes.dart --desajuste` mide cada jefe contra equipos de todos los niveles de X (40 equipos por nivel, 30 partidas por equipo; informe completo en `balance/informes/desajuste_2026-11-15.txt`). Victoria con la política «solo-dueno» (la más dura):
+
+| Jefe (nivel) | Equipo 3 niveles por debajo | 2 por debajo | 1 por debajo | En su nivel | 1 por encima | 2 por encima | 3 por encima |
+|---|---|---|---|---|---|---|---|
+| Onix (1) | | | | 61 % | 100 % | 100 % | 100 % |
+| Manectric (2) | | | 0 % | 63 % | 88 % | 98 % | |
+| Kingdra (3) | | 0 % | 7 % | 34 % | 69 % | | |
+| Arceus (4) | 0 % | 0 % | 3 % | 20 % | | | |
+
+Lo que enseña:
+
+- **Por debajo del rango, un solo nivel ya es casi imposible** (0–7 %). No hay un «un poco por debajo» útil: o el equipo está dentro, o no hay partida.
+- **Por encima, un nivel ya hace el jefe fácil** (69–100 %) y dos lo hacen trivial (98–100 %).
+- Con la ayuda entre jugadores los números son casi iguales (±5 puntos).
+
+Por tanto la distancia que importa es en **niveles de X**, no en puntos sueltos de daño. Propuesta para el aviso (pendiente de decidir): por debajo, «muy difícil» desde el primer nivel; por encima, «más fácil de lo previsto» a 1 nivel y «demasiado fácil» a 2 o más.
+
 ## Pendiente
 
-- Decidir si el aviso de desajuste distingue «un poco» de «mucho» fuera del rango.
+- Decidir los textos del aviso según la propuesta de arriba (hoy el aviso no distingue distancia).
 - Orden de trabajo: primero el simulador de efectos (D-14) y la recalibración de HP, y después este modo.
