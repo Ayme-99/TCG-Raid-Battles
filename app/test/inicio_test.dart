@@ -188,4 +188,22 @@ void main() {
     expect(c.read(modoPreparacionProvider), ModoPreparacion.jefe);
     expect(find.text('¿Contra qué jefe?'), findsOneWidget);
   });
+
+  testWidgets('pulsar la opción ya elegida equivale a Siguiente',
+      (tester) async {
+    await abrirInicio(tester);
+    await tester.tap(find.byKey(const Key('inicio-nueva')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('opcion-libre')));
+    await tester.pumpAndSettle();
+    expect(find.text('¿Con qué formato?'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('opcion-fisico')));
+    await tester.pumpAndSettle();
+    expect(find.text('¿Cómo preparas la partida?'), findsOneWidget);
+    // En el último paso, la opción elegida empieza la partida.
+    await tester.tap(find.byKey(const Key('opcion-danio')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('inicio')), findsNothing);
+    expect(find.text('Jugadores y su mejor ataque'), findsOneWidget);
+  });
 }

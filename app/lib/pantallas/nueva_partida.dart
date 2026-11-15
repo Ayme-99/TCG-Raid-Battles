@@ -348,6 +348,7 @@ List<Widget> _opciones(
   required bool horizontal,
   required ModoPreparacion modo,
   required ValueChanged<ModoPreparacion> alElegir,
+  required VoidCallback alSeguir,
 }) {
   switch (paso) {
     case 0:
@@ -359,6 +360,7 @@ List<Widget> _opciones(
           arte: _icono(Icons.sports_esports_rounded),
           seleccionada: true,
           horizontal: horizontal,
+          onTap: alSeguir,
         ),
         _Opcion(
           clave: 'opcion-campana',
@@ -378,6 +380,7 @@ List<Widget> _opciones(
           arte: _icono(Icons.style_rounded),
           seleccionada: true,
           horizontal: horizontal,
+          onTap: alSeguir,
         ),
         _Opcion(
           clave: 'opcion-digital',
@@ -399,7 +402,9 @@ List<Widget> _opciones(
               activo: modo == ModoPreparacion.jefe),
           seleccionada: modo == ModoPreparacion.jefe,
           horizontal: horizontal,
-          onTap: () => alElegir(ModoPreparacion.jefe),
+          onTap: modo == ModoPreparacion.jefe
+              ? alSeguir
+              : () => alElegir(ModoPreparacion.jefe),
         ),
         _Opcion(
           clave: 'opcion-danio',
@@ -408,7 +413,9 @@ List<Widget> _opciones(
           arte: const _FichasJugador(),
           seleccionada: modo == ModoPreparacion.equipo,
           horizontal: horizontal,
-          onTap: () => alElegir(ModoPreparacion.equipo),
+          onTap: modo == ModoPreparacion.equipo
+              ? alSeguir
+              : () => alElegir(ModoPreparacion.equipo),
         ),
       ];
   }
@@ -510,7 +517,8 @@ class _Asistente extends StatelessWidget {
                   for (final o in _opciones(paso,
                       horizontal: false,
                       modo: estado._modo,
-                      alElegir: estado._elegirModo)) ...[
+                      alElegir: estado._elegirModo,
+                      alSeguir: estado._siguiente)) ...[
                     o,
                     const SizedBox(height: 14),
                   ],
@@ -589,7 +597,8 @@ class _ConCarril extends StatelessWidget {
                         for (final o in _opciones(paso,
                             horizontal: true,
                             modo: estado._modo,
-                            alElegir: estado._elegirModo)) ...[
+                            alElegir: estado._elegirModo,
+                      alSeguir: estado._siguiente)) ...[
                           o,
                           const SizedBox(height: 18),
                         ],
