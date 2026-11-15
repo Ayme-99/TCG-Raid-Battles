@@ -1,0 +1,38 @@
+Incursiones · jefes contra equipos de otro nivel (D-15)
+equipos/nivel=40 partidas/equipo=30
+
+jefe        nivel  equipos de  X medio  dist.  política      victoria  vs. su nivel
+onix        1      1              357     0   solo-dueno     61.1 %    61.1 %
+onix        1      1              357     0   ayuda          66.6 %    66.6 %
+onix        1      2              563     1   solo-dueno    100.0 %    61.1 %
+onix        1      2              563     1   ayuda         100.0 %    66.6 %
+onix        1      3              737     2   solo-dueno    100.0 %    61.1 %
+onix        1      3              737     2   ayuda         100.0 %    66.6 %
+onix        1      4              894     3   solo-dueno    100.0 %    61.1 %
+onix        1      4              894     3   ayuda         100.0 %    66.6 %
+manectric   2      1              357    -1   solo-dueno      0.0 %    63.2 %
+manectric   2      1              357    -1   ayuda           0.2 %    66.9 %
+manectric   2      2              563     0   solo-dueno     63.2 %    63.2 %
+manectric   2      2              563     0   ayuda          66.9 %    66.9 %
+manectric   2      3              737     1   solo-dueno     87.8 %    63.2 %
+manectric   2      3              737     1   ayuda          91.2 %    66.9 %
+manectric   2      4              894     2   solo-dueno     98.2 %    63.2 %
+manectric   2      4              894     2   ayuda          98.9 %    66.9 %
+kingdra     3      1              357    -2   solo-dueno      0.0 %    33.8 %
+kingdra     3      1              357    -2   ayuda           0.0 %    33.7 %
+kingdra     3      2              563    -1   solo-dueno      6.6 %    33.8 %
+kingdra     3      2              563    -1   ayuda           7.1 %    33.7 %
+kingdra     3      3              737     0   solo-dueno     33.8 %    33.8 %
+kingdra     3      3              737     0   ayuda          33.7 %    33.7 %
+kingdra     3      4              894     1   solo-dueno     69.1 %    33.8 %
+kingdra     3      4              894     1   ayuda          70.1 %    33.7 %
+arceus      4      1              357    -3   solo-dueno      0.0 %    20.0 %
+arceus      4      1              357    -3   ayuda           0.0 %    19.6 %
+arceus      4      2              563    -2   solo-dueno      0.0 %    20.0 %
+arceus      4      2              563    -2   ayuda           0.1 %    19.6 %
+arceus      4      3              737    -1   solo-dueno      2.8 %    20.0 %
+arceus      4      3              737    -1   ayuda           3.3 %    19.6 %
+arceus      4      4              894     0   solo-dueno     20.0 %    20.0 %
+arceus      4      4              894     0   ayuda          19.6 %    19.6 %
+
+Informe guardado en /tmp/jefes_desajuste.csv
