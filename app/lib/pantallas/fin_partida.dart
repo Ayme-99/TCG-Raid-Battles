@@ -10,7 +10,7 @@ import 'comun.dart';
 import 'setup.dart';
 import 'inicio.dart';
 
-/// Fin de partida: resultado, puntos de cada jugador (D-10, D-12) y guardado
+/// Fin de partida: resultado, cómo ha ido cada jugador y guardado
 /// de los resultados en el servidor.
 class PantallaFinPartida extends ConsumerWidget {
   const PantallaFinPartida({super.key});
@@ -31,33 +31,23 @@ class PantallaFinPartida extends ConsumerWidget {
           style: Theme.of(context).textTheme.displaySmall,
         ),
         const SizedBox(height: 8),
+        // La partida libre no da puntos: solo se enseña cómo ha ido cada uno.
         if (puntos != null) ...[
           Text(
             'Jefe: nivel ${puntos.nivel} · daño neto ${puntos.danoTotal}',
-          ),
-          Text(
-            'Puntos del equipo: ${puntos.puntosTotal}',
-            key: const Key('puntos-equipo'),
-            style: Theme.of(context).textTheme.titleLarge,
+            key: const Key('resumen-jefe'),
           ),
           const SizedBox(height: 16),
           for (final j in puntos.jugadores)
             Card(
               child: ListTile(
-                key: Key('puntos-${j.asiento}'),
+                key: Key('jugador-${j.asiento}'),
                 leading: CircleAvatar(child: Text('${j.puesto}')),
                 title: Text(j.nombre),
                 subtitle: Text(
                   'Daño ${j.dano} · ${j.porcentaje}% · '
                   'Pokémon perdidos ${j.pokemonPerdidos} · '
                   'estados aplicados ${j.estadosAplicados}',
-                ),
-                trailing: Text(
-                  !j.abonado
-                      ? '${j.puntos} (invitado)'
-                      : j.bonoEstados > 0
-                          ? '${j.puntos} + ${j.bonoEstados}'
-                          : '${j.puntos}',
                 ),
               ),
             ),
@@ -107,7 +97,7 @@ class PantallaFinPartida extends ConsumerWidget {
           title: const Text('¿Empezar sin guardar?'),
           content: const Text(
             'Los resultados de esta partida no se han guardado y '
-            'los puntos se perderán.',
+            'los resultados se perderán.',
           ),
           actions: [
             TextButton(
@@ -156,8 +146,9 @@ class _GuardarResultados extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Inicia sesión con tu cuenta de Deck Tracker para guardar los '
-            'puntos. Los demás jugadores cuentan como invitados.',
+            'Inicia sesión con tu cuenta de Deck Tracker para guardar la '
+            'partida en tu historial. Los demás jugadores cuentan como '
+            'invitados.',
           ),
           const SizedBox(height: 8),
           FilledButton(
@@ -174,7 +165,7 @@ class _GuardarResultados extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Los puntos del jugador 1 se abonarán a ${sesion.username}. '
+            'La partida se guardará en el historial de ${sesion.username}. '
             'Después de guardar ya no se puede deshacer.',
           ),
           const SizedBox(height: 8),
@@ -199,7 +190,7 @@ class _GuardarResultados extends ConsumerWidget {
         texto = 'Guardada en este dispositivo y pendiente de enviar. '
             '${envios.mensaje ?? 'Enviando...'}';
       } else {
-        texto = 'Resultados guardados. Los puntos ya cuentan en tu cuenta.';
+        texto = 'Resultados guardados en tu historial.';
       }
       contenido = Text(texto, key: const Key('estado-envio'));
     }

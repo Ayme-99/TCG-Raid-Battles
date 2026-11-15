@@ -125,7 +125,7 @@ void main() {
     expect(find.byKey(const Key('turno-del-jefe')), findsOneWidget);
   });
 
-  testWidgets('victoria: el fin de partida muestra los puntos', (tester) async {
+  testWidgets('victoria: el fin de partida muestra el resultado sin puntos', (tester) async {
     final c = await abrir(tester);
     await prepararPartida(tester, hp: 100);
 
@@ -134,10 +134,11 @@ void main() {
 
     expect(c.read(estadoProvider).resultado, Resultado.victoria);
     expect(find.text('Victoria'), findsOneWidget);
-    // Nivel 1: 3000 puntos para el equipo.
-    expect(find.text('Puntos del equipo: 3000'), findsOneWidget);
-    expect(find.byKey(const Key('puntos-0')), findsOneWidget);
-    expect(find.byKey(const Key('puntos-1')), findsOneWidget);
+    // La partida libre no da puntos.
+    expect(find.textContaining('Puntos'), findsNothing);
+    expect(find.byKey(const Key('puntos-equipo')), findsNothing);
+    expect(find.byKey(const Key('jugador-0')), findsOneWidget);
+    expect(find.byKey(const Key('jugador-1')), findsOneWidget);
 
     // Sin guardar los resultados pide confirmación antes de descartarlos.
     await tocar(tester, 'nueva-partida');

@@ -4,6 +4,8 @@ Estado: **propuesta v2 para validar** (2026-11-05). Issue #10.
 
 ## 1. Lo que decidió Ayme
 
+- **La partida libre no da puntos** (2026-11-15). La app no los muestra ni habla de ellos en partida libre; el servidor y el motor siguen calculándolos y se usarán cuando exista la campaña. Lo guardado sirve para el historial y el Pokédex.
+
 - Los puntos **no son una puntuación competitiva**. Sirven para **desbloquear jefes nuevos**.
 - Cada partida genera unos puntos **para todo el equipo**, pero **no se reparten a partes iguales**: cada jugador recibe según lo que aportó en el combate (el daño que hizo).
 - **Solo cobran los jugadores con cuenta** en la aplicación. Un invitado no cobra, y su parte **se pierde** (no se reparte a los demás). Si la partida se juega en modo invitado, solo el host recibe la parte que le toca.
