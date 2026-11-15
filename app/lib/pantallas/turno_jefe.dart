@@ -151,9 +151,6 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
     // El panel del ataque solo lleva el ataque; lo demás va en «Más acciones».
     final extras = <Widget>[
       const PanelEfectosActivos(),
-        const PanelEstados(),
-        const PanelPokemon(),
-        const PanelDanoDeEfecto(),
     ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).

@@ -3,101 +3,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
+import 'acciones_objetivo.dart';
 import 'carta.dart';
 import 'comun.dart';
 import 'estilo.dart';
 
-/// Pokémon que le quedan a cada jugador y botón para anotar un KO.
-class PanelPokemon extends ConsumerWidget {
-  const PanelPokemon({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final estado = ref.watch(estadoProvider);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Pokémon de los jugadores',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            for (final j in estado.jugadores)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        j.eliminado
-                            ? '${j.nombre} · eliminado'
-                            : '${j.nombre} · ${j.pokemonVivos}/${j.pokemonTotal}',
-                        key: Key('pokemon-${j.asiento}'),
-                      ),
-                    ),
-                    OutlinedButton(
-                      key: Key('ko-${j.asiento}'),
-                      onPressed: j.eliminado
-                          ? null
-                          : () => registrar(context, ref, PokemonKo(j.asiento)),
-                      child: const Text('Pokémon KO'),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 /// Daño que un efecto hace al jefe o a un aliado (rebote, T-59). Al jefe se
-/// atribuye al jugador que recibió el ataque; a un aliado, a nadie.
-class PanelDanoDeEfecto extends ConsumerWidget {
-  const PanelDanoDeEfecto({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Daño por efecto',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Rebote u otro efecto que daña al jefe o a un aliado.',
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton(
-              key: const Key('dano-efecto'),
-              onPressed: () async {
-                final evento = await showDialog<DanoDeEfecto>(
-                  context: context,
-                  builder: (_) => const _DialogoDanoDeEfecto(),
-                );
-                if (evento == null || !context.mounted) return;
-                registrar(context, ref, evento);
-              },
-              child: const Text('Registrar daño por efecto'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+/// atribuye al jugador que recibió el ataque; a un aliado, a nadie. Si se
+/// abre desde un aliado, viene ya elegido ([slotInicial]).
+Future<void> registrarDanoDeEfecto(
+  BuildContext context,
+  WidgetRef ref, {
+  int? slotInicial,
+}) async {
+  final evento = await showDialog<DanoDeEfecto>(
+    context: context,
+    builder: (_) => _DialogoDanoDeEfecto(slotInicial: slotInicial),
+  );
+  if (evento == null || !context.mounted) return;
+  registrar(context, ref, evento);
 }
 
 class _DialogoDanoDeEfecto extends ConsumerStatefulWidget {
-  const _DialogoDanoDeEfecto();
+  const _DialogoDanoDeEfecto({this.slotInicial});
+
+  final int? slotInicial;
 
   @override
   ConsumerState<_DialogoDanoDeEfecto> createState() =>
@@ -108,7 +38,7 @@ class _DialogoDanoDeEfectoState extends ConsumerState<_DialogoDanoDeEfecto> {
   final _puntos = TextEditingController();
 
   /// Slot del aliado dañado; `null` si el daño va al jefe.
-  int? _slot;
+  late int? _slot = widget.slotInicial;
 
   /// Jugador al que se atribuye el daño al jefe.
   int? _jugador;
@@ -337,6 +267,21 @@ class _CartaAliado extends StatelessWidget {
           '${a.hp}/${a.hpMaximo} HP',
           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
         ),
+        if (a.envenenado || a.quemado)
+          Text(
+            [if (a.envenenado) 'Envenenado', if (a.quemado) 'Quemado'].join(' · '),
+            key: Key('estados-aliado-${a.slot}'),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+          ),
+        const SizedBox(height: 4),
+        Consumer(
+          builder: (context, ref, _) => BotonMenu(
+            key: Key('menu-aliado-${a.slot}'),
+            etiqueta: 'Acciones de ${a.nombre}',
+            tamano: 32,
+            onPressed: () => menuAliado(context, ref, a.slot),
+          ),
+        ),
       ],
     );
   }
@@ -430,115 +375,6 @@ class PanelEfectosActivos extends ConsumerWidget {
                 '${estado.jugadores[f.jugador].nombre} ${_que(f.tipo)} '
                 '(${f.restantes} ${f.restantes == 1 ? 'turno' : 'turnos'})',
               ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Aplicar veneno o quemadura al jefe (D-12). Solo cuenta para el bono si el
-/// jefe no tenía ya el estado; eso lo decide el motor.
-class PanelEstados extends ConsumerStatefulWidget {
-  const PanelEstados({super.key, this.jugadorInicial});
-
-  /// Jugador preseleccionado (el que está jugando su turno).
-  final int? jugadorInicial;
-
-  @override
-  ConsumerState<PanelEstados> createState() => _PanelEstadosState();
-}
-
-class _PanelEstadosState extends ConsumerState<PanelEstados> {
-  int? _jugador;
-
-  /// Slot del aliado al que se aplica el estado; null = el jefe.
-  int? _slot;
-
-  @override
-  Widget build(BuildContext context) {
-    final estado = ref.watch(estadoProvider);
-    final activos = jugadoresActivos(estado);
-    if (_slot != null && estado.aliadoEn(_slot!) == null) _slot = null;
-    var elegido = _jugador ?? widget.jugadorInicial;
-    if (elegido == null || !activos.contains(elegido)) {
-      elegido = activos.isEmpty ? null : activos.first;
-    }
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Estados',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            if (estado.aliados.isNotEmpty) ...[
-              const Text('¿A quién se le aplica?'),
-              Wrap(
-                spacing: 8,
-                children: [
-                  ChoiceChip(
-                    key: const Key('estado-objetivo-jefe'),
-                    label: const Text('Jefe'),
-                    selected: _slot == null,
-                    onSelected: (_) => setState(() => _slot = null),
-                  ),
-                  for (final a in estado.aliados)
-                    ChoiceChip(
-                      key: Key('estado-objetivo-${a.slot}'),
-                      label: Text('Aliado ${a.slot + 1}'),
-                      selected: _slot == a.slot,
-                      onSelected: (_) => setState(() => _slot = a.slot),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-            ],
-            const Text('¿Qué jugador ha aplicado el estado?'),
-            Wrap(
-              spacing: 8,
-              children: [
-                for (final a in activos)
-                  ChoiceChip(
-                    key: Key('estado-jugador-$a'),
-                    label: Text(estado.jugadores[a].nombre),
-                    selected: elegido == a,
-                    onSelected: (_) => setState(() => _jugador = a),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: [
-                for (final e in EstadoDelJefe.values)
-                  FilledButton.tonal(
-                    key: Key('estado-${e.name}'),
-                    onPressed: elegido == null
-                        ? null
-                        : () => registrar(
-                              context,
-                              ref,
-                              _slot == null
-                                  ? AplicarEstadoJefe(
-                                      jugador: elegido!, estado: e)
-                                  : AplicarEstadoAliado(
-                                      jugador: elegido!,
-                                      slot: _slot!,
-                                      estado: e,
-                                    ),
-                            ),
-                    child: Text(
-                      e == EstadoDelJefe.veneno
-                          ? 'Envenenar'
-                          : 'Quemar',
-                    ),
-                  ),
-              ],
-            ),
           ],
         ),
       ),

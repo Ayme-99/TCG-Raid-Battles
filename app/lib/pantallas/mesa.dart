@@ -6,6 +6,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
 import '../partida/tirada_mesa.dart';
+import 'acciones_objetivo.dart';
 import 'dados_en_mesa.dart';
 import 'estilo.dart';
 import 'mapa.dart';
@@ -162,7 +163,6 @@ class DisposicionMesa extends ConsumerStatefulWidget {
 
 class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
   bool _abierto = true;
-  bool _extrasAbierto = false;
   bool _resolviendo = false;
 
   void _alternar() => setState(() => _abierto = !_abierto);
@@ -231,26 +231,9 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
               const Positioned.fill(child: MesaConCamara()),
               if (widget.extras.isNotEmpty)
                 Positioned(
-                  key: const Key('panel-extras'),
-                  // Con el panel del ataque a la derecha, lo demás va a la
-                  // izquierda.
-                  left: widget.lateral && activo == null ? margen : null,
-                  right: widget.lateral && activo == null ? null : margen,
+                  left: margen,
                   top: 72,
-                  bottom: alto * alturaJugadores + 4,
-                  width: 300,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: PanelAcciones(
-                      titulo: 'Más acciones',
-                      prefijoClave: 'panel-extras-interno',
-                      controles: widget.extras,
-                      abierto: _extrasAbierto,
-                      onAlternar: () =>
-                          setState(() => _extrasAbierto = !_extrasAbierto),
-                      ajustar: true,
-                    ),
-                  ),
+                  child: _BotonInfo(extras: widget.extras),
                 ),
               if (widget.lateral && activo == null)
                 Positioned(
@@ -346,6 +329,37 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
 }
 
 /// Pico del bocadillo: un triángulo con el mismo borde blanco que el panel.
+/// Botón que abre lo secundario de la ronda (orden de los jugadores y efectos
+/// activos) en un cuadro, para no tapar la mesa.
+class _BotonInfo extends StatelessWidget {
+  const _BotonInfo({required this.extras});
+
+  final List<Widget> extras;
+
+  @override
+  Widget build(BuildContext context) {
+    return BotonMenu(
+      key: const Key('info-ronda'),
+      etiqueta: 'Orden de la ronda y efectos activos',
+      tamano: 44,
+      onPressed: () => showDialog<void>(
+        context: context,
+        builder: (dialogo) => Dialog(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: ListView(
+              key: const Key('panel-info-ronda'),
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(12),
+              children: extras,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _PicoPainter extends CustomPainter {
   const _PicoPainter();
 
@@ -707,6 +721,15 @@ class _Asiento extends StatelessWidget {
                   ],
                 ),
               ],
+            ),
+            const SizedBox(width: 10),
+            Consumer(
+              builder: (context, ref, _) => BotonMenu(
+                key: Key('menu-jugador-${jugador.asiento}'),
+                etiqueta: 'Acciones de ${jugador.nombre}',
+                tamano: 40,
+                onPressed: () => menuJugador(context, ref, jugador.asiento),
+              ),
             ),
           ],
         ),
