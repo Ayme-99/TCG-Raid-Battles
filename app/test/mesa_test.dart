@@ -45,6 +45,53 @@ Future<void> empezar(WidgetTester tester) async {
 }
 
 void main() {
+  group('izquierdaBocadillo', () {
+    const panel = DisposicionMesa.anchoPanel;
+
+    test('con 2 jugadores queda centrado en su asiento', () {
+      final izq = izquierdaBocadillo(
+        ancho: 1915,
+        alto: 910,
+        jugadores: 2,
+        centro: 1915 * 0.25,
+      );
+      expect(izq + panel / 2, closeTo(1915 * 0.25, 1));
+    });
+
+    test('con 4 jugadores el asiento 2 no tapa al jefe (#217)', () {
+      const ancho = 1915.0;
+      final izq = izquierdaBocadillo(
+        ancho: ancho,
+        alto: 910,
+        jugadores: 4,
+        centro: ancho * 1.5 / 4,
+      );
+      // El cuadro del jefe mide unos 330 px y está centrado.
+      expect(izq + panel, lessThanOrEqualTo(ancho / 2 - 330 / 2));
+    });
+
+    test('el asiento de la derecha se aparta hacia la derecha', () {
+      const ancho = 1915.0;
+      final izq = izquierdaBocadillo(
+        ancho: ancho,
+        alto: 910,
+        jugadores: 4,
+        centro: ancho * 2.5 / 4,
+      );
+      expect(izq, greaterThanOrEqualTo(ancho / 2 + 330 / 2));
+    });
+
+    test('sin sitio a un lado se queda donde estaba', () {
+      final izq = izquierdaBocadillo(
+        ancho: 1100,
+        alto: 900,
+        jugadores: 3,
+        centro: 550,
+      );
+      expect(izq, greaterThanOrEqualTo(12));
+    });
+  });
+
   group('Camara', () {
     test('la vista general no mueve ni acerca', () {
       final c = Camara.de(const FocoGeneral(), 4);
