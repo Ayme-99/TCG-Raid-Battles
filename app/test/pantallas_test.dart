@@ -317,7 +317,7 @@ void main() {
     expect(estado.ronda, 2);
   });
 
-  testWidgets('abandonar termina la partida en derrota', (tester) async {
+  testWidgets('rendirse termina la partida en derrota', (tester) async {
     final c = await abrir(tester);
     await prepararPartida(tester, hp: 500);
     await tocar(tester, 'abandonar');
@@ -325,6 +325,44 @@ void main() {
 
     expect(c.read(estadoProvider).resultado, Resultado.derrota);
     expect(find.text('Derrota'), findsOneWidget);
+  });
+
+  testWidgets('salir vuelve al inicio y la partida se puede continuar (#235)',
+      (tester) async {
+    final c = await abrir(tester);
+    await prepararPartida(tester, hp: 500);
+    final eventos = c.read(partidaProvider).partida.eventos.length;
+
+    await tocar(tester, 'abandonar');
+    await tocar(tester, 'abandonar-salir');
+
+    // Se ve el inicio y la partida sigue como estaba, sin terminar.
+    expect(find.byKey(const Key('inicio')), findsOneWidget);
+    expect(c.read(estadoProvider).terminada, isFalse);
+    expect(c.read(partidaProvider).partida.eventos.length, eventos);
+
+    await tocar(tester, 'inicio-continuar');
+    expect(find.byKey(const Key('inicio')), findsNothing);
+    expect(find.byKey(const Key('mesa')), findsOneWidget);
+  });
+
+  testWidgets('seguir jugando no cambia nada', (tester) async {
+    final c = await abrir(tester);
+    await prepararPartida(tester, hp: 500);
+    await tocar(tester, 'abandonar');
+    await tester.tap(find.text('Seguir jugando'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('inicio')), findsNothing);
+    expect(c.read(estadoProvider).terminada, isFalse);
+  });
+
+  testWidgets('en el setup se puede volver al inicio', (tester) async {
+    await abrir(tester);
+    await tocar(tester, 'inicio-volver');
+    expect(find.byKey(const Key('inicio')), findsOneWidget);
+    // Sin eventos no hay nada que continuar.
+    expect(find.byKey(const Key('inicio-continuar')), findsNothing);
   });
 
   group('guardar los resultados', () {
