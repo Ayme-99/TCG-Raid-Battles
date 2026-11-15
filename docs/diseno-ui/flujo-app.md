@@ -10,19 +10,32 @@ Abrir app
    ├─ Iniciar / Continuar partida
    │  └─ Modo de juego
    │     ├─ Partida libre
-   │     │  ├─ Formato físico
+   │     │  ├─ Formato físico (siempre offline, sin puntos)
    │     │  │  ├─ Elegir jefe → la app recomienda el daño total del equipo → daño por jugador
    │     │  │  └─ Insertar daño por jugador → lista de jefes de ese nivel
-   │     │  └─ Formato digital: TODO
-   │     └─ Modo campaña: TODO
+   │     │  └─ Formato digital (solo online, da puntos): TODO
+   │     └─ Modo campaña (formato digital, individual): TODO
    ├─ Pokédex
-   │  ├─ Jefes y aliados enfrentados, por expansión
-   │  └─ Cartas obtenidas (cuando haya campaña y formato digital): TODO
+   │  ├─ Enemigos: jefes y aliados enfrentados, por expansión
+   │  └─ Mis cartas (cuando haya campaña y formato digital): TODO
+   ├─ Tienda (sobres, con los puntos de la partida libre digital): TODO
    └─ Iniciar sesión
       ├─ Perfil
       ├─ Historial (partidas libres)
       └─ Amigos
 ```
+
+## 1 bis. Formatos y puntos (decidido el 2026-11-15)
+
+| | Formato físico | Formato digital |
+|---|---|---|
+| **Partida libre** | **Siempre offline.** El host pone los nombres de los jugadores. **No da puntos.** | **Solo online.** Cada jugador usa las cartas que tiene desbloqueadas. **Da puntos** (la moneda del juego). |
+| **Modo campaña** | No existe | **Individual.** Es donde se consiguen las cartas que luego se usan en la partida libre digital. |
+
+- Los **puntos** son la moneda del juego: sirven para comprar **sobres** en una **tienda** (nueva, en la pantalla de inicio) y así ampliar la Pokédex.
+- El **servidor** decide si una partida da puntos por su **formato** (`fisico` no, `digital` sí), que viaja en el registro (contrato v13).
+- **Jugador 1** (el host) empieza siempre con su **nickname** si ha iniciado sesión, y se puede cambiar antes de entrar en la partida. Sin sesión se queda «Jugador 1».
+- El formato digital aún no existe: no se diseña hasta que lo pidamos.
 
 ## 2. Pantalla de inicio
 
@@ -30,7 +43,7 @@ Abrir app
 - Accesos a **Pokédex** y a **Cuenta** (iniciar sesión o, con sesión, perfil, historial y amigos).
 - La sesión nunca es obligatoria: sin ella se juega igual y los demás jugadores cuentan como invitados.
 
-## 3. Preparación de una partida libre en formato físico
+## 3. Preparación de una partida libre en formato físico (offline)
 
 Dos caminos, que son los modos de preparación de D-15:
 
@@ -50,7 +63,7 @@ Deshacer y rehacer, cuenta y envíos siguen en la barra flotante. **Abandonar** 
 
 ## 5. Fin de partida
 
-Resultado, puntos y guardado de resultados (como hoy), con tres salidas:
+Resultado, cómo ha ido cada jugador y guardado de resultados. **El formato físico no da puntos**, así que no se enseñan. Tres salidas:
 
 - **Revancha:** mismos jugadores y equipo; vuelve al paso de elegir jefe de la misma vía.
 - **Nueva partida:** vuelve a la elección de modo.
@@ -60,9 +73,12 @@ Si los resultados no se han guardado, cualquiera de las salidas pide confirmar a
 
 ## 6. Pokédex
 
+Tiene **dos categorías**: **Mis cartas** y **Enemigos**. Por ahora solo existe **Enemigos**.
+
+- **Enemigos:** jefes y aliados enfrentados, agrupados por expansión (de salida solo hay una).
+- **Mis cartas:** las cartas conseguidas en la campaña y los sobres (formato digital). **TODO.**
 - Se guarda **en el dispositivo** y funciona sin sesión.
 - Al **iniciar sesión se sincroniza** con la cuenta y se actualiza.
-- Registra jefes y aliados enfrentados, agrupados por expansión (de salida solo hay una).
 
 ## 7. Cuenta
 
@@ -70,7 +86,7 @@ Perfil, historial (partidas libres) y amigos exigen sesión y servidor. Hoy el s
 
 ## 8. Fuera de alcance por ahora
 
-Formato digital, modo campaña, cartas obtenidas, partida multi-dispositivo (#158) y modo por sobres.
+Formato digital (campaña individual y partida libre online), tienda de sobres, «Mis cartas», partida multi-dispositivo (#158, necesaria para la partida libre digital) y modo por sobres.
 
 ## 9. Tareas derivadas
 
