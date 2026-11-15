@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
+import '../cuenta/controlador_sesion.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
 
@@ -106,10 +107,22 @@ class _FilaJugador {
 }
 
 class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
-  final List<_FilaJugador> _filas = [
-    _FilaJugador('Jugador 1'),
-    _FilaJugador('Jugador 2'),
-  ];
+  late final List<_FilaJugador> _filas;
+
+  /// Si el host ha cambiado a mano el nombre del jugador 1, la sesión ya no se
+  /// lo pisa.
+  bool _nombreEditado = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // El jugador 1 es el host: empieza con su nickname si ha iniciado sesión.
+    final nick = ref.read(sesionActualProvider)?.username;
+    _filas = [
+      _FilaJugador(nick ?? 'Jugador 1'),
+      _FilaJugador('Jugador 2'),
+    ];
+  }
 
   @override
   void dispose() {
@@ -165,6 +178,13 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
 
   @override
   Widget build(BuildContext context) {
+    // La sesión se lee de forma asíncrona: si llega con la pantalla abierta, el
+    // nickname entra solo mientras el host no haya escrito otro nombre.
+    ref.listen(sesionActualProvider, (_, sesion) {
+      if (!_nombreEditado) {
+        _filas[0].nombre.text = sesion?.username ?? 'Jugador 1';
+      }
+    });
     final jefe = ref.watch(jefePreelegidoProvider);
     final aviso = jefe == null || _x == 0 ? null : avisoDesajuste(_x, jefe.nivel);
     return ListView(
@@ -211,6 +231,7 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
                   child: TextField(
                     key: Key('nombre-$i'),
                     controller: _filas[i].nombre,
+                    onChanged: i == 0 ? (_) => _nombreEditado = true : null,
                     decoration: const InputDecoration(
                       labelText: 'Nombre',
                       border: OutlineInputBorder(),
