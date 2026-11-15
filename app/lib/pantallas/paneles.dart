@@ -152,7 +152,7 @@ class SlotAliado extends ConsumerWidget {
     if (aliado != null) {
       return _CartaAliado(
         aliado: aliado,
-        dueno: estado.jugadores[slot].nombre,
+        dueno: etiquetaDueno(estado.jugadores[slot].nombre, slot),
       );
     }
     final color = coloresAsiento[slot % coloresAsiento.length];
@@ -230,6 +230,15 @@ class _BordePunteado extends CustomPainter {
 
   @override
   bool shouldRepaint(_BordePunteado old) => old.color != color;
+}
+
+/// Etiqueta corta del dueño de un aliado: la inicial de su nombre y su asiento
+/// ("Jugador 1" → "J1", "Antonio" en el asiento 2 → "A2"). El número evita que
+/// dos jugadores con la misma inicial se confundan.
+String etiquetaDueno(String nombre, int slot) {
+  final limpio = nombre.trim();
+  final inicial = limpio.isEmpty ? '?' : limpio.substring(0, 1).toUpperCase();
+  return '$inicial${slot + 1}';
 }
 
 /// Un aliado: su carta y debajo su dueño y su vida.
