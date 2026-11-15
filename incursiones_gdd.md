@@ -1,6 +1,6 @@
 # Incursiones — Game Design Document
 
-**Versión:** 1.18 (especificación del motor)
+**Versión:** 1.19 (especificación del motor)
 **Formato base:** Pokémon TCG — Raid Battle cooperativo, con soporte virtual como "Game Master"
 **Jugadores:** 1-4 (pensado para 3-4), cooperativo, físico (cartas y contadores en mesa) + asistente virtual para cálculos y registro
 
@@ -36,7 +36,7 @@ Orden (detalle en `docs/D-01-setup.md`):
 | **Jefe** | Elegido a mano o al azar dentro del nivel. Es una **carta fija** del catálogo: tiene su propio HP y sus propios ataques; no se escala con los jugadores. El asistente conoce el HP y el daño de cada ataque y computa solo los efectos «de programa» (D-14: autodaño, daño por ataques previos del turno, daño a los aliados); el resto lo aplican los jugadores en la mesa. **Criterio de nivel**: Nv1 Pokémon Básicos, Nv2 Pokémon de Fase 1 que no evolucionan más, Nv3 Pokémon de Fase 2, Nv4 Pokémon Míticos y Legendarios. Lanzamiento: 4 jefes, uno por nivel (Onix Nv1, Manectric Nv2, Kingdra Nv3, Arceus Nv4), todos disponibles desde el principio; el catálogo crecerá con más jefes. |
 | **HP del jefe** | El de su carta. HP de los jefes del catálogo, calibrados con el simulador (con sus 6 aliados, D-16) para un objetivo de victoria de 75 / 50 / 30 / 15 %: **Onix 2300 / Manectric 2600 / Kingdra 3700 / Arceus 3800** en Nv1 / Nv2 / Nv3 / Nv4 (T-71: son los PS de las cartas; la calibración de T-68 daba 2200 / 2700 / 3800 / 3900). La referencia anterior sin aliados (2382 / 4313 / 4411 / 5205) sigue en `balance/tablas/niveles.csv`. Cada jefe debe cumplir la regla de poder de `docs/D-03-sistema-de-poder.md`. |
 | Ataques del jefe por nivel | Nv1 30/60/120 · Nv2 40/80/160 · Nv3 60/100/200 · Nv4 80/120/240. Los ataques salen de la baraja de ataques del jefe («Ataque X contra jugador Y», como el juego oficial), que también fija el máximo de ataques por turno. |
-| Menos de 4 jugadores | El nivel se autoajusta con X, y los slots de aliados bajan con el número de jugadores (§4.4). **Con 3 jugadores, cada uno usa 3 Pokémon (1 Activo + 2 en Banca; 9 en mesa)** y los PS del jefe no cambian: la partida resulta algo más fácil que con 4 (86,7 / 75,8 / 51,3 / 28,2 % frente a un objetivo de 75 / 50 / 30 / 15 %; informe `calibrar_2026-11-14c.txt`). Con 2 y con 1 jugador la regla sigue sin decidir (2 Pokémon por jugador mientras tanto) (propuesta: 4 y 5 o 6 Pokémon cada uno). |
+| Menos de 4 jugadores | El nivel se autoajusta con X, y los slots de aliados bajan con el número de jugadores (§4.4). **Con 3 jugadores, cada uno usa 3 Pokémon (1 Activo + 2 en Banca; 9 en mesa)** y los PS del jefe no cambian: la partida resulta algo más fácil que con 4 (86,7 / 75,8 / 51,3 / 28,2 % frente a un objetivo de 75 / 50 / 30 / 15 %; informe `calibrar_2026-11-14c.txt`). **Con 2 jugadores, cada uno usa 4 Pokémon (1 Activo + 3 en Banca; 8 en mesa)** y los PS no cambian: Onix sale al 68 % y Manectric al 10 % (informe `calibrar_2026-11-14c.txt`), y se acepta que Manectric sea muy duro a 2 jugadores. **Con 1 jugador no hay modo oficial** (mínimo 2 jugadores): solo existe Onix y ni con 6 Pokémon pasa del 0 %; queda como práctica sin objetivo de victoria (decidido el 2026-11-15, #192; implementación en #207). |
 
 ---
 
@@ -208,7 +208,7 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | Efectos de las cartas de ánimo (curas, +50) | No están en el simulador: la partida real será algo más fácil que lo calibrado |
 | Topes y costes de puntos (3000 / 6000 / 9000 / 15000; 10 000 a 40 000) | Calibrados para desbloquear en ≈ 17 / 22 / 29 / 36 partidas con un grupo de 4 |
 | Invocación de aliados (umbral de HP, probabilidad y aliados por jefe; vida, daño y efectos de cada aliado y de cada categoría) | Todo propuesta sin calibrar; los aliados aún no están en el simulador |
-| Jugar con 1-2 jugadores | Más difícil; se acepta |
+| Jugar con 2 jugadores (4 Pokémon cada uno, PS sin cambios) | Manectric al 10 %: se acepta que sea muy duro. Con 1 jugador no hay modo oficial |
 
 ---
 
@@ -283,3 +283,4 @@ Detalle en `docs/D-11-identidad-jugadores.md`.
 | v1.16 | El jugador con un Pokémon KO se sienta su turno (solo roba carta de ánimo, fuera de la app) y los ataques del jefe o de un aliado contra él fallan (T-72). Daño por efectos (T-59, contrato v8): un rebote («si el Defensor queda KO, el jefe se hace N de daño») se atribuye al jugador que recibió el ataque, cuenta para su daño y puede dar la victoria; un efecto también puede dañar a un aliado, que sale de la mesa a 0 HP. |
 | v1.17 | Con 3 jugadores, cada uno usa 3 Pokémon (9 en mesa) y los PS de los jefes no cambian; se acepta que sea algo más fácil que con 4 jugadores. Las cartas de ánimo (D-05) quedan fijadas en las 5 oficiales y el simulador las modela (#189). Motor, contrato v9 y app lo implementan (#194). |
 | v1.18 | Los aliados pueden quedar Envenenados o Quemados (D-17). Motor, contrato v10 y app lo implementan (#196). |
+| v1.19 | Con 2 jugadores, cada uno usa 4 Pokémon (8 en mesa) y los PS no cambian; con 1 jugador no hay modo oficial (mínimo 2) (#192). Motor, contrato y app lo implementarán en #207. |
