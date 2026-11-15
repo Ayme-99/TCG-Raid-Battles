@@ -7,7 +7,7 @@ La app lleva al jefe y a sus aliados (vida, curas, reducciones, monedas del band
 Diferencias con las cartas impresas a día de hoy (T-70):
 
 - **PS de los jefes**: como en las cartas (Onix 2300, Manectric 2600, Kingdra 3700 y Arceus 3800, T-71). La calibración de T-68 daba 2200 / 2700 / 3800 / 3900.
-- **Lunatone (28/28)**: está en el catálogo con el texto de la versión anterior; falta contrastarlo con su carta del set.
+- **Lote 1 (20 cartas, 15-nov-2026)**: contrastadas con las cartas impresas; coinciden salvo el texto de Lunatone, ya corregido. Faltan 8 por recibir (01, 05, 07, 09, 13, 15, 16, 20).
 - **Bote (Magikarp)** y **Fuerza Lunar (Lunatone)**: la moneda la lanza el jugador y cae en la pantalla (T-71). Con Fijar Blanco en juego (la primera moneda de cada jugador es cruz) la lleva la mesa y la app pregunta el resultado.
 
 ## Onix — Nv1, Túnel Roca
@@ -56,7 +56,7 @@ Diferencias con las cartas impresas a día de hoy (T-70):
 | 25 | Chingling (Curandero) | 50 | — | **Deseo**: Cuando este Pokémon entra en juego, lanza 10 monedas. Cura 100 puntos de daño al jefe por cada cara. Luego, cada aliado y cada Pokémon de los jugadores lanza 1 moneda: si sale cara, cura 100 puntos de daño a ese Pokémon. | Tira las 10 monedas del jefe y una por aliado, y cura. | Una moneda por cada Pokémon de los jugadores: con cara, cura 100. |
 | 26 | Nosepass (Control) | 60 | — | **Fijar Blanco**: Cuando este Pokémon entra en juego, la primera moneda que lance cada jugador a partir de ese momento es cruz. Aunque este Pokémon quede Fuera de Combate, el efecto sigue aplicado. | Lo avisa al entrar y lo sigue recordando el resto de la partida (en el turno de cada jugador y cuando pide una moneda). | La primera moneda de cada jugador es cruz. |
 | 27 | Solrock (Potenciador) | 70 | **Envite Ígneo** 10+: Este ataque hace 10 puntos de daño más por cada vez que este Pokémon lo haya usado. Cada vez que lo usa, este Pokémon gana 10 HP máximos. | — | Sube 10 el daño y 10 los PS de Solrock en cada uso. | El daño al Pokémon. |
-| 28 | Lunatone (Debilitador) | 80 | **Fuerza Lunar** 10: El rival lanza una moneda: si sale cruz, el siguiente ataque de ese Pokémon hace 30 puntos de daño menos. | — | Lanza en la pantalla la moneda del rival; con cruz, resta 30 a su siguiente ataque. | — |
+| 28 | Lunatone (Debilitador) | 80 | **Fuerza Lunar** 10: El jugador objetivo lanza 1 moneda. Si sale cruz, el siguiente ataque del Pokémon Defensor hace 30 puntos de daño menos. | — | Lanza en la pantalla la moneda del jugador objetivo; con cruz, resta 30 a su siguiente ataque. | — |
 
 ## Cuándo salen los avisos
 

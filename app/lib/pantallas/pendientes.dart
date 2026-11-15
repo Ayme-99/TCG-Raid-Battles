@@ -284,7 +284,7 @@ Future<void> atacarConAliado(
         ref,
         titulo: '${aliado.nombre}: ${aliado.ataqueNombre}',
         detalle: '$rivalNombre lanza 1 moneda. Con cruz, el siguiente ataque '
-            'de ese Pokémon hace 30 puntos de daño menos.',
+            'del Pokémon Defensor hace 30 puntos de daño menos.',
       );
     } else {
       monedaRival = await preguntarMesa(

@@ -100,7 +100,7 @@ Efectos de los ataques del jefe (D-14):
 | Cura | Chingling | 50 | — | **Deseo**: Cuando este Pokémon entra en juego, lanza 10 monedas. Cura 100 puntos de daño al jefe por cada cara. Luego, cada aliado y cada Pokémon de los jugadores lanza 1 moneda: si sale cara, cura 100 puntos de daño a ese Pokémon. |
 | Control | Nosepass | 60 | — | **Fijar Blanco**: Cuando este Pokémon entra en juego, la primera moneda que lance cada jugador a partir de ese momento es cruz. Aunque este Pokémon quede Fuera de Combate, el efecto sigue aplicado. |
 | Potenciador | Solrock | 70 | **Envite Ígneo** 10+: Este ataque hace 10 puntos de daño más por cada vez que este Pokémon lo haya usado. Cada vez que lo usa, este Pokémon gana 10 HP máximos. | — |
-| Debilitador | Lunatone | 80 | **Fuerza Lunar** 10: El rival lanza una moneda: si sale cruz, el siguiente ataque de ese Pokémon hace 30 puntos de daño menos. | — |
+| Debilitador | Lunatone | 80 | **Fuerza Lunar** 10: El jugador objetivo lanza 1 moneda. Si sale cruz, el siguiente ataque del Pokémon Defensor hace 30 puntos de daño menos. | — |
 
 Si el mazo sugerido da una partida claramente demasiado fácil o difícil, no lo ajustes sobre la marcha: anótalo y cambia una sola cosa en la partida siguiente.
 

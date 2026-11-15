@@ -103,7 +103,7 @@
           "nombre": "Fuerza Lunar",
           "dano": 10,
           "monedaRival": true,
-          "texto": "El rival lanza una moneda: si sale cruz, el siguiente ataque de ese Pokémon hace 30 puntos de daño menos."
+          "texto": "El jugador objetivo lanza 1 moneda. Si sale cruz, el siguiente ataque del Pokémon Defensor hace 30 puntos de daño menos."
         },
         "efectos": "programa",
         "scriptId": "fuerza-lunar-30"
