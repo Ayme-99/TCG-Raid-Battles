@@ -295,8 +295,12 @@ class EstadoPartida {
   /// Suma del mejor ataque de cada jugador (0 hasta configurar la partida).
   final int x;
 
-  /// Nivel del jefe (0 hasta configurar la partida).
+  /// Nivel del jefe (0 hasta configurar la partida). En el modo `jefe` es el
+  /// del jefe elegido, así que hasta elegirlo vale lo que daría el equipo.
   final int nivel;
+
+  /// Modo de preparación (D-15).
+  final ModoPreparacion modo;
   final JefeEstado? jefe;
 
   /// Ronda actual, empezando en 1 (0 antes de empezar).
@@ -368,6 +372,7 @@ class EstadoPartida {
     required List<JugadorEstado> jugadores,
     required this.x,
     required this.nivel,
+    this.modo = ModoPreparacion.equipo,
     required this.jefe,
     required this.ronda,
     required List<int> orden,
@@ -475,6 +480,7 @@ class EstadoPartida {
     List<JugadorEstado>? jugadores,
     int? x,
     int? nivel,
+    ModoPreparacion? modo,
     JefeEstado? jefe,
     int? ronda,
     List<int>? orden,
@@ -502,6 +508,7 @@ class EstadoPartida {
         jugadores: jugadores ?? this.jugadores,
         x: x ?? this.x,
         nivel: nivel ?? this.nivel,
+        modo: modo ?? this.modo,
         jefe: jefe ?? this.jefe,
         ronda: ronda ?? this.ronda,
         orden: orden ?? this.orden,
@@ -533,6 +540,7 @@ class EstadoPartida {
         'jugadores': [for (final j in jugadores) j.toJson()],
         'x': x,
         'nivel': nivel,
+        'modo': modo.name,
         'jefe': jefe?.toJson(),
         'ronda': ronda,
         'orden': orden,

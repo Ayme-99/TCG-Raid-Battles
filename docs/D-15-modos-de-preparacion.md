@@ -1,6 +1,6 @@
 # D-15 · Modos de preparación de la partida
 
-Estado: **diseño** (2026-11-07). Issue #106 (T-32).
+Estado: **modo 2 hecho** (2026-11-15, contrato v12). Issue #106 (T-32).
 
 ## Idea
 
@@ -30,9 +30,15 @@ Cada jugador compra un sobre Pokémon, lo abre, elige dos cartas y de ahí sale 
 ## Cambios técnicos (modo 2)
 
 1. **Motor:** `ElegirJefe` hoy exige que el nivel del jefe coincida con el calculado por el daño de los jugadores. En el modo `jefe`, el nivel de la partida es el del jefe y esa comprobación no se aplica.
-2. **Contrato v7:** (la v6 es de D-16, las 6 categorías de aliado) campo `modoPreparacion` (`equipo`, `jefe`; más adelante `sobres`), para el historial y para analizar el balance por modo. Migración v6 → v7: las partidas antiguas pasan a `equipo`. Servidor y deck-tracker-server, con el checklist de `docs/DEPENDENCIAS.md`.
+2. **Contrato v12:** campo `modoPreparacion` (`equipo`, `jefe`; más adelante `sobres`) en el evento `configurarJugadores`, para el historial y para analizar el balance por modo. Migración v11 → v12: las partidas antiguas pasan a `equipo`. Servidor y deck-tracker-server, con el checklist de `docs/DEPENDENCIAS.md`.
 3. **App:** selector de modo en el setup, rango recomendado en la tarjeta del jefe y aviso de desajuste.
 4. **Simulador:** medir también equipos fuera del rango, porque el balance está calibrado para equipos en el centro de cada nivel (`x_centro`). Es lo que más afecta al porcentaje de victoria en el modo 2.
+
+## Cómo queda en el motor
+
+- `ConfigurarJugadores(jugadores, modo:)`: el modo se decide en el setup y queda en `EstadoPartida.modo`. El orden de eventos no cambia: en la app, «Elegir jefe primero» solo cambia el orden de las pantallas; el motor sigue recibiendo `ConfigurarJugadores` y después `ElegirJefe`.
+- `ElegirJefe` solo exige que el nivel coincida con el del equipo en el modo `equipo`. En el modo `jefe` el nivel de la partida pasa a ser el del jefe (`EstadoPartida.nivel`).
+- `rangoXDelNivel(nivel)` y `desajusteDeEquipo(x, nivel)` (`reglas.dart`) dan el rango recomendado y si el equipo queda por debajo (-1), dentro (0) o por encima (1).
 
 ## Pendiente
 

@@ -131,4 +131,57 @@ void main() {
       expect(() => s.danoPorJugador[0] = 5, throwsUnsupportedError);
     });
   });
+
+  group('modo de preparación por jefe (D-15)', () {
+    EstadoPartida porJefe(List<int> ataques) => apply(
+          EstadoPartida.inicial(),
+          ConfigurarJugadores(
+            [
+              for (var i = 0; i < ataques.length; i++)
+                ConfigJugador(nombre: 'J$i', ataqueMaximo: ataques[i]),
+            ],
+            modo: ModoPreparacion.jefe,
+          ),
+        );
+
+    test('por equipo, un jefe de otro nivel se rechaza', () {
+      final s = configurar([100, 100]);
+      expect(
+        () => apply(
+            s, const ElegirJefe(nombre: 'Jefe', nivel: 3, hp: 1000)),
+        throwsA(isA<ReglaIncumplida>()),
+      );
+    });
+
+    test('por jefe, el nivel de la partida es el del jefe', () {
+      final s = porJefe([100, 100]);
+      expect(s.modo, ModoPreparacion.jefe);
+      final con = apply(
+          s, const ElegirJefe(nombre: 'Jefe', nivel: 3, hp: 1000));
+      expect(con.nivel, 3);
+      expect(con.jefe!.nivel, 3);
+      expect(con.fase, Fase.turnoJugadores);
+    });
+
+    test('por jefe, un nivel fuera de 1 a 4 se rechaza', () {
+      expect(
+        () => apply(porJefe([100, 100]),
+            const ElegirJefe(nombre: 'Jefe', nivel: 5, hp: 1000)),
+        throwsA(isA<ReglaIncumplida>()),
+      );
+    });
+
+    test('rango recomendado y desajuste por nivel', () {
+      expect(rangoXDelNivel(1), (250, 400));
+      expect(rangoXDelNivel(2), (401, 600));
+      expect(rangoXDelNivel(3), (601, 800));
+      expect(rangoXDelNivel(4), (801, null));
+      expect(desajusteDeEquipo(200, 1), -1);
+      expect(desajusteDeEquipo(250, 1), 0);
+      expect(desajusteDeEquipo(400, 1), 0);
+      expect(desajusteDeEquipo(401, 1), 1);
+      expect(desajusteDeEquipo(400, 2), -1);
+      expect(desajusteDeEquipo(2000, 4), 0);
+    });
+  });
 }
