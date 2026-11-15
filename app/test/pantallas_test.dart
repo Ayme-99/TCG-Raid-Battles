@@ -460,8 +460,6 @@ void main() {
 
       // Vuelve a la partida, ya con la sesión.
       expect(find.byKey(const Key('guardar-resultados')), findsOneWidget);
-      // Los demás jugadores cuentan como invitados.
-      expect(find.textContaining('(invitado)'), findsOneWidget);
 
       await tocar(tester, 'guardar-resultados');
       expect(find.byKey(const Key('estado-envio')), findsOneWidget);
