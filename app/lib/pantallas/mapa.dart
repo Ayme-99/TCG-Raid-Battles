@@ -175,6 +175,7 @@ const fondosDeMapa = <String, Color>{
   'tunel-roca': Color(0xFF1E2532),
   'ruta-110': Color(0xFF1D2839),
   'islas-remolino': Color(0xFF23566C),
+  'sala-origen': Color(0xFF1C1A2E),
 };
 
 /// Fondo de la mesa: la ilustración del mapa del jefe o, si no la tiene, el
