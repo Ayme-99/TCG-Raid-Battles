@@ -7,6 +7,7 @@ import '../cuenta/pantalla_login.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
+import 'inicio.dart';
 
 /// Fin de partida: resultado, puntos de cada jugador (D-10, D-12) y guardado
 /// de los resultados en el servidor.
@@ -63,39 +64,72 @@ class PantallaFinPartida extends ConsumerWidget {
         const SizedBox(height: 16),
         const _GuardarResultados(),
         const SizedBox(height: 16),
+        // Las tres salidas valen igual si se gana, se pierde o se rinde (#234).
+        FilledButton.icon(
+          key: const Key('revancha'),
+          onPressed: () => _empezarOtra(context, ref, guardada, revancha: true),
+          icon: const Icon(Icons.replay),
+          label: const Text('Revancha'),
+        ),
+        const SizedBox(height: 8),
         OutlinedButton(
           key: const Key('nueva-partida'),
-          onPressed: () async {
-            if (!guardada) {
-              final descartar = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('¿Empezar sin guardar?'),
-                  content: const Text(
-                    'Los resultados de esta partida no se han guardado y '
-                    'los puntos se perderán.',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text('Volver'),
-                    ),
-                    FilledButton(
-                      key: const Key('descartar-confirmar'),
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Descartar'),
-                    ),
-                  ],
-                ),
-              );
-              if (descartar != true) return;
-            }
-            ref.read(partidaProvider.notifier).nuevaPartida();
-          },
+          onPressed: () => _empezarOtra(context, ref, guardada),
           child: const Text('Nueva partida'),
+        ),
+        const SizedBox(height: 8),
+        // Volver al inicio no descarta nada: la partida sigue como Continuar
+        // hasta que se guarden los resultados.
+        TextButton.icon(
+          key: const Key('volver-inicio'),
+          onPressed: () => ref.read(enPartidaProvider.notifier).salir(),
+          icon: const Icon(Icons.home_outlined),
+          label: const Text('Volver al inicio'),
         ),
       ],
     );
+  }
+
+  /// Empieza otra partida. Si los resultados no se han guardado, antes pide
+  /// confirmar que se descartan. [revancha]: mismos jugadores y equipo; solo
+  /// queda elegir jefe.
+  Future<void> _empezarOtra(
+    BuildContext context,
+    WidgetRef ref,
+    bool guardada, {
+    bool revancha = false,
+  }) async {
+    if (!guardada) {
+      final descartar = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('¿Empezar sin guardar?'),
+          content: const Text(
+            'Los resultados de esta partida no se han guardado y '
+            'los puntos se perderán.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Volver'),
+            ),
+            FilledButton(
+              key: const Key('descartar-confirmar'),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Descartar'),
+            ),
+          ],
+        ),
+      );
+      if (descartar != true || !context.mounted) return;
+    }
+    // Los jugadores se leen antes de descartar la partida.
+    final jugadores = [
+      for (final j in ref.read(estadoProvider).jugadores)
+        ConfigJugador(nombre: j.nombre, ataqueMaximo: j.ataqueMaximo),
+    ];
+    ref.read(partidaProvider.notifier).nuevaPartida();
+    if (revancha) registrar(context, ref, ConfigurarJugadores(jugadores));
   }
 }
 

@@ -365,6 +365,61 @@ void main() {
     expect(find.byKey(const Key('inicio-continuar')), findsNothing);
   });
 
+  group('salidas del fin de partida (#234)', () {
+    testWidgets('revancha tras ganar: mismos jugadores, queda elegir jefe',
+        (tester) async {
+      final c = await abrir(tester);
+      await prepararPartida(tester, hp: 100);
+      await turno(tester, '100');
+      expect(c.read(estadoProvider).resultado, Resultado.victoria);
+      final antes = [
+        for (final j in c.read(estadoProvider).jugadores)
+          (j.nombre, j.ataqueMaximo),
+      ];
+
+      await tocar(tester, 'revancha');
+      // Sin guardar, pide confirmar antes de descartar los resultados.
+      expect(find.text('¿Empezar sin guardar?'), findsOneWidget);
+      await tocar(tester, 'descartar-confirmar');
+
+      final estado = c.read(estadoProvider);
+      expect(estado.fase, Fase.eleccionJefe);
+      expect(
+        [for (final j in estado.jugadores) (j.nombre, j.ataqueMaximo)],
+        antes,
+      );
+    });
+
+    testWidgets('revancha también sale si te rindes', (tester) async {
+      final c = await abrir(tester);
+      await prepararPartida(tester, hp: 500);
+      await tocar(tester, 'abandonar');
+      await tocar(tester, 'abandonar-confirmar');
+      expect(c.read(estadoProvider).resultado, Resultado.derrota);
+
+      expect(find.byKey(const Key('revancha')), findsOneWidget);
+      await tocar(tester, 'revancha');
+      await tocar(tester, 'descartar-confirmar');
+      expect(c.read(estadoProvider).fase, Fase.eleccionJefe);
+      expect(c.read(estadoProvider).jugadores, hasLength(2));
+    });
+
+    testWidgets('volver al inicio no descarta la partida terminada',
+        (tester) async {
+      final c = await abrir(tester);
+      await prepararPartida(tester, hp: 100);
+      await turno(tester, '100');
+
+      await tocar(tester, 'volver-inicio');
+      expect(find.byKey(const Key('inicio')), findsOneWidget);
+      expect(c.read(estadoProvider).terminada, isTrue);
+
+      // Sin guardar sigue ahí para continuar y guardar los resultados.
+      await tocar(tester, 'inicio-continuar');
+      expect(find.text('Victoria'), findsOneWidget);
+    });
+  });
+
   group('guardar los resultados', () {
     Future<void> ganar(WidgetTester tester) async {
       await prepararPartida(tester, hp: 100);
@@ -441,6 +496,17 @@ void main() {
       await tocar(tester, 'nueva-partida');
       expect(find.text('Nueva partida'), findsWidgets);
       expect(find.byKey(const Key('configurar')), findsOneWidget);
+    });
+
+    testWidgets('con los resultados guardados, la revancha no pide confirmar',
+        (tester) async {
+      final c = await abrir(tester, almacen: almacenConSesion());
+      await ganar(tester);
+      await tocar(tester, 'guardar-resultados');
+
+      await tocar(tester, 'revancha');
+      expect(find.text('¿Empezar sin guardar?'), findsNothing);
+      expect(c.read(estadoProvider).fase, Fase.eleccionJefe);
     });
 
     testWidgets('sin conexión queda pendiente y lo avisa en la barra',
