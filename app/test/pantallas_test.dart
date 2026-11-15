@@ -88,6 +88,40 @@ void main() {
     expect(find.text('Turno de Jugador 1'), findsOneWidget);
   });
 
+  testWidgets('sin sesión el jugador 1 se llama Jugador 1', (tester) async {
+    await abrir(tester);
+    final campo = tester.widget<TextField>(find.byKey(const Key('nombre-0')));
+    expect(campo.controller!.text, 'Jugador 1');
+  });
+
+  testWidgets('con sesión el jugador 1 empieza con su nickname y se puede cambiar',
+      (tester) async {
+    tester.view.physicalSize = const Size(1000, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: sobrescribir(almacen: almacenConSesion()),
+        child: const IncursionesApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(find.byKey(const Key('nombre-0'))).controller!.text,
+      'ana',
+    );
+    expect(
+      tester.widget<TextField>(find.byKey(const Key('nombre-1'))).controller!.text,
+      'Jugador 2',
+    );
+    await tester.enterText(find.byKey(const Key('nombre-0')), 'Ash');
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(find.byKey(const Key('nombre-0'))).controller!.text,
+      'Ash',
+    );
+  });
+
   testWidgets('se pueden añadir y quitar jugadores (de 2 a 4)', (tester) async {
     await abrir(tester);
     expect(find.byKey(const Key('nombre-2')), findsNothing);
