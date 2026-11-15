@@ -491,23 +491,6 @@ void main() {
     expect(c.read(estadoProvider).intentosInvocacionPendientes, 0);
     expect(c.read(estadoProvider).aliados.length, 2);
   });
-}
-
-/// Azar que devuelve valores fijos (módulo el máximo), en orden.
-class _AzarFijo implements Random {
-  _AzarFijo(this._valores);
-
-  final List<int> _valores;
-  var _i = 0;
-
-  @override
-  int nextInt(int max) => _valores[_i++ % _valores.length] % max;
-
-  @override
-  bool nextBool() => true;
-
-  @override
-  double nextDouble() => 0;
 
   group('modo por jefe (#106)', () {
     Future<ProviderContainer> abrir(WidgetTester tester) async {
@@ -587,4 +570,22 @@ class _AzarFijo implements Random {
       expect(find.text('¿Contra qué jefe?'), findsOneWidget);
     });
   });
+
+}
+
+/// Azar que devuelve valores fijos (módulo el máximo), en orden.
+class _AzarFijo implements Random {
+  _AzarFijo(this._valores);
+
+  final List<int> _valores;
+  var _i = 0;
+
+  @override
+  int nextInt(int max) => _valores[_i++ % _valores.length] % max;
+
+  @override
+  bool nextBool() => true;
+
+  @override
+  double nextDouble() => 0;
 }
