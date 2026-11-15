@@ -402,6 +402,52 @@ void main() {
     expect(aliado.efectos, EfectosAliado.programa);
     expect(aliado.scriptId, 'chupavidas-10');
   });
+
+  testWidgets('al cruzar un umbral de HP entra un segundo aliado', (tester) async {
+    tester.view.physicalSize = const Size(1000, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final catalogo =
+        (await tester.runAsync(() => Catalogo.cargar(rootBundle)))!;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sobrescribir(),
+          catalogoProvider.overrideWith((ref) async => catalogo),
+          azarProvider.overrideWithValue(_AzarFijo([0, 1])),
+        ],
+        child: const IncursionesApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final c =
+        ProviderScope.containerOf(tester.element(find.byType(IncursionesApp)));
+    for (final (clave, texto) in [('ataque-0', '100'), ('ataque-1', '100')]) {
+      await tester.enterText(
+        find.descendant(
+          of: find.byKey(Key(clave)),
+          matching: find.byType(TextField),
+        ),
+        texto,
+      );
+    }
+    await tester.tap(find.byKey(const Key('configurar')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('catalogo-onix')));
+    await tester.pumpAndSettle();
+    llegarALaLlamadaDelJefe(c);
+    await tester.pumpAndSettle();
+    expect(c.read(estadoProvider).aliados.length, 1);
+
+    // 1300 de daño: Onix (2300 HP, un intento cada 1200) cruza su umbral.
+    final error = c
+        .read(partidaProvider.notifier)
+        .registrar(const TurnoJugador(jugador: 0, dano: 1300));
+    expect(error, isNull);
+    await tester.pumpAndSettle();
+    expect(c.read(estadoProvider).intentosInvocacionPendientes, 0);
+    expect(c.read(estadoProvider).aliados.length, 2);
+  });
 }
 
 /// Azar que devuelve valores fijos (módulo el máximo), en orden.
