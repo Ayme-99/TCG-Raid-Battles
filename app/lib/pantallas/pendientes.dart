@@ -395,13 +395,17 @@ Future<Object?> _abrirDialogoAliado(
 /// Enseña la tirada sobre la mesa y espera a que los dados paren. Si no
 /// hubiera mesa que la anime, se da por terminada pasado un rato.
 Future<void> _tirarEnMesa(WidgetRef ref, TiradaMesa tirada) async {
-  ref.read(tiradaMesaProvider.notifier).state = tirada;
+  // El controlador se toma antes de esperar: la pantalla que lanzó la tirada
+  // puede desmontarse mientras ruedan los dados (p. ej. al pasar al turno del
+  // jefe) y entonces su `ref` ya no se puede usar.
+  final controlador = ref.read(tiradaMesaProvider.notifier);
+  controlador.state = tirada;
   final seguridad =
       Timer(duracionTirada + const Duration(seconds: 1), tirada.terminar);
   await tirada.terminada;
   seguridad.cancel();
-  if (ref.read(tiradaMesaProvider) == tirada) {
-    ref.read(tiradaMesaProvider.notifier).state = null;
+  if (controlador.state == tirada) {
+    controlador.state = null;
   }
 }
 
