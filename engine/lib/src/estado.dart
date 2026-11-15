@@ -301,6 +301,9 @@ class EstadoPartida {
 
   /// Modo de preparación (D-15).
   final ModoPreparacion modo;
+
+  /// Formato de la partida: cartas físicas o digitales.
+  final FormatoPartida formato;
   final JefeEstado? jefe;
 
   /// Ronda actual, empezando en 1 (0 antes de empezar).
@@ -373,6 +376,7 @@ class EstadoPartida {
     required this.x,
     required this.nivel,
     this.modo = ModoPreparacion.equipo,
+    this.formato = FormatoPartida.fisico,
     required this.jefe,
     required this.ronda,
     required List<int> orden,
@@ -481,6 +485,7 @@ class EstadoPartida {
     int? x,
     int? nivel,
     ModoPreparacion? modo,
+    FormatoPartida? formato,
     JefeEstado? jefe,
     int? ronda,
     List<int>? orden,
@@ -509,6 +514,7 @@ class EstadoPartida {
         x: x ?? this.x,
         nivel: nivel ?? this.nivel,
         modo: modo ?? this.modo,
+        formato: formato ?? this.formato,
         jefe: jefe ?? this.jefe,
         ronda: ronda ?? this.ronda,
         orden: orden ?? this.orden,
@@ -541,6 +547,7 @@ class EstadoPartida {
         'x': x,
         'nivel': nivel,
         'modo': modo.name,
+        'formato': formato.name,
         'jefe': jefe?.toJson(),
         'ronda': ronda,
         'orden': orden,

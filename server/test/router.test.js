@@ -183,6 +183,22 @@ test('el detalle de una partida es solo para quien jugó en ella', async (t) => 
   assert.strictEqual(noExiste.estado, 404);
 });
 
+test('una partida v13 de formato físico no da puntos y la digital sí', async (t) => {
+  const { llamar, cerrar } = await arrancar();
+  t.after(cerrar);
+  const fisica = { ...ejemplo('validos', 'victoria-por-estados', 13), partidaId: 'ejemplo-v13-fisica' };
+  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: fisica });
+  assert.strictEqual(res.estado, 201);
+  assert.strictEqual(res.json.tusPuntos, 0);
+
+  const digital = structuredClone(fisica);
+  digital.partidaId = 'ejemplo-v13-digital';
+  digital.eventos.find((e) => e.tipo === 'configurarJugadores').formato = 'digital';
+  const dig = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: digital });
+  assert.strictEqual(dig.estado, 201);
+  assert.strictEqual(dig.json.tusPuntos, 1650 + 30);
+});
+
 test('una partida v2 abona el reparto y el bono de estados', async (t) => {
   const { llamar, cerrar } = await arrancar();
   t.after(cerrar);
@@ -217,6 +233,7 @@ test('las partidas v1 y v2 conviven', async (t) => {
   const v1 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'victoria-2-jugadores') });
   const v2 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'victoria-por-estados', 2) });
   const v12 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...ejemplo('validos', 'victoria-por-estados', 12), partidaId: 'ejemplo-v12-conviven' } });
+  const v13 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...ejemplo('validos', 'victoria-por-estados', 13), partidaId: 'ejemplo-v13-conviven' } });
   assert.deepStrictEqual([v1.estado, v2.estado], [201, 201]);
   assert.strictEqual(v1.json.tusPuntos, 1650); // la v1 no tiene bono
   const detalle = await llamar('GET', '/partidas/ejemplo-victoria-2-jugadores', { usuario: ANA });
@@ -287,7 +304,7 @@ test('una partida v3 con aliados por categoría se guarda tal cual llegó', asyn
   assert.strictEqual(detalle.json.registro.eventos.find((e) => e.tipo === 'aliadoInvocado').categoria, 'danio');
 });
 
-test('las partidas v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11 y v12 conviven', async (t) => {
+test('las partidas v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12 y v13 conviven', async (t) => {
   const { llamar, cerrar } = await arrancar();
   t.after(cerrar);
   const v1 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: ejemplo('validos', 'victoria-2-jugadores') });
@@ -302,7 +319,8 @@ test('las partidas v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11 y v12 conviven',
   const v10 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...ejemplo('validos', 'victoria-por-estados', 10), partidaId: 'ejemplo-v10-conviven' } });
   const v11 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...ejemplo('validos', 'victoria-por-estados', 11), partidaId: 'ejemplo-v11-conviven' } });
   const v12 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...ejemplo('validos', 'victoria-por-estados', 12), partidaId: 'ejemplo-v12-conviven' } });
-  assert.deepStrictEqual([v1.estado, v2.estado, v3.estado, v4.estado, v5.estado, v6.estado, v7.estado, v8.estado, v9.estado, v10.estado, v11.estado, v12.estado], [201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201]);
+  const v13 = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...ejemplo('validos', 'victoria-por-estados', 13), partidaId: 'ejemplo-v13-conviven' } });
+  assert.deepStrictEqual([v1.estado, v2.estado, v3.estado, v4.estado, v5.estado, v6.estado, v7.estado, v8.estado, v9.estado, v10.estado, v11.estado, v12.estado, v13.estado], [201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201]);
 });
 
 test('un aliado v3 sin categoría o con una desconocida se rechaza', async (t) => {
@@ -320,13 +338,13 @@ test('un aliado v3 sin categoría o con una desconocida se rechaza', async (t) =
   assert.strictEqual(b.estado, 400);
 });
 
-test('el mensaje de versión no soportada lista las doce versiones', async (t) => {
+test('el mensaje de versión no soportada lista las trece versiones', async (t) => {
   const { llamar, cerrar } = await arrancar();
   t.after(cerrar);
-  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...v3ConAliado(), version: 13 } });
+  const res = await llamar('POST', '/partidas', { usuario: ANA, cuerpo: { ...v3ConAliado(), version: 14 } });
   assert.strictEqual(res.estado, 400);
   assert.strictEqual(res.json.error, 'version_no_soportada');
-  assert.match(res.json.mensaje ?? JSON.stringify(res.json), /1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 y 12/);
+  assert.match(res.json.mensaje ?? JSON.stringify(res.json), /1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 y 13/);
 });
 
 // Igual que la v3, pero con la categoría ya renombrada a `tanque` (v4).

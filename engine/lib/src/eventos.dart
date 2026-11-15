@@ -24,15 +24,22 @@ enum ModoPreparacion {
   jefe,
 }
 
+/// Con qué se juega (flujo de la app): cartas físicas o cartas digitales. El
+/// servidor decide por el formato si la partida da puntos: el físico no, el
+/// digital sí.
+enum FormatoPartida { fisico, digital }
+
 /// Setup: jugadores (1 a 4, en orden de asiento) y su mejor ataque.
 /// El motor calcula X y, en el modo [ModoPreparacion.equipo], el nivel del jefe.
 final class ConfigurarJugadores extends Evento {
   final List<ConfigJugador> jugadores;
   final ModoPreparacion modo;
+  final FormatoPartida formato;
 
   const ConfigurarJugadores(
     this.jugadores, {
     this.modo = ModoPreparacion.equipo,
+    this.formato = FormatoPartida.fisico,
   });
 }
 
