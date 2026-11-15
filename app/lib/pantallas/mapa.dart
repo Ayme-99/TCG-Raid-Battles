@@ -175,11 +175,15 @@ const fondosDeMapa = <String, Color>{
   'tunel-roca': Color(0xFF374344),
   'ruta-110': Color(0xFF152332),
   'islas-remolino': Color(0xFF154952),
-  'sala-origen': Color(0xFF1C1A2E),
+  'sala-origen': Color(0xFF76627C),
 };
 
 /// Fondo de la mesa: la ilustración del mapa del jefe o, si no la tiene, el
 /// tapete genérico. Ocupa el lienzo grande de la mesa (2000 px de margen).
+/// Zoom del fondo por mapa (1 = la imagen cubre la mesa; <1 aleja y deja ver
+/// más dibujo, rellenando el resto con el color de borde).
+const Map<String, double> zoomDeMapa = {'sala-origen': 0.85};
+
 class FondoMesa extends StatelessWidget {
   const FondoMesa({super.key, this.mapa});
 
@@ -207,7 +211,10 @@ class FondoMesa extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset('assets/mapas/$id.webp', fit: BoxFit.cover),
+              Transform.scale(
+                scale: zoomDeMapa[id] ?? 1.0,
+                child: Image.asset('assets/mapas/$id.webp', fit: BoxFit.cover),
+              ),
               // Oscurece un poco para que las cartas destaquen.
               ColoredBox(color: Colors.black.withValues(alpha: 0.18)),
             ],
