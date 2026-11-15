@@ -103,7 +103,7 @@ class ControladorEnvios extends Notifier<EstadoEnvios> {
   Future<String?> guardarPartidaActual() async {
     final sesion = ref.read(sesionActualProvider);
     final estado = ref.read(estadoProvider);
-    if (sesion == null) return 'Inicia sesión para guardar los puntos.';
+    if (sesion == null) return 'Inicia sesión para guardar la partida.';
     if (!estado.terminada) return 'La partida todavía no ha terminado.';
     // El host (jugador 1) es la cuenta; los demás van como invitados.
     final registro = ref.read(partidaProvider.notifier).registro(
