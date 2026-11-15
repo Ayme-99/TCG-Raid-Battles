@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
 import '../partida/tirada_mesa.dart';
 import 'acciones_objetivo.dart';
@@ -437,6 +438,11 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
         ? (tirada.sin ? const FocoAliados() : FocoJugador(tirada.asiento))
         : _manual ?? auto;
     final jugadores = estado.jugadores.length;
+    final jefe = estado.jefe;
+    final catalogo = ref.watch(catalogoProvider).asData?.value;
+    final mapa = jefe == null
+        ? null
+        : catalogo?.jefeDe(jefe.nombre, jefe.nivel)?.mapa;
     return ClipRect(
       child: LayoutBuilder(
         builder: (context, caja) {
@@ -468,6 +474,7 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
               child: _Mesa(
                 estado: estado,
                 alto: alto,
+                mapa: mapa,
                 tirada: tirada,
                 onFoco: (f) => _alElegirFoco(f, foco),
               ),
@@ -484,11 +491,13 @@ class _Mesa extends StatelessWidget {
     required this.estado,
     required this.alto,
     required this.onFoco,
+    this.mapa,
     this.tirada,
   });
 
   final EstadoPartida estado;
   final double alto;
+  final String? mapa;
   final TiradaMesa? tirada;
   final void Function(FocoCamara) onFoco;
 
@@ -508,7 +517,7 @@ class _Mesa extends StatelessWidget {
             key: const Key('mesa-fondo'),
             behavior: HitTestBehavior.opaque,
             onTap: () => onFoco(const FocoGeneral()),
-            child: const CustomPaint(painter: MapaPainter()),
+            child: FondoMesa(mapa: mapa),
           ),
         ),
         Column(

@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/catalogo/catalogo.dart';
 import 'package:incursiones_app/pantallas/carta.dart';
+import 'package:incursiones_app/pantallas/mapa.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
@@ -22,6 +23,27 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('catálogo empaquetado', () {
+    test('idMapa quita tildes y usa guiones', () {
+      expect(idMapa('Túnel Roca'), 'tunel-roca');
+      expect(idMapa('Ruta 110'), 'ruta-110');
+      expect(idMapa('Islas Remolino'), 'islas-remolino');
+      expect(idMapa('Sala Origen'), 'sala-origen');
+    });
+
+    test('cada fondo declarado tiene su imagen y es el mapa de un jefe', () {
+      final indice = _json('assets/catalogo/catalogo.json') as Map;
+      final mapas = {
+        for (final id in (indice['jefes'] as List))
+          idMapa((_json('assets/catalogo/bosses/$id.json') as Map)['mapa']
+              as String),
+      };
+      for (final id in fondosDeMapa.keys) {
+        expect(File('assets/mapas/$id.webp').existsSync(), isTrue,
+            reason: 'falta assets/mapas/$id.webp');
+        expect(mapas, contains(id), reason: '$id no es el mapa de ningún jefe');
+      }
+    });
+
     test('cada jefe y cada aliado tiene su imagen en app/assets/cartas', () {
       final indice = _json('assets/catalogo/catalogo.json') as Map;
       final faltan = <String>[];
