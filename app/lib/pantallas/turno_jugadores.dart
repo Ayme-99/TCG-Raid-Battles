@@ -34,12 +34,6 @@ class PantallaTurnoJugadores extends ConsumerWidget {
     final extras = <Widget>[
       const PanelEfectosActivos(),
       _Orden(estado: estado),
-      PanelEstados(
-        key: ValueKey('estados-${estado.ronda}-${estado.turnoActual}'),
-        jugadorInicial: actual,
-      ),
-      const PanelPokemon(),
-      const PanelDanoDeEfecto(),
     ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).

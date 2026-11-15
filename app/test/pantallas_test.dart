@@ -188,16 +188,8 @@ void main() {
     final c = await abrir(tester);
     await prepararPartida(tester, hp: 500);
 
-    // En pantalla estrecha el panel va al final de la lista de acciones.
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('dano-efecto')),
-      300,
-      scrollable: find.descendant(
-        of: find.byKey(const Key('panel-acciones')),
-        matching: find.byType(Scrollable),
-      ).first,
-    );
-    await tocar(tester, 'dano-efecto');
+    await tocar(tester, 'menu-jefe');
+    await tocar(tester, 'accion-dano-efecto');
     await tocar(tester, 'dano-efecto-jugador-1');
     await escribir(tester, 'dano-efecto-puntos', '60');
     // El botón se activa al reconstruirse con el número escrito.
@@ -244,8 +236,15 @@ void main() {
       (tester) async {
     final c = await abrir(tester);
     await prepararPartida(tester, hp: 500);
-    await tocar(tester, 'estado-quemadura');
+    await tocar(tester, 'menu-jefe');
+    await tocar(tester, 'accion-quemar');
+    await tester.tap(find.descendant(
+      of: find.byType(SimpleDialog),
+      matching: find.text('Jugador 1'),
+    ));
+    await tester.pumpAndSettle();
     expect(c.read(estadoProvider).jefe!.quemado, isTrue);
+    expect(c.read(estadoProvider).estadosAplicados[0], 1);
     await turno(tester, '0');
     await turno(tester, '0');
 

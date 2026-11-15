@@ -135,11 +135,20 @@ void main() {
     final pico = tester.getCenter(find.byKey(const Key('pico-bocadillo'))).dx;
     final asiento = tester.getCenter(find.byKey(const Key('asiento-0'))).dx;
     expect((pico - asiento).abs(), lessThan(40));
-    // Lo secundario va en un panel aparte, plegado: el bocadillo no scrollea.
-    expect(find.byKey(const Key('panel-extras-interno')), findsOneWidget);
-    expect(find.byKey(const Key('ko-0')), findsNothing);
-    await tocar(tester, 'panel-extras-interno-toggle');
-    expect(find.byKey(const Key('ko-0')), findsOneWidget);
+    // Lo secundario no tapa la mesa: el orden de la ronda va en un cuadro y
+    // las acciones, en el menú de cada carta o asiento.
+    expect(find.byKey(const Key('panel-extras-interno')), findsNothing);
+    expect(find.byKey(const Key('panel-info-ronda')), findsNothing);
+    await tocar(tester, 'info-ronda');
+    expect(find.byKey(const Key('panel-info-ronda')), findsOneWidget);
+    expect(find.textContaining('Orden de la ronda'), findsOneWidget);
+    await tester.tapAt(const Offset(5, 5));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('panel-info-ronda')), findsNothing);
+    await tocar(tester, 'menu-jugador-0');
+    expect(find.byKey(const Key('accion-ko')), findsOneWidget);
+    await tester.tapAt(const Offset(5, 5));
+    await tester.pumpAndSettle();
     // El panel se pliega y se despliega.
     await tocar(tester, 'panel-acciones-toggle');
     expect(find.byKey(const Key('panel-acciones')), findsOneWidget);

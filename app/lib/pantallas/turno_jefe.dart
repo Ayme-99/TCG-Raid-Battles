@@ -89,6 +89,9 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
     final faltaChequeo = chequeo.isNotEmpty && !_chequeoHecho;
     final controles = <Widget>[
       const PanelPendientes(),
+      // Los ataques del jefe dejan KO a Pokémon: el botón está a mano porque
+      // en este turno la cámara no enseña los asientos.
+      _FilaKo(estado: estado),
       if (sinObjetivos && registrados == 0 && carta == null)
         const Padding(
           padding: EdgeInsets.only(bottom: 8),
@@ -151,9 +154,6 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
     // El panel del ataque solo lleva el ataque; lo demás va en «Más acciones».
     final extras = <Widget>[
       const PanelEfectosActivos(),
-        const PanelEstados(),
-        const PanelPokemon(),
-        const PanelDanoDeEfecto(),
     ];
     // La mesa con cámara a pantalla completa y los controles del turno al
     // lado (o debajo en pantallas estrechas).
@@ -488,6 +488,34 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Botones para anotar un Pokémon KO de cada jugador en juego, durante el
+/// turno del jefe.
+class _FilaKo extends ConsumerWidget {
+  const _FilaKo({required this.estado});
+
+  final EstadoPartida estado;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Wrap(
+        spacing: 8,
+        children: [
+          for (final j in estado.jugadores)
+            if (!j.eliminado)
+              ActionChip(
+                key: Key('ko-${j.asiento}'),
+                avatar: const Icon(Icons.catching_pokemon, size: 18),
+                label: Text('KO ${j.nombre} (${j.pokemonVivos}/${j.pokemonTotal})'),
+                onPressed: () => registrar(context, ref, PokemonKo(j.asiento)),
+              ),
+        ],
       ),
     );
   }

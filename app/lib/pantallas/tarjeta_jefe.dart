@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
+import 'acciones_objetivo.dart';
 import 'carta.dart';
 import 'comun.dart';
 import 'estilo.dart';
@@ -78,6 +79,13 @@ class TarjetaJefe extends ConsumerWidget {
                         texto: 'Quemado',
                         color: Color(0xFFFFCCBC),
                       ),
+                    const SizedBox(width: 8),
+                    BotonMenu(
+                      key: const Key('menu-jefe'),
+                      etiqueta: 'Acciones del jefe',
+                      tamano: 36,
+                      onPressed: () => menuJefe(context, ref),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
