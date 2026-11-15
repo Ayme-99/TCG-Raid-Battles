@@ -76,6 +76,7 @@
 //   dart run bin/sim_jefes.dart --calibrar   # HP (en centenas) que da el objetivo
 //   dart run bin/sim_jefes.dart --causas     # por qué no se usan todos los intentos
 //   dart run bin/sim_jefes.dart --animo=no    # sin cartas de ánimo (modelo anterior)
+//   dart run bin/sim_jefes.dart --desajuste   # cada jefe contra equipos de todos los niveles
 //
 // Opciones propias:
 //   --jefes=RUTA      carpeta del catálogo (defecto ../catalog)
@@ -856,6 +857,61 @@ MedidaJefe medirJefe(
   );
 }
 
+/// Equipos fuera del rango de su nivel (D-15, modo por jefe): cada jefe contra
+/// equipos de cada nivel de X, no solo del suyo. El balance está calibrado para
+/// equipos dentro del rango del jefe; esto mide cuánto cae o sube la victoria
+/// cuando el equipo queda por debajo o por encima. Política «solo-dueno» (la
+/// más dura) y «ayuda».
+void medirDesajuste(
+  List<JefeDef> jefes,
+  List<Nivel> niveles,
+  Map<int, List<List<Pareja>>> porNivel,
+  Config c,
+  String informe,
+) {
+  stdout.writeln('Incursiones · jefes contra equipos de otro nivel (D-15)');
+  stdout.writeln('equipos/nivel=${c.equipos} partidas/equipo=${c.partidas}\n');
+  stdout.writeln('jefe        nivel  equipos de  X medio  dist.  política      victoria  vs. su nivel');
+  final filas = <String>[
+    'jefe,nivel_jefe,nivel_equipo,niveles_de_distancia,x_medio,politica,equipos,partidas_por_equipo,victoria,victoria_en_su_nivel',
+  ];
+  final politicas = {'solo-dueno': (0.0, 1.0), 'ayuda': (0.5, 1.0)};
+  for (final jefe in jefes) {
+    final nv = niveles.firstWhere((n) => n.nivel == jefe.nivel);
+    final propios = porNivel[jefe.nivel]!;
+    final base = <String, double>{};
+    if (propios.isNotEmpty) {
+      for (final e in politicas.entries) {
+        base[e.key] = medirJefe(propios, jefe, nv, c, c.semilla, e.value.$1, e.value.$2).victoria;
+      }
+    }
+    for (final n in niveles) {
+      final eqs = porNivel[n.nivel]!;
+      if (eqs.isEmpty) continue;
+      final xMedio = eqs.map(calcularX).reduce((a, b) => a + b) / eqs.length;
+      for (final e in politicas.entries) {
+        final v = n.nivel == jefe.nivel && base.containsKey(e.key)
+            ? base[e.key]!
+            : medirJefe(eqs, jefe, nv, c, c.semilla, e.value.$1, e.value.$2).victoria;
+        final dist = n.nivel - jefe.nivel;
+        final ref = base[e.key];
+        stdout.writeln('${jefe.id.padRight(11)} ${jefe.nivel}      '
+            '${n.nivel}           ${xMedio.toStringAsFixed(0).padLeft(6)}   '
+            '${dist.toString().padLeft(3)}   ${e.key.padRight(12)}  '
+            '${(100 * v).toStringAsFixed(1).padLeft(5)} %    '
+            '${ref == null ? '-' : '${(100 * ref).toStringAsFixed(1)} %'}');
+        filas.add('${jefe.id},${jefe.nivel},${n.nivel},$dist,'
+            '${xMedio.toStringAsFixed(0)},${e.key},${eqs.length},${c.partidas},'
+            '${v.toStringAsFixed(4)},${ref?.toStringAsFixed(4) ?? ''}');
+      }
+    }
+  }
+  File(informe)
+    ..createSync(recursive: true)
+    ..writeAsStringSync('${filas.join('\n')}\n');
+  stdout.writeln('\nInforme guardado en $informe');
+}
+
 /// Busca el mayor HP (en centenas) con el que la victoria, con la política
 /// más dura (solo el dueño ataca a su aliado), llega al objetivo del nivel.
 int calibrarJefe(List<List<Pareja>> equipos, JefeDef jefe, Nivel nv, Config c) {
@@ -901,9 +957,12 @@ void main(List<String> args) {
   int? pokemon;
   var mejorPrimero = false;
   var animo = <int>[1, 2, 3, 4, 5];
+  var desajuste = false;
   for (final a in args) {
     if (a == '--causas') {
       causas = true;
+    } else if (a == '--desajuste') {
+      desajuste = true;
     } else if (a.startsWith('--jefes=')) {
       carpetaJefes = a.substring('--jefes='.length);
     } else if (a.startsWith('--jugadores=')) {
@@ -928,7 +987,9 @@ void main(List<String> args) {
   }
   final c = leerArgs(resto)..animo = animo;
   final informe = informeArg ??
-      (c.calibrar
+      (desajuste
+          ? '../balance/informes/jefes_desajuste.csv'
+          : c.calibrar
           ? '../balance/informes/jefes_aliados_calibrado.csv'
           : '../balance/informes/jefes_aliados.csv');
   final cartas = leerCatalogo(c.catalogo, c.ataques);
@@ -965,6 +1026,11 @@ void main(List<String> args) {
       }
       if (nivelPorX(calcularX(e), niveles) == n.nivel) destino.add(e);
     }
+  }
+
+  if (desajuste) {
+    medirDesajuste(jefes, niveles, porNivel, c, informe);
+    return;
   }
 
   stdout.writeln('Incursiones · simulador de jefes con aliados (T-28)');

@@ -37,6 +37,7 @@ jobs:
       - run: dart run bin/sim_jefes.dart --equipos=3 --partidas=3 --informe=/tmp/jefes_aliados.csv
       - run: dart run bin/sim_jefes.dart --calibrar --equipos=3 --partidas=3 --informe=/tmp/jefes_calibrado.csv
       - run: dart run bin/sim_jefes.dart --animo=no --equipos=3 --partidas=3 --informe=/tmp/jefes_sin_animo.csv
+      - run: dart run bin/sim_jefes.dart --desajuste --equipos=40 --partidas=30 --informe=/tmp/jefes_desajuste.csv
 
   contrato:
     name: Contrato JSON (esquema del backend)
