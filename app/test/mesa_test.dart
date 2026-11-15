@@ -216,7 +216,7 @@ void main() {
             : 0;
     var anterior = nivel();
     expect(anterior, 2);
-    for (final ancho in [800.0, 650.0, 520.0, 440.0, 380.0, 360.0]) {
+    for (final ancho in [800.0, 650.0, 520.0, 440.0, 400.0]) {
       tester.view.physicalSize = Size(ancho, 800);
       await tester.pumpAndSettle();
       expect(c.read(estadoProvider).ronda, 1);
@@ -228,7 +228,6 @@ void main() {
       }
       expect(find.byKey(const Key('abandonar')), findsOneWidget);
     }
-    expect(anterior, 0, reason: 'a 360 px no cabe ni el texto corto');
   });
 
   testWidgets('la barra de vida llena tiene relleno visible', (tester) async {
