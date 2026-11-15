@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -399,6 +400,28 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
   /// Foco elegido a mano. Se olvida cuando la partida pide mirar a otro sitio.
   FocoCamara? _manual;
   FocoCamara? _ultimoAuto;
+  Timer? _retorno;
+
+  @override
+  void dispose() {
+    _retorno?.cancel();
+    super.dispose();
+  }
+
+  /// Tocar un foco lo acerca; tocar el mismo otra vez (o esperar unos
+  /// segundos) devuelve la cámara a la vista general, para no dejarla
+  /// atascada con los asientos fuera de pantalla.
+  void _alElegirFoco(FocoCamara f, FocoCamara actual) {
+    _retorno?.cancel();
+    if (f == actual || f is FocoGeneral) {
+      setState(() => _manual = const FocoGeneral());
+      return;
+    }
+    setState(() => _manual = f);
+    _retorno = Timer(const Duration(seconds: 6), () {
+      if (mounted) setState(() => _manual = null);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -446,7 +469,7 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
                 estado: estado,
                 alto: alto,
                 tirada: tirada,
-                onFoco: (f) => setState(() => _manual = f),
+                onFoco: (f) => _alElegirFoco(f, foco),
               ),
             ),
           );
