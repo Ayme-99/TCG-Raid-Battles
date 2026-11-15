@@ -9,11 +9,11 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 10;
+const int versionRegistro = 11;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6, 6: _v6AV7, 7: _v7AV8, 8: _v8AV9, 9: _v9AV10};
+    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6, 6: _v6AV7, 7: _v7AV8, 8: _v8AV9, 9: _v9AV10, 10: _v10AV11};
 
 /// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
 /// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
@@ -144,6 +144,11 @@ Map<String, Object?> _v8AV9(Map<String, Object?> datos) =>
 /// solo cambia la versión.
 Map<String, Object?> _v9AV10(Map<String, Object?> datos) =>
     {...datos, 'version': 10};
+
+/// Versión 11 (#207): cuatro Pokémon por jugador con 2 jugadores. Los eventos no
+/// cambian; `pokemonPerdidos` del resumen puede valer hasta 4.
+Map<String, Object?> _v10AV11(Map<String, Object?> datos) =>
+    {...datos, 'version': 11};
 
 // ---------------------------------------------------------------------------
 // Eventos <-> JSON

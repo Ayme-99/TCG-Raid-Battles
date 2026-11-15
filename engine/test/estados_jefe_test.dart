@@ -40,7 +40,8 @@ void main() {
         () => aplicar(configurar([100]), 0, EstadoDelJefe.veneno),
         throwsA(isA<ReglaIncumplida>()),
       );
-      var s = empezar(ataques: [100, 100]);
+      var s = empezar(ataques: [100, 100, 100]);
+      s = apply(s, const PokemonKo(1));
       s = apply(s, const PokemonKo(1));
       s = apply(s, const PokemonKo(1));
       expect(

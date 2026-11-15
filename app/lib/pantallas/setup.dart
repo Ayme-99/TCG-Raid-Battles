@@ -46,7 +46,7 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
   }
 
   void _quitar() {
-    if (_filas.length <= 1) return;
+    if (_filas.length <= minJugadores) return;
     setState(() => _filas.removeLast().dispose());
   }
 
@@ -121,7 +121,7 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
             const SizedBox(width: 12),
             OutlinedButton.icon(
               key: const Key('quitar-jugador'),
-              onPressed: _filas.length > 1 ? _quitar : null,
+              onPressed: _filas.length > minJugadores ? _quitar : null,
               icon: const Icon(Icons.person_remove),
               label: const Text('Quitar jugador'),
             ),
