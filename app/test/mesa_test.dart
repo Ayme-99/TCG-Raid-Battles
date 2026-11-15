@@ -204,16 +204,15 @@ void main() {
 
   testWidgets('en móvil estrecho el chip de ronda va en versión corta (#214)',
       (tester) async {
-    tester.view.physicalSize = const Size(380, 800);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-    await tester.pumpWidget(
-      ProviderScope(overrides: sobrescribir(), child: const IncursionesApp()),
-    );
-    await tester.pumpAndSettle();
+    final c = await abrir(tester);
     await empezar(tester);
+    expect(find.text('Ronda 1 · Turno de Jugador 1'), findsOneWidget);
+    // Se estrecha ya en partida (el formulario de jugadores no cabe a 380 px).
+    tester.view.physicalSize = const Size(380, 800);
+    await tester.pumpAndSettle();
+    expect(c.read(estadoProvider).ronda, 1);
     expect(find.text('R1 · J1'), findsOneWidget);
-    expect(find.textContaining('Turno de'), findsNothing);
+    expect(find.text('Ronda 1 · Turno de Jugador 1'), findsNothing);
   });
 
   testWidgets('la barra de vida llena tiene relleno visible', (tester) async {
