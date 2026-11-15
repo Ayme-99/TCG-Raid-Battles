@@ -207,17 +207,28 @@ void main() {
     final c = await abrir(tester);
     await empezar(tester);
     expect(find.text('Ronda 1 · Turno de Jugador 1'), findsOneWidget);
-    // Se estrecha ya en partida (el formulario de jugadores no cabe a 380 px).
-    tester.view.physicalSize = const Size(480, 800);
-    await tester.pumpAndSettle();
-    expect(c.read(estadoProvider).ronda, 1);
-    expect(find.text('R1 · J1'), findsOneWidget);
-    expect(find.text('Ronda 1 · Turno de Jugador 1'), findsNothing);
-    // En un móvil estrecho no hay sitio ni para el corto: no aparece.
-    tester.view.physicalSize = const Size(360, 800);
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('barra-turno')), findsNothing);
-    expect(find.byKey(const Key('abandonar')), findsOneWidget);
+    // 2 = texto largo, 1 = corto, 0 = oculto. Al estrechar la pantalla (ya en
+    // partida: el formulario de jugadores no cabe a 380 px) solo puede bajar.
+    int nivel() => find.text('Ronda 1 · Turno de Jugador 1').evaluate().isNotEmpty
+        ? 2
+        : find.text('R1 · J1').evaluate().isNotEmpty
+            ? 1
+            : 0;
+    var anterior = nivel();
+    expect(anterior, 2);
+    for (final ancho in [800.0, 650.0, 520.0, 440.0, 380.0, 360.0]) {
+      tester.view.physicalSize = Size(ancho, 800);
+      await tester.pumpAndSettle();
+      expect(c.read(estadoProvider).ronda, 1);
+      expect(nivel(), lessThanOrEqualTo(anterior), reason: 'ancho $ancho');
+      anterior = nivel();
+      // Si no se muestra ninguno, tampoco queda el chip vacío.
+      if (anterior == 0) {
+        expect(find.byKey(const Key('barra-turno')), findsNothing);
+      }
+      expect(find.byKey(const Key('abandonar')), findsOneWidget);
+    }
+    expect(anterior, 0, reason: 'a 360 px no cabe ni el texto corto');
   });
 
   testWidgets('la barra de vida llena tiene relleno visible', (tester) async {
