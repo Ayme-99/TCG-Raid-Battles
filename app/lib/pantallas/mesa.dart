@@ -136,6 +136,39 @@ class _CamaraTween extends Tween<Camara> {
 /// La mesa a pantalla completa. En pantallas anchas el panel de acciones flota
 /// sobre la mesa, a la izquierda y encima de la fila de jugadores; en las
 /// estrechas va debajo de la mesa. En los dos casos se puede plegar.
+/// Mitad del ancho (en pantalla) que ocupa el cuadro del jefe: la zona se
+/// escala para caber, así que depende de lo que limite, el alto o el ancho.
+double _mitadJefe(double ancho, double alto, int jugadores) {
+  final escalaAlto = alto * 0.001;
+  final escalaAncho = (ancho - 16) / _EscenaJefe.anchoPara(jugadores);
+  return 360 * min(escalaAlto, escalaAncho) / 2;
+}
+
+/// Borde izquierdo del bocadillo de turno. Va centrado sobre el asiento del
+/// jugador que actúa, pero sin tapar el cuadro del jefe (su vida y "Curar al
+/// jefe"): si el asiento cae bajo el jefe, se aparta hacia el lado del asiento
+/// y el pico sigue señalándolo. Si el lado no tiene sitio, se queda como antes.
+double izquierdaBocadillo({
+  required double ancho,
+  required double alto,
+  required int jugadores,
+  required double centro,
+}) {
+  const margen = 12.0;
+  const panel = DisposicionMesa.anchoPanel;
+  const holgura = 12.0;
+  final maxIzq = max(margen, ancho - panel - margen);
+  final centrado = (centro - panel / 2).clamp(margen, maxIzq).toDouble();
+  final mitad = _mitadJefe(ancho, alto, jugadores) + holgura;
+  final jefeIzq = ancho / 2 - mitad;
+  final jefeDer = ancho / 2 + mitad;
+  if (centrado + panel <= jefeIzq || centrado >= jefeDer) return centrado;
+  final aLaIzquierda = centro <= ancho / 2;
+  final apartado = aLaIzquierda ? jefeIzq - panel : jefeDer;
+  if (apartado < margen || apartado > maxIzq) return centrado;
+  return apartado;
+}
+
 class DisposicionMesa extends ConsumerStatefulWidget {
   const DisposicionMesa({
     super.key,
@@ -222,9 +255,12 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
           final centro = activo != null
               ? ancho * (activo + 0.5) / n
               : ancho / 2;
-          final izquierda = (centro - panel / 2)
-              .clamp(margen, max(margen, ancho - panel - margen))
-              .toDouble();
+          final izquierda = izquierdaBocadillo(
+            ancho: ancho,
+            alto: alto,
+            jugadores: n,
+            centro: centro,
+          );
           final pico = (centro - izquierda - 14)
               .clamp(26.0, panel - 54.0)
               .toDouble();
