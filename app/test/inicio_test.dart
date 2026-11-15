@@ -113,8 +113,8 @@ void main() {
   testWidgets('el Pokédex avisa de que llega pronto', (tester) async {
     await abrirInicio(tester);
     await tester.tap(find.byKey(const Key('inicio-pokedex')));
-    await tester.pump();
-    expect(find.text('El Pokédex llega pronto.'), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('pokedex')), findsOneWidget);
   });
 
   testWidgets('Cuenta abre el inicio de sesión', (tester) async {

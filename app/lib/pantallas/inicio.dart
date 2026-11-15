@@ -8,6 +8,7 @@ import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'carta.dart';
 import 'nueva_partida.dart';
+import 'pantalla_pokedex.dart';
 import 'setup.dart';
 
 /// Si la app está en la partida o en la pantalla de inicio (#232). Al abrir
@@ -169,9 +170,9 @@ Future<bool> empezarPartidaNueva(
 }
 
 void _pokedex(BuildContext context) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(const SnackBar(content: Text('El Pokédex llega pronto.')));
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => const PantallaPokedex()),
+  );
 }
 
 String _textoCuenta(WidgetRef ref) {

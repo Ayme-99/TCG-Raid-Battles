@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'pantallas/inicio.dart';
 import 'pantallas/pantalla_partida.dart';
+import 'pokedex/pokedex.dart';
 
 /// Raíz de la app. El diseño visual definitivo llega con los bocetos (T-18);
 /// de momento las pantallas son funcionales y sencillas.
@@ -28,6 +29,8 @@ class _Raiz extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Apunta en la Pokédex cada partida que termina, en cualquier pantalla.
+    ref.watch(pokedexProvider);
     return ref.watch(enPartidaProvider)
         ? const PantallaPartida()
         : const PantallaInicio();
