@@ -252,11 +252,11 @@ class _Opcion extends StatelessWidget {
         ),
         if (bloqueada) ...[
           const SizedBox(height: 8),
-          const Row(
-            mainAxisSize: MainAxisSize.min,
+          const Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 6,
             children: [
               Icon(Icons.lock_outline, size: 16, color: _lila),
-              SizedBox(width: 6),
               Text(
                 'Próximamente',
                 style: TextStyle(color: _lila, fontWeight: FontWeight.w700),
@@ -269,8 +269,8 @@ class _Opcion extends StatelessWidget {
     final contenido = horizontal
         ? Row(
             children: [
-              SizedBox(width: 190, child: Center(child: arte)),
-              const SizedBox(width: 24),
+              SizedBox(width: 120, child: Center(child: arte)),
+              const SizedBox(width: 20),
               Expanded(child: texto),
             ],
           )
@@ -297,7 +297,7 @@ class _Opcion extends StatelessWidget {
           onTap: bloqueada ? null : () {},
           child: Container(
             padding: EdgeInsets.symmetric(
-              horizontal: horizontal ? 28 : 18,
+              horizontal: horizontal ? 24 : 18,
               vertical: horizontal ? 20 : 18,
             ),
             decoration: BoxDecoration(
@@ -447,7 +447,14 @@ class _Asistente extends StatelessWidget {
             children: [
               _Atras(onPressed: estado._atras),
               const SizedBox(width: 14),
-              Text('Nueva partida', style: _titulo(24)),
+              Expanded(
+                child: Text(
+                  'Nueva partida',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _titulo(24),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -514,13 +521,14 @@ class _ConCarril extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final paso = estado._paso;
+    final lado = MediaQuery.of(context).size.width >= 900 ? 56.0 : 32.0;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(56, 40, 56, 40),
+      padding: EdgeInsets.fromLTRB(lado, 40, lado, 40),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            width: 280,
+            width: 250,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -547,12 +555,12 @@ class _ConCarril extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 40),
+          SizedBox(width: lado),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(_pasos[paso].pregunta, style: _titulo(40)),
+                Text(_pasos[paso].pregunta, style: _titulo(36)),
                 const SizedBox(height: 24),
                 Expanded(
                   child: SingleChildScrollView(
