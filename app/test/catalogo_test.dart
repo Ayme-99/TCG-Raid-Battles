@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/catalogo/catalogo.dart';
+import 'package:incursiones_app/pantallas/carta.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
@@ -21,6 +22,25 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('catálogo empaquetado', () {
+    test('cada jefe y cada aliado tiene su imagen en app/assets/cartas', () {
+      final indice = _json('assets/catalogo/catalogo.json') as Map;
+      final faltan = <String>[];
+      for (final id in (indice['jefes'] as List)) {
+        final jefe = _json('assets/catalogo/bosses/$id.json') as Map;
+        final nombres = [
+          jefe['nombre'] as String,
+          for (final a in (jefe['invocacion']['aliados'] as Map).values)
+            (a as Map)['nombre'] as String,
+        ];
+        for (final n in nombres) {
+          if (!File('assets/cartas/${idCarta(n)}.webp').existsSync()) {
+            faltan.add(n);
+          }
+        }
+      }
+      expect(faltan, isEmpty, reason: 'sin imagen: $faltan');
+    });
+
     test('la copia de app/assets es la misma que catalog/', () {
       expect(_json('assets/catalogo/catalogo.json'),
           equals(_json('../catalog/catalogo.json')));
