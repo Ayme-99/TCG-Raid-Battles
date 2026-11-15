@@ -64,8 +64,13 @@ class _Orden extends StatelessWidget {
               children: [
                 for (var i = 0; i < estado.orden.length; i++)
                   Chip(
-                    label: Text(
-                      '${i + 1}. ${estado.jugadores[estado.orden[i]].nombre}',
+                    label: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 160),
+                      child: Text(
+                        '${i + 1}. ${estado.jugadores[estado.orden[i]].nombre}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     backgroundColor: i == estado.turnoActual
                         ? Theme.of(context).colorScheme.primaryContainer
