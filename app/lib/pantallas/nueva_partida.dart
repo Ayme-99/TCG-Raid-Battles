@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:incursiones_engine/incursiones_engine.dart';
+
 import 'inicio.dart';
 
 const _morado = Color(0xFF1B1235);
@@ -59,6 +61,7 @@ const _pasos = [
 
 class _PantallaNuevaPartidaState extends ConsumerState<PantallaNuevaPartida> {
   int _paso = 0;
+  ModoPreparacion _modo = ModoPreparacion.equipo;
 
   void _atras() {
     if (_paso == 0) {
@@ -68,6 +71,8 @@ class _PantallaNuevaPartidaState extends ConsumerState<PantallaNuevaPartida> {
     }
   }
 
+  void _elegirModo(ModoPreparacion modo) => setState(() => _modo = modo);
+
   void _ir(int paso) => setState(() => _paso = paso);
 
   Future<void> _siguiente() async {
@@ -76,7 +81,7 @@ class _PantallaNuevaPartidaState extends ConsumerState<PantallaNuevaPartida> {
       return;
     }
     final navegador = Navigator.of(context);
-    if (await empezarPartidaNueva(context, ref)) navegador.pop();
+    if (await empezarPartidaNueva(context, ref, modo: _modo)) navegador.pop();
   }
 
   @override
@@ -214,6 +219,7 @@ class _Opcion extends StatelessWidget {
     this.seleccionada = false,
     this.bloqueada = false,
     this.horizontal = true,
+    this.onTap,
   });
 
   final String clave;
@@ -222,6 +228,7 @@ class _Opcion extends StatelessWidget {
   final Widget arte;
   final bool seleccionada;
   final bool bloqueada;
+  final VoidCallback? onTap;
 
   /// Fila con el dibujo a la izquierda (tablet, PC) o columna (móvil).
   final bool horizontal;
@@ -294,7 +301,7 @@ class _Opcion extends StatelessWidget {
         child: InkWell(
           key: Key(clave),
           borderRadius: BorderRadius.circular(24),
-          onTap: bloqueada ? null : () {},
+          onTap: bloqueada ? null : onTap,
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: horizontal ? 24 : 18,
@@ -336,7 +343,12 @@ Widget _icono(IconData icono, {bool activo = true}) => Icon(
     );
 
 /// Las opciones de cada paso.
-List<Widget> _opciones(int paso, {required bool horizontal}) {
+List<Widget> _opciones(
+  int paso, {
+  required bool horizontal,
+  required ModoPreparacion modo,
+  required ValueChanged<ModoPreparacion> alElegir,
+}) {
   switch (paso) {
     case 0:
       return [
@@ -381,18 +393,22 @@ List<Widget> _opciones(int paso, {required bool horizontal}) {
         _Opcion(
           clave: 'opcion-jefe',
           titulo: 'Elegir jefe primero',
-          detalle: 'La app te recomienda el daño total del equipo.',
-          arte: _icono(Icons.emoji_events_outlined, activo: false),
-          bloqueada: true,
+          detalle: 'La app te recomienda el daño total del equipo y avisa '
+              'si no encaja.',
+          arte: _icono(Icons.emoji_events_outlined,
+              activo: modo == ModoPreparacion.jefe),
+          seleccionada: modo == ModoPreparacion.jefe,
           horizontal: horizontal,
+          onTap: () => alElegir(ModoPreparacion.jefe),
         ),
         _Opcion(
           clave: 'opcion-danio',
           titulo: 'Insertar daño por jugador',
           detalle: 'El daño de cada uno da el nivel y eliges entre sus jefes.',
           arte: const _FichasJugador(),
-          seleccionada: true,
+          seleccionada: modo == ModoPreparacion.equipo,
           horizontal: horizontal,
+          onTap: () => alElegir(ModoPreparacion.equipo),
         ),
       ];
   }
@@ -491,7 +507,10 @@ class _Asistente extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (final o in _opciones(paso, horizontal: false)) ...[
+                  for (final o in _opciones(paso,
+                      horizontal: false,
+                      modo: estado._modo,
+                      alElegir: estado._elegirModo)) ...[
                     o,
                     const SizedBox(height: 14),
                   ],
@@ -567,7 +586,10 @@ class _ConCarril extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        for (final o in _opciones(paso, horizontal: true)) ...[
+                        for (final o in _opciones(paso,
+                            horizontal: true,
+                            modo: estado._modo,
+                            alElegir: estado._elegirModo)) ...[
                           o,
                           const SizedBox(height: 18),
                         ],

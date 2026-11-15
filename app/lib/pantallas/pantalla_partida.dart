@@ -91,7 +91,7 @@ class PantallaPartida extends ConsumerWidget {
       body: enJuego
           ? Stack(
               children: [
-                Positioned.fill(child: _fase(estado)),
+                Positioned.fill(child: _fase(estado, ref)),
                 Positioned(
                   left: 8,
                   right: 8,
@@ -110,7 +110,7 @@ class PantallaPartida extends ConsumerWidget {
           : Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 900),
-                child: _fase(estado),
+                child: _fase(estado, ref),
               ),
             ),
     );
@@ -138,8 +138,12 @@ class PantallaPartida extends ConsumerWidget {
     return 'Ronda ${estado.ronda} · $turno';
   }
 
-  Widget _fase(EstadoPartida estado) => switch (estado.fase) {
-        Fase.preparacion => const PantallaJugadores(),
+  Widget _fase(EstadoPartida estado, WidgetRef ref) => switch (estado.fase) {
+        Fase.preparacion => ref.watch(modoPreparacionProvider) ==
+                    ModoPreparacion.jefe &&
+                ref.watch(jefePreelegidoProvider) == null
+            ? const PantallaJefePrimero()
+            : const PantallaJugadores(),
         Fase.eleccionJefe => const PantallaEleccionJefe(),
         Fase.turnoJugadores => const PantallaTurnoJugadores(),
         Fase.turnoJefe => const PantallaTurnoJefe(),

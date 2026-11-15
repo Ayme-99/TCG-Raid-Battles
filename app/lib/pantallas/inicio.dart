@@ -8,6 +8,7 @@ import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'carta.dart';
 import 'nueva_partida.dart';
+import 'setup.dart';
 
 /// Si la app está en la partida o en la pantalla de inicio (#232). Al abrir
 /// siempre se ve el inicio; los tests pueden arrancar ya dentro de la partida.
@@ -126,7 +127,11 @@ void _nuevaPartida(BuildContext context, WidgetRef ref) {
 
 /// Último paso del selector: pide confirmar si hay una partida a medias, la
 /// descarta y entra a la partida nueva. Devuelve false si se cancela.
-Future<bool> empezarPartidaNueva(BuildContext context, WidgetRef ref) async {
+Future<bool> empezarPartidaNueva(
+  BuildContext context,
+  WidgetRef ref, {
+  ModoPreparacion modo = ModoPreparacion.equipo,
+}) async {
   final hay = ref.read(partidaProvider).partida.eventos.isNotEmpty;
   final pendiente = _resumen(
     ref.read(partidaProvider),
@@ -157,6 +162,8 @@ Future<bool> empezarPartidaNueva(BuildContext context, WidgetRef ref) async {
     if (descartar != true) return false;
   }
   if (hay) ref.read(partidaProvider.notifier).nuevaPartida();
+  ref.read(modoPreparacionProvider.notifier).fijar(modo);
+  ref.read(jefePreelegidoProvider.notifier).fijar(null);
   ref.read(enPartidaProvider.notifier).entrar();
   return true;
 }

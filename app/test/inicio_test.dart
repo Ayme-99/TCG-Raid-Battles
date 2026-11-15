@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/app.dart';
+import 'package:incursiones_app/pantallas/setup.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
@@ -172,18 +173,19 @@ void main() {
     expect(find.text('¿Cómo quieres jugar?'), findsOneWidget);
   });
 
-  testWidgets('Elegir jefe primero está bloqueado hasta el modo por jefe',
-      (tester) async {
-    await abrirInicio(tester);
+  testWidgets('Elegir jefe primero lleva a la lista de jefes', (tester) async {
+    final c = await abrirInicio(tester);
     await tester.tap(find.byKey(const Key('inicio-nueva')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('nueva-siguiente')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('nueva-siguiente')));
     await tester.pumpAndSettle();
-    expect(find.text('Próximamente'), findsOneWidget);
     await tester.tap(find.byKey(const Key('opcion-jefe')));
     await tester.pumpAndSettle();
-    expect(find.text('¿Cómo preparas la partida?'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('nueva-empezar')));
+    await tester.pumpAndSettle();
+    expect(c.read(modoPreparacionProvider), ModoPreparacion.jefe);
+    expect(find.text('¿Contra qué jefe?'), findsOneWidget);
   });
 }

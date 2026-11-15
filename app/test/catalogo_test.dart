@@ -10,6 +10,7 @@ import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/catalogo/catalogo.dart';
 import 'package:incursiones_app/pantallas/carta.dart';
 import 'package:incursiones_app/pantallas/mapa.dart';
+import 'package:incursiones_app/pantallas/setup.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
@@ -507,4 +508,83 @@ class _AzarFijo implements Random {
 
   @override
   double nextDouble() => 0;
+
+  group('modo por jefe (#106)', () {
+    Future<ProviderContainer> abrir(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1000, 3000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final catalogo =
+          (await tester.runAsync(() => Catalogo.cargar(rootBundle)))!;
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...sobrescribir(),
+            catalogoProvider.overrideWith((ref) async => catalogo),
+          ],
+          child: const IncursionesApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final c = ProviderScope.containerOf(
+          tester.element(find.byType(IncursionesApp)));
+      c.read(modoPreparacionProvider.notifier).fijar(ModoPreparacion.jefe);
+      await tester.pumpAndSettle();
+      return c;
+    }
+
+    Future<void> escribir(WidgetTester tester, List<String> ataques) async {
+      for (var i = 0; i < ataques.length; i++) {
+        await tester.enterText(
+          find.descendant(
+            of: find.byKey(Key('ataque-$i')),
+            matching: find.byType(TextField),
+          ),
+          ataques[i],
+        );
+      }
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('se elige el jefe, se avisa del desajuste y se juega',
+        (tester) async {
+      final c = await abrir(tester);
+      expect(find.text('¿Contra qué jefe?'), findsOneWidget);
+      expect(find.byKey(const Key('jefe-primero-kingdra')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('jefe-primero-kingdra')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('jefe-elegido')), findsOneWidget);
+
+      // X = 200 queda muy por debajo del rango del nivel 3 (601–800).
+      await escribir(tester, ['100', '100']);
+      expect(find.byKey(const Key('aviso-desajuste')), findsOneWidget);
+      expect(find.textContaining('demasiado difícil'), findsOneWidget);
+
+      // Dentro del rango el aviso desaparece.
+      await escribir(tester, ['350', '300']);
+      expect(find.byKey(const Key('aviso-desajuste')), findsNothing);
+
+      // Por encima del rango, el aviso cambia.
+      await escribir(tester, ['500', '500']);
+      expect(find.textContaining('demasiado fácil'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('empezar-con-jefe')));
+      await tester.pumpAndSettle();
+      final estado = c.read(estadoProvider);
+      expect(estado.modo, ModoPreparacion.jefe);
+      expect(estado.nivel, 3);
+      expect(estado.jefe!.nivel, 3);
+      expect(estado.fase, Fase.turnoJugadores);
+    });
+
+    testWidgets('Cambiar vuelve a la lista de jefes', (tester) async {
+      await abrir(tester);
+      await tester.tap(find.byKey(const Key('jefe-primero-onix')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('cambiar-jefe')));
+      await tester.pumpAndSettle();
+      expect(find.text('¿Contra qué jefe?'), findsOneWidget);
+    });
+  });
 }
