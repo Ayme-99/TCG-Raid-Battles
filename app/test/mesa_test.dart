@@ -233,7 +233,10 @@ void main() {
   testWidgets('un nombre larguísimo no encoge el asiento (#224)',
       (tester) async {
     await abrir(tester);
-    await escribir(tester, 'nombre-0', 'Maria Del Carmen Piñeiro Fernandez');
+    await tester.enterText(
+      find.byKey(const Key('nombre-0')),
+      'Maria Del Carmen Piñeiro Fernandez',
+    );
     await empezar(tester);
     final largo = tester.getSize(find.byKey(const Key('nombre-asiento-0')));
     final corto = tester.getSize(find.byKey(const Key('nombre-asiento-1')));
