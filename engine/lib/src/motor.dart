@@ -143,6 +143,7 @@ EstadoPartida _configurar(EstadoPartida e, ConfigurarJugadores ev) {
     x: x,
     nivel: nivelPorX(x),
     modo: ev.modo,
+    formato: ev.formato,
     danoPorJugador: List<int>.filled(n, 0),
     estadosAplicados: List<int>.filled(n, 0),
   );

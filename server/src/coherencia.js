@@ -153,9 +153,14 @@ function comprobarCoherencia(registro) {
   return motivos;
 }
 
-// Lo que se abona a cada cuenta: la parte de los puestos con cuenta.
+// Lo que se abona a cada cuenta: la parte de los puestos con cuenta. Una
+// partida de formato físico (v13) no da puntos: se guarda para el historial
+// y no se abona nada. Las anteriores a la v13 no tenían formato: se abonan
+// como hasta ahora.
 function abonos(registro) {
   const salida = [];
+  const config = registro.eventos.find((e) => e.tipo === 'configurarJugadores');
+  const daPuntos = config?.formato !== 'fisico';
   for (const j of registro.resumen.jugadores) {
     const cuentaId = registro.cuentas[j.asiento];
     salida.push({
@@ -169,7 +174,7 @@ function abonos(registro) {
       puntos: j.puntos,
       estadosAplicados: j.estadosAplicados ?? 0,
       bonoEstados: j.bonoEstados ?? 0,
-      abonado: cuentaId !== null && j.abonado,
+      abonado: daPuntos && cuentaId !== null && j.abonado,
     });
   }
   return salida;
