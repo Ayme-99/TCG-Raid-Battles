@@ -172,7 +172,7 @@ String idMapa(String mapa) {
 /// Los demás usan el tapete genérico ([MapaPainter]). Añade aquí cada mapa
 /// nuevo; un test comprueba que existe el archivo.
 const fondosDeMapa = <String, Color>{
-  'tunel-roca': Color(0xFF1E2532),
+  'tunel-roca': Color(0xFF374344),
   'ruta-110': Color(0xFF1D2839),
   'islas-remolino': Color(0xFF154952),
   'sala-origen': Color(0xFF1C1A2E),
