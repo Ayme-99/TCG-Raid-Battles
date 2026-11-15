@@ -230,6 +230,27 @@ void main() {
     }
   });
 
+  testWidgets('un nombre larguísimo no encoge el asiento (#224)',
+      (tester) async {
+    await abrir(tester);
+    await tester.enterText(
+      find.byKey(const Key('nombre-0')),
+      'Maria Del Carmen Piñeiro Fernandez',
+    );
+    await empezar(tester);
+    final largo = tester.getSize(find.byKey(const Key('nombre-asiento-0')));
+    final corto = tester.getSize(find.byKey(const Key('nombre-asiento-1')));
+    // El nombre se recorta a un tope de ancho...
+    expect(largo.width, lessThanOrEqualTo(130));
+    // ...y los dos asientos miden lo mismo.
+    expect(
+      tester.getSize(find.byKey(const Key('menu-jugador-0'))),
+      tester.getSize(find.byKey(const Key('menu-jugador-1'))),
+    );
+    expect(largo.height, corto.height);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('la barra de vida llena tiene relleno visible', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(

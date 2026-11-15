@@ -763,13 +763,21 @@ class _Asiento extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  jugador.nombre,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 16,
-                    shadows: [Shadow(color: Colors.black54, blurRadius: 3)],
+                // Tope de ancho: un nombre larguísimo se recorta con elipsis en
+                // vez de encoger todo el asiento (#224).
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 130),
+                  child: Text(
+                    jugador.nombre,
+                    key: Key('nombre-asiento-${jugador.asiento}'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      shadows: [Shadow(color: Colors.black54, blurRadius: 3)],
+                    ),
                   ),
                 ),
                 Row(
