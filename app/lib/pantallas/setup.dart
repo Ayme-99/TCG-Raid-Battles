@@ -37,13 +37,18 @@ String textoRango(int nivel) {
   return maximo == null ? '$minimo o más' : '$minimo–$maximo';
 }
 
-/// Aviso cuando el equipo (X) no encaja con el jefe; null si encaja.
+/// Aviso cuando el equipo (X) no encaja con el jefe; null si encaja. Según el
+/// simulador (D-15, #246) la distancia que importa es en niveles: un nivel por
+/// debajo ya es casi imposible y uno por encima ya es fácil.
 String? avisoDesajuste(int x, int nivel) => switch (desajusteDeEquipo(x, nivel)) {
       -1 => 'Con X = $x tu equipo queda por debajo del rango recomendado '
-          '(${textoRango(nivel)}): probablemente demasiado difícil. '
-          'Puedes jugar igualmente.',
+          '(${textoRango(nivel)}): será muy difícil. Puedes jugar igualmente.',
+      1 when nivelPorX(x) - nivel >= 2 =>
+        'Con X = $x tu equipo queda muy por encima del rango recomendado '
+            '(${textoRango(nivel)}): será demasiado fácil. '
+            'Puedes jugar igualmente.',
       1 => 'Con X = $x tu equipo queda por encima del rango recomendado '
-          '(${textoRango(nivel)}): probablemente demasiado fácil. '
+          '(${textoRango(nivel)}): será más fácil de lo previsto. '
           'Puedes jugar igualmente.',
       _ => null,
     };

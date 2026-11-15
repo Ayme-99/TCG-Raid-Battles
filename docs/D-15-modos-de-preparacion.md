@@ -57,9 +57,8 @@ Lo que enseña:
 - **Por encima, un nivel ya hace el jefe fácil** (69–100 %) y dos lo hacen trivial (98–100 %).
 - Con la ayuda entre jugadores los números son casi iguales (±5 puntos).
 
-Por tanto la distancia que importa es en **niveles de X**, no en puntos sueltos de daño. Propuesta para el aviso (pendiente de decidir): por debajo, «muy difícil» desde el primer nivel; por encima, «más fácil de lo previsto» a 1 nivel y «demasiado fácil» a 2 o más.
+Por tanto la distancia que importa es en **niveles de X**, no en puntos sueltos de daño. **Decidido (2026-11-15):** por debajo, «muy difícil» desde el primer nivel; por encima, «más fácil de lo previsto» a 1 nivel y «demasiado fácil» a 2 o más.
 
 ## Pendiente
 
-- Decidir los textos del aviso según la propuesta de arriba (hoy el aviso no distingue distancia).
 - Orden de trabajo: primero el simulador de efectos (D-14) y la recalibración de HP, y después este modo.

@@ -529,6 +529,17 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    test('el aviso distingue la distancia en niveles', () {
+      // Onix es de nivel 1 (250–400).
+      expect(avisoDesajuste(300, 1), isNull);
+      expect(avisoDesajuste(200, 1), contains('muy difícil'));
+      expect(avisoDesajuste(500, 1), contains('más fácil de lo previsto'));
+      expect(avisoDesajuste(700, 1), contains('demasiado fácil'));
+      // Arceus es de nivel 4 (801+): por debajo siempre «muy difícil».
+      expect(avisoDesajuste(700, 4), contains('muy difícil'));
+      expect(avisoDesajuste(900, 4), isNull);
+    });
+
     testWidgets('se elige el jefe, se avisa del desajuste y se juega',
         (tester) async {
       final c = await abrir(tester);
@@ -542,15 +553,15 @@ void main() {
       // X = 200 queda muy por debajo del rango del nivel 3 (601–800).
       await escribir(tester, ['100', '100']);
       expect(find.byKey(const Key('aviso-desajuste')), findsOneWidget);
-      expect(find.textContaining('demasiado difícil'), findsOneWidget);
+      expect(find.textContaining('muy difícil'), findsOneWidget);
 
       // Dentro del rango el aviso desaparece.
       await escribir(tester, ['350', '300']);
       expect(find.byKey(const Key('aviso-desajuste')), findsNothing);
 
-      // Por encima del rango, el aviso cambia.
+      // Un nivel por encima del rango (X = 1000, nivel 4): más fácil de lo previsto.
       await escribir(tester, ['500', '500']);
-      expect(find.textContaining('demasiado fácil'), findsOneWidget);
+      expect(find.textContaining('más fácil de lo previsto'), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('empezar-con-jefe')));
       await tester.pumpAndSettle();
