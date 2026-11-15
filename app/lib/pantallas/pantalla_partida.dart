@@ -7,6 +7,7 @@ import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
 import 'fin_partida.dart';
+import 'paneles.dart';
 import 'setup.dart';
 import 'turno_jefe.dart';
 import 'turno_jugadores.dart';
@@ -86,6 +87,7 @@ class PantallaPartida extends ConsumerWidget {
                   child: SafeArea(
                     child: _BarraFlotante(
                       texto: _banner(estado),
+                      textoCorto: textoCortoBanner(estado),
                       acciones: accionesHud,
                       onAbandonar: () => _abandonar(context, ref),
                     ),
@@ -100,6 +102,18 @@ class PantallaPartida extends ConsumerWidget {
               ),
             ),
     );
+  }
+
+  /// Versión corta del banner para pantallas estrechas: "R1 · J1", "R3 · Jefe".
+  @visibleForTesting
+  static String textoCortoBanner(EstadoPartida estado) {
+    final actual = estado.jugadorActual;
+    final turno = estado.fase == Fase.turnoJefe
+        ? 'Jefe'
+        : actual == null
+            ? 'Jugadores'
+            : etiquetaDueno(estado.jugadores[actual].nombre, actual);
+    return 'R${estado.ronda} · $turno';
   }
 
   String _banner(EstadoPartida estado) {
@@ -160,11 +174,15 @@ class PantallaPartida extends ConsumerWidget {
 class _BarraFlotante extends StatelessWidget {
   const _BarraFlotante({
     required this.texto,
+    required this.textoCorto,
     required this.acciones,
     required this.onAbandonar,
   });
 
   final String texto;
+
+  /// Lo que se muestra cuando la barra es estrecha y el texto largo no cabe.
+  final String textoCorto;
   final List<Widget> acciones;
   final VoidCallback onAbandonar;
 
@@ -175,28 +193,60 @@ class _BarraFlotante extends StatelessWidget {
       padding: const EdgeInsets.only(top: 8),
       child: Row(
         children: [
-          Flexible(
-            child: Container(
-              key: const Key('barra-turno'),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xD91A1033),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: Text(
-                texto,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                ),
+          // El chip ocupa todo el hueco libre a la izquierda. Si el texto largo
+          // no cabe, va el corto; si ni ese cabe, no se muestra (la ronda y el
+          // turno ya salen en el panel de acciones) (#214).
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: LayoutBuilder(
+                builder: (context, caja) {
+                  const estilo = TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  );
+                  // Relleno (14 + 14) y borde (2 + 2) del chip.
+                  const extra = 32.0;
+                  final escala = MediaQuery.textScalerOf(context);
+                  bool cabe(String t) {
+                    final medida = TextPainter(
+                      text: TextSpan(text: t, style: estilo),
+                      textDirection: TextDirection.ltr,
+                      textScaler: escala,
+                      maxLines: 1,
+                    )..layout();
+                    return medida.width + extra <= caja.maxWidth;
+                  }
+
+                  final mostrado = cabe(texto)
+                      ? texto
+                      : cabe(textoCorto)
+                          ? textoCorto
+                          : null;
+                  if (mostrado == null) return const SizedBox.shrink();
+                  return Container(
+                    key: const Key('barra-turno'),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xD91A1033),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: Text(
+                      mostrado,
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      style: estilo,
+                    ),
+                  );
+                },
               ),
             ),
           ),
-          const Spacer(),
           Theme(
             data: tema.copyWith(
               iconButtonTheme: IconButtonThemeData(
