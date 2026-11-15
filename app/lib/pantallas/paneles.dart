@@ -251,28 +251,57 @@ class _CartaAliado extends StatelessWidget {
           alternativa: _AliadoSinImagen(aliado: a),
         ),
         const SizedBox(height: 6),
-        Text(
-          '${a.nombre} · $dueno',
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
-        ),
-        const SizedBox(height: 3),
-        BarraVida(
-          fraccion: a.hpMaximo == 0 ? 0 : a.hp / a.hpMaximo,
-          alto: 12,
-        ),
-        Text(
-          '${a.hp}/${a.hpMaximo} HP',
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
-        ),
-        if (a.envenenado || a.quemado)
-          Text(
-            [if (a.envenenado) 'Envenenado', if (a.quemado) 'Quemado'].join(' · '),
-            key: Key('estados-aliado-${a.slot}'),
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+        // Pastilla oscura: cada mapa tiene un fondo distinto y el texto suelto
+        // no se lee sobre todos (#216).
+        Container(
+          key: Key('etiqueta-aliado-${a.slot}'),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1B1235).withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.white24),
           ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${a.nombre} · $dueno',
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 3),
+              BarraVida(
+                fraccion: a.hpMaximo == 0 ? 0 : a.hp / a.hpMaximo,
+                alto: 12,
+              ),
+              Text(
+                '${a.hp}/${a.hpMaximo} HP',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (a.envenenado || a.quemado)
+                Text(
+                  [if (a.envenenado) 'Envenenado', if (a.quemado) 'Quemado']
+                      .join(' · '),
+                  key: Key('estados-aliado-${a.slot}'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+            ],
+          ),
+        ),
         const SizedBox(height: 4),
         Consumer(
           builder: (context, ref, _) => BotonMenu(
