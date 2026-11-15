@@ -1,4 +1,4 @@
-# Contrato del registro de partida (versión 11)
+# Contrato del registro de partida (versión 12)
 
 > Para subir la versión del contrato, sigue el checklist de [`docs/DEPENDENCIAS.md`](../docs/DEPENDENCIAS.md) (motor, servidor, repo externo).
 
@@ -8,9 +8,9 @@ Formato JSON con el que la app guarda una partida y la envía al backend. Una pa
 
 | Archivo | Qué es |
 |---|---|
-| `partida.v11.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
+| `partida.v12.schema.json` | Esquema JSON (draft 2020-12) de la versión actual. |
 | `partida.v7.schema.json`, `partida.v6.schema.json`, `partida.v5.schema.json`, `partida.v4.schema.json`, `partida.v3.schema.json`, `partida.v2.schema.json`, `partida.v1.schema.json` | Esquemas de las versiones 1 a 7, que se conservan: hay partidas guardadas con esos formatos. |
-| `ejemplos/v11/`, `ejemplos/v10/`, `ejemplos/v9/`, `ejemplos/v8/`, `ejemplos/v7/`, `ejemplos/v6/`, `ejemplos/v5/`, `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
+| `ejemplos/v12/`, `ejemplos/v11/`, `ejemplos/v10/`, `ejemplos/v9/`, `ejemplos/v8/`, `ejemplos/v7/`, `ejemplos/v6/`, `ejemplos/v5/`, `ejemplos/v4/`, `ejemplos/v3/`, `ejemplos/v2/`, `ejemplos/v1/` | Ejemplos de cada versión, en tres carpetas: `validos/` (terminados y en curso), `invalidos-estructura/` (**los rechaza el esquema**: versión futura, tipo de evento desconocido, campo del tipo equivocado, campo que falta o desconocido) e `invalidos-reglas/` (estructura correcta que **solo rechaza el motor** porque incumple las reglas: turno fuera de orden, eventos tras el final, cuentas que no coinciden, moneda de la quemadura que falta o sobra). |
 
 Los ejemplos válidos están probados por los dos lados: el motor los lee y los vuelve a escribir igual (`engine/test/registro_test.dart`) y el esquema los acepta (`server/test/contrato.test.js`). El CI ejecuta ambos.
 
@@ -100,6 +100,7 @@ El backend guarda además el registro completo (los eventos) para poder repetir 
 | 9 | Tres Pokémon por jugador con 3 jugadores (#194): `pokemonPerdidos` del resumen puede valer hasta 3 (hasta ahora, 2). Los eventos no cambian: el total de Pokémon sale del número de jugadores (3 con 3 jugadores, 2 en el resto). Migración 8 → 9: solo cambia la versión. |
 | 10 | Estados en los aliados (D-17, #196): evento nuevo `aplicarEstadoAliado` y `finTurnoJefe` gana `monedasQuemaduraAliados`. Migración 9 → 10: solo cambia la versión. |
 | 11 | Cuatro Pokémon por jugador con 2 jugadores (#207): `pokemonPerdidos` del resumen puede valer hasta 4. Los eventos no cambian: el total de Pokémon sale del número de jugadores (4 con 2 jugadores, 3 con 3, 2 en el resto). Migración 10 → 11: solo cambia la versión. |
+| 12 | Modo de preparación (D-15, #106): `configurarJugadores` gana `modoPreparacion` (`equipo` o `jefe`), obligatorio. En el modo `jefe` el nivel de la partida es el del jefe que se elige y no hace falta que coincida con el que daría el equipo. Migración 11 → 12: todas las partidas anteriores pasan a `equipo`. |
 
 `categoria` y `slot` salen de los dos dados de la invocación (D-13): no se repite un slot ocupado ni una categoría con un aliado vivo. `efectos` dice quién aplica los efectos de la carta del aliado: el jugador (no se escribe) o el programa, que ejecuta el script `scriptId` (obligatorio con `programa`, no admitido con `jugador`; el motor rechaza un script que no conoce).
 

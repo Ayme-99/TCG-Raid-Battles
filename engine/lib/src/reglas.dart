@@ -31,6 +31,25 @@ int nivelPorX(int x) {
   return 1;
 }
 
+/// Rango de X recomendado para un nivel (D-15): `(mínimo, máximo)`. El máximo
+/// del nivel 4 es null (sin tope). El nivel 1 empieza en 250, el mínimo de la
+/// tabla de balance, aunque un equipo más flojo también juegue ese nivel.
+(int, int?) rangoXDelNivel(int nivel) => switch (nivel) {
+      1 => (250, maxXNivel1),
+      2 => (maxXNivel1 + 1, maxXNivel2),
+      3 => (maxXNivel2 + 1, maxXNivel3),
+      _ => (maxXNivel3 + 1, null),
+    };
+
+/// Si el equipo (X) queda fuera del rango del nivel: -1 por debajo (más difícil
+/// de lo recomendado para el jefe), 1 por encima (más fácil), 0 dentro.
+int desajusteDeEquipo(int x, int nivel) {
+  final (minimo, maximo) = rangoXDelNivel(nivel);
+  if (x < minimo) return -1;
+  if (maximo != null && x > maximo) return 1;
+  return 0;
+}
+
 /// Daño que cuenta para X: el introducido, sin tope superior (hay cartas de
 /// más de 200 de daño) y nunca negativo.
 int ataqueParaX(int impreso) => impreso < 0 ? 0 : impreso;

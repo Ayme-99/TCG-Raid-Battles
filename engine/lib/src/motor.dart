@@ -142,6 +142,7 @@ EstadoPartida _configurar(EstadoPartida e, ConfigurarJugadores ev) {
     jugadores: jugadores,
     x: x,
     nivel: nivelPorX(x),
+    modo: ev.modo,
     danoPorJugador: List<int>.filled(n, 0),
     estadosAplicados: List<int>.filled(n, 0),
   );
@@ -149,7 +150,12 @@ EstadoPartida _configurar(EstadoPartida e, ConfigurarJugadores ev) {
 
 EstadoPartida _elegirJefe(EstadoPartida e, ElegirJefe ev) {
   _exigeFase(e, Fase.eleccionJefe, 'ElegirJefe');
-  if (ev.nivel != e.nivel) {
+  if (ev.nivel < 1 || ev.nivel > 4) {
+    _error('el nivel del jefe debe estar entre 1 y 4');
+  }
+  // Por equipo, el jefe tiene que ser del nivel que da el daño; por jefe, el
+  // nivel de la partida es el del jefe y el equipo solo recibe un aviso.
+  if (e.modo == ModoPreparacion.equipo && ev.nivel != e.nivel) {
     _error('el jefe es de nivel ${ev.nivel} y la partida es de nivel ${e.nivel}');
   }
   if (ev.hp <= 0) {
@@ -160,6 +166,7 @@ EstadoPartida _elegirJefe(EstadoPartida e, ElegirJefe ev) {
     _error('los HP entre intentos de invocación deben ser mayores que 0');
   }
   final conJefe = e.copiarCon(
+    nivel: ev.nivel,
     jefe: JefeEstado(
       nombre: ev.nombre,
       nivel: ev.nivel,

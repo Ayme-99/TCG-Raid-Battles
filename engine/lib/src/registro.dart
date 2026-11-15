@@ -9,11 +9,11 @@ import 'puntos.dart';
 /// Compatibilidad (ver `contrato/README.md`): cualquier cambio del formato
 /// sube la versión. Este motor lee todas las versiones hasta la actual y
 /// migra las antiguas; rechaza las futuras.
-const int versionRegistro = 11;
+const int versionRegistro = 12;
 
 /// Migraciones del registro de la versión N a la N+1 (sobre el JSON).
 final Map<int, Map<String, Object?> Function(Map<String, Object?>)>
-    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6, 6: _v6AV7, 7: _v7AV8, 8: _v8AV9, 9: _v9AV10, 10: _v10AV11};
+    _migraciones = {1: _v1AV2, 2: _v2AV3, 3: _v3AV4, 4: _v4AV5, 5: _v5AV6, 6: _v6AV7, 7: _v7AV8, 8: _v8AV9, 9: _v9AV10, 10: _v10AV11, 11: _v11AV12};
 
 /// Versión 2 (D-12): estados del jefe. Los eventos nuevos son opcionales, así
 /// que solo cambia el resumen: cada jugador gana `estadosAplicados` y
@@ -150,6 +150,26 @@ Map<String, Object?> _v9AV10(Map<String, Object?> datos) =>
 Map<String, Object?> _v10AV11(Map<String, Object?> datos) =>
     {...datos, 'version': 11};
 
+/// Versión 12 (D-15): `modoPreparacion` en `configurarJugadores`. Todas las
+/// partidas anteriores se prepararon por equipo.
+Map<String, Object?> _v11AV12(Map<String, Object?> datos) {
+  final eventos = datos['eventos'];
+  return {
+    ...datos,
+    'version': 12,
+    if (eventos is List)
+      'eventos': [
+        for (final e in eventos)
+          if (e is Map &&
+              e['tipo'] == 'configurarJugadores' &&
+              !e.containsKey('modoPreparacion'))
+            {...Map<String, Object?>.from(e), 'modoPreparacion': 'equipo'}
+          else
+            e,
+      ],
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Eventos <-> JSON
 // ---------------------------------------------------------------------------
@@ -163,6 +183,7 @@ Map<String, Object?> eventoAJson(Evento evento) {
           for (final j in ev.jugadores)
             {'nombre': j.nombre, 'ataqueMaximo': j.ataqueMaximo},
         ],
+        'modoPreparacion': ev.modo.name,
       },
     ElegirJefe ev => {
         'tipo': 'elegirJefe',
@@ -256,7 +277,11 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
   final tipo = c.texto('tipo');
   switch (tipo) {
     case 'configurarJugadores':
-      c.permitir({'tipo', 'jugadores'});
+      c.permitir({'tipo', 'jugadores', 'modoPreparacion'});
+      final modo = c.texto('modoPreparacion');
+      if (!ModoPreparacion.values.any((m) => m.name == modo)) {
+        c.falla('modo de preparación desconocido: «$modo»');
+      }
       final lista = c.lista('jugadores');
       if (lista.isEmpty || lista.length > 4) {
         c.falla('«jugadores» debe tener de 1 a 4 elementos');
@@ -264,7 +289,7 @@ Evento eventoDeJson(Object? json, [String ruta = 'evento']) {
       return ConfigurarJugadores([
         for (var i = 0; i < lista.length; i++)
           _configJugador(lista[i], '$ruta.jugadores[$i]'),
-      ]);
+      ], modo: ModoPreparacion.values.byName(modo));
     case 'elegirJefe':
       c.permitir({'tipo', 'jefeId', 'nombre', 'nivel', 'hp', 'invocacionCadaHp'});
       return ElegirJefe(

@@ -14,12 +14,26 @@ class ConfigJugador {
   const ConfigJugador({required this.nombre, required this.ataqueMaximo});
 }
 
+/// De dónde sale el nivel de la partida (D-15).
+enum ModoPreparacion {
+  /// El daño del equipo da el nivel y se elige un jefe de ese nivel.
+  equipo,
+
+  /// Se elige el jefe y su nivel es el de la partida; la app solo avisa si el
+  /// equipo queda fuera del rango recomendado.
+  jefe,
+}
+
 /// Setup: jugadores (1 a 4, en orden de asiento) y su mejor ataque.
-/// El motor calcula X y el nivel del jefe.
+/// El motor calcula X y, en el modo [ModoPreparacion.equipo], el nivel del jefe.
 final class ConfigurarJugadores extends Evento {
   final List<ConfigJugador> jugadores;
+  final ModoPreparacion modo;
 
-  const ConfigurarJugadores(this.jugadores);
+  const ConfigurarJugadores(
+    this.jugadores, {
+    this.modo = ModoPreparacion.equipo,
+  });
 }
 
 /// Setup: se elige el jefe del catálogo, que debe ser del nivel calculado.
