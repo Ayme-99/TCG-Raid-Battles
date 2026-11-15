@@ -1,0 +1,101 @@
+{
+  "version": 10,
+  "partidaId": "ejemplo-quemadura-sin-moneda-de-aliado",
+  "cuentas": [
+    "usuario-ana",
+    null
+  ],
+  "eventos": [
+    {
+      "tipo": "configurarJugadores",
+      "jugadores": [
+        {
+          "nombre": "Ana",
+          "ataqueMaximo": 100
+        },
+        {
+          "nombre": "Beto",
+          "ataqueMaximo": 100
+        }
+      ]
+    },
+    {
+      "tipo": "elegirJefe",
+      "jefeId": "ejemplo-nv1",
+      "nombre": "Jefe de ejemplo",
+      "nivel": 1,
+      "hp": 1000,
+      "invocacionCadaHp": 300
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 100
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 1,
+      "dano": 0
+    },
+    {
+      "tipo": "ataqueJefe",
+      "ranura": 1,
+      "dano": 30,
+      "jugador": 0
+    },
+    {
+      "tipo": "finTurnoJefe"
+    },
+    {
+      "tipo": "aliadoInvocado",
+      "slot": 1,
+      "categoria": "danio",
+      "nombre": "Rattata",
+      "hp": 60,
+      "ataqueNombre": "Placaje",
+      "ataqueDano": 20
+    },
+    {
+      "tipo": "ataqueAliado",
+      "slot": 1,
+      "dano": 20
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 100
+    },
+    {
+      "tipo": "ataqueAAliado",
+      "jugador": 1,
+      "slot": 1,
+      "dano": 10
+    },
+    {
+      "tipo": "aplicarEstadoAliado",
+      "jugador": 1,
+      "slot": 1,
+      "estado": "quemadura"
+    },
+    {
+      "tipo": "aplicarEstadoAliado",
+      "jugador": 0,
+      "slot": 1,
+      "estado": "veneno"
+    },
+    {
+      "tipo": "ataqueJefe",
+      "ranura": 1,
+      "dano": 30,
+      "jugador": 0
+    },
+    {
+      "tipo": "ataqueAliado",
+      "slot": 1,
+      "dano": 20
+    },
+    {
+      "tipo": "finTurnoJefe"
+    }
+  ]
+}

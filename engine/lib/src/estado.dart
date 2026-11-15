@@ -154,6 +154,11 @@ class AliadoEstado {
   /// Veces que ha usado su ataque (al entrar y en turnos del jefe).
   final int usos;
 
+  /// Estados alterados del aliado (D-17): hacen daño en el chequeo al cerrar
+  /// el turno del jefe, como en el jefe (D-12).
+  final bool envenenado;
+  final bool quemado;
+
   const AliadoEstado({
     required this.slot,
     required this.categoria,
@@ -168,6 +173,8 @@ class AliadoEstado {
     this.entradaResuelta = false,
     this.atacoEnTurnoJefe = false,
     this.usos = 0,
+    this.envenenado = false,
+    this.quemado = false,
   });
 
   bool get tieneAtaque => ataqueDano != null;
@@ -178,6 +185,8 @@ class AliadoEstado {
     bool? entradaResuelta,
     bool? atacoEnTurnoJefe,
     int? usos,
+    bool? envenenado,
+    bool? quemado,
   }) =>
       AliadoEstado(
         slot: slot,
@@ -193,6 +202,8 @@ class AliadoEstado {
         entradaResuelta: entradaResuelta ?? this.entradaResuelta,
         atacoEnTurnoJefe: atacoEnTurnoJefe ?? this.atacoEnTurnoJefe,
         usos: usos ?? this.usos,
+        envenenado: envenenado ?? this.envenenado,
+        quemado: quemado ?? this.quemado,
       );
 
   Map<String, Object?> toJson() => {
@@ -208,6 +219,8 @@ class AliadoEstado {
         'scriptId': scriptId,
         'entradaResuelta': entradaResuelta,
         'atacoEnTurnoJefe': atacoEnTurnoJefe,
+        'envenenado': envenenado,
+        'quemado': quemado,
       };
 }
 

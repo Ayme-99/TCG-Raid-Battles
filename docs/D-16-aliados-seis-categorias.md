@@ -76,4 +76,4 @@ Potenciador y Debilitador se distinguen por a quién afectan: el primero mejora 
 
 **Las 6 categorías son obligatorias** en el catálogo y su esquema; los 4 jefes ya las tienen.
 
-**Estados en los aliados (pendiente, D-17).** Los aliados también podrán quedar Envenenados o Quemados por un ataque de los jugadores. Decidido: lo lleva la app como en el jefe (D-12; daño en el chequeo al cerrar el turno del jefe), al atacar a un aliado se marca el estado aplicado, Velo Sagrado también los evita en los aliados y las aplicaciones cuentan para el bono de estados. Implica contrato v7 y va en una tarea aparte tras Arceus.
+**Estados en los aliados (D-17, ya decidido).** Los aliados también podrán quedar Envenenados o Quemados por un ataque de los jugadores. Decidido: lo lleva la app como en el jefe (D-12; daño en el chequeo al cerrar el turno del jefe), al atacar a un aliado se marca el estado aplicado, Velo Sagrado también los evita en los aliados y las aplicaciones cuentan para el bono de estados. Detalle en [D-17](D-17-estados-en-aliados.md).

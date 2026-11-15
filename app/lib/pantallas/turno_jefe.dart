@@ -171,6 +171,34 @@ class _BotonFinTurno extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Future<void> terminar() async {
+      final estado = ref.read(estadoProvider);
+      // Moneda de cada aliado quemado, por orden de slot (D-17).
+      final monedasAliados = <MonedaQuemaduraAliado>[];
+      for (final a in estado.aliados.where((a) => a.quemado)) {
+        final caraAliado = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Moneda de la quemadura: ${a.nombre}'),
+            content: Text(
+              'Tira una moneda. Cara: ${a.nombre} deja de estar quemado.',
+            ),
+            actions: [
+              TextButton(
+                key: Key('moneda-aliado-cruz-${a.slot}'),
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cruz'),
+              ),
+              FilledButton(
+                key: Key('moneda-aliado-cara-${a.slot}'),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Cara'),
+              ),
+            ],
+          ),
+        );
+        if (caraAliado == null || !context.mounted) return;
+        monedasAliados.add(MonedaQuemaduraAliado(slot: a.slot, cara: caraAliado));
+      }
       bool? cara;
       if (jefe.quemado) {
         cara = await showDialog<bool>(
@@ -196,7 +224,15 @@ class _BotonFinTurno extends ConsumerWidget {
         );
         if (cara == null || !context.mounted) return;
       }
-      registrar(context, ref, FinTurnoJefe(monedaQuemadura: cara));
+      registrar(
+        context,
+        ref,
+        FinTurnoJefe(
+          monedaQuemadura: cara,
+          monedasQuemaduraAliados:
+              monedasAliados.isEmpty ? null : monedasAliados,
+        ),
+      );
     }
 
     const texto = Text('Terminar el turno del jefe');

@@ -1,0 +1,35 @@
+{
+  "version": 10,
+  "partidaId": "ejemplo-moneda-texto",
+  "eventos": [
+    {
+      "tipo": "configurarJugadores",
+      "jugadores": [
+        {
+          "nombre": "Ana",
+          "ataqueMaximo": 100
+        }
+      ]
+    },
+    {
+      "tipo": "elegirJefe",
+      "nombre": "Jefe",
+      "nivel": 1,
+      "hp": 500
+    },
+    {
+      "tipo": "turnoJugador",
+      "jugador": 0,
+      "dano": 10
+    },
+    {
+      "tipo": "aplicarEstadoJefe",
+      "jugador": 0,
+      "estado": "quemadura"
+    },
+    {
+      "tipo": "finTurnoJefe",
+      "monedaQuemadura": "cara"
+    }
+  ]
+}
