@@ -208,6 +208,10 @@ void main() {
       s = aplicarTodos(s, const [
         PokemonKo(0),
         PokemonKo(0),
+        PokemonKo(0),
+        PokemonKo(0),
+        PokemonKo(1),
+        PokemonKo(1),
         PokemonKo(1),
         PokemonKo(1),
       ]);

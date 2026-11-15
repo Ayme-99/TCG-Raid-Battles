@@ -31,7 +31,7 @@ class JugadorEstado {
   /// Daño de su mejor ataque (nunca negativo, sin tope superior).
   final int ataqueMaximo;
 
-  /// Pokémon con los que empezó (2, o 3 si juegan 3 jugadores).
+  /// Pokémon con los que empezó (2; 3 con 3 jugadores y 4 con 2).
   final int pokemonTotal;
 
   /// Pokémon que le quedan en juego (todos al empezar).

@@ -88,9 +88,14 @@ void main() {
     expect(find.text('Turno de Jugador 1'), findsOneWidget);
   });
 
-  testWidgets('se pueden añadir y quitar jugadores (de 1 a 4)', (tester) async {
+  testWidgets('se pueden añadir y quitar jugadores (de 2 a 4)', (tester) async {
     await abrir(tester);
     expect(find.byKey(const Key('nombre-2')), findsNothing);
+    // Con 2 jugadores no se puede quitar ninguno: el mínimo es 2 (GDD v1.19).
+    final quitar = tester.widget<OutlinedButton>(
+      find.byKey(const Key('quitar-jugador')),
+    );
+    expect(quitar.onPressed, isNull);
     await tocar(tester, 'anadir-jugador');
     await tocar(tester, 'anadir-jugador');
     expect(find.byKey(const Key('nombre-3')), findsOneWidget);
@@ -169,7 +174,7 @@ void main() {
     expect(c.read(estadoProvider).ataquesJefeEnTurno, 1);
 
     await tocar(tester, 'ko-0');
-    expect(c.read(estadoProvider).jugadores[0].pokemonVivos, 1);
+    expect(c.read(estadoProvider).jugadores[0].pokemonVivos, 3);
 
     await tocar(tester, 'fin-turno-jefe');
     final estado = c.read(estadoProvider);

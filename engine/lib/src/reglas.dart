@@ -1,9 +1,16 @@
 /// Constantes y funciones puras de las reglas (GDD v1.0 §2).
 
-/// Pokémon que lleva cada jugador según cuántos juegan (GDD v1.17): con 3
-/// jugadores, 3 cada uno (1 Activo + 2 en Banca, 9 en mesa); en el resto de
-/// casos, 2 (1 Activo + 1 Banca). Es igual en todos los niveles.
-int pokemonPorJugadorSegun(int jugadores) => jugadores == 3 ? 3 : 2;
+/// Pokémon que lleva cada jugador según cuántos juegan (GDD v1.19): con 2
+/// jugadores, 4 cada uno (1 Activo + 3 en Banca, 8 en mesa); con 3, 3 cada uno
+/// (1 Activo + 2 en Banca, 9 en mesa); en el resto de casos, 2 (1 Activo + 1
+/// Banca). Es igual en todos los niveles.
+int pokemonPorJugadorSegun(int jugadores) =>
+    jugadores == 2 ? 4 : (jugadores == 3 ? 3 : 2);
+
+/// Mínimo de jugadores en una partida oficial (GDD v1.19): con 1 jugador no
+/// hay modo oficial (solo existe Onix y no se puede equilibrar). El motor
+/// sigue aceptando 1 jugador para práctica y pruebas.
+const int minJugadores = 2;
 
 /// Máximo de jugadores por partida.
 const int maxJugadores = 4;

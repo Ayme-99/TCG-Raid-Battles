@@ -109,10 +109,9 @@ void main() {
         ..._inicio(),
         const TurnoJugador(jugador: 0, dano: 10),
         const TurnoJugador(jugador: 1, dano: 10),
-        const PokemonKo(0),
-        const PokemonKo(0),
-        const PokemonKo(1),
-        const PokemonKo(1),
+        // Con 2 jugadores, 4 Pokémon cada uno.
+        for (var i = 0; i < 4; i++) const PokemonKo(0),
+        for (var i = 0; i < 4; i++) const PokemonKo(1),
       ]);
       expect(s.fase, Fase.terminada);
       expect(s.resultado, Resultado.derrota);
@@ -131,13 +130,12 @@ void main() {
       expect(s.cartasAnimoPendientes, [1]);
     });
 
-    test('dos KO del mismo jugador lo eliminan y no se sienta turno', () {
+    test('los 4 KO del mismo jugador lo eliminan y no se sienta turno', () {
       final s = reproducir([
         ..._inicio(),
         const TurnoJugador(jugador: 0, dano: 10),
         const TurnoJugador(jugador: 1, dano: 10),
-        const PokemonKo(1),
-        const PokemonKo(1),
+        for (var i = 0; i < 4; i++) const PokemonKo(1),
         const FinTurnoJefe(),
       ]);
       expect(s.jugadores[1].eliminado, isTrue);

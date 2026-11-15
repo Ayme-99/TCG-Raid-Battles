@@ -51,7 +51,9 @@ void main() {
     test('si se elimina al último jugador pendiente, pasa el jefe', () {
       var s = empezar(ataques: const [100, 100]);
       s = apply(s, const TurnoJugador(jugador: 0, dano: 1));
-      s = aplicarTodos(s, const [PokemonKo(1), PokemonKo(1)]);
+      // Con 2 jugadores cada uno lleva 4 Pokémon.
+      s = aplicarTodos(
+          s, const [PokemonKo(1), PokemonKo(1), PokemonKo(1), PokemonKo(1)]);
       expect(s.fase, Fase.turnoJefe);
     });
 
@@ -114,7 +116,16 @@ void main() {
   group('derrota', () {
     test('solo cuando todos los Pokémon de todos los jugadores caen', () {
       var s = todosActuan(empezar(ataques: const [100, 100]));
-      s = aplicarTodos(s, const [PokemonKo(0), PokemonKo(0), PokemonKo(1)]);
+      // Con 2 jugadores son 8 Pokémon en total: caen 7 y la partida sigue.
+      s = aplicarTodos(s, const [
+        PokemonKo(0),
+        PokemonKo(0),
+        PokemonKo(0),
+        PokemonKo(0),
+        PokemonKo(1),
+        PokemonKo(1),
+        PokemonKo(1),
+      ]);
       expect(s.terminada, isFalse);
       s = apply(s, const PokemonKo(1));
       expect(s.terminada, isTrue);
