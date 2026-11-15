@@ -251,6 +251,29 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('con 4 jugadores los slots de los extremos caben en pantalla (#218)',
+      (tester) async {
+    await abrir(tester);
+    await tocar(tester, 'anadir-jugador');
+    await tocar(tester, 'anadir-jugador');
+    for (var i = 0; i < 4; i++) {
+      await escribir(tester, 'ataque-$i', '100');
+    }
+    await tocar(tester, 'configurar');
+    await escribir(tester, 'jefe-hp', '1000');
+    await tocar(tester, 'elegir-jefe');
+    for (final ancho in [1000.0, 800.0, 600.0]) {
+      tester.view.physicalSize = Size(ancho, 1000);
+      await tester.pumpAndSettle();
+      for (var i = 0; i < 4; i++) {
+        final r = tester.getRect(find.byKey(Key('slot-libre-$i')));
+        expect(r.left, greaterThanOrEqualTo(12), reason: 'slot $i a $ancho');
+        expect(r.right, lessThanOrEqualTo(ancho - 12),
+            reason: 'slot $i a $ancho');
+      }
+    }
+  });
+
   testWidgets('la barra de vida llena tiene relleno visible', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(

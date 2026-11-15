@@ -140,7 +140,8 @@ class _CamaraTween extends Tween<Camara> {
 /// escala para caber, así que depende de lo que limite, el alto o el ancho.
 double _mitadJefe(double ancho, double alto, int jugadores) {
   final escalaAlto = alto * 0.001;
-  final escalaAncho = (ancho - 16) / _EscenaJefe.anchoPara(jugadores);
+  final escalaAncho =
+      (ancho - 2 * _Zona.margenLateral) / _EscenaJefe.anchoPara(jugadores);
   return 360 * min(escalaAlto, escalaAncho) / 2;
 }
 
@@ -567,7 +568,7 @@ class _Mesa extends StatelessWidget {
                 onTap: () => onFoco(const FocoJefe()),
                 child: _Zona(
                   ancho: _EscenaJefe.anchoPara(estado.jugadores.length),
-                  arriba: MediaQuery.of(context).padding.top + 52,
+                  arriba: MediaQuery.of(context).padding.top + 64,
                   hijo: _EscenaJefe(slots: estado.jugadores.length),
                 ),
               ),
@@ -650,6 +651,10 @@ class _EscenaJefe extends StatelessWidget {
 class _Zona extends StatelessWidget {
   const _Zona({required this.ancho, required this.hijo, this.arriba = 0});
 
+  /// Aire a cada lado: con 4 jugadores los slots de los extremos no pueden
+  /// rozar el borde de la pantalla (#218).
+  static const margenLateral = 24.0;
+
   final double ancho;
   final Widget hijo;
 
@@ -659,7 +664,12 @@ class _Zona extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(8, 8 + arriba, 8, 8),
+      padding: EdgeInsets.fromLTRB(
+        margenLateral,
+        8 + arriba,
+        margenLateral,
+        8,
+      ),
       child: FittedBox(
         child: SizedBox(width: ancho, child: hijo),
       ),
