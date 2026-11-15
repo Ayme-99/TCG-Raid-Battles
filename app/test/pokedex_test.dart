@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -196,5 +197,41 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('0 de 28'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('la rueda del ratón desplaza y las pestañas suben, '
+      'dejando fija la barra de arriba', (tester) async {
+    tester.view.physicalSize = const Size(390, 600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final catalogo =
+        (await tester.runAsync(() => Catalogo.cargar(rootBundle)))!;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...sobrescribir(conInicio: true),
+          catalogoProvider.overrideWith((ref) async => catalogo),
+        ],
+        child: const IncursionesApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('inicio-pokedex')));
+    await tester.pumpAndSettle();
+
+    final antes = tester.getTopLeft(find.byKey(const Key('pokedex-progreso'))).dy;
+    final volverAntes = tester.getTopLeft(find.byKey(const Key('pokedex-atras'))).dy;
+    final raton = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(raton.hover(const Offset(195, 400)));
+    await tester.sendEventToBinding(raton.scroll(const Offset(0, 150)));
+    await tester.pumpAndSettle();
+
+    final despues =
+        tester.getTopLeft(find.byKey(const Key('pokedex-progreso'))).dy;
+    expect(despues, lessThan(antes));
+    expect(
+      tester.getTopLeft(find.byKey(const Key('pokedex-atras'))).dy,
+      volverAntes,
+    );
   });
 }

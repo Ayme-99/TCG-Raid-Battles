@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,18 +33,31 @@ const _filtroGris = ColorFilter.matrix(<double>[
 /// Pokédex local (#236): los jefes enfrentados y sus aliados, por expansión.
 /// De momento solo la categoría «Enemigos»; «Mis cartas» llega con el formato
 /// digital. Nunca vista = silueta, vista = gris, derrotada = a todo color.
-class PantallaPokedex extends ConsumerWidget {
+class PantallaPokedex extends ConsumerStatefulWidget {
   const PantallaPokedex({super.key});
 
   /// Ancho a partir del cual los jefes se ponen en dos columnas.
   static const anchoDosColumnas = 700.0;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PantallaPokedex> createState() => _EstadoPokedex();
+}
+
+class _EstadoPokedex extends ConsumerState<PantallaPokedex> {
+  final _desplazamiento = ScrollController();
+
+  @override
+  void dispose() {
+    _desplazamiento.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final pokedex = ref.watch(pokedexProvider);
     final jefes = ref.watch(catalogoProvider).valueOrNull?.jefes ?? const [];
     final ancho = MediaQuery.of(context).size.width;
-    final ancha = ancho >= anchoDosColumnas;
+    final ancha = ancho >= PantallaPokedex.anchoDosColumnas;
 
     var vistos = 0;
     var total = 0;
@@ -72,45 +86,72 @@ class PantallaPokedex extends ConsumerWidget {
           ),
           ColoredBox(color: _morado.withValues(alpha: 0.62)),
           SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: ancha ? 48 : 16,
-                vertical: ancha ? 24 : 12,
+            child: ScrollConfiguration(
+              // Rueda, arrastre con el ratón y táctil: todo desplaza.
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: PointerDeviceKind.values.toSet(),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _Cabecera(ancha: ancha),
-                  const SizedBox(height: 16),
-                  const _Pestanas(),
-                  const SizedBox(height: 12),
-                  _Progreso(vistos: vistos, total: total),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: ancha
-                          ? Wrap(
-                              spacing: 16,
-                              runSpacing: 16,
-                              children: [
-                                for (final p in paneles)
-                                  SizedBox(
-                                    width: (ancho - 96 - 16) / 2,
-                                    child: p,
-                                  ),
-                              ],
-                            )
-                          : Column(
-                              children: [
-                                for (final p in paneles) ...[
-                                  p,
-                                  const SizedBox(height: 12),
-                                ],
-                              ],
-                            ),
+              child: Scrollbar(
+                controller: _desplazamiento,
+                thumbVisibility: ancha,
+                child: CustomScrollView(
+                  key: const Key('pokedex-lista'),
+                  controller: _desplazamiento,
+                  slivers: [
+                    // Solo la barra con «volver» y el título se queda fija; el
+                    // resto sube al desplazar y deja sitio a las cartas.
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _CabeceraFija(ancha: ancha),
                     ),
-                  ),
-                ],
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: ancha ? 48 : 16,
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const _Pestanas(),
+                            const SizedBox(height: 12),
+                            _Progreso(vistos: vistos, total: total),
+                            const SizedBox(height: 12),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        ancha ? 48 : 16,
+                        0,
+                        ancha ? 48 : 16,
+                        24,
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: ancha
+                            ? Wrap(
+                                spacing: 16,
+                                runSpacing: 16,
+                                children: [
+                                  for (final p in paneles)
+                                    SizedBox(
+                                      width: (ancho - 96 - 16) / 2,
+                                      child: p,
+                                    ),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  for (final p in paneles) ...[
+                                    p,
+                                    const SizedBox(height: 12),
+                                  ],
+                                ],
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -118,6 +159,37 @@ class PantallaPokedex extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Barra fija de arriba: «volver» y el título, sin ocupar más que lo justo.
+class _CabeceraFija extends SliverPersistentHeaderDelegate {
+  const _CabeceraFija({required this.ancha});
+
+  final bool ancha;
+
+  static const _alto = 64.0;
+
+  @override
+  double get minExtent => _alto;
+
+  @override
+  double get maxExtent => _alto;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: overlapsContent ? _morado.withValues(alpha: 0.94) : null,
+      padding: EdgeInsets.symmetric(horizontal: ancha ? 48 : 16, vertical: 8),
+      child: _Cabecera(ancha: ancha),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_CabeceraFija old) => old.ancha != ancha;
 }
 
 class _Cabecera extends StatelessWidget {
