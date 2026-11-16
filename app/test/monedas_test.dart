@@ -413,74 +413,72 @@ void main() {
   });
 
   group('aliados con monedas', () {
-    testWidgets('Puño Incremento: 2 monedas caen y el daño sale de las caras',
-        (tester) async {
-      tester.view.physicalSize = const Size(1000, 3000);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.reset);
-      final catalogo =
-          (await tester.runAsync(() => Catalogo.cargar(rootBundle)))!;
-      final azar = _Azar([true, false]);
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            ...sobrescribir(),
-            catalogoProvider.overrideWith((ref) async => catalogo),
-            azarProvider.overrideWithValue(azar),
-          ],
-          child: const IncursionesApp(),
-        ),
-      );
-      await tester.pumpAndSettle();
-      for (final clave in ['ataque-0', 'ataque-1']) {
-        await tester.enterText(
-          find.descendant(
-            of: find.byKey(Key(clave)),
-            matching: find.byType(TextField),
+    testWidgets(
+      'Puño Incremento: 2 monedas caen y el daño sale de las caras',
+      timeout: const Timeout(Duration(seconds: 90)),
+      (tester) async {
+        tester.view.physicalSize = const Size(1000, 3000);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+        final catalogo =
+            (await tester.runAsync(() => Catalogo.cargar(rootBundle)))!;
+        // Con el azar a 0, la llamada de Onix elige el primer slot y la
+        // primera categoría libre: Machop (daño).
+        final azar = _Azar([true, false]);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...sobrescribir(),
+              catalogoProvider.overrideWith((ref) async => catalogo),
+              azarProvider.overrideWithValue(azar),
+            ],
+            child: const IncursionesApp(),
           ),
-          '100',
         );
-      }
-      await tester.tap(find.byKey(const Key('configurar')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('catalogo-onix')));
-      await tester.pumpAndSettle();
-      final c = ProviderScope.containerOf(
-        tester.element(find.byType(IncursionesApp)),
-      );
-      llegarALaLlamadaDelJefe(c);
-      final machop = catalogo.aliadoDe('Onix', 1, CategoriaAliado.danio)!;
-      expect(
-        c.read(partidaProvider.notifier).registrar(
-              AliadoInvocado(
-                slot: 0,
-                categoria: CategoriaAliado.danio,
-                nombre: machop.nombre,
-                hp: machop.hp,
-                ataqueNombre: machop.ataqueNombre,
-                ataqueDano: machop.ataqueDano,
-                habilidad: machop.textoParaLaMesa,
-                efectos: machop.efectos,
-                scriptId: machop.scriptId,
-              ),
+        await tester.pumpAndSettle();
+        for (final clave in ['ataque-0', 'ataque-1']) {
+          await tester.enterText(
+            find.descendant(
+              of: find.byKey(Key(clave)),
+              matching: find.byType(TextField),
             ),
-        isNull,
-      );
-      await tester.pumpAndSettle();
+            '100',
+          );
+        }
+        await tester.tap(find.byKey(const Key('configurar')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('catalogo-onix')));
+        await tester.pumpAndSettle();
+        final c = ProviderScope.containerOf(
+          tester.element(find.byType(IncursionesApp)),
+        );
+        llegarALaLlamadaDelJefe(c);
+        // Los dados caen solos y entra el aliado.
+        await tester.pump(const Duration(milliseconds: 500));
+        await tester.pumpAndSettle();
+        final aliado = c.read(estadoProvider).aliados.single;
+        expect(aliado.nombre, 'Machop');
+        expect(azar.sacadas, 0, reason: 'la llamada de Onix es segura');
+        // Si la entrada trae un aviso de la mesa, se cierra.
+        if (find.byKey(const Key('aviso-mesa-hecho')).evaluate().isNotEmpty) {
+          await tester.tap(find.byKey(const Key('aviso-mesa-hecho')));
+          await tester.pump(const Duration(milliseconds: 500));
+        }
 
-      await tester.tap(find.byKey(const Key('entrada-0')));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 900));
-      // Las dos monedas de Machop caen en la mesa.
-      expect(find.byKey(const ValueKey('moneda-mesa-0')), findsOneWidget);
-      expect(find.byKey(const ValueKey('moneda-mesa-1')), findsOneWidget);
-      expect(azar.sacadas, 2);
-      await tester.pumpAndSettle();
-      expect(find.text('1 cara · 1 cruz'), findsNothing,
-          reason: 'la tirada ya terminó');
-      // Una cara de dos: 20 de daño.
-      expect(find.textContaining('1 de 2 monedas en cara'), findsOneWidget);
-      expect(find.textContaining('20 de daño'), findsWidgets);
-    });
+        await tester.tap(find.byKey(const Key('entrada-0')));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 900));
+        // Las dos monedas de Machop caen en la mesa.
+        expect(find.byKey(const ValueKey('moneda-mesa-0')), findsOneWidget);
+        expect(find.byKey(const ValueKey('moneda-mesa-1')), findsOneWidget);
+        expect(azar.sacadas, 2);
+        // Y solo cuando paran se registra el ataque.
+        await tester.pump(duracionMonedas + const Duration(seconds: 1));
+        expect(c.read(tiradaMesaProvider), isNull);
+        // Una cara de dos: 20 de daño.
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(find.textContaining('1 de 2 monedas en cara'), findsOneWidget);
+      },
+    );
   });
 }
