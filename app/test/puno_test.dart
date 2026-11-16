@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/catalogo/catalogo.dart';
+import 'package:incursiones_app/partida/tirada_mesa.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 
 import 'ayudas.dart';
@@ -44,8 +45,9 @@ void main() {
     catalogo = await Catalogo.cargar(rootBundle);
   });
 
-  for (final hasta in [1, 2, 3, 4, 5]) {
-    testWidgets('Puño Incremento, etapa $hasta', (tester) async {
+  for (final hasta in [6, 7, 8, 9]) {
+    testWidgets('Puño Incremento, etapa $hasta',
+        timeout: const Timeout(Duration(seconds: 40)), (tester) async {
       tester.view.physicalSize = const Size(1000, 3000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
@@ -74,20 +76,32 @@ void main() {
       await _asentar(tester);
       await tester.tap(find.byKey(const Key('catalogo-onix')));
       await _asentar(tester);
-      if (hasta == 1) return;
       final c = ProviderScope.containerOf(
         tester.element(find.byType(IncursionesApp)),
       );
       llegarALaLlamadaDelJefe(c);
-      if (hasta == 2) return;
       await tester.pump(const Duration(milliseconds: 500));
-      if (hasta == 3) return;
       await _asentar(tester);
-      if (hasta == 4) return;
       final aliado = c.read(estadoProvider).aliados.single;
       expect(aliado.nombre, 'Machop');
       expect(azar.sacadas, 0, reason: 'la llamada de Onix es segura');
-      expect(find.byKey(const Key('entrada-0')), findsOneWidget);
+      if (find.byKey(const Key('aviso-mesa-hecho')).evaluate().isNotEmpty) {
+        await tester.tap(find.byKey(const Key('aviso-mesa-hecho')));
+        await tester.pump(const Duration(milliseconds: 500));
+      }
+      if (hasta == 6) return;
+      await tester.tap(find.byKey(const Key('entrada-0')));
+      await tester.pump();
+      if (hasta == 7) return;
+      await tester.pump(const Duration(milliseconds: 900));
+      expect(find.byKey(const ValueKey('moneda-mesa-0')), findsOneWidget);
+      expect(find.byKey(const ValueKey('moneda-mesa-1')), findsOneWidget);
+      expect(azar.sacadas, 2);
+      if (hasta == 8) return;
+      await tester.pump(duracionMonedas + const Duration(seconds: 1));
+      expect(c.read(tiradaMesaProvider), isNull);
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.textContaining('1 de 2 monedas en cara'), findsOneWidget);
     });
   }
 }
