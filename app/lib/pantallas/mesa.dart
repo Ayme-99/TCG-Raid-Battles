@@ -116,11 +116,26 @@ class Camara {
         a.zoom + (b.zoom - a.zoom) * t,
       );
 
+  /// Lo que puede asomar la cámara fuera de la mesa: es lo que sobra de
+  /// imagen del tapete por cada lado (ver `FondoMesa`), con margen para la
+  /// inclinación.
+  static const margenFuera = 80.0;
+
   /// Matriz que lleva el punto enfocado al centro de una mesa de [ancho] x
-  /// [alto] y la acerca.
+  /// [alto] y la acerca. El punto se corrige para que la vista no se salga de
+  /// la imagen del tapete: al enfocar los jugadores (abajo) o el jefe (arriba)
+  /// con zoom, sin esto asomaba la franja de color liso de fuera.
   Matrix4 matriz(double ancho, double alto) {
-    final px = (1 + ax) * ancho / 2;
-    final py = (1 + ay) * alto / 2;
+    double dentro(double centro, double total) {
+      final mitad = total / (2 * zoom);
+      final minimo = mitad - margenFuera;
+      final maximo = total - mitad + margenFuera;
+      // Sin zoom la vista ya cabe: el centro se queda donde está.
+      return minimo >= maximo ? total / 2 : centro.clamp(minimo, maximo);
+    }
+
+    final px = dentro((1 + ax) * ancho / 2, ancho);
+    final py = dentro((1 + ay) * alto / 2, alto);
     return Matrix4.translationValues(ancho / 2, alto / 2, 0) *
         Matrix4.diagonal3Values(zoom, zoom, 1) *
         Matrix4.translationValues(-px, -py, 0);
