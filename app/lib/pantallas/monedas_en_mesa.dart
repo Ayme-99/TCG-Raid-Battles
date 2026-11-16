@@ -342,9 +342,11 @@ class _EstadoPregunta extends ConsumerState<PreguntaMonedaEnMesa>
         final h = caja.maxHeight;
         final lado = max(34.0, min(w * 0.08, 64.0));
         final centro = switch (t.lugar) {
+          // Más abajo que las monedas lanzadas: arriba tiene que caber el panel
+          // con los botones sin salirse de lo que enfoca la cámara.
           LugarMoneda.asiento => Offset(
               (t.asiento + 0.5) / widget.asientos * w,
-              (alturaJefe + alturaAliados) * h - lado * 0.5,
+              (alturaJefe + alturaAliados + alturaJugadores * 0.2) * h,
             ),
           LugarMoneda.aliados =>
             Offset(w * 0.5, (alturaJefe + alturaAliados * 0.5) * h),
@@ -411,7 +413,14 @@ class _EstadoPregunta extends ConsumerState<PreguntaMonedaEnMesa>
                 ),
               ];
             }
-            final panelX = (x - 170).clamp(8.0, max(8.0, w - 348)).toDouble();
+            const anchoPanel = 400.0;
+            final panelX = (x - anchoPanel / 2)
+                .clamp(8.0, max(8.0, w - anchoPanel - 8))
+                .toDouble();
+            // Lo que queda a la vista sobre la moneda: el panel se encoge si no
+            // cabe, en vez de salirse de la pantalla.
+            final baseP = centro.dy - lado * 0.9;
+            final cabe = max(60.0, baseP - h * 0.63);
             return Stack(
               clipBehavior: Clip.none,
               children: [
@@ -419,12 +428,22 @@ class _EstadoPregunta extends ConsumerState<PreguntaMonedaEnMesa>
                 if (elegida == null && lista)
                   Positioned(
                     left: panelX,
-                    width: 340,
-                    bottom: h - (centro.dy - lado * 0.9),
-                    child: _PanelPregunta(
-                      key: const Key('pregunta-moneda'),
-                      tirada: t,
-                      alElegir: _elegir,
+                    width: anchoPanel,
+                    bottom: h - baseP,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: cabe),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.bottomCenter,
+                        child: SizedBox(
+                          width: anchoPanel,
+                          child: _PanelPregunta(
+                            key: const Key('pregunta-moneda'),
+                            tirada: t,
+                            alElegir: _elegir,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 if (elegida != null)
@@ -465,7 +484,7 @@ class _PanelPregunta extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
         decoration: BoxDecoration(
           color: const Color(0xE61B1235),
           borderRadius: BorderRadius.circular(14),
@@ -507,24 +526,24 @@ class _PanelPregunta extends StatelessWidget {
                 ),
               ),
             const SizedBox(height: 8),
-            const Text(
-              '¿Qué ha salido?',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const Text(
+                  '¿Qué ha salido?',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 14),
                 OutlinedButton(
                   key: const Key('pregunta-moneda-cruz'),
                   onPressed: () => alElegir(false),
                   child: const Text('Cruz'),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 FilledButton(
                   key: const Key('pregunta-moneda-cara'),
                   onPressed: () => alElegir(true),
