@@ -353,11 +353,13 @@ void main() {
         expect(find.byKey(const Key('pregunta-moneda')), findsOneWidget);
         expect(find.text('Fijar Blanco: la primera es cruz.'), findsOneWidget);
         expect(t.finalizada, isFalse);
-        await tester.tap(
+        // Los botones están en la mesa y responden a la pulsación.
+        final boton = tester.widget<ButtonStyleButton>(
           find.byKey(
             Key(cara ? 'pregunta-moneda-cara' : 'pregunta-moneda-cruz'),
           ),
         );
+        boton.onPressed!();
         await tester.pump();
         // Gira hasta el lado elegido y solo entonces se da por contestada.
         expect(find.byKey(const Key('pregunta-moneda')), findsNothing);
