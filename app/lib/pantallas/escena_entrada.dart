@@ -128,7 +128,11 @@ class _EstadoEscena extends ConsumerState<EscenaEntrada>
     });
     final d = _datos;
     if (d == null) return const IgnorePointer(child: SizedBox.shrink());
-    return GestureDetector(
+    // Material transparente: fuera de un Scaffold el texto saldría con el
+    // subrayado amarillo de «sin Material».
+    return Material(
+      type: MaterialType.transparency,
+      child: GestureDetector(
       key: const Key('escena-entrada'),
       behavior: HitTestBehavior.opaque,
       onTap: _saltar,
@@ -144,6 +148,7 @@ class _EstadoEscena extends ConsumerState<EscenaEntrada>
             mapaId: d.mapaId,
           ),
         ),
+      ),
       ),
     );
   }
