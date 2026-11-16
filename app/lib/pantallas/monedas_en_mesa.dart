@@ -526,8 +526,10 @@ class _PanelPregunta extends StatelessWidget {
                 ),
               ),
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
                   '¿Qué ha salido?',
@@ -550,6 +552,7 @@ class _PanelPregunta extends StatelessWidget {
                   child: const Text('Cara'),
                 ),
               ],
+            ),
             ),
           ],
         ),
