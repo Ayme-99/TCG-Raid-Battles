@@ -92,6 +92,9 @@ class TiradaMesa {
   /// Se completa cuando los dados han parado.
   Future<void> get terminada => _fin.future;
 
+  /// Ya ha parado (aunque la mesa todavía no la haya retirado).
+  bool get finalizada => _fin.isCompleted;
+
   /// Los dados han parado (lo avisa la mesa). Se puede llamar varias veces.
   void terminar() {
     if (!_fin.isCompleted) _fin.complete();

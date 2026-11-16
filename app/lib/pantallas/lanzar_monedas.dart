@@ -38,7 +38,10 @@ Future<List<bool>> lanzarMonedas(
 
 /// Si ya hay unos dados o unas monedas cayendo sobre la mesa. Los botones que
 /// lanzan monedas se ignoran mientras tanto, para no lanzar dos veces.
-bool hayTiradaEnMesa(WidgetRef ref) => ref.read(tiradaMesaProvider) != null;
+bool hayTiradaEnMesa(WidgetRef ref) {
+  final t = ref.read(tiradaMesaProvider);
+  return t != null && !t.finalizada;
+}
 
 /// Enseña la tirada sobre la mesa y espera a que pare. Si no hubiera mesa que
 /// la anime, se da por terminada pasado un rato.
@@ -48,9 +51,10 @@ Future<void> tirarEnMesa(WidgetRef ref, TiradaMesa tirada) async {
   // jefe) y entonces su `ref` ya no se puede usar.
   final controlador = ref.read(tiradaMesaProvider.notifier);
   // Si ya hay otra cayendo, se espera a que acabe: nunca se pisan.
-  while (controlador.state != null) {
-    await controlador.state!.terminada;
-    await Future<void>.delayed(Duration.zero);
+  while (true) {
+    final previa = controlador.state;
+    if (previa == null || previa.finalizada) break;
+    await previa.terminada;
   }
   controlador.state = tirada;
   final seguridad =
