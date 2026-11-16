@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
@@ -7,8 +5,10 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
 import '../partida/recordatorios.dart';
+import '../partida/tirada_mesa.dart';
 import 'carta_ataque_jefe.dart';
 import 'comun.dart';
+import 'lanzar_monedas.dart';
 import 'paneles.dart';
 import 'pendientes.dart';
 import 'mesa.dart';
@@ -171,58 +171,29 @@ class _BotonFinTurno extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Future<void> terminar() async {
+      // Mientras caen unas monedas no se vuelve a pulsar.
+      if (hayTiradaEnMesa(ref)) return;
       final estado = ref.read(estadoProvider);
-      // Moneda de cada aliado quemado, por orden de slot (D-17).
-      final monedasAliados = <MonedaQuemaduraAliado>[];
-      for (final a in estado.aliados.where((a) => a.quemado)) {
-        final caraAliado = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Moneda de la quemadura: ${a.nombre}'),
-            content: Text(
-              'Tira una moneda. Cara: ${a.nombre} deja de estar quemado.',
-            ),
-            actions: [
-              TextButton(
-                key: Key('moneda-aliado-cruz-${a.slot}'),
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cruz'),
-              ),
-              FilledButton(
-                key: Key('moneda-aliado-cara-${a.slot}'),
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Cara'),
-              ),
-            ],
-          ),
-        );
-        if (caraAliado == null || !context.mounted) return;
-        monedasAliados.add(MonedaQuemaduraAliado(slot: a.slot, cara: caraAliado));
-      }
+      // Primero la moneda del jefe y después la de cada aliado quemado, por
+      // orden de slot (D-12, D-17). La app las lanza y las registra.
       bool? cara;
       if (jefe.quemado) {
-        cara = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Moneda de la quemadura'),
-            content: const Text(
-              'Tira una moneda. Cara: el jefe deja de estar quemado.',
-            ),
-            actions: [
-              TextButton(
-                key: const Key('moneda-cruz'),
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cruz'),
-              ),
-              FilledButton(
-                key: const Key('moneda-cara'),
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Cara'),
-              ),
-            ],
-          ),
+        cara = (await lanzarMonedas(
+          ref,
+          lugar: LugarMoneda.jefe,
+          leyenda: 'Quemadura del jefe · cara la quita',
+        ))
+            .first;
+        if (!context.mounted) return;
+      }
+      final monedasAliados = <MonedaQuemaduraAliado>[];
+      for (final a in estado.aliados.where((a) => a.quemado)) {
+        final r = await lanzarMonedas(
+          ref,
+          leyenda: 'Quemadura de ${a.nombre} · cara la quita',
         );
-        if (cara == null || !context.mounted) return;
+        if (!context.mounted) return;
+        monedasAliados.add(MonedaQuemaduraAliado(slot: a.slot, cara: r.first));
       }
       registrar(
         context,
@@ -413,6 +384,8 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
               onPressed: faltaDefensor
                   ? null
                   : () async {
+                      // Mientras caen unas monedas no se vuelve a pulsar.
+                      if (hayTiradaEnMesa(ref)) return;
                       // Daño extra condicionado a la mesa (Castigo): la app
                       // pregunta si se cumple y lo suma.
                       var extra = 0;
@@ -428,16 +401,38 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                       }
                       // La moneda del ataque la lanza la app y queda en el
                       // registro (D-14).
-                      final moneda =
-                          efecto != null && efecto.conMoneda ? Random().nextBool() : null;
+                      bool? moneda;
+                      if (efecto != null && efecto.conMoneda) {
+                        moneda = (await lanzarMonedas(
+                          ref,
+                          lugar: LugarMoneda.jefe,
+                          leyenda: '${ataque?.nombre ?? 'Ataque del jefe'} · '
+                              'cara activa el efecto',
+                        ))
+                            .first;
+                        if (!context.mounted) return;
+                      }
                       // Bonus de los aliados Potenciador vivos (D-16): la app
                       // tira sus monedas y suma el bonus al daño registrado.
                       final base = (int.tryParse(_dano.text) ?? 0) + extra;
                       var total = base;
                       final partesBonus = <String>[];
-                      for (final b in bonusAtaqueJefeActivos(estado)) {
-                        final cara =
-                            !b.conMoneda || ref.read(azarProvider).nextBool();
+                      // Una sola tanda con la moneda de cada Potenciador que
+                      // la lleva, en orden.
+                      final bonus = bonusAtaqueJefeActivos(estado).toList();
+                      final lanzadas = bonus.where((b) => b.conMoneda).length;
+                      final resultados = lanzadas == 0
+                          ? const <bool>[]
+                          : await lanzarMonedas(
+                              ref,
+                              cuantas: lanzadas,
+                              lugar: LugarMoneda.jefe,
+                              leyenda: 'Potenciadores del jefe',
+                            );
+                      if (!context.mounted) return;
+                      var siguiente = 0;
+                      for (final b in bonus) {
+                        final cara = !b.conMoneda || resultados[siguiente++];
                         if (cara) total += b.valor;
                         partesBonus.add(
                           '${b.aliado}: ${cara ? 'cara, +${b.valor}' : 'cruz, sin bonus'}',

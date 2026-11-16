@@ -12,6 +12,7 @@ import 'acciones_objetivo.dart';
 import 'dados_en_mesa.dart';
 import 'estilo.dart';
 import 'mapa.dart';
+import 'monedas_en_mesa.dart';
 import 'panel_acciones.dart';
 import 'paneles.dart';
 import 'pendientes.dart';
@@ -472,7 +473,14 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
     // Mientras ruedan los dados la cámara mira a donde caen.
     final tirada = ref.watch(tiradaMesaProvider);
     final foco = tirada != null
-        ? (tirada.sin ? const FocoAliados() : FocoJugador(tirada.asiento))
+        ? switch (tirada.lugar) {
+            LugarMoneda.asiento => FocoJugador(tirada.asiento),
+            LugarMoneda.jefe => const FocoJefe(),
+            // Los dados de invocación caen ante el asiento; las monedas de los
+            // aliados, ante los aliados.
+            LugarMoneda.aliados =>
+              tirada.esMoneda ? const FocoAliados() : FocoJugador(tirada.asiento),
+          }
         : _manual ?? auto;
     final jugadores = estado.jugadores.length;
     final jefe = estado.jefe;
@@ -582,11 +590,17 @@ class _Mesa extends StatelessWidget {
         if (tirada != null)
           Positioned.fill(
             child: IgnorePointer(
-              child: DadosEnMesa(
-                key: ObjectKey(tirada),
-                tirada: tirada!,
-                asientos: estado.jugadores.length,
-              ),
+              child: tirada!.esMoneda
+                  ? MonedasEnMesa(
+                      key: ObjectKey(tirada),
+                      tirada: tirada!,
+                      asientos: estado.jugadores.length,
+                    )
+                  : DadosEnMesa(
+                      key: ObjectKey(tirada),
+                      tirada: tirada!,
+                      asientos: estado.jugadores.length,
+                    ),
             ),
           ),
       ],

@@ -272,9 +272,10 @@ void main() {
     expect(find.byKey(const Key('fin-turno-jefe')), findsOneWidget);
   });
 
-  testWidgets('la quemadura pide la moneda al terminar el turno del jefe',
+  testWidgets('la quemadura lanza la moneda sobre la mesa al terminar el turno',
       (tester) async {
-    final c = await abrir(tester);
+    // Moneda en cara: la quemadura se quita.
+    final c = await abrir(tester, azar: _AzarFijo([0]));
     await prepararPartida(tester, hp: 500);
     await tocar(tester, 'menu-jefe');
     await tocar(tester, 'accion-quemar');
@@ -291,8 +292,7 @@ void main() {
     await tocar(tester, 'robar-carta-jefe');
     await tocar(tester, 'registrar-ataque-jefe');
     await tocar(tester, 'fin-turno-jefe');
-    expect(find.text('Moneda de la quemadura'), findsOneWidget);
-    await tocar(tester, 'moneda-cara');
+    expect(find.byKey(const Key('moneda-resultado')), findsNothing);
 
     final estado = c.read(estadoProvider);
     expect(estado.jefe!.quemado, isFalse);
