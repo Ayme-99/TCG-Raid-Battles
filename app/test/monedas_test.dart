@@ -58,14 +58,6 @@ Widget _lanzador(void Function(List<bool>) alTerminar, {int cuantas = 1}) {
   );
 }
 
-/// Como `pumpAndSettle`, pero si algo no deja de animarse falla a los 20 s de
-/// tiempo de pantalla en vez de esperar diez minutos.
-Future<void> _asentar(WidgetTester tester) => tester.pumpAndSettle(
-      const Duration(milliseconds: 100),
-      EnginePhase.sendSemanticsUpdate,
-      const Duration(seconds: 20),
-    );
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
