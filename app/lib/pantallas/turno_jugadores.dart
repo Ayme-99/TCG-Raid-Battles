@@ -5,7 +5,9 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
 import '../partida/recordatorios.dart';
+import '../partida/tirada_mesa.dart';
 import 'comun.dart';
+import 'lanzar_monedas.dart';
 import 'paneles.dart';
 import 'pendientes.dart';
 import 'mesa.dart';
@@ -145,22 +147,21 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
       final fijadas =
           recordatoriosDeMoneda(ref.read(catalogoProvider).valueOrNull, estado);
       if (fijadas.isEmpty) {
-        evita = await lanzarMonedaEnPantalla(
-          context,
+        evita = (await lanzarMonedas(
           ref,
+          lugar: LugarMoneda.asiento,
+          asiento: widget.jugador,
+          leyenda: '$nombreJugador lanza: $nombreAliado · Bote',
+        ))
+            .first;
+      } else {
+        final cara = await preguntarMoneda(
+          ref,
+          asiento: widget.jugador,
           titulo: '$nombreAliado: Bote',
           detalle: '$nombreJugador lanza 1 moneda. Con cara, se evita todo el '
               'daño a $nombreAliado.',
-        );
-      } else {
-        final cara = await preguntarMesa(
-          context,
-          [
-            '$nombreAliado: Bote. $nombreJugador lanza 1 moneda. ¿Sale cara?',
-            ...fijadas,
-          ].join('\n'),
-          si: 'Cara',
-          no: 'Cruz',
+          recordatorios: fijadas,
         );
         if (cara == null) return;
         evita = cara;

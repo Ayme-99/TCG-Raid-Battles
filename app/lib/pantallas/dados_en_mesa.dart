@@ -6,7 +6,7 @@ import '../partida/tirada_mesa.dart';
 import 'estilo.dart';
 import 'mesa.dart';
 
-/// Los dados de una [TiradaMesa] cayendo sobre la mesa (T-44): entran desde
+/// Los dados de una [TiradaMesa] de invocación cayendo sobre la mesa (T-44): entran desde
 /// arriba, rebotan, ruedan y se paran en su cara. Se pintan en coordenadas de
 /// la mesa, así que la cámara los sigue y los enfoca como a todo lo demás.
 class DadosEnMesa extends StatefulWidget {
@@ -24,7 +24,7 @@ class DadosEnMesa extends StatefulWidget {
 class _DadosEnMesaState extends State<DadosEnMesa>
     with SingleTickerProviderStateMixin {
   late final AnimationController _anim =
-      AnimationController(vsync: this, duration: duracionTirada)
+      AnimationController(vsync: this, duration: widget.tirada.duracion)
         ..addStatusListener((s) {
           if (s == AnimationStatus.completed) widget.tirada.terminar();
         })
@@ -45,50 +45,35 @@ class _DadosEnMesaState extends State<DadosEnMesa>
         final h = caja.maxHeight;
         final lado = min(w * 0.09, 72.0);
         // Los dados caen delante del asiento, justo encima de la fila de
-        // jugadores; la moneda sin aliado cae en el centro, ante los aliados.
+        // jugadores. Las monedas, en `monedas_en_mesa.dart`.
         final suelo = (alturaJefe + alturaAliados) * h - lado * 0.4;
         final xAsiento = (t.asiento + 0.5) / widget.asientos * w;
-        final dados = t.sin
-            ? [
-                _Dado(
-                  caras: 2,
-                  valor: 2,
-                  x: w * 0.5,
-                  suelo: (alturaJefe + alturaAliados * 0.5) * h,
-                  alto: h,
-                  lado: lado,
-                  retraso: 0,
-                  desvio: 1,
-                  color: const Color(0xFFFFC107),
-                  semilla: 0,
-                ),
-              ]
-            : [
-                _Dado(
-                  caras: t.carasSlot,
-                  valor: t.valorSlot,
-                  x: xAsiento - lado * 0.8,
-                  suelo: suelo,
-                  alto: h,
-                  lado: lado,
-                  retraso: 0,
-                  desvio: -1,
-                  color: coloresAsiento[t.asiento % coloresAsiento.length],
-                  semilla: 0,
-                ),
-                _Dado(
-                  caras: t.carasCategoria,
-                  valor: t.valorCategoria,
-                  x: xAsiento + lado * 0.8,
-                  suelo: suelo - lado * 0.15,
-                  alto: h,
-                  lado: lado,
-                  retraso: 0.12,
-                  desvio: 1,
-                  color: const Color(0xFF7E57C2),
-                  semilla: 1,
-                ),
-              ];
+        final dados = [
+          _Dado(
+            caras: t.carasSlot,
+            valor: t.valorSlot,
+            x: xAsiento - lado * 0.8,
+            suelo: suelo,
+            alto: h,
+            lado: lado,
+            retraso: 0,
+            desvio: -1,
+            color: coloresAsiento[t.asiento % coloresAsiento.length],
+            semilla: 0,
+          ),
+          _Dado(
+            caras: t.carasCategoria,
+            valor: t.valorCategoria,
+            x: xAsiento + lado * 0.8,
+            suelo: suelo - lado * 0.15,
+            alto: h,
+            lado: lado,
+            retraso: 0.12,
+            desvio: 1,
+            color: const Color(0xFF7E57C2),
+            semilla: 1,
+          ),
+        ];
         return AnimatedBuilder(
           animation: _anim,
           builder: (context, _) => Stack(
@@ -146,7 +131,6 @@ class _Dado {
     final cara = t >= 0.85
         ? valor
         : ((t * 18).floor() * 7 + semilla * 3) % caras + 1;
-    final esMoneda = caras == 2;
     final giro = Matrix4.identity()
       ..setEntry(3, 2, 0.004)
       ..rotateX(reposo * 6 * pi)
@@ -183,9 +167,7 @@ class _Dado {
               key: ValueKey('dado-mesa-$semilla'),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                shape: esMoneda ? BoxShape.circle : BoxShape.rectangle,
-                borderRadius:
-                    esMoneda ? null : BorderRadius.circular(lado * 0.22),
+                borderRadius: BorderRadius.circular(lado * 0.22),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,

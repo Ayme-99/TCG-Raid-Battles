@@ -8,7 +8,7 @@ Diferencias con las cartas impresas a día de hoy (T-70):
 
 - **PS de los jefes**: como en las cartas (Onix 2300, Manectric 2600, Kingdra 3700 y Arceus 3800, T-71). La calibración de T-68 daba 2200 / 2700 / 3800 / 3900.
 - **Las 28 cartas están contrastadas con las impresas (15-nov-2026)**: coinciden con el catálogo salvo el texto de Fuerza Lunar de Lunatone, ya corregido.
-- **Bote (Magikarp)** y **Fuerza Lunar (Lunatone)**: la moneda la lanza el jugador y cae en la pantalla (T-71). Con Fijar Blanco en juego (la primera moneda de cada jugador es cruz) la lleva la mesa y la app pregunta el resultado.
+- **Bote (Magikarp)** y **Fuerza Lunar (Lunatone)**: la moneda la lanza el jugador y la app la echa y la hace caer sobre la mesa, ante su asiento (T-71, T-73). Con Fijar Blanco en juego (la primera moneda de cada jugador es cruz) la lleva la mesa y la app pregunta el resultado.
 
 ## Onix — Nv1, Túnel Roca
 

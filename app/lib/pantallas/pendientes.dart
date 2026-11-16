@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
@@ -9,6 +7,7 @@ import '../partida/controlador_partida.dart';
 import '../partida/recordatorios.dart';
 import '../partida/tirada_mesa.dart';
 import 'comun.dart';
+import 'lanzar_monedas.dart';
 
 /// Lo que hay que resolver antes de seguir: intentos de invocación y ataques
 /// de entrada de los aliados (D-04).
@@ -110,13 +109,19 @@ Future<void> resolverInvocacion(BuildContext context, WidgetRef ref) async {
       jefe == null ? null : catalogo?.invocacionDe(jefe.nombre, jefe.nivel);
   final azar = ref.read(azarProvider);
 
-  if (inv != null && !inv.segura && !azar.nextBool()) {
-    await _tirarEnMesa(ref, TiradaMesa.sinAliado());
+  if (inv != null && !inv.segura) {
+    final cara = (await lanzarMonedas(
+      ref,
+      leyenda: 'Llamada de ${jefe!.nombre}',
+    ))
+        .first;
     if (!context.mounted) return;
-    if (registrar(context, ref, const SinInvocacion())) {
-      registrarAviso(context, 'Salió cruz: no se invoca ningún aliado.');
+    if (!cara) {
+      if (registrar(context, ref, const SinInvocacion())) {
+        registrarAviso(context, 'Salió cruz: no se invoca ningún aliado.');
+      }
+      return;
     }
-    return;
   }
 
   final slots = estado.slotsLibres;
@@ -148,7 +153,7 @@ Future<void> resolverInvocacion(BuildContext context, WidgetRef ref) async {
     texto: 'Slot de ${estado.jugadores[slot].nombre} · '
         '${etiquetaCategoria(categoria)}',
   );
-  await _tirarEnMesa(ref, tirada.mesa);
+  await tirarEnMesa(ref, tirada.mesa);
   if (!context.mounted) return;
 
   final carta = jefe == null
@@ -167,10 +172,11 @@ Future<void> resolverInvocacion(BuildContext context, WidgetRef ref) async {
       efectos: carta.efectos,
       scriptId: carta.scriptId,
       monedas: carta.scriptId == 'deseo-100'
-          ? [
-              for (var i = 0; i < 10 + estado.aliados.length + 1; i++)
-                azar.nextBool(),
-            ]
+          ? await lanzarMonedas(
+              ref,
+              cuantas: 10 + estado.aliados.length + 1,
+              leyenda: '${carta.nombre}: ${carta.habilidadNombre ?? 'Deseo'}',
+            )
           : null,
     );
   } else {
@@ -190,6 +196,8 @@ Future<void> atacarConAliado(
   EstadoPartida estado,
   AliadoEstado aliado,
 ) async {
+  // Mientras caen unas monedas o unos dados no se lanza otro ataque.
+  if (hayTiradaEnMesa(ref)) return;
   int? objetivo;
   if (estado.jugadores[aliado.slot].eliminado) {
     objetivo = await elegirJugador(
@@ -231,11 +239,11 @@ Future<void> atacarConAliado(
       : null;
   var caras = 0;
   var dano = aliado.ataqueDano ?? 0;
+  final leyendaAtaque = '${aliado.nombre}: ${aliado.ataqueNombre ?? 'ataque'}';
   if (monedas != null) {
-    final azar = ref.read(azarProvider);
-    for (var i = 0; i < monedas; i++) {
-      if (azar.nextBool()) caras++;
-    }
+    final r = await lanzarMonedas(ref, cuantas: monedas, leyenda: leyendaAtaque);
+    if (!context.mounted) return;
+    caras = r.where((c) => c).length;
     dano = caras * dano;
   }
   // Daño extra con monedas («30+»): con las caras mínimas se suma el bonus.
@@ -245,10 +253,13 @@ Future<void> atacarConAliado(
   var carasBonus = 0;
   var conBonus = false;
   if (bonusMonedas != null) {
-    final azar = ref.read(azarProvider);
-    for (var i = 0; i < bonusMonedas; i++) {
-      if (azar.nextBool()) carasBonus++;
-    }
+    final r = await lanzarMonedas(
+      ref,
+      cuantas: bonusMonedas,
+      leyenda: leyendaAtaque,
+    );
+    if (!context.mounted) return;
+    carasBonus = r.where((c) => c).length;
     conBonus = carasBonus >= (carta!.ataqueBonusCaras ?? 1);
     if (conBonus) dano += carta.ataqueBonusDano ?? 0;
   }
@@ -279,23 +290,20 @@ Future<void> atacarConAliado(
     );
     final rivalNombre = estado.jugadores[objetivo ?? aliado.slot].nombre;
     if (fijadas.isEmpty) {
-      monedaRival = await lanzarMonedaEnPantalla(
-        context,
+      monedaRival = (await lanzarMonedas(
         ref,
-        titulo: '${aliado.nombre}: ${aliado.ataqueNombre}',
-        detalle: '$rivalNombre lanza 1 moneda. Con cruz, el siguiente ataque '
-            'del Pokémon Defensor hace 30 puntos de daño menos.',
-      );
+        lugar: LugarMoneda.asiento,
+        asiento: objetivo ?? aliado.slot,
+        leyenda: '$rivalNombre lanza: $leyendaAtaque',
+      ))
+          .first;
     } else {
-      monedaRival = await preguntarMesa(
-        context,
-        [
-          '${aliado.ataqueNombre}: $rivalNombre lanza una moneda. '
-              '¿Sale cara?',
-          ...fijadas,
-        ].join('\n'),
-        si: 'Cara',
-        no: 'Cruz',
+      monedaRival = await preguntarMoneda(
+        ref,
+        asiento: objetivo ?? aliado.slot,
+        titulo: leyendaAtaque,
+        detalle: '$rivalNombre lanza 1 moneda.',
+        recordatorios: fijadas,
       );
     }
     if (monedaRival == null || !context.mounted) return;
@@ -391,23 +399,6 @@ Future<Object?> _abrirDialogoAliado(
         inicial: inicial,
       ),
     );
-
-/// Enseña la tirada sobre la mesa y espera a que los dados paren. Si no
-/// hubiera mesa que la anime, se da por terminada pasado un rato.
-Future<void> _tirarEnMesa(WidgetRef ref, TiradaMesa tirada) async {
-  // El controlador se toma antes de esperar: la pantalla que lanzó la tirada
-  // puede desmontarse mientras ruedan los dados (p. ej. al pasar al turno del
-  // jefe) y entonces su `ref` ya no se puede usar.
-  final controlador = ref.read(tiradaMesaProvider.notifier);
-  controlador.state = tirada;
-  final seguridad =
-      Timer(duracionTirada + const Duration(seconds: 1), tirada.terminar);
-  await tirada.terminada;
-  seguridad.cancel();
-  if (controlador.state == tirada) {
-    controlador.state = null;
-  }
-}
 
 class _DialogoAliado extends StatefulWidget {
   const _DialogoAliado({

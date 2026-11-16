@@ -12,6 +12,7 @@ import 'acciones_objetivo.dart';
 import 'dados_en_mesa.dart';
 import 'estilo.dart';
 import 'mapa.dart';
+import 'monedas_en_mesa.dart';
 import 'panel_acciones.dart';
 import 'paneles.dart';
 import 'pendientes.dart';
@@ -265,6 +266,15 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
           final pico = (centro - izquierda - 14)
               .clamp(26.0, panel - 54.0)
               .toDouble();
+          // Mientras la mesa pregunta qué salió en una moneda, el panel de
+          // acciones se aparta para no tapar la pregunta ni quitarle los toques.
+          final preguntando = ref.watch(
+            tiradaMesaProvider.select((t) => t?.esPregunta ?? false),
+          );
+          Widget apartable(Widget hijo) => IgnorePointer(
+                ignoring: preguntando,
+                child: Opacity(opacity: preguntando ? 0 : 1, child: hijo),
+              );
           return Stack(
             children: [
               const Positioned.fill(child: MesaConCamara()),
@@ -281,14 +291,16 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
                   top: 72,
                   bottom: alto * alturaJugadores + 4,
                   width: panel,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: PanelAcciones(
-                      titulo: titulo,
-                      controles: widget.controles,
-                      abierto: _abierto,
-                      onAlternar: _alternar,
-                      ajustar: true,
+                  child: apartable(
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: PanelAcciones(
+                        titulo: titulo,
+                        controles: widget.controles,
+                        abierto: _abierto,
+                        onAlternar: _alternar,
+                        ajustar: true,
+                      ),
                     ),
                   ),
                 )
@@ -299,7 +311,8 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
                 left: izquierda,
                 bottom: alto * alturaJugadores + 4,
                 width: panel,
-                child: Column(
+                child: apartable(
+                    Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ConstrainedBox(
@@ -327,6 +340,7 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
                     else
                       const SizedBox(height: DisposicionMesa.altoPico),
                   ],
+                ),
                 ),
               ),
             ],
@@ -472,7 +486,14 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
     // Mientras ruedan los dados la cámara mira a donde caen.
     final tirada = ref.watch(tiradaMesaProvider);
     final foco = tirada != null
-        ? (tirada.sin ? const FocoAliados() : FocoJugador(tirada.asiento))
+        ? switch (tirada.lugar) {
+            LugarMoneda.asiento => FocoJugador(tirada.asiento),
+            LugarMoneda.jefe => const FocoJefe(),
+            // Los dados de invocación caen ante el asiento; las monedas de los
+            // aliados, ante los aliados.
+            LugarMoneda.aliados =>
+              tirada.esMoneda ? const FocoAliados() : FocoJugador(tirada.asiento),
+          }
         : _manual ?? auto;
     final jugadores = estado.jugadores.length;
     final jefe = estado.jefe;
@@ -581,12 +602,26 @@ class _Mesa extends StatelessWidget {
         ),
         if (tirada != null)
           Positioned.fill(
+            // La pregunta de una moneda lleva botones: esa sí recibe toques.
             child: IgnorePointer(
-              child: DadosEnMesa(
-                key: ObjectKey(tirada),
-                tirada: tirada!,
-                asientos: estado.jugadores.length,
-              ),
+              ignoring: !tirada!.esPregunta,
+              child: tirada!.esPregunta
+                  ? PreguntaMonedaEnMesa(
+                      key: ObjectKey(tirada),
+                      tirada: tirada!,
+                      asientos: estado.jugadores.length,
+                    )
+                  : tirada!.esMoneda
+                  ? MonedasEnMesa(
+                      key: ObjectKey(tirada),
+                      tirada: tirada!,
+                      asientos: estado.jugadores.length,
+                    )
+                  : DadosEnMesa(
+                      key: ObjectKey(tirada),
+                      tirada: tirada!,
+                      asientos: estado.jugadores.length,
+                    ),
             ),
           ),
       ],
