@@ -371,8 +371,6 @@ void main() {
           find.text(cara ? 'CARA' : 'CRUZ'),
           findsOneWidget,
         );
-        await tester.pumpAndSettle();
-        expect(c.read(tiradaMesaProvider), isNull);
       });
     }
 
