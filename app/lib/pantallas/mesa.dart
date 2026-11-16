@@ -589,8 +589,16 @@ class _Mesa extends StatelessWidget {
         ),
         if (tirada != null)
           Positioned.fill(
+            // La pregunta de una moneda lleva botones: esa sí recibe toques.
             child: IgnorePointer(
-              child: tirada!.esMoneda
+              ignoring: !tirada!.esPregunta,
+              child: tirada!.esPregunta
+                  ? PreguntaMonedaEnMesa(
+                      key: ObjectKey(tirada),
+                      tirada: tirada!,
+                      asientos: estado.jugadores.length,
+                    )
+                  : tirada!.esMoneda
                   ? MonedasEnMesa(
                       key: ObjectKey(tirada),
                       tirada: tirada!,

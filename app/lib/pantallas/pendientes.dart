@@ -299,7 +299,8 @@ Future<void> atacarConAliado(
           .first;
     } else {
       monedaRival = await preguntarMoneda(
-        context,
+        ref,
+        asiento: objetivo ?? aliado.slot,
         titulo: leyendaAtaque,
         detalle: '$rivalNombre lanza 1 moneda.',
         recordatorios: fijadas,

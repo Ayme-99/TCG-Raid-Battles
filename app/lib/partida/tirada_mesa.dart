@@ -34,7 +34,10 @@ class TiradaMesa {
     required this.valorCategoria,
   })  : monedas = null,
         lugar = LugarMoneda.asiento,
-        leyenda = null;
+        leyenda = null,
+        esPregunta = false,
+        detalle = null,
+        recordatorios = const [];
 
   /// Una tanda de monedas (T-73): ya están lanzadas y caen sobre la mesa hasta
   /// pararse en su cara o su cruz. [resultados] va en orden (true = cara).
@@ -49,7 +52,26 @@ class TiradaMesa {
         carasSlot = 2,
         valorSlot = 2,
         carasCategoria = 0,
-        valorCategoria = 0;
+        valorCategoria = 0,
+        esPregunta = false,
+        detalle = null,
+        recordatorios = const [];
+
+  /// Una moneda que no lanza la app sino la mesa a mano (con Fijar Blanco la
+  /// primera moneda de cada jugador es cruz): cae sobre la mesa, se queda de
+  /// canto y junto a ella se elige qué salió. Hasta que se elige no termina.
+  TiradaMesa.pregunta({
+    this.lugar = LugarMoneda.asiento,
+    this.asiento = 0,
+    this.leyenda,
+    this.detalle,
+    this.recordatorios = const [],
+  })  : monedas = const [false],
+        carasSlot = 2,
+        valorSlot = 2,
+        carasCategoria = 0,
+        valorCategoria = 0,
+        esPregunta = true;
 
   /// La moneda del jefe salió en contra: solo cae una moneda y no hay aliado.
   TiradaMesa.sinAliado()
@@ -69,6 +91,21 @@ class TiradaMesa {
   final List<bool>? monedas;
   final LugarMoneda lugar;
   final String? leyenda;
+
+  /// Si es una pregunta («¿qué ha salido?») y no una tirada ya decidida.
+  final bool esPregunta;
+
+  /// Texto de apoyo de la pregunta y avisos de la mesa (Fijar Blanco…).
+  final String? detalle;
+  final List<String> recordatorios;
+
+  /// Lo que se eligió en una pregunta (true = cara); null si no se contestó.
+  bool? respuesta;
+
+  /// Contesta la pregunta. Lo llama la mesa cuando la moneda ya ha girado.
+  void responder(bool cara) {
+    respuesta ??= cara;
+  }
 
   bool get esMoneda => monedas != null;
 

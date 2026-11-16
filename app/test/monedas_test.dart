@@ -216,42 +216,55 @@ void main() {
   });
 
   group('preguntar la moneda de la mesa', () {
-    for (final cara in [true, false]) {
-      testWidgets('con Fijar Blanco la mesa dice ${cara ? 'cara' : 'cruz'}',
-          (tester) async {
-        bool? r;
-        await tester.pumpWidget(
-          ProviderScope(
-            child: MaterialApp(
-              home: Builder(
-                builder: (context) => Scaffold(
-                  body: TextButton(
+    testWidgets('preguntarMoneda pone la pregunta en la mesa y espera',
+        (tester) async {
+      late ProviderContainer c;
+      bool? r;
+      var vuelta = false;
+      await tester.pumpWidget(
+        ProviderScope(
+          child: Builder(
+            builder: (context) {
+              c = ProviderScope.containerOf(context);
+              return MaterialApp(
+                home: Consumer(
+                  builder: (context, ref, _) => TextButton(
                     key: const Key('preguntar'),
-                    onPressed: () async => r = await preguntarMoneda(
-                      context,
-                      titulo: 'Bote',
-                      detalle: 'Ana lanza 1 moneda.',
-                      recordatorios: const ['Fijar Blanco: la primera es cruz.'],
-                    ),
+                    onPressed: () async {
+                      r = await preguntarMoneda(
+                        ref,
+                        asiento: 1,
+                        titulo: 'Bote',
+                        detalle: 'Ana lanza 1 moneda.',
+                        recordatorios: const ['Fijar Blanco: la primera es cruz.'],
+                      );
+                      vuelta = true;
+                    },
                     child: const Text('preguntar'),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-        );
-        await tester.tap(find.byKey(const Key('preguntar')));
-        await tester.pumpAndSettle();
-        expect(find.byKey(const Key('pregunta-moneda')), findsOneWidget);
-        expect(find.text('Fijar Blanco: la primera es cruz.'), findsOneWidget);
-        await tester.tap(
-          find.byKey(Key(cara ? 'pregunta-moneda-cara' : 'pregunta-moneda-cruz')),
-        );
-        await tester.pumpAndSettle();
-        expect(r, cara);
-        expect(find.byKey(const Key('pregunta-moneda')), findsNothing);
-      });
-    }
+        ),
+      );
+      await tester.tap(find.byKey(const Key('preguntar')));
+      await tester.pump();
+      final t = c.read(tiradaMesaProvider)!;
+      expect(t.esPregunta, isTrue);
+      expect(t.esMoneda, isTrue);
+      expect(t.asiento, 1);
+      expect(t.leyenda, 'Bote');
+      expect(t.recordatorios, ['Fijar Blanco: la primera es cruz.']);
+      // Sin límite de tiempo: nadie contesta y sigue esperando.
+      await tester.pump(const Duration(seconds: 30));
+      expect(vuelta, isFalse);
+      t.responder(true);
+      t.terminar();
+      await tester.pump();
+      expect(r, isTrue);
+      expect(c.read(tiradaMesaProvider), isNull);
+    });
   });
 
   group('en la mesa', () {
@@ -316,6 +329,48 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('4 caras · 3 cruces'), findsOneWidget);
         expect(find.text('Prueba'), findsOneWidget);
+      });
+    }
+
+    for (final cara in [true, false]) {
+      testWidgets(
+          'con Fijar Blanco la moneda cae en la mesa y se dice '
+          '${cara ? 'cara' : 'cruz'} junto a ella', (tester) async {
+        final c = await abrirMesa(tester);
+        final t = TiradaMesa.pregunta(
+          asiento: 1,
+          leyenda: 'Bote',
+          detalle: 'Beto lanza 1 moneda.',
+          recordatorios: const ['Fijar Blanco: la primera es cruz.'],
+        );
+        c.read(tiradaMesaProvider.notifier).state = t;
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        // La moneda está en la mesa, no en un diálogo.
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(find.byKey(const ValueKey('moneda-mesa-0')), findsOneWidget);
+        await tester.pump(const Duration(milliseconds: 1500));
+        expect(find.byKey(const Key('pregunta-moneda')), findsOneWidget);
+        expect(find.text('Fijar Blanco: la primera es cruz.'), findsOneWidget);
+        expect(t.finalizada, isFalse);
+        await tester.tap(
+          find.byKey(
+            Key(cara ? 'pregunta-moneda-cara' : 'pregunta-moneda-cruz'),
+          ),
+        );
+        await tester.pump();
+        // Gira hasta el lado elegido y solo entonces se da por contestada.
+        expect(find.byKey(const Key('pregunta-moneda')), findsNothing);
+        expect(t.respuesta, isNull);
+        await tester.pump(const Duration(milliseconds: 1900));
+        expect(t.respuesta, cara);
+        expect(t.finalizada, isTrue);
+        expect(
+          find.text(cara ? 'CARA' : 'CRUZ'),
+          findsOneWidget,
+        );
+        await tester.pumpAndSettle();
+        expect(c.read(tiradaMesaProvider), isNull);
       });
     }
 

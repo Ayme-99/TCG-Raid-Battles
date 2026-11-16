@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../partida/controlador_partida.dart';
 import '../partida/tirada_mesa.dart';
-import 'moneda.dart';
 
 /// Una sola forma de lanzar monedas en toda la app (T-73): se echan a suerte
 /// con el azar de la partida y caen sobre la mesa, como los dados. Devuelve el
@@ -57,10 +54,12 @@ Future<void> tirarEnMesa(WidgetRef ref, TiradaMesa tirada) async {
     await previa.terminada;
   }
   controlador.state = tirada;
-  final seguridad =
-      Timer(tirada.duracion + const Duration(seconds: 1), tirada.terminar);
+  // Una pregunta espera a que alguien conteste, sin tiempo límite.
+  final seguridad = tirada.esPregunta
+      ? null
+      : Timer(tirada.duracion + const Duration(seconds: 1), tirada.terminar);
   await tirada.terminada;
-  seguridad.cancel();
+  seguridad?.cancel();
   if (controlador.state == tirada) {
     controlador.state = null;
   }
@@ -68,95 +67,24 @@ Future<void> tirarEnMesa(WidgetRef ref, TiradaMesa tirada) async {
 
 /// Cuando la moneda no la lanza la app sino la mesa (con Fijar Blanco la
 /// primera moneda de cada jugador es cruz y la lleva la mesa a mano), la app
-/// pregunta qué salió, con la misma moneda. `true`: cara; null: se cerró sin
-/// responder.
+/// pregunta qué salió, sobre la mesa y con la misma moneda: cae, se queda de
+/// canto y se elige cara o cruz junto a ella. `true`: cara; null: la mesa se
+/// cerró sin responder.
 Future<bool?> preguntarMoneda(
-  BuildContext context, {
+  WidgetRef ref, {
   required String titulo,
   String? detalle,
   List<String> recordatorios = const [],
-}) =>
-    showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => _DialogoMoneda(
-        titulo: titulo,
-        detalle: detalle,
-        recordatorios: recordatorios,
-      ),
-    );
-
-class _DialogoMoneda extends ConsumerStatefulWidget {
-  const _DialogoMoneda({
-    required this.titulo,
-    required this.detalle,
-    required this.recordatorios,
-  });
-
-  final String titulo;
-  final String? detalle;
-  final List<String> recordatorios;
-
-  @override
-  ConsumerState<_DialogoMoneda> createState() => _EstadoDialogoMoneda();
-}
-
-class _EstadoDialogoMoneda extends ConsumerState<_DialogoMoneda>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _giro = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  )..forward();
-
-  @override
-  void dispose() {
-    _giro.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final diseno = ref.watch(disenoMonedaProvider);
-    return AlertDialog(
-      key: const Key('pregunta-moneda'),
-      title: Text(widget.titulo),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (widget.detalle != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(widget.detalle!),
-            ),
-          for (final r in widget.recordatorios)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(r),
-            ),
-          AnimatedBuilder(
-            animation: _giro,
-            builder: (context, _) => MonedaWidget(
-              diseno: diseno,
-              lado: 96,
-              angulo: 4 * math.pi * Curves.easeOut.transform(_giro.value),
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text('¿Qué ha salido?'),
-        ],
-      ),
-      actions: [
-        TextButton(
-          key: const Key('pregunta-moneda-cruz'),
-          onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Cruz'),
-        ),
-        FilledButton(
-          key: const Key('pregunta-moneda-cara'),
-          onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('Cara'),
-        ),
-      ],
-    );
-  }
+  LugarMoneda lugar = LugarMoneda.asiento,
+  int asiento = 0,
+}) async {
+  final t = TiradaMesa.pregunta(
+    lugar: lugar,
+    asiento: asiento,
+    leyenda: titulo,
+    detalle: detalle,
+    recordatorios: recordatorios,
+  );
+  await tirarEnMesa(ref, t);
+  return t.respuesta;
 }

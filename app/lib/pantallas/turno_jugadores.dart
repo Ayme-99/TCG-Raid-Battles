@@ -156,7 +156,8 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
             .first;
       } else {
         final cara = await preguntarMoneda(
-          context,
+          ref,
+          asiento: widget.jugador,
           titulo: '$nombreAliado: Bote',
           detalle: '$nombreJugador lanza 1 moneda. Con cara, se evita todo el '
               'daño a $nombreAliado.',

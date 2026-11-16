@@ -17,7 +17,7 @@ Cada moneda del juego, quién la lanza, dónde cae y qué queda registrado. Desd
 | 9 | **Bote** (Magikarp) | El jugador atacante, **la lanza la app** | 1 | ante el asiento del jugador | Cara: se evita todo el daño | `AtaqueAAliado.dano` (0 si cara) |
 | 10 | **Fuerza Lunar** (Lunatone) | El jugador rival, **la lanza la app** | 1 | ante el asiento del rival | Cruz: −30 al siguiente ataque | `AtaqueAliado.moneda` |
 
-**Fijar Blanco** (Nosepass) afecta a 9 y 10: la primera moneda de cada jugador es cruz y la lleva la mesa a mano. En ese caso la app **pregunta** qué ha salido con la misma moneda (`preguntarMoneda`: la moneda y dos botones, Cara y Cruz) en vez de lanzarla.
+**Fijar Blanco** (Nosepass) afecta a 9 y 10: la primera moneda de cada jugador es cruz y la lleva la mesa a mano. En ese caso la app **pregunta** qué ha salido, también sobre la mesa y no en un diálogo (`preguntarMoneda` → `TiradaMesa.pregunta`): la moneda cae ante el jugador, se queda de canto y junto a ella salen los avisos de Fijar Blanco y los botones Cara y Cruz; al elegir, gira hasta ese lado y enseña el resultado. No tiene tiempo límite.
 
 Fuera de la app, porque no gestiona los ataques de los jugadores: las monedas de las cartas de los jugadores y las que lanzan ellos por cada uno de sus Pokémon con Deseo.
 
