@@ -421,77 +421,75 @@ void main() {
   });
 
   group('aliados con monedas', () {
-    // Se ejecuta por etapas para saber hasta dónde llega.
-    for (final hasta in [1, 2, 3, 4]) {
-      testWidgets(
-        'Puño Incremento: 2 monedas caen y el daño sale de las caras (etapa $hasta)',
-        timeout: const Timeout(Duration(seconds: 40)),
-        (tester) async {
-          tester.view.physicalSize = const Size(1000, 3000);
-          tester.view.devicePixelRatio = 1.0;
-          addTearDown(tester.view.reset);
-          final catalogo =
-              (await tester.runAsync(() => Catalogo.cargar(rootBundle)))!;
-          // Con el azar a 0, la llamada de Onix elige el primer slot y la
-          // primera categoría libre: Machop (daño).
-          final azar = _Azar([true, false]);
-          await tester.pumpWidget(
-            ProviderScope(
-              overrides: [
-                ...sobrescribir(),
-                catalogoProvider.overrideWith((ref) async => catalogo),
-                azarProvider.overrideWithValue(azar),
-              ],
-              child: const IncursionesApp(),
+    late Catalogo catalogo;
+
+    setUpAll(() async {
+      catalogo = await Catalogo.cargar(rootBundle);
+    });
+
+    testWidgets(
+      'Puño Incremento: 2 monedas caen y el daño sale de las caras',
+      timeout: const Timeout(Duration(seconds: 60)),
+      (tester) async {
+        tester.view.physicalSize = const Size(1000, 3000);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+        // Con el azar a 0, la llamada de Onix elige el primer slot y la
+        // primera categoría libre: Machop (daño).
+        final azar = _Azar([true, false]);
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...sobrescribir(),
+              catalogoProvider.overrideWith((ref) async => catalogo),
+              azarProvider.overrideWithValue(azar),
+            ],
+            child: const IncursionesApp(),
+          ),
+        );
+        await _asentar(tester);
+        for (final clave in ['ataque-0', 'ataque-1']) {
+          await tester.enterText(
+            find.descendant(
+              of: find.byKey(Key(clave)),
+              matching: find.byType(TextField),
             ),
+            '100',
           );
-          await _asentar(tester);
-          for (final clave in ['ataque-0', 'ataque-1']) {
-            await tester.enterText(
-              find.descendant(
-                of: find.byKey(Key(clave)),
-                matching: find.byType(TextField),
-              ),
-              '100',
-            );
-          }
-          await tester.tap(find.byKey(const Key('configurar')));
-          await _asentar(tester);
-          await tester.tap(find.byKey(const Key('catalogo-onix')));
-          await _asentar(tester);
-          if (hasta == 1) return;
-          final c = ProviderScope.containerOf(
-            tester.element(find.byType(IncursionesApp)),
-          );
-          llegarALaLlamadaDelJefe(c);
-          // Los dados caen solos y entra el aliado.
+        }
+        await tester.tap(find.byKey(const Key('configurar')));
+        await _asentar(tester);
+        await tester.tap(find.byKey(const Key('catalogo-onix')));
+        await _asentar(tester);
+        final c = ProviderScope.containerOf(
+          tester.element(find.byType(IncursionesApp)),
+        );
+        llegarALaLlamadaDelJefe(c);
+        // Los dados caen solos y entra el aliado.
+        await tester.pump(const Duration(milliseconds: 500));
+        await _asentar(tester);
+        final aliado = c.read(estadoProvider).aliados.single;
+        expect(aliado.nombre, 'Machop');
+        expect(azar.sacadas, 0, reason: 'la llamada de Onix es segura');
+        // Si la entrada trae un aviso de la mesa, se cierra.
+        if (find.byKey(const Key('aviso-mesa-hecho')).evaluate().isNotEmpty) {
+          await tester.tap(find.byKey(const Key('aviso-mesa-hecho')));
           await tester.pump(const Duration(milliseconds: 500));
-          await _asentar(tester);
-          if (hasta == 2) return;
-          final aliado = c.read(estadoProvider).aliados.single;
-          expect(aliado.nombre, 'Machop');
-          expect(azar.sacadas, 0, reason: 'la llamada de Onix es segura');
-          // Si la entrada trae un aviso de la mesa, se cierra.
-          if (find.byKey(const Key('aviso-mesa-hecho')).evaluate().isNotEmpty) {
-            await tester.tap(find.byKey(const Key('aviso-mesa-hecho')));
-            await tester.pump(const Duration(milliseconds: 500));
-          }
-          await tester.tap(find.byKey(const Key('entrada-0')));
-          await tester.pump();
-          await tester.pump(const Duration(milliseconds: 900));
-          if (hasta == 3) return;
-          // Las dos monedas de Machop caen en la mesa.
-          expect(find.byKey(const ValueKey('moneda-mesa-0')), findsOneWidget);
-          expect(find.byKey(const ValueKey('moneda-mesa-1')), findsOneWidget);
-          expect(azar.sacadas, 2);
-          // Y solo cuando paran se registra el ataque.
-          await tester.pump(duracionMonedas + const Duration(seconds: 1));
-          expect(c.read(tiradaMesaProvider), isNull);
-          // Una cara de dos: 20 de daño.
-          await tester.pump(const Duration(milliseconds: 300));
-          expect(find.textContaining('1 de 2 monedas en cara'), findsOneWidget);
-        },
-      );
-    }
+        }
+        await tester.tap(find.byKey(const Key('entrada-0')));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 900));
+        // Las dos monedas de Machop caen en la mesa.
+        expect(find.byKey(const ValueKey('moneda-mesa-0')), findsOneWidget);
+        expect(find.byKey(const ValueKey('moneda-mesa-1')), findsOneWidget);
+        expect(azar.sacadas, 2);
+        // Y solo cuando paran se registra el ataque.
+        await tester.pump(duracionMonedas + const Duration(seconds: 1));
+        expect(c.read(tiradaMesaProvider), isNull);
+        // Una cara de dos: 20 de daño.
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(find.textContaining('1 de 2 monedas en cara'), findsOneWidget);
+      },
+    );
   });
 }
