@@ -65,11 +65,11 @@ final monedaClasica = DisenoMoneda(
   canto: const Color(0xFFA9771A),
   cara: (lado) => SizedBox.square(
     dimension: lado,
-    child: CustomPaint(painter: _PintorMoneda(cara: true)),
+    child: const CustomPaint(painter: _PintorMoneda(cara: true)),
   ),
   cruz: (lado) => SizedBox.square(
     dimension: lado,
-    child: CustomPaint(painter: _PintorMoneda(cara: false)),
+    child: const CustomPaint(painter: _PintorMoneda(cara: false)),
   ),
 );
 
