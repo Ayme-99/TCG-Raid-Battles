@@ -66,9 +66,8 @@ void main() {
     await abrirInicio(tester, tamano: const Size(1024, 768));
     expect(tester.hasRunningAnimations, isTrue);
     await tester.tap(find.byKey(const Key('inicio-nueva')));
-    await tester.pump(const Duration(milliseconds: 600));
-    // El fondo del inicio queda tapado: su reloj deja de contar.
-    expect(find.byKey(const Key('nueva-partida')), findsOneWidget);
+    // Si el fondo del inicio siguiera corriendo debajo, esto no terminaría.
     await tester.pumpAndSettle();
+    expect(find.byKey(const Key('nueva-siguiente')), findsOneWidget);
   });
 }
