@@ -436,6 +436,7 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
+        debugPrint('MARCA 1');
         for (final clave in ['ataque-0', 'ataque-1']) {
           await tester.enterText(
             find.descendant(
@@ -446,16 +447,23 @@ void main() {
           );
         }
         await tester.tap(find.byKey(const Key('configurar')));
+        debugPrint('MARCA 2');
         await tester.pumpAndSettle();
+        debugPrint('MARCA 3');
         await tester.tap(find.byKey(const Key('catalogo-onix')));
+        debugPrint('MARCA 4');
         await tester.pumpAndSettle();
+        debugPrint('MARCA 5');
         final c = ProviderScope.containerOf(
           tester.element(find.byType(IncursionesApp)),
         );
         llegarALaLlamadaDelJefe(c);
+        debugPrint('MARCA 6');
         // Los dados caen solos y entra el aliado.
         await tester.pump(const Duration(milliseconds: 500));
+        debugPrint('MARCA 7');
         await tester.pumpAndSettle();
+        debugPrint('MARCA 8');
         final aliado = c.read(estadoProvider).aliados.single;
         expect(aliado.nombre, 'Machop');
         expect(azar.sacadas, 0, reason: 'la llamada de Onix es segura');
@@ -466,17 +474,22 @@ void main() {
         }
 
         await tester.tap(find.byKey(const Key('entrada-0')));
+        debugPrint('MARCA 9');
         await tester.pump();
+        debugPrint('MARCA 10');
         await tester.pump(const Duration(milliseconds: 900));
+        debugPrint('MARCA 11');
         // Las dos monedas de Machop caen en la mesa.
         expect(find.byKey(const ValueKey('moneda-mesa-0')), findsOneWidget);
         expect(find.byKey(const ValueKey('moneda-mesa-1')), findsOneWidget);
         expect(azar.sacadas, 2);
         // Y solo cuando paran se registra el ataque.
         await tester.pump(duracionMonedas + const Duration(seconds: 1));
+        debugPrint('MARCA 12');
         expect(c.read(tiradaMesaProvider), isNull);
         // Una cara de dos: 20 de daño.
         await tester.pump(const Duration(milliseconds: 300));
+        debugPrint('MARCA 13');
         expect(find.textContaining('1 de 2 monedas en cara'), findsOneWidget);
       },
     );
