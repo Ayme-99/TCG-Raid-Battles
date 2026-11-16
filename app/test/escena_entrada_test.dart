@@ -60,7 +60,7 @@ void main() {
     ]));
     p.registrar(const ElegirJefe(nombre: 'Onix', nivel: 1, hp: 100));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 3100));
+    await tester.pump(const Duration(milliseconds: 4600));
     expect(find.byKey(const Key('escena-entrada')), findsNothing);
   });
 
@@ -73,7 +73,7 @@ void main() {
     ]));
     p.registrar(const ElegirJefe(nombre: 'Onix', nivel: 1, hp: 100));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 3100));
+    await tester.pump(const Duration(milliseconds: 4600));
     p.registrar(const TurnoJugador(jugador: 0, dano: 10));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));

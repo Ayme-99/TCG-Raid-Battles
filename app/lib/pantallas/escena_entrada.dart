@@ -55,7 +55,7 @@ class _Datos {
 
 /// Escena de entrada al empezar la partida: al llegar a la mesa del jefe, su
 /// escena (según el mapa) y su carta, y después se descubre la mesa. Dura unos
-/// 3 s y un toque la salta. No sale al retomar una partida a medias ni con
+/// 4,5 s y un toque la salta. No sale al retomar una partida a medias ni con
 /// «reducir movimiento» del sistema.
 class EscenaEntrada extends ConsumerStatefulWidget {
   const EscenaEntrada({super.key});
@@ -68,7 +68,7 @@ class _EstadoEscena extends ConsumerState<EscenaEntrada>
     with TickerProviderStateMixin {
   late final AnimationController _linea = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 3000),
+    duration: const Duration(milliseconds: 4500),
   )..addStatusListener((s) {
       if (s == AnimationStatus.completed) _terminar();
     });
