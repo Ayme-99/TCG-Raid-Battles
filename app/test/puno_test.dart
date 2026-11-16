@@ -45,8 +45,7 @@ void main() {
     catalogo = await Catalogo.cargar(rootBundle);
   });
 
-  for (final hasta in [6, 7, 8, 9]) {
-    testWidgets('Puño Incremento, etapa $hasta',
+  testWidgets('Puño Incremento: 2 monedas caen y el daño sale de las caras',
         timeout: const Timeout(Duration(seconds: 40)), (tester) async {
       tester.view.physicalSize = const Size(1000, 3000);
       tester.view.devicePixelRatio = 1.0;
@@ -89,19 +88,15 @@ void main() {
         await tester.tap(find.byKey(const Key('aviso-mesa-hecho')));
         await tester.pump(const Duration(milliseconds: 500));
       }
-      if (hasta == 6) return;
       await tester.tap(find.byKey(const Key('entrada-0')));
       await tester.pump();
-      if (hasta == 7) return;
       await tester.pump(const Duration(milliseconds: 900));
       expect(find.byKey(const ValueKey('moneda-mesa-0')), findsOneWidget);
       expect(find.byKey(const ValueKey('moneda-mesa-1')), findsOneWidget);
       expect(azar.sacadas, 2);
-      if (hasta == 8) return;
       await tester.pump(duracionMonedas + const Duration(seconds: 1));
       expect(c.read(tiradaMesaProvider), isNull);
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.textContaining('1 de 2 monedas en cara'), findsOneWidget);
     });
-  }
 }
