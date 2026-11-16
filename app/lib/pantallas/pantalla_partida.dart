@@ -6,6 +6,7 @@ import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import 'comun.dart';
+import 'escena_entrada.dart';
 import 'fin_partida.dart';
 import 'inicio.dart';
 import 'paneles.dart';
@@ -71,7 +72,7 @@ class PantallaPartida extends ConsumerWidget {
       const BotonEnvios(),
       const BotonCuenta(),
     ];
-    return Scaffold(
+    final mesa = Scaffold(
       // En juego no hay barra: la mesa llena la pantalla y la barra flota.
       appBar: enJuego
           ? null
@@ -113,6 +114,13 @@ class PantallaPartida extends ConsumerWidget {
                 child: _fase(estado, ref),
               ),
             ),
+    );
+    // La escena de entrada va por encima de todo al empezar la partida.
+    return Stack(
+      children: [
+        mesa,
+        const Positioned.fill(child: EscenaEntrada()),
+      ],
     );
   }
 
