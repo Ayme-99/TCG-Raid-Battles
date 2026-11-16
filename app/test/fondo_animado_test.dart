@@ -63,7 +63,7 @@ void main() {
   });
 
   testWidgets('se detiene al abrir otra pantalla encima', (tester) async {
-    await abrirInicio(tester, tamano: const Size(390, 844));
+    await abrirInicio(tester, tamano: const Size(1024, 768));
     expect(tester.hasRunningAnimations, isTrue);
     await tester.tap(find.byKey(const Key('inicio-nueva')));
     await tester.pump(const Duration(milliseconds: 600));
