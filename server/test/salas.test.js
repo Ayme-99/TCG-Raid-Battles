@@ -198,6 +198,18 @@ test('entran los jugadores, todos ven la sala y el host es el asiento 0', async 
   assert.strictEqual(sa2.tuAsiento, 0);
 });
 
+test('el nombre de la sala es el de la sesión, recortado a 40 caracteres', async (t) => {
+  const { crearSala, conectar, cerrar } = await arrancar({
+    verificarToken: async (token) => ({ cuentaId: token.slice(4), nombre: `${token.slice(4)} ${'x'.repeat(60)}` }),
+  });
+  t.after(cerrar);
+  const { json: { codigo } } = await crearSala('ana');
+  const ana = await conectar();
+  const s = await entrar(ana, 'ana', codigo);
+  assert.strictEqual(s.jugadores[0].nombre, `ana ${'x'.repeat(36)}`);
+  assert.strictEqual(s.jugadores[0].nombre.length, 40);
+});
+
 test('errores al entrar: sesión, sala, protocolo y sala llena', async (t) => {
   const { crearSala, conectar, cerrar } = await arrancar();
   t.after(cerrar);
