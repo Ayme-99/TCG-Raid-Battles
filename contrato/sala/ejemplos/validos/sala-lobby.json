@@ -1,0 +1,19 @@
+{
+  "tipo": "sala",
+  "estado": "abierta",
+  "host": 0,
+  "tuAsiento": 1,
+  "jugadores": [
+    {
+      "asiento": 0,
+      "nombre": "Ana",
+      "conectado": true
+    },
+    {
+      "asiento": 1,
+      "nombre": "Bea",
+      "conectado": true
+    }
+  ],
+  "ultimoSeq": 0
+}

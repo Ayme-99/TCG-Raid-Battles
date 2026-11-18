@@ -1,0 +1,7 @@
+{
+  "tipo": "aceptar",
+  "seq": 16,
+  "evento": {
+    "tipo": "finTurnoJefe"
+  }
+}

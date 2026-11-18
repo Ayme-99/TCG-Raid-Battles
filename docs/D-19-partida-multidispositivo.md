@@ -186,6 +186,7 @@ Los **eventos viajan con el mismo JSON del contrato** (el del registro); solo se
 
 - Los mensajes llevan `idMensaje` para que un reintento no se aplique dos veces.
 - La versión del protocolo va en `hola`; un cliente viejo recibe un error claro.
+- El esquema y los ejemplos están en `contrato/sala/` (T-78). Al escribirlo se añadieron cinco mensajes que esta tabla no listaba pero que D7, D8 y D9 exigen: `empezar`, `echar`, `salir`, `ventanaVencida` y `error`.
 - Lo que valida el motor (reglas) lo decide el host. El servidor solo comprueba que quien manda es quien dice ser y que está en la sala.
 
 ## 5. Qué cambia en cada pieza

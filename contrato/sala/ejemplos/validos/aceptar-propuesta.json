@@ -1,0 +1,10 @@
+{
+  "tipo": "aceptar",
+  "seq": 15,
+  "idMensaje": "m-0001",
+  "evento": {
+    "tipo": "turnoJugador",
+    "jugador": 1,
+    "dano": 120
+  }
+}

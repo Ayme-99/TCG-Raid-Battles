@@ -1,0 +1,34 @@
+{
+  "tipo": "sala",
+  "estado": "abierta",
+  "host": 0,
+  "tuAsiento": 0,
+  "jugadores": [
+    {
+      "asiento": 0,
+      "nombre": "J",
+      "conectado": true
+    },
+    {
+      "asiento": 1,
+      "nombre": "J",
+      "conectado": true
+    },
+    {
+      "asiento": 2,
+      "nombre": "J",
+      "conectado": true
+    },
+    {
+      "asiento": 3,
+      "nombre": "J",
+      "conectado": true
+    },
+    {
+      "asiento": 4,
+      "nombre": "J",
+      "conectado": true
+    }
+  ],
+  "ultimoSeq": 0
+}
