@@ -140,6 +140,42 @@ class ClienteApi {
     );
   }
 
+  /// Crea una sala (el que la crea es el host). Devuelve el código de 5
+  /// caracteres que se comparte con los demás jugadores.
+  Future<String> crearSala(String token) async {
+    final http.Response r;
+    try {
+      r = await _http
+          .post(
+            Uri.parse('$base/incursiones/salas'),
+            headers: {'authorization': 'Bearer $token'},
+          )
+          .timeout(espera);
+    } catch (_) {
+      throw const ErrorApi('No se pudo conectar con el servidor.');
+    }
+    final cuerpo = _cuerpo(r);
+    if (r.statusCode == 201 && cuerpo['codigo'] is String) {
+      return cuerpo['codigo']! as String;
+    }
+    if (r.statusCode == 401) {
+      throw const ErrorApi(
+        'La sesión ha caducado. Inicia sesión otra vez.',
+        estado: 401,
+      );
+    }
+    if (r.statusCode == 409) {
+      throw ErrorApi(
+        'Ya estás en una sala (${cuerpo['codigo'] ?? 'sin código'}).',
+        estado: 409,
+      );
+    }
+    throw ErrorApi(
+      '${cuerpo['mensaje'] ?? cuerpo['error'] ?? 'El servidor respondió ${r.statusCode}.'}',
+      estado: r.statusCode,
+    );
+  }
+
   /// Cuerpo JSON de la respuesta, o vacío si no lo es (un 502 de Render, por
   /// ejemplo, responde con HTML).
   Map<String, Object?> _cuerpo(http.Response r) {
