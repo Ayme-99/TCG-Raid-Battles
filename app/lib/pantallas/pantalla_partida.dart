@@ -5,6 +5,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
+import '../sala/controlador_sala.dart';
 import 'comun.dart';
 import 'escena_entrada.dart';
 import 'fin_partida.dart';
@@ -79,7 +80,10 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
         ref.watch(enviosProvider.select((e) => e.partidaEncolada != null));
     final enJuego =
         estado.fase == Fase.turnoJugadores || estado.fase == Fase.turnoJefe;
+    // En una sala no se deshace ni se rehace (D-19 §D1).
+    final enSala = ref.watch(enSalaProvider);
     final acciones = <Widget>[
+      if (!enSala)
       IconButton(
         key: const Key('deshacer'),
         tooltip: 'Deshacer',
@@ -88,6 +92,7 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
             ? () => ref.read(partidaProvider.notifier).deshacer()
             : null,
       ),
+      if (!enSala)
       IconButton(
         key: const Key('rehacer'),
         tooltip: 'Rehacer',
@@ -101,6 +106,7 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
     ];
     // La barra flotante lleva los mismos botones con su nombre debajo.
     final accionesHud = <Widget>[
+      if (!enSala)
       _BotonHud(
         key: const Key('deshacer'),
         icono: Icons.undo,
@@ -109,6 +115,7 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
             ? () => ref.read(partidaProvider.notifier).deshacer()
             : null,
       ),
+      if (!enSala)
       _BotonHud(
         key: const Key('rehacer'),
         icono: Icons.redo,
@@ -193,7 +200,17 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
     return 'Ronda ${estado.ronda} · $turno';
   }
 
-  Widget _fase(EstadoPartida estado, WidgetRef ref) => switch (estado.fase) {
+  Widget _fase(EstadoPartida estado, WidgetRef ref) {
+    // Los jugadores que no son el host esperan mientras él prepara la partida.
+    final espera = ref.watch(miAsientoProvider) != null &&
+        !ref.watch(soyHostProvider) &&
+        (estado.fase == Fase.preparacion || estado.fase == Fase.eleccionJefe);
+    if (espera) return const _EsperandoAlHost();
+    return _faseDe(estado, ref);
+  }
+
+  Widget _faseDe(EstadoPartida estado, WidgetRef ref) =>
+      switch (estado.fase) {
         Fase.preparacion => ref.watch(modoPreparacionProvider) ==
                     ModoPreparacion.jefe &&
                 ref.watch(jefePreelegidoProvider) == null
@@ -251,6 +268,22 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
         registrar(context, ref, const Abandonar());
     }
   }
+}
+
+class _EsperandoAlHost extends StatelessWidget {
+  const _EsperandoAlHost();
+
+  @override
+  Widget build(BuildContext context) => const Center(
+        key: Key('esperando-host'),
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'El host está preparando la partida…',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
 }
 
 /// Barra de la partida que flota sobre la mesa: ronda y turno a la izquierda,
