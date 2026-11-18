@@ -15,7 +15,6 @@ import 'mapa.dart';
 import 'monedas_en_mesa.dart';
 import 'panel_acciones.dart';
 import 'paneles.dart';
-import 'pendientes.dart';
 import 'tarjeta_jefe.dart';
 
 /// Hacia dónde mira la cámara de la mesa (T-47).
