@@ -26,8 +26,13 @@ class Aviso {
   factory Aviso.deTexto(String texto, {TipoAviso? tipo}) {
     final t = texto.trim();
     final m = RegExp(r'^([^:.\n]{1,28}): (.+)$', dotAll: true).firstMatch(t);
-    final nombre = m?.group(1)?.toUpperCase();
-    var motivo = (m?.group(2) ?? t).trim();
+    // «Daño total: 80», «Moneda: cara»…: lo de antes de los dos puntos no es
+    // el nombre de nadie.
+    final esEtiqueta = m != null &&
+        RegExp(r'^(daño|moneda|potenciador|se cumple)', caseSensitive: false)
+            .hasMatch(m.group(1)!);
+    final nombre = esEtiqueta ? null : m?.group(1)?.toUpperCase();
+    var motivo = (m != null && !esEtiqueta ? m.group(2)! : t).trim();
     if (motivo.endsWith('.') && !motivo.endsWith('..')) {
       motivo = motivo.substring(0, motivo.length - 1);
     }

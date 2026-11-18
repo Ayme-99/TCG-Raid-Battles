@@ -96,7 +96,17 @@ void main() {
       expect(azar.sacadas, 2);
       await tester.pump(duracionMonedas + const Duration(seconds: 1));
       expect(c.read(tiradaMesaProvider), isNull);
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 600));
+      // Los avisos salen de uno en uno: se pasan tocándolos hasta llegar al
+      // del resultado de las monedas.
+      for (var i = 0;
+          i < 8 &&
+              find.textContaining('1 de 2 monedas en cara').evaluate().isEmpty;
+          i++) {
+        await tester.tap(find.byKey(const Key('aviso')));
+        await tester.pump(const Duration(milliseconds: 400));
+        await tester.pump(const Duration(milliseconds: 600));
+      }
       expect(find.textContaining('1 de 2 monedas en cara'), findsOneWidget);
     });
 }
