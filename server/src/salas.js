@@ -76,6 +76,8 @@ function crearSalas({ generarCodigo = codigoAleatorio } = {}) {
 
   function empezar(sala, partidaId, creadaEn) {
     if (sala.estado !== 'abierta' && sala.estado !== 'completa') return resultado(false, { error: 'salaCerrada' });
+    // D-19 §9: no hay partida con un solo jugador.
+    if (sala.jugadores.length < 2) return resultado(false, { error: 'pocosJugadores' });
     sala.estado = 'enCurso';
     sala.partidaId = partidaId;
     sala.creadaEn = creadaEn;

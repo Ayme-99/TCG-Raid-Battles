@@ -206,7 +206,7 @@ function montarSalas({
   function alEmpezar(ws, m) {
     const { sala } = ws;
     const r = salas.empezar(sala, m.partidaId, m.creadaEn);
-    if (!r.ok) return error(ws, 'salaCerrada');
+    if (!r.ok) return error(ws, r.error === 'pocosJugadores' ? 'mensajeNoValido' : 'salaCerrada');
     difundirSala(sala);
     return undefined;
   }
