@@ -115,7 +115,7 @@ function crearRouter({
 
   // Guarda una partida terminada. Idempotente por partidaId.
   router.post('/partidas', asincrono(async (req, res) => {
-    const registro = req.body;
+    let registro = req.body;
     if (!registro || typeof registro !== 'object' || Array.isArray(registro)) {
       return error(res, 400, 'estructura_invalida', 'el cuerpo debe ser un registro de partida');
     }
@@ -128,6 +128,11 @@ function crearRouter({
     if (errores.length > 0) {
       return error(res, 400, 'estructura_invalida', 'el registro no cumple el esquema', { errores });
     }
+    // Partida de una sala: las cuentas las pone el servidor (D-19 §D8), no el
+    // cliente, así todos guardan el mismo registro y nadie se anota una cuenta
+    // ajena. Quien no volvió a tiempo va a null y no cobra.
+    const deSala = salas ? salas.cuentasDe(registro.partidaId) : null;
+    if (deSala) registro = { ...registro, cuentas: deSala };
     if (!registro.cuentas || !registro.cuentas.includes(req.cuentaId)) {
       return error(res, 403, 'no_participas', 'tu cuenta no figura en las cuentas de la partida');
     }

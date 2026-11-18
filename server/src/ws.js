@@ -97,6 +97,7 @@ function montarSalas({
       jugador.temporizadorVentana = null;
       if (jugador.conectado || salas.obtener(sala.codigo) !== sala) return;
       jugador.vencido = true; // el host registra sus PokemonKo; no vuelve ni cobra (§D8)
+      salas.marcarVencido(sala, jugador.asiento);
       const host = socketDe(sala, sala.jugadores[salas.asientoHost()]);
       if (host) enviar(host, { tipo: 'ventanaVencida', asiento: jugador.asiento });
       difundirSala(sala);
