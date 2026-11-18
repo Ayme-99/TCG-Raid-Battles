@@ -3,7 +3,9 @@
 Inventario de las pantallas que existen hoy en la app y diagrama de flujo de los dos modos de juego decididos en T-53 (#154):
 
 1. **Host único:** la tablet la lleva el host y todos juegan en ese dispositivo. Es lo que hace la app hoy.
-2. **Un dispositivo por jugador:** cada jugador usa su pantalla (móvil, tablet o PC). **No existe todavía** (arquitectura en #158). Lo de este documento es una propuesta de pantallas a partir de las reglas ya cerradas; lo marcado como **PROPUESTA** o **PREGUNTA** está sin aprobar.
+2. **Un dispositivo por jugador:** cada jugador usa su pantalla (móvil, tablet o PC). **No existe todavía** (arquitectura en #158). Las reglas están cerradas (T-53 y las decisiones del 2026-11-18, §4); las pantallas concretas son una **PROPUESTA** sin aprobar.
+
+**Los modos y los formatos van de la mano** (decidido el 2026-11-18, no se admite partida mixta): el *host único* es el **formato físico** (todos en la mesa) y *un dispositivo por jugador* es el **formato digital** (cada uno en su dispositivo, online). Ver `flujo-app.md` §1 bis.
 
 Sustituye a la tarjeta suelta T-18 (bocetos). El flujo de producto (inicio, formatos, Pokédex, cuenta) ya está aprobado en `flujo-app.md` (T-58); aquí se baja a pantallas concretas.
 
@@ -78,34 +80,42 @@ Notas:
 
 ## 3. Modo un dispositivo por jugador (PROPUESTA)
 
-Reglas ya cerradas en T-53:
+Reglas cerradas (T-53 y decisiones del 2026-11-18):
 
+- Es el **formato digital**: solo online, con sesión **obligatoria** para todos los jugadores, y da puntos.
 - Cada jugador apunta **su propio daño** cuando es su turno.
-- El turno del jefe es automático; la acción de «siguiente» la hace el **host**.
+- La **baraja de ataques del jefe está en la app**, así que el turno del jefe es automático: la app roba la carta y resuelve el ataque. La acción de «siguiente» la hace el **host**.
 - Todos ven lo mismo: la mesa con la cámara en el momento de la partida (la cámara sigue al estado, no a cada jugador).
+- **No hay deshacer ni rehacer**: no existen en el formato digital.
+- **No hay partida mixta:** o todos en su dispositivo, o todos en físico.
 - Desconexión: se espera 2 minutos con un mensaje para todos; si no vuelve, sus dos Pokémon se dan por muertos.
+- Se entra por **invitación dentro de la app** o con un **código**.
+- Al terminar, **cada jugador guarda sus propios resultados**.
 
 Roles y qué ve cada uno:
 
 | | Host | Jugador |
 |---|---|---|
 | Crear la partida y elegir jefe/preparación | Sí | No |
+| Invitar o dar el código | Sí | No |
 | Ver la mesa | Sí | Sí, la misma |
 | Apuntar daño en su turno | Solo el suyo | Solo el suyo |
-| Pasar de turno del jefe a la ronda siguiente | Sí | No |
-| Deshacer/rehacer | **PREGUNTA** | No |
+| Pasar del turno del jefe a la ronda siguiente | Sí | No |
+| Deshacer/rehacer | No existe | No existe |
 | Abandonar | Cierra la partida para todos | Se desconecta (ver desconexión) |
+| Guardar sus resultados al final | Los suyos | Los suyos |
 
 Pantallas nuevas o distintas respecto al host único:
 
 | Pantalla | Quién | Qué es |
 |---|---|---|
-| Elegir cómo jugar | Host | Paso nuevo del asistente: un dispositivo / un dispositivo por jugador. |
-| Sala del host | Host | Muestra cómo entrar (código o enlace, **PREGUNTA**) y quién ha entrado. Empieza cuando están todos. |
-| Unirse | Jugador | Introducir código y nombre (o usar su sesión). |
+| Elegir formato | Host | El paso «Formato» del asistente ya existe: «Digital» lleva a este modo (hoy no disponible). |
+| Sala del host | Host | Muestra el código, deja invitar desde la app y enseña quién ha entrado. Empieza cuando están todos. |
+| Unirse | Jugador | Aceptar una invitación o introducir un código. Usa su sesión, que es obligatoria. |
 | Sala de espera | Jugador | «Esperando a que el host empiece». |
-| Mesa de jugador | Jugador | La misma mesa; los controles solo se activan en su turno. Fuera de su turno ve de quién es. |
+| Mesa de jugador | Jugador | La misma mesa; los controles solo se activan en su turno. Fuera de su turno ve de quién es. Sin deshacer ni rehacer. |
 | Aviso de desconexión | Todos | Cuenta atrás de 2 minutos con el nombre del jugador que falta. |
+| Fin de partida | Todos | Resultado y resumen; cada jugador guarda los suyos. |
 
 ```mermaid
 flowchart TD
@@ -116,36 +126,49 @@ flowchart TD
         H4 --> H5[Escena de llegada]
     end
     subgraph Jugador
-        J1[Inicio] --> J2[Unirse con código]
+        J1[Inicio con sesión] --> J2[Unirse: invitación o código]
         J2 --> J3[Sala de espera]
     end
-    H3 -. código .-> J2
+    H3 -. invitación o código .-> J2
     H5 --> M
     J3 -->|empieza el host| M
     subgraph Partida
         M[Turno de los jugadores]
         M -->|cada jugador apunta su daño| M
-        M -->|todos han jugado| B[Turno del jefe]
+        M -->|todos han jugado| B[Turno del jefe automático]
         B -->|el host pulsa siguiente| M
         M --> D[Desconexión: espera 2 min]
         D -->|vuelve| M
         D -->|no vuelve| K[Sus Pokémon, KO]
         K --> M
     end
-    M -->|jefe a 0| F[Fin de partida]
+    M -->|jefe a 0| F[Fin de partida: cada jugador guarda los suyos]
     B -->|todos KO| F
 ```
 
-## 4. Preguntas abiertas
+## 4. Decisiones (2026-11-18) y lo que queda abierto
 
-Estas son las que bloquean el diseño de las maquetas (T-56) o la arquitectura (T-57):
+Decidido:
 
-1. **«Automático» en el turno del jefe.** La baraja de ataques del jefe es física (#95). ¿Quién roba la carta y registra el ataque: el host, o hay una acción en la app que lo hace sin entrada manual? (Pendiente desde T-53.)
-2. **Cómo se entra a una partida:** código corto, enlace, QR o invitación de amigos. Afecta a la pantalla Unirse y a la cuenta.
-3. **Deshacer y rehacer en multi-dispositivo.** Hoy son del host y valen en cualquier fase; con jugadores apuntando su propio daño, ¿puede el jugador corregir su turno?
-4. **Jugadores sin dispositivo.** ¿Puede haber una partida mixta, con algunos jugadores en la tablet del host y otros en su móvil?
-5. **Sesión.** En el modo un dispositivo por jugador, ¿es obligatoria la sesión? Hoy nunca lo es (`flujo-app.md`, §2).
-6. **Fin de partida en multi-dispositivo.** ¿Cada jugador ve su resumen y el guardado lo hace el host, o cada uno guarda el suyo?
+| Pregunta | Decisión |
+|---|---|
+| Turno del jefe «automático» | La baraja de ataques del jefe está en la app. La app roba la carta y resuelve el ataque; el host solo pasa al siguiente turno. |
+| Cómo se entra | Invitación dentro de la app o código. |
+| Deshacer y rehacer | No existen en el formato digital. |
+| Partida mixta | No se admite: o cada uno en su dispositivo, o todos en físico. |
+| Sesión | Obligatoria en el modo un dispositivo por jugador. |
+| Fin de partida | Cada jugador guarda sus propios resultados. |
+
+Efectos a vigilar en otras tarjetas:
+
+- **T-57 (#158):** sin deshacer, el servidor no necesita historial reversible; basta un registro de eventos en un solo sentido. La sesión obligatoria simplifica la identidad de los jugadores (D-11).
+- **Turno del jefe en digital:** hoy el host único ya roba la carta del jefe en la app, pero registra el ataque a mano (objetivo, daño, monedas). En digital esa entrada manual desaparece y hay que decidir cómo se resuelven objetivos y tiradas entre los jugadores conectados.
+- **Invitaciones dentro de la app** necesitan amigos (T-64, #237).
+
+Abierto:
+
+1. Quién lanza las monedas y dados del turno del jefe en digital: la app o el jugador afectado.
+2. Qué pasa si se desconecta el host: ¿pasa el rol a otro jugador o se cierra la partida?
 
 ## 5. Qué no cubre este documento
 
