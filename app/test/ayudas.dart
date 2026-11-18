@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import 'package:incursiones_app/envios/controlador_envios.dart';
 import 'package:incursiones_app/pantallas/escena_entrada.dart';
 import 'package:incursiones_app/pantallas/inicio.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
+import 'package:incursiones_app/sala/canal_sala.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 const sesionDePrueba = Sesion(
@@ -125,3 +127,66 @@ void jugadoresActuanSinDano(ProviderContainer c) {
     estado = c.read(estadoProvider);
   }
 }
+
+/// Canal de sala falso: el test escribe lo que "manda el servidor" y lee lo
+/// que la app envía.
+class CanalFalso implements CanalSala {
+  final StreamController<String> _entrada = StreamController<String>();
+  final List<Map<String, Object?>> enviados = [];
+  bool cerrado = false;
+
+  @override
+  Stream<String> get mensajes => _entrada.stream;
+
+  @override
+  void enviar(String texto) =>
+      enviados.add(Map<String, Object?>.from(jsonDecode(texto) as Map));
+
+  @override
+  Future<void> cerrar() async {
+    cerrado = true;
+    if (!_entrada.isClosed) await _entrada.close();
+  }
+
+  /// El servidor manda un mensaje.
+  void recibir(Map<String, Object?> mensaje) => _entrada.add(jsonEncode(mensaje));
+
+  /// Se corta la conexión sin que la app lo haya pedido.
+  void cortar() => unawaited(_entrada.close());
+
+  /// Lo que la app ha enviado de un tipo.
+  List<Map<String, Object?>> de(String tipo) =>
+      enviados.where((m) => m['tipo'] == tipo).toList();
+}
+
+/// Mensaje `sala` del servidor.
+Map<String, Object?> mensajeSala({
+  String estado = 'enCurso',
+  int host = 0,
+  int tuAsiento = 0,
+  int jugadores = 2,
+  int ultimoSeq = 0,
+}) =>
+    {
+      'tipo': 'sala',
+      'estado': estado,
+      'host': host,
+      'tuAsiento': tuAsiento,
+      'jugadores': [
+        for (var i = 0; i < jugadores; i++)
+          {'asiento': i, 'nombre': 'J$i', 'conectado': true},
+      ],
+      'ultimoSeq': ultimoSeq,
+      if (estado == 'enCurso') ...{
+        'partidaId': 'partida-1',
+        'creadaEn': '2026-11-18T22:00:00.000Z',
+      },
+    };
+
+/// Mensaje `evento` del servidor.
+Map<String, Object?> mensajeEvento(int seq, Evento evento, {String? id}) => {
+      'tipo': 'evento',
+      'seq': seq,
+      'evento': eventoAJson(evento),
+      if (id != null) 'idMensaje': id,
+    };

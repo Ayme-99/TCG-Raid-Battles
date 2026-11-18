@@ -21,6 +21,13 @@ class ControladorPartida extends Notifier<Historial> {
   String? _partidaId;
   String? _creadaEn;
 
+  // En una sala (D-19) el host fija el id y la fecha para todos y no cambian
+  // mientras dura la partida.
+  bool _identidadFija = false;
+
+  // Solo el host: avisa de cada evento que registra, para difundirlo.
+  void Function(Evento)? _alRegistrar;
+
   @override
   Historial build() {
     // Si la app se cerró a mitad de partida, se retoma donde estaba.
@@ -45,14 +52,50 @@ class ControladorPartida extends Notifier<Historial> {
 
   /// Empieza una partida nueva y descarta la actual.
   void nuevaPartida() {
+    salirDeSala();
     _olvidarIdentidad();
     state = Historial.nuevo();
     _guardar();
   }
 
   void _olvidarIdentidad() {
+    if (_identidadFija) return;
     _partidaId = null;
     _creadaEn = null;
+  }
+
+  /// Pasa a jugar en una sala (T-81). El host fija [partidaId] y [creadaEn] y
+  /// llegan a todos. [alRegistrar] es solo del host: se le avisa de cada
+  /// evento que registra para difundirlo. En una sala no hay deshacer ni
+  /// rehacer (D-19).
+  void entrarEnSala({
+    required String partidaId,
+    required String creadaEn,
+    void Function(Evento)? alRegistrar,
+  }) {
+    _identidadFija = true;
+    _partidaId = partidaId;
+    _creadaEn = creadaEn;
+    _alRegistrar = alRegistrar;
+    ref.read(enSalaProvider.notifier).state = true;
+  }
+
+  /// Vuelve al juego de un solo dispositivo.
+  void salirDeSala() {
+    _identidadFija = false;
+    _alRegistrar = null;
+    ref.read(enSalaProvider.notifier).state = false;
+  }
+
+  /// Aplica un evento que el host ha difundido (solo en una sala). Devuelve
+  /// `null` si se aplicó o el motivo por el que las reglas lo rechazan.
+  String? aplicarDeSala(Evento evento) {
+    try {
+      state = state.aplicar(evento);
+      return null;
+    } on ReglaIncumplida catch (e) {
+      return e.mensaje;
+    }
   }
 
   /// Registra un evento. Devuelve `null` si se aplicó, o el motivo por el que
@@ -62,6 +105,7 @@ class ControladorPartida extends Notifier<Historial> {
       state = state.aplicar(evento);
       _olvidarIdentidad();
       _guardar();
+      _alRegistrar?.call(evento);
       return null;
     } on ReglaIncumplida catch (e) {
       return e.mensaje;
@@ -90,6 +134,7 @@ class ControladorPartida extends Notifier<Historial> {
 
   /// Quita el último evento (no hace nada si no hay ninguno).
   void deshacer() {
+    if (ref.read(enSalaProvider)) return;
     _olvidarIdentidad();
     state = state.deshacer();
     _guardar();
@@ -97,6 +142,7 @@ class ControladorPartida extends Notifier<Historial> {
 
   /// Vuelve a aplicar el último evento deshecho.
   void rehacer() {
+    if (ref.read(enSalaProvider)) return;
     _olvidarIdentidad();
     state = state.rehacer();
     _guardar();
@@ -132,12 +178,20 @@ final estadoProvider = Provider<EstadoPartida>(
   (ref) => ref.watch(partidaProvider.select((h) => h.partida.estado)),
 );
 
+/// Si la partida es de una sala (varios dispositivos). Mientras lo es, no hay
+/// deshacer ni rehacer.
+final enSalaProvider = StateProvider<bool>((ref) => false);
+
 final puedeDeshacerProvider = Provider<bool>(
-  (ref) => ref.watch(partidaProvider.select((h) => h.puedeDeshacer)),
+  (ref) =>
+      !ref.watch(enSalaProvider) &&
+      ref.watch(partidaProvider.select((h) => h.puedeDeshacer)),
 );
 
 final puedeRehacerProvider = Provider<bool>(
-  (ref) => ref.watch(partidaProvider.select((h) => h.puedeRehacer)),
+  (ref) =>
+      !ref.watch(enSalaProvider) &&
+      ref.watch(partidaProvider.select((h) => h.puedeRehacer)),
 );
 
 /// Puntos de la partida, o `null` mientras no ha terminado. Con la sesión

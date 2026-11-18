@@ -59,7 +59,7 @@ Jugador ──propone──▶ Servidor ──▶ Host: valida con el motor
                                     └─ inválido: rechazo solo al que propuso
 ```
 
-- Cada evento aceptado lleva un **número de secuencia** (`seq`, 0, 1, 2…). Los clientes los aplican **en orden**.
+- Cada evento aceptado lleva un **número de secuencia** (`seq`, 1, 2, 3…; así quedó en `contrato/sala/`, donde 0 significa «no tengo ninguno»). Los clientes los aplican **en orden**.
 - Todos los clientes (host incluido) llevan el mismo registro y reconstruyen el mismo estado con el motor. El host no es especial salvo en que decide qué se acepta.
 - Un cliente **nunca aplica** un evento que no haya difundido el host. Así no hay estado «provisional» que deshacer.
 
