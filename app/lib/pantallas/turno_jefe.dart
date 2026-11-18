@@ -464,7 +464,7 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                             'Daño total: $total.',
                         ];
                         if (avisos.isNotEmpty) {
-                          registrarAviso(context, avisos.join('\n'));
+                          registrarAvisos(context, avisos);
                         }
                         final defensor = _objetivo;
                         if (efecto != null &&

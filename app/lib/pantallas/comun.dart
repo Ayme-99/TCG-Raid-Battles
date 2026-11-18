@@ -6,7 +6,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 import '../partida/controlador_partida.dart';
 import 'aviso_central.dart';
 
-export 'aviso_central.dart' show TipoAviso;
+export 'aviso_central.dart' show Aviso, TipoAviso;
 
 /// Envía un evento al motor y, si las reglas lo rechazan, muestra el motivo.
 /// Devuelve `true` si se aplicó.
@@ -29,20 +29,25 @@ String etiquetaCategoria(CategoriaAliado c) => switch (c) {
       CategoriaAliado.debilitador => 'Debilitador',
     };
 
-/// Muestra un aviso en medio de la pantalla (ver `mostrarAvisoCentral`): se
-/// cierra solo, más tarde cuantas más líneas tenga, o al tocarlo, y no
-/// bloquea los controles. Uno nuevo sustituye al anterior.
+/// Muestra un aviso en medio de la pantalla (ver `mostrarAvisoCentral`).
+/// Si el texto trae varias líneas, cada una es un aviso. Salen de uno en uno;
+/// tocar el que se ve lo pasa al siguiente.
 void registrarAviso(
   BuildContext context,
   String mensaje, {
-  TipoAviso tipo = TipoAviso.info,
-}) =>
-    mostrarAvisoCentral(context, mensaje, tipo: tipo);
+  TipoAviso? tipo,
+}) {
+  for (final linea in mensaje.split('\n')) {
+    if (linea.trim().isEmpty) continue;
+    mostrarAvisoCentral(context, Aviso.deTexto(linea, tipo: tipo));
+  }
+}
 
-/// Varios avisos a la vez, en uno solo (un aviso nuevo sustituye al anterior).
+/// Varios avisos a la vez: se ponen en cola y salen uno detrás de otro.
 void registrarAvisos(BuildContext context, Iterable<String> mensajes) {
-  final lista = mensajes.toList();
-  if (lista.isNotEmpty) registrarAviso(context, lista.join('\n'));
+  for (final m in mensajes) {
+    registrarAviso(context, m);
+  }
 }
 
 /// Algo que la mesa tiene que hacer con sus cartas (poner contadores, lanzar

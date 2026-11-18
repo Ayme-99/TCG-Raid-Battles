@@ -7,7 +7,7 @@ import 'package:incursiones_app/pantallas/comun.dart';
 /// para lanzar el aviso que toque.
 Widget _pantalla({
   required void Function(BuildContext) lanzar,
-  required void Function() alPulsar,
+  void Function()? alPulsar,
   bool sinMovimiento = false,
 }) {
   return MaterialApp(
@@ -22,7 +22,7 @@ Widget _pantalla({
             alignment: Alignment.bottomLeft,
             child: TextButton(
               key: const Key('esquina'),
-              onPressed: alPulsar,
+              onPressed: alPulsar ?? () {},
               child: const Text('esquina'),
             ),
           ),
@@ -45,69 +45,141 @@ Widget _pantalla({
 Future<void> _lanzar(WidgetTester tester) async {
   await tester.tap(find.byKey(const Key('lanzar')));
   await tester.pump();
-  await tester.pump(const Duration(milliseconds: 300));
+  await tester.pump(const Duration(milliseconds: 600));
+}
+
+/// Deja pasar lo que dura un aviso y su salida.
+Future<void> _pasaElAviso(WidgetTester tester) async {
+  await tester.pump(const Duration(seconds: 8));
+  await tester.pump(const Duration(milliseconds: 400));
+  await tester.pump(const Duration(milliseconds: 100));
 }
 
 void main() {
+  group('Aviso.deTexto', () {
+    test('separa el nombre, el titular y el motivo', () {
+      final a = Aviso.deTexto(
+        'Magikarp: Jugador 2 está KO, el ataque falla.',
+      );
+      expect(a.tipo, TipoAviso.fallo);
+      expect(a.nombre, 'MAGIKARP');
+      expect(a.titulo, '¡EL ATAQUE FALLA!');
+      expect(a.motivo, 'Jugador 2 está KO, el ataque falla');
+    });
+
+    test('adivina el tipo por lo que cuenta', () {
+      expect(Aviso.deTexto('Horsea: cae, KO.').tipo, TipoAviso.ko);
+      expect(Aviso.deTexto('Machop: moneda en cruz, recibe el daño.').tipo,
+          TipoAviso.danio);
+      expect(Aviso.deTexto('Chansey: se evita todo el daño.').tipo,
+          TipoAviso.esquiva);
+      expect(Aviso.deTexto('El jefe se cura 300.').tipo, TipoAviso.cura);
+      expect(Aviso.deTexto('Empieza la ronda 4').tipo, TipoAviso.info);
+      expect(
+        Aviso.deTexto('Salió cruz: no se invoca ningún aliado.').tipo,
+        TipoAviso.fallo,
+      );
+    });
+
+    test('sin nombre, todo el texto es el motivo', () {
+      final a = Aviso.deTexto('Daño total: 80.');
+      expect(a.nombre, isNull);
+      expect(a.motivo, 'Daño total: 80');
+    });
+
+    test('el tipo que se pide manda sobre el que se adivina', () {
+      expect(
+        Aviso.deTexto('No hay hueco', tipo: TipoAviso.error).tipo,
+        TipoAviso.error,
+      );
+    });
+
+    test('dura más cuanto más hay que leer', () {
+      const corto = Aviso(tipo: TipoAviso.info, titulo: 'AVISO', motivo: 'Hola');
+      final largo = Aviso(
+        tipo: TipoAviso.info,
+        titulo: 'AVISO',
+        motivo: List.filled(40, 'palabra').join(' '),
+      );
+      expect(duracionAviso(corto).inMilliseconds, greaterThanOrEqualTo(2400));
+      expect(duracionAviso(largo), greaterThan(duracionAviso(corto)));
+      expect(duracionAviso(largo), const Duration(seconds: 7));
+    });
+  });
+
   group('aviso central', () {
-    testWidgets('sale en medio de la pantalla', (tester) async {
+    testWidgets('sale en medio de la pantalla, con su jerarquía',
+        (tester) async {
       await tester.pumpWidget(
-        _pantalla(
-          lanzar: (c) => registrarAviso(c, 'Salió cruz'),
-          alPulsar: () {},
-        ),
+        _pantalla(lanzar: (c) => registrarAviso(c, 'Magikarp: está KO')),
       );
       await _lanzar(tester);
-      expect(find.text('Salió cruz'), findsOneWidget);
+      expect(find.byKey(const Key('aviso')), findsOneWidget);
+      expect(find.text('MAGIKARP'), findsOneWidget);
+      expect(find.byKey(const Key('aviso-titulo')), findsOneWidget);
+      expect(find.text('está KO'), findsOneWidget);
       final centro = tester.getCenter(find.byKey(const Key('aviso')));
       final pantalla = tester.getCenter(find.byType(Scaffold));
       expect((centro.dx - pantalla.dx).abs(), lessThan(1));
-      expect((centro.dy - pantalla.dy).abs(), lessThan(1));
-      // Ya no es un SnackBar de abajo.
+      expect((centro.dy - pantalla.dy).abs(), lessThan(40));
       expect(find.byType(SnackBar), findsNothing);
+      await _pasaElAviso(tester);
     });
 
-    testWidgets('se cierra solo, y tarda más con más líneas', (tester) async {
+    testWidgets('se cierra solo', (tester) async {
+      await tester.pumpWidget(
+        _pantalla(lanzar: (c) => registrarAviso(c, 'Hola')),
+      );
+      await _lanzar(tester);
+      expect(find.byKey(const Key('aviso')), findsOneWidget);
+      await _pasaElAviso(tester);
+      expect(find.byKey(const Key('aviso')), findsNothing);
+    });
+
+    testWidgets('salen de uno en uno, sin apilarse', (tester) async {
       await tester.pumpWidget(
         _pantalla(
-          lanzar: (c) => registrarAvisos(c, ['uno', 'dos', 'tres']),
-          alPulsar: () {},
+          lanzar: (c) => registrarAvisos(c, ['Uno: a', 'Dos: b', 'Tres: c']),
         ),
       );
       await _lanzar(tester);
       expect(find.byKey(const Key('aviso')), findsOneWidget);
-      // Tres líneas: más de lo que dura un aviso de una.
-      await tester.pump(const Duration(seconds: 4));
+      expect(find.text('UNO'), findsOneWidget);
+      expect(avisosEnCola(), 2);
+      await _pasaElAviso(tester);
       expect(find.byKey(const Key('aviso')), findsOneWidget);
-      await tester.pump(const Duration(seconds: 3));
-      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.text('DOS'), findsOneWidget);
+      expect(find.text('UNO'), findsNothing);
+      await _pasaElAviso(tester);
+      expect(find.text('TRES'), findsOneWidget);
+      await _pasaElAviso(tester);
       expect(find.byKey(const Key('aviso')), findsNothing);
+      expect(avisosEnCola(), 0);
     });
 
-    testWidgets('un aviso de una línea dura menos', (tester) async {
-      expect(duracionAviso('una'), const Duration(seconds: 3));
-      expect(
-        duracionAviso('a\nb\nc'),
-        greaterThan(duracionAviso('a\nb')),
-      );
-      expect(
-        duracionAviso(List.filled(30, 'x').join('\n')),
-        const Duration(seconds: 10),
-      );
-    });
-
-    testWidgets('se cierra al tocarlo', (tester) async {
+    testWidgets('un texto de varias líneas son varios avisos', (tester) async {
       await tester.pumpWidget(
-        _pantalla(
-          lanzar: (c) => registrarAviso(c, 'Hola'),
-          alPulsar: () {},
-        ),
+        _pantalla(lanzar: (c) => registrarAviso(c, 'Uno: a\nDos: b')),
+      );
+      await _lanzar(tester);
+      expect(find.text('UNO'), findsOneWidget);
+      expect(avisosEnCola(), 1);
+      await _pasaElAviso(tester);
+      expect(find.text('DOS'), findsOneWidget);
+      await _pasaElAviso(tester);
+    });
+
+    testWidgets('tocarlo pasa al siguiente', (tester) async {
+      await tester.pumpWidget(
+        _pantalla(lanzar: (c) => registrarAvisos(c, ['Uno: a', 'Dos: b'])),
       );
       await _lanzar(tester);
       await tester.tap(find.byKey(const Key('aviso')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
-      expect(find.byKey(const Key('aviso')), findsNothing);
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.text('DOS'), findsOneWidget);
+      await _pasaElAviso(tester);
     });
 
     testWidgets('no bloquea los controles de debajo', (tester) async {
@@ -119,76 +191,61 @@ void main() {
         ),
       );
       await _lanzar(tester);
-      expect(find.byKey(const Key('aviso')), findsOneWidget);
       await tester.tap(find.byKey(const Key('esquina')));
       await tester.pump();
       expect(pulsaciones, 1);
-      // Y el aviso sigue ahí: pulsar otra cosa no lo cierra.
       expect(find.byKey(const Key('aviso')), findsOneWidget);
+      await _pasaElAviso(tester);
     });
 
-    testWidgets('uno nuevo sustituye al anterior', (tester) async {
-      var n = 0;
+    testWidgets('un error pasa por delante y tira la cola', (tester) async {
       await tester.pumpWidget(
         _pantalla(
-          lanzar: (c) => registrarAviso(c, 'aviso ${++n}'),
-          alPulsar: () {},
-        ),
-      );
-      await _lanzar(tester);
-      await _lanzar(tester);
-      expect(find.byKey(const Key('aviso')), findsOneWidget);
-      expect(find.text('aviso 2'), findsOneWidget);
-      expect(find.text('aviso 1'), findsNothing);
-    });
-
-    testWidgets('varios avisos a la vez salen juntos en uno', (tester) async {
-      await tester.pumpWidget(
-        _pantalla(
-          lanzar: (c) => registrarAvisos(c, ['Primero', 'Segundo']),
-          alPulsar: () {},
+          lanzar: (c) {
+            registrarAvisos(c, ['Uno: a', 'Dos: b']);
+            registrarAviso(c, 'No se puede', tipo: TipoAviso.error);
+          },
         ),
       );
       await _lanzar(tester);
       expect(find.byKey(const Key('aviso')), findsOneWidget);
-      expect(find.text('Primero\nSegundo'), findsOneWidget);
+      expect(find.text('NO SE PUEDE'), findsOneWidget);
+      expect(find.text('UNO'), findsNothing);
+      expect(avisosEnCola(), 0);
+      await _pasaElAviso(tester);
     });
 
-    testWidgets('sin avisos no sale nada', (tester) async {
-      await tester.pumpWidget(
-        _pantalla(
-          lanzar: (c) => registrarAvisos(c, const []),
-          alPulsar: () {},
-        ),
-      );
-      await _lanzar(tester);
-      expect(find.byKey(const Key('aviso')), findsNothing);
-    });
-
-    testWidgets('con «reducir movimiento» aparece y desaparece sin animar',
+    testWidgets('con «reducir movimiento» no hay animaciones',
         (tester) async {
       await tester.pumpWidget(
         _pantalla(
           lanzar: (c) => registrarAviso(c, 'Sin animación'),
-          alPulsar: () {},
           sinMovimiento: true,
         ),
       );
       await tester.tap(find.byKey(const Key('lanzar')));
-      // Un solo fotograma y ya está entero.
+      // Un solo fotograma y ya está entero y en su sitio.
       await tester.pump();
-      final fade = tester.widget<FadeTransition>(
-        find
-            .ancestor(
-              of: find.byKey(const Key('aviso')),
-              matching: find.byType(FadeTransition),
-            )
-            .first,
-      );
-      expect(fade.opacity.value, 1);
+      final fotograma = tester.getRect(find.byKey(const Key('aviso')));
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(tester.getRect(find.byKey(const Key('aviso'))), fotograma);
       await tester.tap(find.byKey(const Key('aviso')));
       await tester.pump();
       expect(find.byKey(const Key('aviso')), findsNothing);
+    });
+
+    testWidgets('tiene vida: la banda se mueve mientras está en pantalla',
+        (tester) async {
+      await tester.pumpWidget(
+        _pantalla(lanzar: (c) => registrarAviso(c, 'Horsea: KO')),
+      );
+      await _lanzar(tester);
+      final antes = tester.getRect(find.byKey(const Key('aviso')));
+      // Durante el temblor del KO el cartel se desplaza un poco.
+      await tester.pump(const Duration(milliseconds: 100));
+      final durante = tester.getRect(find.byKey(const Key('aviso')));
+      expect(antes.width, durante.width);
+      await _pasaElAviso(tester);
     });
 
     for (final (nombre, tam) in [
@@ -203,33 +260,43 @@ void main() {
           _pantalla(
             lanzar: (c) => registrarAviso(
               c,
-              'Un aviso bastante largo para comprobar que el texto se parte '
-              'en varias líneas y no se sale por los lados de la pantalla.',
-              tipo: TipoAviso.error,
+              'Magikarp: Jugador 2 está KO, el ataque falla porque no hay '
+              'ningún Pokémon que pueda recibir el daño de esta forma.',
             ),
-            alPulsar: () {},
           ),
         );
         await _lanzar(tester);
         final caja = tester.getRect(find.byKey(const Key('aviso')));
         expect(caja.left, greaterThanOrEqualTo(0));
         expect(caja.right, lessThanOrEqualTo(tam.width));
-        expect(caja.width, lessThanOrEqualTo(440));
+        expect(caja.width, lessThanOrEqualTo(600));
         expect(tester.takeException(), isNull);
-        expect(find.byIcon(Icons.error_outline), findsOneWidget);
+        await _pasaElAviso(tester);
       });
     }
 
-    testWidgets('un aviso de error lleva su icono', (tester) async {
-      await tester.pumpWidget(
-        _pantalla(
-          lanzar: (c) => registrarAviso(c, 'Rechazado', tipo: TipoAviso.error),
-          alPulsar: () {},
-        ),
-      );
-      await _lanzar(tester);
-      expect(find.byIcon(Icons.error_outline), findsOneWidget);
-      expect(find.byIcon(Icons.info_outline), findsNothing);
+    testWidgets('cada tipo lleva su icono', (tester) async {
+      final tipos = {
+        TipoAviso.ko: Icons.heart_broken,
+        TipoAviso.danio: Icons.bolt,
+        TipoAviso.cura: Icons.favorite,
+        TipoAviso.fallo: Icons.block,
+        TipoAviso.info: Icons.notifications_active,
+        TipoAviso.error: Icons.warning_amber_rounded,
+      };
+      for (final e in tipos.entries) {
+        await tester.pumpWidget(
+          _pantalla(
+            lanzar: (c) => mostrarAvisoCentral(
+              c,
+              Aviso(tipo: e.key, titulo: 'X', motivo: 'y'),
+            ),
+          ),
+        );
+        await _lanzar(tester);
+        expect(find.byIcon(e.value), findsOneWidget, reason: '${e.key}');
+        await _pasaElAviso(tester);
+      }
     });
   });
 }
