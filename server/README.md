@@ -55,6 +55,23 @@ app.use('/api/incursiones', crearRouter({
 }));
 ```
 
+### Salas y WebSocket (partida multi-dispositivo)
+
+Para la partida digital con varios dispositivos (D-19, [`../docs/D-19-partida-multidispositivo.md`](../docs/D-19-partida-multidispositivo.md)) el módulo añade dos piezas más, con el estado **en memoria** (se pierde al reiniciar):
+
+- `crearSalas()` (`src/salas.js`): código de 5 caracteres, hasta 4 jugadores, host en el asiento 0, una sola sala viva por cuenta. Pasándola a `crearRouter({ ..., salas, nombreDe })` aparece `POST /salas` (`201 { codigo }`, `409 ya_en_sala`).
+- `montarSalas({ servidor, salas, verificarToken })` (`src/ws.js`): WebSocket con `ws` en `/api/incursiones/ws` sobre el servidor HTTP. El primer mensaje es `hola` con el token (nunca en la URL); `verificarToken(token)` devuelve `{ cuentaId, nombre }` o `null`. Los mensajes son los de [`../contrato/sala/`](../contrato/sala/README.md) y se validan con su esquema. El host decide qué eventos valen; el servidor solo numera, guarda y difunde.
+
+```js
+const servidor = http.createServer(app); // el que ya usa el backend
+const salas = crearSalas();
+app.use('/api/incursiones', crearRouter({ ..., salas, nombreDe: (req) => req.user.nombre }));
+montarSalas({ servidor, salas, verificarToken: async (t) => { /* JWT → { cuentaId, nombre } | null */ } });
+servidor.listen(puerto);
+```
+
+`ws` es una dependencia del host (como `express`). Todavía **no** están los latidos ni la ventana de 2 minutos (T-80): hasta entonces, un jugador que se cae en partida queda «desconectado» y puede volver con `hola`, y si se cae el host se cancela la partida al instante.
+
 El router incluye `express.json` (límite de 1 MB). `express` es una dependencia del host; aquí solo se usa en los tests. Los esquemas se leen de `../contrato/partida.vN.schema.json` (una por versión): al montarlo, hay que llevar esa carpeta (`crearValidador(carpeta)` acepta otra ruta) o pasar un `validar` propio.
 
 ## Tests

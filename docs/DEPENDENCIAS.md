@@ -63,6 +63,7 @@ Cualquier cambio del formato sube la versión (`contrato/README.md`, «Versionad
 
 1. Fusiona y comprueba el CI en este repo.
 2. En una copia de `TCGMasters-server`, rama nueva desde `main`: `node <este repo>/server/scripts/exportar.js src/modules/tcg-raid-battles`. Copia los `.js` del módulo y los esquemas `partida.vN.schema.json`.
+   Desde T-79 el módulo también trae `salas.js`, `ws.js` y `protocoloSala.js` (y `contrato/sala/sala.v1.schema.json`). `TCGMasters-server` necesita la dependencia `ws` y pasar su servidor HTTP a `montarSalas` en `montar.js` (ejemplo en `server/README.md`); eso sí es del host y no se copia.
 3. Si hay versión nueva del contrato: añade `tests/tcg-raid-battles/partida-vN.json` y sus tests en `tests/tcg-raid-battles/montar.test.js`.
 4. `npx jest` en ese repo (**no tiene CI**: es la única comprobación) y PR.
 5. Al fusionar, Render despliega. Comprueba que el servidor responde y guarda una partida desde la app.

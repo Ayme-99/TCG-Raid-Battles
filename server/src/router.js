@@ -71,6 +71,8 @@ function resumenDeFila(f) {
  * @param {Function} [o.existenCuentas] async (ids) → ids que no existen
  * @param {Function} [o.validar]  (registro) → errores del esquema
  * @param {Function} [o.ahora]    () → Date, para los tests
+ * @param {object} [o.salas]     crearSalas(); si se pasa, añade POST /salas (D-19 §D7)
+ * @param {Function} [o.nombreDe] (req) → nombre que ven los demás en la sala
  */
 function crearRouter({
   repo,
@@ -79,6 +81,8 @@ function crearRouter({
   existenCuentas = async () => [],
   validar = crearValidador(),
   ahora = () => new Date(),
+  salas = null,
+  nombreDe = (req) => req.cuentaId,
 }) {
   if (!repo || typeof autenticar !== 'function') {
     throw new Error('crearRouter necesita repo y autenticar');
@@ -94,6 +98,18 @@ function crearRouter({
     req.cuentaId = id;
     return next();
   });
+
+  // Crea una sala; quien la crea es el host (asiento 0). El WebSocket (ws.js)
+  // se conecta después con el código.
+  if (salas) {
+    router.post('/salas', (req, res) => {
+      const r = salas.crear(req.cuentaId, String(nombreDe(req) || req.cuentaId));
+      if (!r.ok) {
+        return error(res, 409, 'ya_en_sala', 'esta cuenta ya está en una sala', { codigo: r.codigo });
+      }
+      return res.status(201).json({ codigo: r.sala.codigo });
+    });
+  }
 
   const asincrono = (fn) => (req, res, next) => fn(req, res).catch(next);
 
