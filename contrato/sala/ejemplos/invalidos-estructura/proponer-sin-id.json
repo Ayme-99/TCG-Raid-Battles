@@ -1,0 +1,8 @@
+{
+  "tipo": "proponer",
+  "evento": {
+    "tipo": "turnoJugador",
+    "jugador": 1,
+    "dano": 120
+  }
+}

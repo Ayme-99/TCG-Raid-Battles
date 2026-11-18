@@ -1,0 +1,21 @@
+{
+  "tipo": "sala",
+  "estado": "enCurso",
+  "host": 0,
+  "tuAsiento": 1,
+  "jugadores": [
+    {
+      "asiento": 0,
+      "nombre": "Ana",
+      "conectado": true
+    },
+    {
+      "asiento": 1,
+      "nombre": "Bea",
+      "conectado": false
+    }
+  ],
+  "partidaId": "8f3a1c52e9b04d7a",
+  "creadaEn": "2026-11-18T21:30:00Z",
+  "ultimoSeq": 14
+}

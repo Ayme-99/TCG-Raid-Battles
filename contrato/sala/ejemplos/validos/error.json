@@ -1,0 +1,5 @@
+{
+  "tipo": "error",
+  "codigo": "protocoloNoSoportado",
+  "texto": "Actualiza la app: el servidor habla el protocolo 1."
+}

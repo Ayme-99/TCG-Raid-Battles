@@ -1,0 +1,9 @@
+{
+  "tipo": "aceptar",
+  "seq": 0,
+  "evento": {
+    "tipo": "turnoJugador",
+    "jugador": 1,
+    "dano": 120
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "tipo": "proponer",
+  "idMensaje": "m",
+  "evento": {
+    "tipo": "inventado"
+  }
+}

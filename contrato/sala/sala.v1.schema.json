@@ -1,0 +1,544 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ayme-99/TCG-Raid-Battles/contrato/sala/sala.v1.schema.json",
+  "title": "Protocolo de sala de Incursiones, versión 1",
+  "description": "Mensajes WebSocket de la partida multi-dispositivo (D-19 §D11). Los eventos llevan el JSON del contrato del registro (partida.v13).",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/hola"
+    },
+    {
+      "$ref": "#/$defs/sala"
+    },
+    {
+      "$ref": "#/$defs/proponerCliente"
+    },
+    {
+      "$ref": "#/$defs/proponerServidor"
+    },
+    {
+      "$ref": "#/$defs/aceptar"
+    },
+    {
+      "$ref": "#/$defs/rechazar"
+    },
+    {
+      "$ref": "#/$defs/evento"
+    },
+    {
+      "$ref": "#/$defs/jugadorDesconectado"
+    },
+    {
+      "$ref": "#/$defs/jugadorVuelve"
+    },
+    {
+      "$ref": "#/$defs/ventanaVencida"
+    },
+    {
+      "$ref": "#/$defs/partidaCancelada"
+    },
+    {
+      "$ref": "#/$defs/registro"
+    },
+    {
+      "$ref": "#/$defs/ping"
+    },
+    {
+      "$ref": "#/$defs/pong"
+    },
+    {
+      "$ref": "#/$defs/empezar"
+    },
+    {
+      "$ref": "#/$defs/echar"
+    },
+    {
+      "$ref": "#/$defs/salir"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
+  ],
+  "$defs": {
+    "hola": {
+      "description": "Cliente → servidor: primer mensaje de la conexión. Autentica con el token de sesión (nunca en la URL).",
+      "type": "object",
+      "required": [
+        "tipo",
+        "protocolo",
+        "token",
+        "codigo"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "hola"
+        },
+        "protocolo": {
+          "const": 1
+        },
+        "token": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "codigo": {
+          "$ref": "#/$defs/codigo"
+        },
+        "ultimoSeq": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "sala": {
+      "description": "Servidor → cliente: estado de la sala. Se manda al entrar y cada vez que cambia (entra o sale alguien, empieza la partida).",
+      "type": "object",
+      "required": [
+        "tipo",
+        "estado",
+        "host",
+        "tuAsiento",
+        "jugadores",
+        "ultimoSeq"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "sala"
+        },
+        "estado": {
+          "enum": [
+            "abierta",
+            "completa",
+            "enCurso",
+            "terminada",
+            "cancelada"
+          ]
+        },
+        "host": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "tuAsiento": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "jugadores": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/jugadorSala"
+          }
+        },
+        "partidaId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "creadaEn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ultimoSeq": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "proponerCliente": {
+      "description": "Cliente → servidor: un jugador propone un evento de su asiento y de su turno (D-19 §D2).",
+      "type": "object",
+      "required": [
+        "tipo",
+        "idMensaje",
+        "evento"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "proponer"
+        },
+        "idMensaje": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "evento": {
+          "$ref": "https://github.com/Ayme-99/TCG-Raid-Battles/contrato/partida.v13.schema.json#/$defs/evento"
+        }
+      }
+    },
+    "proponerServidor": {
+      "description": "Servidor → host: la propuesta de un jugador, con el asiento de la conexión de origen (el servidor lo pone; el cliente no lo manda).",
+      "type": "object",
+      "required": [
+        "tipo",
+        "idMensaje",
+        "asiento",
+        "evento"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "proponer"
+        },
+        "idMensaje": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "asiento": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "evento": {
+          "$ref": "https://github.com/Ayme-99/TCG-Raid-Battles/contrato/partida.v13.schema.json#/$defs/evento"
+        }
+      }
+    },
+    "aceptar": {
+      "description": "Host → servidor: el evento queda en el registro con el número siguiente. Si responde a una propuesta lleva su idMensaje; los eventos que genera el propio host (turno del jefe) no lo llevan.",
+      "type": "object",
+      "required": [
+        "tipo",
+        "seq",
+        "evento"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "aceptar"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evento": {
+          "$ref": "https://github.com/Ayme-99/TCG-Raid-Battles/contrato/partida.v13.schema.json#/$defs/evento"
+        },
+        "idMensaje": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      }
+    },
+    "rechazar": {
+      "description": "Host → servidor (que lo reenvía al que propuso): el motor ha rechazado la propuesta.",
+      "type": "object",
+      "required": [
+        "tipo",
+        "idMensaje",
+        "motivo"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "rechazar"
+        },
+        "idMensaje": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "motivo": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    },
+    "evento": {
+      "description": "Servidor → todos: evento aceptado, con su número en el registro. Lleva idMensaje para que el que propuso sepa que ya está.",
+      "type": "object",
+      "required": [
+        "tipo",
+        "seq",
+        "evento"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "evento"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evento": {
+          "$ref": "https://github.com/Ayme-99/TCG-Raid-Battles/contrato/partida.v13.schema.json#/$defs/evento"
+        },
+        "idMensaje": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      }
+    },
+    "jugadorDesconectado": {
+      "description": "Servidor → todos: se ha caído la conexión de un asiento (también el del host: la sala queda en «host ausente»). venceEn es cuándo acaba la ventana de 2 minutos.",
+      "type": "object",
+      "required": [
+        "tipo",
+        "asiento",
+        "venceEn"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "jugadorDesconectado"
+        },
+        "asiento": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "venceEn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "jugadorVuelve": {
+      "description": "Servidor → todos: el asiento ha vuelto antes de que venciera la ventana.",
+      "type": "object",
+      "required": [
+        "tipo",
+        "asiento"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "jugadorVuelve"
+        },
+        "asiento": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        }
+      }
+    },
+    "ventanaVencida": {
+      "description": "Servidor → host: la ventana de un jugador ha vencido; el host registra un pokemonKo por cada Pokémon que le quede (D-19 §D9). Para el host ausente no hay mensaje: se cancela la partida.",
+      "type": "object",
+      "required": [
+        "tipo",
+        "asiento"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "ventanaVencida"
+        },
+        "asiento": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        }
+      }
+    },
+    "partidaCancelada": {
+      "description": "Servidor → todos: la sala se cierra sin guardar nada ni dar puntos.",
+      "type": "object",
+      "required": [
+        "tipo",
+        "motivo"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "partidaCancelada"
+        },
+        "motivo": {
+          "enum": [
+            "hostDesconectado",
+            "hostCancelo"
+          ]
+        },
+        "texto": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    },
+    "registro": {
+      "description": "Los eventos desde desdeSeq. Servidor → cliente al reconectar (eventos vacío si ya está al día). Host → servidor al reconstruir la sala tras un reinicio, con desdeSeq 1.",
+      "type": "object",
+      "required": [
+        "tipo",
+        "desdeSeq",
+        "eventos"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "registro"
+        },
+        "desdeSeq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "eventos": {
+          "type": "array",
+          "items": {
+            "$ref": "https://github.com/Ayme-99/TCG-Raid-Battles/contrato/partida.v13.schema.json#/$defs/evento"
+          }
+        }
+      }
+    },
+    "ping": {
+      "description": "Latido, en ambos sentidos: cada 10 s; sin respuesta en 25 s la conexión se da por caída.",
+      "type": "object",
+      "required": [
+        "tipo"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "ping"
+        }
+      }
+    },
+    "pong": {
+      "description": "Respuesta al ping.",
+      "type": "object",
+      "required": [
+        "tipo"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "pong"
+        }
+      }
+    },
+    "empezar": {
+      "description": "Host → servidor: cierra la sala a nuevas entradas y fija partidaId y creadaEn para todos (D-19 §D8).",
+      "type": "object",
+      "required": [
+        "tipo",
+        "partidaId",
+        "creadaEn"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "empezar"
+        },
+        "partidaId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "creadaEn": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "echar": {
+      "description": "Host → servidor: expulsa a un jugador antes de empezar (nunca el asiento del host).",
+      "type": "object",
+      "required": [
+        "tipo",
+        "asiento"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "echar"
+        },
+        "asiento": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        }
+      }
+    },
+    "salir": {
+      "description": "Cliente → servidor: sale de la sala en el lobby. Después de empezar, salir equivale a desconectarse.",
+      "type": "object",
+      "required": [
+        "tipo"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "salir"
+        }
+      }
+    },
+    "error": {
+      "description": "Servidor → cliente: el mensaje no se puede atender. Un cliente con otra versión del protocolo recibe protocoloNoSoportado.",
+      "type": "object",
+      "required": [
+        "tipo",
+        "codigo",
+        "texto"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "const": "error"
+        },
+        "codigo": {
+          "enum": [
+            "protocoloNoSoportado",
+            "sesionNoValida",
+            "salaNoExiste",
+            "salaLlena",
+            "salaCerrada",
+            "noEresDeLaSala",
+            "noEsHost",
+            "mensajeNoValido"
+          ]
+        },
+        "texto": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "idMensaje": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      }
+    },
+    "codigo": {
+      "description": "5 caracteres sin 0, 1, I, L ni O.",
+      "type": "string",
+      "pattern": "^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{5}$"
+    },
+    "jugadorSala": {
+      "type": "object",
+      "required": [
+        "asiento",
+        "nombre",
+        "conectado"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "asiento": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "nombre": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "conectado": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

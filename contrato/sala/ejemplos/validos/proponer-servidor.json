@@ -1,0 +1,10 @@
+{
+  "tipo": "proponer",
+  "idMensaje": "m-0001",
+  "asiento": 1,
+  "evento": {
+    "tipo": "turnoJugador",
+    "jugador": 1,
+    "dano": 120
+  }
+}
