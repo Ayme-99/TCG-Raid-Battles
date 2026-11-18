@@ -4,6 +4,9 @@ const { crearValidadorSala, VERSION_PROTOCOLO } = require('./protocoloSala');
 
 const RUTA_POR_DEFECTO = '/api/incursiones/ws';
 const ESPERA_HOLA_MS = 10_000;
+const INTERVALO_PING_MS = 10_000; // D-19 §D5
+const CAIDA_MS = 25_000; // sin ningún mensaje en este tiempo, la conexión se da por caída
+const VENTANA_MS = 120_000; // D-19 §D9: 2 minutos para volver
 const MAX_BYTES = 256 * 1024;
 
 const TEXTO_ERROR = {
@@ -26,6 +29,10 @@ const TEXTO_ERROR = {
  * @param {Function} o.verificarToken async (token) → { cuentaId, nombre } | null
  * @param {string} [o.ruta]       ruta del upgrade
  * @param {number} [o.esperaHolaMs] tiempo máximo para recibir el `hola`
+ * @param {number} [o.intervaloPingMs] cada cuánto manda `ping` (10 s)
+ * @param {number} [o.caidaMs]    silencio tras el que se da por caída la conexión (25 s)
+ * @param {number} [o.ventanaMs]  tiempo para volver tras caerse en partida (2 min)
+ * @param {Function} [o.ahora]    () → Date, para `venceEn`
  * @param {Function} [o.validar]  validador de mensajes (para los tests)
  * @returns {{ cerrar: () => Promise<void> }}
  */
@@ -35,6 +42,10 @@ function montarSalas({
   verificarToken,
   ruta = RUTA_POR_DEFECTO,
   esperaHolaMs = ESPERA_HOLA_MS,
+  intervaloPingMs = INTERVALO_PING_MS,
+  caidaMs = CAIDA_MS,
+  ventanaMs = VENTANA_MS,
+  ahora = () => new Date(),
   validar = crearValidadorSala(),
 }) {
   if (!servidor || !salas || typeof verificarToken !== 'function') {
@@ -73,7 +84,29 @@ function montarSalas({
     }
   };
 
+  // Ventana de desconexión de un jugador (no host): lleva su temporizador.
+  function pararVentana(jugador) {
+    clearTimeout(jugador.temporizadorVentana);
+    jugador.temporizadorVentana = null;
+  }
+
+  function abrirVentana(sala, jugador) {
+    const venceEn = new Date(ahora().getTime() + ventanaMs).toISOString();
+    pararVentana(jugador);
+    jugador.temporizadorVentana = setTimeout(() => {
+      jugador.temporizadorVentana = null;
+      if (jugador.conectado || salas.obtener(sala.codigo) !== sala) return;
+      jugador.vencido = true; // el host registra sus PokemonKo; no vuelve ni cobra (§D8)
+      const host = socketDe(sala, sala.jugadores[salas.asientoHost()]);
+      if (host) enviar(host, { tipo: 'ventanaVencida', asiento: jugador.asiento });
+      difundirSala(sala);
+    }, ventanaMs);
+    difundir(sala, { tipo: 'jugadorDesconectado', asiento: jugador.asiento, venceEn });
+    difundirSala(sala);
+  }
+
   function cancelar(sala, motivo, texto) {
+    for (const j of sala.jugadores) pararVentana(j);
     difundir(sala, { tipo: 'partidaCancelada', motivo, ...(texto ? { texto } : {}) });
     const todos = [...socketsDe(sala).values()];
     conexiones.delete(sala.codigo);
@@ -90,6 +123,9 @@ function montarSalas({
     }
     if (ws.readyState !== ws.OPEN) return;
     const r = salas.entrar(m.codigo, sesion.cuentaId, sesion.nombre || sesion.cuentaId);
+    if (r.ok && r.jugador.vencido) { // la ventana ya venció: el host le dio por KO
+      error(ws, 'salaCerrada'); ws.close(1008, 'ventanaVencida'); return;
+    }
     if (!r.ok) { error(ws, r.error === 'yaEnSala' ? 'salaCerrada' : r.error); ws.close(1008, r.error); return; }
 
     const { sala, jugador } = r;
@@ -98,7 +134,10 @@ function montarSalas({
     const anterior = mapa.get(jugador.cuentaId);
     mapa.set(jugador.cuentaId, ws);
     if (anterior && anterior !== ws) { anterior.sala = null; anterior.close(1000, 'reemplazada'); }
+    const volvia = sala.estado === 'enCurso' && !jugador.conectado;
     jugador.conectado = true;
+    pararVentana(jugador);
+    ws.ultimaActividad = Date.now();
     ws.sala = sala; ws.jugador = jugador;
     clearTimeout(ws.temporizadorHola);
 
@@ -110,6 +149,11 @@ function montarSalas({
     for (const j of sala.jugadores) {
       const otro = socketDe(sala, j);
       if (otro && otro !== ws) enviar(otro, mensajeSala(sala, j));
+    }
+    if (volvia) {
+      for (const otro of socketsDe(sala).values()) {
+        if (otro !== ws) enviar(otro, { tipo: 'jugadorVuelve', asiento: jugador.asiento });
+      }
     }
   }
 
@@ -199,10 +243,10 @@ function montarSalas({
       cancelar(sala, 'hostDesconectado');
       return;
     }
-    if (sala.estado === 'enCurso') { // la ventana de 2 minutos llega en T-80
+    if (sala.estado === 'enCurso') { // empieza la ventana de 2 minutos (D-19 §D9)
       jugador.conectado = false;
       socketsDe(sala).delete(jugador.cuentaId);
-      difundirSala(sala);
+      abrirVentana(sala, jugador);
       return;
     }
     socketsDe(sala).delete(jugador.cuentaId);
@@ -217,9 +261,11 @@ function montarSalas({
     ws.temporizadorHola = setTimeout(() => {
       if (!ws.sala) { error(ws, 'mensajeNoValido'); ws.close(1008, 'sin hola'); }
     }, esperaHolaMs);
+    ws.ultimaActividad = Date.now();
     let ocupado = Promise.resolve(); // procesa los mensajes de uno en uno, en orden
 
     ws.on('message', (datos) => {
+      ws.ultimaActividad = Date.now(); // cualquier mensaje (no solo `pong`) cuenta como vivo
       ocupado = ocupado.then(async () => {
         let m;
         try { m = JSON.parse(datos.toString('utf8')); } catch { return error(ws, 'mensajeNoValido'); }
@@ -250,8 +296,23 @@ function montarSalas({
     ws.on('error', () => {});
   });
 
+  // Latido: `ping` cada intervalo; sin ningún mensaje en `caidaMs`, caída.
+  const latido = setInterval(() => {
+    const ya = Date.now();
+    for (const ws of wss.clients) {
+      if (!ws.sala) continue; // antes del hola manda el temporizador del hola
+      if (ya - ws.ultimaActividad > caidaMs) ws.terminate();
+      else enviar(ws, { tipo: 'ping' });
+    }
+  }, intervaloPingMs);
+  latido.unref();
+
   return {
     cerrar: () => new Promise((resolve) => {
+      clearInterval(latido);
+      for (const { jugadores } of [...conexiones.keys()].map((c) => salas.obtener(c)).filter(Boolean)) {
+        for (const j of jugadores) pararVentana(j);
+      }
       for (const ws of wss.clients) ws.terminate();
       wss.close(() => resolve());
     }),
