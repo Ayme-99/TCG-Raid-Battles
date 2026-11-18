@@ -123,13 +123,16 @@ function montarSalas({
       error(ws, 'sesionNoValida'); ws.close(1008, 'sesionNoValida'); return;
     }
     if (ws.readyState !== ws.OPEN) return;
-    const r = salas.entrar(m.codigo, sesion.cuentaId, sesion.nombre || sesion.cuentaId);
+    // El nombre que ven los demás es el de la sesión (el contrato admite 40).
+    const nombre = String(sesion.nombre || sesion.cuentaId).slice(0, 40);
+    const r = salas.entrar(m.codigo, sesion.cuentaId, nombre);
     if (r.ok && r.jugador.vencido) { // la ventana ya venció: el host le dio por KO
       error(ws, 'salaCerrada'); ws.close(1008, 'ventanaVencida'); return;
     }
     if (!r.ok) { error(ws, r.error === 'yaEnSala' ? 'salaCerrada' : r.error); ws.close(1008, r.error); return; }
 
     const { sala, jugador } = r;
+    jugador.nombre = nombre; // el host se creó por HTTP sin nombre de sesión
     const mapa = conexiones.get(sala.codigo) ?? new Map();
     conexiones.set(sala.codigo, mapa);
     const anterior = mapa.get(jugador.cuentaId);
