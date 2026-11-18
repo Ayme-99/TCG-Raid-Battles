@@ -68,6 +68,26 @@ class ControladorPartida extends Notifier<Historial> {
     }
   }
 
+  /// Juega el turno del jefe entero (T-77): el motor compone los eventos con
+  /// el mazo y el azar de la app y se registran en orden. Pensado para el
+  /// formato digital, donde nadie escribe los ataques a mano. Devuelve `null`
+  /// si se registró todo, o el motivo del primer rechazo (los eventos
+  /// anteriores ya se aplicaron).
+  String? turnoDelJefeAutomatico(DatosJefe datos, {PreguntaMesa? alPreguntarMesa}) {
+    final eventos = turnoJefeAutomatico(
+      state.partida.estado,
+      ref.read(mazoAtaquesJefeProvider),
+      ref.read(azarProvider),
+      datos,
+      alPreguntarMesa: alPreguntarMesa ?? (_) => false,
+    );
+    for (final evento in eventos) {
+      final error = registrar(evento);
+      if (error != null) return error;
+    }
+    return null;
+  }
+
   /// Quita el último evento (no hace nada si no hay ninguno).
   void deshacer() {
     _olvidarIdentidad();
