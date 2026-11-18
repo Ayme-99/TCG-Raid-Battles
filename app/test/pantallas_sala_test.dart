@@ -41,6 +41,13 @@ Future<(ProviderContainer, List<CanalFalso>)> abrirInicio(
   return (c, canales);
 }
 
+/// Unos fotogramas: la sala conectando lleva una barra que no termina.
+Future<void> avanzar(WidgetTester tester) async {
+  for (var i = 0; i < 5; i++) {
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+}
+
 void main() {
   testWidgets('crear sala enseña el código y deja empezar con 2 jugadores',
       (tester) async {
@@ -48,7 +55,7 @@ void main() {
     await tester.tap(find.byKey(const Key('inicio-sala')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('sala-crear')));
-    await tester.pumpAndSettle();
+    await avanzar(tester); // la barra «conectando» no deja asentar
     expect(canales.single.enviados.single['codigo'], 'K7M2Q');
 
     canales.single.recibir(mensajeSala(estado: 'abierta', jugadores: 1));
@@ -111,7 +118,7 @@ void main() {
     await tester.tap(find.byKey(const Key('inicio-sala')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('sala-crear')));
-    await tester.pumpAndSettle();
+    await avanzar(tester); // la barra «conectando» no deja asentar
     canales.single.recibir(mensajeSala(estado: 'abierta'));
     await tester.pumpAndSettle();
     canales.single.recibir({
@@ -136,7 +143,7 @@ void main() {
     await tester.tap(find.byKey(const Key('inicio-sala')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('sala-crear')));
-    await tester.pumpAndSettle();
+    await avanzar(tester); // la barra «conectando» no deja asentar
     canales.single.recibir(mensajeSala());
     await tester.pumpAndSettle();
     canales.single.recibir({'tipo': 'partidaCancelada', 'motivo': 'hostDesconectado'});
@@ -171,7 +178,7 @@ void main() {
     await tester.tap(find.byKey(const Key('inicio-sala')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('sala-crear')));
-    await tester.pumpAndSettle();
+    await avanzar(tester); // la barra «conectando» no deja asentar
     canales.single.recibir(mensajeSala());
     await tester.pumpAndSettle();
     expect(
