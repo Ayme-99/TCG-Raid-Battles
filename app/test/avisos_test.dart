@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:incursiones_app/pantallas/aviso_central.dart';
 import 'package:incursiones_app/pantallas/comun.dart';
 
 /// Una pantalla con un botón en una esquina (que cuenta pulsaciones) y otro
