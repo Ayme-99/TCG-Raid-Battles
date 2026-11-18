@@ -5,8 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_app/sala/controlador_sala.dart';
-import 'package:incursiones_app/sala/pantalla_sala.dart';
-import 'package:incursiones_engine/incursiones_engine.dart';
 
 import 'ayudas.dart';
 
