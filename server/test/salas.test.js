@@ -69,10 +69,20 @@ test('empezada la sala solo vuelve a entrar quien ya estaba', () => {
   assert.strictEqual(salas.empezar(sala, 'p-2', '2026-11-18T22:00:00.000Z').error, 'salaCerrada');
 });
 
+test('no se puede empezar con un solo jugador', () => {
+  const salas = crearSalas();
+  const { sala } = salas.crear('a', 'Ana');
+  assert.strictEqual(salas.empezar(sala, 'p-1', '2026-11-18T22:00:00.000Z').error, 'pocosJugadores');
+  assert.strictEqual(sala.estado, 'abierta');
+  salas.entrar(sala.codigo, 'b', 'Bea');
+  assert.ok(salas.empezar(sala, 'p-1', '2026-11-18T22:00:00.000Z').ok);
+});
+
 test('el registro exige el seq siguiente', () => {
   const salas = crearSalas();
   const { sala } = salas.crear('a', 'Ana');
   assert.strictEqual(salas.registrar(sala, 1, EVENTO).error, 'salaCerrada');
+  salas.entrar(sala.codigo, 'b', 'Bea');
   salas.empezar(sala, 'p-1', '2026-11-18T22:00:00.000Z');
   assert.strictEqual(salas.registrar(sala, 2, EVENTO).error, 'seqFueraDeOrden');
   assert.ok(salas.registrar(sala, 1, EVENTO).ok);
@@ -244,6 +254,15 @@ async function partida(t, jugadores = ['ana', 'bea'], opciones = {}, cliente = {
   }
   return { ...ctx, codigo, ...clientes };
 }
+
+test('el host solo no puede empezar la partida', async (t) => {
+  const ctx = await arrancar();
+  t.after(ctx.cerrar);
+  const { json: { codigo } } = await ctx.crearSala('ana');
+  const ana = await ctx.conectar(); await entrar(ana, 'ana', codigo);
+  ana.mandar({ tipo: 'empezar', partidaId: 'p-1', creadaEn: '2026-11-18T22:00:00.000Z' });
+  assert.strictEqual((await ana.siguiente('error')).codigo, 'mensajeNoValido');
+});
 
 test('solo el host puede empezar, echar y aceptar', async (t) => {
   const ctx = await arrancar();

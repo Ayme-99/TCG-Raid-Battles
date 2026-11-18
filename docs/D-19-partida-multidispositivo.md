@@ -236,3 +236,12 @@ En este orden, porque cada una desbloquea la siguiente (la 9 y la 10 pueden ir e
 | ¿Se confía en el host en la primera versión? | **Sí.** Al ser digital, falsear una partida exige enfrentarse al jefe de verdad; el riesgo se revisa si los puntos llegan a desbloquear algo que importe. |
 | ¿Sala con un solo jugador? | **No.** |
 | ¿Espectadores? | **No.** |
+
+## 10. Ideas aparcadas
+
+**Guardar el registro de las salas en MongoDB** (idea del 2026-11-18, **no se implementa**). Hoy las salas viven solo en memoria (D6) y tras un reinicio el host reenvía su registro. La variante: guardar solo la lista de eventos de cada sala en una colección `incursiones_salas`, con un índice TTL de unas horas, y usarla únicamente para reconstruir la sala al reiniciar el servidor (sin necesitar al host y sin cambiar el protocolo de `contrato/sala/`).
+
+- **Cuándo hacerla:** si en la práctica los reinicios (despliegues de Render, caídas) interrumpen partidas con frecuencia y reconstruir desde el host se queda corto. Si no molestan, se queda aparcada.
+- **Coste:** una escritura por evento aceptado en la base compartida con Deck Tracker, y limpieza por TTL.
+- **Lo que no resuelve:** los WebSockets se cortan igual al reiniciar y todos tienen que reconectar; con varias instancias seguiría haciendo falta enrutado por sala (D5).
+
