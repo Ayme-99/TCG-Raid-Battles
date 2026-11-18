@@ -175,7 +175,7 @@ class _GuardarResultados extends ConsumerWidget {
               final error =
                   await ref.read(enviosProvider.notifier).guardarPartidaActual();
               if (error != null && context.mounted) {
-                registrarAviso(context, error);
+                registrarAviso(context, error, tipo: TipoAviso.error);
               }
             },
             child: const Text('Guardar resultados'),

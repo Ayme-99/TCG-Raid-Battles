@@ -4,13 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
+import 'aviso_central.dart';
+
+export 'aviso_central.dart' show TipoAviso;
 
 /// Envía un evento al motor y, si las reglas lo rechazan, muestra el motivo.
 /// Devuelve `true` si se aplicó.
 bool registrar(BuildContext context, WidgetRef ref, Evento evento) {
   final error = ref.read(partidaProvider.notifier).registrar(evento);
   if (error != null) {
-    registrarAviso(context, error);
+    registrarAviso(context, error, tipo: TipoAviso.error);
     return false;
   }
   return true;
@@ -26,21 +29,17 @@ String etiquetaCategoria(CategoriaAliado c) => switch (c) {
       CategoriaAliado.debilitador => 'Debilitador',
     };
 
-/// Muestra un aviso breve en la parte inferior. Un aviso de varias líneas se
-/// queda más tiempo para que dé tiempo a leerlo.
-void registrarAviso(BuildContext context, String mensaje) {
-  final lineas = '\n'.allMatches(mensaje).length + 1;
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        duration: Duration(seconds: 4 + 2 * (lineas - 1)),
-      ),
-    );
-}
+/// Muestra un aviso en medio de la pantalla (ver `mostrarAvisoCentral`): se
+/// cierra solo, más tarde cuantas más líneas tenga, o al tocarlo, y no
+/// bloquea los controles. Uno nuevo sustituye al anterior.
+void registrarAviso(
+  BuildContext context,
+  String mensaje, {
+  TipoAviso tipo = TipoAviso.info,
+}) =>
+    mostrarAvisoCentral(context, mensaje, tipo: tipo);
 
-/// Varios avisos a la vez, en uno solo (un aviso nuevo tapa al anterior).
+/// Varios avisos a la vez, en uno solo (un aviso nuevo sustituye al anterior).
 void registrarAvisos(BuildContext context, Iterable<String> mensajes) {
   final lista = mensajes.toList();
   if (lista.isNotEmpty) registrarAviso(context, lista.join('\n'));
