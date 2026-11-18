@@ -178,10 +178,12 @@ void main() {
       // Un solo fotograma y ya está entero.
       await tester.pump();
       final fade = tester.widget<FadeTransition>(
-        find.descendant(
-          of: find.byKey(const Key('aviso')).hitTestable().first,
-          matching: find.byType(FadeTransition),
-        ).first,
+        find
+            .ancestor(
+              of: find.byKey(const Key('aviso')),
+              matching: find.byType(FadeTransition),
+            )
+            .first,
       );
       expect(fade.opacity.value, 1);
       await tester.tap(find.byKey(const Key('aviso')));
