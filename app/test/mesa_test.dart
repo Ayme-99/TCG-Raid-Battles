@@ -123,6 +123,34 @@ void main() {
       expect(punto.dx, closeTo(400, 0.001));
       expect(punto.dy, closeTo(300, 0.001));
     });
+
+    test('la vista nunca se sale de la imagen del tapete', () {
+      const ancho = 1900.0;
+      const alto = 1000.0;
+      final focos = <FocoCamara>[
+        const FocoGeneral(),
+        const FocoJefe(),
+        const FocoAliados(),
+        for (var i = 0; i < 4; i++) FocoJugador(i),
+      ];
+      for (final f in focos) {
+        final m = Camara.de(f, 4).matriz(ancho, alto);
+        // Dónde caen en pantalla las esquinas de la mesa más lo que sobra de
+        // imagen: tienen que cubrir toda la pantalla.
+        final arribaIzq = MatrixUtils.transformPoint(
+          m,
+          const Offset(-Camara.margenFuera, -Camara.margenFuera),
+        );
+        final abajoDer = MatrixUtils.transformPoint(
+          m,
+          const Offset(ancho + Camara.margenFuera, alto + Camara.margenFuera),
+        );
+        expect(arribaIzq.dx, lessThanOrEqualTo(0.001), reason: '$f izquierda');
+        expect(arribaIzq.dy, lessThanOrEqualTo(0.001), reason: '$f arriba');
+        expect(abajoDer.dx, greaterThanOrEqualTo(ancho - 0.001), reason: '$f derecha');
+        expect(abajoDer.dy, greaterThanOrEqualTo(alto - 0.001), reason: '$f abajo');
+      }
+    });
   });
 
   testWidgets('la mesa sale en el turno de los jugadores con todos sus sitios',
