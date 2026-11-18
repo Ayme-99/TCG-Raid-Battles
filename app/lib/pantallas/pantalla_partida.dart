@@ -10,6 +10,7 @@ import 'escena_entrada.dart';
 import 'fin_partida.dart';
 import 'inicio.dart';
 import 'paneles.dart';
+import 'pendientes.dart';
 import 'setup.dart';
 import 'turno_jefe.dart';
 import 'turno_jugadores.dart';
@@ -17,11 +18,58 @@ import 'turno_jugadores.dart';
 /// Pantalla única de la partida: según la fase del motor muestra el setup, el
 /// turno de los jugadores, el del jefe o el final. La barra superior lleva
 /// deshacer y rehacer, que valen en todas las fases.
-class PantallaPartida extends ConsumerWidget {
+class PantallaPartida extends ConsumerStatefulWidget {
   const PantallaPartida({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PantallaPartida> createState() => _EstadoPantallaPartida();
+}
+
+class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
+  bool _resolviendo = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Una partida retomada puede tener un intento de invocación sin resolver.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _resolverInvocaciones());
+  }
+
+  /// Mientras haya intentos de invocación, tira los dados sobre la mesa y
+  /// registra el resultado, de uno en uno. No hay botón: sale solo.
+  ///
+  /// Vive aquí, y no en cada pantalla de turno, porque esta pantalla es la
+  /// única que sigue montada al pasar del turno del jefe al de los jugadores
+  /// (que es justo cuando el jefe hace su primera llamada): si lo llevara
+  /// cada pantalla, las dos tirarían los dados a la vez y la primera tirada
+  /// se perdía.
+  Future<void> _resolverInvocaciones() async {
+    if (_resolviendo) return;
+    _resolviendo = true;
+    try {
+      while (mounted) {
+        final antes = ref.read(estadoProvider).intentosInvocacionPendientes;
+        if (antes == 0) break;
+        await resolverInvocacion(context, ref);
+        if (!mounted) break;
+        // Si el motor no ha aceptado nada, no se insiste.
+        if (ref.read(estadoProvider).intentosInvocacionPendientes >= antes) {
+          break;
+        }
+      }
+    } finally {
+      _resolviendo = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(
+      estadoProvider.select((e) => e.intentosInvocacionPendientes),
+      (_, intentos) {
+        if (intentos > 0) _resolverInvocaciones();
+      },
+    );
     final estado = ref.watch(estadoProvider);
     final puedeDeshacer = ref.watch(puedeDeshacerProvider);
     final puedeRehacer = ref.watch(puedeRehacerProvider);
@@ -125,7 +173,6 @@ class PantallaPartida extends ConsumerWidget {
   }
 
   /// Versión corta del banner para pantallas estrechas: "R1 · J1", "R3 · Jefe".
-  @visibleForTesting
   static String textoCortoBanner(EstadoPartida estado) {
     final actual = estado.jugadorActual;
     final turno = estado.fase == Fase.turnoJefe
