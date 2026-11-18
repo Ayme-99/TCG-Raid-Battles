@@ -70,7 +70,7 @@ montarSalas({ servidor, salas, verificarToken: async (t) => { /* JWT → { cuent
 servidor.listen(puerto);
 ```
 
-`ws` es una dependencia del host (como `express`). Todavía **no** están los latidos ni la ventana de 2 minutos (T-80): hasta entonces, un jugador que se cae en partida queda «desconectado» y puede volver con `hola`, y si se cae el host se cancela la partida al instante.
+`ws` es una dependencia del host (como `express`). **Latidos y desconexión** (D-19 §D5, §D9): el servidor manda `ping` cada 10 s (cualquier mensaje del cliente cuenta como señal de vida) y da por caída la conexión a los 25 s de silencio. Un jugador que no es el host y se cae en partida abre una **ventana de 2 minutos**: todos reciben `jugadorDesconectado { asiento, venceEn }`; si vuelve con `hola` recupera su asiento y el registro desde su `ultimoSeq` y todos reciben `jugadorVuelve`; si vence, el host recibe `ventanaVencida { asiento }` (su app registra los `PokemonKo`), el jugador queda marcado `vencido` (cuenta a `null` al guardar, D-19 §D8) y ya no puede volver. El servidor no salta turnos: si es su turno, el host espera. Si se cae el host, la partida se cancela al instante (su ventana es una entrega aparte). En el lobby, caerse equivale a salir.
 
 El router incluye `express.json` (límite de 1 MB). `express` es una dependencia del host; aquí solo se usa en los tests. Los esquemas se leen de `../contrato/partida.vN.schema.json` (una por versión): al montarlo, hay que llevar esa carpeta (`crearValidador(carpeta)` acepta otra ruta) o pasar un `validar` propio.
 

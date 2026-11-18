@@ -109,13 +109,14 @@ async function arrancar(opciones = {}) {
     return { estado: r.status, json: await r.json() };
   };
   // Cliente de pruebas: guarda lo que llega y deja esperar un mensaje por tipo.
-  const conectar = async () => {
+  const conectar = async ({ autoPong = false } = {}) => {
     const s = new WebSocket(`ws://127.0.0.1:${puerto}/api/incursiones/ws`);
     const recibidos = [];
     const espera = [];
     s.on('message', (d) => {
       const m = JSON.parse(d.toString());
       recibidos.push(m);
+      if (autoPong && m.tipo === 'ping') s.send(JSON.stringify({ tipo: 'pong' }));
       for (const e of [...espera]) if (e.ok(m)) { espera.splice(espera.indexOf(e), 1); e.res(m); }
     });
     const cierre = new Promise((res) => s.on('close', (codigo) => res(codigo)));
@@ -227,13 +228,13 @@ test('un mensaje que no es JSON o no cumple el esquema da error y no tira la con
   await ana.siguiente('pong');
 });
 
-async function partida(t, jugadores = ['ana', 'bea']) {
-  const ctx = await arrancar();
+async function partida(t, jugadores = ['ana', 'bea'], opciones = {}, cliente = {}) {
+  const ctx = await arrancar(opciones);
   t.after(ctx.cerrar);
   const { json: { codigo } } = await ctx.crearSala(jugadores[0]);
   const clientes = {};
   for (const u of jugadores) {
-    clientes[u] = await ctx.conectar();
+    clientes[u] = await ctx.conectar(cliente);
     await entrar(clientes[u], u, codigo);
   }
   clientes[jugadores[0]].mandar({ tipo: 'empezar', partidaId: 'p-1', creadaEn: '2026-11-18T22:00:00.000Z' });
@@ -384,4 +385,93 @@ test('si el host sale o se cae se cancela la partida y se libera la sala', async
   ana.mandar({ tipo: 'salir' });
   assert.strictEqual((await bea.siguiente('partidaCancelada')).motivo, 'hostCancelo');
   assert.strictEqual(ctx.salas.vivas(), 0);
+});
+
+// --- latidos y ventana de desconexión (D-19 §D5, §D9) ---------------
+const RAPIDO = { intervaloPingMs: 40, caidaMs: 160, ventanaMs: 400 };
+
+test('el servidor manda ping y quien contesta no se cae', async (t) => {
+  const ctx = await arrancar(RAPIDO);
+  t.after(ctx.cerrar);
+  const { json: { codigo } } = await ctx.crearSala('ana');
+  const ana = await ctx.conectar({ autoPong: true }); await entrar(ana, 'ana', codigo);
+  const bea = await ctx.conectar({ autoPong: true }); await entrar(bea, 'bea', codigo);
+  ana.mandar({ tipo: 'empezar', partidaId: 'p-1', creadaEn: '2026-11-18T22:00:00.000Z' });
+  await bea.siguiente('sala', (m) => m.estado === 'enCurso');
+  await bea.siguiente('ping');
+  await new Promise((ok) => setTimeout(ok, 400));
+  assert.ok(ana.recibidos.filter((m) => m.tipo === 'ping').length >= 3);
+  assert.ok(ana.s.readyState === 1 && bea.s.readyState === 1, 'los que contestan siguen conectados');
+  assert.ok(!bea.recibidos.some((m) => m.tipo === 'jugadorDesconectado'));
+});
+
+test('quien deja de dar señales se da por caído y todos reciben la cuenta atrás', async (t) => {
+  const p = await partida(t, ['ana', 'bea'], RAPIDO);
+  // ana contesta; bea no (el cliente de pruebas no contesta a los ping)
+  p.ana.s.on('message', (d) => { if (JSON.parse(d).tipo === 'ping') p.ana.s.send('{"tipo":"pong"}'); });
+  const d = await p.ana.siguiente('jugadorDesconectado');
+  assert.strictEqual(d.asiento, 1);
+  const falta = Date.parse(d.venceEn) - Date.now();
+  assert.ok(falta > 0 && falta <= RAPIDO.ventanaMs, `venceEn en ${falta} ms`);
+  assert.strictEqual(await p.bea.cierre, 1006);
+});
+
+test('si vuelve antes de vencer: jugadorVuelve, su asiento y el registro; no vence nada', async (t) => {
+  const p = await partida(t, ['ana', 'bea', 'cai'], { ...RAPIDO, ventanaMs: 600 }, { autoPong: true });
+  p.ana.mandar({ tipo: 'aceptar', seq: 1, evento: EVENTO });
+  await p.bea.siguiente('evento');
+  p.bea.s.terminate();
+  const d = await p.cai.siguiente('jugadorDesconectado');
+  assert.strictEqual(d.asiento, 1);
+  await p.ana.siguiente('jugadorDesconectado');
+  p.ana.mandar({ tipo: 'aceptar', seq: 2, evento: EVENTO_B }); // la partida sigue mientras tanto
+
+  const bea2 = await p.conectar({ autoPong: true });
+  const s = await entrar(bea2, 'bea', p.codigo, { ultimoSeq: 1 });
+  assert.deepStrictEqual([s.tuAsiento, s.jugadores[1].conectado], [1, true]);
+  assert.deepStrictEqual((await bea2.siguiente('registro')).eventos, [EVENTO_B]);
+  for (const o of [p.ana, p.cai]) assert.strictEqual((await o.siguiente('jugadorVuelve')).asiento, 1);
+  assert.ok(!bea2.recibidos.some((m) => m.tipo === 'jugadorVuelve'));
+
+  await new Promise((ok) => setTimeout(ok, 800)); // pasa la ventana: ya no debe vencer
+  assert.ok(!p.ana.recibidos.some((m) => m.tipo === 'ventanaVencida'));
+});
+
+test('al vencer la ventana se avisa al host y ya no puede volver', async (t) => {
+  const p = await partida(t, ['ana', 'bea', 'cai'], { ...RAPIDO, caidaMs: 10_000 }, { autoPong: true });
+  p.bea.s.terminate();
+  await p.ana.siguiente('jugadorDesconectado');
+  const v = await p.ana.siguiente('ventanaVencida');
+  assert.strictEqual(v.asiento, 1);
+  assert.ok(!p.cai.recibidos.some((m) => m.tipo === 'ventanaVencida'), 'solo se avisa al host');
+  const sala = p.salas.obtener(p.codigo);
+  assert.strictEqual(sala.jugadores[1].vencido, true);
+  assert.strictEqual(sala.jugadores[2].vencido, undefined);
+
+  const tarde = await p.conectar();
+  tarde.mandar({ tipo: 'hola', protocolo: 1, token: 'tok-bea', codigo: p.codigo });
+  assert.strictEqual((await tarde.siguiente('error')).codigo, 'salaCerrada');
+});
+
+test('si se cae el host durante una ventana abierta se cancela y no vence nada después', async (t) => {
+  const p = await partida(t, ['ana', 'bea', 'cai'], { ...RAPIDO, caidaMs: 10_000 }, { autoPong: true });
+  p.bea.s.terminate();
+  await p.cai.siguiente('jugadorDesconectado');
+  p.ana.s.terminate();
+  assert.strictEqual((await p.cai.siguiente('partidaCancelada')).motivo, 'hostDesconectado');
+  await new Promise((ok) => setTimeout(ok, 600));
+  assert.ok(!p.cai.recibidos.some((m) => m.tipo === 'ventanaVencida'));
+  assert.strictEqual(p.salas.vivas(), 0);
+});
+
+test('en el lobby caerse es salir: no hay ventana', async (t) => {
+  const ctx = await arrancar(RAPIDO);
+  t.after(ctx.cerrar);
+  const { json: { codigo } } = await ctx.crearSala('ana');
+  const ana = await ctx.conectar({ autoPong: true }); await entrar(ana, 'ana', codigo);
+  const bea = await ctx.conectar(); await entrar(bea, 'bea', codigo);
+  bea.s.terminate();
+  const s = await ana.siguiente('sala', (m) => m.jugadores.length === 1);
+  assert.strictEqual(s.estado, 'abierta');
+  assert.ok(!ana.recibidos.some((m) => m.tipo === 'jugadorDesconectado'));
 });
