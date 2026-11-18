@@ -5,6 +5,7 @@ const http = require('node:http');
 const express = require('express');
 const WebSocket = require('ws');
 const { crearRouter, crearRepoMemoria, crearSalas, montarSalas } = require('../src');
+const { ejemplo } = require('./ayudas');
 const { ALFABETO } = require('../src/salas');
 
 const EVENTO = { tipo: 'turnoJugador', jugador: 1, dano: 120 };
@@ -118,6 +119,14 @@ async function arrancar(opciones = {}) {
     });
     return { estado: r.status, json: await r.json() };
   };
+  const guardar = async (usuario, cuerpo) => {
+    const r = await fetch(`http://127.0.0.1:${puerto}/api/incursiones/partidas`, {
+      method: 'POST',
+      headers: { 'x-usuario': usuario, 'content-type': 'application/json' },
+      body: JSON.stringify(cuerpo),
+    });
+    return { estado: r.status, json: await r.json() };
+  };
   // Cliente de pruebas: guarda lo que llega y deja esperar un mensaje por tipo.
   const conectar = async ({ autoPong = false } = {}) => {
     const s = new WebSocket(`ws://127.0.0.1:${puerto}/api/incursiones/ws`);
@@ -150,7 +159,7 @@ async function arrancar(opciones = {}) {
     await ws.cerrar();
     await new Promise((ok) => servidor.close(ok));
   };
-  return { salas, crearSala, conectar, cerrar };
+  return { salas, crearSala, guardar, conectar, cerrar };
 }
 
 // Entra con `hola` y espera el estado de la sala.
@@ -493,4 +502,73 @@ test('en el lobby caerse es salir: no hay ventana', async (t) => {
   const s = await ana.siguiente('sala', (m) => m.jugadores.length === 1);
   assert.strictEqual(s.estado, 'abierta');
   assert.ok(!ana.recibidos.some((m) => m.tipo === 'jugadorDesconectado'));
+});
+
+// --- guardado multi-dispositivo (D-19 §D8) --------------------------
+const ANA = 'usuario-ana';
+const BEA = 'usuario-bea';
+
+// Sala de Ana y Bea que ya ha empezado una partida con el id del ejemplo.
+async function salaConPartida(t, opciones) {
+  const ctx = await arrancar(opciones);
+  t.after(ctx.cerrar);
+  const { json: { codigo } } = await ctx.crearSala(ANA);
+  const ana = await ctx.conectar({ autoPong: true }); await entrar(ana, 'usuario-ana', codigo);
+  const bea = await ctx.conectar({ autoPong: true }); await entrar(bea, 'usuario-bea', codigo);
+  ana.mandar({ tipo: 'empezar', partidaId: 'ejemplo-victoria-2-jugadores', creadaEn: '2026-11-18T22:00:00.000Z' });
+  await bea.siguiente('sala', (m) => m.estado === 'enCurso');
+  return { ...ctx, codigo, ana, bea };
+}
+
+function registroDeAmbos() {
+  const r = ejemplo('validos', 'victoria-2-jugadores');
+  r.resumen.jugadores[1].abonado = true; // los dos cobran
+  return r;
+}
+
+test('las cuentas de la partida las pone el servidor, aunque el cliente mande otras', async (t) => {
+  const s = await salaConPartida(t);
+  const r = registroDeAmbos();
+  r.cuentas = [ANA, ANA]; // el cliente intenta anotarse el puesto de Bea
+  const a = await s.guardar(ANA, r);
+  assert.strictEqual(a.estado, 201);
+  assert.strictEqual(a.json.tusPuntos, 1650);
+  // Bea manda su copia sin cuentas: mismo registro, 200 duplicada, y cobra lo suyo.
+  const sinCuentas = registroDeAmbos(); delete sinCuentas.cuentas;
+  const b = await s.guardar(BEA, sinCuentas);
+  assert.deepStrictEqual([b.estado, b.json.duplicada, b.json.tusPuntos], [200, true, 1350]);
+});
+
+test('quien no volvió a tiempo queda con cuenta null: no cobra ni guarda', async (t) => {
+  const s = await salaConPartida(t, { intervaloPingMs: 1000, caidaMs: 10_000, ventanaMs: 150 });
+  s.bea.s.terminate();
+  await s.ana.siguiente('ventanaVencida');
+  const r = ejemplo('validos', 'victoria-2-jugadores'); // abonado: [true, false]
+  r.cuentas = [ANA, BEA]; // el cliente miente
+  const a = await s.guardar(ANA, r);
+  assert.strictEqual(a.estado, 201);
+  const b = await s.guardar(BEA, r);
+  assert.strictEqual(b.estado, 403);
+  assert.strictEqual(b.json.error, 'no_participas');
+});
+
+test('una partida que el servidor no conoce sigue usando las cuentas del cliente', async (t) => {
+  const ctx = await arrancar();
+  t.after(ctx.cerrar);
+  const r = ejemplo('validos', 'victoria-2-jugadores');
+  assert.strictEqual((await ctx.guardar(ANA, r)).estado, 201);
+});
+
+test('las cuentas de una partida se olvidan a las 24 horas', () => {
+  let reloj = Date.parse('2026-11-18T22:00:00.000Z');
+  const salas = crearSalas({ ahora: () => new Date(reloj) });
+  const { sala } = salas.crear('a', 'Ana');
+  salas.entrar(sala.codigo, 'b', 'Bea');
+  salas.empezar(sala, 'p-1', '2026-11-18T22:00:00.000Z');
+  salas.cerrar(sala);
+  assert.deepStrictEqual(salas.cuentasDe('p-1'), ['a', 'b']);
+  salas.marcarVencido(sala, 1);
+  assert.deepStrictEqual(salas.cuentasDe('p-1'), ['a', null]);
+  reloj += 24 * 60 * 60 * 1000 + 1;
+  assert.strictEqual(salas.cuentasDe('p-1'), null);
 });

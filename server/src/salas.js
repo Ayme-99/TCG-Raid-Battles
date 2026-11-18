@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const ALFABETO = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const LONGITUD_CODIGO = 5;
 const MAX_JUGADORES = 4;
+const VIDA_PARTIDA_MS = 24 * 60 * 60 * 1000; // cuánto se recuerdan las cuentas de una partida
 
 function codigoAleatorio() {
   let c = '';
@@ -21,9 +22,12 @@ function codigoAleatorio() {
  *             partidaId?, creadaEn? }
  * `estado`: abierta → completa → enCurso (la cancelada/terminada se borra).
  */
-function crearSalas({ generarCodigo = codigoAleatorio } = {}) {
+function crearSalas({ generarCodigo = codigoAleatorio, ahora = () => new Date() } = {}) {
   const salas = new Map(); // codigo → sala
   const salaDeCuenta = new Map(); // cuentaId → codigo
+  // partidaId → { cuentas, desde }: quién jugó cada asiento (D-19 §D8). Sobrevive
+  // a la sala, porque los jugadores guardan la partida cuando ya ha acabado.
+  const partidas = new Map();
 
   const resultado = (ok, datos = {}) => ({ ok, ...datos });
 
@@ -81,7 +85,28 @@ function crearSalas({ generarCodigo = codigoAleatorio } = {}) {
     sala.estado = 'enCurso';
     sala.partidaId = partidaId;
     sala.creadaEn = creadaEn;
+    purgarPartidas();
+    partidas.set(partidaId, { cuentas: sala.jugadores.map((j) => j.cuentaId), desde: ahora().getTime() });
     return resultado(true);
+  }
+
+  function purgarPartidas() {
+    const limite = ahora().getTime() - VIDA_PARTIDA_MS;
+    for (const [id, p] of partidas) if (p.desde < limite) partidas.delete(id);
+  }
+
+  // Un jugador que no volvió a tiempo no cobra: su cuenta pasa a null (§D8.4).
+  function marcarVencido(sala, asiento) {
+    const p = sala.partidaId !== undefined ? partidas.get(sala.partidaId) : undefined;
+    if (p) p.cuentas[asiento] = null;
+  }
+
+  // Cuentas por asiento de una partida empezada en una sala, o null si el
+  // servidor no la conoce (partida de un solo dispositivo).
+  function cuentasDe(partidaId) {
+    purgarPartidas();
+    const p = partidas.get(partidaId);
+    return p ? [...p.cuentas] : null;
   }
 
   // Añade el evento aceptado por el host. `seq` debe ser el siguiente.
@@ -106,7 +131,10 @@ function crearSalas({ generarCodigo = codigoAleatorio } = {}) {
 
   const vivas = () => salas.size;
 
-  return { crear, obtener, entrar, quitar, empezar, registrar, cerrar, jugadorDe, asientoHost, vivas };
+  return {
+    crear, obtener, entrar, quitar, empezar, registrar, cerrar, jugadorDe, asientoHost, vivas,
+    marcarVencido, cuentasDe,
+  };
 }
 
 module.exports = { crearSalas, ALFABETO, MAX_JUGADORES };
