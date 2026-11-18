@@ -456,7 +456,6 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                             moneda
                                 ? 'Moneda: cara. ${efecto!.texto}'
                                 : 'Moneda: cruz. No pasa nada.',
-                          if (extra > 0) 'Se cumple: +$extra de daño.',
                           if (partesBonus.isNotEmpty)
                             'Potenciador (${partesBonus.join(' · ')}). '
                                 'Daño total: $total.',

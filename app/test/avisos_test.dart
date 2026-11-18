@@ -126,6 +126,24 @@ void main() {
       await _pasaElAviso(tester);
     });
 
+    testWidgets('el texto lleva su estilo: sin subrayado amarillo',
+        (tester) async {
+      await tester.pumpWidget(
+        _pantalla(lanzar: (c) => registrarAviso(c, 'Horsea: está KO')),
+      );
+      await _lanzar(tester);
+      final t = tester.widget<Text>(find.byKey(const Key('aviso-titulo')));
+      final estilo = DefaultTextStyle.of(
+        tester.element(find.byKey(const Key('aviso-titulo'))),
+      ).style.merge(t.style);
+      expect(estilo.decoration, isNot(TextDecoration.underline));
+      expect(find.ancestor(
+        of: find.byKey(const Key('aviso-titulo')),
+        matching: find.byType(Material),
+      ), findsWidgets);
+      await _pasaElAviso(tester);
+    });
+
     testWidgets('se cierra solo', (tester) async {
       await tester.pumpWidget(
         _pantalla(lanzar: (c) => registrarAviso(c, 'Hola')),

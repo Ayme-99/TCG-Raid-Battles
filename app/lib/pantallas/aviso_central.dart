@@ -237,7 +237,11 @@ class _EstadoAviso extends State<_AvisoCentral> with TickerProviderStateMixin {
                     key: const Key('aviso'),
                     behavior: HitTestBehavior.opaque,
                     onTap: _cerrar,
-                    child: AnimatedBuilder(
+                    // Sin un Material encima, el texto de un Overlay sale con
+                    // el subrayado amarillo de «sin estilo».
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: AnimatedBuilder(
                       animation:
                           Listenable.merge([_vida, _entrada, _salida]),
                       builder: (context, _) => _Cartel(
@@ -250,6 +254,7 @@ class _EstadoAviso extends State<_AvisoCentral> with TickerProviderStateMixin {
                         salida: _salida.value,
                         animado: !_sinMovimiento,
                       ),
+                    ),
                     ),
                   ),
                 ),
