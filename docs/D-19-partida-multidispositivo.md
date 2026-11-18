@@ -1,8 +1,8 @@
 # D-19 · Partida multi-dispositivo (sala, sincronización, host autoritativo)
 
-Estado: **borrador para cerrar** (2026-11-18). Issue #158 (T-57). Depende de T-53 (#154) y T-54 (#155, `docs/diseno-ui/mapa-pantallas.md`).
+Estado: **decidido** (2026-11-18, respuestas de Ayme en la sección 9). Issue #158 (T-57). Depende de T-53 (#154) y T-54 (#155, `docs/diseno-ui/mapa-pantallas.md`).
 
-Este documento decide la arquitectura **antes de escribir código**. Cada decisión lleva una recomendación y lo que se descarta. Lo que sigue sin respuesta está en la sección 9.
+Este documento decide la arquitectura **antes de escribir código**. Cada decisión lleva su razonamiento y lo que se descarta. Las preguntas que quedaban abiertas se cerraron el 2026-11-18 (sección 9).
 
 ## 1. Alcance
 
@@ -133,7 +133,8 @@ Cada jugador guarda el suyo con el camino ya existente (`POST /partidas`, idempo
 1. El **`partidaId` y `creadaEn`** los fija el host al crear la partida y viajan a todos. Hoy se generan al pedir el registro (`controlador_partida.dart`), lo que daría un id distinto en cada dispositivo.
 2. **El registro serializado debe ser idéntico** en todos los dispositivos. Como los eventos son los mismos y el motor serializa de forma determinista, basta con que el orden y el contenido no cambien.
 3. **`cuentas` lo rellena el servidor** a partir de los jugadores autenticados de la sala, no el cliente. Así nadie puede anotarse una cuenta ajena.
-4. El primero que guarda crea la partida; los demás reciben `200 duplicada` y su `tusPuntos`. Ya lo hace el servidor.
+4. Un jugador que **se desconectó y no volvió** (se le dieron por KO sus Pokémon) **no cobra puntos**: el servidor pone su cuenta a `null` en `cuentas`, como un invitado (ocupa puesto, no cobra). Tampoco guarda la partida en su historial.
+5. El primero que guarda crea la partida; los demás reciben `200 duplicada` y su `tusPuntos`. Ya lo hace el servidor.
 
 **Riesgo asumido y apuntado:** como el servidor no ejecuta las reglas, un host y su grupo podrían fabricar una partida para ganar puntos. Hoy el servidor ya acepta ese riesgo (`server/README.md`: «no ejecuta las reglas»), y con puntos cobra más importancia en el digital. Cuando importe, la salida es reproducir el registro en el servidor (portar el motor o ejecutar Dart). Es una decisión aparte y no bloquea esto.
 
@@ -148,8 +149,11 @@ Cada jugador guarda el suyo con el camino ya existente (`POST /partidas`, idempo
 
 **El host:**
 
-- Si se cae, la partida **se pierde** (decidido). Todos reciben `partidaCancelada { motivo: hostDesconectado }`, la sala se cierra y no se guarda ni se dan puntos.
-- Propuesta: dar al host **la misma ventana de 2 minutos** antes de cancelar, para no perder una partida entera por un parpadeo de la red o por pasar la app a segundo plano un momento. Ver pregunta 1.
+- Si se cae y no vuelve en esa ventana, la partida **se pierde** (decidido). Todos reciben `partidaCancelada { motivo: hostDesconectado }`, la sala se cierra y no se guarda ni se dan puntos.
+- El host tiene **la misma ventana de 2 minutos** para volver antes de que se cancele, para no perder una partida entera por un parpadeo de la red o por pasar la app a segundo plano un momento (pregunta 1, decidido).
+- Mientras tanto la sala queda en «host ausente»: nadie puede proponer eventos y todos ven la cuenta atrás. Si el host vuelve, reenvía su registro y se sigue.
+- Para que pueda volver aunque la app se haya cerrado, el host **guarda en el dispositivo el registro y el orden del mazo de ataques** (hoy solo guarda el registro). Si no, al volver el mazo se barajaría de nuevo y podrían repetirse cartas ya robadas.
+- Si vence la ventana, se cancela la partida como se describe arriba.
 
 **En móviles:** si el sistema suspende la app, el WebSocket se corta, así que cuenta como desconexión. Conviene que la app mantenga la pantalla encendida en partida (ya lo hace `wakelock`) y avise al jugador antes de salir de ella.
 
@@ -202,17 +206,18 @@ Los **eventos viajan con el mismo JSON del contrato** (el del registro); solo se
 
 ## 7. Tareas derivadas (para crear tras aprobar)
 
-En este orden, porque cada una desbloquea la siguiente:
+En este orden, porque cada una desbloquea la siguiente (la 9 y la 10 pueden ir en una segunda entrega):
 
 1. **Motor:** turno del jefe automático (D4). Sirve ya para el digital en un solo dispositivo.
 2. **Contrato del protocolo:** mensajes de sala (D11), con esquema y ejemplos, como el del registro.
 3. **Servidor:** salas por código, WebSocket, difusión de eventos y registro en memoria (D5 a D7, D11), con tests.
-4. **Servidor:** latidos, desconexión con cuenta atrás y reconexión (D9).
+4. **Servidor y app:** latidos, desconexión con cuenta atrás y reconexión de los **jugadores** (D9).
 5. **App:** capa de red y partida compartida (sala, sincronización, sesión obligatoria).
 6. **App:** animaciones y avisos a partir de eventos, con cola (D10).
 7. **App:** pantallas de sala, unirse, espera y desconexión (con los diseños de T-56).
 8. **Guardado:** `partidaId` del host y `cuentas` puestas por el servidor (D8).
-9. **Invitaciones dentro de la app** (cuando haya amigos, T-64).
+9. **Reconexión del host** (ventana de 2 minutos, D9): estado «host ausente» en el servidor, guardado local del orden del mazo y reenvío del registro al volver. Va después de lo básico y se puede hacer en una segunda entrega sin cambiar lo anterior; mientras no esté, el host que se cae cancela la partida al instante.
+10. **Invitaciones dentro de la app** (cuando haya amigos, T-64).
 
 ## 8. Cambios en otros documentos
 
@@ -221,10 +226,12 @@ En este orden, porque cada una desbloquea la siguiente:
 - **`flujo-app.md` §8:** la partida multi-dispositivo deja de estar «fuera de alcance» cuando se apruebe este documento.
 - **GDD:** sin cambios; esto no toca reglas de juego.
 
-## 9. Preguntas para cerrar
+## 9. Decisiones de cierre (2026-11-18)
 
-1. **¿Qué margen tiene el host al caerse?** Recomendado: la misma ventana de 2 minutos que los jugadores antes de cancelar la partida (D9). La alternativa es cancelar al instante.
-2. **¿Cobra puntos un jugador que se desconecta y no vuelve?** Sus Pokémon se dan por KO, pero la partida puede ganarse o perderse. Recomendado: **cobra lo que le toque** por el daño hecho (el reparto ya lo calcula `puntos.dart`) y sin penalización añadida; no se castiga más de lo decidido.
-3. **¿Se acepta confiar en el host en esta primera versión (D8)?** Recomendado: sí, con el riesgo apuntado, y revisarlo cuando los puntos desbloqueen cosas que importen.
-4. **¿Puede una sala tener un solo jugador (el host)?** Recomendado: no; con un jugador es el digital de un solo dispositivo, sin sala.
-5. **¿Hay espectadores?** Recomendado: no, ni ahora ni en esta tarjeta.
+| Pregunta | Decisión |
+|---|---|
+| Margen del host al caerse | La misma ventana de 2 minutos que los jugadores. Requiere reconexión del host (tarea 9), que va después de lo básico. |
+| ¿Cobra un jugador que se desconecta y no vuelve? | **No.** Se trata como un invitado a efectos de puntos (D8). |
+| ¿Se confía en el host en la primera versión? | **Sí.** Al ser digital, falsear una partida exige enfrentarse al jefe de verdad; el riesgo se revisa si los puntos llegan a desbloquear algo que importe. |
+| ¿Sala con un solo jugador? | **No.** |
+| ¿Espectadores? | **No.** |
