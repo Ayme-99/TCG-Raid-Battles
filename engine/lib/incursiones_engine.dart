@@ -13,3 +13,4 @@ export 'src/puntos.dart';
 export 'src/registro.dart';
 export 'src/reglas.dart';
 export 'src/scripts_aliado.dart';
+export 'src/turno_jefe_automatico.dart';
