@@ -88,7 +88,8 @@ Reglas cerradas (T-53 y decisiones del 2026-11-18):
 - Todos ven lo mismo: la mesa con la cámara en el momento de la partida (la cámara sigue al estado, no a cada jugador).
 - **No hay deshacer ni rehacer**: no existen en el formato digital.
 - **No hay partida mixta:** o todos en su dispositivo, o todos en físico.
-- Desconexión: se espera 2 minutos con un mensaje para todos; si no vuelve, sus dos Pokémon se dan por muertos.
+- Desconexión de un jugador: se espera 2 minutos con un mensaje para todos; si no vuelve, sus dos Pokémon se dan por muertos. **Si se desconecta el host, se pierde la partida.**
+- Las monedas y dados del turno del jefe los tira el jefe (la app); los jugadores no intervienen.
 - Se entra por **invitación dentro de la app** o con un **código**.
 - Al terminar, **cada jugador guarda sus propios resultados**.
 
@@ -102,7 +103,7 @@ Roles y qué ve cada uno:
 | Apuntar daño en su turno | Solo el suyo | Solo el suyo |
 | Pasar del turno del jefe a la ronda siguiente | Sí | No |
 | Deshacer/rehacer | No existe | No existe |
-| Abandonar | Cierra la partida para todos | Se desconecta (ver desconexión) |
+| Abandonar o desconectarse | Se pierde la partida para todos | Se desconecta (ver desconexión) |
 | Guardar sus resultados al final | Los suyos | Los suyos |
 
 Pantallas nuevas o distintas respecto al host único:
@@ -141,6 +142,7 @@ flowchart TD
         D -->|vuelve| M
         D -->|no vuelve| K[Sus Pokémon, KO]
         K --> M
+        M -->|se desconecta el host| X[Partida perdida]
     end
     M -->|jefe a 0| F[Fin de partida: cada jugador guarda los suyos]
     B -->|todos KO| F
@@ -158,17 +160,16 @@ Decidido:
 | Partida mixta | No se admite: o cada uno en su dispositivo, o todos en físico. |
 | Sesión | Obligatoria en el modo un dispositivo por jugador. |
 | Fin de partida | Cada jugador guarda sus propios resultados. |
+| Monedas y dados del turno del jefe | Los tira el jefe, es decir, la app, sin intervención de los jugadores. |
+| Desconexión del host | Se pierde la partida. |
 
 Efectos a vigilar en otras tarjetas:
 
 - **T-57 (#158):** sin deshacer, el servidor no necesita historial reversible; basta un registro de eventos en un solo sentido. La sesión obligatoria simplifica la identidad de los jugadores (D-11).
-- **Turno del jefe en digital:** hoy el host único ya roba la carta del jefe en la app, pero registra el ataque a mano (objetivo, daño, monedas). En digital esa entrada manual desaparece y hay que decidir cómo se resuelven objetivos y tiradas entre los jugadores conectados.
+- **Turno del jefe en digital:** hoy el host único ya roba la carta del jefe en la app, pero registra el ataque a mano (objetivo, daño, monedas). En digital esa entrada manual desaparece y la app tira las monedas y dados del jefe y resuelve el ataque; queda para T-57 cómo se elige el objetivo cuando depende de una tirada.
 - **Invitaciones dentro de la app** necesitan amigos (T-64, #237).
 
-Abierto:
-
-1. Quién lanza las monedas y dados del turno del jefe en digital: la app o el jugador afectado.
-2. Qué pasa si se desconecta el host: ¿pasa el rol a otro jugador o se cierra la partida?
+Abierto: nada por ahora en esta tarjeta.
 
 ## 5. Qué no cubre este documento
 
