@@ -4,13 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
+import 'aviso_central.dart';
+
+export 'aviso_central.dart' show Aviso, TipoAviso;
 
 /// Envía un evento al motor y, si las reglas lo rechazan, muestra el motivo.
 /// Devuelve `true` si se aplicó.
 bool registrar(BuildContext context, WidgetRef ref, Evento evento) {
   final error = ref.read(partidaProvider.notifier).registrar(evento);
   if (error != null) {
-    registrarAviso(context, error);
+    registrarAviso(context, error, tipo: TipoAviso.error);
     return false;
   }
   return true;
@@ -26,24 +29,25 @@ String etiquetaCategoria(CategoriaAliado c) => switch (c) {
       CategoriaAliado.debilitador => 'Debilitador',
     };
 
-/// Muestra un aviso breve en la parte inferior. Un aviso de varias líneas se
-/// queda más tiempo para que dé tiempo a leerlo.
-void registrarAviso(BuildContext context, String mensaje) {
-  final lineas = '\n'.allMatches(mensaje).length + 1;
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        duration: Duration(seconds: 4 + 2 * (lineas - 1)),
-      ),
-    );
+/// Muestra un aviso en medio de la pantalla (ver `mostrarAvisoCentral`).
+/// Si el texto trae varias líneas, cada una es un aviso. Salen de uno en uno;
+/// tocar el que se ve lo pasa al siguiente.
+void registrarAviso(
+  BuildContext context,
+  String mensaje, {
+  TipoAviso? tipo,
+}) {
+  for (final linea in mensaje.split('\n')) {
+    if (linea.trim().isEmpty) continue;
+    mostrarAvisoCentral(context, Aviso.deTexto(linea, tipo: tipo));
+  }
 }
 
-/// Varios avisos a la vez, en uno solo (un aviso nuevo tapa al anterior).
+/// Varios avisos a la vez: se ponen en cola y salen uno detrás de otro.
 void registrarAvisos(BuildContext context, Iterable<String> mensajes) {
-  final lista = mensajes.toList();
-  if (lista.isNotEmpty) registrarAviso(context, lista.join('\n'));
+  for (final m in mensajes) {
+    registrarAviso(context, m);
+  }
 }
 
 /// Algo que la mesa tiene que hacer con sus cartas (poner contadores, lanzar

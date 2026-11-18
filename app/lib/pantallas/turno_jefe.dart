@@ -456,7 +456,6 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                             moneda
                                 ? 'Moneda: cara. ${efecto!.texto}'
                                 : 'Moneda: cruz. No pasa nada.',
-                          if (extra > 0) 'Se cumple: +$extra de daño.',
                           if (partesBonus.isNotEmpty)
                             'Potenciador (${partesBonus.join(' · ')}). '
                                 'Daño total: $total.',
@@ -464,7 +463,7 @@ class _AtaqueJefeState extends ConsumerState<_AtaqueJefe> {
                             'Daño total: $total.',
                         ];
                         if (avisos.isNotEmpty) {
-                          registrarAviso(context, avisos.join('\n'));
+                          registrarAvisos(context, avisos);
                         }
                         final defensor = _objetivo;
                         if (efecto != null &&
