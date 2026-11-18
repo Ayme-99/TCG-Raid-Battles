@@ -24,6 +24,13 @@ function exportar(destino) {
     fs.copyFileSync(path.join(ORIGEN_CONTRATO, nombre), path.join(destino, 'contrato', nombre));
     copiados.push(`contrato/${nombre}`);
   }
+  // Esquema del protocolo de sala (T-78), que carga src/protocoloSala.js.
+  fs.mkdirSync(path.join(destino, 'contrato', 'sala'), { recursive: true });
+  fs.copyFileSync(
+    path.join(ORIGEN_CONTRATO, 'sala', 'sala.v1.schema.json'),
+    path.join(destino, 'contrato', 'sala', 'sala.v1.schema.json'),
+  );
+  copiados.push('contrato/sala/sala.v1.schema.json');
   fs.writeFileSync(
     path.join(destino, 'ORIGEN.md'),
     [
