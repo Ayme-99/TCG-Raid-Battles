@@ -138,6 +138,8 @@ Cada jugador guarda el suyo con el camino ya existente (`POST /partidas`, idempo
 
 **Riesgo asumido y apuntado:** como el servidor no ejecuta las reglas, un host y su grupo podrían fabricar una partida para ganar puntos. Hoy el servidor ya acepta ese riesgo (`server/README.md`: «no ejecuta las reglas»), y con puntos cobra más importancia en el digital. Cuando importe, la salida es reproducir el registro en el servidor (portar el motor o ejecutar Dart). Es una decisión aparte y no bloquea esto.
 
+**Segundo riesgo asumido y apuntado (2026-11-18):** el servidor **no sabe cuándo acaba una partida** (el final lo deduce el motor del registro), así que no puede impedir que se guarde una que **se canceló** (por ejemplo, la del host que se cayó). Hoy `POST /partidas` solo exige que el registro sea coherente y que las cuentas coincidan con las de la sala. Es el mismo riesgo de confiar en el host. Si algún día importa, la salida más barata es un mensaje del host (`terminar`, con el resultado) que marque la sala como terminada y deje las canceladas fuera de `POST /partidas`; la completa es reproducir el registro en el servidor, como arriba.
+
 ### D9 · Desconexión y reconexión
 
 **Un jugador (no host):**
