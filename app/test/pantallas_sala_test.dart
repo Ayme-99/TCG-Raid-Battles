@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_app/sala/controlador_sala.dart';
+import 'package:incursiones_engine/incursiones_engine.dart';
 
 import 'ayudas.dart';
 
@@ -187,5 +188,23 @@ void main() {
     );
     expect(find.byKey(const Key('anadir-jugador')), findsNothing);
     expect(find.byKey(const Key('deshacer')), findsNothing);
+  });
+
+  testWidgets('la partida de una sala se configura en formato físico',
+      (tester) async {
+    final (c, canales) = await abrirInicio(tester);
+    await tester.tap(find.byKey(const Key('inicio-sala')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('sala-crear')));
+    await avanzar(tester);
+    canales.single.recibir(mensajeSala());
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('ataque-0')), '100');
+    await tester.enterText(find.byKey(const Key('ataque-1')), '100');
+    await tester.ensureVisible(find.byKey(const Key('configurar')));
+    await tester.tap(find.byKey(const Key('configurar')));
+    await tester.pumpAndSettle();
+    expect(c.read(estadoProvider).jugadores, hasLength(2));
+    expect(c.read(estadoProvider).formato, FormatoPartida.fisico);
   });
 }

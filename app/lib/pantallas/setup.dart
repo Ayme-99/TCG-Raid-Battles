@@ -119,7 +119,9 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
   /// lo pisa.
   bool _nombreEditado = false;
 
-  /// Partida de una sala: el número de jugadores lo fijan los que entraron.
+  /// Partida de una sala: el número de jugadores lo fijan los que entraron. El
+  /// formato sigue siendo físico (cada uno con sus cartas) hasta que existan
+  /// las cartas digitales (T-91).
   bool _enSala = false;
 
   @override
@@ -173,7 +175,6 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
             ),
         ],
         modo: modo,
-        formato: _enSala ? FormatoPartida.digital : FormatoPartida.fisico,
       );
 
   /// Modo `jefe`: se registran la configuración y el jefe ya elegido.

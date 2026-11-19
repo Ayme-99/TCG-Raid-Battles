@@ -20,6 +20,7 @@ De T-53 y de las decisiones del 2026-11-18:
 | Tema | Decisión |
 |---|---|
 | Modo | Un dispositivo por jugador = formato digital: online, con sesión **obligatoria** para todos. Da puntos. |
+| Formato mientras no haya cartas digitales (T-91) | Las salas se juegan en **formato físico** (cada uno con sus cartas, la app lleva la cuenta y todos ven lo mismo). Por eso, de momento, **no dan puntos** (`server/src/coherencia.js`: lo físico solo va al historial). El formato digital vuelve a las salas cuando existan las cartas. |
 | Turnos | Cada jugador apunta su propio daño en su turno. |
 | Turno del jefe | **Automático.** La baraja de ataques está en la app. Las monedas y los dados los tira el jefe (la app). El host solo pasa al «siguiente». |
 | Cámara | Depende solo del estado de la partida; es igual para todos. |
