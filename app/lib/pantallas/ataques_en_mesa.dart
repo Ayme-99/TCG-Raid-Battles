@@ -68,14 +68,15 @@ class _EstadoAtaquesEnMesa extends ConsumerState<AtaquesEnMesa>
           }
           // Las posiciones se leen en cada imagen: la cámara de la mesa se
           // mueve mientras tanto.
+          // Se mide respecto al propio lienzo, sin pasar por la pantalla: así
+          // el zoom y la inclinación de la cámara no descuadran el marco.
           Rect? rectDe(PuntoMesa punto) {
             final caja = claves.caja(punto);
             if (caja == null) return null;
-            final a = lienzo.globalToLocal(caja.localToGlobal(Offset.zero));
-            final b = lienzo.globalToLocal(
-              caja.localToGlobal(caja.size.bottomRight(Offset.zero)),
+            return MatrixUtils.transformRect(
+              caja.getTransformTo(lienzo),
+              Offset.zero & caja.size,
             );
-            return Rect.fromPoints(a, b);
           }
 
           final origen = rectDe(ataque.origen);
