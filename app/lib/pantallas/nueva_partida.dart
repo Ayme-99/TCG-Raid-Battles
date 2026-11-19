@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import 'fondo_menu.dart';
 import 'inicio.dart';
 
 const _morado = Color(0xFF1B1235);
@@ -91,21 +92,10 @@ class _PantallaNuevaPartidaState extends ConsumerState<PantallaNuevaPartida> {
     return Scaffold(
       key: const Key('nueva-partida'),
       backgroundColor: _morado,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            carril
-                ? 'assets/mapas/sala-origen.webp'
-                : 'assets/mapas/ruta-110.webp',
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const ColoredBox(color: _morado),
-          ),
-          ColoredBox(color: _morado.withValues(alpha: 0.5)),
-          SafeArea(
-            child: carril ? _ConCarril(estado: this) : _Asistente(estado: this),
-          ),
-        ],
+      body: FondoMenu(
+        child: SafeArea(
+          child: carril ? _ConCarril(estado: this) : _Asistente(estado: this),
+        ),
       ),
     );
   }

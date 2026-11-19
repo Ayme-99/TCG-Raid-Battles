@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:incursiones_app/almacen/almacen.dart';
+import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/cuenta/cliente_api.dart';
 import 'package:incursiones_app/cuenta/sesion.dart';
 import 'package:incursiones_app/envios/controlador_envios.dart';
@@ -190,3 +192,25 @@ Map<String, Object?> mensajeEvento(int seq, Evento evento, {String? id}) => {
       'evento': eventoAJson(evento),
       if (id != null) 'idMensaje': id,
     };
+
+/// Elige un jefe de prueba con los HP indicados (el setup solo ofrece los del
+/// catálogo, que no tienen los HP que cada test necesita).
+Future<void> elegirJefeDePrueba(
+  WidgetTester tester, {
+  String nombre = 'Jefe',
+  int nivel = 1,
+  required int hp,
+  int? invocacionCadaHp,
+}) async {
+  final c = ProviderScope.containerOf(tester.element(find.byType(IncursionesApp)));
+  final error = c.read(partidaProvider.notifier).registrar(
+        ElegirJefe(
+          nombre: nombre,
+          nivel: nivel,
+          hp: hp,
+          invocacionCadaHp: invocacionCadaHp,
+        ),
+      );
+  expect(error, isNull);
+  await tester.pumpAndSettle();
+}

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
@@ -75,19 +77,162 @@ class PantallaJefePrimero extends ConsumerWidget {
         if (jefes.isEmpty)
           const Text('No hay jefes en el catálogo.')
         else
-          for (final j in jefes)
-            Card(
-              child: ListTile(
-                key: Key('jefe-primero-${j.id}'),
-                title: Text('${j.nombre} · Nv. ${j.nivel}'),
-                subtitle: Text(
-                  '${j.hp} HP · equipo recomendado ${textoRango(j.nivel)}',
+          _RejillaJefes(
+            jefes: jefes,
+            clave: (j) => Key('jefe-primero-${j.id}'),
+            onElegir: (j) => ref.read(jefePreelegidoProvider.notifier).fijar(j),
+          ),
+      ],
+    );
+  }
+}
+
+/// Rejilla de tarjetas de jefe: 2 columnas como mínimo, más si hay ancho.
+class _RejillaJefes extends StatelessWidget {
+  const _RejillaJefes({
+    required this.jefes,
+    required this.clave,
+    required this.onElegir,
+    this.aviso,
+  });
+
+  final List<JefeCatalogo> jefes;
+  final Key Function(JefeCatalogo) clave;
+  final void Function(JefeCatalogo) onElegir;
+
+  /// Texto de aviso bajo la tarjeta de un jefe (p. ej. «fuera de rango»).
+  final String? Function(JefeCatalogo)? aviso;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, caja) {
+        const separacion = 12.0;
+        final columnas = max(2, (caja.maxWidth / 200).floor());
+        final ancho = (caja.maxWidth - separacion * (columnas - 1)) / columnas;
+        return Wrap(
+          alignment: WrapAlignment.center,
+          spacing: separacion,
+          runSpacing: separacion,
+          children: [
+            for (final j in jefes)
+              SizedBox(
+                width: ancho,
+                child: _TarjetaJefe(
+                  key: clave(j),
+                  jefe: j,
+                  aviso: aviso?.call(j),
+                  onTap: () => onElegir(j),
                 ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => ref.read(jefePreelegidoProvider.notifier).fijar(j),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Ataques e invocación de un jefe en una línea.
+String resumenAtaquesJefe(JefeCatalogo j) {
+  final ataques = j.ataques.map((a) => a.dano).join('/');
+  final n = j.intentosDeInvocacion;
+  final invoca = n == 0
+      ? 'no invoca'
+      : 'invoca $n aliado${n == 1 ? '' : 's'}'
+          '${j.invocacion!.segura ? ' (seguro)' : ''}';
+  return 'ataques $ataques · $invoca';
+}
+
+/// Color del tipo de cada jefe, para el fondo de su foto de perfil.
+Color _colorTipoJefe(String id) => switch (id) {
+      'onix' => const Color(0xFF7A6A55),
+      'manectric' => const Color(0xFFB59A12),
+      'kingdra' => const Color(0xFF2E7DB5),
+      'arceus' => const Color(0xFF8A8F9C),
+      _ => const Color(0xFF5B4A8A),
+    };
+
+/// Un jefe del catálogo en la rejilla: su artwork oficial como foto de perfil, con su nombre, nivel, HP y el equipo recomendado.
+class _TarjetaJefe extends StatelessWidget {
+  const _TarjetaJefe({
+    super.key,
+    required this.jefe,
+    required this.onTap,
+    this.aviso,
+  });
+
+  final JefeCatalogo jefe;
+  final VoidCallback onTap;
+  final String? aviso;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      margin: EdgeInsets.zero,
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Artwork del Pokémon sobre un degradado del color de su tipo.
+            AspectRatio(
+              aspectRatio: 1.3,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      _colorTipoJefe(jefe.id),
+                      const Color(0xFF1B1235),
+                    ],
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Image.asset(
+                    'assets/jefes/${jefe.id}.png',
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.medium,
+                    errorBuilder: (_, __, ___) => const Center(
+                        child: Icon(Icons.catching_pokemon, size: 48)),
+                  ),
+                ),
               ),
             ),
-      ],
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    jefe.nombre,
+                    style: tema.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 2),
+                  Text('Nivel ${jefe.nivel}',
+                      style: tema.textTheme.labelLarge
+                          ?.copyWith(color: const Color(0xFFFFC400))),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${jefe.hp} HP · equipo ${textoRango(jefe.nivel)}',
+                    style: tema.textTheme.bodySmall,
+                  ),
+                  Text(resumenAtaquesJefe(jefe),
+                      style: tema.textTheme.bodySmall),
+                  if (aviso != null)
+                    Text(aviso!,
+                        style: tema.textTheme.bodySmall
+                            ?.copyWith(color: tema.colorScheme.error)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -333,32 +478,6 @@ class PantallaEleccionJefe extends ConsumerStatefulWidget {
 }
 
 class _PantallaEleccionJefeState extends ConsumerState<PantallaEleccionJefe> {
-  final _nombre = TextEditingController();
-  final _hp = TextEditingController();
-  final _invocacion = TextEditingController();
-
-  @override
-  void dispose() {
-    _nombre.dispose();
-    _hp.dispose();
-    _invocacion.dispose();
-    super.dispose();
-  }
-
-  void _elegir(EstadoPartida estado) {
-    final cada = int.tryParse(_invocacion.text);
-    registrar(
-      context,
-      ref,
-      ElegirJefe(
-        nombre: _nombre.text.trim().isEmpty ? 'Jefe' : _nombre.text.trim(),
-        nivel: estado.nivel,
-        hp: int.tryParse(_hp.text) ?? 0,
-        invocacionCadaHp: cada == null || cada == 0 ? null : cada,
-      ),
-    );
-  }
-
   void _elegirDelCatalogo(JefeCatalogo jefe) {
     registrar(
       context,
@@ -371,16 +490,6 @@ class _PantallaEleccionJefeState extends ConsumerState<PantallaEleccionJefe> {
         jefeId: jefe.id,
       ),
     );
-  }
-
-  String _resumen(JefeCatalogo j) {
-    final ataques = j.ataques.map((a) => a.dano).join('/');
-    final n = j.intentosDeInvocacion;
-    final invoca = n == 0
-        ? 'no invoca'
-        : 'invoca $n aliado${n == 1 ? '' : 's'}'
-            '${j.invocacion!.segura ? ' (seguro)' : ''}';
-    return '${j.hp} HP · ataques $ataques · $invoca';
   }
 
   @override
@@ -405,73 +514,23 @@ class _PantallaEleccionJefeState extends ConsumerState<PantallaEleccionJefe> {
         Text(
           porJefe
               ? 'La app avisa si tu equipo no encaja con el jefe.'
-              : 'Elige un jefe del catálogo o introduce su carta a mano.',
+              : 'Elige el jefe al que os enfrentáis.',
         ),
         const SizedBox(height: 16),
-        if (delNivel.isNotEmpty) ...[
-          Text(
-            'Jefes del catálogo',
-            style: Theme.of(context).textTheme.titleMedium,
+        if (delNivel.isEmpty)
+          const Text('No hay jefes en el catálogo para este nivel.')
+        else
+          _RejillaJefes(
+            jefes: delNivel,
+            clave: (j) => Key('catalogo-${j.id}'),
+            onElegir: _elegirDelCatalogo,
+            aviso: porJefe
+                ? (j) => avisoDesajuste(estado.x, j.nivel) == null
+                    ? null
+                    : 'Fuera de rango'
+                : null,
           ),
-          for (final j in delNivel)
-            Card(
-              child: ListTile(
-                key: Key('catalogo-${j.id}'),
-                title: Text(porJefe ? '${j.nombre} · Nv. ${j.nivel}' : j.nombre),
-                subtitle: Text(
-                  porJefe
-                      ? '${_resumen(j)}\nEquipo recomendado ${textoRango(j.nivel)}'
-                          '${avisoDesajuste(estado.x, j.nivel) == null ? '' : ' · fuera de rango'}'
-                      : _resumen(j),
-                ),
-                isThreeLine: porJefe,
-                trailing: const Icon(Icons.play_arrow),
-                onTap: () => _elegirDelCatalogo(j),
-              ),
-            ),
-          const SizedBox(height: 16),
-        ],
-        if (!porJefe) ..._jefePersonalizado(context, estado),
       ],
     );
-  }
-
-  List<Widget> _jefePersonalizado(BuildContext context, EstadoPartida estado) {
-    return [
-        if (ref.watch(catalogoProvider).valueOrNull?.delNivel(estado.nivel).isNotEmpty ?? false) ...[
-          Text(
-            'Jefe personalizado',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-        ],
-        TextField(
-          key: const Key('jefe-nombre'),
-          controller: _nombre,
-          decoration: const InputDecoration(
-            labelText: 'Nombre del jefe',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 12),
-        KeyedSubtree(
-          key: const Key('jefe-hp'),
-          child: CampoNumero(controlador: _hp, etiqueta: 'HP del jefe'),
-        ),
-        const SizedBox(height: 12),
-        KeyedSubtree(
-          key: const Key('jefe-invocacion'),
-          child: CampoNumero(
-            controlador: _invocacion,
-            etiqueta: 'Llama a aliados cada X HP perdidos (vacío o 0: nunca)',
-          ),
-        ),
-        const SizedBox(height: 24),
-        FilledButton(
-          key: const Key('elegir-jefe'),
-          onPressed: () => _elegir(estado),
-          child: const Text('Empezar la partida'),
-        ),
-    ];
   }
 }

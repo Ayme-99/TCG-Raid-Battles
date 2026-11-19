@@ -57,8 +57,7 @@ Future<void> prepararPartida(WidgetTester tester, {int hp = 100}) async {
   await escribir(tester, 'ataque-0', '100');
   await escribir(tester, 'ataque-1', '100');
   await tocar(tester, 'configurar');
-  await escribir(tester, 'jefe-hp', '$hp');
-  await tocar(tester, 'elegir-jefe');
+  await elegirJefeDePrueba(tester, hp: hp);
 }
 
 Future<void> turno(WidgetTester tester, String dano) async {
@@ -77,9 +76,7 @@ void main() {
     expect(find.text('Nivel 1 (X = 200)'), findsOneWidget);
     expect(c.read(estadoProvider).fase, Fase.eleccionJefe);
 
-    await tester.enterText(find.byKey(const Key('jefe-nombre')), 'Mewtwo');
-    await escribir(tester, 'jefe-hp', '300');
-    await tocar(tester, 'elegir-jefe');
+    await elegirJefeDePrueba(tester, nombre: 'Mewtwo', hp: 300);
 
     final estado = c.read(estadoProvider);
     expect(estado.fase, Fase.turnoJugadores);
@@ -316,15 +313,13 @@ void main() {
     expect(c.read(estadoProvider).fase, Fase.turnoJefe);
   });
 
-  testWidgets('un jefe a mano: salen los dados y se piden los datos del aliado',
+  testWidgets('un jefe que invoca: salen los dados y se piden los datos del aliado',
       (tester) async {
     final c = await abrir(tester, azar: _AzarFijo([0, 2]));
     await escribir(tester, 'ataque-0', '100');
     await escribir(tester, 'ataque-1', '100');
     await tocar(tester, 'configurar');
-    await escribir(tester, 'jefe-hp', '300');
-    await escribir(tester, 'jefe-invocacion', '100');
-    await tocar(tester, 'elegir-jefe');
+    await elegirJefeDePrueba(tester, hp: 300, invocacionCadaHp: 100);
 
     // El jefe llama a su primer aliado al terminar su turno de la ronda 1.
     llegarALaLlamadaDelJefe(c);
@@ -394,10 +389,29 @@ void main() {
 
   testWidgets('en el setup se puede volver al inicio', (tester) async {
     await abrir(tester);
-    await tocar(tester, 'inicio-volver');
+    await tocar(tester, 'preparacion-atras');
     expect(find.byKey(const Key('inicio')), findsOneWidget);
     // Sin eventos no hay nada que continuar.
     expect(find.byKey(const Key('inicio-continuar')), findsNothing);
+  });
+
+  testWidgets(
+      'en la preparación «atrás» sustituye a deshacer y rehacer y retrocede '
+      'un paso', (tester) async {
+    final c = await abrir(tester);
+    expect(find.byKey(const Key('deshacer')), findsNothing);
+    expect(find.byKey(const Key('rehacer')), findsNothing);
+
+    await escribir(tester, 'ataque-0', '100');
+    await escribir(tester, 'ataque-1', '100');
+    await tocar(tester, 'configurar');
+    expect(c.read(estadoProvider).fase, Fase.eleccionJefe);
+    expect(find.byKey(const Key('deshacer')), findsNothing);
+
+    // De la elección de jefe se vuelve al paso de los jugadores.
+    await tocar(tester, 'preparacion-atras');
+    expect(c.read(estadoProvider).fase, Fase.preparacion);
+    expect(find.byKey(const Key('configurar')), findsOneWidget);
   });
 
   group('salidas del fin de partida (#234)', () {

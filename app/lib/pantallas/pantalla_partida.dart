@@ -6,8 +6,10 @@ import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import '../sala/controlador_sala.dart';
+import 'boton_atras.dart';
 import 'comun.dart';
 import 'escena_entrada.dart';
+import 'fondo_menu.dart';
 import 'fin_partida.dart';
 import 'inicio.dart';
 import 'paneles.dart';
@@ -63,6 +65,18 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
     }
   }
 
+  /// «Atrás» en la preparación: del jefe al equipo, del equipo a la rejilla de
+  /// jefes y, desde el primer paso, al inicio. No se pierde nada.
+  void _atrasPreparacion(EstadoPartida estado) {
+    if (estado.fase == Fase.eleccionJefe && ref.read(puedeDeshacerProvider)) {
+      ref.read(partidaProvider.notifier).deshacer();
+    } else if (ref.read(jefePreelegidoProvider) != null) {
+      ref.read(jefePreelegidoProvider.notifier).fijar(null);
+    } else {
+      ref.read(enPartidaProvider.notifier).salir();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen(
@@ -82,8 +96,12 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
         estado.fase == Fase.turnoJugadores || estado.fase == Fase.turnoJefe;
     // En una sala no se deshace ni se rehace (D-19 §D1).
     final enSala = ref.watch(enSalaProvider);
+    // Mientras se prepara la partida no hay deshacer/rehacer: su sitio lo
+    // ocupa el botón «atrás» de la izquierda.
+    final preparando =
+        estado.fase == Fase.preparacion || estado.fase == Fase.eleccionJefe;
     final acciones = <Widget>[
-      if (!enSala)
+      if (!enSala && !preparando)
       IconButton(
         key: const Key('deshacer'),
         tooltip: 'Deshacer',
@@ -92,7 +110,7 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
             ? () => ref.read(partidaProvider.notifier).deshacer()
             : null,
       ),
-      if (!enSala)
+      if (!enSala && !preparando)
       IconButton(
         key: const Key('rehacer'),
         tooltip: 'Rehacer',
@@ -127,19 +145,30 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
       const BotonEnvios(),
       const BotonCuenta(),
     ];
-    final mesa = Scaffold(
+    // Mientras se prepara la partida sigue el fondo del menú; al empezar,
+    // el de la mesa.
+    final escenario = Scaffold(
+      backgroundColor: preparando ? Colors.transparent : null,
       // En juego no hay barra: la mesa llena la pantalla y la barra flota.
       appBar: enJuego
           ? null
           : AppBar(
+              backgroundColor: preparando ? Colors.transparent : null,
               // Fuera de la mesa también se puede volver al inicio: no se
               // pierde nada, la partida queda guardada (#235).
-              leading: IconButton(
-                key: const Key('inicio-volver'),
-                tooltip: 'Inicio',
-                icon: const Icon(Icons.home_outlined),
-                onPressed: () => ref.read(enPartidaProvider.notifier).salir(),
-              ),
+              leadingWidth: preparando && !enSala ? 68 : null,
+              leading: preparando && !enSala
+                  ? BotonAtras(
+                      key: const Key('preparacion-atras'),
+                      onPressed: () => _atrasPreparacion(estado),
+                    )
+                  : IconButton(
+                      key: const Key('inicio-volver'),
+                      tooltip: 'Inicio',
+                      icon: const Icon(Icons.home_outlined),
+                      onPressed: () =>
+                          ref.read(enPartidaProvider.notifier).salir(),
+                    ),
               title: Text(_titulo(estado)),
               actions: acciones,
             ),
@@ -170,6 +199,17 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
               ),
             ),
     );
+    final mesa = preparando
+        ? Theme(
+            data: temaSobreFondoMenu(),
+            child: Stack(
+              children: [
+                const Positioned.fill(child: FondoMenu()),
+                escenario,
+              ],
+            ),
+          )
+        : escenario;
     // La escena de entrada va por encima de todo al empezar la partida.
     return Stack(
       children: [

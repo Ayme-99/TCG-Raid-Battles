@@ -40,8 +40,7 @@ Future<void> empezar(WidgetTester tester) async {
   await escribir(tester, 'ataque-0', '100');
   await escribir(tester, 'ataque-1', '100');
   await tocar(tester, 'configurar');
-  await escribir(tester, 'jefe-hp', '1000');
-  await tocar(tester, 'elegir-jefe');
+  await elegirJefeDePrueba(tester, hp: 1000);
 }
 
 void main() {
@@ -288,8 +287,7 @@ void main() {
       await escribir(tester, 'ataque-$i', '100');
     }
     await tocar(tester, 'configurar');
-    await escribir(tester, 'jefe-hp', '1000');
-    await tocar(tester, 'elegir-jefe');
+    await elegirJefeDePrueba(tester, hp: 1000);
     for (final ancho in [1000.0, 800.0, 600.0]) {
       tester.view.physicalSize = Size(ancho, 1000);
       await tester.pumpAndSettle();
