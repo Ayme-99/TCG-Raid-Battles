@@ -238,6 +238,21 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
     final activo =
         estado.fase == Fase.turnoJugadores ? estado.jugadorActual : null;
     final titulo = activo != null ? 'Tu turno' : 'Acciones';
+    // Mientras la mesa pregunta qué salió en una moneda, o enseña un ataque,
+    // el panel de acciones se aparta para no tapar la escena ni quitarle los
+    // toques.
+    final apartado = ref.watch(
+          tiradaMesaProvider.select((t) => t?.esPregunta ?? false),
+        ) ||
+        ref.watch(colaAtaquesMesaProvider.select((c) => c.isNotEmpty));
+    Widget apartable(Widget hijo) => IgnorePointer(
+          ignoring: apartado,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            opacity: apartado ? 0 : 1,
+            child: hijo,
+          ),
+        );
     return LayoutBuilder(
       builder: (context, caja) {
         if (caja.maxWidth >= DisposicionMesa.anchoMinimoFlotante) {
@@ -260,15 +275,6 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
           final pico = (centro - izquierda - 14)
               .clamp(26.0, panel - 54.0)
               .toDouble();
-          // Mientras la mesa pregunta qué salió en una moneda, el panel de
-          // acciones se aparta para no tapar la pregunta ni quitarle los toques.
-          final preguntando = ref.watch(
-            tiradaMesaProvider.select((t) => t?.esPregunta ?? false),
-          );
-          Widget apartable(Widget hijo) => IgnorePointer(
-                ignoring: preguntando,
-                child: Opacity(opacity: preguntando ? 0 : 1, child: hijo),
-              );
           return Stack(
             children: [
               const Positioned.fill(child: MesaConCamara()),
@@ -348,24 +354,28 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
                 flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
-                  child: PanelAcciones(
-                    titulo: titulo,
-                    controles: [...widget.controles, ...widget.extras],
-                    abierto: true,
-                    onAlternar: _alternar,
-                    ajustar: false,
+                  child: apartable(
+                    PanelAcciones(
+                      titulo: titulo,
+                      controles: [...widget.controles, ...widget.extras],
+                      abierto: true,
+                      onAlternar: _alternar,
+                      ajustar: false,
+                    ),
                   ),
                 ),
               )
             else
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
-                child: PanelAcciones(
-                  titulo: titulo,
-                  controles: [...widget.controles, ...widget.extras],
-                  abierto: false,
-                  onAlternar: _alternar,
-                  ajustar: true,
+                child: apartable(
+                  PanelAcciones(
+                    titulo: titulo,
+                    controles: [...widget.controles, ...widget.extras],
+                    abierto: false,
+                    onAlternar: _alternar,
+                    ajustar: true,
+                  ),
                 ),
               ),
           ],

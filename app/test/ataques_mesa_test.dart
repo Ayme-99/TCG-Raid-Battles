@@ -83,6 +83,36 @@ void main() {
     expect(c.read(colaAtaquesMesaProvider), isEmpty);
   });
 
+  testWidgets('mientras dura el ataque el panel de acciones se aparta',
+      (tester) async {
+    final c = await enTurnoDelJefe(tester);
+    Opacity? panel() => tester
+        .widgetList<AnimatedOpacity>(find.ancestor(
+          of: find.text('Terminar el turno del jefe'),
+          matching: find.byType(AnimatedOpacity),
+        ))
+        .map((o) => Opacity(opacity: o.opacity))
+        .firstOrNull;
+    expect(panel()?.opacity, 1);
+
+    c.read(partidaProvider.notifier).registrar(
+          const AtaqueJefe(ranura: 1, dano: 30, jugador: 0),
+        );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(panel()?.opacity, 0);
+    final bloqueo = tester.widget<IgnorePointer>(find
+        .ancestor(
+          of: find.text('Terminar el turno del jefe'),
+          matching: find.byType(IgnorePointer),
+        )
+        .first);
+    expect(bloqueo.ignoring, isTrue);
+
+    await tester.pumpAndSettle();
+    expect(panel()?.opacity, 1);
+  });
+
   testWidgets('la cámara mira a quien ataca y luego al objetivo', (tester) async {
     final c = await enTurnoDelJefe(tester);
     expect(c.read(enfoqueAtaqueProvider), isNull);
