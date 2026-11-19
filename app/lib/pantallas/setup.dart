@@ -111,6 +111,7 @@ class _RejillaJefes extends StatelessWidget {
         final columnas = max(2, (caja.maxWidth / 200).floor());
         final ancho = (caja.maxWidth - separacion * (columnas - 1)) / columnas;
         return Wrap(
+          alignment: WrapAlignment.center,
           spacing: separacion,
           runSpacing: separacion,
           children: [
