@@ -227,8 +227,8 @@ class _PintorAtaque extends CustomPainter {
           fontSize: 44 * aparece.clamp(0.0, 1.3),
           fontWeight: FontWeight.w900,
           color: Colors.white.withValues(alpha: 1 - _tramo(0.8, 1)),
-          shadows: [
-            Shadow(color: const Color(0xFFD50000), blurRadius: 0, offset: const Offset(3, 3)),
+          shadows: const [
+            Shadow(color: Color(0xFFD50000), offset: Offset(3, 3)),
             Shadow(color: Colors.black87, blurRadius: 8),
           ],
         ),
