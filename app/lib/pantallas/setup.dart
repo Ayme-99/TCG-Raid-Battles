@@ -8,7 +8,6 @@ import '../catalogo/catalogo.dart';
 import '../cuenta/controlador_sesion.dart';
 import '../partida/controlador_partida.dart';
 import '../sala/controlador_sala.dart';
-import 'carta.dart';
 import 'comun.dart';
 
 /// Modo de preparación de la partida que se está montando (D-15). Lo fija el
