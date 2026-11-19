@@ -6,6 +6,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../almacen/almacen.dart';
 import '../cuenta/controlador_sesion.dart';
+import 'ataque_mesa.dart';
 import 'persistencia.dart';
 
 /// Controlador de la partida en curso.
@@ -113,10 +114,12 @@ class ControladorPartida extends Notifier<Historial> {
     final proponer = _alProponer;
     if (proponer != null) return proponer(evento);
     try {
+      final antes = state.partida.estado;
       state = state.aplicar(evento);
       _olvidarIdentidad();
       _guardar();
       _alRegistrar?.call(evento);
+      ref.read(colaAtaquesMesaProvider.notifier).alRegistrar(antes, evento);
       return null;
     } on ReglaIncumplida catch (e) {
       return e.mensaje;

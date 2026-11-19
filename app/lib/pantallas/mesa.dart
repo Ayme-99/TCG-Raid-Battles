@@ -6,9 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
+import '../partida/ataque_mesa.dart';
 import '../partida/controlador_partida.dart';
 import '../partida/tirada_mesa.dart';
 import 'acciones_objetivo.dart';
+import 'ataques_en_mesa.dart';
 import 'dados_en_mesa.dart';
 import 'estilo.dart';
 import 'mapa.dart';
@@ -602,6 +604,8 @@ class _Mesa extends StatelessWidget {
                     ),
             ),
           ),
+        // Los ataques del jefe y de los aliados, por encima de todo.
+        const Positioned.fill(child: AtaquesEnMesa()),
       ],
     );
   }
@@ -639,7 +643,10 @@ class _EscenaJefe extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: SizedBox(
                       width: _anchoSlot,
-                      child: SlotAliado(slot: i),
+                      child: _Punto(
+                        punto: puntoAliado(i),
+                        child: SlotAliado(slot: i),
+                      ),
                     ),
                   ),
               ],
@@ -650,7 +657,10 @@ class _EscenaJefe extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         lado([for (var i = 0; i < izquierda; i++) i], MainAxisAlignment.end),
-        const SizedBox(width: _anchoJefe, child: TarjetaJefe()),
+        const SizedBox(
+          width: _anchoJefe,
+          child: _Punto(punto: puntoJefe, child: TarjetaJefe()),
+        ),
         lado(
           [for (var i = izquierda; i < slots; i++) i],
           MainAxisAlignment.start,
@@ -658,6 +668,21 @@ class _EscenaJefe extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Marca un sitio de la mesa para que los ataques sepan dónde empiezan y
+/// dónde acaban.
+class _Punto extends ConsumerWidget {
+  const _Punto({required this.punto, required this.child});
+
+  final PuntoMesa punto;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => KeyedSubtree(
+        key: ref.read(clavesMesaProvider).clave(punto),
+        child: child,
+      );
 }
 
 /// Zona de la mesa que escala su contenido para que quepa entera.
@@ -712,10 +737,13 @@ class _FilaJugadores extends StatelessWidget {
               onTap: () => onFoco(FocoJugador(i)),
               child: Padding(
                 padding: const EdgeInsets.all(6),
-                child: _Asiento(
-                  jugador: estado.jugadores[i],
-                  color: coloresAsiento[i % coloresAsiento.length],
-                  activo: activo == i,
+                child: _Punto(
+                  punto: puntoJugador(i),
+                  child: _Asiento(
+                    jugador: estado.jugadores[i],
+                    color: coloresAsiento[i % coloresAsiento.length],
+                    activo: activo == i,
+                  ),
                 ),
               ),
             ),
