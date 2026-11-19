@@ -76,11 +76,29 @@ void main() {
     expect(c.read(colaAtaquesMesaProvider), hasLength(2));
 
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 1400));
+    await tester.pump(const Duration(milliseconds: 2700));
     expect(c.read(colaAtaquesMesaProvider), hasLength(1));
 
     await tester.pumpAndSettle();
     expect(c.read(colaAtaquesMesaProvider), isEmpty);
+  });
+
+  testWidgets('la cámara mira a quien ataca y luego al objetivo', (tester) async {
+    final c = await enTurnoDelJefe(tester);
+    expect(c.read(enfoqueAtaqueProvider), isNull);
+
+    c.read(partidaProvider.notifier).registrar(
+          const AtaqueJefe(ranura: 1, dano: 30, jugador: 1),
+        );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(c.read(enfoqueAtaqueProvider), puntoJefe);
+
+    await tester.pump(const Duration(milliseconds: 1200));
+    expect(c.read(enfoqueAtaqueProvider), puntoJugador(1));
+
+    await tester.pumpAndSettle();
+    expect(c.read(enfoqueAtaqueProvider), isNull);
   });
 
   testWidgets('qué ataque sale de cada evento', (tester) async {
@@ -105,6 +123,13 @@ void main() {
         ataqueDe(estado, const AtaqueAAliado(jugador: 0, slot: 1, dano: 20))!;
     expect(aAliado.origen, puntoJugador(0));
     expect(aAliado.destinos, [puntoAliado(1)]);
+
+    // El turno de un jugador que daña al jefe también se anima.
+    final alJefe = ataqueDe(estado, const TurnoJugador(jugador: 0, dano: 50))!;
+    expect(alJefe.origen, puntoJugador(0));
+    expect(alJefe.destinos, [puntoJefe]);
+    expect(alJefe.atacante, 'jugador');
+    expect(ataqueDe(estado, const TurnoJugador(jugador: 0, dano: 0)), isNull);
 
     // Lo que no es un ataque no se anima.
     expect(ataqueDe(estado, const CuracionJefe(10)), isNull);

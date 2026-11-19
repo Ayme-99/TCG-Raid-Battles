@@ -5,8 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../partida/ataque_mesa.dart';
 
-/// Duración de cada ataque en la mesa.
-const duracionAtaqueMesa = Duration(milliseconds: 1300);
+/// Duración de cada ataque en la mesa: la cámara llega a quien ataca, carga,
+/// sale el proyectil mientras la cámara viaja al objetivo, e impacto.
+const duracionAtaqueMesa = Duration(milliseconds: 2600);
+
+/// Momento (0 a 1) en que la cámara deja a quien ataca y viaja al objetivo.
+const _salidaProyectil = 0.45;
 
 /// Enseña sobre la mesa los ataques del jefe y de los aliados: una carga en
 /// quien ataca, un proyectil hasta el objetivo, el impacto y el daño que
@@ -23,13 +27,26 @@ class _EstadoAtaquesEnMesa extends ConsumerState<AtaquesEnMesa>
   late final AnimationController _c =
       AnimationController(vsync: this, duration: duracionAtaqueMesa);
   AtaqueMesa? _actual;
+  bool _camaraEnObjetivo = false;
+  late final ProviderContainer _contenedor;
 
   @override
   void initState() {
     super.initState();
+    _contenedor = ProviderScope.containerOf(context, listen: false);
+    _c.addListener(() {
+      final ataque = _actual;
+      if (ataque == null || _camaraEnObjetivo || _c.value < _salidaProyectil) {
+        return;
+      }
+      _camaraEnObjetivo = true;
+      ref.read(enfoqueAtaqueProvider.notifier).state =
+          ataque.destinos.length == 1 ? ataque.destinos.first : puntoTodos;
+    });
     _c.addStatusListener((estado) {
       if (estado != AnimationStatus.completed) return;
       final terminado = _actual;
+      ref.read(enfoqueAtaqueProvider.notifier).state = null;
       setState(() => _actual = null);
       if (terminado != null) {
         ref.read(colaAtaquesMesaProvider.notifier).terminar(terminado.id);
@@ -43,11 +60,21 @@ class _EstadoAtaquesEnMesa extends ConsumerState<AtaquesEnMesa>
   @override
   void dispose() {
     _c.dispose();
+    // Si la mesa se va con un ataque a medias, que no quede la cámara fijada.
+    final contenedor = _contenedor;
+    Future(() {
+      try {
+        contenedor.read(enfoqueAtaqueProvider.notifier).state = null;
+        contenedor.read(colaAtaquesMesaProvider.notifier).limpiar();
+      } catch (_) {}
+    });
     super.dispose();
   }
 
   void _revisar(List<AtaqueMesa> cola) {
     if (_actual != null || cola.isEmpty) return;
+    _camaraEnObjetivo = false;
+    ref.read(enfoqueAtaqueProvider.notifier).state = cola.first.origen;
     setState(() => _actual = cola.first);
     _c.forward(from: 0);
   }
@@ -123,9 +150,10 @@ class _PintorAtaque extends CustomPainter {
   final int dano;
   final Color color;
 
-  // Fases (0 a 1): carga, vuelo del proyectil e impacto.
-  static const _finCarga = 0.22;
-  static const _inicioImpacto = 0.55;
+  // Fases (0 a 1): la cámara llega, carga, vuelo del proyectil e impacto.
+  static const _inicioCarga = 0.2;
+  static const _finCarga = _salidaProyectil;
+  static const _inicioImpacto = 0.62;
 
   double _tramo(double desde, double hasta) =>
       ((t - desde) / (hasta - desde)).clamp(0.0, 1.0);
@@ -136,7 +164,7 @@ class _PintorAtaque extends CustomPainter {
     final radio = math.max(origen.shortestSide, 40.0);
 
     // Carga: un resplandor que crece alrededor de quien ataca.
-    final carga = _tramo(0, _finCarga);
+    final carga = _tramo(_inicioCarga, _finCarga);
     final enfriar = 1 - _tramo(_finCarga, _inicioImpacto);
     if (carga > 0 && enfriar > 0) {
       final pincel = Paint()
@@ -220,14 +248,14 @@ class _PintorAtaque extends CustomPainter {
     }
     // El daño sube y se desvanece.
     final subida = Curves.easeOut.transform(k);
-    final aparece = Curves.easeOutBack.transform(_tramo(_inicioImpacto, 0.7));
+    final aparece = Curves.easeOutBack.transform(_tramo(_inicioImpacto, 0.72));
     final texto = TextPainter(
       text: TextSpan(
         text: dano > 0 ? '-$dano' : '0',
         style: TextStyle(
           fontSize: 44 * aparece.clamp(0.0, 1.3),
           fontWeight: FontWeight.w900,
-          color: Colors.white.withValues(alpha: 1 - _tramo(0.8, 1)),
+          color: Colors.white.withValues(alpha: 1 - _tramo(0.85, 1)),
           shadows: const [
             Shadow(color: Color(0xFFD50000), offset: Offset(3, 3)),
             Shadow(color: Colors.black87, blurRadius: 8),

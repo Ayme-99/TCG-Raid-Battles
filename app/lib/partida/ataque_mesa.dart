@@ -7,6 +7,9 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 typedef PuntoMesa = String;
 
 const PuntoMesa puntoJefe = 'jefe';
+
+/// Varios sitios a la vez (un ataque que va a todos los jugadores).
+const PuntoMesa puntoTodos = 'todos';
 PuntoMesa puntoAliado(int slot) => 'aliado-$slot';
 PuntoMesa puntoJugador(int asiento) => 'jugador-$asiento';
 
@@ -61,6 +64,16 @@ AtaqueMesa? ataqueDe(EstadoPartida antes, Evento evento, {int id = 0}) {
         destinos: [puntoJugador(destino)],
         dano: dano,
       );
+    case TurnoJugador(:final jugador, :final dano):
+      // Sin daño al jefe (ataca a un aliado o no hace nada) no hay nada que
+      // enseñar contra el jefe.
+      if (dano <= 0) return null;
+      return AtaqueMesa(
+        id: id,
+        origen: puntoJugador(jugador),
+        destinos: const [puntoJefe],
+        dano: dano,
+      );
     case AtaqueAAliado(:final jugador, :final slot, :final dano):
       return AtaqueMesa(
         id: id,
@@ -89,6 +102,9 @@ class ColaAtaquesMesa extends Notifier<List<AtaqueMesa>> {
     state = [...state, ataque];
   }
 
+  /// Olvida lo pendiente (la mesa se ha ido con un ataque a medias).
+  void limpiar() => state = const [];
+
   /// La mesa ha terminado de enseñar el ataque [id].
   void terminar(int id) => state = [
         for (final a in state)
@@ -98,6 +114,10 @@ class ColaAtaquesMesa extends Notifier<List<AtaqueMesa>> {
 
 final colaAtaquesMesaProvider =
     NotifierProvider<ColaAtaquesMesa, List<AtaqueMesa>>(ColaAtaquesMesa.new);
+
+/// Sitio al que debe mirar la cámara mientras se enseña un ataque: primero a
+/// quien ataca y, cuando sale el proyectil, al objetivo. null: no hay ataque.
+final enfoqueAtaqueProvider = StateProvider<PuntoMesa?>((ref) => null);
 
 /// Las claves con las que la mesa localiza cada sitio para dibujar el ataque
 /// de uno a otro.

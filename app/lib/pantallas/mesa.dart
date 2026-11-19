@@ -83,6 +83,20 @@ FocoCamara focoDe(EstadoPartida estado) {
   return const FocoGeneral();
 }
 
+/// A dónde mira la cámara mientras se enseña un ataque: el sitio que marca
+/// la animación (primero quien ataca, luego el objetivo).
+FocoCamara? _focoDeAtaque(PuntoMesa? punto) {
+  if (punto == null) return null;
+  if (punto == puntoJefe) return const FocoJefe();
+  if (punto == puntoTodos) return const FocoGeneral();
+  if (punto.startsWith('aliado-')) return const FocoAliados();
+  if (punto.startsWith('jugador-')) {
+    final asiento = int.tryParse(punto.substring('jugador-'.length));
+    if (asiento != null) return FocoJugador(asiento);
+  }
+  return null;
+}
+
 /// Reparto vertical de la mesa: jefe arriba, aliados en medio, jugadores
 /// abajo del todo. Suman 1.
 const alturaJefe = 0.50;
@@ -474,7 +488,7 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
             LugarMoneda.aliados =>
               tirada.esMoneda ? const FocoAliados() : FocoJugador(tirada.asiento),
           }
-        : _manual ?? auto;
+        : _focoDeAtaque(ref.watch(enfoqueAtaqueProvider)) ?? _manual ?? auto;
     final jugadores = estado.jugadores.length;
     final jefe = estado.jefe;
     final catalogo = ref.watch(catalogoProvider).asData?.value;
