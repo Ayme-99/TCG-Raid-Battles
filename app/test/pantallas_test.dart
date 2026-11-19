@@ -389,10 +389,29 @@ void main() {
 
   testWidgets('en el setup se puede volver al inicio', (tester) async {
     await abrir(tester);
-    await tocar(tester, 'inicio-volver');
+    await tocar(tester, 'preparacion-atras');
     expect(find.byKey(const Key('inicio')), findsOneWidget);
     // Sin eventos no hay nada que continuar.
     expect(find.byKey(const Key('inicio-continuar')), findsNothing);
+  });
+
+  testWidgets(
+      'en la preparación «atrás» sustituye a deshacer y rehacer y retrocede '
+      'un paso', (tester) async {
+    final c = await abrir(tester);
+    expect(find.byKey(const Key('deshacer')), findsNothing);
+    expect(find.byKey(const Key('rehacer')), findsNothing);
+
+    await escribir(tester, 'ataque-0', '100');
+    await escribir(tester, 'ataque-1', '100');
+    await tocar(tester, 'configurar');
+    expect(c.read(estadoProvider).fase, Fase.eleccionJefe);
+    expect(find.byKey(const Key('deshacer')), findsNothing);
+
+    // De la elección de jefe se vuelve al paso de los jugadores.
+    await tocar(tester, 'preparacion-atras');
+    expect(c.read(estadoProvider).fase, Fase.preparacion);
+    expect(find.byKey(const Key('configurar')), findsOneWidget);
   });
 
   group('salidas del fin de partida (#234)', () {
