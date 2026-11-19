@@ -238,12 +238,10 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
     final activo =
         estado.fase == Fase.turnoJugadores ? estado.jugadorActual : null;
     final titulo = activo != null ? 'Tu turno' : 'Acciones';
-    // Mientras la mesa pregunta qué salió en una moneda, o enseña un ataque,
-    // el panel de acciones se aparta para no tapar la escena ni quitarle los
-    // toques.
-    final apartado = ref.watch(
-          tiradaMesaProvider.select((t) => t?.esPregunta ?? false),
-        ) ||
+    // Mientras hay una animación en la mesa (dados, monedas, una pregunta de
+    // moneda o un ataque) el panel de acciones se aparta para no tapar la
+    // escena ni quitarle los toques.
+    final apartado = ref.watch(tiradaMesaProvider.select((t) => t != null)) ||
         ref.watch(colaAtaquesMesaProvider.select((c) => c.isNotEmpty));
     Widget apartable(Widget hijo) => IgnorePointer(
           ignoring: apartado,

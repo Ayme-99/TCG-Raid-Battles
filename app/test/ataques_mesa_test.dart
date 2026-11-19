@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/partida/ataque_mesa.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
+import 'package:incursiones_app/partida/tirada_mesa.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import 'ayudas.dart';
@@ -88,7 +89,7 @@ void main() {
     final c = await enTurnoDelJefe(tester);
     Opacity? panel() => tester
         .widgetList<AnimatedOpacity>(find.ancestor(
-          of: find.text('Terminar el turno del jefe'),
+          of: find.text('Acciones'),
           matching: find.byType(AnimatedOpacity),
         ))
         .map((o) => Opacity(opacity: o.opacity))
@@ -103,7 +104,7 @@ void main() {
     expect(panel()?.opacity, 0);
     final bloqueo = tester.widget<IgnorePointer>(find
         .ancestor(
-          of: find.text('Terminar el turno del jefe'),
+          of: find.text('Acciones'),
           matching: find.byType(IgnorePointer),
         )
         .first);
@@ -111,6 +112,29 @@ void main() {
 
     await tester.pumpAndSettle();
     expect(panel()?.opacity, 1);
+  });
+
+  testWidgets('tampoco está el panel mientras ruedan los dados o las monedas',
+      (tester) async {
+    final c = await enTurnoDelJefe(tester);
+    double opacidad() => tester
+        .widget<AnimatedOpacity>(find
+            .ancestor(
+              of: find.text('Acciones'),
+              matching: find.byType(AnimatedOpacity),
+            )
+            .first)
+        .opacity;
+    expect(opacidad(), 1);
+
+    c.read(tiradaMesaProvider.notifier).state = TiradaMesa.monedas([true]);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(opacidad(), 0);
+
+    c.read(tiradaMesaProvider.notifier).state = null;
+    await tester.pumpAndSettle();
+    expect(opacidad(), 1);
   });
 
   testWidgets('la cámara mira a quien ataca y luego al objetivo', (tester) async {
