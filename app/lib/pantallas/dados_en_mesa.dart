@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../partida/tirada_mesa.dart';
 import 'estilo.dart';
 import 'mesa.dart';
+import 'poliedro.dart';
 
 /// Los dados de una [TiradaMesa] de invocación cayendo sobre la mesa (T-44): entran desde
 /// arriba, rebotan, ruedan y se paran en su cara. Se pintan en coordenadas de
@@ -48,21 +49,24 @@ class _DadosEnMesaState extends State<DadosEnMesa>
         // jugadores. Las monedas, en `monedas_en_mesa.dart`.
         final suelo = (alturaJefe + alturaAliados) * h - lado * 0.4;
         final xAsiento = (t.asiento + 0.5) / widget.asientos * w;
+        // Slot: d4 (tetraedro) con 2 o 4 jugadores y d6 (cubo, cada cara
+        // repetida dos veces) con 3. Con 1 jugador no se tira. Categoría: d6.
         final dados = [
+          if (t.carasSlot >= 2)
+            _Dado(
+              forma: _formaSlot(t.carasSlot),
+              valor: t.valorSlot,
+              x: xAsiento - lado * 0.8,
+              suelo: suelo,
+              alto: h,
+              lado: lado,
+              retraso: 0,
+              desvio: -1,
+              color: coloresAsiento[t.asiento % coloresAsiento.length],
+              semilla: 0,
+            ),
           _Dado(
-            caras: t.carasSlot,
-            valor: t.valorSlot,
-            x: xAsiento - lado * 0.8,
-            suelo: suelo,
-            alto: h,
-            lado: lado,
-            retraso: 0,
-            desvio: -1,
-            color: coloresAsiento[t.asiento % coloresAsiento.length],
-            semilla: 0,
-          ),
-          _Dado(
-            caras: t.carasCategoria,
+            forma: Poliedro.cubo(const [1, 6, 2, 5, 3, 4]),
             valor: t.valorCategoria,
             x: xAsiento + lado * 0.8,
             suelo: suelo - lado * 0.15,
@@ -86,9 +90,16 @@ class _DadosEnMesaState extends State<DadosEnMesa>
   }
 }
 
+Poliedro _formaSlot(int caras) => switch (caras) {
+      2 => Poliedro.tetraedro(const [1, 2, 1, 2]),
+      3 => Poliedro.cubo(const [1, 1, 2, 2, 3, 3]),
+      4 => Poliedro.tetraedro(const [1, 2, 3, 4]),
+      _ => Poliedro.cubo(const [1, 6, 2, 5, 3, 4]),
+    };
+
 class _Dado {
   const _Dado({
-    required this.caras,
+    required this.forma,
     required this.valor,
     required this.x,
     required this.suelo,
@@ -100,7 +111,7 @@ class _Dado {
     required this.semilla,
   });
 
-  final int caras;
+  final Poliedro forma;
   final int valor;
 
   /// Donde se para (centro del dado).
@@ -128,14 +139,15 @@ class _Dado {
     // Cuanto más lejos del suelo, más pequeña y suave la sombra.
     final altura = (suelo - y) / (suelo - inicio);
     final reposo = 1 - Curves.easeOut.transform(t);
-    final cara = t >= 0.85
-        ? valor
-        : ((t * 18).floor() * 7 + semilla * 3) % caras + 1;
-    final giro = Matrix4.identity()
-      ..setEntry(3, 2, 0.004)
-      ..rotateX(reposo * 6 * pi)
-      ..rotateY(reposo * 4 * pi * desvio)
-      ..rotateZ(reposo * 2 * pi * desvio);
+    // Gira por el aire sobre dos ejes y va frenando hasta quedarse con la
+    // cara del resultado de frente.
+    final giro = Rot.eje(const V3(0.6, 0.8, 0.3), reposo * 5 * pi) *
+        Rot.eje(V3(-0.5, 0.3, 0.8 * desvio), reposo * 4 * pi);
+    final rot = giro *
+        orientacionFinal(
+          forma.caraCon(valor),
+          inclinacion: 0.22 * desvio,
+        );
     return Positioned(
       left: xActual - lado / 2,
       top: y - lado / 2,
@@ -160,32 +172,16 @@ class _Dado {
               ),
             ),
           ),
-          Transform(
-            alignment: Alignment.center,
-            transform: giro,
-            child: Container(
-              key: ValueKey('dado-mesa-$semilla'),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(lado * 0.22),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color.lerp(color, Colors.white, 0.55)!, color],
-                ),
-                border: Border.all(color: Colors.white, width: 3),
-                boxShadow: const [
-                  BoxShadow(color: Colors.black45, blurRadius: 6),
-                ],
-              ),
-              child: Text(
-                '$cara',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: lado * 0.5,
-                  fontWeight: FontWeight.w900,
-                  shadows: const [Shadow(color: Colors.black54, blurRadius: 4)],
-                ),
+          SizedBox(
+            key: ValueKey('dado-mesa-$semilla'),
+            width: lado,
+            height: lado,
+            child: CustomPaint(
+              painter: PoliedroPainter(
+                forma: forma,
+                rot: rot,
+                color: color,
+                escala: lado * 0.3,
               ),
             ),
           ),
