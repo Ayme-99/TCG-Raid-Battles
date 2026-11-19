@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
@@ -6,6 +8,7 @@ import '../catalogo/catalogo.dart';
 import '../cuenta/controlador_sesion.dart';
 import '../partida/controlador_partida.dart';
 import '../sala/controlador_sala.dart';
+import 'carta.dart';
 import 'comun.dart';
 
 /// Modo de preparación de la partida que se está montando (D-15). Lo fija el
@@ -75,19 +78,90 @@ class PantallaJefePrimero extends ConsumerWidget {
         if (jefes.isEmpty)
           const Text('No hay jefes en el catálogo.')
         else
-          for (final j in jefes)
-            Card(
-              child: ListTile(
-                key: Key('jefe-primero-${j.id}'),
-                title: Text('${j.nombre} · Nv. ${j.nivel}'),
-                subtitle: Text(
-                  '${j.hp} HP · equipo recomendado ${textoRango(j.nivel)}',
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => ref.read(jefePreelegidoProvider.notifier).fijar(j),
+          LayoutBuilder(
+            builder: (context, caja) {
+              const separacion = 12.0;
+              final columnas = max(2, (caja.maxWidth / 200).floor());
+              final ancho =
+                  (caja.maxWidth - separacion * (columnas - 1)) / columnas;
+              return Wrap(
+                spacing: separacion,
+                runSpacing: separacion,
+                children: [
+                  for (final j in jefes)
+                    SizedBox(
+                      width: ancho,
+                      child: _TarjetaJefe(
+                        key: Key('jefe-primero-${j.id}'),
+                        jefe: j,
+                        onTap: () =>
+                            ref.read(jefePreelegidoProvider.notifier).fijar(j),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+      ],
+    );
+  }
+}
+
+/// Un jefe del catálogo en la rejilla: la ilustración de su carta recortada
+/// como foto de perfil, con su nombre, nivel, HP y el equipo recomendado.
+class _TarjetaJefe extends StatelessWidget {
+  const _TarjetaJefe({super.key, required this.jefe, required this.onTap});
+
+  final JefeCatalogo jefe;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      margin: EdgeInsets.zero,
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // La ilustración ocupa la franja alta de la carta.
+            AspectRatio(
+              aspectRatio: 1.7,
+              child: Image.asset(
+                rutaCarta(jefe.nombre),
+                fit: BoxFit.cover,
+                alignment: const Alignment(0, -0.62),
+                errorBuilder: (_, __, ___) =>
+                    const Center(child: Icon(Icons.catching_pokemon, size: 48)),
               ),
             ),
-      ],
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    jefe.nombre,
+                    style: tema.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 2),
+                  Text('Nivel ${jefe.nivel}',
+                      style: tema.textTheme.labelLarge
+                          ?.copyWith(color: const Color(0xFFFFC400))),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${jefe.hp} HP · equipo ${textoRango(jefe.nivel)}',
+                    style: tema.textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

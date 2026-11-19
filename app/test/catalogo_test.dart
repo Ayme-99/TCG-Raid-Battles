@@ -545,6 +545,21 @@ void main() {
       final c = await abrir(tester);
       expect(find.text('¿Contra qué jefe?'), findsOneWidget);
       expect(find.byKey(const Key('jefe-primero-kingdra')), findsOneWidget);
+      // Rejilla de tarjetas: nombre, nivel y la ilustración de cada jefe.
+      for (final (id, nombre, nivel) in [
+        ('onix', 'Onix', 1),
+        ('manectric', 'Manectric', 2),
+        ('kingdra', 'Kingdra', 3),
+        ('arceus', 'Arceus', 4),
+      ]) {
+        final tarjeta = find.byKey(Key('jefe-primero-$id'));
+        expect(find.descendant(of: tarjeta, matching: find.text(nombre)),
+            findsOneWidget);
+        expect(find.descendant(of: tarjeta, matching: find.text('Nivel $nivel')),
+            findsOneWidget);
+        expect(find.descendant(of: tarjeta, matching: find.byType(Image)),
+            findsOneWidget);
+      }
 
       await tester.tap(find.byKey(const Key('jefe-primero-kingdra')));
       await tester.pumpAndSettle();
