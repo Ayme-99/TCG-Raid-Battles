@@ -62,7 +62,7 @@ class _EstadoAtaquesEnMesa extends ConsumerState<AtaquesEnMesa>
     _c.dispose();
     // Si la mesa se va con un ataque a medias, que no quede la cámara fijada.
     final contenedor = _contenedor;
-    Future(() {
+    Future.microtask(() {
       try {
         contenedor.read(enfoqueAtaqueProvider.notifier).state = null;
         contenedor.read(colaAtaquesMesaProvider.notifier).limpiar();
