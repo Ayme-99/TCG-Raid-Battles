@@ -28,6 +28,10 @@ class ControladorPartida extends Notifier<Historial> {
   // Solo el host: avisa de cada evento que registra, para difundirlo.
   void Function(Evento)? _alRegistrar;
 
+  // Solo un jugador que no es el host: sus eventos no se aplican aquí, se
+  // proponen al host y llegan difundidos (D-19 §D1).
+  String? Function(Evento)? _alProponer;
+
   @override
   Historial build() {
     // Si la app se cerró a mitad de partida, se retoma donde estaba.
@@ -72,11 +76,13 @@ class ControladorPartida extends Notifier<Historial> {
     required String partidaId,
     required String creadaEn,
     void Function(Evento)? alRegistrar,
+    String? Function(Evento)? alProponer,
   }) {
     _identidadFija = true;
     _partidaId = partidaId;
     _creadaEn = creadaEn;
     _alRegistrar = alRegistrar;
+    _alProponer = alProponer;
     ref.read(enSalaProvider.notifier).state = true;
   }
 
@@ -84,6 +90,7 @@ class ControladorPartida extends Notifier<Historial> {
   void salirDeSala() {
     _identidadFija = false;
     _alRegistrar = null;
+    _alProponer = null;
     ref.read(enSalaProvider.notifier).state = false;
   }
 
@@ -99,8 +106,12 @@ class ControladorPartida extends Notifier<Historial> {
   }
 
   /// Registra un evento. Devuelve `null` si se aplicó, o el motivo por el que
-  /// las reglas lo rechazan; en ese caso la partida no cambia.
+  /// las reglas lo rechazan; en ese caso la partida no cambia. Un jugador de
+  /// una sala que no es el host no aplica nada: el evento se propone al host y
+  /// `null` quiere decir «enviado» (la respuesta llega difundida o rechazada).
   String? registrar(Evento evento) {
+    final proponer = _alProponer;
+    if (proponer != null) return proponer(evento);
     try {
       state = state.aplicar(evento);
       _olvidarIdentidad();

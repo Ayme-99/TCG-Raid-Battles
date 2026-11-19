@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'pantallas/inicio.dart';
+import 'sala/controlador_sala.dart';
+import 'sala/pantalla_sala.dart';
 import 'pantallas/pantalla_partida.dart';
 import 'pokedex/pokedex.dart';
 
@@ -31,8 +33,18 @@ class _Raiz extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Apunta en la Pokédex cada partida que termina, en cualquier pantalla.
     ref.watch(pokedexProvider);
-    return ref.watch(enPartidaProvider)
-        ? const PantallaPartida()
-        : const PantallaInicio();
+    final sala = ref.watch(salaProvider);
+    final Widget pantalla;
+    if (sala.cancelada) {
+      pantalla = const PantallaSalaCancelada();
+    } else if (sala.enSala && !(sala.info?.enCurso ?? false)) {
+      pantalla = const PantallaSala();
+    } else if (ref.watch(enPartidaProvider) || sala.enSala) {
+      pantalla = const PantallaPartida();
+    } else {
+      pantalla = const PantallaInicio();
+    }
+    // El aviso de desconexión flota sobre cualquier pantalla de la sala.
+    return Stack(children: [pantalla, const AvisoDesconexion()]);
   }
 }

@@ -4,6 +4,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
+import '../sala/controlador_sala.dart';
 import '../partida/recordatorios.dart';
 import '../partida/tirada_mesa.dart';
 import 'comun.dart';
@@ -21,9 +22,23 @@ class PantallaTurnoJugadores extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final estado = ref.watch(estadoProvider);
     final actual = estado.jugadorActual;
+    // En una sala solo el jugador al que le toca ve los controles del turno.
+    final miAsiento = ref.watch(miAsientoProvider);
+    final esMiTurno = miAsiento == null || miAsiento == actual;
     final controles = <Widget>[
         const PanelPendientes(),
-        if (actual != null)
+        if (actual != null && !esMiTurno)
+          Card(
+            key: const Key('turno-ajeno'),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Turno de ${estado.jugadores[actual].nombre}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          ),
+        if (actual != null && esMiTurno)
           _TurnoActual(
             key: ValueKey('turno-${estado.ronda}-${estado.turnoActual}'),
             estado: estado,

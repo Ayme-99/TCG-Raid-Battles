@@ -138,6 +138,12 @@ class ControladorSala extends Notifier<EstadoSala> {
     return null;
   }
 
+  /// Mi asiento en la sala, o `null` si no estoy en ninguna.
+  int? get miAsiento => _cliente?.info?.tuAsiento;
+
+  /// Quita el aviso de «partida cancelada» una vez visto.
+  void descartarCancelada() => state = const EstadoSala();
+
   /// Sale de la sala. En el lobby avisa al servidor; en partida equivale a
   /// desconectarse (y empieza la ventana de 2 minutos para los demás).
   Future<void> salir() async {
@@ -148,9 +154,17 @@ class ControladorSala extends Notifier<EstadoSala> {
     state = const EstadoSala();
   }
 
-  /// Cierra el cliente y deja la partida otra vez en modo un dispositivo.
+  /// Cierra el cliente y deja la partida otra vez en modo un dispositivo. Si
+  /// la partida de la sala estaba a medias se descarta (sin el host no hay
+  /// forma de seguirla); si ya había terminado se conserva para guardar los
+  /// resultados.
   Future<void> _soltar() async {
-    ref.read(partidaProvider.notifier).salirDeSala();
+    final partida = ref.read(partidaProvider.notifier);
+    if (ref.read(enSalaProvider) && !ref.read(estadoProvider).terminada) {
+      partida.nuevaPartida();
+    } else {
+      partida.salirDeSala();
+    }
     await _liberarCliente();
   }
 
@@ -186,8 +200,11 @@ class ControladorSala extends Notifier<EstadoSala> {
       case PropuestaRechazada(:final motivo):
         state = state.copiar(error: motivo);
       case PartidaCancelada():
+        // Si la partida ya había terminado, el host solo cerró la sala: no es
+        // una cancelación y hay que dejar guardar los resultados.
+        final terminada = ref.read(estadoProvider).terminada;
         unawaited(_soltar());
-        state = const EstadoSala(cancelada: true);
+        state = terminada ? const EstadoSala() : const EstadoSala(cancelada: true);
       case ErrorDeSala(:final texto, :final fatal):
         if (fatal) {
           unawaited(_soltar());
@@ -208,6 +225,7 @@ class ControladorSala extends Notifier<EstadoSala> {
       partidaId: info.partidaId!,
       creadaEn: info.creadaEn!,
       alRegistrar: info.soyHost ? cliente.difundir : null,
+      alProponer: info.soyHost ? null : (evento) => proponer(evento),
     );
   }
 
@@ -229,3 +247,13 @@ class ControladorSala extends Notifier<EstadoSala> {
 
 final salaProvider =
     NotifierProvider<ControladorSala, EstadoSala>(ControladorSala.new);
+
+/// Mi asiento en la sala, o `null` si no estoy en ninguna.
+final miAsientoProvider = Provider<int?>(
+  (ref) => ref.watch(salaProvider.select((s) => s.info?.tuAsiento)),
+);
+
+/// Si soy el host de la sala en la que estoy.
+final soyHostProvider = Provider<bool>(
+  (ref) => ref.watch(salaProvider.select((s) => s.info?.soyHost ?? false)),
+);

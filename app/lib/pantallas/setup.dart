@@ -5,6 +5,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 import '../catalogo/catalogo.dart';
 import '../cuenta/controlador_sesion.dart';
 import '../partida/controlador_partida.dart';
+import '../sala/controlador_sala.dart';
 import 'comun.dart';
 
 /// Modo de preparación de la partida que se está montando (D-15). Lo fija el
@@ -118,15 +119,27 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
   /// lo pisa.
   bool _nombreEditado = false;
 
+  /// Partida de una sala: el número de jugadores lo fijan los que entraron.
+  bool _enSala = false;
+
   @override
   void initState() {
     super.initState();
     // El jugador 1 es el host: empieza con su nickname si ha iniciado sesión.
     final nick = ref.read(sesionActualProvider)?.username;
-    _filas = [
-      _FilaJugador(nick ?? 'Jugador 1'),
-      _FilaJugador('Jugador 2'),
-    ];
+    final sala = ref.read(salaProvider).info;
+    if (sala != null && sala.enCurso) {
+      // En una sala los jugadores son los que han entrado, en su orden.
+      final ordenados = [...sala.jugadores]
+        ..sort((a, b) => a.asiento.compareTo(b.asiento));
+      _filas = [for (final j in ordenados) _FilaJugador(j.nombre)];
+      _enSala = true;
+    } else {
+      _filas = [
+        _FilaJugador(nick ?? 'Jugador 1'),
+        _FilaJugador('Jugador 2'),
+      ];
+    }
   }
 
   @override
@@ -160,6 +173,7 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
             ),
         ],
         modo: modo,
+        formato: _enSala ? FormatoPartida.digital : FormatoPartida.fisico,
       );
 
   /// Modo `jefe`: se registran la configuración y el jefe ya elegido.
@@ -186,7 +200,7 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
     // La sesión se lee de forma asíncrona: si llega con la pantalla abierta, el
     // nickname entra solo mientras el host no haya escrito otro nombre.
     ref.listen(sesionActualProvider, (_, sesion) {
-      if (!_nombreEditado) {
+      if (!_nombreEditado && !_enSala) {
         _filas[0].nombre.text = sesion?.username ?? 'Jugador 1';
       }
     });
@@ -257,7 +271,7 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
               ],
             ),
           ),
-        Row(
+        if (!_enSala) Row(
           children: [
             OutlinedButton.icon(
               key: const Key('anadir-jugador'),

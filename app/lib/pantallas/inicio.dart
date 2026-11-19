@@ -6,6 +6,7 @@ import '../cuenta/controlador_sesion.dart';
 import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
+import '../sala/pantalla_sala.dart';
 import 'carta.dart';
 import 'nueva_partida.dart';
 import 'pantalla_pokedex.dart';
@@ -347,6 +348,15 @@ class _MenuTitulo extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 _BotonInicio(
+                  clave: 'inicio-sala',
+                  etiqueta: 'Jugar en sala',
+                  detalle: 'Con otros dispositivos',
+                  icono: Icons.groups_rounded,
+                  alto: 84,
+                  onPressed: () => abrirSala(context, ref),
+                ),
+                const SizedBox(height: 16),
+                _BotonInicio(
                   clave: 'inicio-pokedex',
                   etiqueta: 'Pokédex',
                   detalle: 'Jefes y aliados enfrentados',
@@ -498,7 +508,15 @@ class _MenuMovil extends ConsumerWidget {
               principal: guardada == null,
               onPressed: () => _nuevaPartida(context, ref),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            _MosaicoInicio(
+              clave: 'inicio-sala',
+              etiqueta: 'Jugar en sala',
+              detalle: 'Con otros dispositivos',
+              icono: Icons.groups_rounded,
+              onPressed: () => abrirSala(context, ref),
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
