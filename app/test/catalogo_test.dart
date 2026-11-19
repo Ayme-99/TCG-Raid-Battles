@@ -557,8 +557,11 @@ void main() {
             findsOneWidget);
         expect(find.descendant(of: tarjeta, matching: find.text('Nivel $nivel')),
             findsOneWidget);
-        expect(find.descendant(of: tarjeta, matching: find.byType(Image)),
-            findsOneWidget);
+        final foto = find.descendant(of: tarjeta, matching: find.byType(Image));
+        expect(foto, findsOneWidget);
+        final imagen = tester.widget<Image>(foto).image;
+        expect(imagen, isA<AssetImage>());
+        expect((imagen as AssetImage).assetName, 'assets/jefes/$id.png');
       }
 
       await tester.tap(find.byKey(const Key('jefe-primero-kingdra')));

@@ -107,8 +107,16 @@ class PantallaJefePrimero extends ConsumerWidget {
   }
 }
 
-/// Un jefe del catálogo en la rejilla: la ilustración de su carta recortada
-/// como foto de perfil, con su nombre, nivel, HP y el equipo recomendado.
+/// Color del tipo de cada jefe, para el fondo de su foto de perfil.
+Color _colorTipoJefe(String id) => switch (id) {
+      'onix' => const Color(0xFF7A6A55),
+      'manectric' => const Color(0xFFB59A12),
+      'kingdra' => const Color(0xFF2E7DB5),
+      'arceus' => const Color(0xFF8A8F9C),
+      _ => const Color(0xFF5B4A8A),
+    };
+
+/// Un jefe del catálogo en la rejilla: su artwork oficial como foto de perfil, con su nombre, nivel, HP y el equipo recomendado.
 class _TarjetaJefe extends StatelessWidget {
   const _TarjetaJefe({super.key, required this.jefe, required this.onTap});
 
@@ -126,15 +134,30 @@ class _TarjetaJefe extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // La ilustración ocupa la franja alta de la carta.
+            // Artwork del Pokémon sobre un degradado del color de su tipo.
             AspectRatio(
-              aspectRatio: 1.7,
-              child: Image.asset(
-                rutaCarta(jefe.nombre),
-                fit: BoxFit.cover,
-                alignment: const Alignment(0, -0.62),
-                errorBuilder: (_, __, ___) =>
-                    const Center(child: Icon(Icons.catching_pokemon, size: 48)),
+              aspectRatio: 1.3,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      _colorTipoJefe(jefe.id),
+                      const Color(0xFF1B1235),
+                    ],
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Image.asset(
+                    'assets/jefes/${jefe.id}.png',
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.medium,
+                    errorBuilder: (_, __, ___) => const Center(
+                        child: Icon(Icons.catching_pokemon, size: 48)),
+                  ),
+                ),
               ),
             ),
             Padding(
