@@ -16,12 +16,15 @@ PuntoMesa puntoJugador(int asiento) => 'jugador-$asiento';
 /// Un ataque que la mesa enseña: de [origen] a cada uno de [destinos], con el
 /// [dano] que hace. Es solo visual: el motor ya lo ha aplicado.
 class AtaqueMesa {
-  const AtaqueMesa({
+  AtaqueMesa({
     required this.id,
     required this.origen,
     required this.destinos,
     required this.dano,
-  });
+  }) : creado = DateTime.now();
+
+  /// Cuándo se registró, para descartar los que se quedaron sin enseñar.
+  final DateTime creado;
 
   final int id;
   final PuntoMesa origen;
@@ -102,8 +105,19 @@ class ColaAtaquesMesa extends Notifier<List<AtaqueMesa>> {
     state = [...state, ataque];
   }
 
-  /// Olvida lo pendiente (la mesa se ha ido con un ataque a medias).
+  /// Olvida lo pendiente.
   void limpiar() => state = const [];
+
+  /// Quita los ataques que llevan demasiado esperando: la mesa se fue antes
+  /// de enseñarlos y ya no tiene sentido enseñarlos tarde.
+  void descartarCaducados() {
+    final limite = DateTime.now().subtract(const Duration(seconds: 8));
+    final vigentes = [
+      for (final a in state)
+        if (a.creado.isAfter(limite)) a,
+    ];
+    if (vigentes.length != state.length) state = vigentes;
+  }
 
   /// La mesa ha terminado de enseñar el ataque [id].
   void terminar(int id) => state = [

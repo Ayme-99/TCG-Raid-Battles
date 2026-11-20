@@ -57,6 +57,8 @@ class ControladorPartida extends Notifier<Historial> {
 
   /// Empieza una partida nueva y descarta la actual.
   void nuevaPartida() {
+    ref.read(colaAtaquesMesaProvider.notifier).limpiar();
+    ref.read(enfoqueAtaqueProvider.notifier).state = null;
     salirDeSala();
     _olvidarIdentidad();
     state = Historial.nuevo();

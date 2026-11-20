@@ -28,12 +28,10 @@ class _EstadoAtaquesEnMesa extends ConsumerState<AtaquesEnMesa>
       AnimationController(vsync: this, duration: duracionAtaqueMesa);
   AtaqueMesa? _actual;
   bool _camaraEnObjetivo = false;
-  late final ProviderContainer _contenedor;
 
   @override
   void initState() {
     super.initState();
-    _contenedor = ProviderScope.containerOf(context, listen: false);
     _c.addListener(() {
       final ataque = _actual;
       if (ataque == null || _camaraEnObjetivo || _c.value < _salidaProyectil) {
@@ -53,21 +51,24 @@ class _EstadoAtaquesEnMesa extends ConsumerState<AtaquesEnMesa>
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _revisar(ref.read(colaAtaquesMesaProvider));
+      if (!mounted) return;
+      ref.read(colaAtaquesMesaProvider.notifier).descartarCaducados();
+      final cola = ref.read(colaAtaquesMesaProvider);
+      if (cola.isEmpty) {
+        // Una mesa anterior pudo irse con la cámara fijada en un ataque.
+        ref.read(enfoqueAtaqueProvider.notifier).state = null;
+      } else {
+        _revisar(cola);
+      }
     });
   }
 
   @override
   void dispose() {
+    // No se limpia la cola: al pasar del último jugador al jefe cambia la
+    // pantalla y la mesa se recrea con el ataque recién registrado, que la
+    // nueva mesa tiene que recoger.
     _c.dispose();
-    // Si la mesa se va con un ataque a medias, que no quede la cámara fijada.
-    final contenedor = _contenedor;
-    Future.microtask(() {
-      try {
-        contenedor.read(enfoqueAtaqueProvider.notifier).state = null;
-        contenedor.read(colaAtaquesMesaProvider.notifier).limpiar();
-      } catch (_) {}
-    });
     super.dispose();
   }
 

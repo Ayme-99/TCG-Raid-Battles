@@ -9,8 +9,8 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import 'ayudas.dart';
 
-/// Partida de dos jugadores que ya está en el turno del jefe.
-Future<ProviderContainer> enTurnoDelJefe(WidgetTester tester) async {
+/// Partida de dos jugadores al empezar el turno de los jugadores.
+Future<ProviderContainer> enTurnoDeJugadores(WidgetTester tester) async {
   tester.view.physicalSize = const Size(1000, 3000);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
@@ -37,6 +37,12 @@ Future<ProviderContainer> enTurnoDelJefe(WidgetTester tester) async {
   await tester.tap(find.byKey(const Key('configurar')));
   await tester.pumpAndSettle();
   await elegirJefeDePrueba(tester, hp: 1000);
+  return c;
+}
+
+/// Partida de dos jugadores que ya está en el turno del jefe.
+Future<ProviderContainer> enTurnoDelJefe(WidgetTester tester) async {
+  final c = await enTurnoDeJugadores(tester);
   final n = c.read(partidaProvider.notifier);
   expect(n.registrar(const TurnoJugador(jugador: 0, dano: 10)), isNull);
   expect(n.registrar(const TurnoJugador(jugador: 1, dano: 10)), isNull);
@@ -82,6 +88,29 @@ void main() {
 
     await tester.pumpAndSettle();
     expect(c.read(colaAtaquesMesaProvider), isEmpty);
+  });
+
+  testWidgets(
+      'el ataque del último jugador se ve aunque la partida pase al turno '
+      'del jefe', (tester) async {
+    final c = await enTurnoDeJugadores(tester);
+    final n = c.read(partidaProvider.notifier);
+    expect(n.registrar(const TurnoJugador(jugador: 0, dano: 10)), isNull);
+    await tester.pumpAndSettle();
+
+    // El jugador 2 es el último: su turno cambia la pantalla al turno del jefe.
+    expect(n.registrar(const TurnoJugador(jugador: 1, dano: 50)), isNull);
+    expect(c.read(estadoProvider).fase, Fase.turnoJefe);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 700));
+    expect(c.read(colaAtaquesMesaProvider), hasLength(1));
+    expect(find.byKey(const Key('ataque-mesa')), findsOneWidget);
+    expect(c.read(enfoqueAtaqueProvider), isNotNull);
+
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('ataque-mesa')), findsNothing);
+    expect(c.read(colaAtaquesMesaProvider), isEmpty);
+    expect(c.read(enfoqueAtaqueProvider), isNull);
   });
 
   testWidgets('mientras dura el ataque el panel de acciones se aparta',
