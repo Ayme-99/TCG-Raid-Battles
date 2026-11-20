@@ -18,6 +18,8 @@ Decidido (2026-11-14): se quedan estas 5 cartas, una de cada, con la misma proba
 
 Pendiente de playtest (T-17): el simulador los modela por defecto (#189; `--animo=no` los quita) con las simplificaciones de `sim/README.md`. Sin ellos, el KO de T-72 sale mucho más duro (`balance/informes/calibrar_2026-11-14.txt`), y se adopta de forma provisional el resto de la regla oficial (una carta por KO, máximo 3 cartas distintas por partida).
 
+**Decidido (2026-11-20): el KO de un Pokémon de la Banca solo le quita el Pokémon.** Baja su recuento y cuenta para la eliminación, pero el jugador sigue jugando con normalidad: no se sienta ni roba carta de ánimo. Solo el KO del Pokémon Activo da carta y sienta el turno. *Pendiente de implementar:* hoy el motor trata igual cualquier KO; hace falta distinguir Activo y Banca en el evento `pokemonKo` (contrato nuevo) y preguntarlo en la app al marcar el KO.
+
 ## 2. Pokémon KO: no revive
 
 Un Pokémon que cae KO queda fuera de la partida. No se revive al final de la ronda, a diferencia del juego oficial: la carta de ánimo no revive. Es lo que asume la calibración del simulador (D-03): se pierde cuando caen todos los Pokémon de todos los jugadores.

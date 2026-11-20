@@ -92,6 +92,7 @@ FIN (VICTORIA / DERROTA)
 
 - Un Pokémon que cae KO **no revive**: queda fuera toda la partida.
 - Cuando cae el Activo, la **Banca asciende**: automáticamente si solo hay un Pokémon en la banca; con 3 jugadores (2 en banca) el jugador elige cuál sube, en la mesa (D-05 §3).
+- Si cae un Pokémon de la **Banca**, el jugador solo pierde ese Pokémon: no se sienta ni roba carta de ánimo (decidido 2026-11-20; el motor aún no distingue Activo y Banca, ver D-05).
 - Un jugador solo queda **eliminado** cuando no le queda ningún Pokémon en juego. El primer KO no lo elimina.
 - Un jugador eliminado no actúa, no gana prioridad y no cuenta en las tiradas de objetivo.
 
