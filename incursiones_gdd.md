@@ -178,7 +178,7 @@ Se pierde solo cuando todos los Pokémon de todos los jugadores han caído (8 KO
 
 Detalle en `docs/D-10-sistema-de-puntos.md`. Cifras en `balance/tablas/`.
 
-> **Pendiente de revisar (2026-11-15):** las partidas libres en formato físico no dan puntos; los puntos se cobrarán en el formato digital (campaña y partida libre online) y se usarán como moneda de la tienda de sobres. El modelo de desbloqueo de abajo es el de la decisión original y se revisará cuando se diseñe el formato digital.
+> **Pendiente de revisar (2026-11-15):** las partidas libres en formato físico no dan puntos; los puntos se cobrarán en el formato digital (campaña y partida libre online) y se usarán como moneda de una tienda (qué se podrá comprar y qué no se decidirá más adelante). El modelo de desbloqueo de abajo es el de la decisión original y se revisará cuando se diseñe el formato digital.
 
 - Los puntos son **individuales**: cada partida genera un total para el equipo que se reparte según lo aportado en el combate (el daño hecho por la fuente de cada jugador: ataques, daño extra de las cartas de ánimo y aliados que invoca).
 - **Victoria**: el total es el tope del nivel (3000 / 6000 / 9000 / 15000). **Derrota** (también al abandonar): `round(vida perdida por el jefe × Y ÷ 4) + 1`, con Y = tope del nivel ÷ HP del jefe (perder sin hacer nada da 1 punto).

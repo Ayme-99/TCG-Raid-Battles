@@ -1,6 +1,6 @@
 # D-14 · Efectos en los ataques del jefe
 
-Estado: **motor, contrato v5, catálogo y app hechos** (2026-11-07); simulador y recalibrado de HP pendientes. Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están los 4 jefes iniciales.
+Estado: **motor, contrato v5, catálogo, app y simulador hechos** (el simulador modela estos efectos, `sim/README.md`; el HP se recalibró con ellos, `balance/informes/calibrar_2026-11-14*.txt`). Issue #102. Los efectos de cada jefe se cierran uno a uno con Ayme; aquí están los 4 jefes iniciales.
 
 ## Motivación
 
@@ -79,4 +79,3 @@ Se irán añadiendo (daño a cada Activo, daño a la Banca, moneda) según los j
 ## Pendiente
 
 - Idea aparte, fuera de esta tarea: un botón opcional «Lanzar moneda» como utilidad para los jugadores.
-- Después: simulador (modelar los efectos) y recalibrado de HP.
