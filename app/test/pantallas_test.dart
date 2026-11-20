@@ -248,6 +248,18 @@ void main() {
     expect(c.read(estadoProvider).fase, Fase.preparacion);
   });
 
+  testWidgets('fin de partida: los jugadores salen de más a menos daño',
+      (tester) async {
+    await abrir(tester);
+    await prepararPartida(tester, hp: 100);
+    await turno(tester, '30');
+    await turno(tester, '70');
+
+    final arriba = tester.getTopLeft(find.byKey(const Key('jugador-1'))).dy;
+    final abajo = tester.getTopLeft(find.byKey(const Key('jugador-0'))).dy;
+    expect(arriba, lessThan(abajo));
+  });
+
   testWidgets('deshacer y rehacer funcionan desde la barra', (tester) async {
     final c = await abrir(tester);
     await prepararPartida(tester, hp: 500);
