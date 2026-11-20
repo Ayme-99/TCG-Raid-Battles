@@ -6,6 +6,7 @@ import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import '../sala/controlador_sala.dart';
+import 'aviso_central.dart';
 import 'boton_atras.dart';
 import 'comun.dart';
 import 'escena_entrada.dart';
@@ -36,6 +37,15 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
     super.initState();
     // Una partida retomada puede tener un intento de invocación sin resolver.
     WidgetsBinding.instance.addPostFrameCallback((_) => _resolverInvocaciones());
+  }
+
+  @override
+  void dispose() {
+    // Salir de la partida no deja alertas flotando sobre el menú. Se retiran
+    // después del fotograma: la capa de alertas no se toca a mitad de un
+    // desmontaje.
+    Future<void>.microtask(descartarAvisos);
+    super.dispose();
   }
 
   /// Mientras haya intentos de invocación, tira los dados sobre la mesa y

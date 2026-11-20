@@ -142,6 +142,14 @@ void _siguiente() {
   }
 }
 
+/// Retira la alerta que se ve y vacía la cola. Las alertas viven en la capa
+/// superior de la app, no en la pantalla que las lanzó: al salir de ella hay
+/// que retirarlas a mano.
+void descartarAvisos() {
+  _cola.clear();
+  _quitarActual();
+}
+
 /// Pone [aviso] en la cola: salen de uno en uno, en medio de la pantalla, sin
 /// tapar ni bloquear los controles. Los de tipo error pasan por delante y
 /// tiran la cola (es la respuesta a lo que se acaba de intentar).

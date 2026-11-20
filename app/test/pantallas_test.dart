@@ -7,6 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:incursiones_app/almacen/almacen.dart';
 import 'package:incursiones_app/cuenta/controlador_sesion.dart';
 import 'package:incursiones_app/app.dart';
+import 'package:incursiones_app/pantallas/aviso_central.dart';
+import 'package:incursiones_app/pantallas/comun.dart';
+import 'package:incursiones_app/pantallas/pantalla_partida.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
@@ -385,6 +388,26 @@ void main() {
 
     expect(find.byKey(const Key('inicio')), findsNothing);
     expect(c.read(estadoProvider).terminada, isFalse);
+  });
+
+  testWidgets('al volver al inicio se retiran las alertas que había',
+      (tester) async {
+    await abrir(tester);
+    registrarAviso(
+      tester.element(find.byType(PantallaPartida)),
+      'Magikarp: está KO',
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.byKey(const Key('aviso')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('preparacion-atras')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byKey(const Key('inicio')), findsOneWidget);
+    expect(find.byKey(const Key('aviso')), findsNothing);
+    expect(avisosEnCola(), 0);
+    await tester.pumpAndSettle();
   });
 
   testWidgets('en el setup se puede volver al inicio', (tester) async {
