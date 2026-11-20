@@ -23,7 +23,7 @@ class Aviso {
   /// Convierte un texto suelto («Magikarp: Jugador 2 está KO, el ataque
   /// falla.») en un aviso: el nombre antes de los dos puntos, el tipo según
   /// lo que cuente y el resto como motivo.
-  factory Aviso.deTexto(String texto, {TipoAviso? tipo}) {
+  factory Aviso.deTexto(String texto, {TipoAviso? tipo, String? titulo}) {
     final t = texto.trim();
     final m = RegExp(r'^([^:.\n]{1,28}): (.+)$', dotAll: true).firstMatch(t);
     // «Daño total: 80», «Moneda: cara»…: lo de antes de los dos puntos no es
@@ -52,7 +52,7 @@ class Aviso {
     return Aviso(
       tipo: tp,
       nombre: nombre,
-      titulo: _titular(tp, bajo),
+      titulo: titulo ?? _titular(tp, bajo),
       motivo: motivo,
     );
   }

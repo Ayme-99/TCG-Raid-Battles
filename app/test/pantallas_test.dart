@@ -190,6 +190,17 @@ void main() {
     expect(c.read(estadoProvider).jefe!.hp, 450);
   });
 
+  testWidgets('el campo de daño no deja ceros a la izquierda', (tester) async {
+    await abrir(tester);
+    await prepararPartida(tester, hp: 500);
+    await escribir(tester, 'dano-turno', '0100');
+    expect(danoEscrito(tester), '100');
+    await escribir(tester, 'dano-turno', '000');
+    expect(danoEscrito(tester), '0');
+    await escribir(tester, 'dano-turno', '0');
+    expect(danoEscrito(tester), '0');
+  });
+
   testWidgets('fijar daño: se repite en los turnos del jugador y se quita',
       (tester) async {
     final c = await abrir(tester);
