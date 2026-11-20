@@ -14,11 +14,11 @@ Abrir app
    │     │  │  ├─ Elegir jefe → la app recomienda el daño total del equipo → daño por jugador
    │     │  │  └─ Insertar daño por jugador → lista de jefes de ese nivel
    │     │  └─ Formato digital (solo online, da puntos): TODO
-   │     └─ Modo campaña (formato digital, individual): TODO
+   │     └─ Modo campaña (individual, 1 contra 1, ajeno a la partida libre): ver D-20
    ├─ Pokédex
    │  ├─ Enemigos: jefes y aliados enfrentados, por expansión
-   │  └─ Mis cartas (cuando haya campaña y formato digital): TODO
-   ├─ Tienda (sobres, con los puntos de la partida libre digital): TODO
+   │  └─ Mis cartas (formato digital, vía tienda): TODO
+   ├─ Tienda (monedas, dados, sobres y cartas sueltas, con los puntos de la campaña y de la partida libre digital): TODO
    └─ Iniciar sesión
       ├─ Perfil
       ├─ Historial (partidas libres)
@@ -30,9 +30,9 @@ Abrir app
 | | Formato físico | Formato digital |
 |---|---|---|
 | **Partida libre** | **Siempre offline.** El host pone los nombres de los jugadores. **No da puntos.** | **Solo online.** Cada jugador usa las cartas que tiene desbloqueadas. **Da puntos** (la moneda del juego). |
-| **Modo campaña** | No existe | **Individual.** Es donde se consiguen las cartas que luego se usan en la partida libre digital. |
+| **Modo campaña** | No existe | **Individual, 1 contra 1.** Juego de Pokémon propio (energía, rutas, captura, medallas); **no** entrega cartas a la partida libre. **Da puntos.** Diseño en [D-20](../D-20-modo-campana.md). |
 
-- Los **puntos** son la moneda del juego: sirven para comprar **sobres** en una **tienda** (nueva, en la pantalla de inicio) y así ampliar la Pokédex.
+- Los **puntos** son la moneda del juego (los dan la campaña y la partida libre digital): sirven para comprar en una **tienda** (nueva, en la pantalla de inicio) monedas, dados, **sobres** y cartas sueltas del formato digital, y así ampliar la Pokédex. *Corregido el 2026-11-21: antes decía que la campaña entregaba las cartas de la partida libre.*
 - El **servidor** decide si una partida da puntos por su **formato** (`fisico` no, `digital` sí), que viaja en el registro (contrato v13).
 - **Jugador 1** (el host) empieza siempre con su **nickname** si ha iniciado sesión, y se puede cambiar antes de entrar en la partida. Sin sesión se queda «Jugador 1».
 - El formato digital aún no existe: no se diseña hasta que lo pidamos.
@@ -76,7 +76,7 @@ Si los resultados no se han guardado, cualquiera de las salidas pide confirmar a
 Tiene **dos categorías**: **Mis cartas** y **Enemigos**. Por ahora solo existe **Enemigos**.
 
 - **Enemigos:** jefes y aliados enfrentados, agrupados por expansión (de salida solo hay una).
-- **Mis cartas:** las cartas conseguidas en la campaña y los sobres (formato digital). **TODO.**
+- **Mis cartas:** las cartas del formato digital conseguidas en la tienda (sobres y cartas sueltas). **TODO.**
 - Se guarda **en el dispositivo** y funciona sin sesión.
 - Al **iniciar sesión se sincroniza** con la cuenta y se actualiza.
 
