@@ -576,9 +576,10 @@ void main() {
       expect(find.byKey(const Key('aviso-desajuste')), findsOneWidget);
       expect(find.textContaining('muy difícil'), findsOneWidget);
 
-      // Dentro del rango el aviso desaparece.
+      // Dentro del rango el aviso desaparece y la app dice que encaja.
       await escribir(tester, ['350', '300']);
       expect(find.byKey(const Key('aviso-desajuste')), findsNothing);
+      expect(find.byKey(const Key('equipo-adecuado')), findsOneWidget);
 
       // Un nivel por encima del rango (X = 1000, nivel 4): más fácil de lo previsto.
       await escribir(tester, ['500', '500']);
@@ -590,6 +591,40 @@ void main() {
       expect(estado.modo, ModoPreparacion.jefe);
       expect(estado.nivel, 3);
       expect(estado.jefe!.nivel, 3);
+      expect(estado.fase, Fase.turnoJugadores);
+    });
+
+    testWidgets('los daños son opcionales: se puede empezar sin ellos',
+        (tester) async {
+      final c = await abrir(tester);
+      await tester.tap(find.byKey(const Key('jefe-primero-onix')));
+      await tester.pumpAndSettle();
+      // El jefe elegido se ve con su sprite y su botón de cambiar.
+      expect(find.byKey(const Key('jefe-elegido')), findsOneWidget);
+      expect(find.byKey(const Key('cambiar-jefe')), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('jefe-elegido')),
+          matching: find.byType(Image),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Mejor ataque (opcional)'), findsWidgets);
+      // Sin daños no hay recomendación ni aviso.
+      expect(find.byKey(const Key('aviso-desajuste')), findsNothing);
+      expect(find.byKey(const Key('equipo-adecuado')), findsNothing);
+
+      // Con solo el daño de uno la recomendación se queda a la espera.
+      await escribir(tester, ['100', '']);
+      expect(find.byKey(const Key('faltan-danos')), findsOneWidget);
+      expect(find.byKey(const Key('aviso-desajuste')), findsNothing);
+      await escribir(tester, ['', '']);
+
+      await tester.tap(find.byKey(const Key('empezar-con-jefe')));
+      await tester.pumpAndSettle();
+      final estado = c.read(estadoProvider);
+      expect(estado.modo, ModoPreparacion.jefe);
+      expect(estado.jefe!.nombre, 'Onix');
       expect(estado.fase, Fase.turnoJugadores);
     });
 

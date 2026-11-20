@@ -152,6 +152,37 @@ Color _colorTipoJefe(String id) => switch (id) {
       _ => const Color(0xFF5B4A8A),
     };
 
+/// Artwork del Pokémon del jefe sobre un degradado del color de su tipo: su
+/// foto de perfil.
+class _FotoJefe extends StatelessWidget {
+  const _FotoJefe({required this.jefe});
+
+  final JefeCatalogo jefe;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [_colorTipoJefe(jefe.id), const Color(0xFF1B1235)],
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Image.asset(
+          'assets/jefes/${jefe.id}.png',
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+          errorBuilder: (_, __, ___) =>
+              const Center(child: Icon(Icons.catching_pokemon, size: 48)),
+        ),
+      ),
+    );
+  }
+}
+
 /// Un jefe del catálogo en la rejilla: su artwork oficial como foto de perfil, con su nombre, nivel, HP y el equipo recomendado.
 class _TarjetaJefe extends StatelessWidget {
   const _TarjetaJefe({
@@ -176,32 +207,7 @@ class _TarjetaJefe extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Artwork del Pokémon sobre un degradado del color de su tipo.
-            AspectRatio(
-              aspectRatio: 1.3,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      _colorTipoJefe(jefe.id),
-                      const Color(0xFF1B1235),
-                    ],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Image.asset(
-                    'assets/jefes/${jefe.id}.png',
-                    fit: BoxFit.contain,
-                    filterQuality: FilterQuality.medium,
-                    errorBuilder: (_, __, ___) => const Center(
-                        child: Icon(Icons.catching_pokemon, size: 48)),
-                  ),
-                ),
-              ),
-            ),
+            AspectRatio(aspectRatio: 1.3, child: _FotoJefe(jefe: jefe)),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
@@ -350,12 +356,17 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
       }
     });
     final jefe = ref.watch(jefePreelegidoProvider);
-    final aviso = jefe == null || _x == 0 ? null : avisoDesajuste(_x, jefe.nivel);
+    // La recomendación necesita el daño de todos: con solo algunos, X se
+    // quedaría corta y el aviso engañaría.
+    final completos = _filas.every((f) => (int.tryParse(f.ataque.text) ?? 0) > 0);
+    final algunos = _filas.any((f) => f.ataque.text.trim().isNotEmpty);
+    final aviso = jefe == null || !completos ? null : avisoDesajuste(_x, jefe.nivel);
+    final encaja = jefe != null && completos && aviso == null;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'Jugadores y su mejor ataque',
+          jefe == null ? 'Jugadores y su mejor ataque' : 'Jugadores',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 4),
@@ -363,23 +374,62 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
           jefe == null
               ? 'Escribe el daño del mejor ataque de cada jugador. '
                   'Con eso se calcula X y el nivel del jefe.'
-              : 'Escribe el daño del mejor ataque de cada jugador. '
-                  'La app avisa si el equipo no encaja con el jefe.',
+              : 'Opcional: si escribes el daño del mejor ataque de cada '
+                  'jugador, la app te dice si el equipo es demasiado flojo o '
+                  'demasiado fuerte para este jefe.',
         ),
         const SizedBox(height: 16),
         if (jefe != null) ...[
           Card(
             key: const Key('jefe-elegido'),
-            child: ListTile(
-              title: Text('${jefe.nombre} · Nv. ${jefe.nivel}'),
-              subtitle: Text(
-                '${jefe.hp} HP · equipo recomendado ${textoRango(jefe.nivel)}',
-              ),
-              trailing: TextButton(
-                key: const Key('cambiar-jefe'),
-                onPressed: () =>
-                    ref.read(jefePreelegidoProvider.notifier).fijar(null),
-                child: const Text('Cambiar'),
+            clipBehavior: Clip.antiAlias,
+            margin: EdgeInsets.zero,
+            child: SizedBox(
+              height: 112,
+              child: Row(
+                children: [
+                  SizedBox(width: 128, child: _FotoJefe(jefe: jefe)),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            jefe.nombre,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(fontWeight: FontWeight.w800),
+                          ),
+                          Text(
+                            'Nivel ${jefe.nivel}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(color: const Color(0xFFFFC400)),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${jefe.hp} HP · equipo recomendado '
+                            '${textoRango(jefe.nivel)}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: TextButton(
+                      key: const Key('cambiar-jefe'),
+                      onPressed: () =>
+                          ref.read(jefePreelegidoProvider.notifier).fijar(null),
+                      child: const Text('Cambiar'),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -408,7 +458,8 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
                     key: Key('ataque-$i'),
                     child: CampoNumero(
                       controlador: _filas[i].ataque,
-                      etiqueta: 'Mejor ataque',
+                      etiqueta:
+                          jefe == null ? 'Mejor ataque' : 'Mejor ataque (opcional)',
                       onChanged: (_) => setState(() {}),
                     ),
                   ),
@@ -433,6 +484,36 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
             ),
           ],
         ),
+        if (jefe != null && algunos && !completos) ...[
+          const SizedBox(height: 12),
+          const Text(
+            'Escribe el daño de todos los jugadores para recibir la '
+            'recomendación.',
+            key: Key('faltan-danos'),
+          ),
+        ],
+        if (encaja) ...[
+          const SizedBox(height: 16),
+          Card(
+            key: const Key('equipo-adecuado'),
+            color: Theme.of(context).colorScheme.secondaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Con X = $_x tu equipo encaja con el jefe '
+                      '(${textoRango(jefe.nivel)}).',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
         if (aviso != null) ...[
           const SizedBox(height: 16),
           Card(
@@ -505,7 +586,7 @@ class _PantallaEleccionJefeState extends ConsumerState<PantallaEleccionJefe> {
       children: [
         Text(
           porJefe
-              ? 'Elige el jefe (X = ${estado.x})'
+              ? (estado.x == 0 ? 'Elige el jefe' : 'Elige el jefe (X = ${estado.x})')
               : 'Nivel ${estado.nivel} (X = ${estado.x})',
           key: const Key('nivel-calculado'),
           style: Theme.of(context).textTheme.titleLarge,
@@ -524,7 +605,7 @@ class _PantallaEleccionJefeState extends ConsumerState<PantallaEleccionJefe> {
             jefes: delNivel,
             clave: (j) => Key('catalogo-${j.id}'),
             onElegir: _elegirDelCatalogo,
-            aviso: porJefe
+            aviso: porJefe && estado.x > 0
                 ? (j) => avisoDesajuste(estado.x, j.nivel) == null
                     ? null
                     : 'Fuera de rango'
