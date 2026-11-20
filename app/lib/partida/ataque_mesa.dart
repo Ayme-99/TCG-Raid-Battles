@@ -24,6 +24,8 @@ class AtaqueMesa {
     required this.origen,
     required this.destinos,
     required this.dano,
+    this.reducido = 0,
+    this.extra = 0,
   }) : creado = DateTime.now();
 
   /// Cuándo se registró, para descartar los que se quedaron sin enseñar.
@@ -34,6 +36,14 @@ class AtaqueMesa {
   final List<PuntoMesa> destinos;
   final int dano;
 
+  /// Daño que se ha quitado el objetivo (Bloqueo, aliados Tanque,
+  /// debilitación): se enseña con un escudo. [dano] ya va descontado.
+  final int reducido;
+
+  /// Daño de más que ha puesto la mesa (doble daño, +50 de las cartas de
+  /// ánimo): se enseña con una explosión. Va incluido en [dano].
+  final int extra;
+
   /// Quién ataca, para elegir el color: `jefe`, `aliado` o `jugador`.
   String get atacante => origen.split('-').first;
 }
@@ -41,7 +51,12 @@ class AtaqueMesa {
 /// Qué ataque hay que enseñar para [evento], dado el estado de [antes] de
 /// aplicarlo, o null si el evento no es un ataque o no llega a nada (por
 /// ejemplo, un aliado que ataca a un jugador que ya está KO).
-AtaqueMesa? ataqueDe(EstadoPartida antes, Evento evento, {int id = 0}) {
+AtaqueMesa? ataqueDe(
+  EstadoPartida antes,
+  Evento evento, {
+  int id = 0,
+  int extra = 0,
+}) {
   switch (evento) {
     case AtaqueJefe(:final dano, :final jugador):
       final destinos = jugador != null
@@ -74,18 +89,32 @@ AtaqueMesa? ataqueDe(EstadoPartida antes, Evento evento, {int id = 0}) {
       // Sin daño al jefe (ataca a un aliado o no hace nada) no hay nada que
       // enseñar contra el jefe.
       if (dano <= 0) return null;
+      final quita = reduccionDanoAlJefe(antes, scriptsAliado) +
+          (antes.debilitados[jugador] ?? 0);
+      final neto = dano > quita ? dano - quita : 0;
       return AtaqueMesa(
         id: id,
         origen: puntoJugador(jugador),
         destinos: const [puntoJefe],
-        dano: dano,
+        dano: neto,
+        reducido: dano - neto,
+        extra: extra < 0 ? 0 : (extra > neto ? neto : extra),
       );
     case AtaqueAAliado(:final jugador, :final slot, :final dano):
+      final aliado = antes.aliadoEn(slot);
+      final quita = dano <= 0 || aliado == null
+          ? 0
+          : reduccionDanoAlJefe(antes, scriptsAliado) +
+              reduccionPropiaDe(aliado, scriptsAliado) +
+              (antes.debilitados[jugador] ?? 0);
+      final neto = dano > quita ? dano - quita : 0;
       return AtaqueMesa(
         id: id,
         origen: puntoJugador(jugador),
         destinos: [puntoAliado(slot)],
-        dano: dano,
+        dano: neto,
+        reducido: dano - neto,
+        extra: extra < 0 ? 0 : (extra > neto ? neto : extra),
       );
     default:
       return null;
@@ -102,7 +131,10 @@ class ColaAtaquesMesa extends Notifier<List<AtaqueMesa>> {
 
   /// Añade el ataque de [evento] si lo hay. [antes] es el estado previo.
   void alRegistrar(EstadoPartida antes, Evento evento) {
-    final ataque = ataqueDe(antes, evento, id: _siguiente);
+    // La mesa deja dicho cuánto daño de más lleva el ataque que va a registrar.
+    final extra = ref.read(extraDanoProvider);
+    ref.read(extraDanoProvider.notifier).state = 0;
+    final ataque = ataqueDe(antes, evento, id: _siguiente, extra: extra);
     if (ataque == null) return;
     _siguiente++;
     state = [...state, ataque];
@@ -128,6 +160,10 @@ class ColaAtaquesMesa extends Notifier<List<AtaqueMesa>> {
           if (a.id != id) a,
       ];
 }
+
+/// Daño de más del próximo ataque de un jugador (doble daño, +50): lo deja la
+/// pantalla del turno justo antes de registrar y la cola lo recoge.
+final extraDanoProvider = StateProvider<int>((ref) => 0);
 
 final colaAtaquesMesaProvider =
     NotifierProvider<ColaAtaquesMesa, List<AtaqueMesa>>(ColaAtaquesMesa.new);

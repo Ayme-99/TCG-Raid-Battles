@@ -219,4 +219,47 @@ void main() {
     // Lo que no es un ataque no se anima.
     expect(ataqueDe(estado, const CuracionJefe(10)), isNull);
   });
+
+  testWidgets('el daño que se enseña es el neto: escudo y explosión',
+      (tester) async {
+    final c = await enTurnoDeJugadores(tester);
+    final base = c.read(estadoProvider);
+    // Bronzong (Bloqueo): recibe 100 menos por ataque.
+    final estado = base.copiarCon(aliados: const [
+      AliadoEstado(
+        slot: 0,
+        categoria: CategoriaAliado.tanque,
+        nombre: 'Bronzong',
+        hpMaximo: 100,
+        hp: 100,
+        efectos: EfectosAliado.programa,
+        scriptId: 'bloqueo-100',
+      ),
+    ]);
+
+    final contraBronzong = ataqueDe(
+      estado,
+      const AtaqueAAliado(jugador: 1, slot: 0, dano: 200),
+    )!;
+    expect(contraBronzong.dano, 100);
+    expect(contraBronzong.reducido, 100);
+
+    // Un golpe más flojo que la reducción hace 0.
+    final flojo = ataqueDe(
+      estado,
+      const AtaqueAAliado(jugador: 1, slot: 0, dano: 60),
+    )!;
+    expect(flojo.dano, 0);
+    expect(flojo.reducido, 60);
+
+    // El daño de más que pone la mesa no pasa del daño que llega.
+    final conExplosion = ataqueDe(
+      base,
+      const TurnoJugador(jugador: 0, dano: 150),
+      extra: 50,
+    )!;
+    expect(conExplosion.dano, 150);
+    expect(conExplosion.reducido, 0);
+    expect(conExplosion.extra, 50);
+  });
 }

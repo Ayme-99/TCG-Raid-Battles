@@ -123,6 +123,8 @@ class _EstadoAtaquesEnMesa extends ConsumerState<AtaquesEnMesa>
               origen: origen,
               destinos: destinos,
               dano: ataque.dano,
+              reducido: ataque.reducido,
+              extra: ataque.extra,
               color: switch (ataque.atacante) {
                 'jefe' => const Color(0xFFFF5A3C),
                 'aliado' => const Color(0xFFB26BFF),
@@ -142,6 +144,8 @@ class _PintorAtaque extends CustomPainter {
     required this.origen,
     required this.destinos,
     required this.dano,
+    this.reducido = 0,
+    this.extra = 0,
     required this.color,
   });
 
@@ -149,6 +153,8 @@ class _PintorAtaque extends CustomPainter {
   final Rect origen;
   final List<Rect> destinos;
   final int dano;
+  final int reducido;
+  final int extra;
   final Color color;
 
   // Fases (0 a 1): la cámara llega, carga, vuelo del proyectil e impacto.
@@ -250,6 +256,14 @@ class _PintorAtaque extends CustomPainter {
     // El daño sube y se desvanece.
     final subida = Curves.easeOut.transform(k);
     final aparece = Curves.easeOutBack.transform(_tramo(_inicioImpacto, 0.72));
+    final altoNumero = centro.dy - 30 - 70 * subida;
+    final visible = 1 - _tramo(0.85, 1);
+    if (extra > 0) {
+      _explosion(canvas, Offset(centro.dx, altoNumero), aparece, visible);
+    }
+    if (reducido > 0) {
+      _escudo(canvas, Offset(centro.dx, altoNumero), aparece, visible);
+    }
     final texto = TextPainter(
       text: TextSpan(
         text: dano > 0 ? '-$dano' : '0',
@@ -267,7 +281,82 @@ class _PintorAtaque extends CustomPainter {
     )..layout();
     texto.paint(
       canvas,
-      Offset(centro.dx - texto.width / 2, centro.dy - 30 - 70 * subida - texto.height / 2),
+      Offset(centro.dx - texto.width / 2, altoNumero - texto.height / 2),
+    );
+    if (extra > 0 || reducido > 0) {
+      final partes = [
+        if (reducido > 0) '−$reducido',
+        if (extra > 0) '+$extra',
+      ].join('  ');
+      final nota = TextPainter(
+        text: TextSpan(
+          text: partes,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            color: (extra > 0 ? const Color(0xFFFFD54F) : const Color(0xFF81D4FA))
+                .withValues(alpha: visible),
+            shadows: const [Shadow(color: Colors.black87, blurRadius: 6)],
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      nota.paint(
+        canvas,
+        Offset(centro.dx - nota.width / 2, altoNumero + texto.height / 2 + 2),
+      );
+    }
+  }
+
+  /// Estrella de picos detrás del número: el daño de más.
+  void _explosion(Canvas canvas, Offset c, double escala, double visible) {
+    final radio = 70.0 * escala.clamp(0.0, 1.3);
+    const picos = 12;
+    final camino = Path();
+    for (var i = 0; i < picos * 2; i++) {
+      final r = i.isEven ? radio : radio * 0.62;
+      final a = i * math.pi / picos - math.pi / 2;
+      final p = c + Offset(math.cos(a), math.sin(a)) * r;
+      i == 0 ? camino.moveTo(p.dx, p.dy) : camino.lineTo(p.dx, p.dy);
+    }
+    camino.close();
+    canvas.drawPath(
+      camino,
+      Paint()
+        ..color = const Color(0xFFFF9100).withValues(alpha: 0.9 * visible)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
+    );
+    canvas.drawPath(
+      camino,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4
+        ..color = const Color(0xFFFFEB3B).withValues(alpha: visible),
+    );
+  }
+
+  /// Escudo detrás del número: el daño que se ha quitado el objetivo.
+  void _escudo(Canvas canvas, Offset c, double escala, double visible) {
+    final k = escala.clamp(0.0, 1.3);
+    final ancho = 64.0 * k;
+    final alto = 78.0 * k;
+    final camino = Path()
+      ..moveTo(c.dx - ancho, c.dy - alto * 0.8)
+      ..lineTo(c.dx + ancho, c.dy - alto * 0.8)
+      ..lineTo(c.dx + ancho, c.dy + alto * 0.1)
+      ..quadraticBezierTo(c.dx + ancho, c.dy + alto * 0.7, c.dx, c.dy + alto)
+      ..quadraticBezierTo(c.dx - ancho, c.dy + alto * 0.7, c.dx - ancho, c.dy + alto * 0.1)
+      ..close();
+    canvas.drawPath(
+      camino,
+      Paint()..color = const Color(0xFF1565C0).withValues(alpha: 0.85 * visible),
+    );
+    canvas.drawPath(
+      camino,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 5
+        ..color = const Color(0xFFB3E5FC).withValues(alpha: visible),
     );
   }
 
