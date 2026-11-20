@@ -63,6 +63,14 @@ Future<void> prepararPartida(WidgetTester tester, {int hp = 100}) async {
   await elegirJefeDePrueba(tester, hp: hp);
 }
 
+String danoEscrito(WidgetTester tester) => tester
+    .widget<TextField>(find.descendant(
+      of: find.byKey(const Key('dano-turno')),
+      matching: find.byType(TextField),
+    ))
+    .controller!
+    .text;
+
 Future<void> turno(WidgetTester tester, String dano) async {
   await escribir(tester, 'dano-turno', dano);
   await tocar(tester, 'registrar-turno');
@@ -157,6 +165,54 @@ void main() {
     expect(find.byKey(const Key('turno-del-jefe')), findsNothing);
     await tocar(tester, 'robar-carta-jefe');
     expect(find.byKey(const Key('turno-del-jefe')), findsOneWidget);
+  });
+
+  testWidgets('el daño del turno se ajusta con pasos y el número es editable',
+      (tester) async {
+    final c = await abrir(tester);
+    await prepararPartida(tester, hp: 500);
+    await tocar(tester, 'dano-mas-50');
+    await tocar(tester, 'dano-mas-10');
+    await tocar(tester, 'dano-mas-10');
+    await tocar(tester, 'dano-menos-10');
+    expect(danoEscrito(tester), '60');
+    // Nunca baja de 0.
+    await tocar(tester, 'dano-menos-10');
+    await tocar(tester, 'dano-menos-10');
+    await tocar(tester, 'dano-menos-10');
+    await tocar(tester, 'dano-menos-10');
+    await tocar(tester, 'dano-menos-10');
+    await tocar(tester, 'dano-menos-10');
+    await tocar(tester, 'dano-menos-10');
+    expect(danoEscrito(tester), '0');
+    await tocar(tester, 'dano-mas-50');
+    await tocar(tester, 'registrar-turno');
+    expect(c.read(estadoProvider).jefe!.hp, 450);
+  });
+
+  testWidgets('fijar daño: se repite en los turnos del jugador y se quita',
+      (tester) async {
+    final c = await abrir(tester);
+    await prepararPartida(tester, hp: 1000);
+    await tocar(tester, 'dano-mas-50');
+    await tocar(tester, 'dano-mas-10');
+    await tocar(tester, 'fijar-dano');
+    await tocar(tester, 'registrar-turno');
+    // El otro jugador empieza de cero.
+    expect(danoEscrito(tester), '0');
+    await tocar(tester, 'registrar-turno');
+    await tocar(tester, 'robar-carta-jefe');
+    await escribir(tester, 'dano-jefe', '10');
+    await tocar(tester, 'objetivo-1');
+    await tocar(tester, 'registrar-ataque-jefe');
+    await tocar(tester, 'fin-turno-jefe');
+    expect(c.read(estadoProvider).fase, Fase.turnoJugadores);
+    // Vuelve el primero con su daño de 60 ya puesto.
+    expect(danoEscrito(tester), '60');
+    expect(c.read(danoFijadoProvider), {c.read(estadoProvider).jugadorActual!: 60});
+    await tocar(tester, 'fijar-dano');
+    await tocar(tester, 'registrar-turno');
+    expect(c.read(danoFijadoProvider), isEmpty);
   });
 
   testWidgets('victoria: el fin de partida muestra el resultado sin puntos', (tester) async {

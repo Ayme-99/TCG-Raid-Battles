@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
@@ -113,12 +116,51 @@ class _TurnoActual extends ConsumerStatefulWidget {
 }
 
 class _TurnoActualState extends ConsumerState<_TurnoActual> {
-  final _dano = TextEditingController();
+  late final TextEditingController _dano;
+  late bool _fijado;
+  Timer? _repeticion;
+
+  @override
+  void initState() {
+    super.initState();
+    final fijo = ref.read(danoFijadoProvider)[widget.jugador];
+    _fijado = fijo != null && !widget.estado.enKo(widget.jugador);
+    _dano = TextEditingController(text: _fijado ? '$fijo' : '0');
+  }
 
   @override
   void dispose() {
+    _repeticion?.cancel();
     _dano.dispose();
     super.dispose();
+  }
+
+  int get _valor => int.tryParse(_dano.text) ?? 0;
+
+  void _sumar(int paso) {
+    final v = (_valor + paso).clamp(0, 9999);
+    setState(() => _dano.text = '$v');
+  }
+
+  void _empezarRepeticion(int paso) {
+    _repeticion?.cancel();
+    _repeticion =
+        Timer.periodic(const Duration(milliseconds: 90), (_) => _sumar(paso));
+  }
+
+  void _pararRepeticion() {
+    _repeticion?.cancel();
+    _repeticion = null;
+  }
+
+  void _guardarFijado() {
+    final mapa = {...ref.read(danoFijadoProvider)};
+    if (_fijado) {
+      mapa[widget.jugador] = _valor;
+    } else {
+      mapa.remove(widget.jugador);
+    }
+    ref.read(danoFijadoProvider.notifier).state = mapa;
   }
 
   Future<void> _atacarAliado() async {
@@ -263,12 +305,53 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                 ),
               ),
             const SizedBox(height: 12),
-            KeyedSubtree(
-              key: const Key('dano-turno'),
-              child: CampoNumero(
-                controlador: _dano,
-                etiqueta: 'Daño al jefe (vacío: 0)',
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: KeyedSubtree(
+                    key: const Key('dano-turno'),
+                    child: TextField(
+                      controller: _dano,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                      decoration: const InputDecoration(
+                        labelText: 'Daño al jefe',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  key: const Key('fijar-dano'),
+                  selected: _fijado,
+                  avatar: Icon(_fijado ? Icons.lock : Icons.lock_open),
+                  label: Text(_fijado ? 'Fijado' : 'Fijar'),
+                  onSelected: (v) => setState(() => _fijado = v),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                for (final paso in const [-10, 10, 50]) ...[
+                  Expanded(
+                    child: GestureDetector(
+                      onLongPressStart: (_) => _empezarRepeticion(paso),
+                      onLongPressEnd: (_) => _pararRepeticion(),
+                      onLongPressCancel: _pararRepeticion,
+                      child: OutlinedButton(
+                        key: Key('dano-${paso < 0 ? 'menos' : 'mas'}-${paso.abs()}'),
+                        onPressed: () => _sumar(paso),
+                        child: Text(paso < 0 ? '−${-paso}' : '+$paso'),
+                      ),
+                    ),
+                  ),
+                  if (paso != 50) const SizedBox(width: 8),
+                ],
+              ],
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -277,14 +360,14 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
               children: [
                 FilledButton(
                   key: const Key('registrar-turno'),
-                  onPressed: () => registrar(
-                    context,
-                    ref,
-                    TurnoJugador(
-                      jugador: widget.jugador,
-                      dano: int.tryParse(_dano.text) ?? 0,
-                    ),
-                  ),
+                  onPressed: () {
+                    _guardarFijado();
+                    registrar(
+                      context,
+                      ref,
+                      TurnoJugador(jugador: widget.jugador, dano: _valor),
+                    );
+                  },
                   child: const Text('Registrar turno'),
                 ),
                 if (estado.aliados.isNotEmpty)
