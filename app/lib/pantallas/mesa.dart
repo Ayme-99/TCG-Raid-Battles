@@ -18,6 +18,7 @@ import 'monedas_en_mesa.dart';
 import 'panel_acciones.dart';
 import 'paneles.dart';
 import 'tarjeta_jefe.dart';
+import 'comun.dart';
 
 /// Hacia dónde mira la cámara de la mesa (T-47).
 sealed class FocoCamara {
@@ -417,7 +418,7 @@ class _BotonInfo extends StatelessWidget {
       key: const Key('info-ronda'),
       etiqueta: 'Orden de la ronda y efectos activos',
       tamano: 44,
-      onPressed: () => showDialog<void>(
+      onPressed: () => mostrarDialogo<void>(
         context: context,
         builder: (dialogo) => Dialog(
           child: ConstrainedBox(

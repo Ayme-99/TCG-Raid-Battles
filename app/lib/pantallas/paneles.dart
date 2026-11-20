@@ -16,7 +16,7 @@ Future<void> registrarDanoDeEfecto(
   WidgetRef ref, {
   int? slotInicial,
 }) async {
-  final evento = await showDialog<DanoDeEfecto>(
+  final evento = await mostrarDialogo<DanoDeEfecto>(
     context: context,
     builder: (_) => _DialogoDanoDeEfecto(slotInicial: slotInicial),
   );

@@ -52,22 +52,39 @@ class _EstadoMonedas extends ConsumerState<MonedasEnMesa>
       builder: (context, caja) {
         final w = caja.maxWidth;
         final h = caja.maxHeight;
-        final lado = max(
-          34.0,
-          min(w * 0.08, 64.0) * (n > 8 ? 0.78 : (n > 4 ? 0.9 : 1.0)),
-        );
-        final columnas = min(n, 5);
+        // Ante un jugador caen justo encima de su asiento. Las del jefe y las de
+        // los aliados caen a un lado del panel del jefe, en el anillo libre,
+        // para no tapar su nombre ni su vida: las del jefe a la derecha y las
+        // de los aliados a la izquierda.
+        final alLado = t.lugar != LugarMoneda.asiento;
+        final reduccion = alLado
+            ? (n > 6 ? 0.7 : (n > 3 ? 0.85 : 1.0))
+            : (n > 8 ? 0.78 : (n > 4 ? 0.9 : 1.0));
+        final lado = max(34.0 * (alLado ? 0.8 : 1.0), min(w * 0.08, 64.0) * reduccion);
+        final columnas = alLado ? min(n, n > 6 ? 4 : 3) : min(n, 5);
         final filas = (n / columnas).ceil();
         final espacioX = lado * 1.35;
         final espacioY = lado * 1.0;
-        // Dónde caen: ante el jugador, ante los aliados o ante el jefe.
+        final anchoGrupo = columnas * espacioX;
+        // Mitad del ancho del panel del jefe, más un margen.
+        final aLaDerecha = t.lugar == LugarMoneda.jefe;
+        final xLado = aLaDerecha
+            ? w * 0.62 + anchoGrupo / 2
+            : w * 0.38 - anchoGrupo / 2;
         final centro = switch (t.lugar) {
           LugarMoneda.asiento => Offset(
               (t.asiento + 0.5) / widget.asientos * w,
               (alturaJefe + alturaAliados) * h - lado * 0.5 - (filas - 1) * espacioY / 2,
             ),
-          LugarMoneda.aliados => Offset(w * 0.5, (alturaJefe + alturaAliados * 0.5) * h),
-          LugarMoneda.jefe => Offset(w * 0.5, (alturaJefe + alturaAliados * 0.2) * h),
+          _ => Offset(
+              xLado
+                  .clamp(
+                    anchoGrupo / 2 + lado,
+                    max(anchoGrupo / 2 + lado, w - anchoGrupo / 2 - lado),
+                  )
+                  .toDouble(),
+              (alturaJefe + alturaAliados * 0.6) * h,
+            ),
         };
         final monedas = <_Posicion>[];
         for (var i = 0; i < n; i++) {

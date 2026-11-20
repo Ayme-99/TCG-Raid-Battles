@@ -5,6 +5,7 @@ import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../partida/controlador_partida.dart';
 import 'aviso_central.dart';
+import 'fondo_menu.dart';
 
 export 'aviso_central.dart' show Aviso, TipoAviso;
 
@@ -28,6 +29,20 @@ String etiquetaCategoria(CategoriaAliado c) => switch (c) {
       CategoriaAliado.potenciador => 'Potenciador',
       CategoriaAliado.debilitador => 'Debilitador',
     };
+
+/// Un diálogo con el tema oscuro del juego: sin esto salen con el tema claro
+/// de la app, que desentona sobre la mesa.
+Future<T?> mostrarDialogo<T>({
+  required BuildContext context,
+  required WidgetBuilder builder,
+  bool barrierDismissible = true,
+}) {
+  return showDialog<T>(
+    context: context,
+    barrierDismissible: barrierDismissible,
+    builder: (c) => Theme(data: temaSobreFondoMenu(), child: Builder(builder: builder)),
+  );
+}
 
 /// Muestra un aviso en medio de la pantalla (ver `mostrarAvisoCentral`).
 /// Si el texto trae varias líneas, cada una es un aviso. Salen de uno en uno;
@@ -59,7 +74,7 @@ Future<void> avisarMesa(
   required List<String> lineas,
 }) {
   if (lineas.isEmpty) return Future.value();
-  return showDialog<void>(
+  return mostrarDialogo<void>(
     context: context,
     barrierDismissible: false,
     builder: (c) => AlertDialog(
@@ -94,7 +109,7 @@ Future<bool?> preguntarMesa(
   String si = 'Sí',
   String no = 'No',
 }) =>
-    showDialog<bool>(
+    mostrarDialogo<bool>(
       context: context,
       builder: (c) => AlertDialog(
         content: Text(pregunta),
@@ -154,7 +169,7 @@ void preguntarRebote(
   required int puntos,
 }) {
   final nombre = ref.read(estadoProvider).jugadores[jugador].nombre;
-  showDialog<void>(
+  mostrarDialogo<void>(
     context: context,
     builder: (dialogo) => AlertDialog(
       key: const Key('dialogo-rebote'),
@@ -190,7 +205,7 @@ Future<int?> pedirNumero(
   required String titulo,
   required String etiqueta,
 }) {
-  return showDialog<int>(
+  return mostrarDialogo<int>(
     context: context,
     builder: (_) => _DialogoNumero(titulo: titulo, etiqueta: etiqueta),
   );
@@ -246,7 +261,7 @@ Future<int?> elegirJugador(
   required String titulo,
   required List<int> asientos,
 }) {
-  return showDialog<int>(
+  return mostrarDialogo<int>(
     context: context,
     builder: (context) => SimpleDialog(
       title: Text(titulo),

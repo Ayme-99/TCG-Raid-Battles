@@ -98,7 +98,7 @@ class PantallaFinPartida extends ConsumerWidget {
     bool revancha = false,
   }) async {
     if (!guardada) {
-      final descartar = await showDialog<bool>(
+      final descartar = await mostrarDialogo<bool>(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('¿Empezar sin guardar?'),

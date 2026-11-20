@@ -309,7 +309,7 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
   /// «Abandonar» ofrece dos salidas: Salir (la partida ya está guardada y se
   /// continúa desde el inicio) o Rendirse (termina en derrota, #235).
   Future<void> _abandonar(BuildContext context, WidgetRef ref) async {
-    final opcion = await showDialog<String>(
+    final opcion = await mostrarDialogo<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('¿Abandonar la partida?'),
