@@ -134,6 +134,8 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
     // ocupa el botón «atrás» de la izquierda.
     final preparando =
         estado.fase == Fase.preparacion || estado.fase == Fase.eleccionJefe;
+    // Al terminar sigue el fondo oscuro del menú, como al prepararla.
+    final sobreFondo = preparando || estado.fase == Fase.terminada;
     final acciones = <Widget>[
       if (!enSala && !preparando)
       IconButton(
@@ -182,12 +184,12 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
     // Mientras se prepara la partida sigue el fondo del menú; al empezar,
     // el de la mesa.
     final escenario = Scaffold(
-      backgroundColor: preparando ? Colors.transparent : null,
+      backgroundColor: sobreFondo ? Colors.transparent : null,
       // En juego no hay barra: la mesa llena la pantalla y la barra flota.
       appBar: enJuego
           ? null
           : AppBar(
-              backgroundColor: preparando ? Colors.transparent : null,
+              backgroundColor: sobreFondo ? Colors.transparent : null,
               // Fuera de la mesa también se puede volver al inicio: no se
               // pierde nada, la partida queda guardada (#235).
               leadingWidth: preparando && !enSala ? 68 : null,
@@ -233,7 +235,7 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
               ),
             ),
     );
-    final mesa = preparando
+    final mesa = sobreFondo
         ? Theme(
             data: temaSobreFondoMenu(),
             child: Stack(
