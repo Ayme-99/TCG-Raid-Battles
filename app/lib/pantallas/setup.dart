@@ -448,6 +448,7 @@ class _PantallaJugadoresState extends ConsumerState<PantallaJugadores> {
                     onChanged: i == 0 ? (_) => _nombreEditado = true : null,
                     decoration: const InputDecoration(
                       labelText: 'Nombre',
+                      filled: true,
                       border: OutlineInputBorder(),
                     ),
                   ),

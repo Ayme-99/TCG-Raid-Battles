@@ -306,6 +306,7 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                   '${provocador.nombre} obliga a atacarle: ataca a ese '
                   'aliado o pasa el turno sin dañar al jefe.',
                   key: const Key('aviso-bloqueo'),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
             if (recordatorios.isNotEmpty)
@@ -314,15 +315,19 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                 padding: const EdgeInsets.only(top: 4),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [for (final r in recordatorios) Text('• $r')],
+                  children: [
+                    for (final r in recordatorios)
+                      Text('• $r', style: Theme.of(context).textTheme.bodyLarge),
+                  ],
                 ),
               ),
             if (conAliado)
-              const Padding(
-                padding: EdgeInsets.only(top: 4),
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
                 child: Text(
                   'Tiene un aliado en su slot: puede atacarlo o ignorarlo y '
                   'dañar al jefe (el aliado atacará igualmente).',
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
             const SizedBox(height: 12),
@@ -497,6 +502,7 @@ class _SentadosPorKo extends ConsumerWidget {
               '$nombre no actúa este turno por tener un Pokémon KO: solo roba '
               'una carta de ánimo. Los ataques del jefe y de sus aliados '
               'contra él fallan.',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 12),
             FilledButton.icon(
