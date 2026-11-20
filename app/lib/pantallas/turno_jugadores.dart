@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
+import '../partida/ataque_mesa.dart';
 import '../partida/controlador_partida.dart';
 import '../sala/controlador_sala.dart';
 import '../partida/recordatorios.dart';
@@ -148,6 +149,10 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
     return d;
   }
 
+  /// Daño de más que ponen las cartas de ánimo sobre el escrito, para la
+  /// explosión del ataque.
+  int get _extraAnimo => _valor > 0 ? _danoFinal - _valor : 0;
+
   void _gastarDoble() {
     if (!_doble) return;
     ref.read(dobleUsadoProvider.notifier).state = widget.estado.ronda;
@@ -197,6 +202,7 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
               );
     if (slot == null || !mounted) return;
     final dano = _danoFinal;
+    final extra = _extraAnimo;
     _gastarDoble();
     _guardarFijado();
     final aliado = estado.aliadoEn(slot);
@@ -242,6 +248,7 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
       }
       if (!mounted) return;
     }
+    ref.read(extraDanoProvider.notifier).state = evita ? 0 : extra;
     final aplicado = registrar(
       context,
       ref,
@@ -410,6 +417,7 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                   onPressed: () {
                     _guardarFijado();
                     final dano = _danoFinal;
+                    ref.read(extraDanoProvider.notifier).state = _extraAnimo;
                     _gastarDoble();
                     registrar(
                       context,
