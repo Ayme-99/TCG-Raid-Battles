@@ -306,7 +306,7 @@ List<Evento> turnoJefeAutomatico(
 
   // Ataques del jefe. Sin nadie a quien atacar (todos KO) fallan y no hay
   // carta que robar.
-  final maximo = maxAtaquesJefePorTurno(jefe.nivel);
+  final maximo = maxAtaquesJefeEnTurno(s, jefe.nivel);
   while (!s.terminada && s.ataquesJefeEnTurno < maximo) {
     final objetivos = {
       for (final j in s.jugadores)

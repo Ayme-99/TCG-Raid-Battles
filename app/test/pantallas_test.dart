@@ -272,11 +272,62 @@ void main() {
     expect(estado.fase, Fase.turnoJugadores);
     expect(estado.ronda, 2);
     // El jugador con un Pokémon KO se sienta el turno (solo roba carta de
-    // ánimo, fuera de la app) y los ataques contra él fallan.
+    // ánimo) y los ataques contra él fallan.
     expect(estado.orden, [1]);
     expect(find.byKey(const Key('sentados-ko')), findsOneWidget);
     expect(estado.enKo(0), isTrue);
     expect(estado.enKo(1), isFalse);
+  });
+
+  /// Deja la ronda 2 con el jugador 0 sentado por KO (carta de ánimo por
+  /// robar) y 500 de vida en el jefe.
+  Future<ProviderContainer> llegarASentados(
+    WidgetTester tester,
+    int valorAzar,
+  ) async {
+    final c = await abrir(tester, azar: _AzarFijo([valorAzar]));
+    await prepararPartida(tester, hp: 500);
+    await turno(tester, '0');
+    await turno(tester, '0');
+    await tocar(tester, 'robar-carta-jefe');
+    await escribir(tester, 'dano-jefe', '80');
+    await tocar(tester, 'objetivo-1');
+    await tocar(tester, 'registrar-ataque-jefe');
+    await tocar(tester, 'ko-0');
+    await tocar(tester, 'fin-turno-jefe');
+    return c;
+  }
+
+  testWidgets('carta de ánimo: la app la roba y bloquea el turno hasta entonces',
+      (tester) async {
+    final c = await llegarASentados(tester, 4);
+    // Hasta que roba, no hay panel de turno para los demás.
+    expect(find.byKey(const Key('turno-de')), findsNothing);
+    await tocar(tester, 'robar-carta-animo');
+
+    final estado = c.read(estadoProvider);
+    expect(estado.cartasAnimoPendientes, isEmpty);
+    expect(estado.cartasAnimo.single.carta, 5);
+    expect(find.byKey(const Key('sentados-ko')), findsNothing);
+    // +50: la app lo suma al ataque del jugador.
+    await tocar(tester, 'dano-mas-50');
+    expect(find.byKey(const Key('dano-con-animo')), findsOneWidget);
+    await tocar(tester, 'registrar-turno');
+    expect(c.read(estadoProvider).jefe!.hp, 400);
+  });
+
+  testWidgets('carta de ánimo 1: doble daño una sola vez por carta',
+      (tester) async {
+    final c = await llegarASentados(tester, 0);
+    await tocar(tester, 'robar-carta-animo');
+    expect(c.read(estadoProvider).cartasAnimo.single.carta, 1);
+    await tocar(tester, 'doble-dano');
+    await tocar(tester, 'dano-mas-50');
+    await tocar(tester, 'registrar-turno');
+    expect(c.read(estadoProvider).jefe!.hp, 400);
+    // El doble ya se gastó: no vuelve a ofrecerse.
+    expect(c.read(dobleUsadoProvider), c.read(estadoProvider).ronda);
+    expect(find.byKey(const Key('doble-dano')), findsNothing);
   });
 
   testWidgets('el daño por efecto al jefe se atribuye al jugador elegido',

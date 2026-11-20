@@ -53,7 +53,7 @@ class _PantallaTurnoJefeState extends ConsumerState<PantallaTurnoJefe> {
       _chequeoHecho = false;
     }
     final registrados = estado.ataquesJefeEnTurno;
-    final maximo = maxAtaquesJefePorTurno(jefe.nivel);
+    final maximo = maxAtaquesJefeEnTurno(estado, jefe.nivel);
     final carta = _carta;
     // Con todos los jugadores KO los ataques del jefe fallan: no hay carta
     // que robar y se sigue con el resto del turno.

@@ -60,6 +60,7 @@ class ControladorPartida extends Notifier<Historial> {
     ref.read(colaAtaquesMesaProvider.notifier).limpiar();
     ref.read(enfoqueAtaqueProvider.notifier).state = null;
     ref.read(danoFijadoProvider.notifier).state = const {};
+    ref.read(dobleUsadoProvider.notifier).state = -1;
     salirDeSala();
     _olvidarIdentidad();
     state = Historial.nuevo();
@@ -188,6 +189,10 @@ class ControladorPartida extends Notifier<Historial> {
 /// Daño fijado por jugador (asiento → daño): se rellena solo en sus turnos
 /// siguientes, para repetir el mismo ataque varias rondas.
 final danoFijadoProvider = StateProvider<Map<int, int>>((ref) => const {});
+
+/// Ronda en la que ya se usó el «doble daño» de la carta de ánimo 1 (una sola
+/// vez por carta); -1 si no se ha usado.
+final dobleUsadoProvider = StateProvider<int>((ref) => -1);
 
 final partidaInicialProvider = Provider<PartidaGuardada?>((ref) => null);
 

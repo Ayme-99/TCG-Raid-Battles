@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'estado.dart';
+
 /// Carta del mazo de ataques del jefe (Incursión Max, 20 cartas): qué ataque
 /// usa el jefe, contra qué jugador y si hay que robar otra carta.
 final class CartaAtaqueJefe {
@@ -46,6 +48,11 @@ final List<CartaAtaqueJefe> cartasAtaqueJefe = List.unmodifiable([
 /// Máximo de ataques del jefe en un turno según su nivel: nivel + 1 (Nv1: 2,
 /// Nv2: 3, Nv3: 4; el Nv4, propio de este formato, 5, como en D-03).
 int maxAtaquesJefePorTurno(int nivel) => nivel + 1;
+
+/// Máximo de ataques del jefe en el turno actual: con la carta de ánimo 4 de
+/// la ronda, uno solo; si no, el de su nivel.
+int maxAtaquesJefeEnTurno(EstadoPartida estado, int nivel) =>
+    estado.cartaAnimoEnRonda(4) ? 1 : maxAtaquesJefePorTurno(nivel);
 
 /// Las cartas del mazo según los jugadores de la partida:
 ///
