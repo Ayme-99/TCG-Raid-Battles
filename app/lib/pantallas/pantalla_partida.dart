@@ -73,8 +73,9 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
     }
   }
 
-  /// Espera a que la mesa termine de enseñar los ataques en cola (con un tope,
-  /// por si la mesa no llegara a enseñarlos).
+  /// Espera a que la mesa termine de enseñar los ataques en cola. Si la mesa
+  /// se va antes (la partida termina), la espera queda sin efecto con esta
+  /// pantalla.
   Future<void> _esperarAtaques() async {
     if (ref.read(colaAtaquesMesaProvider).isEmpty) return;
     final fin = Completer<void>();
@@ -82,9 +83,7 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
       if (cola.isEmpty && !fin.isCompleted) fin.complete();
     });
     try {
-      await fin.future.timeout(const Duration(seconds: 12));
-    } on TimeoutException {
-      // Se sigue igualmente.
+      await fin.future;
     } finally {
       suscripcion.close();
     }
