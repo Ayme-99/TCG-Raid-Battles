@@ -4,15 +4,15 @@ Estado: decidido (2026-11-05). Issue #18.
 
 ## 1. Qué es la carta de ánimo
 
-El jugador cuyo Pokémon activo cae KO (y al que le queda otro Pokémon) **se sienta su siguiente turno y solo roba una carta de ánimo (Cheer)**, como en la carta oficial (T-72). La carta se roba en la mesa: la app ya no la pide (TODO). Mientras está KO, los ataques del jefe (se descarta la carta y se roba otra) y de sus aliados (se omiten) contra él fallan; vale desde la caída hasta el final de la ronda siguiente.
+El jugador cuyo Pokémon activo cae KO (y al que le queda otro Pokémon) **se sienta su siguiente turno y solo roba una carta de ánimo (Cheer)**, como en la carta oficial (T-72). La app la roba al empezar la ronda, al azar entre las 5, con un aviso animado; hasta que la roba no sale el panel de turno de los demás (T-104). Mientras está KO, los ataques del jefe (se descarta la carta y se roba otra) y de sus aliados (se omiten) contra él fallan; vale desde la caída hasta el final de la ronda siguiente.
 
-La base son las **5 cartas oficiales de Cheer**, que se resuelven en la mesa (el asistente no computa su efecto, solo puede registrar cuál salió):
+La base son las **5 cartas oficiales de Cheer**. La app aplica los efectos que puede (marcados abajo) y recuerda los demás a la mesa, que los resuelve:
 
-1. Un Pokémon a elección hace doble daño este turno.
-2. Cura 80 de daño a cada Pokémon de los jugadores.
-3. Cura todo el daño de 1 Pokémon.
-4. El jefe no puede jugar más de una carta el próximo turno.
-5. Los ataques de todos los Pokémon de los jugadores hacen 50 más de daño este turno.
+1. Un Pokémon a elección hace doble daño este turno. *La app:* ficha ×2 en el panel de turno, una sola vez por carta.
+2. Cura 80 de daño a cada Pokémon de los jugadores. *La mesa:* la app lo avisa y espera a que se pulse «Hecho».
+3. Cura todo el daño de 1 Pokémon. *La mesa*, con el mismo aviso.
+4. El jefe no puede jugar más de una carta el próximo turno. *La app:* limita sus ataques a 1 (`maxAtaquesJefeEnTurno`).
+5. Los ataques de todos los Pokémon de los jugadores hacen 50 más de daño este turno. *La app:* suma 50 a cada ataque de la ronda (si hace daño).
 
 Decidido (2026-11-14): se quedan estas 5 cartas, una de cada, con la misma probabilidad. El sistema sigue abierto: según se desarrolle el juego se podrán añadir cartas y mecánicas nuevas.
 

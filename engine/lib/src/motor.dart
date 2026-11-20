@@ -180,7 +180,7 @@ EstadoPartida _elegirJefe(EstadoPartida e, ElegirJefe ev) {
 }
 
 /// Prepara la ronda siguiente. Los jugadores con un Pokémon KO se sientan
-/// su turno (solo roban carta de ánimo, fuera de la app: TODO); actúan los
+/// su turno (solo roban carta de ánimo, que roba la app); actúan los
 /// demás por orden de asiento. Si no queda nadie que actúe, pasa directo al
 /// turno del jefe.
 EstadoPartida _empezarRonda(EstadoPartida e) {

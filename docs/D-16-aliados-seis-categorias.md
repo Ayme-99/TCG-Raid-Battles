@@ -1,6 +1,6 @@
 # D-16 · Aliados con 6 categorías
 
-Estado: **cerrada** (2026-11-08). Issue #116. Propuesta de Ayme; nada de esto está en el motor, el contrato ni el catálogo.
+Estado: **cerrada** (2026-11-08). Issue #116. Propuesta de Ayme; hoy está en el motor (6 categorías), el contrato (v6) y el catálogo.
 
 Amplía D-13: cada jefe pasa de 4 a **6 aliados, uno por categoría**, para que dos partidas contra el mismo jefe se parezcan menos entre sí. D-04 (slots, bloqueo, ayuda, objetivo del aliado, exceso de daño, umbrales) y el resto de D-13 no cambian.
 
@@ -41,7 +41,7 @@ Potenciador y Debilitador se distinguen por a quién afectan: el primero mejora 
 
 ## 4. Decisiones (2026-11-08)
 
-1. **El Pícaro desaparece: pasa a llamarse Control.** Conserva lo suyo (estados alterados, fuerza, contadores de daño) y sigue siendo el **único que ataca a la Banca**. El Debilitador es una categoría nueva.
+1. **El Pícaro desaparece: pasa a llamarse Control.** Conserva lo suyo (estados alterados, fuerza, contadores de daño). *Ya no ataca a la Banca:* ningún aliado lo hace. El Debilitador es una categoría nueva.
 2. **Tanque y Debilitador se separan por a quién actúan:** el Tanque **protege al jefe** (y a su bando); el Debilitador **reduce a los jugadores** (a un jugador concreto o a sus recursos). La reducción global del daño al jefe (`tanque-jefe-N`) sigue siendo del Tanque.
 3. **Potenciador: la app suma el bonus al daño del ataque** (del jefe y/o de los aliados) mientras viva, y **muestra el valor total** al registrar el ataque. El evento guarda el daño final, como con el Tanque. Si el Potenciador cae, deja de sumar.
 4. **Los 6 aliados en todos los jefes.** 8 aliados nuevos con los 4 jefes actuales, 14 con los 7 de lanzamiento.

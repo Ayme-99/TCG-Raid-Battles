@@ -13,7 +13,7 @@ Asistente de combate para **Incursiones**, un formato cooperativo casero de Pok�
 - 4 jefes en el catálogo (Onix, Manectric, Kingdra y Arceus), cada uno con 6 aliados.
 - Condiciones de victoria/derrota, curación del jefe, estados, puntos y envío de resultados al servidor.
 
-Pendiente: playtests en papel (los valores de balance salen del simulador), partida multi-dispositivo y el resto del [tablero](https://github.com/users/Ayme-99/projects/10). El diseño de juego está en el [Game Design Document](./incursiones_gdd.md).
+Pendiente: playtests en papel (los valores de balance salen del simulador), el formato digital y el modo campaña (sin diseñar), las salas multi-dispositivo (en pruebas, aparcadas) y el resto del [tablero](https://github.com/users/Ayme-99/projects/10). El diseño de juego está en el [Game Design Document](./incursiones_gdd.md).
 
 ## Planteamiento técnico
 

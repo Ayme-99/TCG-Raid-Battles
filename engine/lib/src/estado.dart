@@ -444,7 +444,7 @@ class EstadoPartida {
   bool get terminada => fase == Fase.terminada;
 
   /// El jugador [j] está KO: tiene un Pokémon KO y se sienta su turno (solo
-  /// roba carta de ánimo, fuera de la app). Va desde el KO hasta el final de
+  /// roba carta de ánimo). Va desde el KO hasta el final de
   /// la ronda siguiente: los ataques del jefe y de sus aliados contra él
   /// fallan.
   bool enKo(int j) =>

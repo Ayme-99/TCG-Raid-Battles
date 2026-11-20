@@ -9,7 +9,7 @@ La preparación de la partida decide qué nivel de jefe toca. Hay tres modos; so
 | Modo | Cómo se decide el nivel | Estado |
 |---|---|---|
 | **1. Por equipo** | Cada jugador indica el daño de su Pokémon; el equipo da un nivel y se elige un jefe entre los de ese nivel. | Ya está |
-| **2. Por jefe** | Se elige el jefe. Su nivel es el de la partida y su tarjeta muestra el daño máximo recomendado. | A construir |
+| **2. Por jefe** | Se elige el jefe. Su nivel es el de la partida y su tarjeta muestra el daño máximo recomendado. | Ya está |
 | **3. Por sobres** | Cada jugador abre un sobre, elige dos cartas y de ahí sale el daño y el nivel. | Idea futura |
 
 ## Modo 1: por equipo (el actual)
@@ -20,7 +20,7 @@ Los jugadores introducen el daño máximo de sus cartas. El nivel sale de `nivel
 
 - El jugador elige el jefe en el setup. El nivel de la partida es el del jefe.
 - La tarjeta del jefe muestra el **daño máximo recomendado**: el rango `x_min`–`x_max` de su nivel (por ejemplo, 401–600 en Nv2).
-- Se pide el daño de los jugadores igual que en el modo 1. Si el equipo queda **fuera del rango**, la app lo avisa («probablemente demasiado difícil» o «probablemente demasiado fácil»), pero se puede jugar igualmente.
+- Después del jefe se piden los jugadores, con el jefe a la vista (su sprite y «Cambiar»). **El daño de cada jugador es opcional** (2026-11-20, T-102): si se escribe el de todos, la app avisa si el equipo queda **fuera del rango** («muy difícil» o «más fácil de lo previsto») o confirma que encaja; sin daños no hay aviso y se puede jugar igualmente.
 - **Decisión: solo aviso.** No se bloquea la partida ni se cambia la recompensa según el desajuste. Se descartó escalar la recompensa (más puntos por debajo del rango, menos por encima) porque añadiría datos que introducir y complicaría la preparación. Los puntos siguen dependiendo solo del nivel del jefe.
 
 ## Modo 3: por sobres (futuro)
@@ -61,4 +61,4 @@ Por tanto la distancia que importa es en **niveles de X**, no en puntos sueltos 
 
 ## Pendiente
 
-- Orden de trabajo: primero el simulador de efectos (D-14) y la recalibración de HP, y después este modo.
+Nada del modo 2. El modo 3 (por sobres) no se diseña hasta que exista el formato digital.

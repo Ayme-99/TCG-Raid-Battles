@@ -1,6 +1,6 @@
 # D-10 · Sistema de puntos
 
-Estado: **propuesta v2 para validar** (2026-11-05). Issue #10.
+Estado: **decidido** (2026-11-05, repartos y costes confirmados por Ayme; ver §«Resueltas»). Desde el 2026-11-15 la partida libre física no da puntos y estos se cobrarán en el formato digital. Issue #10.
 
 ## 1. Lo que decidió Ayme
 
