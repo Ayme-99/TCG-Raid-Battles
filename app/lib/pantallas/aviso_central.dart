@@ -142,6 +142,14 @@ void _siguiente() {
   }
 }
 
+/// Retira la alerta que se ve y vacía la cola. Las alertas viven en la capa
+/// superior de la app, no en la pantalla que las lanzó: al salir de ella hay
+/// que retirarlas a mano.
+void descartarAvisos() {
+  _cola.clear();
+  _quitarActual();
+}
+
 /// Pone [aviso] en la cola: salen de uno en uno, en medio de la pantalla, sin
 /// tapar ni bloquear los controles. Los de tipo error pasan por delante y
 /// tiran la cola (es la respuesta a lo que se acaba de intentar).
@@ -417,13 +425,19 @@ class _Cartel extends StatelessWidget {
                 if (aviso.nombre != null)
                   Text(
                     aviso.nombre!,
+                    key: const Key('aviso-nombre'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    // Blanco y no el color del aviso: las primeras letras caen
+                    // sobre la franja de ese mismo color y desaparecían.
                     style: TextStyle(
-                      color: estilo.color,
+                      color: Colors.white.withValues(alpha: .92),
                       fontSize: fNombre,
                       fontWeight: FontWeight.w900,
                       letterSpacing: fNombre * .2,
+                      shadows: const [
+                        Shadow(color: Color(0x73000000), offset: Offset(0, 2)),
+                      ],
                     ),
                   ),
                 FittedBox(
