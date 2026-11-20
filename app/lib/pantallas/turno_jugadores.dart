@@ -167,21 +167,21 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
     final estado = widget.estado;
     // Bloqueo (Bronzong): solo se puede atacar a ese aliado.
     final provocador = aliadoProvocador(estado);
+    // Con un solo aliado en juego no hay nada que elegir. El daño es el del
+    // panel: el mismo número sirve para el jefe y para el aliado.
     final slot = provocador != null
         ? provocador.slot
-        : await elegirJugador(
-            context,
-            estado,
-            titulo: '¿Qué aliado ataca? (slot de...)',
-            asientos: [for (final a in estado.aliados) a.slot],
-          );
+        : estado.aliados.length == 1
+            ? estado.aliados.first.slot
+            : await elegirJugador(
+                context,
+                estado,
+                titulo: '¿Qué aliado ataca? (slot de...)',
+                asientos: [for (final a in estado.aliados) a.slot],
+              );
     if (slot == null || !mounted) return;
-    final dano = await pedirNumero(
-      context,
-      titulo: 'Daño al aliado',
-      etiqueta: 'Daño',
-    );
-    if (dano == null || !mounted) return;
+    final dano = _valor;
+    _guardarFijado();
     final aliado = estado.aliadoEn(slot);
     final jefeCarta = estado.jefe;
     final cartaAliado = jefeCarta == null || aliado == null

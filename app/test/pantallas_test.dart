@@ -404,6 +404,14 @@ void main() {
     expect(estado.aliados.single.categoria, CategoriaAliado.cura);
     expect(estado.fase, Fase.turnoJugadores);
     expect(estado.ronda, 2);
+
+    // Atacar al aliado usa el daño del panel y, con un solo aliado, no
+    // pregunta nada más.
+    await tocar(tester, 'dano-mas-10');
+    await tocar(tester, 'dano-mas-10');
+    await tester.tap(find.byKey(const Key('atacar-aliado')));
+    await tester.pump();
+    expect(c.read(estadoProvider).aliados.single.hp, 30);
   });
 
   testWidgets('rendirse termina la partida en derrota', (tester) async {
