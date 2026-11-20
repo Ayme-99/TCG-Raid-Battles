@@ -135,6 +135,7 @@ class CampoNumero extends StatelessWidget {
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       decoration: InputDecoration(
         labelText: etiqueta,
+        filled: true,
         border: const OutlineInputBorder(),
       ),
     );
