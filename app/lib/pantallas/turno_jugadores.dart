@@ -41,7 +41,7 @@ class PantallaTurnoJugadores extends ConsumerWidget {
               ),
             ),
           ),
-        if (actual != null && esMiTurno)
+        if (actual != null && esMiTurno && estado.cartasAnimoPendientes.isEmpty)
           _TurnoActual(
             key: ValueKey('turno-${estado.ronda}-${estado.turnoActual}'),
             estado: estado,
@@ -118,6 +118,7 @@ class _TurnoActual extends ConsumerStatefulWidget {
 class _TurnoActualState extends ConsumerState<_TurnoActual> {
   late final TextEditingController _dano;
   late bool _fijado;
+  bool _doble = false;
   Timer? _repeticion;
 
   @override
@@ -136,6 +137,21 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
   }
 
   int get _valor => int.tryParse(_dano.text) ?? 0;
+
+  /// Daño que se registra: el del panel con las cartas de ánimo de la ronda
+  /// (doble daño y +50), si salieron.
+  int get _danoFinal {
+    var d = _valor;
+    if (d <= 0) return 0;
+    if (_doble) d *= 2;
+    if (widget.estado.cartaAnimoEnRonda(5)) d += bonoCartaAnimoAtaque;
+    return d;
+  }
+
+  void _gastarDoble() {
+    if (!_doble) return;
+    ref.read(dobleUsadoProvider.notifier).state = widget.estado.ronda;
+  }
 
   void _sumar(int paso) {
     final v = (_valor + paso).clamp(0, 9999);
@@ -180,7 +196,8 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                 asientos: [for (final a in estado.aliados) a.slot],
               );
     if (slot == null || !mounted) return;
-    final dano = _valor;
+    final dano = _danoFinal;
+    _gastarDoble();
     _guardarFijado();
     final aliado = estado.aliadoEn(slot);
     final jefeCarta = estado.jefe;
@@ -254,6 +271,10 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
     ];
     registrarAvisos(context, avisos);
   }
+
+  bool _hayDoble(EstadoPartida estado) =>
+      estado.cartaAnimoEnRonda(1) &&
+      (_doble || ref.watch(dobleUsadoProvider) != estado.ronda);
 
   @override
   Widget build(BuildContext context) {
@@ -333,6 +354,24 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                 ),
               ],
             ),
+            if (_hayDoble(estado)) ...[
+              const SizedBox(height: 8),
+              FilterChip(
+                key: const Key('doble-dano'),
+                selected: _doble,
+                avatar: const Icon(Icons.bolt),
+                label: const Text('Carta de ánimo: ataque con doble daño (×2)'),
+                onSelected: (v) => setState(() => _doble = v),
+              ),
+            ],
+            if (_danoFinal != _valor)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  'Con las cartas de ánimo se registrarán $_danoFinal de daño.',
+                  key: const Key('dano-con-animo'),
+                ),
+              ),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -362,10 +401,12 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                   key: const Key('registrar-turno'),
                   onPressed: () {
                     _guardarFijado();
+                    final dano = _danoFinal;
+                    _gastarDoble();
                     registrar(
                       context,
                       ref,
-                      TurnoJugador(jugador: widget.jugador, dano: _valor),
+                      TurnoJugador(jugador: widget.jugador, dano: dano),
                     );
                   },
                   child: const Text('Registrar turno'),
@@ -386,27 +427,63 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
 }
 
 /// Quien tuvo un Pokémon KO se sienta este turno: solo roba una carta de
-/// ánimo y los ataques del jefe y de sus aliados contra él fallan.
-// TODO: la carta de ánimo se roba en la mesa; cuando la app vuelva a
-// gestionarla, volver a pedir aquí el número que ha salido.
-class _SentadosPorKo extends StatelessWidget {
+/// ánimo y los ataques del jefe y de sus aliados contra él fallan. La carta
+/// la roba la app, al azar entre las 5, antes de que actúen los demás.
+class _SentadosPorKo extends ConsumerWidget {
   const _SentadosPorKo({required this.estado});
 
   final EstadoPartida estado;
 
+  Future<void> _robar(BuildContext context, WidgetRef ref, int jugador) async {
+    final carta = ref.read(azarProvider).nextInt(cartasAnimoTotal) + 1;
+    final nombre = estado.jugadores[jugador].nombre;
+    final texto = textosCartaAnimo[carta - 1];
+    if (!registrar(context, ref, CartaAnimoRobada(jugador: jugador, carta: carta))) {
+      return;
+    }
+    if (!context.mounted) return;
+    // Las curas son de los Pokémon de la mesa: se quedan en pantalla hasta
+    // que alguien las hace.
+    if (carta == 2 || carta == 3) {
+      await avisarMesa(
+        context,
+        titulo: 'Carta de ánimo de $nombre',
+        lineas: [texto],
+      );
+    } else {
+      registrarAviso(context, '$nombre: Carta de ánimo. $texto');
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
-    final nombres = [
-      for (final a in estado.cartasAnimoPendientes) estado.jugadores[a].nombre,
-    ].join(', ');
+  Widget build(BuildContext context, WidgetRef ref) {
+    final primero = estado.cartasAnimoPendientes.first;
+    final nombre = estado.jugadores[primero].nombre;
+    final otros = estado.cartasAnimoPendientes.length - 1;
     return Card(
       key: const Key('sentados-ko'),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Text(
-          'Este turno no actúa por tener un Pokémon KO: $nombres. Solo '
-          'roba una carta de ánimo (en la mesa). Los ataques del jefe y de '
-          'sus aliados contra él fallan.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$nombre no actúa este turno por tener un Pokémon KO: solo roba '
+              'una carta de ánimo. Los ataques del jefe y de sus aliados '
+              'contra él fallan.',
+            ),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              key: const Key('robar-carta-animo'),
+              onPressed: () => _robar(context, ref, primero),
+              icon: const Icon(Icons.favorite),
+              label: Text(
+                otros > 0
+                    ? 'Robar carta de ánimo ($nombre, +$otros)'
+                    : 'Robar carta de ánimo ($nombre)',
+              ),
+            ),
+          ],
         ),
       ),
     );

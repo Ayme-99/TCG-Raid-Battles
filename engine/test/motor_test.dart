@@ -143,6 +143,22 @@ void main() {
       expect(s.cartasAnimoPendientes, isEmpty);
     });
 
+    test('la carta de ánimo 4 limita al jefe a un ataque en su turno', () {
+      final base = reproducir([
+        ..._inicio(),
+        const TurnoJugador(jugador: 0, dano: 10),
+        const TurnoJugador(jugador: 1, dano: 10),
+        const PokemonKo(1),
+        const FinTurnoJefe(),
+      ]);
+      expect(maxAtaquesJefeEnTurno(base, 1), maxAtaquesJefePorTurno(1));
+      final con3 = apply(base, const CartaAnimoRobada(jugador: 1, carta: 3));
+      expect(maxAtaquesJefeEnTurno(con3, 1), maxAtaquesJefePorTurno(1));
+      final con4 = apply(base, const CartaAnimoRobada(jugador: 1, carta: 4));
+      expect(con4.cartaAnimoEnRonda(4), isTrue);
+      expect(maxAtaquesJefeEnTurno(con4, 1), 1);
+    });
+
     test('la carta de ánimo se roba una vez por prioridad', () {
       final base = reproducir([
         ..._inicio(),

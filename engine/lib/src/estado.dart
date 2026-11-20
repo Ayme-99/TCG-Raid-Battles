@@ -443,6 +443,10 @@ class EstadoPartida {
 
   bool get terminada => fase == Fase.terminada;
 
+  /// Si en esta ronda ha salido la carta de ánimo [carta] (1 a 5).
+  bool cartaAnimoEnRonda(int carta) =>
+      cartasAnimo.any((c) => c.ronda == ronda && c.carta == carta);
+
   /// El jugador [j] está KO: tiene un Pokémon KO y se sienta su turno (solo
   /// roba carta de ánimo, fuera de la app). Va desde el KO hasta el final de
   /// la ronda siguiente: los ataques del jefe y de sus aliados contra él

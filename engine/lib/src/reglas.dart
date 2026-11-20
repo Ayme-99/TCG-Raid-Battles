@@ -71,3 +71,16 @@ const int topeAplicacionesBono = 3;
 
 /// Cartas de ánimo oficiales (numeradas 1 a 5).
 const int cartasAnimoTotal = 5;
+
+/// Texto de cada carta de ánimo (D-05), en el orden de su número (1 a 5).
+const List<String> textosCartaAnimo = [
+  'Un Pokémon a elección hace el doble de daño este turno.',
+  'Cura 80 de daño a cada Pokémon de los jugadores.',
+  'Cura todo el daño de 1 Pokémon.',
+  'El jefe no puede jugar más de una carta el próximo turno.',
+  'Los ataques de todos los Pokémon de los jugadores hacen 50 más de '
+      'daño este turno.',
+];
+
+/// Daño extra de la carta de ánimo 5 a cada ataque.
+const int bonoCartaAnimoAtaque = 50;
