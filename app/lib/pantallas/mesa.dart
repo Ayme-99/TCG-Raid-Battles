@@ -57,6 +57,20 @@ class FocoAliados extends FocoCamara {
   int get hashCode => 2;
 }
 
+/// Un aliado concreto, el del slot [slot]. La cámara lo mide en la mesa y lo
+/// centra.
+class FocoAliado extends FocoCamara {
+  const FocoAliado(this.slot);
+
+  final int slot;
+
+  @override
+  bool operator ==(Object other) => other is FocoAliado && other.slot == slot;
+
+  @override
+  int get hashCode => Object.hash(4, slot);
+}
+
 /// El asiento de un jugador (posición en la lista de jugadores).
 class FocoJugador extends FocoCamara {
   const FocoJugador(this.indice);
@@ -89,7 +103,10 @@ FocoCamara? _focoDeAtaque(PuntoMesa? punto) {
   if (punto == null) return null;
   if (punto == puntoJefe) return const FocoJefe();
   if (punto == puntoTodos) return const FocoGeneral();
-  if (punto.startsWith('aliado-')) return const FocoAliados();
+  if (punto.startsWith('aliado-')) {
+    final slot = int.tryParse(punto.substring('aliado-'.length));
+    return slot == null ? const FocoAliados() : FocoAliado(slot);
+  }
   if (punto.startsWith('jugador-')) {
     final asiento = int.tryParse(punto.substring('jugador-'.length));
     if (asiento != null) return FocoJugador(asiento);
@@ -118,6 +135,9 @@ class Camara {
         FocoJefe() => const Camara(0, 2 * (alturaJefe / 2) - 1, 1.15),
         FocoAliados() =>
           const Camara(0, 2 * (alturaJefe + alturaAliados / 2) - 1, 1.45),
+        // Sin medir (se mide en la mesa): la fila de aliados.
+        FocoAliado() =>
+          const Camara(0, 2 * (alturaJefe + alturaAliados / 2) - 1, 1.45),
         FocoJugador(:final indice) => Camara(
             jugadores <= 1 ? 0 : 2 * (indice + 0.5) / jugadores - 1,
             2 * (alturaJefe + alturaAliados + alturaJugadores / 2) - 1,
@@ -134,7 +154,7 @@ class Camara {
   /// Lo que puede asomar la cámara fuera de la mesa: es lo que sobra de
   /// imagen del tapete por cada lado (ver `FondoMesa`), con margen para la
   /// inclinación.
-  static const margenFuera = 80.0;
+  static const margenFuera = 120.0;
 
   /// Matriz que lleva el punto enfocado al centro de una mesa de [ancho] x
   /// [alto] y la acerca. El punto se corrige para que la vista no se salga de
@@ -477,6 +497,24 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
     });
   }
 
+  /// La cámara de [foco]. El foco de un aliado se mide sobre la mesa, porque
+  /// su sitio depende de cuántos jugadores hay.
+  Camara _camaraPara(FocoCamara foco, int jugadores, double ancho, double alto) {
+    if (foco is FocoAliado) {
+      final claves = ref.read(clavesMesaProvider);
+      final mesa = claves.caja(puntoMesa);
+      final aliado = claves.caja(puntoAliado(foco.slot));
+      if (mesa != null && aliado != null && alto > 0 && ancho > 0) {
+        final centro = MatrixUtils.transformPoint(
+          aliado.getTransformTo(mesa),
+          aliado.size.center(Offset.zero),
+        );
+        return Camara(2 * centro.dx / ancho - 1, 2 * centro.dy / alto - 1, 1.5);
+      }
+    }
+    return Camara.de(foco, jugadores);
+  }
+
   @override
   Widget build(BuildContext context) {
     final estado = ref.watch(estadoProvider);
@@ -485,18 +523,22 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
       _ultimoAuto = auto;
       _manual = null;
     }
-    // Mientras ruedan los dados la cámara mira a donde caen.
+    // Mientras ruedan los dados la cámara mira a donde caen; mientras se
+    // enseña un ataque, a quien ataca y a quien lo recibe, aunque haya dados.
     final tirada = ref.watch(tiradaMesaProvider);
-    final foco = tirada != null
-        ? switch (tirada.lugar) {
-            LugarMoneda.asiento => FocoJugador(tirada.asiento),
-            LugarMoneda.jefe => const FocoJefe(),
-            // Los dados de invocación caen ante el asiento; las monedas de los
-            // aliados, ante los aliados.
-            LugarMoneda.aliados =>
-              tirada.esMoneda ? const FocoAliados() : FocoJugador(tirada.asiento),
-          }
-        : _focoDeAtaque(ref.watch(enfoqueAtaqueProvider)) ?? _manual ?? auto;
+    final enAtaque = _focoDeAtaque(ref.watch(enfoqueAtaqueProvider));
+    final foco = enAtaque ??
+        (tirada != null
+            ? switch (tirada.lugar) {
+                LugarMoneda.asiento => FocoJugador(tirada.asiento),
+                LugarMoneda.jefe => const FocoJefe(),
+                // Los dados de invocación caen ante el asiento; las monedas de
+                // los aliados, ante los aliados.
+                LugarMoneda.aliados => tirada.esMoneda
+                    ? const FocoAliados()
+                    : FocoJugador(tirada.asiento),
+              }
+            : _manual ?? auto);
     final jugadores = estado.jugadores.length;
     final jefe = estado.jefe;
     final catalogo = ref.watch(catalogoProvider).asData?.value;
@@ -509,7 +551,7 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
           final ancho = caja.maxWidth;
           final alto = caja.hasBoundedHeight ? caja.maxHeight : ancho * 0.9;
           return TweenAnimationBuilder<Camara>(
-            tween: _CamaraTween(end: Camara.de(foco, jugadores)),
+            tween: _CamaraTween(end: _camaraPara(foco, jugadores, ancho, alto)),
             duration: const Duration(milliseconds: 700),
             curve: Curves.easeInOutCubic,
             builder: (context, camara, hijo) {
@@ -527,7 +569,9 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
                 ),
               );
             },
-            child: SizedBox(
+            child: KeyedSubtree(
+              key: ref.read(clavesMesaProvider).clave(puntoMesa),
+              child: SizedBox(
               key: const Key('mesa'),
               width: ancho,
               height: alto,
@@ -538,6 +582,7 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
                 tirada: tirada,
                 onFoco: (f) => _alElegirFoco(f, foco),
               ),
+            ),
             ),
           );
         },

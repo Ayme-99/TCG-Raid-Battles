@@ -101,8 +101,10 @@ void main() {
     // El jugador 2 es el último: su turno cambia la pantalla al turno del jefe.
     expect(n.registrar(const TurnoJugador(jugador: 1, dano: 50)), isNull);
     expect(c.read(estadoProvider).fase, Fase.turnoJefe);
+    // La mesa nueva arranca el ataque al terminar su primer fotograma.
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(milliseconds: 650));
     expect(c.read(colaAtaquesMesaProvider), hasLength(1));
     expect(find.byKey(const Key('ataque-mesa')), findsOneWidget);
     expect(c.read(enfoqueAtaqueProvider), isNotNull);

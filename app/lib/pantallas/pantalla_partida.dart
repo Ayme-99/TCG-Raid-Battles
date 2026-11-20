@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
+import '../partida/ataque_mesa.dart';
 import '../partida/controlador_partida.dart';
 import '../sala/controlador_sala.dart';
 import 'boton_atras.dart';
@@ -51,6 +54,11 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
     _resolviendo = true;
     try {
       while (mounted) {
+        // Si lo que ha provocado la llamada es un ataque, los dados esperan a
+        // que acabe su animación para no quitarle la cámara.
+        await Future<void>.microtask(() {});
+        await _esperarAtaques();
+        if (!mounted) break;
         final antes = ref.read(estadoProvider).intentosInvocacionPendientes;
         if (antes == 0) break;
         await resolverInvocacion(context, ref);
@@ -62,6 +70,23 @@ class _EstadoPantallaPartida extends ConsumerState<PantallaPartida> {
       }
     } finally {
       _resolviendo = false;
+    }
+  }
+
+  /// Espera a que la mesa termine de enseñar los ataques en cola (con un tope,
+  /// por si la mesa no llegara a enseñarlos).
+  Future<void> _esperarAtaques() async {
+    if (ref.read(colaAtaquesMesaProvider).isEmpty) return;
+    final fin = Completer<void>();
+    final suscripcion = ref.listenManual(colaAtaquesMesaProvider, (_, cola) {
+      if (cola.isEmpty && !fin.isCompleted) fin.complete();
+    });
+    try {
+      await fin.future.timeout(const Duration(seconds: 12));
+    } on TimeoutException {
+      // Se sigue igualmente.
+    } finally {
+      suscripcion.close();
     }
   }
 

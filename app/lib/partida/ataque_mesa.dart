@@ -8,6 +8,9 @@ typedef PuntoMesa = String;
 
 const PuntoMesa puntoJefe = 'jefe';
 
+/// La propia mesa: referencia para medir dónde está cada sitio.
+const PuntoMesa puntoMesa = 'mesa';
+
 /// Varios sitios a la vez (un ataque que va a todos los jugadores).
 const PuntoMesa puntoTodos = 'todos';
 PuntoMesa puntoAliado(int slot) => 'aliado-$slot';
