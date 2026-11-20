@@ -334,7 +334,10 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
                     child: TextField(
                       controller: _dano,
                       keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        _SinCerosIzquierda(),
+                      ],
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineMedium,
                       decoration: const InputDecoration(
@@ -426,6 +429,24 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
   }
 }
 
+/// Quita los ceros de la izquierda al escribir («0100» pasa a «100»); un
+/// solo «0» se queda.
+class _SinCerosIzquierda extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue anterior,
+    TextEditingValue nuevo,
+  ) {
+    final t = nuevo.text;
+    final limpio = t.replaceFirst(RegExp(r'^0+(?=\d)'), '');
+    if (limpio == t) return nuevo;
+    return TextEditingValue(
+      text: limpio,
+      selection: TextSelection.collapsed(offset: limpio.length),
+    );
+  }
+}
+
 /// Quien tuvo un Pokémon KO se sienta este turno: solo roba una carta de
 /// ánimo y los ataques del jefe y de sus aliados contra él fallan. La carta
 /// la roba la app, al azar entre las 5, antes de que actúen los demás.
@@ -447,11 +468,16 @@ class _SentadosPorKo extends ConsumerWidget {
     if (carta == 2 || carta == 3) {
       await avisarMesa(
         context,
-        titulo: 'Carta de ánimo de $nombre',
+        titulo: 'CARTA DE ÁNIMO · $nombre',
         lineas: [texto],
       );
     } else {
-      registrarAviso(context, '$nombre: Carta de ánimo. $texto');
+      registrarAviso(
+        context,
+        '$nombre: $texto',
+        tipo: TipoAviso.info,
+        titulo: 'CARTA DE ÁNIMO',
+      );
     }
   }
 

@@ -36,10 +36,11 @@ void registrarAviso(
   BuildContext context,
   String mensaje, {
   TipoAviso? tipo,
+  String? titulo,
 }) {
   for (final linea in mensaje.split('\n')) {
     if (linea.trim().isEmpty) continue;
-    mostrarAvisoCentral(context, Aviso.deTexto(linea, tipo: tipo));
+    mostrarAvisoCentral(context, Aviso.deTexto(linea, tipo: tipo, titulo: titulo));
   }
 }
 
