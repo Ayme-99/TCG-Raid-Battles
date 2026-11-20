@@ -373,6 +373,7 @@ void main() {
 
     // Onix llama a su primer aliado al terminar su turno de la ronda 1.
     llegarALaLlamadaDelJefe(c);
+    await esperarAtaques(tester, c);
     // No hay botón de invocar: los dados caen solos sobre la mesa...
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byKey(const Key('invocar-aliado')), findsNothing);
@@ -429,6 +430,7 @@ void main() {
     await tester.tap(find.byKey(const Key('catalogo-onix')));
     await tester.pumpAndSettle();
     llegarALaLlamadaDelJefe(c);
+    await esperarAtaques(tester, c);
     // T-44: los dados ruedan sobre la mesa sin pulsar nada.
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byKey(const ValueKey('dado-mesa-0')), findsOneWidget);
@@ -479,6 +481,7 @@ void main() {
     await tester.tap(find.byKey(const Key('catalogo-onix')));
     await tester.pumpAndSettle();
     llegarALaLlamadaDelJefe(c);
+    await esperarAtaques(tester, c);
     await tester.pumpAndSettle();
     expect(c.read(estadoProvider).aliados.length, 1);
 

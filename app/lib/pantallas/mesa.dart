@@ -6,9 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 import '../catalogo/catalogo.dart';
+import '../partida/ataque_mesa.dart';
 import '../partida/controlador_partida.dart';
 import '../partida/tirada_mesa.dart';
 import 'acciones_objetivo.dart';
+import 'ataques_en_mesa.dart';
 import 'dados_en_mesa.dart';
 import 'estilo.dart';
 import 'mapa.dart';
@@ -55,6 +57,20 @@ class FocoAliados extends FocoCamara {
   int get hashCode => 2;
 }
 
+/// Un aliado concreto, el del slot [slot]. La cámara lo mide en la mesa y lo
+/// centra.
+class FocoAliado extends FocoCamara {
+  const FocoAliado(this.slot);
+
+  final int slot;
+
+  @override
+  bool operator ==(Object other) => other is FocoAliado && other.slot == slot;
+
+  @override
+  int get hashCode => Object.hash(4, slot);
+}
+
 /// El asiento de un jugador (posición en la lista de jugadores).
 class FocoJugador extends FocoCamara {
   const FocoJugador(this.indice);
@@ -81,6 +97,23 @@ FocoCamara focoDe(EstadoPartida estado) {
   return const FocoGeneral();
 }
 
+/// A dónde mira la cámara mientras se enseña un ataque: el sitio que marca
+/// la animación (primero quien ataca, luego el objetivo).
+FocoCamara? _focoDeAtaque(PuntoMesa? punto) {
+  if (punto == null) return null;
+  if (punto == puntoJefe) return const FocoJefe();
+  if (punto == puntoTodos) return const FocoGeneral();
+  if (punto.startsWith('aliado-')) {
+    final slot = int.tryParse(punto.substring('aliado-'.length));
+    return slot == null ? const FocoAliados() : FocoAliado(slot);
+  }
+  if (punto.startsWith('jugador-')) {
+    final asiento = int.tryParse(punto.substring('jugador-'.length));
+    if (asiento != null) return FocoJugador(asiento);
+  }
+  return null;
+}
+
 /// Reparto vertical de la mesa: jefe arriba, aliados en medio, jugadores
 /// abajo del todo. Suman 1.
 const alturaJefe = 0.50;
@@ -102,6 +135,9 @@ class Camara {
         FocoJefe() => const Camara(0, 2 * (alturaJefe / 2) - 1, 1.15),
         FocoAliados() =>
           const Camara(0, 2 * (alturaJefe + alturaAliados / 2) - 1, 1.45),
+        // Sin medir (se mide en la mesa): la fila de aliados.
+        FocoAliado() =>
+          const Camara(0, 2 * (alturaJefe + alturaAliados / 2) - 1, 1.45),
         FocoJugador(:final indice) => Camara(
             jugadores <= 1 ? 0 : 2 * (indice + 0.5) / jugadores - 1,
             2 * (alturaJefe + alturaAliados + alturaJugadores / 2) - 1,
@@ -118,7 +154,7 @@ class Camara {
   /// Lo que puede asomar la cámara fuera de la mesa: es lo que sobra de
   /// imagen del tapete por cada lado (ver `FondoMesa`), con margen para la
   /// inclinación.
-  static const margenFuera = 80.0;
+  static const margenFuera = 120.0;
 
   /// Matriz que lleva el punto enfocado al centro de una mesa de [ancho] x
   /// [alto] y la acerca. El punto se corrige para que la vista no se salga de
@@ -222,6 +258,19 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
     final activo =
         estado.fase == Fase.turnoJugadores ? estado.jugadorActual : null;
     final titulo = activo != null ? 'Tu turno' : 'Acciones';
+    // Mientras hay una animación en la mesa (dados, monedas, una pregunta de
+    // moneda o un ataque) el panel de acciones se aparta para no tapar la
+    // escena ni quitarle los toques.
+    final apartado = ref.watch(tiradaMesaProvider.select((t) => t != null)) ||
+        ref.watch(colaAtaquesMesaProvider.select((c) => c.isNotEmpty));
+    Widget apartable(Widget hijo) => IgnorePointer(
+          ignoring: apartado,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            opacity: apartado ? 0 : 1,
+            child: hijo,
+          ),
+        );
     return LayoutBuilder(
       builder: (context, caja) {
         if (caja.maxWidth >= DisposicionMesa.anchoMinimoFlotante) {
@@ -244,15 +293,6 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
           final pico = (centro - izquierda - 14)
               .clamp(26.0, panel - 54.0)
               .toDouble();
-          // Mientras la mesa pregunta qué salió en una moneda, el panel de
-          // acciones se aparta para no tapar la pregunta ni quitarle los toques.
-          final preguntando = ref.watch(
-            tiradaMesaProvider.select((t) => t?.esPregunta ?? false),
-          );
-          Widget apartable(Widget hijo) => IgnorePointer(
-                ignoring: preguntando,
-                child: Opacity(opacity: preguntando ? 0 : 1, child: hijo),
-              );
           return Stack(
             children: [
               const Positioned.fill(child: MesaConCamara()),
@@ -332,24 +372,28 @@ class _DisposicionMesaState extends ConsumerState<DisposicionMesa> {
                 flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
-                  child: PanelAcciones(
-                    titulo: titulo,
-                    controles: [...widget.controles, ...widget.extras],
-                    abierto: true,
-                    onAlternar: _alternar,
-                    ajustar: false,
+                  child: apartable(
+                    PanelAcciones(
+                      titulo: titulo,
+                      controles: [...widget.controles, ...widget.extras],
+                      abierto: true,
+                      onAlternar: _alternar,
+                      ajustar: false,
+                    ),
                   ),
                 ),
               )
             else
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
-                child: PanelAcciones(
-                  titulo: titulo,
-                  controles: [...widget.controles, ...widget.extras],
-                  abierto: false,
-                  onAlternar: _alternar,
-                  ajustar: true,
+                child: apartable(
+                  PanelAcciones(
+                    titulo: titulo,
+                    controles: [...widget.controles, ...widget.extras],
+                    abierto: false,
+                    onAlternar: _alternar,
+                    ajustar: true,
+                  ),
                 ),
               ),
           ],
@@ -453,6 +497,24 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
     });
   }
 
+  /// La cámara de [foco]. El foco de un aliado se mide sobre la mesa, porque
+  /// su sitio depende de cuántos jugadores hay.
+  Camara _camaraPara(FocoCamara foco, int jugadores, double ancho, double alto) {
+    if (foco is FocoAliado) {
+      final claves = ref.read(clavesMesaProvider);
+      final mesa = claves.caja(puntoMesa);
+      final aliado = claves.caja(puntoAliado(foco.slot));
+      if (mesa != null && aliado != null && alto > 0 && ancho > 0) {
+        final centro = MatrixUtils.transformPoint(
+          aliado.getTransformTo(mesa),
+          aliado.size.center(Offset.zero),
+        );
+        return Camara(2 * centro.dx / ancho - 1, 2 * centro.dy / alto - 1, 1.5);
+      }
+    }
+    return Camara.de(foco, jugadores);
+  }
+
   @override
   Widget build(BuildContext context) {
     final estado = ref.watch(estadoProvider);
@@ -461,18 +523,22 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
       _ultimoAuto = auto;
       _manual = null;
     }
-    // Mientras ruedan los dados la cámara mira a donde caen.
+    // Mientras ruedan los dados la cámara mira a donde caen; mientras se
+    // enseña un ataque, a quien ataca y a quien lo recibe, aunque haya dados.
     final tirada = ref.watch(tiradaMesaProvider);
-    final foco = tirada != null
-        ? switch (tirada.lugar) {
-            LugarMoneda.asiento => FocoJugador(tirada.asiento),
-            LugarMoneda.jefe => const FocoJefe(),
-            // Los dados de invocación caen ante el asiento; las monedas de los
-            // aliados, ante los aliados.
-            LugarMoneda.aliados =>
-              tirada.esMoneda ? const FocoAliados() : FocoJugador(tirada.asiento),
-          }
-        : _manual ?? auto;
+    final enAtaque = _focoDeAtaque(ref.watch(enfoqueAtaqueProvider));
+    final foco = enAtaque ??
+        (tirada != null
+            ? switch (tirada.lugar) {
+                LugarMoneda.asiento => FocoJugador(tirada.asiento),
+                LugarMoneda.jefe => const FocoJefe(),
+                // Los dados de invocación caen ante el asiento; las monedas de
+                // los aliados, ante los aliados.
+                LugarMoneda.aliados => tirada.esMoneda
+                    ? const FocoAliados()
+                    : FocoJugador(tirada.asiento),
+              }
+            : _manual ?? auto);
     final jugadores = estado.jugadores.length;
     final jefe = estado.jefe;
     final catalogo = ref.watch(catalogoProvider).asData?.value;
@@ -485,7 +551,7 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
           final ancho = caja.maxWidth;
           final alto = caja.hasBoundedHeight ? caja.maxHeight : ancho * 0.9;
           return TweenAnimationBuilder<Camara>(
-            tween: _CamaraTween(end: Camara.de(foco, jugadores)),
+            tween: _CamaraTween(end: _camaraPara(foco, jugadores, ancho, alto)),
             duration: const Duration(milliseconds: 700),
             curve: Curves.easeInOutCubic,
             builder: (context, camara, hijo) {
@@ -503,7 +569,9 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
                 ),
               );
             },
-            child: SizedBox(
+            child: KeyedSubtree(
+              key: ref.read(clavesMesaProvider).clave(puntoMesa),
+              child: SizedBox(
               key: const Key('mesa'),
               width: ancho,
               height: alto,
@@ -514,6 +582,7 @@ class _MesaConCamaraState extends ConsumerState<MesaConCamara> {
                 tirada: tirada,
                 onFoco: (f) => _alElegirFoco(f, foco),
               ),
+            ),
             ),
           );
         },
@@ -602,6 +671,8 @@ class _Mesa extends StatelessWidget {
                     ),
             ),
           ),
+        // Los ataques del jefe y de los aliados, por encima de todo.
+        const Positioned.fill(child: AtaquesEnMesa()),
       ],
     );
   }
@@ -639,7 +710,10 @@ class _EscenaJefe extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: SizedBox(
                       width: _anchoSlot,
-                      child: SlotAliado(slot: i),
+                      child: _Punto(
+                        punto: puntoAliado(i),
+                        child: SlotAliado(slot: i),
+                      ),
                     ),
                   ),
               ],
@@ -650,7 +724,10 @@ class _EscenaJefe extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         lado([for (var i = 0; i < izquierda; i++) i], MainAxisAlignment.end),
-        const SizedBox(width: _anchoJefe, child: TarjetaJefe()),
+        const SizedBox(
+          width: _anchoJefe,
+          child: _Punto(punto: puntoJefe, child: TarjetaJefe()),
+        ),
         lado(
           [for (var i = izquierda; i < slots; i++) i],
           MainAxisAlignment.start,
@@ -658,6 +735,21 @@ class _EscenaJefe extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Marca un sitio de la mesa para que los ataques sepan dónde empiezan y
+/// dónde acaban.
+class _Punto extends ConsumerWidget {
+  const _Punto({required this.punto, required this.child});
+
+  final PuntoMesa punto;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => KeyedSubtree(
+        key: ref.read(clavesMesaProvider).clave(punto),
+        child: child,
+      );
 }
 
 /// Zona de la mesa que escala su contenido para que quepa entera.
@@ -712,10 +804,13 @@ class _FilaJugadores extends StatelessWidget {
               onTap: () => onFoco(FocoJugador(i)),
               child: Padding(
                 padding: const EdgeInsets.all(6),
-                child: _Asiento(
-                  jugador: estado.jugadores[i],
-                  color: coloresAsiento[i % coloresAsiento.length],
-                  activo: activo == i,
+                child: _Punto(
+                  punto: puntoJugador(i),
+                  child: _Asiento(
+                    jugador: estado.jugadores[i],
+                    color: coloresAsiento[i % coloresAsiento.length],
+                    activo: activo == i,
+                  ),
                 ),
               ),
             ),

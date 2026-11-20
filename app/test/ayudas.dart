@@ -12,6 +12,7 @@ import 'package:incursiones_app/cuenta/sesion.dart';
 import 'package:incursiones_app/envios/controlador_envios.dart';
 import 'package:incursiones_app/pantallas/escena_entrada.dart';
 import 'package:incursiones_app/pantallas/inicio.dart';
+import 'package:incursiones_app/partida/ataque_mesa.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_app/sala/canal_sala.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
@@ -213,4 +214,14 @@ Future<void> elegirJefeDePrueba(
       );
   expect(error, isNull);
   await tester.pumpAndSettle();
+}
+
+/// Deja pasar las animaciones de ataque en cola: los dados de invocación
+/// esperan a que acaben.
+Future<void> esperarAtaques(WidgetTester tester, ProviderContainer c) async {
+  await tester.pump();
+  for (var i = 0; i < 60 && c.read(colaAtaquesMesaProvider).isNotEmpty; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
+  await tester.pump();
 }
