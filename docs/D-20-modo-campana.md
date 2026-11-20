@@ -23,7 +23,8 @@ Cada Pokémon es un registro del catálogo:
 | Campo | Significado |
 |---|---|
 | `id`, `nombre`, `numero` | identidad |
-| `tipos` | uno o dos, para la tabla de tipos |
+| `tipo` | el tipo del Pokémon y de sus ataques |
+| `debilidad`, `resistencia` | opcionales: tipo y valor (×2 y −30 de salida) |
 | `ps` | puntos de salud |
 | `retirada` | coste de cambiarlo por otro; **0 (gratis)** de salida |
 | `ataques` | 1 a 3: `nombre`, `tipo`, `coste` (energía), `dano`, `efecto` opcional |
@@ -43,30 +44,33 @@ Cada bando (jugador y «máquina») tiene una **reserva de energía de máximo 1
 
 - Empieza en **10**.
 - Cada ataque **gasta** su coste de la reserva. Si no hay energía suficiente, no se puede usar.
-- Al empezar el turno de un bando **recupera 1**.
-- **Pasar turno** recupera 1 más (propuesta provisional).
+- Al **terminar su turno**, un bando **recupera 1** (decidido el 2026-11-21).
 
-Ejemplo con un ataque de coste 3 usado todos los turnos: `10 → 7 → 8 → 5 → 6 → 3 → 4 → 1 → 2`. Son cuatro ataques seguidos y después toca ahorrar. Es una reserva y no un maná que sube por turno, y es lo que encaja con **una acción por turno**: con la opción tipo Hearthstone, a partir del turno 5 sobraría energía y dejaría de haber decisión.
+Ejemplo con un ataque de coste 3 usado todos los turnos: se puede atacar con `10, 8, 6, 4` de reserva y después queda en `2`, así que toca ahorrar (en cada turno se gastan 3 y se recupera 1 al terminar). Es una reserva y no un maná que sube por turno, y es lo que encaja con **una acción por turno**.
 
-Los números (inicio, recuperación, bonus por pasar, máximo) son **parámetros** y se ajustan con el simulador.
+Los números (inicio, recuperación, máximo) son **parámetros** y se ajustan con el simulador.
 
 ### 3.2 Turno
 
-En su turno, un bando hace **una acción**:
+Empieza el **jugador**. En su turno, un bando hace **una acción, y las tres gastan el turno**:
 
 1. **Atacar** con el Pokémon activo (si le llega la energía).
-2. **Cambiar** de Pokémon activo (gratis de salida, y no cuenta como acción si el coste de retirada es 0: propuesta a validar).
-3. **Pasar** (recupera energía extra).
+2. **Cambiar** de Pokémon activo.
+3. **Pasar.**
 
-Si el Pokémon activo queda a 0 PS, su dueño elige el siguiente, sin gastar turno.
+**Elegir el siguiente Pokémon** cuando cae el activo **no** gasta turno: su dueño lo elige y sigue su turno.
 
-### 3.3 Tabla de tipos
+**Cambiar: turno o energía.** Se decidió que cambiar **gasta el turno**. La carta puede añadir además una **retirada con coste de energía** (el campo `retirada`; es 0 de salida, es decir, «retirada gratis»). Así, la retirada gratis significa que cambiar no cuesta energía, y un Pokémon pesado podría costar turno **y** energía. Si preferís que la retirada sea solo energía y no turno, es cambiar una línea del motor; queda a validar con el simulador.
 
-Existe y se aplica al daño. Propuesta provisional: **×2** si el tipo del ataque es fuerte contra el defensor, **×0,5** si es débil, **×0** si es inmune. Para la porción vertical solo hacen falta los tipos de la región (Roca, Tierra, Lucha, Normal, Fantasma, Veneno, Eléctrico, Psíquico), así que la tabla empieza pequeña.
+### 3.3 Debilidades y resistencias
+
+No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de cartas. Un Pokémon puede tener una **debilidad** (el daño de ese tipo se multiplica, ×2 de salida) y una **resistencia** (el daño de ese tipo baja, −30 de salida), o ninguna. Primero se aplica la debilidad y luego la resistencia, y el daño nunca baja de 0. Cada Pokémon tiene **un solo tipo**. No existen las inmunidades.
+
+**Victoria:** gana el bando que deja sin Pokémon en pie al otro.
 
 ### 3.4 La «máquina»
 
-El rival juega con **las mismas reglas** (la misma energía y la misma tabla de tipos), de modo que los combates se igualan sin reglas asimétricas. Su decisión es simple y determinista: ataca con el que más daño efectivo hace por energía gastada, cambia si tiene desventaja de tipo clara y la reserva lo permite, y pasa si no llega a ningún ataque.
+El rival juega con **las mismas reglas** (la misma energía y las mismas debilidades y resistencias), de modo que los combates se igualan sin reglas asimétricas. Su decisión es simple y determinista: ataca con el que más daño efectivo hace por energía gastada, cambia si tiene desventaja de tipo clara y la reserva lo permite, y pasa si no llega a ningún ataque.
 
 ## 4. Mapa
 
@@ -97,7 +101,7 @@ El jefe se enfrenta como un **equipo rival**: sus aliados salen primero y el jef
 
 | Pieza | Propuesta |
 |---|---|
-| Motor | Librería nueva `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho el combate 1 contra 1 (#336)**: energía, atacar, cambiar, pasar, elegir siguiente y tabla de tipos; el cambio gratis es de una vez por turno y no gasta turno, y quién empieza es un parámetro (por defecto, el jugador). |
+| Motor | Librería nueva `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho el combate 1 contra 1 (#336)**: energía, atacar, cambiar, pasar, elegir siguiente, debilidad y resistencia. |
 | Catálogo | `catalog/campana/`: `pokemon/*.json`, `regiones/*.json`, `tipos.json` y su esquema. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
 | Guardado | Progreso de campaña (región, nodo, equipo, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
@@ -111,9 +115,9 @@ El jefe se enfrenta como un **equipo rival**: sus aliados salen primero y el jef
 Una sola región, **Túnel Roca**, con jefe **Onix** y sus aliados:
 
 - 3 iniciales y unos 15 a 20 Pokémon de campaña en total.
-- Tabla de tipos reducida a los de la región.
+- Solo los tipos de la región (Roca, Tierra, Lucha, Normal, Fantasma, Veneno, Eléctrico, Psíquico) y los de los iniciales.
 - 3 rutas, 1 descanso, 1 gimnasio con medalla y el jefe.
-- Combate completo con energía, cambio gratis, IA rival y victoria o derrota.
+- Combate completo con energía, cambio de Pokémon, IA rival y victoria o derrota.
 - Guardado local del progreso.
 
 Fuera de la primera entrega: Liga, más regiones, evolución, tienda, sincronización con la cuenta y los combates 2 contra 2 y 3 contra 3.
@@ -121,16 +125,15 @@ Fuera de la primera entrega: Liga, más regiones, evolución, tienda, sincroniza
 ## 8. Preguntas abiertas
 
 1. **Derrota.** ¿Qué pasa al perder un combate? Propuesta: volver al último descanso con el equipo curado y sin perder lo ganado, para que no frustre. Alternativa más dura: perder una parte del dinero.
-2. **Quién empieza** el combate y si el primer turno tiene ventaja.
-3. **Máximo de Pokémon en el equipo** y qué pasa con los que se sueltan.
-4. **Qué se vende en el descanso** (curas, objetos, Pokémon).
-5. **Cuántos ataques** puede tener un Pokémon y rango de costes (propuesta: 1 a 3 ataques, coste de 1 a 5).
-6. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
+2. **Máximo de Pokémon en el equipo** y qué pasa con los que se sueltan.
+3. **Qué se vende en el descanso** (curas, objetos, Pokémon).
+4. **Cuántos ataques** puede tener un Pokémon y rango de costes (propuesta: 1 a 3 ataques, coste de 1 a 5).
+5. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
 
 ## 9. Tareas derivadas (para crear tras aprobar)
 
 1. Catálogo de campaña: esquema y los primeros Pokémon de Túnel Roca.
-2. Motor de combate 1 contra 1: energía, acciones y tabla de tipos.
+2. Motor de combate 1 contra 1: energía, acciones, debilidades y resistencias.
 3. IA rival determinista.
 4. Simulador de combates de campaña y primer equilibrado.
 5. Modelo de región y de nodos, y avance por el mapa.

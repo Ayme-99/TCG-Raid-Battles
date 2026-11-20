@@ -1,6 +1,5 @@
 import '../errores.dart';
 import 'pokemon.dart';
-import 'tipos.dart';
 
 /// Los dos bandos de un combate de campaña.
 enum Bando {
@@ -18,17 +17,13 @@ class ParametrosCombate {
   /// Máximo de la reserva.
   final int energiaMaxima;
 
-  /// Energía que recupera un bando al empezar su turno.
+  /// Energía que recupera un bando al terminar su turno.
   final int energiaPorTurno;
-
-  /// Energía extra que recupera al pasar turno.
-  final int energiaAlPasar;
 
   const ParametrosCombate({
     this.energiaInicial = 10,
     this.energiaMaxima = 10,
     this.energiaPorTurno = 1,
-    this.energiaAlPasar = 1,
   });
 }
 
@@ -92,8 +87,6 @@ class EstadoCombate {
   /// Turnos jugados (empieza en 1).
   final int numeroTurno;
 
-  /// El bando que tiene el turno ya ha usado su cambio gratis.
-  final bool cambioGratisUsado;
   final ParametrosCombate parametros;
 
   const EstadoCombate({
@@ -103,7 +96,6 @@ class EstadoCombate {
     required this.fase,
     required this.ganador,
     required this.numeroTurno,
-    required this.cambioGratisUsado,
     required this.parametros,
   });
 
@@ -129,7 +121,6 @@ class EstadoCombate {
       fase: FaseCombate.enCurso,
       ganador: null,
       numeroTurno: 1,
-      cambioGratisUsado: false,
       parametros: parametros,
     );
   }
@@ -143,7 +134,6 @@ class EstadoCombate {
     FaseCombate? fase,
     Bando? ganador,
     int? numeroTurno,
-    bool? cambioGratisUsado,
   }) =>
       EstadoCombate(
         jugador: jugador ?? this.jugador,
@@ -152,7 +142,6 @@ class EstadoCombate {
         fase: fase ?? this.fase,
         ganador: ganador ?? this.ganador,
         numeroTurno: numeroTurno ?? this.numeroTurno,
-        cambioGratisUsado: cambioGratisUsado ?? this.cambioGratisUsado,
         parametros: parametros,
       );
 
@@ -175,14 +164,15 @@ class Atacar extends AccionCombate {
   const Atacar(super.bando, this.indice);
 }
 
-/// Cambia el Pokémon activo por el del equipo en la posición [indice].
+/// Cambia el Pokémon activo por el del equipo en la posición [indice]. Gasta
+/// el turno.
 class Cambiar extends AccionCombate {
   final int indice;
 
   const Cambiar(super.bando, this.indice);
 }
 
-/// No hace nada y recupera energía extra.
+/// No hace nada y termina el turno.
 class Pasar extends AccionCombate {
   const Pasar(super.bando);
 }
@@ -194,10 +184,17 @@ class ElegirSiguiente extends AccionCombate {
   const ElegirSiguiente(super.bando, this.indice);
 }
 
-/// Daño real de un ataque contra un defensor: el daño base por la efectividad
-/// de tipos, redondeado.
-int danoDeAtaque(AtaqueCampana ataque, PokemonCampana defensor) =>
-    (ataque.dano * multiplicadorDeTipos(ataque.tipo, defensor.tipos)).round();
+/// Daño real de un ataque contra un defensor, como en las cartas: primero la
+/// debilidad (el daño se multiplica) y luego la resistencia (se resta); nunca
+/// baja de 0.
+int danoDeAtaque(AtaqueCampana ataque, PokemonCampana defensor) {
+  var dano = ataque.dano;
+  final d = defensor.debilidad;
+  if (d != null && d.tipo == ataque.tipo) dano *= d.multiplicador;
+  final r = defensor.resistencia;
+  if (r != null && r.tipo == ataque.tipo) dano -= r.reduccion;
+  return dano < 0 ? 0 : dano;
+}
 
 /// Aplica una acción al combate y devuelve un estado nuevo (no modifica el
 /// recibido). Si la acción no es válida lanza [ReglaIncumplida].
@@ -217,7 +214,7 @@ EstadoCombate aplicarCombate(EstadoCombate estado, AccionCombate accion) {
   return switch (accion) {
     Atacar a => _atacar(estado, a),
     Cambiar a => _cambiar(estado, a),
-    Pasar a => _pasar(estado, a),
+    Pasar _ => _terminarTurno(estado),
     ElegirSiguiente _ =>
       throw const ReglaIncumplida('No hay que elegir Pokémon ahora.'),
   };
@@ -245,70 +242,51 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   }
   final rivalBando = a.bando.otro;
   final defensor = estado.bando(rivalBando);
-  final golpeado = defensor.pokemonActivo
-      .conPs(defensor.pokemonActivo.ps -
-          danoDeAtaque(ataque, defensor.pokemonActivo.especie));
+  final golpeado = defensor.pokemonActivo.conPs(defensor.pokemonActivo.ps -
+      danoDeAtaque(ataque, defensor.pokemonActivo.especie));
   final equipo = [...defensor.equipo]..[defensor.activo] = golpeado;
   final defensorNuevo = defensor.copiarCon(equipo: equipo);
-  final atacanteNuevo =
-      atacante.copiarCon(energia: atacante.energia - ataque.coste);
   var nuevo = estado
-      .conBando(a.bando, atacanteNuevo)
+      .conBando(
+          a.bando, atacante.copiarCon(energia: atacante.energia - ataque.coste))
       .conBando(rivalBando, defensorNuevo);
   if (defensorNuevo.derrotado) {
     return nuevo.copiarCon(fase: FaseCombate.terminado, ganador: a.bando);
   }
-  nuevo = _pasarTurno(nuevo);
+  nuevo = _terminarTurno(nuevo);
   if (!golpeado.enPie) {
     nuevo = nuevo.copiarCon(fase: FaseCombate.eligiendoActivo);
   }
   return nuevo;
 }
 
+/// Cambiar siempre gasta el turno; además cuesta la retirada del Pokémon que
+/// sale (0 de salida, así que normalmente solo cuesta el turno).
 EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
   final b = estado.bando(a.bando);
   if (!b.relevos.contains(a.indice)) {
     throw const ReglaIncumplida('Ese Pokémon no puede salir.');
   }
   final retirada = b.pokemonActivo.especie.retirada;
-  if (retirada == 0) {
-    if (estado.cambioGratisUsado) {
-      throw const ReglaIncumplida('Ya has hecho el cambio gratis este turno.');
-    }
-    return estado
-        .conBando(a.bando, b.copiarCon(activo: a.indice))
-        .copiarCon(cambioGratisUsado: true);
-  }
   if (b.energia < retirada) {
     throw const ReglaIncumplida('No hay energía para retirar al Pokémon.');
   }
-  return _pasarTurno(estado.conBando(
+  return _terminarTurno(estado.conBando(
     a.bando,
     b.copiarCon(activo: a.indice, energia: b.energia - retirada),
   ));
 }
 
-EstadoCombate _pasar(EstadoCombate estado, Pasar a) {
-  final b = estado.bando(a.bando);
+/// Termina el turno del bando actual: recupera energía y pasa el turno al otro.
+EstadoCombate _terminarTurno(EstadoCombate estado) {
+  final actual = estado.bando(estado.turno);
   final p = estado.parametros;
-  final energia = _sumarEnergia(b.energia, p.energiaAlPasar, p);
-  return _pasarTurno(estado.conBando(a.bando, b.copiarCon(energia: energia)));
-}
-
-/// Termina el turno del bando actual: el otro empieza y recupera energía.
-EstadoCombate _pasarTurno(EstadoCombate estado) {
-  final siguiente = estado.turno.otro;
-  final b = estado.bando(siguiente);
-  final energia = _sumarEnergia(
-      b.energia, estado.parametros.energiaPorTurno, estado.parametros);
-  return estado.conBando(siguiente, b.copiarCon(energia: energia)).copiarCon(
-        turno: siguiente,
+  final total = actual.energia + p.energiaPorTurno;
+  final energia = total > p.energiaMaxima ? p.energiaMaxima : total;
+  return estado
+      .conBando(estado.turno, actual.copiarCon(energia: energia))
+      .copiarCon(
+        turno: estado.turno.otro,
         numeroTurno: estado.numeroTurno + 1,
-        cambioGratisUsado: false,
       );
-}
-
-int _sumarEnergia(int actual, int suma, ParametrosCombate p) {
-  final total = actual + suma;
-  return total > p.energiaMaxima ? p.energiaMaxima : total;
 }

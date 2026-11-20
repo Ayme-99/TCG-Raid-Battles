@@ -4,7 +4,9 @@ import 'package:test/test.dart';
 
 PokemonCampana pokemon(
   String id, {
-  List<TipoCampana> tipos = const [TipoCampana.normal],
+  TipoCampana tipo = TipoCampana.normal,
+  Debilidad? debilidad,
+  Resistencia? resistencia,
   int ps = 100,
   int retirada = 0,
   List<AtaqueCampana>? ataques,
@@ -12,7 +14,9 @@ PokemonCampana pokemon(
     PokemonCampana(
       id: id,
       nombre: id,
-      tipos: tipos,
+      tipo: tipo,
+      debilidad: debilidad,
+      resistencia: resistencia,
       ps: ps,
       retirada: retirada,
       ataques: ataques ??
@@ -38,24 +42,51 @@ EstadoCombate nuevo({
     );
 
 void main() {
-  group('tabla de tipos', () {
-    test('fuerte, débil, inmune y neutro', () {
-      expect(multiplicadorDeTipos(TipoCampana.agua, [TipoCampana.fuego]), 2);
-      expect(multiplicadorDeTipos(TipoCampana.fuego, [TipoCampana.agua]), 0.5);
-      expect(multiplicadorDeTipos(TipoCampana.normal, [TipoCampana.fantasma]),
-          0);
-      expect(multiplicadorDeTipos(TipoCampana.normal, [TipoCampana.fuego]), 1);
+  group('debilidad y resistencia', () {
+    const agua = AtaqueCampana(
+        nombre: 'Pistola Agua', tipo: TipoCampana.agua, coste: 1, dano: 50);
+    final tirador = pokemon('agua', tipo: TipoCampana.agua, ataques: const [agua]);
+
+    int danoA(PokemonCampana defensor) {
+      final e = aplicarCombate(
+        nuevo(jugador: [tirador], rival: [defensor]),
+        const Atacar(Bando.jugador, 0),
+      );
+      return 100 - e.rival.pokemonActivo.ps;
+    }
+
+    test('sin debilidad ni resistencia el daño es el de la carta', () {
+      expect(danoA(pokemon('b')), 50);
     });
 
-    test('con dos tipos se multiplican', () {
+    test('una debilidad multiplica el daño (×2)', () {
       expect(
-          multiplicadorDeTipos(
-              TipoCampana.agua, [TipoCampana.tierra, TipoCampana.roca]),
-          4);
+          danoA(pokemon('b', debilidad: const Debilidad(TipoCampana.agua))), 100);
+    });
+
+    test('una resistencia resta 30 y nunca baja de 0', () {
       expect(
-          multiplicadorDeTipos(
-              TipoCampana.agua, [TipoCampana.tierra, TipoCampana.planta]),
-          1);
+          danoA(pokemon('b', resistencia: const Resistencia(TipoCampana.agua))),
+          20);
+      final debil = pokemon('c',
+          resistencia: const Resistencia(TipoCampana.agua, reduccion: 80));
+      expect(danoA(debil), 0);
+    });
+
+    test('con las dos, primero se multiplica y luego se resta', () {
+      expect(
+          danoA(pokemon('b',
+              debilidad: const Debilidad(TipoCampana.agua),
+              resistencia: const Resistencia(TipoCampana.agua))),
+          70);
+    });
+
+    test('solo cuentan si el tipo del ataque coincide', () {
+      expect(
+          danoA(pokemon('b',
+              debilidad: const Debilidad(TipoCampana.fuego),
+              resistencia: const Resistencia(TipoCampana.planta))),
+          50);
     });
   });
 
@@ -66,54 +97,48 @@ void main() {
       expect(e.rival.energia, 10);
     });
 
-    test('atacar gasta el coste y el otro bando recupera al empezar', () {
+    test('atacar gasta el coste y al terminar el turno se recupera 1', () {
       final e = aplicarCombate(nuevo(), const Atacar(Bando.jugador, 1));
-      expect(e.jugador.energia, 7);
-      expect(e.rival.energia, 10, reason: 'ya estaba al máximo');
+      expect(e.jugador.energia, 8);
+      expect(e.rival.energia, 10);
       expect(e.turno, Bando.rival);
     });
 
-    test('la secuencia de coste 3 sigue 10, 7, 8, 5, 6, 3, 4, 1, 2', () {
-      // El rival pasa en cada turno para que nada cambie salvo la energía.
-      // Pasar recupera 1 extra: con 0 extra de pasar y 1 por turno la
-      // secuencia del jugador es exactamente la del ejemplo de D-20.
-      var e = nuevo(
-        parametros: const ParametrosCombate(energiaAlPasar: 0),
-        rival: [pokemon('muro', ps: 100000)],
-      );
-      final vistos = <int>[e.jugador.energia];
+    test('con coste 3 se encadenan 4 ataques: 10, 8, 6, 4 y luego 2', () {
+      var e = nuevo(rival: [pokemon('muro', ps: 100000)]);
+      final antes = <int>[];
       for (var i = 0; i < 4; i++) {
+        antes.add(e.jugador.energia);
         e = aplicarCombate(e, const Atacar(Bando.jugador, 1));
-        vistos.add(e.jugador.energia);
         e = aplicarCombate(e, const Pasar(Bando.rival));
-        vistos.add(e.jugador.energia);
       }
-      expect(vistos, [10, 7, 8, 5, 6, 3, 4, 1, 2]);
+      expect(antes, [10, 8, 6, 4]);
+      expect(e.jugador.energia, 2);
+      expect(() => aplicarCombate(e, const Atacar(Bando.jugador, 1)),
+          throwsA(isA<ReglaIncumplida>()));
     });
 
     test('no se puede atacar sin energía suficiente', () {
-      var e = nuevo(
-        parametros: const ParametrosCombate(energiaInicial: 2),
-      );
+      var e = nuevo(parametros: const ParametrosCombate(energiaInicial: 2));
       expect(() => aplicarCombate(e, const Atacar(Bando.jugador, 1)),
           throwsA(isA<ReglaIncumplida>()));
       e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
-      expect(e.jugador.energia, 1);
+      expect(e.jugador.energia, 2, reason: '2 - 1 + 1 al terminar el turno');
     });
 
     test('la reserva nunca pasa del máximo', () {
       var e = nuevo();
       e = aplicarCombate(e, const Pasar(Bando.jugador));
       expect(e.jugador.energia, 10);
-      e = aplicarCombate(e, const Pasar(Bando.rival));
-      expect(e.rival.energia, 10);
     });
 
-    test('pasar recupera energía extra', () {
-      var e = nuevo(parametros: const ParametrosCombate(energiaInicial: 4));
-      e = aplicarCombate(e, const Pasar(Bando.jugador));
+    test('pasar recupera la energía de fin de turno', () {
+      final e = aplicarCombate(
+        nuevo(parametros: const ParametrosCombate(energiaInicial: 4)),
+        const Pasar(Bando.jugador),
+      );
       expect(e.jugador.energia, 5);
-      expect(e.rival.energia, 5, reason: '+1 del turno al empezar');
+      expect(e.rival.energia, 4, reason: 'solo recupera quien termina turno');
     });
   });
 
@@ -123,31 +148,10 @@ void main() {
           throwsA(isA<ReglaIncumplida>()));
     });
 
-    test('puede empezar el rival', () {
+    test('el jugador empieza por defecto y puede empezar el rival', () {
+      expect(nuevo().turno, Bando.jugador);
       final e = nuevo(empieza: Bando.rival);
       expect(e.turno, Bando.rival);
-    });
-
-    test('el daño aplica la tabla de tipos', () {
-      final agua = pokemon('agua', tipos: [TipoCampana.agua], ataques: const [
-        AtaqueCampana(
-            nombre: 'Pistola Agua', tipo: TipoCampana.agua, coste: 1, dano: 30),
-      ]);
-      final fuego = pokemon('fuego', tipos: [TipoCampana.fuego]);
-      final e = aplicarCombate(
-        nuevo(jugador: [agua], rival: [fuego]),
-        const Atacar(Bando.jugador, 0),
-      );
-      expect(e.rival.pokemonActivo.ps, 100 - 60);
-    });
-
-    test('un ataque inmune no hace daño', () {
-      final fantasma = pokemon('fantasma', tipos: [TipoCampana.fantasma]);
-      final e = aplicarCombate(
-        nuevo(rival: [fantasma]),
-        const Atacar(Bando.jugador, 0),
-      );
-      expect(e.rival.pokemonActivo.ps, 100);
     });
 
     test('un ataque inexistente se rechaza', () {
@@ -164,28 +168,22 @@ void main() {
   });
 
   group('cambio de Pokémon', () {
-    test('el cambio gratis no gasta turno ni energía, una vez por turno', () {
+    test('cambiar gasta el turno y no gasta energía si la retirada es 0', () {
       var e = nuevo();
       e = aplicarCombate(e, const Cambiar(Bando.jugador, 1));
       expect(e.jugador.activo, 1);
-      expect(e.turno, Bando.jugador);
+      expect(e.turno, Bando.rival);
       expect(e.jugador.energia, 10);
-      expect(() => aplicarCombate(e, const Cambiar(Bando.jugador, 0)),
-          throwsA(isA<ReglaIncumplida>()));
-      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
-      e = aplicarCombate(e, const Pasar(Bando.rival));
-      e = aplicarCombate(e, const Cambiar(Bando.jugador, 0));
-      expect(e.jugador.activo, 0, reason: 'se renueva con el turno');
     });
 
-    test('una retirada con coste gasta energía y el turno', () {
-      var e = nuevo(jugador: [
-        pokemon('pesado', retirada: 2),
-        pokemon('ligero'),
-      ]);
+    test('una retirada con coste gasta energía además del turno', () {
+      var e = nuevo(
+        jugador: [pokemon('pesado', retirada: 2), pokemon('ligero')],
+        parametros: const ParametrosCombate(energiaInicial: 5),
+      );
       e = aplicarCombate(e, const Cambiar(Bando.jugador, 1));
       expect(e.jugador.activo, 1);
-      expect(e.jugador.energia, 8);
+      expect(e.jugador.energia, 4, reason: '5 - 2 + 1 al terminar el turno');
       expect(e.turno, Bando.rival);
     });
 
