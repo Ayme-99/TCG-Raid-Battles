@@ -237,8 +237,9 @@ class _EstadoAviso extends State<_AvisoCentral> with TickerProviderStateMixin {
             padding: const EdgeInsets.all(16),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
+              // Sin liveRegion: en Windows ese nodo, que nace y muere con cada
+              // aviso, desincroniza el árbol de accesibilidad (#332).
               child: Semantics(
-                liveRegion: true,
                 label: texto,
                 child: ExcludeSemantics(
                   child: GestureDetector(
