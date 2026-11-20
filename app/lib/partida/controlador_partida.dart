@@ -195,9 +195,12 @@ final danoFijadoProvider = StateProvider<Map<int, int>>((ref) => const {});
 /// vez por carta); -1 si no se ha usado.
 final dobleUsadoProvider = StateProvider<int>((ref) => -1);
 
-/// Jugadores (asientos) de los que ya se sabe si su primera moneda cayó bajo
-/// un efecto que la fija (Fijar Blanco). Se pregunta una sola vez por jugador.
-final primeraMonedaResueltaProvider = StateProvider<Set<int>>((ref) => const {});
+/// Por jugador (asiento), en qué entrada del aliado con efecto permanente
+/// (Nosepass) se resolvió su primera moneda. Se pregunta una vez por jugador
+/// y por entrada: si el aliado cae y se vuelve a invocar, la pasiva vuelve a
+/// valer para la primera moneda de cada jugador.
+final primeraMonedaResueltaProvider =
+    StateProvider<Map<int, int>>((ref) => const {});
 
 final partidaInicialProvider = Provider<PartidaGuardada?>((ref) => null);
 

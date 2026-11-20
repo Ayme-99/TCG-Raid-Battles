@@ -106,3 +106,17 @@ List<String> recordatoriosDeTurno(
   }
   return lineas;
 }
+
+/// Cuántas veces ha entrado en juego un aliado con efecto permanente (Fijar
+/// Blanco): cada entrada, también tras caer y volver a invocarse, renueva la
+/// pasiva para la primera moneda de cada jugador.
+int entradasDeEfectoPermanente(
+  Iterable<Evento> eventos,
+  EstadoPartida estado,
+) {
+  final ids = {for (final f in estado.efectosPermanentes) f.scriptId};
+  return eventos
+      .whereType<AliadoInvocado>()
+      .where((e) => ids.contains(e.scriptId))
+      .length;
+}

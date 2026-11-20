@@ -7,6 +7,7 @@ import 'package:incursiones_app/app.dart';
 import 'package:incursiones_app/pantallas/lanzar_monedas.dart';
 import 'package:incursiones_app/pantallas/moneda.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
+import 'package:incursiones_app/partida/recordatorios.dart';
 import 'package:incursiones_app/partida/tirada_mesa.dart';
 import 'package:incursiones_engine/incursiones_engine.dart';
 
@@ -276,7 +277,7 @@ void main() {
       expect(c.read(tiradaMesaProvider)!.monedas, [false]);
       await tester.pump(const Duration(seconds: 10));
       expect(r, isFalse);
-      expect(c.read(primeraMonedaResueltaProvider), {0});
+      expect(c.read(primeraMonedaResueltaProvider), {0: 0});
 
       // La segunda moneda de Ana ya no pregunta nada.
       await tester.tap(find.byKey(const Key('lanzar-ana')));
@@ -284,6 +285,29 @@ void main() {
       expect(find.textContaining('primera moneda'), findsNothing);
       expect(c.read(tiradaMesaProvider), isNotNull);
       await tester.pump(const Duration(seconds: 10));
+    });
+
+    test('cada vez que Nosepass entra renueva la pasiva', () {
+      const nosepass = AliadoInvocado(
+        slot: 0,
+        categoria: CategoriaAliado.tanque,
+        nombre: 'Nosepass',
+        hp: 60,
+        efectos: EfectosAliado.programa,
+        scriptId: 'fijar-blanco',
+      );
+      const otro = AliadoInvocado(
+        slot: 1,
+        categoria: CategoriaAliado.danio,
+        nombre: 'Otro',
+        hp: 60,
+      );
+      expect(entradasDeEfectoPermanente(const [], conFijar), 0);
+      expect(entradasDeEfectoPermanente(const [nosepass, otro], conFijar), 1);
+      expect(
+        entradasDeEfectoPermanente(const [nosepass, otro, nosepass], conFijar),
+        2,
+      );
     });
 
     testWidgets('si no es la primera, se lanza como siempre y no se repite',
@@ -294,7 +318,7 @@ void main() {
       await tester.tap(find.text('No'));
       await tester.pump();
       expect(c.read(tiradaMesaProvider), isNotNull);
-      expect(c.read(primeraMonedaResueltaProvider), {0});
+      expect(c.read(primeraMonedaResueltaProvider), {0: 0});
       await tester.pump(const Duration(seconds: 10));
     });
   });

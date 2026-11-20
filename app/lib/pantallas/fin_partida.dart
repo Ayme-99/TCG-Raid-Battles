@@ -189,7 +189,7 @@ class _FilaJugador extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Daño ${j.dano} · ${j.porcentaje}%',
+                'Daño ${j.dano}',
                 style: base.titleMedium?.copyWith(
                   color: tinta,
                   fontWeight: FontWeight.w800,

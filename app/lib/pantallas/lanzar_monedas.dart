@@ -41,7 +41,7 @@ Future<List<bool>> lanzarMonedas(
 /// fija la primera moneda de cada jugador (Fijar Blanco: es cruz) la app
 /// pregunta UNA sola vez por jugador si esta es su primera moneda: si lo es,
 /// sale cruz sin más preguntas; si no, se lanza como siempre. Después no se
-/// vuelve a preguntar por ese jugador. `true`: cara; null: se cerró la
+/// vuelve a preguntar por ese jugador hasta que el aliado se invoque otra vez. `true`: cara; null: se cerró la
 /// pregunta sin responder.
 Future<bool?> lanzarMonedaDeJugador(
   BuildContext context,
@@ -53,8 +53,12 @@ Future<bool?> lanzarMonedaDeJugador(
   final fijadas =
       recordatoriosDeMoneda(ref.read(catalogoProvider).valueOrNull, estado);
   final resueltas = ref.read(primeraMonedaResueltaProvider);
+  final entrada = entradasDeEfectoPermanente(
+    ref.read(partidaProvider).partida.eventos,
+    estado,
+  );
   var cruzFijada = false;
-  if (fijadas.isNotEmpty && !resueltas.contains(asiento)) {
+  if (fijadas.isNotEmpty && resueltas[asiento] != entrada) {
     final nombre = estado.jugadores[asiento].nombre;
     final primera = await preguntarMesa(
       context,
@@ -64,7 +68,7 @@ Future<bool?> lanzarMonedaDeJugador(
     if (primera == null) return null;
     ref.read(primeraMonedaResueltaProvider.notifier).state = {
       ...resueltas,
-      asiento,
+      asiento: entrada,
     };
     cruzFijada = primera;
   }
