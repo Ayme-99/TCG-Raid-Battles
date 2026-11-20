@@ -155,10 +155,9 @@ Color _colorTipoJefe(String id) => switch (id) {
 /// Artwork del Pokémon del jefe sobre un degradado del color de su tipo: su
 /// foto de perfil.
 class _FotoJefe extends StatelessWidget {
-  const _FotoJefe({required this.jefe, this.relleno = 8});
+  const _FotoJefe({required this.jefe});
 
   final JefeCatalogo jefe;
-  final double relleno;
 
   @override
   Widget build(BuildContext context) {
@@ -171,7 +170,7 @@ class _FotoJefe extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(relleno),
+        padding: const EdgeInsets.all(8),
         child: Image.asset(
           'assets/jefes/${jefe.id}.png',
           fit: BoxFit.contain,
