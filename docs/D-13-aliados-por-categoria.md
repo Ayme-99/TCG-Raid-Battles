@@ -10,7 +10,7 @@ Cada jefe que invoca tiene **4 aliados, uno por categoría**: Daño, Tanque, Cur
 
 Cada jefe tiene sus **propios** 4 aliados. Ejemplo ilustrativo (no es un jefe real, ni sus números): Daño Rattata, Tanque Mr. Mime, Cura Chansey, Pícaro Scyther.
 
-**Pícaro** es la categoría de **control**, la más versátil: aplica estados alterados, modifica la fuerza, pone contadores de daño, etc. Son los **únicos aliados que atacan a la Banca**; el resto solo afecta al Pokémon Activo.
+**Pícaro** (hoy **Control**, ver D-16) es la categoría de **control**, la más versátil: aplica estados alterados, modifica la fuerza, pone contadores de daño, etc. *Obsoleto:* ya no existe el Pícaro y ningún aliado ataca a la Banca; todos afectan solo al Pokémon Activo.
 
 ## 2. Cómo se resuelve un intento de invocación
 
@@ -48,13 +48,9 @@ Las habilidades siguen siendo **pasivas** (D-04 §7.4).
 - `incursiones_gdd.md` → v1.5: §4.4, glosario, valores provisionales (§9), índice de apoyo (§11) y este cambio en el historial.
 - `docs/D-04-aliados.md`: aviso en §7 de lo que sustituye esta decisión.
 
-## 6. Pendiente (tareas aparte, sin implementar todavía)
+## 6. Estado de la implementación
 
-- Motor: dado de categoría, no repetir categoría, efectos con script.
-- Contrato: nueva versión con la categoría y los efectos del programa.
-- Catálogo (T-13): `categoria` por aliado y un aliado por categoría en cada jefe.
-- App: mostrar la categoría del aliado y los efectos automáticos.
-- Simulador: aún no modela aliados.
+Hecho: motor (dado de categoría, categorías sin repetir, efectos con script), contrato (v3 en adelante), catálogo (`categoria` por aliado) y app (categoría y efectos automáticos). El simulador (`sim/bin/sim_jefes.dart`) también modela a los aliados.
 
 ## 7. Baraja de ataques del jefe (enmienda, v1.6)
 

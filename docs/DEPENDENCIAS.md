@@ -23,7 +23,7 @@ Leyenda de la columna «Avisa»: ✅ un test del CI falla si se desincroniza · 
 | | `catalog/README.md` (ejemplo y descripción de campos) y los ejemplos de `catalog/ejemplos/` | ✅ `server/test/catalogo.test.js` (ejemplos válidos e inválidos) |
 | | El script de la hoja `balance/scripts/generar_hoja.py` si usa el campo | ❌ |
 | | Si rompe los jefes existentes: sube `formato` y migra los jefes | ❌ |
-| Una **categoría de aliado** (renombrar, añadir o quitar: `danio`, `tanque`, `cura`, `picaro`) | Engine: `enum CategoriaAliado` en `engine/lib/src/eventos.dart` | ✅ |
+| Una **categoría de aliado** (renombrar, añadir o quitar: `danio`, `tanque`, `cura`, `control`, `potenciador`, `debilitador`) | Engine: `enum CategoriaAliado` en `engine/lib/src/eventos.dart` | ✅ |
 | | Contrato: **nueva versión** (ver sección 2) con el esquema, la migración y los ejemplos | ⚠️ ver sección 2 |
 | | Catálogo: `boss.schema.json` (`required` y `properties` de `aliados`), ejemplos de `catalog/ejemplos/`, los jefes y `catalog/README.md` | ✅ |
 | | App: etiqueta en `app/lib/pantallas/pendientes.dart` (`_etiquetaCategoria`) y `app/lib/catalogo/catalogo.dart` (usa `CategoriaAliado.values`) | ✅ `flutter analyze` falla si falta un caso del `switch` |

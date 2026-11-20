@@ -54,7 +54,7 @@ Cada evento es un objeto con un campo `tipo`. Los campos marcados con `?` son op
 | `curacionJefe` | `cantidad` | El jefe se cura (el motor topa al HP máximo) |
 | `danoDeEfecto` | `puntos` (≥ 1) y `jugador` **o** `slot` (uno solo) | Daño de un efecto (rebote, T-59). Con `jugador`: al jefe, atribuido a ese jugador (el defensor); puede dar la victoria y cruzar umbrales de llamada. Con `slot`: a un aliado, sin atribuir; a 0 HP sale de la mesa |
 | `sinInvocacion` | — | Intento de invocación sin aliado |
-| `aliadoInvocado` | `slot`, `categoria` (`danio`, `tanque`, `cura` o `picaro`), `nombre`, `hp`, `ataqueNombre?`, `ataqueDano?`, `habilidad?`, `efectos?` (`jugador`, por defecto, o `programa`), `scriptId?` | Intento de invocación con aliado (D-13) |
+| `aliadoInvocado` | `slot`, `categoria` (`danio`, `tanque`, `cura`, `control`, `potenciador` o `debilitador`), `nombre`, `hp`, `ataqueNombre?`, `ataqueDano?`, `habilidad?`, `efectos?` (`jugador`, por defecto, o `programa`), `scriptId?` | Intento de invocación con aliado (D-13) |
 | `ataqueAliado` | `slot`, `dano`, `objetivo?` | Ataque de un aliado (al entrar y al final del turno del jefe) |
 | `aplicarEstadoJefe` | `jugador`, `estado` (`veneno` o `quemadura`) | Un jugador deja al jefe con un estado alterado (D-12) |
 | `finTurnoJefe` | `monedaQuemadura?` | Cierra la ronda; antes se hace el chequeo de estados del jefe |

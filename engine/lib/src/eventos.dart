@@ -173,10 +173,10 @@ final class PokemonKo extends Evento {
   const PokemonKo(this.jugador);
 }
 
-/// El jugador KO roba su carta de ánimo (1 a 5) en el turno que se sienta.
-/// La app ya no lo pide (TODO: la carta se roba en la mesa); el motor sigue
-/// aceptando el registro por compatibilidad con el contrato.
-/// El efecto se resuelve en la mesa; el motor solo lo registra.
+/// El jugador KO roba su carta de ánimo (1 a 5) en el turno que se sienta. La
+/// app la roba al azar al empezar la ronda y aplica los efectos que puede
+/// (+50, doble daño, el jefe juega una sola carta); las curas las hace la
+/// mesa. El motor solo registra cuál salió.
 final class CartaAnimoRobada extends Evento {
   final int jugador;
   final int carta;
@@ -285,7 +285,7 @@ enum CategoriaAliado {
   cura,
 
   /// Estados alterados, contadores de daño y limitar las acciones de los
-  /// jugadores. Antes se llamaba Pícaro; es el único que ataca a la Banca.
+  /// jugadores. Antes se llamaba Pícaro, que ya no existe.
   control,
 
   /// Mejora al jefe y a los aliados (más daño, defensa o velocidad).
