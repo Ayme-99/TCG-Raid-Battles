@@ -126,6 +126,26 @@ void main() {
       await _pasaElAviso(tester);
     });
 
+    testWidgets('el nombre se lee entero: no va del color de la franja',
+        (tester) async {
+      await tester.pumpWidget(
+        _pantalla(
+          lanzar: (c) => registrarAviso(
+            c,
+            'Bronzong obliga a atacarle: ataca al aliado o pasa el turno.',
+            tipo: TipoAviso.error,
+          ),
+        ),
+      );
+      await _lanzar(tester);
+      final nombre = tester.widget<Text>(find.byKey(const Key('aviso-nombre')));
+      expect(nombre.data, 'BRONZONG OBLIGA A ATACARLE');
+      // La franja de la izquierda lleva el color del aviso (naranja en los
+      // errores): el nombre tiene que ser claro para no confundirse con ella.
+      expect(nombre.style!.color!.computeLuminance(), greaterThan(0.8));
+      await _pasaElAviso(tester);
+    });
+
     testWidgets('el texto lleva su estilo: sin subrayado amarillo',
         (tester) async {
       await tester.pumpWidget(

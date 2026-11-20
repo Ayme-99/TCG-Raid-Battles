@@ -417,13 +417,19 @@ class _Cartel extends StatelessWidget {
                 if (aviso.nombre != null)
                   Text(
                     aviso.nombre!,
+                    key: const Key('aviso-nombre'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    // Blanco y no el color del aviso: las primeras letras caen
+                    // sobre la franja de ese mismo color y desaparecían.
                     style: TextStyle(
-                      color: estilo.color,
+                      color: Colors.white.withValues(alpha: .92),
                       fontSize: fNombre,
                       fontWeight: FontWeight.w900,
                       letterSpacing: fNombre * .2,
+                      shadows: const [
+                        Shadow(color: Color(0x73000000), offset: Offset(0, 2)),
+                      ],
                     ),
                   ),
                 FittedBox(
