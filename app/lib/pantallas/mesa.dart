@@ -651,7 +651,9 @@ class _Mesa extends StatelessWidget {
         if (tirada != null)
           Positioned.fill(
             // La pregunta de una moneda lleva botones: esa sí recibe toques.
-            child: IgnorePointer(
+            child: ExcludeSemantics(
+              excluding: !tirada!.esPregunta,
+              child: IgnorePointer(
               ignoring: !tirada!.esPregunta,
               child: tirada!.esPregunta
                   ? PreguntaMonedaEnMesa(
@@ -670,10 +672,11 @@ class _Mesa extends StatelessWidget {
                       tirada: tirada!,
                       asientos: estado.jugadores.length,
                     ),
+              ),
             ),
           ),
         // Los ataques del jefe y de los aliados, por encima de todo.
-        const Positioned.fill(child: AtaquesEnMesa()),
+        const Positioned.fill(child: ExcludeSemantics(child: AtaquesEnMesa())),
       ],
     );
   }
