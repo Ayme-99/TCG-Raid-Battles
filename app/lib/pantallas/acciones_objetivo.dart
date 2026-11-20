@@ -56,7 +56,7 @@ Future<void> _mostrarMenu(
   String titulo,
   List<_Accion> acciones,
 ) async {
-  final elegida = await showDialog<_Accion>(
+  final elegida = await mostrarDialogo<_Accion>(
     context: context,
     builder: (dialogo) => SimpleDialog(
       title: Text(titulo),

@@ -390,7 +390,7 @@ Future<Object?> _abrirDialogoAliado(
   EstadoPartida estado, {
   required _ResultadoTirada inicial,
 }) =>
-    showDialog<Object>(
+    mostrarDialogo<Object>(
       context: context,
       barrierDismissible: false,
       builder: (_) => _DialogoAliado(
