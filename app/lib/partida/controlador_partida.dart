@@ -59,6 +59,7 @@ class ControladorPartida extends Notifier<Historial> {
   void nuevaPartida() {
     ref.read(colaAtaquesMesaProvider.notifier).limpiar();
     ref.read(enfoqueAtaqueProvider.notifier).state = null;
+    ref.read(danoFijadoProvider.notifier).state = const {};
     salirDeSala();
     _olvidarIdentidad();
     state = Historial.nuevo();
@@ -184,6 +185,10 @@ class ControladorPartida extends Notifier<Historial> {
 
 /// Partida que había en curso al abrir la app (la lee `main.dart` del
 /// almacén antes de arrancar). Sin valor, se empieza una nueva.
+/// Daño fijado por jugador (asiento → daño): se rellena solo en sus turnos
+/// siguientes, para repetir el mismo ataque varias rondas.
+final danoFijadoProvider = StateProvider<Map<int, int>>((ref) => const {});
+
 final partidaInicialProvider = Provider<PartidaGuardada?>((ref) => null);
 
 final partidaProvider =
