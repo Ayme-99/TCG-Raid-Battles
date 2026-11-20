@@ -281,31 +281,16 @@ Future<void> atacarConAliado(
   }
   // Moneda del rival (Fuerza Lunar): la lanza el jugador. Cae en la pantalla;
   // con Fijar Blanco en juego (la primera moneda de cada jugador es cruz) la
-  // lleva la mesa y la app solo la anota.
+  // app pregunta una sola vez por jugador si es la primera.
   bool? monedaRival;
   if (esDeCarta && carta.ataqueMonedaRival) {
-    final fijadas = recordatoriosDeMoneda(
-      ref.read(catalogoProvider).valueOrNull,
-      estado,
-    );
     final rivalNombre = estado.jugadores[objetivo ?? aliado.slot].nombre;
-    if (fijadas.isEmpty) {
-      monedaRival = (await lanzarMonedas(
-        ref,
-        lugar: LugarMoneda.asiento,
-        asiento: objetivo ?? aliado.slot,
-        leyenda: '$rivalNombre lanza: $leyendaAtaque',
-      ))
-          .first;
-    } else {
-      monedaRival = await preguntarMoneda(
-        ref,
-        asiento: objetivo ?? aliado.slot,
-        titulo: leyendaAtaque,
-        detalle: '$rivalNombre lanza 1 moneda.',
-        recordatorios: fijadas,
-      );
-    }
+    monedaRival = await lanzarMonedaDeJugador(
+      context,
+      ref,
+      asiento: objetivo ?? aliado.slot,
+      leyenda: '$rivalNombre lanza: $leyendaAtaque',
+    );
     if (monedaRival == null || !context.mounted) return;
   }
   final aplicado = registrar(

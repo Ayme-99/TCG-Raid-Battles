@@ -215,6 +215,90 @@ void main() {
     });
   });
 
+  group('Fijar Blanco: se pregunta una vez por jugador', () {
+    final base = apply(
+      EstadoPartida.inicial(),
+      const ConfigurarJugadores([
+        ConfigJugador(nombre: 'Ana', ataqueMaximo: 100),
+        ConfigJugador(nombre: 'Bea', ataqueMaximo: 100),
+      ]),
+    );
+    final conFijar = base.copiarCon(efectosPermanentes: const [
+      EfectoPermanente(
+        scriptId: 'fijar-blanco',
+        origen: 'Nosepass',
+        texto: 'Fijar Blanco: la primera moneda de cada jugador es cruz.',
+      ),
+    ]);
+
+    Future<ProviderContainer> abrir(
+      WidgetTester tester,
+      void Function(bool?) alTerminar,
+    ) async {
+      late ProviderContainer c;
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [estadoProvider.overrideWithValue(conFijar)],
+          child: MaterialApp(
+            home: Consumer(
+              builder: (context, ref, _) {
+                c = ProviderScope.containerOf(context);
+                return TextButton(
+                  key: const Key('lanzar-ana'),
+                  onPressed: () async => alTerminar(
+                    await lanzarMonedaDeJugador(
+                      context,
+                      ref,
+                      asiento: 0,
+                      leyenda: 'Ana lanza',
+                    ),
+                  ),
+                  child: const Text('lanzar'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      return c;
+    }
+
+    testWidgets('si es la primera, sale cruz y no se vuelve a preguntar',
+        (tester) async {
+      bool? r;
+      final c = await abrir(tester, (v) => r = v);
+      await tester.tap(find.byKey(const Key('lanzar-ana')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('primera moneda que lanza Ana'), findsOneWidget);
+      await tester.tap(find.text('Sí'));
+      await tester.pump();
+      // Cae una moneda en cruz sobre la mesa.
+      expect(c.read(tiradaMesaProvider)!.monedas, [false]);
+      await tester.pump(const Duration(seconds: 10));
+      expect(r, isFalse);
+      expect(c.read(primeraMonedaResueltaProvider), {0});
+
+      // La segunda moneda de Ana ya no pregunta nada.
+      await tester.tap(find.byKey(const Key('lanzar-ana')));
+      await tester.pump();
+      expect(find.textContaining('primera moneda'), findsNothing);
+      expect(c.read(tiradaMesaProvider), isNotNull);
+      await tester.pump(const Duration(seconds: 10));
+    });
+
+    testWidgets('si no es la primera, se lanza como siempre y no se repite',
+        (tester) async {
+      final c = await abrir(tester, (_) {});
+      await tester.tap(find.byKey(const Key('lanzar-ana')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('No'));
+      await tester.pump();
+      expect(c.read(tiradaMesaProvider), isNotNull);
+      expect(c.read(primeraMonedaResueltaProvider), {0});
+      await tester.pump(const Duration(seconds: 10));
+    });
+  });
+
   group('preguntar la moneda de la mesa', () {
     testWidgets('preguntarMoneda pone la pregunta en la mesa y espera',
         (tester) async {

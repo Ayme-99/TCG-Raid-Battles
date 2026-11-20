@@ -10,7 +10,6 @@ import '../partida/ataque_mesa.dart';
 import '../partida/controlador_partida.dart';
 import '../sala/controlador_sala.dart';
 import '../partida/recordatorios.dart';
-import '../partida/tirada_mesa.dart';
 import 'comun.dart';
 import 'lanzar_monedas.dart';
 import 'paneles.dart';
@@ -224,28 +223,14 @@ class _TurnoActualState extends ConsumerState<_TurnoActual> {
     if (conBote) {
       final nombreAliado = aliado.nombre;
       final nombreJugador = estado.jugadores[widget.jugador].nombre;
-      final fijadas =
-          recordatoriosDeMoneda(ref.read(catalogoProvider).valueOrNull, estado);
-      if (fijadas.isEmpty) {
-        evita = (await lanzarMonedas(
-          ref,
-          lugar: LugarMoneda.asiento,
-          asiento: widget.jugador,
-          leyenda: '$nombreJugador lanza: $nombreAliado · Bote',
-        ))
-            .first;
-      } else {
-        final cara = await preguntarMoneda(
-          ref,
-          asiento: widget.jugador,
-          titulo: '$nombreAliado: Bote',
-          detalle: '$nombreJugador lanza 1 moneda. Con cara, se evita todo el '
-              'daño a $nombreAliado.',
-          recordatorios: fijadas,
-        );
-        if (cara == null) return;
-        evita = cara;
-      }
+      final cara = await lanzarMonedaDeJugador(
+        context,
+        ref,
+        asiento: widget.jugador,
+        leyenda: '$nombreJugador lanza: $nombreAliado · Bote',
+      );
+      if (cara == null) return;
+      evita = cara;
       if (!mounted) return;
     }
     ref.read(extraDanoProvider.notifier).state = evita ? 0 : extra;

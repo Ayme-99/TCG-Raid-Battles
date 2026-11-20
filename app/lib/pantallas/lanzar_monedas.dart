@@ -1,8 +1,13 @@
 import 'dart:async';
+
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../catalogo/catalogo.dart';
 import '../partida/controlador_partida.dart';
+import '../partida/recordatorios.dart';
 import '../partida/tirada_mesa.dart';
+import 'comun.dart';
 
 /// Una sola forma de lanzar monedas en toda la app (T-73): se echan a suerte
 /// con el azar de la partida y caen sobre la mesa, como los dados. Devuelve el
@@ -30,6 +35,58 @@ Future<List<bool>> lanzarMonedas(
     ),
   );
   return resultados;
+}
+
+/// Una moneda que lanza un jugador (Bote, Fuerza Lunar). Con un efecto que
+/// fija la primera moneda de cada jugador (Fijar Blanco: es cruz) la app
+/// pregunta UNA sola vez por jugador si esta es su primera moneda: si lo es,
+/// sale cruz sin más preguntas; si no, se lanza como siempre. Después no se
+/// vuelve a preguntar por ese jugador. `true`: cara; null: se cerró la
+/// pregunta sin responder.
+Future<bool?> lanzarMonedaDeJugador(
+  BuildContext context,
+  WidgetRef ref, {
+  required int asiento,
+  required String leyenda,
+}) async {
+  final estado = ref.read(estadoProvider);
+  final fijadas =
+      recordatoriosDeMoneda(ref.read(catalogoProvider).valueOrNull, estado);
+  final resueltas = ref.read(primeraMonedaResueltaProvider);
+  var cruzFijada = false;
+  if (fijadas.isNotEmpty && !resueltas.contains(asiento)) {
+    final nombre = estado.jugadores[asiento].nombre;
+    final primera = await preguntarMesa(
+      context,
+      '${fijadas.join('\n')}\n\n¿Es esta la primera moneda que lanza '
+      '$nombre desde que entró ese efecto?',
+    );
+    if (primera == null) return null;
+    ref.read(primeraMonedaResueltaProvider.notifier).state = {
+      ...resueltas,
+      asiento,
+    };
+    cruzFijada = primera;
+  }
+  if (cruzFijada) {
+    await tirarEnMesa(
+      ref,
+      TiradaMesa.monedas(
+        const [false],
+        lugar: LugarMoneda.asiento,
+        asiento: asiento,
+        leyenda: leyenda,
+      ),
+    );
+    return false;
+  }
+  return (await lanzarMonedas(
+    ref,
+    lugar: LugarMoneda.asiento,
+    asiento: asiento,
+    leyenda: leyenda,
+  ))
+      .first;
 }
 
 /// Si ya hay unos dados o unas monedas cayendo sobre la mesa. Los botones que
