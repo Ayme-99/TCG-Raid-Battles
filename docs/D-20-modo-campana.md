@@ -97,7 +97,7 @@ El jefe se enfrenta como un **equipo rival**: sus aliados salen primero y el jef
 
 | Pieza | Propuesta |
 |---|---|
-| Motor | Paquete nuevo `engine/lib/campana/`, con el mismo patrón que la partida: estado y eventos, reductor puro y determinista. No toca el motor de las incursiones. |
+| Motor | Librería nueva `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho el combate 1 contra 1 (#336)**: energía, atacar, cambiar, pasar, elegir siguiente y tabla de tipos; el cambio gratis es de una vez por turno y no gasta turno, y quién empieza es un parámetro (por defecto, el jugador). |
 | Catálogo | `catalog/campana/`: `pokemon/*.json`, `regiones/*.json`, `tipos.json` y su esquema. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
 | Guardado | Progreso de campaña (región, nodo, equipo, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
