@@ -24,7 +24,7 @@
       "nombre": "Ataque Ala",
       "tipo": "volador",
       "coste": 2,
-      "dano": 25
+      "dano": 30
     }
   ]
 }

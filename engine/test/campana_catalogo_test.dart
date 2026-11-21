@@ -53,6 +53,8 @@ void main() {
         for (final a in p.ataques) {
           expect(a.coste, inInclusiveRange(1, 5), reason: '${p.id}/${a.nombre}');
           expect(a.dano, greaterThan(0), reason: '${p.id}/${a.nombre}');
+          expect(a.dano % 10, 0,
+              reason: '${p.id}/${a.nombre}: daño en múltiplos de 10');
         }
       }
     });
