@@ -95,6 +95,14 @@ void main() {
       expect(m.ataques.last.coste, 1);
     });
 
+    test('Kakuna: Fortaleza y Picotazo Veneno', () {
+      final k = pokemon['kakuna']!;
+      expect(k.ps, 70);
+      expect(k.ataques.first.efecto, isA<ReduceDanoPropio>());
+      expect(k.ataques.last.dano, 10);
+      expect(k.ataques.last.efecto, isA<EnvenenaDefensor>());
+    });
+
     test('Weedle: Picotazo Veneno hace 10 y envenena', () {
       final w = pokemon['weedle']!;
       expect(w.ps, 50);
