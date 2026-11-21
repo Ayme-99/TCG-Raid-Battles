@@ -149,6 +149,16 @@ void main() {
       expect(n.ataques.last.efecto, isA<RepiteDanoAlDerribar>());
     });
 
+    test('Nidoran♂ (032/150): oscuridad, Picotazo veneno y Ataque Furia', () {
+      final n = pokemon['nidoran-m']!;
+      expect(n.ps, 60);
+      expect(n.tipo, TipoCampana.oscuridad);
+      expect(n.ataques.first.coste, 1);
+      expect(n.ataques.first.dano, 0);
+      expect(n.ataques.first.efecto, isA<EnvenenaDefensor>());
+      expect(n.ataques.last.efecto, isA<MonedasDano>());
+    });
+
     test('Kakuna: Fortaleza y Picotazo Veneno', () {
       final k = pokemon['kakuna']!;
       expect(k.ps, 70);
