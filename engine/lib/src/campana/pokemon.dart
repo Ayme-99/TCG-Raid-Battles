@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy hay cuatro; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay cinco; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -42,6 +42,15 @@ class MonedaDanoExtra extends EfectoAtaque {
   final int valor;
 
   const MonedaDanoExtra(this.valor);
+}
+
+/// Deja al Pokémon activo del rival envenenado: en cada chequeo Pokémon (cada
+/// vez que cambia el turno) pierde [valor] PS. Dura mientras siga activo: se
+/// quita cuando cae o se cambia a la banca. No se acumula (Picotazo Veneno).
+class EnvenenaDefensor extends EfectoAtaque {
+  final int valor;
+
+  const EnvenenaDefensor(this.valor);
 }
 
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener

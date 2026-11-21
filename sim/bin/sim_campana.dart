@@ -84,7 +84,7 @@ Resultado jugar(
   var cambiar = 0;
   var cargar = 0;
   for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
-    final accion = decidirAccion(e, e.turno);
+    final accion = decidirAccion(e, e.actua);
     switch (accion) {
       case Atacar _:
         atacar++;

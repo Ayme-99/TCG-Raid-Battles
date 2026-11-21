@@ -57,12 +57,17 @@ class BandoCombate {
   /// bando por un efecto del rival (Látigo). Se quita al cambiar de activo.
   final int danoExtra;
 
+  /// Daño que pierde el Pokémon activo de este bando en cada chequeo Pokémon
+  /// por estar envenenado (0 = no lo está). Se quita al cambiar de activo.
+  final int veneno;
+
   const BandoCombate({
     required this.equipo,
     required this.activo,
     required this.energia,
     this.danoReducido = 0,
     this.danoExtra = 0,
+    this.veneno = 0,
   });
 
   PokemonEnCombate get pokemonActivo => equipo[activo];
@@ -82,6 +87,7 @@ class BandoCombate {
     int? energia,
     int? danoReducido,
     int? danoExtra,
+    int? veneno,
   }) =>
       BandoCombate(
         equipo: equipo ?? this.equipo,
@@ -89,6 +95,7 @@ class BandoCombate {
         energia: energia ?? this.energia,
         danoReducido: danoReducido ?? this.danoReducido,
         danoExtra: danoExtra ?? this.danoExtra,
+        veneno: veneno ?? this.veneno,
       );
 }
 
@@ -154,6 +161,21 @@ class EstadoCombate {
       semilla: _normalizarSemilla(semilla),
     );
   }
+
+  /// Bandos cuyo Pokémon activo ha caído y tienen que elegir el siguiente
+  /// (el del turno primero). Puede haber dos a la vez si el chequeo de veneno
+  /// derriba a uno mientras el otro ya había caído.
+  List<Bando> get debenElegir => [
+        for (final b in [turno, turno.otro])
+          if (!bando(b).pokemonActivo.enPie) b,
+      ];
+
+  /// Quién tiene que actuar ahora: quien elige Pokémon si hay que elegir, y si
+  /// no, el del turno. Úsalo (no [turno]) para pedir la acción a la IA.
+  Bando get actua =>
+      fase == FaseCombate.eligiendoActivo && debenElegir.isNotEmpty
+          ? debenElegir.first
+          : turno;
 
   BandoCombate bando(Bando b) => b == Bando.jugador ? jugador : rival;
 
@@ -240,14 +262,17 @@ EstadoCombate aplicarCombate(EstadoCombate estado, AccionCombate accion) {
   if (estado.fase == FaseCombate.terminado) {
     throw const ReglaIncumplida('El combate ha terminado.');
   }
-  if (accion.bando != estado.turno) {
-    throw const ReglaIncumplida('No es el turno de ese bando.');
-  }
   if (estado.fase == FaseCombate.eligiendoActivo) {
     if (accion is! ElegirSiguiente) {
       throw const ReglaIncumplida('Primero hay que elegir el siguiente Pokémon.');
     }
+    if (!estado.debenElegir.contains(accion.bando)) {
+      throw const ReglaIncumplida('Ese bando no tiene que elegir Pokémon.');
+    }
     return _elegirSiguiente(estado, accion);
+  }
+  if (accion.bando != estado.turno) {
+    throw const ReglaIncumplida('No es el turno de ese bando.');
   }
   return switch (accion) {
     Atacar a => _atacar(estado, a),
@@ -275,9 +300,14 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
   if (!b.relevos.contains(a.indice)) {
     throw const ReglaIncumplida('Ese Pokémon no puede salir.');
   }
-  return estado
-      .conBando(a.bando, b.copiarCon(activo: a.indice, danoReducido: 0, danoExtra: 0))
-      .copiarCon(fase: FaseCombate.enCurso);
+  final nuevo = estado.conBando(
+      a.bando,
+      b.copiarCon(
+          activo: a.indice, danoReducido: 0, danoExtra: 0, veneno: 0));
+  return nuevo.copiarCon(
+      fase: nuevo.debenElegir.isEmpty
+          ? FaseCombate.enCurso
+          : FaseCombate.eligiendoActivo);
 }
 
 EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
@@ -319,6 +349,9 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   if (efecto is AumentaDanoRecibido && efecto.valor > defensor.danoExtra) {
     defensorNuevo = defensorNuevo.copiarCon(danoExtra: efecto.valor);
   }
+  if (efecto is EnvenenaDefensor && efecto.valor > defensor.veneno) {
+    defensorNuevo = defensorNuevo.copiarCon(veneno: efecto.valor);
+  }
   if (efecto is QuitaEnergiaRival) {
     final resto = defensorNuevo.energia - efecto.valor;
     defensorNuevo = defensorNuevo.copiarCon(energia: resto < 0 ? 0 : resto);
@@ -331,11 +364,7 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   if (defensorNuevo.derrotado) {
     return nuevo.copiarCon(fase: FaseCombate.terminado, ganador: a.bando);
   }
-  nuevo = _terminarTurno(nuevo);
-  if (!golpeado.enPie) {
-    nuevo = nuevo.copiarCon(fase: FaseCombate.eligiendoActivo);
-  }
-  return nuevo;
+  return _terminarTurno(nuevo);
 }
 
 /// Cambiar siempre gasta el turno; además cuesta la retirada del Pokémon que
@@ -355,7 +384,8 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
         activo: a.indice,
         energia: b.energia - retirada,
         danoReducido: 0,
-        danoExtra: 0),
+        danoExtra: 0,
+        veneno: 0),
   ));
 }
 
@@ -373,10 +403,38 @@ EstadoCombate _terminarTurno(EstadoCombate estado) {
   final p = estado.parametros;
   final total = actual.energia + p.energiaPorTurno;
   final energia = total > p.energiaMaxima ? p.energiaMaxima : total;
-  return estado
-      .conBando(estado.turno, actual.copiarCon(energia: energia))
+  final termina = estado.turno;
+  final cambiado = estado
+      .conBando(termina, actual.copiarCon(energia: energia))
       .copiarCon(
-        turno: estado.turno.otro,
+        turno: termina.otro,
         numeroTurno: estado.numeroTurno + 1,
       );
+  final tras = _chequeoPokemon(cambiado, termina);
+  if (tras.fase == FaseCombate.terminado) return tras;
+  // Si cae algún activo (por un ataque o por el veneno), hay que elegir relevo.
+  return tras.debenElegir.isEmpty
+      ? tras
+      : tras.copiarCon(fase: FaseCombate.eligiendoActivo);
+}
+
+/// Chequeo Pokémon, cada vez que cambia el turno: el activo envenenado de cada
+/// bando pierde su veneno en PS. Va primero el bando que acaba de terminar su
+/// turno; si su último Pokémon cae, el combate termina y gana el otro aunque
+/// el segundo chequeo también lo hubiera derribado.
+EstadoCombate _chequeoPokemon(EstadoCombate estado, Bando primero) {
+  var s = estado;
+  for (final b in [primero, primero.otro]) {
+    final bando = s.bando(b);
+    final activo = bando.pokemonActivo;
+    if (bando.veneno <= 0 || !activo.enPie) continue;
+    final equipo = [...bando.equipo]
+      ..[bando.activo] = activo.conPs(activo.ps - bando.veneno);
+    final nuevo = bando.copiarCon(equipo: equipo);
+    s = s.conBando(b, nuevo);
+    if (nuevo.derrotado) {
+      return s.copiarCon(fase: FaseCombate.terminado, ganador: b.otro);
+    }
+  }
+  return s;
 }

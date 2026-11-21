@@ -368,6 +368,102 @@ void main() {
     });
   });
 
+  group('efecto: veneno (Picotazo Veneno)', () {
+    const picotazo = AtaqueCampana(
+      nombre: 'Picotazo Veneno',
+      tipo: TipoCampana.planta,
+      coste: 2,
+      dano: 10,
+      efecto: EnvenenaDefensor(10),
+    );
+    const golpe = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.normal, coste: 1, dano: 10);
+    final bicho = pokemon('w', tipo: TipoCampana.planta, ps: 50, ataques: const [picotazo]);
+    final sano = pokemon('r', ps: 100, ataques: const [golpe]);
+
+    EstadoCombate envenenado() => aplicarCombate(
+        nuevo(jugador: [bicho], rival: [sano, pokemon('r2')]),
+        const Atacar(Bando.jugador, 0));
+
+    test('el chequeo al acabar el turno quita 10 más al envenenado', () {
+      final e = envenenado();
+      expect(e.rival.veneno, 10);
+      expect(e.rival.pokemonActivo.ps, 80); // 100 - 10 del golpe - 10 de veneno
+    });
+
+    test('hay chequeo en cada cambio de turno: 10 por turno de cualquiera', () {
+      var e = envenenado();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(e.rival.pokemonActivo.ps, 70);
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      expect(e.rival.pokemonActivo.ps, 60);
+    });
+
+    test('no se acumula', () {
+      var e = envenenado();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.rival.veneno, 10);
+    });
+
+    test('cambiar de Pokémon lo quita', () {
+      var e = envenenado();
+      e = aplicarCombate(e, const Cambiar(Bando.rival, 1));
+      expect(e.rival.veneno, 0);
+      expect(e.rival.pokemonActivo.especie.id, 'r2');
+      final ps = e.rival.pokemonActivo.ps;
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      expect(e.rival.pokemonActivo.ps, ps);
+    });
+
+    test('el veneno puede derribar al activo y el dueño elige relevo', () {
+      var e = envenenado();
+      e = e.copiarCon(
+        rival: e.rival.copiarCon(equipo: [
+          e.rival.equipo[0].conPs(10),
+          e.rival.equipo[1],
+        ]),
+      );
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      // El chequeo tras el turno del rival envenena y derriba a su activo.
+      expect(e.fase, FaseCombate.eligiendoActivo);
+      expect(e.actua, Bando.rival);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.fase, FaseCombate.enCurso);
+      expect(e.rival.veneno, 0);
+      expect(e.turno, Bando.jugador);
+    });
+
+    test('si cae su último Pokémon por veneno, gana el otro', () {
+      var e = aplicarCombate(
+          nuevo(jugador: [bicho], rival: [sano]), const Atacar(Bando.jugador, 0));
+      e = e.copiarCon(
+          rival: e.rival.copiarCon(equipo: [e.rival.equipo[0].conPs(10)]));
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(e.fase, FaseCombate.terminado);
+      expect(e.ganador, Bando.jugador);
+    });
+
+    test('si cae quien acaba el turno por veneno, elige y luego juega el otro', () {
+      // El jugador está envenenado y su último turno le deja en 10 PS.
+      var e = nuevo(
+          jugador: [pokemon('a', ps: 100), pokemon('a2')],
+          rival: [pokemon('b')]);
+      e = e.copiarCon(
+          jugador: e.jugador.copiarCon(
+              veneno: 10, equipo: [e.jugador.equipo[0].conPs(10), e.jugador.equipo[1]]));
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      expect(e.fase, FaseCombate.eligiendoActivo);
+      expect(e.turno, Bando.rival);
+      expect(e.actua, Bando.jugador);
+      expect(() => aplicarCombate(e, const ElegirSiguiente(Bando.rival, 0)),
+          throwsA(isA<ReglaIncumplida>()));
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.jugador, 1));
+      expect(e.fase, FaseCombate.enCurso);
+      expect(e.turno, Bando.rival);
+    });
+  });
+
   group('efecto: moneda (Hiper Colmillo)', () {
     const colmillo = AtaqueCampana(
       nombre: 'Hiper Colmillo',

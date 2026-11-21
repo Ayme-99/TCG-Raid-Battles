@@ -61,12 +61,13 @@ void main() {
       }
     });
 
-    test('ninguna carta queda anulada por Grunido: un ataque de 20 o mas', () {
+    test('ninguna carta queda anulada por Grunido: un ataque de 20 o mas '
+        'o con veneno', () {
       for (final p in pokemon.values) {
-        final mejor =
-            p.ataques.map((a) => a.dano).reduce((a, b) => a > b ? a : b);
-        expect(mejor, greaterThanOrEqualTo(20),
-            reason: '${p.id}: su mejor ataque hace $mejor');
+        final valido = p.ataques
+            .any((a) => a.dano >= 20 || a.efecto is EnvenenaDefensor);
+        expect(valido, isTrue,
+            reason: '${p.id}: ningún ataque de 20+ ni con veneno');
       }
     });
 
@@ -79,6 +80,17 @@ void main() {
       expect(grunido.dano, 0);
       expect(grunido.coste, 1);
       expect(grunido.efecto, isA<ReduceDanoRival>()
+          .having((e) => e.valor, 'valor', 10));
+    });
+
+    test('Weedle: Picotazo Veneno hace 10 y envenena', () {
+      final w = pokemon['weedle']!;
+      expect(w.ps, 50);
+      expect(w.ataques, hasLength(1));
+      final a = w.ataques.single;
+      expect(a.coste, 2);
+      expect(a.dano, 10);
+      expect(a.efecto, isA<EnvenenaDefensor>()
           .having((e) => e.valor, 'valor', 10));
     });
 
@@ -225,7 +237,7 @@ void main() {
         for (final b in pokemon.values) {
           var e = EstadoCombate.inicial(equipoJugador: [a], equipoRival: [b]);
           for (var i = 0; i < 1000 && e.fase != FaseCombate.terminado; i++) {
-            e = aplicarCombate(e, decidirAccion(e, e.turno));
+            e = aplicarCombate(e, decidirAccion(e, e.actua));
           }
           expect(e.fase, FaseCombate.terminado, reason: '${a.id} vs ${b.id}');
           expect(e.ganador, isNotNull);

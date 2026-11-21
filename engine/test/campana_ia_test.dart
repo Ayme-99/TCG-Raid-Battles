@@ -211,7 +211,7 @@ void main() {
     EstadoCombate jugar(EstadoCombate inicial) {
       var e = inicial;
       for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
-        e = aplicarCombate(e, decidirAccion(e, e.turno));
+        e = aplicarCombate(e, decidirAccion(e, e.actua));
       }
       return e;
     }
@@ -302,7 +302,36 @@ void main() {
           for (final empieza in Bando.values) {
             var e = combate(x, y, empieza: empieza);
             for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
-              e = aplicarCombate(e, decidirAccion(e, e.turno));
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
+  group('Veneno', () {
+    const veneno = AtaqueCampana(
+      nombre: 'Picotazo Veneno',
+      tipo: TipoCampana.planta,
+      coste: 2,
+      dano: 10,
+      efecto: EnvenenaDefensor(10),
+    );
+
+    test('todos los emparejamientos con veneno terminan', () {
+      final a = [pokemon('w', ps: 50, ataques: [veneno])];
+      final b = [
+        pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(3, 60)]),
+        pokemon('d', ps: 60, ataques: [ataque(2, 30)]),
+      ];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
             }
             expect(e.fase, FaseCombate.terminado);
           }
@@ -345,7 +374,7 @@ void main() {
           for (final empieza in Bando.values) {
             var e = combate(x, y, empieza: empieza);
             for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
-              e = aplicarCombate(e, decidirAccion(e, e.turno));
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
             }
             expect(e.fase, FaseCombate.terminado);
           }
@@ -393,7 +422,7 @@ void main() {
           for (final empieza in Bando.values) {
             var e = combate(x, y, empieza: empieza);
             for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
-              e = aplicarCombate(e, decidirAccion(e, e.turno));
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
             }
             expect(e.fase, FaseCombate.terminado);
           }

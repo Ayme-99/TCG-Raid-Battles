@@ -31,7 +31,11 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
   if (estado.fase == FaseCombate.terminado) {
     throw const ReglaIncumplida('El combate ha terminado.');
   }
-  if (estado.turno != bando) {
+  if (estado.fase == FaseCombate.eligiendoActivo) {
+    if (!estado.debenElegir.contains(bando)) {
+      throw const ReglaIncumplida('Ese bando no tiene que elegir Pokémon.');
+    }
+  } else if (estado.turno != bando) {
     throw const ReglaIncumplida('No es el turno de ese bando.');
   }
   final yo = estado.bando(bando);
