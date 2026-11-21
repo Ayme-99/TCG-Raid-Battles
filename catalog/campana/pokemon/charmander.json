@@ -1,0 +1,31 @@
+{
+  "id": "charmander",
+  "numero": 4,
+  "nombre": "Charmander",
+  "tipo": "fuego",
+  "ps": 70,
+  "debilidad": {
+    "tipo": "agua",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Gruñido",
+      "tipo": "fuego",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "reduceDanoRival",
+        "valor": 10,
+        "texto": "Mientras el Pokémon Defensor siga activo, sus ataques hacen 10 puntos menos de daño (antes de aplicar debilidad y resistencia). No se acumula."
+      }
+    },
+    {
+      "nombre": "Ascuas",
+      "tipo": "fuego",
+      "coste": 2,
+      "dano": 30
+    }
+  ]
+}
