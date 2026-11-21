@@ -14,7 +14,7 @@
       "nombre": "Picotazo veneno",
       "tipo": "oscuridad",
       "coste": 1,
-      "dano": 0,
+      "dano": 10,
       "efecto": {
         "tipo": "envenenaDefensor",
         "valor": 10,

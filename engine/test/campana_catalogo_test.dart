@@ -154,7 +154,7 @@ void main() {
       expect(n.ps, 60);
       expect(n.tipo, TipoCampana.oscuridad);
       expect(n.ataques.first.coste, 1);
-      expect(n.ataques.first.dano, 0);
+      expect(n.ataques.first.dano, 10);
       expect(n.ataques.first.efecto, isA<EnvenenaDefensor>());
       expect(n.ataques.last.efecto, isA<MonedasDano>());
     });
