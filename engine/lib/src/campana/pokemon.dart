@@ -18,6 +18,47 @@ class AtaqueCampana {
   });
 }
 
+/// Cómo se consigue una evolución (D-20 §2.1).
+enum ViaEvolucion {
+  /// Acumulando XP (convertida de puntos en un centro Pokémon).
+  xp,
+
+  /// Con un objeto de evolución (una piedra…).
+  objeto,
+
+  /// Por intercambio: cuesta puntos por usar la máquina de intercambio.
+  intercambio,
+
+  /// Gastando puntos, para hacerse ex un Pokémon que no evoluciona.
+  puntos,
+}
+
+/// Una evolución posible de un Pokémon. La carta evolucionada sustituye a la
+/// anterior.
+class EvolucionCampana {
+  /// Id del Pokémon en que evoluciona.
+  final String a;
+  final ViaEvolucion via;
+
+  /// XP necesaria (con [ViaEvolucion.xp]).
+  final int? xp;
+
+  /// Id del objeto (con [ViaEvolucion.objeto]).
+  final String? objeto;
+
+  /// Puntos que cuesta (con [ViaEvolucion.intercambio] o
+  /// [ViaEvolucion.puntos]).
+  final int? puntos;
+
+  const EvolucionCampana({
+    required this.a,
+    required this.via,
+    this.xp,
+    this.objeto,
+    this.puntos,
+  });
+}
+
 /// Un Pokémon de campaña tal como está en el catálogo.
 class PokemonCampana {
   final String id;
@@ -33,6 +74,12 @@ class PokemonCampana {
   final int retirada;
   final List<AtaqueCampana> ataques;
 
+  /// Carta ex: la última fase de cada Pokémon.
+  final bool ex;
+
+  /// Las formas en que puede evolucionar (vacía si no evoluciona).
+  final List<EvolucionCampana> evoluciones;
+
   const PokemonCampana({
     required this.id,
     required this.nombre,
@@ -42,6 +89,8 @@ class PokemonCampana {
     this.resistencia,
     this.retirada = 0,
     required this.ataques,
+    this.ex = false,
+    this.evoluciones = const [],
   });
 }
 

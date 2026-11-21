@@ -74,6 +74,65 @@ void main() {
     });
   });
 
+  group('evolución y cartas ex', () {
+    Map<String, dynamic> base(List<Map<String, dynamic>> evoluciones,
+            {bool ex = false}) =>
+        {
+          'id': 'prueba',
+          'nombre': 'Prueba',
+          'tipo': 'normal',
+          'ps': 60,
+          'ex': ex,
+          'evoluciones': evoluciones,
+          'ataques': [
+            {'nombre': 'Placaje', 'tipo': 'normal', 'coste': 1, 'dano': 10},
+          ],
+        };
+
+    test('un Pokémon sin evoluciones ni ex es lo habitual', () {
+      final p = pokemonCampanaDesdeJson(base([]));
+      expect(p.evoluciones, isEmpty);
+      expect(p.ex, isFalse);
+    });
+
+    test('se leen las cuatro vías de evolución', () {
+      final p = pokemonCampanaDesdeJson(base([
+        {'a': 'a', 'via': 'xp', 'xp': 30},
+        {'a': 'b', 'via': 'objeto', 'objeto': 'piedra-trueno'},
+        {'a': 'c', 'via': 'intercambio', 'puntos': 200},
+        {'a': 'd', 'via': 'puntos', 'puntos': 300},
+      ], ex: true));
+      expect(p.ex, isTrue);
+      expect(p.evoluciones.map((e) => e.via), ViaEvolucion.values);
+      expect(p.evoluciones[0].xp, 30);
+      expect(p.evoluciones[1].objeto, 'piedra-trueno');
+      expect(p.evoluciones[2].puntos, 200);
+      expect(p.evoluciones[3].puntos, 300);
+    });
+
+    test('una evolución a medias o con una vía desconocida se rechaza', () {
+      expect(() => pokemonCampanaDesdeJson(base([{'a': 'a', 'via': 'xp'}])),
+          throwsFormatException);
+      expect(
+          () => pokemonCampanaDesdeJson(base([{'a': 'a', 'via': 'objeto'}])),
+          throwsFormatException);
+      expect(
+          () => pokemonCampanaDesdeJson(
+              base([{'a': 'a', 'via': 'intercambio'}])),
+          throwsFormatException);
+      expect(() => pokemonCampanaDesdeJson(base([{'a': 'a', 'via': 'magia'}])),
+          throwsFormatException);
+    });
+
+    test('toda evolución del catálogo apunta a un Pokémon que existe', () {
+      for (final p in pokemon.values) {
+        for (final e in p.evoluciones) {
+          expect(pokemon.containsKey(e.a), isTrue, reason: '${p.id} → ${e.a}');
+        }
+      }
+    });
+  });
+
   group('zonas', () {
     final zonas = carpetaZonas
         .listSync()
