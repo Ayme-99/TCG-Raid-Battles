@@ -33,11 +33,15 @@ jobs:
           sdk: stable
       - run: dart pub get
       - run: dart analyze bin/sim_jefes.dart
+      - run: dart analyze bin/sim_campana.dart
       # Humo: una partida mínima con todos los jefes del catálogo. No mide nada.
       - run: dart run bin/sim_jefes.dart --equipos=3 --partidas=3 --informe=/tmp/jefes_aliados.csv
       - run: dart run bin/sim_jefes.dart --calibrar --equipos=3 --partidas=3 --informe=/tmp/jefes_calibrado.csv
       - run: dart run bin/sim_jefes.dart --animo=no --equipos=3 --partidas=3 --informe=/tmp/jefes_sin_animo.csv
       - run: dart run bin/sim_jefes.dart --desajuste --equipos=40 --partidas=30 --informe=/tmp/jefes_desajuste.csv
+      # Humo del simulador de campaña (D-20): duelos y equipos.
+      - run: dart run bin/sim_campana.dart --informe=/tmp/campana_duelos.csv
+      - run: dart run bin/sim_campana.dart --modo=equipos --partidas=50 --informe=/tmp/campana_equipos.csv
 
   contrato:
     name: Contrato JSON (esquema del backend)
