@@ -65,6 +65,10 @@ class BandoCombate {
   /// bando por un efecto propio (Fortaleza). Se quita al cambiar de activo.
   final int proteccion;
 
+  /// Si es true, el próximo ataque de este bando lanza una moneda y con cruz
+  /// no hace nada (Bofetón Lodo del rival). Dura solo su próximo turno.
+  final bool cegado;
+
   const BandoCombate({
     required this.equipo,
     required this.activo,
@@ -73,6 +77,7 @@ class BandoCombate {
     this.danoExtra = 0,
     this.veneno = 0,
     this.proteccion = 0,
+    this.cegado = false,
   });
 
   PokemonEnCombate get pokemonActivo => equipo[activo];
@@ -98,6 +103,7 @@ class BandoCombate {
     int? danoExtra,
     int? veneno,
     int? proteccion,
+    bool? cegado,
   }) =>
       BandoCombate(
         equipo: equipo ?? this.equipo,
@@ -107,6 +113,7 @@ class BandoCombate {
         danoExtra: danoExtra ?? this.danoExtra,
         veneno: veneno ?? this.veneno,
         proteccion: proteccion ?? this.proteccion,
+        cegado: cegado ?? this.cegado,
       );
 }
 
@@ -318,7 +325,8 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
           danoReducido: 0,
           danoExtra: 0,
           veneno: 0,
-          proteccion: 0));
+          proteccion: 0,
+          cegado: false));
   return nuevo.copiarCon(
       fase: nuevo.debenElegir.isEmpty
           ? FaseCombate.enCurso
@@ -339,6 +347,20 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   final defensor = estado.bando(rivalBando);
   var semilla = estado.semilla;
   bool? moneda;
+  if (atacante.cegado) {
+    // Bofetón Lodo del rival: con cruz este ataque no hace nada.
+    semilla = _siguienteSemilla(semilla);
+    moneda = (semilla >> 8) & 1 == 1;
+    if (!moneda) {
+      final fallido = estado
+          .conBando(
+              a.bando,
+              atacante.copiarCon(
+                  energia: atacante.energia - ataque.coste, cegado: false))
+          .copiarCon(semilla: semilla, ultimaMoneda: moneda);
+      return _terminarTurno(fallido);
+    }
+  }
   var golpe = ataque;
   final efecto = ataque.efecto;
   if (efecto is MonedaDanoExtra) {
@@ -366,6 +388,9 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   }
   if (efecto is EnvenenaDefensor && efecto.valor > defensor.veneno) {
     defensorNuevo = defensorNuevo.copiarCon(veneno: efecto.valor);
+  }
+  if (efecto is MonedaFalloRival) {
+    defensorNuevo = defensorNuevo.copiarCon(cegado: true);
   }
   if (efecto is QuitaEnergiaRival) {
     final resto = defensorNuevo.energia - efecto.valor;
@@ -424,8 +449,9 @@ EstadoCombate _terminarTurno(EstadoCombate estado) {
   final total = actual.energia + p.energiaPorTurno;
   final energia = total > p.energiaMaxima ? p.energiaMaxima : total;
   final termina = estado.turno;
+  // El efecto de Bofetón Lodo solo dura el turno que acaba de jugarse.
   final cambiado = estado
-      .conBando(termina, actual.copiarCon(energia: energia))
+      .conBando(termina, actual.copiarCon(energia: energia, cegado: false))
       .copiarCon(
         turno: termina.otro,
         numeroTurno: estado.numeroTurno + 1,

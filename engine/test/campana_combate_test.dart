@@ -368,6 +368,67 @@ void main() {
     });
   });
 
+  group('efecto: moneda de fallo (Bofetón Lodo)', () {
+    const bofeton = AtaqueCampana(
+      nombre: 'Bofetón Lodo',
+      tipo: TipoCampana.lucha,
+      coste: 2,
+      dano: 30,
+      efecto: MonedaFalloRival(),
+    );
+    const golpe = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.normal, coste: 1, dano: 40);
+    final topo = pokemon('d', tipo: TipoCampana.lucha, ps: 100, ataques: const [bofeton]);
+    final rival = pokemon('r', ps: 200, ataques: const [golpe]);
+
+    EstadoCombate marcado([int semilla = 1]) => aplicarCombate(
+          EstadoCombate.inicial(
+              equipoJugador: [topo, pokemon('t2')],
+              equipoRival: [rival, pokemon('r2')],
+              semilla: semilla),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('hace su daño y marca al rival', () {
+      final e = marcado();
+      expect(e.rival.pokemonActivo.ps, 170);
+      expect(e.rival.cegado, isTrue);
+      expect(e.jugador.cegado, isFalse);
+      expect(e.ultimaMoneda, isNull); // la moneda se lanza cuando el rival ataca
+    });
+
+    test('con cara el ataque del rival funciona y con cruz no hace nada', () {
+      final resultados = <bool, EstadoCombate>{};
+      for (var s = 1; s <= 40; s++) {
+        final e = aplicarCombate(marcado(s), const Atacar(Bando.rival, 0));
+        resultados[e.ultimaMoneda!] = e;
+      }
+      final cara = resultados[true]!;
+      final cruz = resultados[false]!;
+      expect(cara.jugador.pokemonActivo.ps, 60);
+      expect(cruz.jugador.pokemonActivo.ps, 100);
+      // La energía se gasta igual (10 - 1 + 1 de fin de turno).
+      expect(cruz.rival.energia, cara.rival.energia);
+      expect(cruz.rival.cegado, isFalse);
+      expect(cara.rival.cegado, isFalse);
+    });
+
+    test('solo dura su próximo turno aunque no ataque', () {
+      var e = marcado();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(e.rival.cegado, isFalse);
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 60); // sin moneda, hace su daño
+    });
+
+    test('cambiar de Pokémon también lo quita', () {
+      var e = marcado();
+      e = aplicarCombate(e, const Cambiar(Bando.rival, 1));
+      expect(e.rival.cegado, isFalse);
+    });
+  });
+
   group('efecto: protección propia (Fortaleza)', () {
     const fortaleza = AtaqueCampana(
       nombre: 'Fortaleza',

@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy hay seis; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay siete; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -61,6 +61,13 @@ class ReduceDanoPropio extends EfectoAtaque {
   final int valor;
 
   const ReduceDanoPropio(this.valor);
+}
+
+/// En su próximo turno, si el Pokémon activo del rival ataca, lanza una moneda:
+/// con cruz ese ataque no hace nada (la energía se gasta igual). Solo afecta a
+/// ese turno, pase lo que pase en él (Bofetón Lodo).
+class MonedaFalloRival extends EfectoAtaque {
+  const MonedaFalloRival();
 }
 
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener

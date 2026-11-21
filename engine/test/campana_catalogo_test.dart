@@ -105,6 +105,16 @@ void main() {
       expect(p.ataques.last.coste, 2);
     });
 
+    test('Diglett (050/150): 50 PS, lucha y Bofetón Lodo con moneda de fallo', () {
+      final d = pokemon['diglett']!;
+      expect(d.ps, 50);
+      expect(d.tipo, TipoCampana.lucha);
+      expect(d.debilidad!.tipo, TipoCampana.planta);
+      expect(d.ataques.first.dano, 10);
+      expect(d.ataques.last.dano, 30);
+      expect(d.ataques.last.efecto, isA<MonedaFalloRival>());
+    });
+
     test('Kakuna: Fortaleza y Picotazo Veneno', () {
       final k = pokemon['kakuna']!;
       expect(k.ps, 70);

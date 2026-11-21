@@ -311,6 +311,38 @@ void main() {
     });
   });
 
+  group('Bofetón Lodo', () {
+    const bofeton = AtaqueCampana(
+      nombre: 'Bofetón Lodo',
+      tipo: TipoCampana.lucha,
+      coste: 2,
+      dano: 30,
+      efecto: MonedaFalloRival(),
+    );
+
+    test('todos los emparejamientos con Bofetón Lodo terminan', () {
+      final a = [pokemon('d', ps: 50, ataques: [ataque(1, 10), bofeton])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (var semilla = 1; semilla <= 20; semilla++) {
+        for (final x in [a, b]) {
+          for (final y in [a, b]) {
+            for (final empieza in Bando.values) {
+              var e = EstadoCombate.inicial(
+                  equipoJugador: x,
+                  equipoRival: y,
+                  empieza: empieza,
+                  semilla: semilla);
+              for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+                e = aplicarCombate(e, decidirAccion(e, e.actua));
+              }
+              expect(e.fase, FaseCombate.terminado);
+            }
+          }
+        }
+      }
+    });
+  });
+
   group('Fortaleza', () {
     const fortaleza = AtaqueCampana(
       nombre: 'Fortaleza',
