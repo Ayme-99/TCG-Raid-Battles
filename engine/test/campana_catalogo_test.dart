@@ -53,11 +53,46 @@ void main() {
         expect(p.ps, inInclusiveRange(30, 340), reason: '${p.id}: PS de la escala real');
         for (final a in p.ataques) {
           expect(a.coste, inInclusiveRange(1, 4), reason: '${p.id}/${a.nombre}');
-          expect(a.dano, greaterThan(0), reason: '${p.id}/${a.nombre}');
+          expect(a.dano > 0 || a.efecto != null, isTrue,
+              reason: '${p.id}/${a.nombre}: sin daño solo con efecto');
           expect(a.dano % 10, 0,
               reason: '${p.id}/${a.nombre}: daño en múltiplos de 10');
         }
       }
+    });
+
+    test('ninguna carta queda anulada por Grunido: un ataque de 20 o mas', () {
+      for (final p in pokemon.values) {
+        final mejor =
+            p.ataques.map((a) => a.dano).reduce((a, b) => a > b ? a : b);
+        expect(mejor, greaterThanOrEqualTo(20),
+            reason: '${p.id}: su mejor ataque hace $mejor');
+      }
+    });
+
+    test('Bulbasaur: Gruñido reduce 10 el daño del rival y no hace daño', () {
+      final b = pokemon['bulbasaur']!;
+      expect(b.ps, 90);
+      expect(b.debilidad!.tipo, TipoCampana.fuego);
+      expect(b.resistencia, isNull);
+      final grunido = b.ataques.first;
+      expect(grunido.dano, 0);
+      expect(grunido.coste, 1);
+      expect(grunido.efecto, isA<ReduceDanoRival>()
+          .having((e) => e.valor, 'valor', 10));
+    });
+
+    test('Squirtle: Látigo hace que el rival reciba 10 más y no hace daño', () {
+      final s = pokemon['squirtle']!;
+      expect(s.ps, 80);
+      expect(s.tipo, TipoCampana.agua);
+      expect(s.debilidad!.tipo, TipoCampana.electrico);
+      expect(s.resistencia, isNull);
+      final latigo = s.ataques.first;
+      expect(latigo.dano, 0);
+      expect(latigo.coste, 1);
+      expect(latigo.efecto,
+          isA<AumentaDanoRecibido>().having((e) => e.valor, 'valor', 10));
     });
 
     test('Onix lleva debilidad, resistencia y retirada con coste', () {

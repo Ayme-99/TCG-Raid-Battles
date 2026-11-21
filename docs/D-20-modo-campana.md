@@ -31,9 +31,25 @@ Cada Pokémon es un registro del catálogo:
 | `evoluciones` | lista (puede ser vacía): `a` (id) y cómo se consigue (ver 2.1) |
 | `ex` | `true` si es una carta ex |
 | `rareza` | cuánto cuesta encontrarlo en las rutas |
+| imagen | no va en el JSON: es `app/assets/campana/cartas/<id>.webp` (480×670) |
 
 - El equipo tiene un **máximo de Pokémon por definir** (propuesta provisional: 6; es un parámetro).
-- Los efectos de los ataques reutilizan las piezas que ya existen en las cartas de los aliados: monedas, curar, estados y habilidades pasivas. No se inventa un sistema de efectos nuevo.
+- Los efectos de los ataques (§3.6) empiezan por uno: reducir el daño del rival. Los siguientes (monedas, curar, estados) reutilizarán las piezas que ya existen en las cartas de los aliados, sin inventar un sistema nuevo.
+
+### 2.1 Progresión: sin niveles, con XP y evolución
+
+Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos PS y daños; se mejora evolucionando.
+
+- **Las victorias en combate dan puntos** (los mismos puntos del juego, §5).
+- En un **centro Pokémon** (el nodo de descanso) se pueden **convertir puntos en XP** de un Pokémon del equipo. Cuántos puntos cuesta cada XP queda por equilibrar.
+- Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xp: N` en la carta). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4).
+- **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`).
+- **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): cuesta **puntos**, por usar la máquina de intercambio (`via: "intercambio"`, `puntos: N`).
+- **Cartas ex.** La **última fase de cada Pokémon es una carta ex**. Un Pokémon que no evoluciona (Onix…) puede hacerse ex **gastando puntos** (`via: "puntos"`, `puntos: N`), con el mismo proceso. Cada carta ex es una **entrada propia del catálogo** (`"ex": true`).
+- **La carta evolucionada sustituye a la anterior** y recupera todos sus PS. Una forma evolucionada también puede aparecer salvaje en una zona si el catálogo la incluye, y entonces se captura aparte.
+- Un Pokémon puede tener **varias** evoluciones (Eevee con sus piedras), por eso `evoluciones` es una lista.
+
+Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo**.
 
 ### 2.1 Progresión: sin niveles, con XP y evolución
 
@@ -91,9 +107,78 @@ El rival juega con **las mismas reglas** (la misma energía y las mismas debilid
 1. Si cae su activo, saca al relevo que no sea débil al rival, haga más daño y tenga más salud.
 2. Si puede **rematar** al Pokémon rival, ataca con lo más barato que lo consiga.
 3. Si su activo es **débil** a un ataque del rival, o no llega a ningún ataque, **cambia** a un relevo que no sea débil y sí pueda atacar (si le llega la energía de la retirada).
-4. Si con la carga extra podría **rematar** al turno siguiente un ataque que hoy no le llega, **carga**.
-5. Ataca: con el de **más daño** si la reserva está llena (la energía sobrante se perdería) y, si no, con el de **más daño por energía gastada**.
-6. Si no llega a nada, **carga**.
+4. Si tiene un ataque que **reduce el daño del rival** (Gruñido) y compensa (evita más daño, en los golpes que el rival necesita para derribarlo, que el que haría atacando), lo usa; no lo repite mientras siga activo el mismo rival (§3.6).
+5. Si tiene un ataque que hace que el rival **reciba más daño** (Látigo) y lo derriba en menos golpes contando el turno que gasta, lo usa; no lo repite mientras siga activo el mismo rival.
+6. Si con la carga extra podría **rematar** al turno siguiente un ataque que hoy no le llega, **carga**.
+7. Ataca: con el de **más daño** si la reserva está llena (la energía sobrante se perdería) y, si no, con el de **más daño por energía gastada**.
+8. Si no llega a nada, **carga**.
+
+### 3.5 Baremo de PS y daños
+
+Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2026-27** (marcas H, I y J), de modo que las cartas de campaña se parezcan a las físicas.
+
+**Escala real de referencia**
+- Básico: 30–90 PS; los que evolucionan, en torno a 70. Fase 1: 90–130. Fase 2 sin ex: 150–190. Pokémon ex: 200–340.
+- Un básico pega 10–30 con una energía y 30–50 con dos. Un ex de Fase 1 como Lucario ex (260 PS) pega 60 con dos energías y 160 con tres.
+- La debilidad es ×2 y casi ninguna carta lleva resistencia.
+
+**Baremo de campaña** (PS y daño por coste de energía)
+
+| Fase | PS | Coste 1 | Coste 2 | Coste 3 | Coste 4 |
+|---|---|---|---|---|---|
+| Básico | 50–90 | 10–20 | 30–40 | 50–60 | — |
+| Fase 1 | 90–130 | 20–30 | 50–60 | 80–100 | 110–130 |
+| ex (línea de 2 fases o sin evolución) | 200–260 | 30–60 | 80–110 | 130–160 | 180–200 |
+| ex (línea de 3 fases) | 270–340 | 40–60 | 90–120 | 150–190 | 220–300 |
+
+**Reglas de calibración**
+- El ataque de **coste 2** es el golpe principal: quita del 40 al 50 % de los PS de un rival de su misma fase, así que un duelo igualado dura unos 3 golpes. Con debilidad ×2 baja a 1–2.
+- Los ataques de coste 3 y 4 matan en 2 golpes, pero vacían la reserva y obligan a Cargar o Cambiar.
+- **1 a 2 ataques** por carta, con coste de 1 a 4. Metapod y Kakuna llevan uno.
+- **Siempre un ataque de 20 o más** (decidido el 2026-11-21): así Gruñido (−10, §3.6) nunca deja a una carta sin poder hacer daño. Un ataque de coste 1 de 10 sí se anula, pero es el de relleno. El esquema y un test lo comprueban. Metapod y Kakuna llevan un único ataque de 20 (coste 1).
+- **Retirada:** 0–1 en los básicos, 1–2 en las fases evolucionadas, 2–3 en los pesados y los ex.
+- **Jefes:** pueden salirse de la tabla en PS (Pikachu 100, Onix 110) pero hacen daño de su fase; un ataque que mate al inicial de un golpe no entra.
+- **Resistencia (−30):** solo en pocas cartas (de salida Squirtle, Pidgey, Spearow, Geodude y Onix).
+- Los números son **provisionales** hasta calibrarlos con el simulador (D-20 §9, tarea 4).
+
+**Cartas del primer tramo (Pueblo Paleta → Ciudad Plateada)**
+
+| Pokémon | PS | Debilidad | Resistencia |
+|---|---|---|---|
+| Bulbasaur | 80 | fuego | — |
+| Charmander | 70 | agua | — |
+| Squirtle | 80 | eléctrico | fuego |
+| Pidgey | 60 | eléctrico | tierra |
+| Rattata | 60 | lucha | — |
+| Caterpie | 50 | fuego | — |
+| Weedle | 50 | tierra | — |
+| Metapod | 80 | fuego | — |
+| Kakuna | 80 | tierra | — |
+| Pikachu (jefe) | 100 | tierra | — |
+| Diglett | 50 | agua | — |
+| Sandshrew | 70 | agua | — |
+| Spearow | 60 | eléctrico | tierra |
+| Nidoran♀ | 60 | tierra | — |
+| Nidoran♂ | 60 | tierra | — |
+| Mankey | 70 | volador | — |
+| Geodude | 80 | agua | normal |
+| Onix | 110 | agua | normal |
+
+Evoluciones: Fase 1 de 90 a 110 PS (Ivysaur 100, Charmeleon 90, Wartortle 100, Pidgeotto 90, Nidorina 90, Nidorino 90, Graveler 110). ex de 3 fases de 270 a 340 (Venusaur 340, Charizard 330, Blastoise 330, Golem 330, Nidoqueen 310, Nidoking 310, Pidgeot 280, Butterfree 270, Beedrill 270). ex de 2 fases o sin evolución de 210 a 240 (Onix 240, Sandslash 230, Fearow 230, Raichu 220, Primeape 220, Raticate 210, Dugtrio 210). Heredan tipo, debilidad y resistencia de su base. Los rivales de zonas avanzadas tendrán que usar también cartas ex para que siga habiendo reto.
+
+### 3.6 Efectos de ataque
+
+Decidido el 2026-11-21. Un ataque puede llevar un `efecto` y entonces puede tener **0 de daño** (solo hace el efecto).
+
+**`reduceDanoRival` (Gruñido de Bulbasaur):** «Mientras el Pokémon Defensor siga activo, sus ataques hacen 10 puntos menos de daño (antes de aplicar debilidad y resistencia). No se acumula.»
+- Dura **todo el combate o hasta que ese Pokémon sale del puesto activo**, ya sea porque cae o porque su dueño lo cambia a la banca. Cambiar es la forma de quitárselo (gasta el turno y la retirada).
+- Se resta **antes** de la debilidad y la resistencia, y el daño nunca baja de 0 (sin suelo).
+- **No se acumula:** si el rival ya tiene una reducción igual o mayor, usarlo otra vez no hace nada. Cuenta la mayor.
+- **Por qué no se acumula** (a diferencia de los juegos, donde Gruñido llega a 6 etapas): allí cada etapa multiplica el daño y nunca llega a cero; aquí el daño es plano y no hay suelo, y como cuesta 1 de energía (que se recupera cada turno), tres usos anularían los ataques de coste 1 y 2. El efecto simétrico (Malicioso: «el Defensor recibe 10 más de daño») seguirá la misma regla.
+- **`aumentaDanoRecibido` (Látigo de Squirtle):** «Mientras el Pokémon Defensor siga activo, recibe 10 puntos más de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula.» Es el efecto simétrico: mismas reglas (dura mientras ese Pokémon siga activo, se quita al cambiarlo o cuando cae, no se acumula) pero sobre el daño que **recibe**. Se suma antes de la debilidad y la resistencia; un ataque sin daño no gana el extra. Los dos efectos se combinan. Estado del bando afectado: `BandoCombate.danoExtra`.
+- Es un estado del **bando afectado** (`BandoCombate.danoReducido`), que se pone a 0 al cambiar de activo.
+- **Ninguna carta queda anulada:** todas llevan al menos un ataque de 20 o más (§3.5), de modo que Gruñido deja siempre un ataque de 10 como mínimo.
+- La IA lo usa solo si compensa; contra un rival que pega poco (10 de daño) lo deja sin hacer daño; contra uno que pega fuerte no lo usa.
 
 ### 3.5 Baremo de PS y daños
 

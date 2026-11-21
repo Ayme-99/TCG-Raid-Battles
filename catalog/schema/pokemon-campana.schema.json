@@ -102,10 +102,158 @@
           },
           "dano": {
             "type": "integer",
+            "minimum": 0,
+            "multipleOf": 10,
+            "description": "0 solo si el ataque lleva un efecto."
+          },
+          "efecto": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tipo",
+              "valor"
+            ],
+            "properties": {
+              "tipo": {
+                "enum": [
+                  "reduceDanoRival",
+                  "aumentaDanoRecibido"
+                ],
+                "description": "reduceDanoRival: mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (Gruñido). aumentaDanoRecibido: mientras siga activo, recibe `valor` más de daño de los ataques (Látigo). Ambos, antes de debilidad y resistencia, sin acumular (D-20 §3.6)."
+              },
+              "valor": {
+                "type": "integer",
+                "minimum": 10,
+                "multipleOf": 10
+              },
+              "texto": {
+                "type": "string",
+                "description": "Texto de la carta."
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "not": {
+                "required": [
+                  "efecto"
+                ]
+              }
+            },
+            "then": {
+              "properties": {
+                "dano": {
+                  "minimum": 10
+                }
+              }
+            }
+          }
+        ]
+      },
+      "contains": {
+        "properties": {
+          "dano": {
+            "minimum": 20
+          }
+        },
+        "required": [
+          "dano"
+        ]
+      },
+      "description": "Al menos un ataque de 20 o más de daño, para que Gruñido (−10) nunca anule a la carta (D-20 §3.6)."
+    },
+    "ex": {
+      "type": "boolean",
+      "default": false,
+      "description": "Carta ex: la última fase de cada Pokémon (D-20 §2.1)."
+    },
+    "evoluciones": {
+      "type": "array",
+      "default": [],
+      "description": "Cómo evoluciona (D-20 §2.1). La carta evolucionada sustituye a la anterior.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "a",
+          "via"
+        ],
+        "properties": {
+          "a": {
+            "type": "string",
+            "description": "Id del Pokémon en que evoluciona."
+          },
+          "via": {
+            "enum": [
+              "xp",
+              "objeto",
+              "intercambio",
+              "puntos"
+            ]
+          },
+          "xp": {
+            "type": "integer",
+            "minimum": 10,
+            "multipleOf": 10
+          },
+          "objeto": {
+            "type": "string"
+          },
+          "puntos": {
+            "type": "integer",
             "minimum": 10,
             "multipleOf": 10
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "via": {
+                  "const": "xp"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "xp"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "via": {
+                  "const": "objeto"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "objeto"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "via": {
+                  "enum": [
+                    "intercambio",
+                    "puntos"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "puntos"
+              ]
+            }
+          }
+        ]
       }
     },
     "ex": {

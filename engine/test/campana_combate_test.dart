@@ -260,4 +260,191 @@ void main() {
       );
     });
   });
+
+  group('efecto: reducir el daño del rival (Gruñido)', () {
+    const grunido = AtaqueCampana(
+      nombre: 'Gruñido',
+      tipo: TipoCampana.normal,
+      coste: 1,
+      dano: 0,
+      efecto: ReduceDanoRival(10),
+    );
+    const golpe30 = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.normal, coste: 1, dano: 30);
+
+    EstadoCombate conGrunido({List<PokemonCampana>? rival}) => aplicarCombate(
+          nuevo(
+            jugador: [pokemon('g', ataques: const [grunido, golpe30])],
+            rival: rival ??
+                [
+                  pokemon('r1', ataques: const [golpe30]),
+                  pokemon('r2', ataques: const [golpe30]),
+                ],
+          ),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('no hace daño, gasta el coste y marca al activo rival', () {
+      final e = conGrunido();
+      expect(e.rival.pokemonActivo.ps, 100);
+      expect(e.jugador.energia, 10); // 10 - 1 + 1 de fin de turno
+      expect(e.rival.danoReducido, 10);
+      expect(e.jugador.danoReducido, 0);
+    });
+
+    test('los ataques del rival hacen 10 menos mientras siga activo', () {
+      var e = conGrunido();
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 80); // 30 - 10 = 20
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 1));
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 60);
+    });
+
+    test('no se acumula: usarlo otra vez no quita más', () {
+      var e = conGrunido();
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.rival.danoReducido, 10);
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 60);
+    });
+
+    test('se quita al cambiar el activo rival a la banca', () {
+      var e = conGrunido();
+      e = aplicarCombate(e, const Cambiar(Bando.rival, 1));
+      expect(e.rival.danoReducido, 0);
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 1));
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 70);
+    });
+
+    test('se quita cuando el activo rival cae y entra otro', () {
+      final fragil = pokemon('frágil', ps: 30, ataques: const [golpe30]);
+      var e = conGrunido(rival: [fragil, pokemon('r2')]);
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 1));
+      expect(e.fase, FaseCombate.eligiendoActivo);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.rival.danoReducido, 0);
+    });
+
+    test('se resta antes de la debilidad y la resistencia', () {
+      const agua = AtaqueCampana(
+          nombre: 'Pistola Agua', tipo: TipoCampana.agua, coste: 1, dano: 30);
+      final debil = pokemon('d',
+          tipo: TipoCampana.planta,
+          debilidad: const Debilidad(TipoCampana.agua),
+          ataques: const [grunido]);
+      var e = aplicarCombate(
+        nuevo(
+          jugador: [debil],
+          rival: [pokemon('tirador', tipo: TipoCampana.agua, ataques: const [agua])],
+          empieza: Bando.jugador,
+        ),
+        const Atacar(Bando.jugador, 0),
+      );
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 60); // (30 - 10) × 2 = 40
+    });
+
+    test('un ataque sin daño no hace daño aunque haya debilidad', () {
+      expect(
+        danoDeAtaque(grunido,
+            pokemon('x', debilidad: const Debilidad(TipoCampana.normal))),
+        0,
+      );
+    });
+
+    test('la reducción nunca deja el daño por debajo de 0', () {
+      expect(
+        danoDeAtaque(
+            const AtaqueCampana(
+                nombre: 'a', tipo: TipoCampana.normal, coste: 1, dano: 10),
+            pokemon('x'),
+            reduccion: 30),
+        0,
+      );
+    });
+  });
+
+  group('efecto: el rival recibe más daño (Látigo)', () {
+    const latigo = AtaqueCampana(
+      nombre: 'Látigo',
+      tipo: TipoCampana.agua,
+      coste: 1,
+      dano: 0,
+      efecto: AumentaDanoRecibido(10),
+    );
+    const golpe20 = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.agua, coste: 1, dano: 20);
+
+    EstadoCombate conLatigo({List<PokemonCampana>? rival}) => aplicarCombate(
+          nuevo(
+            jugador: [pokemon('s', tipo: TipoCampana.agua, ataques: const [latigo, golpe20])],
+            rival: rival ?? [pokemon('r1'), pokemon('r2')],
+          ),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('no hace daño y marca al activo rival', () {
+      final e = conLatigo();
+      expect(e.rival.pokemonActivo.ps, 100);
+      expect(e.rival.danoExtra, 10);
+      expect(e.jugador.danoExtra, 0);
+    });
+
+    test('los ataques contra el rival hacen 10 más mientras siga activo', () {
+      var e = conLatigo();
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0)); // el rival ataca
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 1));
+      expect(e.rival.pokemonActivo.ps, 70); // 20 + 10
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 1));
+      expect(e.rival.pokemonActivo.ps, 40);
+    });
+
+    test('no se acumula', () {
+      var e = conLatigo();
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.rival.danoExtra, 10);
+    });
+
+    test('se quita al cambiar el activo rival a la banca', () {
+      var e = conLatigo();
+      e = aplicarCombate(e, const Cambiar(Bando.rival, 1));
+      expect(e.rival.danoExtra, 0);
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 1));
+      expect(e.rival.pokemonActivo.ps, 80); // 20 sin extra
+    });
+
+    test('se suma antes de la debilidad', () {
+      final debil = pokemon('d',
+          debilidad: const Debilidad(TipoCampana.agua),
+          ataques: const [golpe20]);
+      var e = conLatigo(rival: [debil]);
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 1));
+      expect(e.rival.pokemonActivo.ps, 40); // (20 + 10) × 2 = 60
+    });
+
+    test('un ataque sin daño no gana el extra', () {
+      expect(danoDeAtaque(latigo, pokemon('x'), extra: 10), 0);
+    });
+
+    test('Gruñido y Látigo se combinan', () {
+      const grunido = AtaqueCampana(
+          nombre: 'Gruñido',
+          tipo: TipoCampana.normal,
+          coste: 1,
+          dano: 0,
+          efecto: ReduceDanoRival(10));
+      expect(
+        danoDeAtaque(golpe20, pokemon('x'), reduccion: 10, extra: 10),
+        20,
+      );
+      expect(grunido.efecto, isA<ReduceDanoRival>());
+    });
+  });
 }
