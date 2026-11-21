@@ -8,10 +8,6 @@
     "tipo": "agua",
     "multiplicador": 2
   },
-  "resistencia": {
-    "tipo": "electrico",
-    "reduccion": 30
-  },
   "retirada": 0,
   "ataques": [
     {

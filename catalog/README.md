@@ -59,4 +59,4 @@ Ver `ejemplos/validos/jefe-con-aliados.json` para un jefe completo.
 
 ## Campaña (`campana/`)
 
-Datos del modo campaña (D-20): `campana/pokemon/*.json` (un Pokémon por archivo, validado por `schema/pokemon-campana.schema.json`) y `campana/zonas/*.json` (qué aparece en cada zona, `schema/zona-campana.schema.json`). El primer set será Kanto (151 Pokémon), pero se rellena por zonas: de cada una solo entran los Pokémon que aparecen en ella. Hoy está el Túnel Roca. Las cifras (PS, daños, costes) son provisionales hasta equilibrarlas con el simulador.
+Datos del modo campaña (D-20): `campana/pokemon/*.json` (un Pokémon por archivo, validado por `schema/pokemon-campana.schema.json`) y `campana/zonas/*.json` (qué aparece en cada zona, `schema/zona-campana.schema.json`). El primer set será Kanto (151 Pokémon), pero se rellena por zonas: de cada una solo entran los Pokémon que aparecen en ella. Hoy está el Túnel Roca. Las cifras (PS, daños, costes) siguen el baremo de D-20 §3.5, basado en cartas reales, y son provisionales hasta equilibrarlas con el simulador.
