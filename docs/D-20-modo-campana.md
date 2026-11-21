@@ -51,6 +51,21 @@ Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos
 
 Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo**.
 
+### 2.1 Progresión: sin niveles, con XP y evolución
+
+Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos PS y daños; se mejora evolucionando.
+
+- **Las victorias en combate dan puntos** (los mismos puntos del juego, §5).
+- En un **centro Pokémon** (el nodo de descanso) se pueden **convertir puntos en XP** de un Pokémon del equipo. Cuántos puntos cuesta cada XP queda por equilibrar.
+- Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xp: N` en la carta). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4).
+- **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`).
+- **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): cuesta **puntos**, por usar la máquina de intercambio (`via: "intercambio"`, `puntos: N`).
+- **Cartas ex.** La **última fase de cada Pokémon es una carta ex**. Un Pokémon que no evoluciona (Onix…) puede hacerse ex **gastando puntos** (`via: "puntos"`, `puntos: N`), con el mismo proceso. Cada carta ex es una **entrada propia del catálogo** (`"ex": true`).
+- **La carta evolucionada sustituye a la anterior** y recupera todos sus PS. Una forma evolucionada también puede aparecer salvaje en una zona si el catálogo la incluye, y entonces se captura aparte.
+- Un Pokémon puede tener **varias** evoluciones (Eevee con sus piedras), por eso `evoluciones` es una lista.
+
+Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo**.
+
 ## 3. Combate
 
 **1 contra 1.** Cada bando tiene un Pokémon activo y el resto de su equipo en reserva. Gana quien deja sin Pokémon al otro.
@@ -164,6 +179,58 @@ Decidido el 2026-11-21. Un ataque puede llevar un `efecto` y entonces puede tene
 - Es un estado del **bando afectado** (`BandoCombate.danoReducido`), que se pone a 0 al cambiar de activo.
 - **Ninguna carta queda anulada:** todas llevan al menos un ataque de 20 o más (§3.5), de modo que Gruñido deja siempre un ataque de 10 como mínimo.
 - La IA lo usa solo si compensa; contra un rival que pega poco (10 de daño) lo deja sin hacer daño; contra uno que pega fuerte no lo usa.
+
+### 3.5 Baremo de PS y daños
+
+Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2026-27** (marcas H, I y J), de modo que las cartas de campaña se parezcan a las físicas.
+
+**Escala real de referencia**
+- Básico: 30–90 PS; los que evolucionan, en torno a 70. Fase 1: 90–130. Fase 2 sin ex: 150–190. Pokémon ex: 200–340.
+- Un básico pega 10–30 con una energía y 30–50 con dos. Un ex de Fase 1 como Lucario ex (260 PS) pega 60 con dos energías y 160 con tres.
+- La debilidad es ×2 y casi ninguna carta lleva resistencia.
+
+**Baremo de campaña** (PS y daño por coste de energía)
+
+| Fase | PS | Coste 1 | Coste 2 | Coste 3 | Coste 4 |
+|---|---|---|---|---|---|
+| Básico | 50–90 | 10–20 | 30–40 | 50–60 | — |
+| Fase 1 | 90–130 | 20–30 | 50–60 | 80–100 | 110–130 |
+| ex (línea de 2 fases o sin evolución) | 200–260 | 30–60 | 80–110 | 130–160 | 180–200 |
+| ex (línea de 3 fases) | 270–340 | 40–60 | 90–120 | 150–190 | 220–300 |
+
+**Reglas de calibración**
+- El ataque de **coste 2** es el golpe principal: quita del 40 al 50 % de los PS de un rival de su misma fase, así que un duelo igualado dura unos 3 golpes. Con debilidad ×2 baja a 1–2.
+- Los ataques de coste 3 y 4 matan en 2 golpes, pero vacían la reserva y obligan a Cargar o Cambiar.
+- **1 a 2 ataques** por carta, con coste de 1 a 4. Metapod y Kakuna llevan uno.
+- **Retirada:** 0–1 en los básicos, 1–2 en las fases evolucionadas, 2–3 en los pesados y los ex.
+- **Jefes:** pueden salirse de la tabla en PS (Pikachu 100, Onix 110) pero hacen daño de su fase; un ataque que mate al inicial de un golpe no entra.
+- **Resistencia (−30):** solo en pocas cartas (de salida Squirtle, Pidgey, Spearow, Geodude y Onix).
+- Los números son **provisionales** hasta calibrarlos con el simulador (D-20 §9, tarea 4).
+
+**Cartas del primer tramo (Pueblo Paleta → Ciudad Plateada)**
+
+| Pokémon | PS | Debilidad | Resistencia |
+|---|---|---|---|
+| Bulbasaur | 80 | fuego | — |
+| Charmander | 70 | agua | — |
+| Squirtle | 80 | eléctrico | fuego |
+| Pidgey | 60 | eléctrico | tierra |
+| Rattata | 60 | lucha | — |
+| Caterpie | 50 | fuego | — |
+| Weedle | 50 | tierra | — |
+| Metapod | 80 | fuego | — |
+| Kakuna | 80 | tierra | — |
+| Pikachu (jefe) | 100 | tierra | — |
+| Diglett | 50 | agua | — |
+| Sandshrew | 70 | agua | — |
+| Spearow | 60 | eléctrico | tierra |
+| Nidoran♀ | 60 | tierra | — |
+| Nidoran♂ | 60 | tierra | — |
+| Mankey | 70 | volador | — |
+| Geodude | 80 | agua | normal |
+| Onix | 110 | agua | normal |
+
+Evoluciones: Fase 1 de 90 a 110 PS (Ivysaur 100, Charmeleon 90, Wartortle 100, Pidgeotto 90, Nidorina 90, Nidorino 90, Graveler 110). ex de 3 fases de 270 a 340 (Venusaur 340, Charizard 330, Blastoise 330, Golem 330, Nidoqueen 310, Nidoking 310, Pidgeot 280, Butterfree 270, Beedrill 270). ex de 2 fases o sin evolución de 210 a 240 (Onix 240, Sandslash 230, Fearow 230, Raichu 220, Primeape 220, Raticate 210, Dugtrio 210). Heredan tipo, debilidad y resistencia de su base. Los rivales de zonas avanzadas tendrán que usar también cartas ex para que siga habiendo reto.
 
 ## 4. Mapa
 
