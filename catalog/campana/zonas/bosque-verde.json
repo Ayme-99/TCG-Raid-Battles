@@ -1,0 +1,23 @@
+{
+  "id": "bosque-verde",
+  "nombre": "Bosque Verde",
+  "region": "kanto",
+  "salvajes": [
+    "caterpie",
+    "weedle",
+    "metapod",
+    "kakuna",
+    "pikachu"
+  ],
+  "entrenadores": [
+    {
+      "clase": "Cazabichos",
+      "pokemon": [
+        "weedle",
+        "caterpie",
+        "kakuna",
+        "metapod"
+      ]
+    }
+  ]
+}

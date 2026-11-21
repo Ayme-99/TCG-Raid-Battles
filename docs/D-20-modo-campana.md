@@ -193,6 +193,29 @@ La campaña inicial es **Kanto** (decidido el 2026-11-21). La región se recorre
 
 Estructura de una región: `Inicio → rutas → jefe del tramo → descanso → gimnasio (medalla) → rutas → jefe del tramo → … → Liga` (más jefes en rutas clave y los 4 legendarios). Hay ramas: en una bifurcación se elige por qué ruta seguir.
 
+### Modelo de la ruta
+
+Decidido el 2026-11-22. Una región es un **grafo dirigido sin ciclos** que se recorre solo hacia delante (`RegionCampana`, `engine/lib/src/campana/ruta.dart`; datos en `catalog/campana/regiones/<id>.json`, esquema `region-campana.schema.json`). Cada nodo (`NodoRuta`) lleva `id`, `tipo`, `nombre`, `salidas` y los datos propios de su tipo:
+
+| Tipo | Datos | Salidas |
+|---|---|---|
+| `inicio` | `iniciales` (ids de Pokémon) | 1 |
+| `combate` | `zona`, `rival` (`salvaje` o `entrenador`) y, con un entrenador, su `clase` en la zona | 1 |
+| `bifurcacion` | — (no tiene evento: solo se elige camino) | 2 o más |
+| `descanso` | — | 1 |
+| `gimnasio` | `lider` (nombre y Pokémon) y `medalla` | 1, o 0 si es el final |
+| `jefe` | `jefe` (id del archivo de `jefes/`) | 1, o 0 si es el final |
+
+- **Reglas de estructura** (las comprueba `RegionCampana.problemas()` y un test): un solo `inicio`, sin entradas; las salidas existen y no se repiten; solo una bifurcación tiene varias salidas; sin ciclos; a todos los nodos se llega desde el inicio; **la región solo acaba en un gimnasio o un jefe** (nunca en un callejón sin salida); cada tipo lleva sus datos y no los de otro. Varios nodos pueden llevar al mismo (las ramas se juntan).
+- **Nodos opcionales:** `opcional: true`, solo en un combate o un descanso. Es un desvío: siempre se puede llegar a todos los nodos obligatorios **sin pasar por ninguno opcional**, así que una bifurcación ofrece el desvío o seguir de largo (los dos caminos se juntan después).
+- **Reglas de diseño** (un test las comprueba sobre los datos de Kanto, no son del motor): entre una medalla y la siguiente, y desde el inicio hasta la primera, hay **un jefe** y **al menos una bifurcación**.
+- **Qué rival toca:** el nodo de combate dice la zona y si es salvaje o entrenador; el Pokémon concreto lo elige el combate con la semilla de la partida (tarea 6, captura). El gimnasio usa sus Pokémon en orden.
+- **La Liga:** fase 2; todavía no hay tipo de nodo.
+
+**Progreso** (`ProgresoRuta`, es lo que se guarda en el dispositivo, §6): nodo actual, si está resuelto, nodos superados, medallas, jefes derrotados y el inicial elegido; con `aJson`/`desdeJson`. Es inmutable y avanza con tres operaciones: `resolver` (da por hecho el nodo: elegir inicial, ganar el combate, usar el descanso; un gimnasio da su medalla y un jefe queda anotado como derrotado), `opciones` (a dónde se puede ir: nada hasta resolver) y `avanzar(destino)`, que solo admite una salida del nodo actual ya resuelto. Una bifurcación se da por resuelta al llegar. No se puede volver atrás. `puedeCapturarJefe` dice si el jefe se captura (solo la primera vez, §4 Jefes). Qué pasa al perder es la pregunta 1 de §8.
+
+**Primer tramo de Kanto** (`catalog/campana/regiones/kanto.json`, propuesta): `Pueblo Paleta (inicio) → Ruta 1 → Ciudad Verde (bifurcación: Ruta 22 opcional, o seguir) → Ruta 2 → Bosque Verde → Cazabichos → Pikachu (jefe 01/20) → Salida del Bosque (bifurcación: Cueva Diglett opcional, o seguir) → Centro Pokémon de Ciudad Plateada → Gimnasio de Brock (medalla Roca)`. Las zonas nuevas (`ruta-1`, `ruta-2`, `bosque-verde`, `ruta-22`, `cueva-diglett`) siguen las listas de Rojo y Azul de memoria y están por revisar con Serebii o Bulbapedia; Sandshrew todavía no aparece en ninguna.
+
 ### Jefes
 
 Decidido el 2026-11-21. Los jefes son **Pokémon salvajes**, no entrenadores: los líderes de gimnasio y el Alto Mando no son jefes y usan cartas normales (el Geodude y el Onix de Brock, por ejemplo). Tienen una **serie propia de 20 cartas, NN/20** (la carta de Pikachu lleva impreso 01/20), distinta de la 001/150 de los Pokémon:
@@ -218,7 +241,7 @@ Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar
 | Pieza | Propuesta |
 |---|---|
 | Motor | Librería nueva `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho el combate 1 contra 1 (#336)**: energía, atacar, cambiar, cargar, elegir siguiente, debilidad y resistencia; **IA rival (#338)**. |
-| Catálogo | `catalog/campana/`: `pokemon/*.json` (uno por Pokémon, con su número de la Pokédex), `zonas/*.json` (qué aparece en cada zona) y sus esquemas en `catalog/schema/`. El JSON manda, como con los jefes. |
+| Catálogo | `catalog/campana/`: `pokemon/*.json` (uno por Pokémon, con su número de la Pokédex), `zonas/*.json` (qué aparece en cada zona), `regiones/*.json` (el grafo de nodos de la ruta) y sus esquemas en `catalog/schema/`. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
 | Guardado | Progreso de campaña (región, nodo, equipo, **PC**, jefes ya capturados, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
 | Servidor | Recibe los puntos ganados al terminar un jefe o una medalla. Al ser un solo jugador y coste 0, se acepta lo que reporta el cliente con un tope por hito (no hay competición). |
@@ -260,7 +283,7 @@ Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, ev
 2. Motor de combate 1 contra 1: energía, acciones, debilidades y resistencias.
 3. IA rival determinista.
 4. Simulador de combates de campaña y primer equilibrado.
-5. Modelo de región y de nodos, y avance por el mapa.
+5. ~~Modelo de región y de nodos, y avance por el mapa.~~ **Hecho (§4, Modelo de la ruta).**
 6. Captura, equipo y descanso.
 7. Jefe con aliados y medalla.
 8. Guardado de progreso de campaña en el dispositivo.

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Región de campaña (D-20 §4)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "nombre", "inicio", "nodos"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "nombre": { "type": "string" },
+    "inicio": { "type": "string", "description": "Id del nodo de inicio." },
+    "nodos": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/nodo" },
+      "description": "El grafo de la ruta. La estructura (un solo inicio, sin ciclos, todo alcanzable, salidas por tipo, nodos opcionales saltables) la comprueba el motor con `RegionCampana.problemas()` y un test."
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "nodo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "tipo", "nombre"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "tipo": { "enum": ["inicio", "combate", "bifurcacion", "descanso", "gimnasio", "jefe"] },
+        "nombre": { "type": "string" },
+        "salidas": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" },
+          "description": "A qué nodos se puede ir. Vacía solo en el final de la región (un gimnasio o un jefe). Una bifurcación tiene dos o más; el resto, una."
+        },
+        "opcional": { "type": "boolean", "default": false, "description": "Solo combate o descanso: se puede saltar." },
+        "iniciales": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" }, "description": "inicio: Pokémon entre los que se elige." },
+        "zona": { "$ref": "#/$defs/id" },
+        "rival": { "enum": ["salvaje", "entrenador"] },
+        "clase": { "type": "string", "description": "combate contra un entrenador: su clase en la zona." },
+        "lider": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["nombre", "pokemon"],
+          "properties": {
+            "nombre": { "type": "string" },
+            "pokemon": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } }
+          }
+        },
+        "medalla": { "$ref": "#/$defs/id" },
+        "jefe": { "$ref": "#/$defs/id", "description": "jefe: id del archivo de catalog/campana/jefes/." }
+      }
+    }
+  }
+}

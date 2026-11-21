@@ -1,0 +1,11 @@
+{
+  "id": "ruta-2",
+  "nombre": "Ruta 2",
+  "region": "kanto",
+  "salvajes": [
+    "rattata",
+    "pidgey",
+    "caterpie",
+    "weedle"
+  ]
+}
