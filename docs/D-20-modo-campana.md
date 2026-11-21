@@ -31,6 +31,7 @@ Cada Pokémon es un registro del catálogo:
 | `evoluciones` | lista (puede ser vacía): `a` (id) y cómo se consigue (ver 2.1) |
 | `ex` | `true` si es una carta ex |
 | `rareza` | cuánto cuesta encontrarlo en las rutas |
+| imagen | no va en el JSON: es `app/assets/campana/cartas/<id>.webp` (480×670) |
 
 - El equipo tiene un **máximo de Pokémon por definir** (propuesta provisional: 6; es un parámetro).
 - Los efectos de los ataques (§3.6) empiezan por uno: reducir el daño del rival. Los siguientes (monedas, curar, estados) reutilizarán las piezas que ya existen en las cartas de los aliados, sin inventar un sistema nuevo.

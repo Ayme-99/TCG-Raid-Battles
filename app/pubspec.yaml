@@ -28,5 +28,6 @@ flutter:
     - assets/catalogo/
     - assets/catalogo/bosses/
     - assets/cartas/
+    - assets/campana/cartas/
     - assets/mapas/
     - assets/jefes/
