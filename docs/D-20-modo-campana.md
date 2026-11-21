@@ -241,12 +241,12 @@ Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, ev
 ## 8. Preguntas abiertas
 
 1. **Derrota.** ¿Qué pasa al perder un combate? Propuesta: volver al último descanso con el equipo curado y sin perder lo ganado, para que no frustre. Alternativa más dura: perder una parte del dinero.
-2. ~~Máximo de Pokémon en el equipo~~ **Decidido (§2):** 6 (1 activo y 5 en banca); los demás van al PC, sin límite por definir de capacidad del PC.
+2. ~~Máximo de Pokémon en el equipo~~ **Decidido (§2):** 6 (1 activo y 5 en banca); los demás van al PC, el PC no tiene límite de capacidad por ahora.
 3. **Qué se vende en el descanso** (curas, objetos, Pokémon).
 4. ~~Cuántos ataques~~ **Decidido (§3.5):** 1 a 2 ataques por carta, coste de 1 a 4.
 5. **Cifras de progresión:** cuántos puntos cuesta cada XP, cuántas XP necesita cada Pokémon para evolucionar, y cuánto cuestan el intercambio y hacerse ex.
 6. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex).
-7. **Capacidad del PC:** ¿ilimitada o con un tope (por ejemplo, 30)?
+7. ~~Capacidad del PC~~ **Decidido por ahora (2026-11-21): ilimitada.** Se revisará si hace falta un tope.
 8. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
 
 ## 9. Tareas derivadas (para crear tras aprobar)
