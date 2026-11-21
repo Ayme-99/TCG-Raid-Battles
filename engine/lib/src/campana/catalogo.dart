@@ -53,6 +53,8 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
   switch (tipo) {
     case 'reduceDanoRival':
       return ReduceDanoRival(_campo<int>(json, 'valor'));
+    case 'aumentaDanoRecibido':
+      return AumentaDanoRecibido(_campo<int>(json, 'valor'));
   }
   throw FormatException('Efecto de ataque desconocido: "$tipo".');
 }

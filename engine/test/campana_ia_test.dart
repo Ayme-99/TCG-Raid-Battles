@@ -310,4 +310,52 @@ void main() {
       }
     });
   });
+
+  group('Látigo', () {
+    const latigo = AtaqueCampana(
+      nombre: 'Látigo',
+      tipo: TipoCampana.normal,
+      coste: 1,
+      dano: 0,
+      efecto: AumentaDanoRecibido(10),
+    );
+    PokemonCampana tortuga() =>
+        pokemon('t', ps: 80, ataques: [latigo, ataque(2, 20)]);
+
+    test('lo usa en un combate largo (muchos golpes por delante)', () {
+      final e = combate([tortuga()], [pokemon('duro', ps: 200)]);
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('no lo usa si no ahorra golpes', () {
+      final e = combate([tortuga()], [pokemon('blando', ps: 60)]);
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('no lo repite mientras el mismo rival siga activo', () {
+      var e = combate([tortuga()], [pokemon('duro', ps: 200)]);
+      e = aplicarCombate(e, decidirAccion(e, Bando.jugador));
+      e = aplicarCombate(e, decidirAccion(e, Bando.rival));
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('todos los emparejamientos con Látigo terminan', () {
+      final a = [tortuga(), pokemon('b', ps: 80, ataques: [ataque(2, 20)])];
+      final b = [pokemon('c', ps: 150, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.turno));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
 }

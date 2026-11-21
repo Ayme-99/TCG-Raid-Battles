@@ -53,11 +53,16 @@ class BandoCombate {
   /// efecto del rival (Gruñido). Se quita al cambiar de Pokémon activo.
   final int danoReducido;
 
+  /// Daño extra que reciben los ataques contra el Pokémon activo de este
+  /// bando por un efecto del rival (Látigo). Se quita al cambiar de activo.
+  final int danoExtra;
+
   const BandoCombate({
     required this.equipo,
     required this.activo,
     required this.energia,
     this.danoReducido = 0,
+    this.danoExtra = 0,
   });
 
   PokemonEnCombate get pokemonActivo => equipo[activo];
@@ -76,12 +81,14 @@ class BandoCombate {
     int? activo,
     int? energia,
     int? danoReducido,
+    int? danoExtra,
   }) =>
       BandoCombate(
         equipo: equipo ?? this.equipo,
         activo: activo ?? this.activo,
         energia: energia ?? this.energia,
         danoReducido: danoReducido ?? this.danoReducido,
+        danoExtra: danoExtra ?? this.danoExtra,
       );
 }
 
@@ -196,13 +203,13 @@ class ElegirSiguiente extends AccionCombate {
 }
 
 /// Daño real de un ataque contra un defensor, como en las cartas: primero se
-/// resta la [reduccion] de efectos (Gruñido), luego la debilidad (el daño se
-/// multiplica) y luego la resistencia (se resta); nunca baja de 0. Un ataque
-/// sin daño sigue sin hacerlo.
+/// resta la [reduccion] de efectos (Gruñido) y se suma el [extra] del defensor
+/// (Látigo), luego la debilidad (el daño se multiplica) y luego la resistencia
+/// (se resta); nunca baja de 0. Un ataque sin daño sigue sin hacerlo.
 int danoDeAtaque(AtaqueCampana ataque, PokemonCampana defensor,
-    {int reduccion = 0}) {
+    {int reduccion = 0, int extra = 0}) {
   if (ataque.dano <= 0) return 0;
-  var dano = ataque.dano - reduccion;
+  var dano = ataque.dano - reduccion + extra;
   if (dano < 0) dano = 0;
   final d = defensor.debilidad;
   if (d != null && d.tipo == ataque.tipo) dano *= d.multiplicador;
@@ -241,7 +248,7 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
     throw const ReglaIncumplida('Ese Pokémon no puede salir.');
   }
   return estado
-      .conBando(a.bando, b.copiarCon(activo: a.indice, danoReducido: 0))
+      .conBando(a.bando, b.copiarCon(activo: a.indice, danoReducido: 0, danoExtra: 0))
       .copiarCon(fase: FaseCombate.enCurso);
 }
 
@@ -259,13 +266,16 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   final defensor = estado.bando(rivalBando);
   final golpeado = defensor.pokemonActivo.conPs(defensor.pokemonActivo.ps -
       danoDeAtaque(ataque, defensor.pokemonActivo.especie,
-          reduccion: atacante.danoReducido));
+          reduccion: atacante.danoReducido, extra: defensor.danoExtra));
   final equipo = [...defensor.equipo]..[defensor.activo] = golpeado;
   var defensorNuevo = defensor.copiarCon(equipo: equipo);
   final efecto = ataque.efecto;
   if (efecto is ReduceDanoRival && efecto.valor > defensor.danoReducido) {
     // No se acumula: solo cuenta el mayor.
     defensorNuevo = defensorNuevo.copiarCon(danoReducido: efecto.valor);
+  }
+  if (efecto is AumentaDanoRecibido && efecto.valor > defensor.danoExtra) {
+    defensorNuevo = defensorNuevo.copiarCon(danoExtra: efecto.valor);
   }
   var nuevo = estado
       .conBando(
@@ -295,7 +305,10 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
   return _terminarTurno(estado.conBando(
     a.bando,
     b.copiarCon(
-        activo: a.indice, energia: b.energia - retirada, danoReducido: 0),
+        activo: a.indice,
+        energia: b.energia - retirada,
+        danoReducido: 0,
+        danoExtra: 0),
   ));
 }
 

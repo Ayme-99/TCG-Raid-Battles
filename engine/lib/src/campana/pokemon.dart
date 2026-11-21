@@ -16,6 +16,15 @@ class ReduceDanoRival extends EfectoAtaque {
   const ReduceDanoRival(this.valor);
 }
 
+/// Mientras el Pokémon activo del rival siga activo, recibe [valor] puntos más
+/// de daño de los ataques, antes de aplicar debilidad y resistencia. No se
+/// acumula. Se acaba cuando ese Pokémon cae o se cambia a la banca (Látigo).
+class AumentaDanoRecibido extends EfectoAtaque {
+  final int valor;
+
+  const AumentaDanoRecibido(this.valor);
+}
+
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener
 /// [dano] 0 (solo hace el efecto).
 class AtaqueCampana {

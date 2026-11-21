@@ -116,9 +116,10 @@
             "properties": {
               "tipo": {
                 "enum": [
-                  "reduceDanoRival"
+                  "reduceDanoRival",
+                  "aumentaDanoRecibido"
                 ],
-                "description": "Mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (antes de debilidad y resistencia). No se acumula (D-20 §3.6)."
+                "description": "reduceDanoRival: mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (Gruñido). aumentaDanoRecibido: mientras siga activo, recibe `valor` más de daño de los ataques (Látigo). Ambos, antes de debilidad y resistencia, sin acumular (D-20 §3.6)."
               },
               "valor": {
                 "type": "integer",

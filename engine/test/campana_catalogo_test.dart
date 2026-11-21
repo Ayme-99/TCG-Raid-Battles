@@ -82,6 +82,17 @@ void main() {
           .having((e) => e.valor, 'valor', 10));
     });
 
+    test('Squirtle: Látigo hace que el rival reciba 10 más y no hace daño', () {
+      final s = pokemon['squirtle']!;
+      expect(s.ps, 80);
+      expect(s.tipo, TipoCampana.agua);
+      final latigo = s.ataques.first;
+      expect(latigo.dano, 0);
+      expect(latigo.coste, 1);
+      expect(latigo.efecto,
+          isA<AumentaDanoRecibido>().having((e) => e.valor, 'valor', 10));
+    });
+
     test('Onix lleva debilidad, resistencia y retirada con coste', () {
       final onix = pokemon['onix']!;
       expect(onix.tipo, TipoCampana.roca);
