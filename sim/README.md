@@ -47,3 +47,12 @@ Con `--calibrar` busca, por jefe, el mayor HP (en centenas) con el que la polít
 
 
 > **T-71:** el jefe llama a su primer aliado al terminar su turno de la ronda 1 y a los siguientes cada vez que su HP baja a un umbral (`cadaHp` HP perdidos), hasta nivel + 1 llamadas en total y sin moneda. Los umbrales cruzados antes de la primera llamada se suman a ella. `tirada` del catálogo se ignora (salvo que `invocacion` exista).
+
+## Combate de campaña (D-20)
+
+`bin/sim_campana.dart` juega combates 1 contra 1 del modo campaña con el motor `engine/lib/campana.dart` y la IA rival en los dos bandos, con los Pokémon de `catalog/campana/`. No usa cartas ni imágenes, solo los datos (provisionales). Modo `duelos` (cada Pokémon contra cada uno, empezando cada bando) y modo `equipos` (equipos aleatorios). Muestra victorias por Pokémon, turnos medios, la mezcla de acciones (atacar, cargar, cambiar) y la ventaja de empezar; la energía se puede cambiar con `--energia-inicial`, `--energia-maxima`, `--energia-turno` y `--energia-cargar`.
+
+```
+dart run bin/sim_campana.dart
+dart run bin/sim_campana.dart --modo=equipos --tamano=3 --partidas=2000
+```
