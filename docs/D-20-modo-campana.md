@@ -140,6 +140,7 @@ Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2
 | Weedle | 50 | fuego | — |
 | Metapod | 80 | fuego | — |
 | Kakuna | 70 | fuego | — |
+| Pikachu | 60 | lucha | — |
 | Pikachu (jefe 01/20) | 100 | lucha | — |
 | Diglett | 50 | agua | — |
 | Sandshrew | 70 | agua | — |
@@ -196,7 +197,7 @@ Decidido el 2026-11-21. Los jefes son **Pokémon salvajes**, no entrenadores: lo
 
 Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar): 01 Pikachu, 02 Clefairy, 03 Dugtrio, 04 Marowak, 05 Kangaskhan, 06 Lapras, 07 Muk, 08 Gyarados, 09 Snorlax, 10 Electrode, 11 Dodrio, 12 Golem, 13 Alakazam, 14 Aerodactyl, 15 Scyther, 16 Dragonite, 17 Articuno, 18 Zapdos, 19 Moltres, 20 Mewtwo.
 
-**Combate:** es un 1 contra 1 con el mismo motor y la misma IA. El jefe **no se captura** y da puntos solo la primera vez. Si lleva `llamaAliado`, al **bajar de ese porcentaje de PS** (Pikachu: la mitad) el jefe se retira a la banca y entra un **aliado elegido al azar** con la semilla del combate (Pikachu: Weedle, Caterpie, Metapod o Kakuna); cuando el aliado cae, **vuelve el jefe con los PS que tenía**. Los PS de los jefes pueden salirse de la tabla de §3.5, pero su daño es el de su fase. Los datos están en `catalog/campana/jefes/*.json`.
+**Combate:** es un 1 contra 1 con el mismo motor y la misma IA. **Capturable** (decidido el 2026-11-21): al derrotarlo se ofrece la carta **normal** del Pokémon (la 025/150 en el caso de Pikachu, con 60 PS), no la del jefe, y los puntos del jefe se dan solo la primera vez. Si lleva `llamaAliado`, al **bajar de ese porcentaje de PS** (Pikachu: la mitad) el jefe se retira a la banca y entra un **aliado elegido al azar** con la semilla del combate (Pikachu: Weedle, Caterpie, Metapod o Kakuna); cuando el aliado cae, **vuelve el jefe con los PS que tenía**. Los PS de los jefes pueden salirse de la tabla de §3.5, pero su daño es el de su fase. Los datos están en `catalog/campana/jefes/*.json`.
 
 **Pikachu (01/20):** 100 PS, eléctrico, debilidad lucha ×2, sin resistencia, retirada 0. Ataque Rápido (1, 10) e Impactrueno (2, 30). Estimación de dificultad: unos 20 de daño por turno, de modo que el inicial aguanta 4–5 turnos; se calibrará con el simulador. **Pendiente de implementar en el motor:** la llamada del aliado a mitad de combate (hoy el combate contra Pikachu es un 1 contra 1 normal).
 

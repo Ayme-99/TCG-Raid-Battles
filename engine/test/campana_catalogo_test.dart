@@ -95,6 +95,16 @@ void main() {
       expect(m.ataques.last.coste, 1);
     });
 
+    test('Pikachu (025/150): Látigo y Impactrueno, 60 PS', () {
+      final p = pokemon['pikachu']!;
+      expect(p.ps, 60);
+      expect(p.tipo, TipoCampana.electrico);
+      expect(p.debilidad!.tipo, TipoCampana.lucha);
+      expect(p.ataques.first.efecto, isA<AumentaDanoRecibido>());
+      expect(p.ataques.last.dano, 30);
+      expect(p.ataques.last.coste, 2);
+    });
+
     test('Kakuna: Fortaleza y Picotazo Veneno', () {
       final k = pokemon['kakuna']!;
       expect(k.ps, 70);
