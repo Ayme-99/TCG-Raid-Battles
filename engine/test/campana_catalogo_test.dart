@@ -86,6 +86,8 @@ void main() {
       final s = pokemon['squirtle']!;
       expect(s.ps, 80);
       expect(s.tipo, TipoCampana.agua);
+      expect(s.debilidad!.tipo, TipoCampana.electrico);
+      expect(s.resistencia, isNull);
       final latigo = s.ataques.first;
       expect(latigo.dano, 0);
       expect(latigo.coste, 1);
