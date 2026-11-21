@@ -110,7 +110,7 @@ void main() {
       for (var i = 0; i < 4; i++) {
         antes.add(e.jugador.energia);
         e = aplicarCombate(e, const Atacar(Bando.jugador, 1));
-        e = aplicarCombate(e, const Pasar(Bando.rival));
+        e = aplicarCombate(e, const Cargar(Bando.rival));
       }
       expect(antes, [10, 8, 6, 4]);
       expect(e.jugador.energia, 2);
@@ -128,17 +128,26 @@ void main() {
 
     test('la reserva nunca pasa del máximo', () {
       var e = nuevo();
-      e = aplicarCombate(e, const Pasar(Bando.jugador));
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
       expect(e.jugador.energia, 10);
     });
 
-    test('pasar recupera la energía de fin de turno', () {
+    test('cargar recupera 1 más que el fin de turno normal', () {
       final e = aplicarCombate(
         nuevo(parametros: const ParametrosCombate(energiaInicial: 4)),
-        const Pasar(Bando.jugador),
+        const Cargar(Bando.jugador),
       );
-      expect(e.jugador.energia, 5);
+      expect(e.jugador.energia, 6, reason: '4 + 1 al cargar + 1 al terminar');
       expect(e.rival.energia, 4, reason: 'solo recupera quien termina turno');
+      expect(e.turno, Bando.rival);
+    });
+
+    test('cargar tampoco pasa del máximo', () {
+      final e = aplicarCombate(
+        nuevo(parametros: const ParametrosCombate(energiaInicial: 9)),
+        const Cargar(Bando.jugador),
+      );
+      expect(e.jugador.energia, 10);
     });
   });
 
@@ -214,7 +223,7 @@ void main() {
       e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
       expect(e.fase, FaseCombate.eligiendoActivo);
       expect(e.turno, Bando.rival);
-      expect(() => aplicarCombate(e, const Pasar(Bando.rival)),
+      expect(() => aplicarCombate(e, const Cargar(Bando.rival)),
           throwsA(isA<ReglaIncumplida>()));
       expect(() => aplicarCombate(e, const ElegirSiguiente(Bando.rival, 0)),
           throwsA(isA<ReglaIncumplida>()),
@@ -230,7 +239,7 @@ void main() {
       e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
       expect(e.fase, FaseCombate.terminado);
       expect(e.ganador, Bando.jugador);
-      expect(() => aplicarCombate(e, const Pasar(Bando.rival)),
+      expect(() => aplicarCombate(e, const Cargar(Bando.rival)),
           throwsA(isA<ReglaIncumplida>()));
     });
 

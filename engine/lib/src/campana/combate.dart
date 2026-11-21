@@ -20,10 +20,14 @@ class ParametrosCombate {
   /// Energía que recupera un bando al terminar su turno.
   final int energiaPorTurno;
 
+  /// Energía extra que recupera al cargar (además de la del fin de turno).
+  final int energiaAlCargar;
+
   const ParametrosCombate({
     this.energiaInicial = 10,
     this.energiaMaxima = 10,
     this.energiaPorTurno = 1,
+    this.energiaAlCargar = 1,
   });
 }
 
@@ -32,7 +36,7 @@ enum FaseCombate {
   /// El bando al que toca debe elegir su siguiente Pokémon (el anterior cayó).
   eligiendoActivo,
 
-  /// El bando al que toca puede atacar, cambiar o pasar.
+  /// El bando al que toca puede atacar, cambiar o cargar.
   enCurso,
 
   /// Alguien se ha quedado sin Pokémon.
@@ -172,9 +176,9 @@ class Cambiar extends AccionCombate {
   const Cambiar(super.bando, this.indice);
 }
 
-/// No hace nada y termina el turno.
-class Pasar extends AccionCombate {
-  const Pasar(super.bando);
+/// Carga energía: recupera 1 más de lo normal y termina el turno.
+class Cargar extends AccionCombate {
+  const Cargar(super.bando);
 }
 
 /// Elige el Pokémon que sustituye al que ha caído. No gasta turno.
@@ -214,7 +218,7 @@ EstadoCombate aplicarCombate(EstadoCombate estado, AccionCombate accion) {
   return switch (accion) {
     Atacar a => _atacar(estado, a),
     Cambiar a => _cambiar(estado, a),
-    Pasar _ => _terminarTurno(estado),
+    Cargar a => _cargar(estado, a),
     ElegirSiguiente _ =>
       throw const ReglaIncumplida('No hay que elegir Pokémon ahora.'),
   };
@@ -275,6 +279,14 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
     a.bando,
     b.copiarCon(activo: a.indice, energia: b.energia - retirada),
   ));
+}
+
+EstadoCombate _cargar(EstadoCombate estado, Cargar a) {
+  final b = estado.bando(a.bando);
+  final p = estado.parametros;
+  final total = b.energia + p.energiaAlCargar;
+  final energia = total > p.energiaMaxima ? p.energiaMaxima : total;
+  return _terminarTurno(estado.conBando(a.bando, b.copiarCon(energia: energia)));
 }
 
 /// Termina el turno del bando actual: recupera energía y pasa el turno al otro.

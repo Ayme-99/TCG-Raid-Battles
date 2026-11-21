@@ -15,9 +15,11 @@ import 'pokemon.dart';
 ///    lo logre.
 /// 3. Si su activo es débil a un ataque del rival, o no llega a ningún ataque,
 ///    cambia a un relevo que sí le sirva.
-/// 4. Ataca: con el de más daño si la reserva está llena (la energía
+/// 4. Si con la carga extra podría rematar al turno siguiente algo que hoy no
+///    le llega, carga.
+/// 5. Ataca: con el de más daño si la reserva está llena (la energía
 ///    sobrante se perdería) y, si no, con el de más daño por energía gastada.
-/// 5. Si no llega a nada, pasa.
+/// 6. Si no llega a nada, carga.
 AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
   if (estado.fase == FaseCombate.terminado) {
     throw const ReglaIncumplida('El combate ha terminado.');
@@ -56,8 +58,25 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
     }
   }
 
+  if (_remataCargando(activo, yo.energia, objetivo, p)) return Cargar(bando);
   if (ataque != null) return Atacar(bando, ataque);
-  return Pasar(bando);
+  return Cargar(bando);
+}
+
+/// ¿Hay un ataque que remata al [objetivo], hoy no le llega la energía y
+/// cargando sí le llegará al turno siguiente?
+bool _remataCargando(
+  PokemonCampana atacante,
+  int energia,
+  PokemonEnCombate objetivo,
+  ParametrosCombate p,
+) {
+  final total = energia + p.energiaPorTurno + p.energiaAlCargar;
+  final siguiente = total > p.energiaMaxima ? p.energiaMaxima : total;
+  return atacante.ataques.any((a) =>
+      a.coste > energia &&
+      a.coste <= siguiente &&
+      danoDeAtaque(a, objetivo.especie) >= objetivo.ps);
 }
 
 /// ¿Tiene [rival] algún ataque con daño del tipo al que [mio] es débil?

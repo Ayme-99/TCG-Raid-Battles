@@ -85,13 +85,35 @@ void main() {
           reason: '30 × 2 = 60 supera a 40');
     });
 
-    test('pasa si no llega a ningún ataque ni a ningún relevo', () {
+    test('carga si no llega a ningún ataque ni a ningún relevo', () {
       final e = combate(
         [pokemon('yo')],
         [pokemon('rival')],
         parametros: const ParametrosCombate(energiaInicial: 0),
       );
-      expect(decidirAccion(e, Bando.jugador), isA<Pasar>());
+      expect(decidirAccion(e, Bando.jugador), isA<Cargar>());
+    });
+  });
+
+  group('carga', () {
+    test('carga para rematar al turno siguiente lo que hoy no le llega', () {
+      final yo = pokemon('yo', ataques: [ataque(1, 10), ataque(4, 100)]);
+      final e = combate(
+        [yo],
+        [pokemon('rival', ps: 100)],
+        parametros: const ParametrosCombate(energiaInicial: 3),
+      );
+      expect(decidirAccion(e, Bando.jugador), isA<Cargar>());
+    });
+
+    test('no carga si ni cargando le llega el ataque que remata', () {
+      final yo = pokemon('yo', ataques: [ataque(1, 10), ataque(6, 100)]);
+      final e = combate(
+        [yo],
+        [pokemon('rival', ps: 100)],
+        parametros: const ParametrosCombate(energiaInicial: 3),
+      );
+      expect(decidirAccion(e, Bando.jugador), isA<Atacar>());
     });
   });
 
