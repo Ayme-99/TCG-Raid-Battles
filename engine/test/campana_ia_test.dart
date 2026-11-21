@@ -368,6 +368,29 @@ void main() {
       efecto: EnvenenaDefensor(10),
     );
 
+    test('envenena aunque el golpe quede en 0 por Fortaleza', () {
+      final e = combate([
+        pokemon('w', ps: 50, ataques: [veneno])
+      ], [
+        pokemon('m', ps: 80, ataques: [ataque(1, 20)])
+      ]);
+      final protegido = e.copiarCon(
+          rival: e.rival.copiarCon(proteccion: 10));
+      expect(decidirAccion(protegido, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('no repite el veneno si el rival ya está envenenado', () {
+      final e = combate([
+        pokemon('w', ps: 50, ataques: [veneno, ataque(1, 20)])
+      ], [
+        pokemon('m', ps: 80, ataques: [ataque(1, 10)])
+      ]);
+      final ya = e.copiarCon(rival: e.rival.copiarCon(veneno: 10));
+      expect(decidirAccion(ya, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
     test('todos los emparejamientos con veneno terminan', () {
       final a = [pokemon('w', ps: 50, ataques: [veneno])];
       final b = [

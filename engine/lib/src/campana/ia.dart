@@ -20,6 +20,9 @@ import 'pokemon.dart';
 ///    atacando), lo usa; nunca lo repite mientras siga activo el mismo rival.
 /// 5. Si tiene un ataque que hace que el rival reciba más daño (Látigo) y lo
 ///    derriba en menos golpes contando el turno que gasta, lo usa.
+///    Si tiene un ataque que envenena al rival y este no lo está ya, lo usa
+///    (antes que Gruñido y compañía: el veneno cuenta aunque el golpe quede
+///    en 0).
 ///    Si tiene un ataque que reduce el daño que recibe su activo (Fortaleza) y
 ///    compensa igual que Gruñido, lo usa.
 ///    Si tiene un ataque que quita energía al rival (Disparo Demora) y con ello
@@ -77,6 +80,9 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
       if (relevo != null) return Cambiar(bando, relevo);
     }
   }
+
+  final veneno = _ataqueDeVeneno(yo, rival);
+  if (veneno != null) return Atacar(bando, veneno);
 
   final reduccion = _ataqueDeReduccion(yo, rival, danoMio);
   if (reduccion != null) return Atacar(bando, reduccion);
@@ -147,6 +153,27 @@ int? _ataqueDeReduccion(BandoCombate yo, BandoCombate rival, int danoMio) {
     if (evitado > danoMio && evitado > mejorEvitado) {
       mejor = i;
       mejorEvitado = evitado;
+    }
+  }
+  return mejor;
+}
+
+/// Índice de un ataque que envenena al activo rival (Picotazo Veneno), o null.
+///
+/// Siempre compensa mientras el rival no esté envenenado (o lo esté con menos
+/// daño): el veneno quita PS en cada chequeo aunque el golpe quede en 0 por
+/// Fortaleza o Gruñido. No se repite mientras siga envenenado.
+int? _ataqueDeVeneno(BandoCombate yo, BandoCombate rival) {
+  final ataques = yo.pokemonActivo.especie.ataques;
+  int? mejor;
+  var mejorValor = rival.veneno;
+  for (var i = 0; i < ataques.length; i++) {
+    final a = ataques[i];
+    final e = a.efecto;
+    if (e is! EnvenenaDefensor || a.coste > yo.energia) continue;
+    if (e.valor > mejorValor) {
+      mejor = i;
+      mejorValor = e.valor;
     }
   }
   return mejor;
