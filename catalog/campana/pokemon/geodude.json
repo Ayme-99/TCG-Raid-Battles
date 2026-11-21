@@ -3,7 +3,7 @@
   "numero": 74,
   "nombre": "Geodude",
   "tipo": "roca",
-  "ps": 60,
+  "ps": 80,
   "debilidad": {
     "tipo": "agua",
     "multiplicador": 2

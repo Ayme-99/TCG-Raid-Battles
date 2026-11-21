@@ -3,7 +3,7 @@
   "numero": 95,
   "nombre": "Onix",
   "tipo": "roca",
-  "ps": 90,
+  "ps": 110,
   "debilidad": {
     "tipo": "agua",
     "multiplicador": 2
@@ -24,13 +24,7 @@
       "nombre": "Lanzarrocas",
       "tipo": "roca",
       "coste": 3,
-      "dano": 50
-    },
-    {
-      "nombre": "Furia",
-      "tipo": "normal",
-      "coste": 4,
-      "dano": 70
+      "dano": 60
     }
   ]
 }
