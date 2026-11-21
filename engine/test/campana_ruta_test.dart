@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:incursiones_engine/campana.dart';
+import 'package:incursiones_engine/incursiones_engine.dart' show ReglaIncumplida;
 import 'package:test/test.dart';
 
 Map<String, dynamic> leer(File f) =>
