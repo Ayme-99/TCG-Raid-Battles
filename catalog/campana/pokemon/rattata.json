@@ -20,7 +20,12 @@
       "nombre": "Hiper Colmillo",
       "tipo": "normal",
       "coste": 2,
-      "dano": 20
+      "dano": 20,
+      "efecto": {
+        "tipo": "monedaDanoExtra",
+        "valor": 20,
+        "texto": "Lanza una moneda, si sale cara este ataque hace 20 puntos de daño más."
+      }
     }
   ]
 }

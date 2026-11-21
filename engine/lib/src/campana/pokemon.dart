@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy hay tres; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay cuatro; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -31,6 +31,17 @@ class QuitaEnergiaRival extends EfectoAtaque {
   final int valor;
 
   const QuitaEnergiaRival(this.valor);
+}
+
+/// Lanza una moneda al atacar: si sale cara, el ataque hace [valor] puntos de
+/// daño más (Hiper Colmillo). El daño de la carta ([AtaqueCampana.dano]) es el
+/// de cruz; el extra se suma al daño base, antes de reducciones, debilidad y
+/// resistencia. La moneda sale de la semilla del combate: mismo estado y misma
+/// semilla, mismo resultado.
+class MonedaDanoExtra extends EfectoAtaque {
+  final int valor;
+
+  const MonedaDanoExtra(this.valor);
 }
 
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener

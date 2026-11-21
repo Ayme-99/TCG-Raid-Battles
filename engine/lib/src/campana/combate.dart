@@ -107,6 +107,14 @@ class EstadoCombate {
 
   final ParametrosCombate parametros;
 
+  /// Semilla del generador de monedas. Avanza cada vez que se lanza una
+  /// moneda; el reductor sigue siendo puro (mismo estado, mismo resultado).
+  final int semilla;
+
+  /// Resultado de la última moneda lanzada (true = cara), o null si todavía
+  /// no se ha lanzado ninguna. La interfaz lo usa para mostrarla.
+  final bool? ultimaMoneda;
+
   const EstadoCombate({
     required this.jugador,
     required this.rival,
@@ -115,6 +123,8 @@ class EstadoCombate {
     required this.ganador,
     required this.numeroTurno,
     required this.parametros,
+    this.semilla = 1,
+    this.ultimaMoneda,
   });
 
   /// Combate nuevo: el primer Pokémon de cada equipo sale activo.
@@ -123,6 +133,7 @@ class EstadoCombate {
     required List<PokemonCampana> equipoRival,
     Bando empieza = Bando.jugador,
     ParametrosCombate parametros = const ParametrosCombate(),
+    int semilla = 1,
   }) {
     if (equipoJugador.isEmpty || equipoRival.isEmpty) {
       throw const ReglaIncumplida('Cada bando necesita al menos un Pokémon.');
@@ -140,6 +151,7 @@ class EstadoCombate {
       ganador: null,
       numeroTurno: 1,
       parametros: parametros,
+      semilla: _normalizarSemilla(semilla),
     );
   }
 
@@ -152,6 +164,8 @@ class EstadoCombate {
     FaseCombate? fase,
     Bando? ganador,
     int? numeroTurno,
+    int? semilla,
+    bool? ultimaMoneda,
   }) =>
       EstadoCombate(
         jugador: jugador ?? this.jugador,
@@ -161,6 +175,8 @@ class EstadoCombate {
         ganador: ganador ?? this.ganador,
         numeroTurno: numeroTurno ?? this.numeroTurno,
         parametros: parametros,
+        semilla: semilla ?? this.semilla,
+        ultimaMoneda: ultimaMoneda ?? this.ultimaMoneda,
       );
 
   EstadoCombate conBando(Bando b, BandoCombate nuevo) => b == Bando.jugador
@@ -242,6 +258,18 @@ EstadoCombate aplicarCombate(EstadoCombate estado, AccionCombate accion) {
   };
 }
 
+const _modulo = 2147483647;
+
+/// Semilla válida para el generador (1 a 2^31-2).
+int _normalizarSemilla(int s) {
+  final r = s % _modulo;
+  return r <= 0 ? r + _modulo - 1 : r;
+}
+
+/// Siguiente semilla del generador (Park-Miller). Las cuentas caben en 53 bits,
+/// así que da lo mismo en la VM de Dart que compilado a web.
+int _siguienteSemilla(int s) => (s * 48271) % _modulo;
+
 EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
   final b = estado.bando(a.bando);
   if (!b.relevos.contains(a.indice)) {
@@ -264,12 +292,26 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   }
   final rivalBando = a.bando.otro;
   final defensor = estado.bando(rivalBando);
+  var semilla = estado.semilla;
+  bool? moneda;
+  var golpe = ataque;
+  final efecto = ataque.efecto;
+  if (efecto is MonedaDanoExtra) {
+    semilla = _siguienteSemilla(semilla);
+    moneda = (semilla >> 8) & 1 == 1;
+    if (moneda) {
+      golpe = AtaqueCampana(
+          nombre: ataque.nombre,
+          tipo: ataque.tipo,
+          coste: ataque.coste,
+          dano: ataque.dano + efecto.valor);
+    }
+  }
   final golpeado = defensor.pokemonActivo.conPs(defensor.pokemonActivo.ps -
-      danoDeAtaque(ataque, defensor.pokemonActivo.especie,
+      danoDeAtaque(golpe, defensor.pokemonActivo.especie,
           reduccion: atacante.danoReducido, extra: defensor.danoExtra));
   final equipo = [...defensor.equipo]..[defensor.activo] = golpeado;
   var defensorNuevo = defensor.copiarCon(equipo: equipo);
-  final efecto = ataque.efecto;
   if (efecto is ReduceDanoRival && efecto.valor > defensor.danoReducido) {
     // No se acumula: solo cuenta el mayor.
     defensorNuevo = defensorNuevo.copiarCon(danoReducido: efecto.valor);
@@ -284,7 +326,8 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   var nuevo = estado
       .conBando(
           a.bando, atacante.copiarCon(energia: atacante.energia - ataque.coste))
-      .conBando(rivalBando, defensorNuevo);
+      .conBando(rivalBando, defensorNuevo)
+      .copiarCon(semilla: semilla, ultimaMoneda: moneda);
   if (defensorNuevo.derrotado) {
     return nuevo.copiarCon(fase: FaseCombate.terminado, ganador: a.bando);
   }

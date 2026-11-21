@@ -368,6 +368,57 @@ void main() {
     });
   });
 
+  group('efecto: moneda (Hiper Colmillo)', () {
+    const colmillo = AtaqueCampana(
+      nombre: 'Hiper Colmillo',
+      tipo: TipoCampana.normal,
+      coste: 1,
+      dano: 20,
+      efecto: MonedaDanoExtra(20),
+    );
+    final rata = pokemon('r', ataques: const [colmillo]);
+
+    EstadoCombate atacarCon(int semilla) => aplicarCombate(
+          EstadoCombate.inicial(
+              equipoJugador: [rata],
+              equipoRival: [pokemon('d', ps: 200)],
+              semilla: semilla),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('cara hace 40 y cruz hace 20, y se anota la moneda', () {
+      final danos = {
+        for (var s = 1; s <= 40; s++)
+          atacarCon(s).ultimaMoneda!: 200 - atacarCon(s).rival.pokemonActivo.ps,
+      };
+      expect(danos[true], 40);
+      expect(danos[false], 20);
+    });
+
+    test('misma semilla, mismo resultado; la semilla avanza', () {
+      final a = atacarCon(7);
+      final b = atacarCon(7);
+      expect(a.ultimaMoneda, b.ultimaMoneda);
+      expect(a.rival.pokemonActivo.ps, b.rival.pokemonActivo.ps);
+      expect(a.semilla, isNot(7));
+    });
+
+    test('sale cara y cruz con proporción razonable', () {
+      var caras = 0;
+      for (var s = 1; s <= 200; s++) {
+        if (atacarCon(s).ultimaMoneda!) caras++;
+      }
+      expect(caras, inInclusiveRange(70, 130));
+    });
+
+    test('un ataque sin moneda no toca la semilla', () {
+      final e = aplicarCombate(
+          nuevo(jugador: [pokemon('a')]), const Atacar(Bando.jugador, 0));
+      expect(e.semilla, 1);
+      expect(e.ultimaMoneda, isNull);
+    });
+  });
+
   group('efecto: el rival pierde energía (Disparo Demora)', () {
     const demora = AtaqueCampana(
       nombre: 'Disparo Demora',

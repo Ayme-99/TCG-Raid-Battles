@@ -82,6 +82,16 @@ void main() {
           .having((e) => e.valor, 'valor', 10));
     });
 
+    test('Rattata: Hiper Colmillo hace 20 y 20 más si sale cara', () {
+      final r = pokemon['rattata']!;
+      expect(r.ps, 60);
+      expect(r.debilidad!.tipo, TipoCampana.lucha);
+      final colmillo = r.ataques.last;
+      expect(colmillo.dano, 20);
+      expect(colmillo.efecto, isA<MonedaDanoExtra>()
+          .having((e) => e.valor, 'valor', 20));
+    });
+
     test('Caterpie: Disparo Demora quita 1 de energía y no hace daño', () {
       final c = pokemon['caterpie']!;
       expect(c.ps, 50);
