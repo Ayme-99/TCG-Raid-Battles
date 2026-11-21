@@ -5,7 +5,7 @@
   "tipo": "agua",
   "ps": 80,
   "debilidad": {
-    "tipo": "agua",
+    "tipo": "electrico",
     "multiplicador": 2
   },
   "retirada": 0,
