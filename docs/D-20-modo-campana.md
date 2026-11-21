@@ -33,7 +33,7 @@ Cada Pokémon es un registro del catálogo:
 | `rareza` | cuánto cuesta encontrarlo en las rutas |
 | imagen | no va en el JSON: es `app/assets/campana/cartas/<id>.webp` (480×670) |
 
-- El equipo tiene un **máximo de Pokémon por definir** (propuesta provisional: 6; es un parámetro).
+- El equipo lleva **hasta 6 Pokémon: 1 activo y 5 en la banca** (decidido el 2026-11-21; es un parámetro). Los demás están en el **PC** (§4, Descanso). Un Pokémon capturado se une al equipo si hay hueco; si el equipo está lleno, la app pregunta si se **cambia por uno del equipo**, y el que se descarta (el capturado o el sustituido) **va al PC**: no se pierde ningún Pokémon.
 - Los efectos de los ataques (§3.6) empiezan por uno: reducir el daño del rival. Los siguientes (monedas, curar, estados) reutilizarán las piezas que ya existen en las cartas de los aliados, sin inventar un sistema nuevo.
 
 ### 2.1 Progresión: sin niveles, con XP y evolución
@@ -179,8 +179,8 @@ La campaña inicial es **Kanto** (decidido el 2026-11-21). La región se recorre
 | Nodo | Qué pasa |
 |---|---|
 | **Inicio** | Elegir un Pokémon inicial entre tres (cuáles, por decidir). |
-| **Ruta** | Combate contra un Pokémon salvaje. Al derrotarlo se pregunta si se añade al equipo (si hay hueco; si no, hay que soltar uno). |
-| **Descanso** | Cura el equipo, permite gestionar el equipo, **evolucionar 1 Pokémon** y comprar (qué se vende, por decidir). |
+| **Ruta** | Combate contra un Pokémon salvaje. Al derrotarlo se pregunta si se captura: si hay hueco se une al equipo, y si está lleno se elige a quién sustituir y el descartado va al PC (§2). |
+| **Descanso** | El **centro Pokémon**: cura el equipo, da acceso al **PC** (guarda los Pokémon que no caben en el equipo y permite cambiarlos por los del equipo), permite **evolucionar 1 Pokémon** y comprar (qué se vende, por decidir). |
 | **Gimnasio** | Combate contra un entrenador. Da una **medalla** y puntos. |
 | **Jefe** | Un **Pokémon salvaje** con su carta de la serie NN/20 (§4, Jefes). Da muchos puntos. |
 | **Liga** | Tras reunir todas las medallas. **Fase 2.** |
@@ -197,7 +197,7 @@ Decidido el 2026-11-21. Los jefes son **Pokémon salvajes**, no entrenadores: lo
 
 Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar): 01 Pikachu, 02 Clefairy, 03 Dugtrio, 04 Marowak, 05 Kangaskhan, 06 Lapras, 07 Muk, 08 Gyarados, 09 Snorlax, 10 Electrode, 11 Dodrio, 12 Golem, 13 Alakazam, 14 Aerodactyl, 15 Scyther, 16 Dragonite, 17 Articuno, 18 Zapdos, 19 Moltres, 20 Mewtwo.
 
-**Combate:** es un 1 contra 1 con el mismo motor y la misma IA. **Capturable** (decidido el 2026-11-21): al derrotarlo se ofrece la carta **normal** del Pokémon (la 025/150 en el caso de Pikachu, con 60 PS), no la del jefe, y los puntos del jefe se dan solo la primera vez. Si lleva `llamaAliado`, al **bajar de ese porcentaje de PS** (Pikachu: la mitad) el jefe se retira a la banca y entra un **aliado elegido al azar** con la semilla del combate (Pikachu: Weedle, Caterpie, Metapod o Kakuna); cuando el aliado cae, **vuelve el jefe con los PS que tenía**. Los PS de los jefes pueden salirse de la tabla de §3.5, pero su daño es el de su fase. Los datos están en `catalog/campana/jefes/*.json`.
+**Combate:** es un 1 contra 1 con el mismo motor y la misma IA. **Capturable** (decidido el 2026-11-21): al derrotarlo se ofrece la carta **normal** del Pokémon (la 025/150 en el caso de Pikachu, con 60 PS), no la del jefe, con las mismas reglas de equipo y PC que cualquier captura (§2). **Solo se captura la primera vez**: si se repite el jefe, ya no se puede volver a capturar. **Los aliados que llama el jefe no se capturan.** Los puntos del jefe se dan solo la primera vez. Si lleva `llamaAliado`, al **bajar de ese porcentaje de PS** (Pikachu: la mitad) el jefe se retira a la banca y entra un **aliado elegido al azar** con la semilla del combate (Pikachu: Weedle, Caterpie, Metapod o Kakuna); cuando el aliado cae, **vuelve el jefe con los PS que tenía**. Los PS de los jefes pueden salirse de la tabla de §3.5, pero su daño es el de su fase. Los datos están en `catalog/campana/jefes/*.json`.
 
 **Pikachu (01/20):** 100 PS, eléctrico, debilidad lucha ×2, sin resistencia, retirada 0. Ataque Rápido (1, 10) e Impactrueno (2, 30). Estimación de dificultad: unos 20 de daño por turno, de modo que el inicial aguanta 4–5 turnos; se calibrará con el simulador. **Pendiente de implementar en el motor:** la llamada del aliado a mitad de combate (hoy el combate contra Pikachu es un 1 contra 1 normal).
 
@@ -214,7 +214,7 @@ Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar
 | Motor | Librería nueva `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho el combate 1 contra 1 (#336)**: energía, atacar, cambiar, cargar, elegir siguiente, debilidad y resistencia; **IA rival (#338)**. |
 | Catálogo | `catalog/campana/`: `pokemon/*.json` (uno por Pokémon, con su número de la Pokédex), `zonas/*.json` (qué aparece en cada zona) y sus esquemas en `catalog/schema/`. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
-| Guardado | Progreso de campaña (región, nodo, equipo, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
+| Guardado | Progreso de campaña (región, nodo, equipo, **PC**, jefes ya capturados, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
 | Servidor | Recibe los puntos ganados al terminar un jefe o una medalla. Al ser un solo jugador y coste 0, se acepta lo que reporta el cliente con un tope por hito (no hay competición). |
 | App | Pantallas nuevas: mapa de región, combate, equipo, descanso y tienda. Reutiliza los fondos de mesa por mapa y los avisos. |
 
@@ -240,12 +240,13 @@ Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, ev
 ## 8. Preguntas abiertas
 
 1. **Derrota.** ¿Qué pasa al perder un combate? Propuesta: volver al último descanso con el equipo curado y sin perder lo ganado, para que no frustre. Alternativa más dura: perder una parte del dinero.
-2. **Máximo de Pokémon en el equipo** y qué pasa con los que se sueltan.
+2. ~~Máximo de Pokémon en el equipo~~ **Decidido (§2):** 6 (1 activo y 5 en banca); los demás van al PC, sin límite por definir de capacidad del PC.
 3. **Qué se vende en el descanso** (curas, objetos, Pokémon).
 4. ~~Cuántos ataques~~ **Decidido (§3.5):** 1 a 2 ataques por carta, coste de 1 a 4.
 5. **Cifras de progresión:** cuántos puntos cuesta cada XP, cuántas XP necesita cada Pokémon para evolucionar, y cuánto cuestan el intercambio y hacerse ex.
 6. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex).
-7. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
+7. **Capacidad del PC:** ¿ilimitada o con un tope (por ejemplo, 30)?
+8. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
 
 ## 9. Tareas derivadas (para crear tras aprobar)
 
