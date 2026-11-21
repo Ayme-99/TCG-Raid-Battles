@@ -56,7 +56,7 @@ Empieza el **jugador**. En su turno, un bando hace **una acción, y las tres gas
 
 1. **Atacar** con el Pokémon activo (si le llega la energía).
 2. **Cambiar** de Pokémon activo.
-3. **Pasar.**
+3. **Cargar:** no ataca y recupera **1 de energía más** de lo normal (2 en total ese turno), pensada para llegar al ataque grande. Sustituye a «Pasar» (decidido el 2026-11-21).
 
 **Elegir el siguiente Pokémon** cuando cae el activo **no** gasta turno: su dueño lo elige y sigue su turno.
 
@@ -70,7 +70,14 @@ No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de
 
 ### 3.4 La «máquina»
 
-El rival juega con **las mismas reglas** (la misma energía y las mismas debilidades y resistencias), de modo que los combates se igualan sin reglas asimétricas. Su decisión es simple y determinista: ataca con el que más daño efectivo hace por energía gastada, cambia si tiene desventaja de tipo clara y la reserva lo permite, y pasa si no llega a ningún ataque.
+El rival juega con **las mismas reglas** (la misma energía y las mismas debilidades y resistencias), de modo que los combates se igualan sin reglas asimétricas. Su decisión es **determinista** (`decidirAccion` en `engine/lib/src/campana/ia.dart`, #338), en este orden:
+
+1. Si cae su activo, saca al relevo que no sea débil al rival, haga más daño y tenga más salud.
+2. Si puede **rematar** al Pokémon rival, ataca con lo más barato que lo consiga.
+3. Si su activo es **débil** a un ataque del rival, o no llega a ningún ataque, **cambia** a un relevo que no sea débil y sí pueda atacar (si le llega la energía de la retirada).
+4. Si con la carga extra podría **rematar** al turno siguiente un ataque que hoy no le llega, **carga**.
+5. Ataca: con el de **más daño** si la reserva está llena (la energía sobrante se perdería) y, si no, con el de **más daño por energía gastada**.
+6. Si no llega a nada, **carga**.
 
 ## 4. Mapa
 
