@@ -3,6 +3,7 @@
 /// Es independiente del motor de la partida (`incursiones_engine.dart`).
 library campana;
 
+export 'src/campana/catalogo.dart';
 export 'src/campana/combate.dart';
 export 'src/campana/ia.dart';
 export 'src/campana/pokemon.dart';

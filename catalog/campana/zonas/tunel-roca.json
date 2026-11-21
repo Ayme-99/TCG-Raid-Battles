@@ -1,0 +1,21 @@
+{
+  "id": "tunel-roca",
+  "nombre": "Túnel Roca",
+  "region": "kanto",
+  "salvajes": [
+    "zubat",
+    "geodude",
+    "machop",
+    "onix"
+  ],
+  "entrenadores": [
+    {
+      "clase": "PokéManiaco",
+      "pokemon": [
+        "cubone",
+        "slowpoke"
+      ]
+    }
+  ],
+  "jefe": "onix"
+}

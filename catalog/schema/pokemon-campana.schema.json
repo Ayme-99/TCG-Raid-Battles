@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pokémon de campaña (D-20)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "numero",
+    "nombre",
+    "tipo",
+    "ps",
+    "ataques"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "numero": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 151,
+      "description": "Número de la Pokédex de Kanto."
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "tipo": {
+      "$ref": "#/$defs/tipo"
+    },
+    "ps": {
+      "type": "integer",
+      "minimum": 10,
+      "multipleOf": 10
+    },
+    "debilidad": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tipo"
+      ],
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/tipo"
+        },
+        "multiplicador": {
+          "type": "integer",
+          "minimum": 2,
+          "default": 2
+        }
+      }
+    },
+    "resistencia": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tipo"
+      ],
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/tipo"
+        },
+        "reduccion": {
+          "type": "integer",
+          "minimum": 10,
+          "default": 30
+        }
+      }
+    },
+    "retirada": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10,
+      "default": 0
+    },
+    "ataques": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "nombre",
+          "tipo",
+          "coste",
+          "dano"
+        ],
+        "properties": {
+          "nombre": {
+            "type": "string"
+          },
+          "tipo": {
+            "$ref": "#/$defs/tipo"
+          },
+          "coste": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "dano": {
+            "type": "integer",
+            "minimum": 10,
+            "multipleOf": 5
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "tipo": {
+      "enum": [
+        "normal",
+        "fuego",
+        "agua",
+        "planta",
+        "electrico",
+        "hielo",
+        "lucha",
+        "veneno",
+        "tierra",
+        "volador",
+        "psiquico",
+        "bicho",
+        "roca",
+        "fantasma",
+        "dragon"
+      ]
+    }
+  }
+}

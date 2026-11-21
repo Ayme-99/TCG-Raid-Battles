@@ -1,18 +1,22 @@
-/// Tipos de los Pokémon de campaña (D-20).
+/// Tipos de los Pokémon de campaña: los 15 de la 1.ª generación (D-20).
 ///
-/// Por ahora solo los de la región Túnel Roca y los de los tres iniciales.
+/// El nombre de cada valor es el que se escribe en el catálogo JSON.
 enum TipoCampana {
   normal,
   fuego,
   agua,
   planta,
   electrico,
-  roca,
-  tierra,
+  hielo,
   lucha,
-  fantasma,
   veneno,
+  tierra,
+  volador,
   psiquico,
+  bicho,
+  roca,
+  fantasma,
+  dragon,
 }
 
 /// Debilidad de una carta: los ataques de [tipo] le hacen [multiplicador]
