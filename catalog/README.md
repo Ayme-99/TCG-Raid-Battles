@@ -56,3 +56,7 @@ Ver `ejemplos/validos/jefe-con-aliados.json` para un jefe completo.
 3. Si algún aliado usa `programa`, el script tiene que existir antes en el motor (`engine/lib/src/scripts_aliado.dart`).
 4. Genera su informe de simulación: `cd sim && dart run bin/sim_jefes.dart` (escribe `balance/informes/jefes_aliados.csv`).
 5. El CI valida el esquema, que el `id` coincida con el nombre del archivo, que el índice liste exactamente los jefes de `bosses/` y que los scripts existan.
+
+## Campaña (`campana/`)
+
+Datos del modo campaña (D-20): `campana/pokemon/*.json` (un Pokémon por archivo, validado por `schema/pokemon-campana.schema.json`) y `campana/zonas/*.json` (qué aparece en cada zona, `schema/zona-campana.schema.json`). El primer set será Kanto (151 Pokémon), pero se rellena por zonas: de cada una solo entran los Pokémon que aparecen en ella. Hoy está el Túnel Roca. Las cifras (PS, daños, costes) son provisionales hasta equilibrarlas con el simulador.

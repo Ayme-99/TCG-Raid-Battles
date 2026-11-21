@@ -1,0 +1,36 @@
+{
+  "id": "onix",
+  "numero": 95,
+  "nombre": "Onix",
+  "tipo": "roca",
+  "ps": 90,
+  "debilidad": {
+    "tipo": "agua",
+    "multiplicador": 2
+  },
+  "resistencia": {
+    "tipo": "normal",
+    "reduccion": 30
+  },
+  "retirada": 1,
+  "ataques": [
+    {
+      "nombre": "Atadura",
+      "tipo": "normal",
+      "coste": 2,
+      "dano": 25
+    },
+    {
+      "nombre": "Lanzarrocas",
+      "tipo": "roca",
+      "coste": 3,
+      "dano": 50
+    },
+    {
+      "nombre": "Furia",
+      "tipo": "normal",
+      "coste": 4,
+      "dano": 70
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "zubat",
+  "numero": 41,
+  "nombre": "Zubat",
+  "tipo": "veneno",
+  "ps": 50,
+  "debilidad": {
+    "tipo": "tierra",
+    "multiplicador": 2
+  },
+  "resistencia": {
+    "tipo": "lucha",
+    "reduccion": 30
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Mordisco",
+      "tipo": "normal",
+      "coste": 1,
+      "dano": 10
+    },
+    {
+      "nombre": "Ataque Ala",
+      "tipo": "volador",
+      "coste": 2,
+      "dano": 25
+    }
+  ]
+}

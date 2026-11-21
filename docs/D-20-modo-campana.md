@@ -81,11 +81,11 @@ El rival juega con **las mismas reglas** (la misma energía y las mismas debilid
 
 ## 4. Mapa
 
-La campaña se juega **por regiones**; cada región es un mapa de los que ya existen (Túnel Roca, Islas Remolino…). Una región es un grafo de **nodos**:
+La campaña inicial es **Kanto** (decidido el 2026-11-21). La región se recorre por **zonas** (rutas, cuevas, ciudades), como en los juegos, y cada zona define qué Pokémon salvajes aparecen y qué entrenadores hay. El **Túnel Roca** es una de esas zonas. El recorrido es un grafo de **nodos**:
 
 | Nodo | Qué pasa |
 |---|---|
-| **Inicio** | Elegir un Pokémon inicial entre tres. |
+| **Inicio** | Elegir un Pokémon inicial entre tres (cuáles, por decidir). |
 | **Ruta** | Combate contra un Pokémon salvaje. Al derrotarlo se pregunta si se añade al equipo (si hay hueco; si no, hay que soltar uno). |
 | **Descanso** | Cura el equipo, permite gestionar el equipo, **evolucionar 1 Pokémon** y comprar (qué se vende, por decidir). |
 | **Gimnasio** | Combate contra un entrenador. Da una **medalla** y puntos. |
@@ -108,8 +108,8 @@ El jefe se enfrenta como un **equipo rival**: sus aliados salen primero y el jef
 
 | Pieza | Propuesta |
 |---|---|
-| Motor | Librería nueva `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho el combate 1 contra 1 (#336)**: energía, atacar, cambiar, pasar, elegir siguiente, debilidad y resistencia. |
-| Catálogo | `catalog/campana/`: `pokemon/*.json`, `regiones/*.json`, `tipos.json` y su esquema. El JSON manda, como con los jefes. |
+| Motor | Librería nueva `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho el combate 1 contra 1 (#336)**: energía, atacar, cambiar, cargar, elegir siguiente, debilidad y resistencia; **IA rival (#338)**. |
+| Catálogo | `catalog/campana/`: `pokemon/*.json` (uno por Pokémon, con su número de la Pokédex), `zonas/*.json` (qué aparece en cada zona) y sus esquemas en `catalog/schema/`. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
 | Guardado | Progreso de campaña (región, nodo, equipo, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
 | Servidor | Recibe los puntos ganados al terminar un jefe o una medalla. Al ser un solo jugador y coste 0, se acepta lo que reporta el cliente con un tope por hito (no hay competición). |
@@ -117,17 +117,22 @@ El jefe se enfrenta como un **equipo rival**: sus aliados salen primero y el jef
 
 `flujo-app.md` se corrige en este mismo cambio: la campaña **ya no** entrega las cartas de la partida libre digital, y «Mis cartas» deja de depender de ella.
 
-## 7. Porción vertical (primera entrega)
+## 7. Primera entrega
 
-Una sola región, **Túnel Roca**, con jefe **Onix** y sus aliados:
+**El primer set tendrá los 151 Pokémon de Kanto, pero se rellena por zonas:** de cada zona solo entran los Pokémon que aparecen en ella. La primera zona es el **Túnel Roca**, con datos de Serebii y Bulbapedia (Rojo, Azul y Amarillo):
 
-- 3 iniciales y unos 15 a 20 Pokémon de campaña en total.
-- Solo los tipos de la región (Roca, Tierra, Lucha, Normal, Fantasma, Veneno, Eléctrico, Psíquico) y los de los iniciales.
-- 3 rutas, 1 descanso, 1 gimnasio con medalla y el jefe.
-- Combate completo con energía, cambio de Pokémon, IA rival y victoria o derrota.
+- **Salvajes:** Zubat, Geodude, Machop y Onix. El Onix salvaje se puede capturar y es distinto del Onix jefe.
+- **Entrenadores (PokéManiacos):** Cubone y Slowpoke.
+- El jefe de la zona es **Onix**, con sus aliados.
+
+Contenido de la primera entrega, además:
+
+- Los 15 tipos de la 1.ª generación en el motor.
+- Esquema JSON de Pokémon y de zona, y su carga en el motor (#340).
+- Combate completo con energía, cambio de Pokémon, IA rival y victoria o derrota (hecho).
 - Guardado local del progreso.
 
-Fuera de la primera entrega: Liga, más regiones, evolución, tienda, sincronización con la cuenta y los combates 2 contra 2 y 3 contra 3.
+Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, evolución, tienda, sincronización con la cuenta y los combates 2 contra 2 y 3 contra 3.
 
 ## 8. Preguntas abiertas
 
