@@ -311,6 +311,49 @@ void main() {
     });
   });
 
+  group('Rodar', () {
+    const rodar = AtaqueCampana(
+      nombre: 'Rodar',
+      tipo: TipoCampana.lucha,
+      coste: 2,
+      dano: 20,
+      efecto: DanoPorRacha(),
+    );
+
+    test('lo encadena cuando la racha ya supera a su otro ataque', () {
+      var e = combate([
+        pokemon('s', ps: 70, ataques: [rodar, ataque(1, 30)])
+      ], [
+        pokemon('b', ps: 500, ataques: [ataque(1, 10)])
+      ]);
+      final usados = <int>[];
+      for (var i = 0; i < 6; i++) {
+        final a = decidirAccion(e, Bando.jugador);
+        if (a is Atacar) usados.add(a.indice);
+        e = aplicarCombate(e, a);
+        e = aplicarCombate(e, decidirAccion(e, Bando.rival));
+      }
+      // Al principio pega más el otro (30 > 20); cuando Rodar llega a 40, lo encadena.
+      expect(usados.last, 0);
+    });
+
+    test('todos los emparejamientos con Rodar terminan', () {
+      final a = [pokemon('s', ps: 70, ataques: [rodar])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
   group('Bofetón Lodo', () {
     const bofeton = AtaqueCampana(
       nombre: 'Bofetón Lodo',

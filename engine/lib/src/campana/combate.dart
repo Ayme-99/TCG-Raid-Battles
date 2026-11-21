@@ -69,6 +69,11 @@ class BandoCombate {
   /// no hace nada (Bofetón Lodo del rival). Dura solo su próximo turno.
   final bool cegado;
 
+  /// Índice del ataque que usó el activo en su turno anterior (-1 si no atacó,
+  /// o si cargó o cambió) y cuántas veces seguidas lo lleva usando (Rodar).
+  final int ultimoAtaque;
+  final int racha;
+
   const BandoCombate({
     required this.equipo,
     required this.activo,
@@ -78,6 +83,8 @@ class BandoCombate {
     this.veneno = 0,
     this.proteccion = 0,
     this.cegado = false,
+    this.ultimoAtaque = -1,
+    this.racha = 0,
   });
 
   PokemonEnCombate get pokemonActivo => equipo[activo];
@@ -104,6 +111,8 @@ class BandoCombate {
     int? veneno,
     int? proteccion,
     bool? cegado,
+    int? ultimoAtaque,
+    int? racha,
   }) =>
       BandoCombate(
         equipo: equipo ?? this.equipo,
@@ -114,6 +123,8 @@ class BandoCombate {
         veneno: veneno ?? this.veneno,
         proteccion: proteccion ?? this.proteccion,
         cegado: cegado ?? this.cegado,
+        ultimoAtaque: ultimoAtaque ?? this.ultimoAtaque,
+        racha: racha ?? this.racha,
       );
 }
 
@@ -326,7 +337,9 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
           danoExtra: 0,
           veneno: 0,
           proteccion: 0,
-          cegado: false));
+          cegado: false,
+          ultimoAtaque: -1,
+          racha: 0));
   return nuevo.copiarCon(
       fase: nuevo.debenElegir.isEmpty
           ? FaseCombate.enCurso
@@ -345,6 +358,7 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   }
   final rivalBando = a.bando.otro;
   final defensor = estado.bando(rivalBando);
+  final racha = atacante.ultimoAtaque == a.indice ? atacante.racha + 1 : 1;
   var semilla = estado.semilla;
   bool? moneda;
   if (atacante.cegado) {
@@ -356,13 +370,23 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
           .conBando(
               a.bando,
               atacante.copiarCon(
-                  energia: atacante.energia - ataque.coste, cegado: false))
+                  energia: atacante.energia - ataque.coste,
+                  cegado: false,
+                  ultimoAtaque: a.indice,
+                  racha: racha))
           .copiarCon(semilla: semilla, ultimaMoneda: moneda);
       return _terminarTurno(fallido);
     }
   }
   var golpe = ataque;
   final efecto = ataque.efecto;
+  if (efecto is DanoPorRacha) {
+    golpe = AtaqueCampana(
+        nombre: ataque.nombre,
+        tipo: ataque.tipo,
+        coste: ataque.coste,
+        dano: ataque.dano * racha);
+  }
   if (efecto is MonedaDanoExtra) {
     semilla = _siguienteSemilla(semilla);
     moneda = (semilla >> 8) & 1 == 1;
@@ -396,8 +420,10 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
     final resto = defensorNuevo.energia - efecto.valor;
     defensorNuevo = defensorNuevo.copiarCon(energia: resto < 0 ? 0 : resto);
   }
-  var atacanteNuevo =
-      atacante.copiarCon(energia: atacante.energia - ataque.coste);
+  var atacanteNuevo = atacante.copiarCon(
+      energia: atacante.energia - ataque.coste,
+      ultimoAtaque: a.indice,
+      racha: racha);
   if (efecto is ReduceDanoPropio && efecto.valor > atacante.proteccion) {
     atacanteNuevo = atacanteNuevo.copiarCon(proteccion: efecto.valor);
   }
@@ -430,7 +456,9 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
         danoReducido: 0,
         danoExtra: 0,
         veneno: 0,
-        proteccion: 0),
+        proteccion: 0,
+        ultimoAtaque: -1,
+        racha: 0),
   ));
 }
 
@@ -439,7 +467,8 @@ EstadoCombate _cargar(EstadoCombate estado, Cargar a) {
   final p = estado.parametros;
   final total = b.energia + p.energiaAlCargar;
   final energia = total > p.energiaMaxima ? p.energiaMaxima : total;
-  return _terminarTurno(estado.conBando(a.bando, b.copiarCon(energia: energia)));
+  return _terminarTurno(estado.conBando(
+      a.bando, b.copiarCon(energia: energia, ultimoAtaque: -1, racha: 0)));
 }
 
 /// Termina el turno del bando actual: recupera energía y pasa el turno al otro.

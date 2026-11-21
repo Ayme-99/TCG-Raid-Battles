@@ -115,6 +115,16 @@ void main() {
       expect(d.ataques.last.efecto, isA<MonedaFalloRival>());
     });
 
+    test('Sandshrew (027/150): Rizo Defensa y Rodar por racha', () {
+      final s = pokemon['sandshrew']!;
+      expect(s.ps, 70);
+      expect(s.tipo, TipoCampana.lucha);
+      expect(s.debilidad!.tipo, TipoCampana.planta);
+      expect(s.ataques.first.efecto, isA<ReduceDanoPropio>());
+      expect(s.ataques.last.dano, 20);
+      expect(s.ataques.last.efecto, isA<DanoPorRacha>());
+    });
+
     test('Kakuna: Fortaleza y Picotazo Veneno', () {
       final k = pokemon['kakuna']!;
       expect(k.ps, 70);

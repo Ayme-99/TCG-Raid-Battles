@@ -368,6 +368,64 @@ void main() {
     });
   });
 
+  group('efecto: daño por racha (Rodar)', () {
+    const rodar = AtaqueCampana(
+      nombre: 'Rodar',
+      tipo: TipoCampana.lucha,
+      coste: 2,
+      dano: 20,
+      efecto: DanoPorRacha(),
+    );
+    const otro = AtaqueCampana(
+        nombre: 'Otro', tipo: TipoCampana.lucha, coste: 1, dano: 10);
+    final rueda = pokemon('s', tipo: TipoCampana.lucha, ps: 70, ataques: const [rodar, otro]);
+    final blanco = pokemon('b', ps: 500, ataques: const [
+      AtaqueCampana(nombre: 'Nada', tipo: TipoCampana.normal, coste: 1, dano: 10)
+    ]);
+
+    EstadoCombate turno(EstadoCombate e, AccionCombate a) {
+      e = aplicarCombate(e, a);
+      return e.fase == FaseCombate.terminado
+          ? e
+          : aplicarCombate(e, const Cargar(Bando.rival));
+    }
+
+    EstadoCombate inicio() => nuevo(jugador: [rueda, pokemon('s2')], rival: [blanco, pokemon('b2')]);
+
+    test('20, 40, 60… con usos seguidos', () {
+      var e = inicio();
+      final danos = <int>[];
+      for (var i = 0; i < 3; i++) {
+        final antes = e.rival.pokemonActivo.ps;
+        e = turno(e, const Atacar(Bando.jugador, 0));
+        danos.add(antes - e.rival.pokemonActivo.ps);
+      }
+      expect(danos, [20, 40, 60]);
+    });
+
+    test('usar otro ataque reinicia la racha', () {
+      var e = inicio();
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      e = turno(e, const Atacar(Bando.jugador, 1));
+      final antes = e.rival.pokemonActivo.ps;
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      expect(antes - e.rival.pokemonActivo.ps, 20);
+    });
+
+    test('cargar o cambiar de Pokémon reinicia la racha', () {
+      var e = inicio();
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      e = turno(e, const Cargar(Bando.jugador));
+      expect(e.jugador.racha, 0);
+      var antes = e.rival.pokemonActivo.ps;
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      expect(antes - e.rival.pokemonActivo.ps, 20);
+      e = turno(e, const Cambiar(Bando.jugador, 1));
+      expect(e.jugador.ultimoAtaque, -1);
+    });
+  });
+
   group('efecto: moneda de fallo (Bofetón Lodo)', () {
     const bofeton = AtaqueCampana(
       nombre: 'Bofetón Lodo',

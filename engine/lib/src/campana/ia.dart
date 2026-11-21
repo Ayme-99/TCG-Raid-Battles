@@ -54,7 +54,7 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
     return ElegirSiguiente(bando, i ?? yo.relevos.first);
   }
 
-  final activo = yo.pokemonActivo.especie;
+  final activo = _conRacha(yo);
   final ataque = _mejorAtaque(
       activo, yo.energia, objetivo, p, yo.danoReducido, rival.extraRecibido);
   final danoMio = ataque == null
@@ -367,4 +367,36 @@ int? _mejorRelevo(
     }
   }
   return mejor;
+}
+
+/// El Pokémon activo de [yo] con el daño de sus ataques de racha (Rodar) ya
+/// escalado a lo que harían si los usara ahora. Los índices no cambian.
+PokemonCampana _conRacha(BandoCombate yo) {
+  final e = yo.pokemonActivo.especie;
+  if (!e.ataques.any((a) => a.efecto is DanoPorRacha)) return e;
+  return PokemonCampana(
+    id: e.id,
+    nombre: e.nombre,
+    tipo: e.tipo,
+    ps: e.ps,
+    debilidad: e.debilidad,
+    resistencia: e.resistencia,
+    retirada: e.retirada,
+    ex: e.ex,
+    evoluciones: e.evoluciones,
+    ataques: [
+      for (var i = 0; i < e.ataques.length; i++)
+        if (e.ataques[i].efecto is DanoPorRacha)
+          AtaqueCampana(
+            nombre: e.ataques[i].nombre,
+            tipo: e.ataques[i].tipo,
+            coste: e.ataques[i].coste,
+            dano: e.ataques[i].dano *
+                (yo.ultimoAtaque == i ? yo.racha + 1 : 1),
+            efecto: e.ataques[i].efecto,
+          )
+        else
+          e.ataques[i],
+    ],
+  );
 }
