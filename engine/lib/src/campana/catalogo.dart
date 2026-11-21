@@ -17,6 +17,33 @@ T _campo<T>(Map<String, dynamic> json, String clave) {
   return v;
 }
 
+ViaEvolucion _viaDeTexto(String texto) {
+  for (final v in ViaEvolucion.values) {
+    if (v.name == texto) return v;
+  }
+  throw FormatException('Vía de evolución desconocida: "$texto".');
+}
+
+EvolucionCampana _evolucionDesdeJson(Map<String, dynamic> json) {
+  final via = _viaDeTexto(_campo<String>(json, 'via'));
+  switch (via) {
+    case ViaEvolucion.xp:
+      return EvolucionCampana(
+          a: _campo<String>(json, 'a'), via: via, xp: _campo<int>(json, 'xp'));
+    case ViaEvolucion.objeto:
+      return EvolucionCampana(
+          a: _campo<String>(json, 'a'),
+          via: via,
+          objeto: _campo<String>(json, 'objeto'));
+    case ViaEvolucion.intercambio:
+    case ViaEvolucion.puntos:
+      return EvolucionCampana(
+          a: _campo<String>(json, 'a'),
+          via: via,
+          puntos: _campo<int>(json, 'puntos'));
+  }
+}
+
 /// Un Pokémon de campaña a partir de su JSON del catálogo
 /// (`catalog/campana/pokemon/*.json`).
 PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
@@ -41,6 +68,11 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
           )
         : null,
     retirada: (json['retirada'] as int?) ?? 0,
+    ex: (json['ex'] as bool?) ?? false,
+    evoluciones: [
+      for (final e in (json['evoluciones'] as List<dynamic>?) ?? const [])
+        _evolucionDesdeJson(e as Map<String, dynamic>),
+    ],
     ataques: [
       for (final a in ataques)
         AtaqueCampana(

@@ -28,11 +28,27 @@ Cada Pokémon es un registro del catálogo:
 | `ps` | puntos de salud |
 | `retirada` | coste de cambiarlo por otro; **0 (gratis)** de salida |
 | `ataques` | 1 a 3: `nombre`, `tipo`, `coste` (energía), `dano`, `efecto` opcional |
-| `evolucion` | `a` (id) y condición, si evoluciona |
+| `evoluciones` | lista (puede ser vacía): `a` (id) y cómo se consigue (ver 2.1) |
+| `ex` | `true` si es una carta ex |
 | `rareza` | cuánto cuesta encontrarlo en las rutas |
 
 - El equipo tiene un **máximo de Pokémon por definir** (propuesta provisional: 6; es un parámetro).
 - Los efectos de los ataques reutilizan las piezas que ya existen en las cartas de los aliados: monedas, curar, estados y habilidades pasivas. No se inventa un sistema de efectos nuevo.
+
+### 2.1 Progresión: sin niveles, con XP y evolución
+
+Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos PS y daños; se mejora evolucionando.
+
+- **Las victorias en combate dan puntos** (los mismos puntos del juego, §5).
+- En un **centro Pokémon** (el nodo de descanso) se pueden **convertir puntos en XP** de un Pokémon del equipo. Cuántos puntos cuesta cada XP queda por equilibrar.
+- Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xp: N` en la carta). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4).
+- **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`).
+- **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): cuesta **puntos**, por usar la máquina de intercambio (`via: "intercambio"`, `puntos: N`).
+- **Cartas ex.** La **última fase de cada Pokémon es una carta ex**. Un Pokémon que no evoluciona (Onix…) puede hacerse ex **gastando puntos** (`via: "puntos"`, `puntos: N`), con el mismo proceso. Cada carta ex es una **entrada propia del catálogo** (`"ex": true`).
+- **La carta evolucionada sustituye a la anterior** y recupera todos sus PS. Una forma evolucionada también puede aparecer salvaje en una zona si el catálogo la incluye, y entonces se captura aparte.
+- Un Pokémon puede tener **varias** evoluciones (Eevee con sus piedras), por eso `evoluciones` es una lista.
+
+Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo**.
 
 ## 3. Combate
 
@@ -100,9 +116,9 @@ El jefe se enfrenta como un **equipo rival**: sus aliados salen primero y el jef
 
 ## 5. Puntos y tienda
 
-- La campaña da puntos por **medalla** y por **jefe**, más una cantidad menor por ruta superada (las cifras son provisionales y se ajustan al final; solo importan si hay compras dentro de la campaña).
+- La campaña da puntos por **victoria en combate**, por **medalla** y por **jefe**, más una cantidad menor por ruta superada (las cifras son provisionales y se ajustan al final; solo importan si hay compras dentro de la campaña).
 - Los puntos van a la **cuenta** (hace falta sesión) y se gastan en la **tienda** de la pantalla de inicio: monedas, dados, sobres y cartas sueltas del formato digital.
-- Compras dentro de la campaña (el descanso): se pagan con los mismos puntos, y lo que sobra al terminar se conserva.
+- Compras dentro de la campaña (el descanso), la **XP de evolución** y la evolución por intercambio o a ex se pagan con los mismos puntos, y lo que sobra al terminar se conserva. Gastar puntos en evolucionar es renunciar a gastarlos en la tienda.
 
 ## 6. Cómo encaja en el proyecto
 
@@ -140,7 +156,9 @@ Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, ev
 2. **Máximo de Pokémon en el equipo** y qué pasa con los que se sueltan.
 3. **Qué se vende en el descanso** (curas, objetos, Pokémon).
 4. **Cuántos ataques** puede tener un Pokémon y rango de costes (propuesta: 1 a 3 ataques, coste de 1 a 5).
-5. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
+5. **Cifras de progresión:** cuántos puntos cuesta cada XP, cuántas XP necesita cada Pokémon para evolucionar, y cuánto cuestan el intercambio y hacerse ex.
+6. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex).
+7. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
 
 ## 9. Tareas derivadas (para crear tras aprobar)
 
