@@ -207,6 +207,18 @@
       },
       "description": "Al menos un ataque de 20 o más de daño, o con un efecto de estado (veneno) que Gruñido no anula (D-20 §3.6)."
     },
+    "habilidad": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nombre", "tipo", "valor"],
+      "properties": {
+        "nombre": { "type": "string" },
+        "tipo": { "enum": ["monedaDanoExtraAlAtacar"] },
+        "valor": { "type": "integer", "minimum": 1 },
+        "texto": { "type": "string" }
+      },
+      "description": "Habilidad pasiva. monedaDanoExtraAlAtacar: mientras el Pokémon siga activo, cada vez que ataca lanza una moneda y con cara el ataque hace `valor` más de daño (D-20 §3.6)."
+    },
     "ex": {
       "type": "boolean",
       "default": false,

@@ -96,6 +96,23 @@ class RepiteDanoAlDerribar extends EfectoAtaque {
   const RepiteDanoAlDerribar();
 }
 
+/// Habilidad pasiva de una carta (D-20 §3.6). Hoy hay una.
+sealed class HabilidadCampana {
+  final String nombre;
+
+  const HabilidadCampana(this.nombre);
+}
+
+/// Mientras el Pokémon siga activo, cada vez que ataca lanza una moneda: con
+/// cara, ese ataque hace [valor] puntos más de daño, antes de reducciones,
+/// debilidad y resistencia (Foco Energía). Es una moneda aparte de las que
+/// pueda lanzar el propio ataque.
+class MonedaDanoExtraAlAtacar extends HabilidadCampana {
+  final int valor;
+
+  const MonedaDanoExtraAlAtacar(super.nombre, this.valor);
+}
+
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener
 /// [dano] 0 (solo hace el efecto).
 class AtaqueCampana {
@@ -172,6 +189,9 @@ class PokemonCampana {
   final int retirada;
   final List<AtaqueCampana> ataques;
 
+  /// Habilidad pasiva, si la tiene.
+  final HabilidadCampana? habilidad;
+
   /// Carta ex: la última fase de cada Pokémon.
   final bool ex;
 
@@ -187,6 +207,7 @@ class PokemonCampana {
     this.resistencia,
     this.retirada = 0,
     required this.ataques,
+    this.habilidad,
     this.ex = false,
     this.evoluciones = const [],
   });

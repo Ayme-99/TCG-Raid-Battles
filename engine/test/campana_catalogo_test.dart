@@ -159,6 +159,20 @@ void main() {
       expect(n.ataques.last.efecto, isA<MonedasDano>());
     });
 
+    test('Mankey (056/150): lucha, Foco Energía y Golpe Kárate', () {
+      final m = pokemon['mankey']!;
+      expect(m.ps, 70);
+      expect(m.tipo, TipoCampana.lucha);
+      expect(m.debilidad!.tipo, TipoCampana.psiquico);
+      expect(m.retirada, 1);
+      final h = m.habilidad as MonedaDanoExtraAlAtacar;
+      expect(h.nombre, 'Foco Energía');
+      expect(h.valor, 20);
+      expect(m.ataques.single.coste, 2);
+      expect(m.ataques.single.dano, 30);
+      expect(m.ataques.single.efecto, isA<MonedaDanoExtra>());
+    });
+
     test('Kakuna: Fortaleza y Picotazo Veneno', () {
       final k = pokemon['kakuna']!;
       expect(k.ps, 70);

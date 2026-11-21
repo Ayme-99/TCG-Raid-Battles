@@ -368,6 +368,66 @@ void main() {
     });
   });
 
+  group('habilidad: moneda de daño extra al atacar (Foco Energía)', () {
+  PokemonCampana mono({List<AtaqueCampana>? ataques}) => PokemonCampana(
+        id: 'm',
+        nombre: 'm',
+        tipo: TipoCampana.lucha,
+        ps: 100,
+        habilidad: const MonedaDanoExtraAlAtacar('Foco Energía', 20),
+        ataques: ataques ??
+            const [
+              AtaqueCampana(
+                  nombre: 'Golpe',
+                  tipo: TipoCampana.lucha,
+                  coste: 2,
+                  dano: 30),
+            ],
+      );
+
+    test('lanza una moneda y con cara suma 20; con cruz no', () {
+      final danos = <int>{};
+      for (var semilla = 1; semilla < 40; semilla++) {
+        final e = aplicarCombate(
+            EstadoCombate.inicial(
+                equipoJugador: [mono()],
+                equipoRival: [pokemon('r')],
+                semilla: semilla),
+            const Atacar(Bando.jugador, 0));
+        final dano = 100 - e.rival.pokemonActivo.ps;
+        expect(dano, e.ultimaMoneda! ? 50 : 30);
+        danos.add(dano);
+      }
+      expect(danos, {30, 50});
+    });
+
+    test('es una moneda aparte de la del ataque', () {
+      final golpe = mono(ataques: const [
+        AtaqueCampana(
+            nombre: 'Golpe Kárate',
+            tipo: TipoCampana.lucha,
+            coste: 2,
+            dano: 30,
+            efecto: MonedaDanoExtra(20)),
+      ]);
+      final vistos = <int>{};
+      for (var semilla = 1; semilla < 60; semilla++) {
+        final e = aplicarCombate(
+            EstadoCombate.inicial(
+                equipoJugador: [golpe],
+                equipoRival: [pokemon('r')],
+                semilla: semilla),
+            const Atacar(Bando.jugador, 0));
+        expect(e.ultimasMonedas!.length, 2);
+        final caras = e.ultimasMonedas!.where((c) => c).length;
+        final dano = 100 - e.rival.pokemonActivo.ps;
+        expect(dano, 30 + 20 * caras);
+        vistos.add(dano);
+      }
+      expect(vistos, {30, 50, 70});
+    });
+  });
+
   group('efecto: repetir el daño al derribar (Doble Patada)', () {
     const patada = AtaqueCampana(
       nombre: 'Doble Patada',

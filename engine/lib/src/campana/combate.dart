@@ -462,6 +462,19 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
           dano: ataque.dano + efecto.valor);
     }
   }
+  final habilidad = atacante.pokemonActivo.especie.habilidad;
+  if (habilidad is MonedaDanoExtraAlAtacar) {
+    semilla = _siguienteSemilla(semilla);
+    moneda = (semilla >> 8) & 1 == 1;
+    monedas.add(moneda);
+    if (moneda) {
+      golpe = AtaqueCampana(
+          nombre: golpe.nombre,
+          tipo: golpe.tipo,
+          coste: golpe.coste,
+          dano: golpe.dano + habilidad.valor);
+    }
+  }
   final golpeado = defensor.pokemonActivo.conPs(defensor.pokemonActivo.ps -
       danoDeAtaque(golpe, defensor.pokemonActivo.especie,
           reduccion: atacante.danoReducido, extra: defensor.extraRecibido));

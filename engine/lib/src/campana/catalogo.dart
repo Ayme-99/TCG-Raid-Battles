@@ -107,6 +107,7 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
           )
         : null,
     retirada: (json['retirada'] as int?) ?? 0,
+    habilidad: _habilidadDesdeJson(json['habilidad']),
     ex: (json['ex'] as bool?) ?? false,
     evoluciones: [
       for (final e in (json['evoluciones'] as List<dynamic>?) ?? const [])
@@ -123,6 +124,17 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
         ),
     ],
   );
+}
+
+HabilidadCampana? _habilidadDesdeJson(dynamic json) {
+  if (json == null) return null;
+  final h = json as Map<String, dynamic>;
+  final nombre = _campo<String>(h, 'nombre');
+  switch (_campo<String>(h, 'tipo')) {
+    case 'monedaDanoExtraAlAtacar':
+      return MonedaDanoExtraAlAtacar(nombre, _campo<int>(h, 'valor'));
+  }
+  throw FormatException('Habilidad desconocida: ${h['tipo']}');
 }
 
 /// Total de la serie de jefes de campaña (cartas NN/20): 8 de tramo, 8 de
