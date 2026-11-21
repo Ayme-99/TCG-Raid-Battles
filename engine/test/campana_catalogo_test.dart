@@ -82,6 +82,19 @@ void main() {
           .having((e) => e.valor, 'valor', 10));
     });
 
+    test('Caterpie: Disparo Demora quita 1 de energía y no hace daño', () {
+      final c = pokemon['caterpie']!;
+      expect(c.ps, 50);
+      expect(c.debilidad!.tipo, TipoCampana.fuego);
+      expect(c.resistencia, isNull);
+      final demora = c.ataques.first;
+      expect(demora.dano, 0);
+      expect(demora.coste, 1);
+      expect(demora.efecto, isA<QuitaEnergiaRival>()
+          .having((e) => e.valor, 'valor', 1));
+      expect(c.ataques.last.dano, 20);
+    });
+
     test('Squirtle: Látigo hace que el rival reciba 10 más y no hace daño', () {
       final s = pokemon['squirtle']!;
       expect(s.ps, 80);

@@ -311,6 +311,49 @@ void main() {
     });
   });
 
+  group('Disparo Demora', () {
+    const demora = AtaqueCampana(
+      nombre: 'Disparo Demora',
+      tipo: TipoCampana.normal,
+      coste: 1,
+      dano: 0,
+      efecto: QuitaEnergiaRival(1),
+    );
+    PokemonCampana oruga() =>
+        pokemon('o', ps: 90, ataques: [demora, ataque(2, 20)]);
+    EstadoCombate conRivalJusto(int energia) {
+      final e = combate([oruga()], [pokemon('r', ataques: [ataque(3, 60)])]);
+      return e.copiarCon(
+          rival: e.rival.copiarCon(energia: energia));
+    }
+
+    test('lo usa si con ello el rival deja de llegar a su ataque fuerte', () {
+      expect(decidirAccion(conRivalJusto(3), Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('no lo usa si el rival llega de sobra', () {
+      expect(decidirAccion(conRivalJusto(10), Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('todos los emparejamientos con Disparo Demora terminan', () {
+      final a = [oruga(), pokemon('b', ps: 80, ataques: [ataque(1, 10), ataque(2, 20)])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(3, 60)])];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.turno));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
   group('Látigo', () {
     const latigo = AtaqueCampana(
       nombre: 'Látigo',

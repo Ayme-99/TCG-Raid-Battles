@@ -109,6 +109,7 @@ El rival juega con **las mismas reglas** (la misma energía y las mismas debilid
 3. Si su activo es **débil** a un ataque del rival, o no llega a ningún ataque, **cambia** a un relevo que no sea débil y sí pueda atacar (si le llega la energía de la retirada).
 4. Si tiene un ataque que **reduce el daño del rival** (Gruñido) y compensa (evita más daño, en los golpes que el rival necesita para derribarlo, que el que haría atacando), lo usa; no lo repite mientras siga activo el mismo rival (§3.6).
 5. Si tiene un ataque que hace que el rival **reciba más daño** (Látigo) y lo derriba en menos golpes contando el turno que gasta, lo usa; no lo repite mientras siga activo el mismo rival.
+5b. Si tiene un ataque que **quita energía al rival** (Disparo Demora) y con ello el rival deja de poder dar un golpe mayor que el suyo, lo usa (§3.6).
 6. Si con la carga extra podría **rematar** al turno siguiente un ataque que hoy no le llega, **carga**.
 7. Ataca: con el de **más daño** si la reserva está llena (la energía sobrante se perdería) y, si no, con el de **más daño por energía gastada**.
 8. Si no llega a nada, **carga**.
@@ -176,6 +177,7 @@ Decidido el 2026-11-21. Un ataque puede llevar un `efecto` y entonces puede tene
 - **No se acumula:** si el rival ya tiene una reducción igual o mayor, usarlo otra vez no hace nada. Cuenta la mayor.
 - **Por qué no se acumula** (a diferencia de los juegos, donde Gruñido llega a 6 etapas): allí cada etapa multiplica el daño y nunca llega a cero; aquí el daño es plano y no hay suelo, y como cuesta 1 de energía (que se recupera cada turno), tres usos anularían los ataques de coste 1 y 2. El efecto simétrico (Malicioso: «el Defensor recibe 10 más de daño») seguirá la misma regla.
 - **`aumentaDanoRecibido` (Látigo de Squirtle):** «Mientras el Pokémon Defensor siga activo, recibe 10 puntos más de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula.» Es el efecto simétrico: mismas reglas (dura mientras ese Pokémon siga activo, se quita al cambiarlo o cuando cae, no se acumula) pero sobre el daño que **recibe**. Se suma antes de la debilidad y la resistencia; un ataque sin daño no gana el extra. Los dos efectos se combinan. Estado del bando afectado: `BandoCombate.danoExtra`.
+- **`quitaEnergiaRival` (Disparo Demora de Caterpie):** «El rival pierde 1 de energía (si le queda alguna). No se acumula con nada: se aplica una vez, al usar el ataque.» Es instantáneo: baja la reserva del rival en `valor` (mínimo 0) en el momento de atacar y no deja estado, así que no hay nada que acumular ni que quitar al cambiar de Pokémon. Vale como ataque de 0 de daño (coste 1). La IA lo usa solo si con ello el rival deja de poder dar un golpe mayor que el que haría ella atacando.
 - Es un estado del **bando afectado** (`BandoCombate.danoReducido`), que se pone a 0 al cambiar de activo.
 - **Ninguna carta queda anulada:** todas llevan al menos un ataque de 20 o más (§3.5), de modo que Gruñido deja siempre un ataque de 10 como mínimo.
 - La IA lo usa solo si compensa; contra un rival que pega poco (10 de daño) lo deja sin hacer daño; contra uno que pega fuerte no lo usa.

@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy solo existe uno; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay tres; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -23,6 +23,14 @@ class AumentaDanoRecibido extends EfectoAtaque {
   final int valor;
 
   const AumentaDanoRecibido(this.valor);
+}
+
+/// El rival pierde [valor] de energía (si le queda alguna) en el momento de
+/// usar el ataque. Se aplica una vez y no deja estado (Disparo Demora).
+class QuitaEnergiaRival extends EfectoAtaque {
+  final int valor;
+
+  const QuitaEnergiaRival(this.valor);
 }
 
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener

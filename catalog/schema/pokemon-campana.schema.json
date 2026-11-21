@@ -117,9 +117,10 @@
               "tipo": {
                 "enum": [
                   "reduceDanoRival",
-                  "aumentaDanoRecibido"
+                  "aumentaDanoRecibido",
+                  "quitaEnergiaRival"
                 ],
-                "description": "reduceDanoRival: mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (Gruñido). aumentaDanoRecibido: mientras siga activo, recibe `valor` más de daño de los ataques (Látigo). Ambos, antes de debilidad y resistencia, sin acumular (D-20 §3.6)."
+                "description": "reduceDanoRival: mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (Gruñido). aumentaDanoRecibido: mientras siga activo, recibe `valor` más de daño de los ataques (Látigo). Ambos, antes de debilidad y resistencia, sin acumular. quitaEnergiaRival: el rival pierde `valor` de energía (si le queda) al usar el ataque, una sola vez (D-20 §3.6)."
               },
               "valor": {
                 "type": "integer",

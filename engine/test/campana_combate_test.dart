@@ -368,6 +368,47 @@ void main() {
     });
   });
 
+  group('efecto: el rival pierde energía (Disparo Demora)', () {
+    const demora = AtaqueCampana(
+      nombre: 'Disparo Demora',
+      tipo: TipoCampana.planta,
+      coste: 1,
+      dano: 0,
+      efecto: QuitaEnergiaRival(1),
+    );
+    final oruga = pokemon('o', tipo: TipoCampana.planta, ataques: const [demora]);
+
+    test('quita 1 de energía al rival y no le hace daño', () {
+      final e = aplicarCombate(
+          nuevo(jugador: [oruga]), const Atacar(Bando.jugador, 0));
+      expect(e.rival.energia, 9);
+      expect(e.rival.pokemonActivo.ps, 100);
+      expect(e.jugador.energia, 10); // -1 del coste, +1 al acabar el turno
+    });
+
+    test('no baja de 0 si no le queda energía', () {
+      final e = aplicarCombate(
+        nuevo(
+          jugador: [oruga],
+          parametros: const ParametrosCombate(energiaInicial: 0),
+        ).copiarCon(
+            jugador: nuevo(jugador: [oruga]).jugador.copiarCon(energia: 1)),
+        const Atacar(Bando.jugador, 0),
+      );
+      expect(e.rival.energia, 0);
+    });
+
+    test('no se acumula ni deja estado: dos usos quitan 1 cada uno', () {
+      var e = aplicarCombate(nuevo(jugador: [oruga]), const Atacar(Bando.jugador, 0));
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      final antes = e.rival.energia;
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.rival.energia, antes - 1);
+      expect(e.rival.danoReducido, 0);
+      expect(e.rival.danoExtra, 0);
+    });
+  });
+
   group('efecto: el rival recibe más daño (Látigo)', () {
     const latigo = AtaqueCampana(
       nombre: 'Látigo',

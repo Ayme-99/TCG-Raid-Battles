@@ -277,6 +277,10 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   if (efecto is AumentaDanoRecibido && efecto.valor > defensor.danoExtra) {
     defensorNuevo = defensorNuevo.copiarCon(danoExtra: efecto.valor);
   }
+  if (efecto is QuitaEnergiaRival) {
+    final resto = defensorNuevo.energia - efecto.valor;
+    defensorNuevo = defensorNuevo.copiarCon(energia: resto < 0 ? 0 : resto);
+  }
   var nuevo = estado
       .conBando(
           a.bando, atacante.copiarCon(energia: atacante.energia - ataque.coste))

@@ -20,6 +20,8 @@ import 'pokemon.dart';
 ///    atacando), lo usa; nunca lo repite mientras siga activo el mismo rival.
 /// 5. Si tiene un ataque que hace que el rival reciba más daño (Látigo) y lo
 ///    derriba en menos golpes contando el turno que gasta, lo usa.
+///    Si tiene un ataque que quita energía al rival (Disparo Demora) y con ello
+///    el rival deja de poder dar un golpe mayor que el suyo, lo usa.
 /// 6. Si con la carga extra podría rematar al turno siguiente algo que hoy no
 ///    le llega, carga.
 /// 7. Ataca: con el de más daño si la reserva está llena (la energía
@@ -75,6 +77,9 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
 
   final masDano = _ataqueDeDanoExtra(yo, rival, danoMio);
   if (masDano != null) return Atacar(bando, masDano);
+
+  final sinEnergia = _ataqueDeQuitaEnergia(yo, rival, danoMio);
+  if (sinEnergia != null) return Atacar(bando, sinEnergia);
 
   if (_remataCargando(
       activo, yo.energia, objetivo, p, yo.danoReducido, rival.danoExtra)) {
@@ -161,6 +166,42 @@ int? _ataqueDeDanoExtra(BandoCombate yo, BandoCombate rival, int danoMio) {
     if (golpes < mejorGolpes) {
       mejor = i;
       mejorGolpes = golpes;
+    }
+  }
+  return mejor;
+}
+
+/// Índice de un ataque que quita energía al rival (Disparo Demora) y compensa
+/// usarlo ahora, o null.
+///
+/// Compensa si el mejor golpe que el rival puede dar en su turno baja (por no
+/// llegarle ya la energía a un ataque) en más de lo que yo haría atacando.
+int? _ataqueDeQuitaEnergia(BandoCombate yo, BandoCombate rival, int danoMio) {
+  final activo = yo.pokemonActivo;
+  int mejorGolpe(int energia) {
+    var mejor = 0;
+    for (final a in rival.pokemonActivo.especie.ataques) {
+      if (a.coste > energia) continue;
+      final d = danoDeAtaque(a, activo.especie,
+          reduccion: rival.danoReducido, extra: yo.danoExtra);
+      if (d > mejor) mejor = d;
+    }
+    return mejor;
+  }
+
+  final ahora = mejorGolpe(rival.energia);
+  int? mejor;
+  var mejorEvitado = 0;
+  final ataques = activo.especie.ataques;
+  for (var i = 0; i < ataques.length; i++) {
+    final a = ataques[i];
+    final e = a.efecto;
+    if (e is! QuitaEnergiaRival || a.coste > yo.energia) continue;
+    final resto = rival.energia - e.valor;
+    final evitado = ahora - mejorGolpe(resto < 0 ? 0 : resto);
+    if (evitado > danoMio && evitado > mejorEvitado) {
+      mejor = i;
+      mejorEvitado = evitado;
     }
   }
   return mejor;
