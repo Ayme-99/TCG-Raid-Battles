@@ -8,10 +8,6 @@
     "tipo": "electrico",
     "multiplicador": 2
   },
-  "resistencia": {
-    "tipo": "fuego",
-    "reduccion": 30
-  },
   "retirada": 1,
   "ataques": [
     {

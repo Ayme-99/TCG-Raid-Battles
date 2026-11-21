@@ -3,14 +3,10 @@
   "numero": 41,
   "nombre": "Zubat",
   "tipo": "veneno",
-  "ps": 50,
+  "ps": 60,
   "debilidad": {
     "tipo": "tierra",
     "multiplicador": 2
-  },
-  "resistencia": {
-    "tipo": "lucha",
-    "reduccion": 30
   },
   "retirada": 0,
   "ataques": [

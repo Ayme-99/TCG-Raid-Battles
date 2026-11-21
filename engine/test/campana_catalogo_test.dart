@@ -49,9 +49,10 @@ void main() {
         expect(p.ps, greaterThan(0), reason: p.id);
         expect(p.ps % 10, 0, reason: '${p.id}: PS en decenas');
         expect(p.ataques, isNotEmpty, reason: p.id);
-        expect(p.ataques.length, lessThanOrEqualTo(3), reason: p.id);
+        expect(p.ataques.length, lessThanOrEqualTo(2), reason: p.id);
+        expect(p.ps, inInclusiveRange(30, 340), reason: '${p.id}: PS de la escala real');
         for (final a in p.ataques) {
-          expect(a.coste, inInclusiveRange(1, 5), reason: '${p.id}/${a.nombre}');
+          expect(a.coste, inInclusiveRange(1, 4), reason: '${p.id}/${a.nombre}');
           expect(a.dano, greaterThan(0), reason: '${p.id}/${a.nombre}');
           expect(a.dano % 10, 0,
               reason: '${p.id}/${a.nombre}: daño en múltiplos de 10');

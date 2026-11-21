@@ -24,10 +24,10 @@ Cada Pokémon es un registro del catálogo:
 |---|---|
 | `id`, `nombre`, `numero` | identidad |
 | `tipo` | el tipo del Pokémon y de sus ataques |
-| `debilidad`, `resistencia` | opcionales: tipo y valor (×2 y −30 de salida) |
+| `debilidad`, `resistencia` | opcionales: tipo y valor (×2 y −30 de salida). Casi todas las cartas llevan debilidad y **solo unas pocas** resistencia, como en las cartas reales |
 | `ps` | puntos de salud |
 | `retirada` | coste de cambiarlo por otro; **0 (gratis)** de salida |
-| `ataques` | 1 a 3: `nombre`, `tipo`, `coste` (energía), `dano`, `efecto` opcional |
+| `ataques` | 1 a 2 (como las cartas reales): `nombre`, `tipo`, `coste` (energía), `dano`, `efecto` opcional |
 | `evoluciones` | lista (puede ser vacía): `a` (id) y cómo se consigue (ver 2.1) |
 | `ex` | `true` si es una carta ex |
 | `rareza` | cuánto cuesta encontrarlo en las rutas |
@@ -80,7 +80,7 @@ Empieza el **jugador**. En su turno, un bando hace **una acción, y las tres gas
 
 ### 3.3 Debilidades y resistencias
 
-No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de cartas. Un Pokémon puede tener una **debilidad** (el daño de ese tipo se multiplica, ×2 de salida) y una **resistencia** (el daño de ese tipo baja, −30 de salida), o ninguna. Primero se aplica la debilidad y luego la resistencia, y el daño nunca baja de 0. Cada Pokémon tiene **un solo tipo**. No existen las inmunidades.
+No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de cartas. Un Pokémon puede tener una **debilidad** (el daño de ese tipo se multiplica, ×2 de salida) y una **resistencia** (el daño de ese tipo baja, −30 de salida), o ninguna. Primero se aplica la debilidad y luego la resistencia, y el daño nunca baja de 0 (**sin suelo**, decidido el 2026-11-21). Cada Pokémon tiene **un solo tipo**. No existen las inmunidades. Si dos cartas se bloquean entre sí por resistencias, se corrige la carta, no el motor; el test «todos contra todos» lo detecta.
 
 **Victoria:** gana el bando que deja sin Pokémon en pie al otro.
 
@@ -94,6 +94,58 @@ El rival juega con **las mismas reglas** (la misma energía y las mismas debilid
 4. Si con la carga extra podría **rematar** al turno siguiente un ataque que hoy no le llega, **carga**.
 5. Ataca: con el de **más daño** si la reserva está llena (la energía sobrante se perdería) y, si no, con el de **más daño por energía gastada**.
 6. Si no llega a nada, **carga**.
+
+### 3.5 Baremo de PS y daños
+
+Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2026-27** (marcas H, I y J), de modo que las cartas de campaña se parezcan a las físicas.
+
+**Escala real de referencia**
+- Básico: 30–90 PS; los que evolucionan, en torno a 70. Fase 1: 90–130. Fase 2 sin ex: 150–190. Pokémon ex: 200–340.
+- Un básico pega 10–30 con una energía y 30–50 con dos. Un ex de Fase 1 como Lucario ex (260 PS) pega 60 con dos energías y 160 con tres.
+- La debilidad es ×2 y casi ninguna carta lleva resistencia.
+
+**Baremo de campaña** (PS y daño por coste de energía)
+
+| Fase | PS | Coste 1 | Coste 2 | Coste 3 | Coste 4 |
+|---|---|---|---|---|---|
+| Básico | 50–90 | 10–20 | 30–40 | 50–60 | — |
+| Fase 1 | 90–130 | 20–30 | 50–60 | 80–100 | 110–130 |
+| ex (línea de 2 fases o sin evolución) | 200–260 | 30–60 | 80–110 | 130–160 | 180–200 |
+| ex (línea de 3 fases) | 270–340 | 40–60 | 90–120 | 150–190 | 220–300 |
+
+**Reglas de calibración**
+- El ataque de **coste 2** es el golpe principal: quita del 40 al 50 % de los PS de un rival de su misma fase, así que un duelo igualado dura unos 3 golpes. Con debilidad ×2 baja a 1–2.
+- Los ataques de coste 3 y 4 matan en 2 golpes, pero vacían la reserva y obligan a Cargar o Cambiar.
+- **1 a 2 ataques** por carta, con coste de 1 a 4. Metapod y Kakuna llevan uno.
+- **Retirada:** 0–1 en los básicos, 1–2 en las fases evolucionadas, 2–3 en los pesados y los ex.
+- **Jefes:** pueden salirse de la tabla en PS (Pikachu 100, Onix 110) pero hacen daño de su fase; un ataque que mate al inicial de un golpe no entra.
+- **Resistencia (−30):** solo en pocas cartas (de salida Squirtle, Pidgey, Spearow, Geodude y Onix).
+- Los números son **provisionales** hasta calibrarlos con el simulador (D-20 §9, tarea 4).
+
+**Cartas del primer tramo (Pueblo Paleta → Ciudad Plateada)**
+
+| Pokémon | PS | Debilidad | Resistencia |
+|---|---|---|---|
+| Bulbasaur | 80 | fuego | — |
+| Charmander | 70 | agua | — |
+| Squirtle | 80 | eléctrico | fuego |
+| Pidgey | 60 | eléctrico | tierra |
+| Rattata | 60 | lucha | — |
+| Caterpie | 50 | fuego | — |
+| Weedle | 50 | tierra | — |
+| Metapod | 80 | fuego | — |
+| Kakuna | 80 | tierra | — |
+| Pikachu (jefe) | 100 | tierra | — |
+| Diglett | 50 | agua | — |
+| Sandshrew | 70 | agua | — |
+| Spearow | 60 | eléctrico | tierra |
+| Nidoran♀ | 60 | tierra | — |
+| Nidoran♂ | 60 | tierra | — |
+| Mankey | 70 | volador | — |
+| Geodude | 80 | agua | normal |
+| Onix | 110 | agua | normal |
+
+Evoluciones: Fase 1 de 90 a 110 PS (Ivysaur 100, Charmeleon 90, Wartortle 100, Pidgeotto 90, Nidorina 90, Nidorino 90, Graveler 110). ex de 3 fases de 270 a 340 (Venusaur 340, Charizard 330, Blastoise 330, Golem 330, Nidoqueen 310, Nidoking 310, Pidgeot 280, Butterfree 270, Beedrill 270). ex de 2 fases o sin evolución de 210 a 240 (Onix 240, Sandslash 230, Fearow 230, Raichu 220, Primeape 220, Raticate 210, Dugtrio 210). Heredan tipo, debilidad y resistencia de su base. Los rivales de zonas avanzadas tendrán que usar también cartas ex para que siga habiendo reto.
 
 ## 4. Mapa
 
@@ -155,7 +207,7 @@ Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, ev
 1. **Derrota.** ¿Qué pasa al perder un combate? Propuesta: volver al último descanso con el equipo curado y sin perder lo ganado, para que no frustre. Alternativa más dura: perder una parte del dinero.
 2. **Máximo de Pokémon en el equipo** y qué pasa con los que se sueltan.
 3. **Qué se vende en el descanso** (curas, objetos, Pokémon).
-4. **Cuántos ataques** puede tener un Pokémon y rango de costes (propuesta: 1 a 3 ataques, coste de 1 a 5).
+4. ~~Cuántos ataques~~ **Decidido (§3.5):** 1 a 2 ataques por carta, coste de 1 a 4.
 5. **Cifras de progresión:** cuántos puntos cuesta cada XP, cuántas XP necesita cada Pokémon para evolucionar, y cuánto cuestan el intercambio y hacerse ex.
 6. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex).
 7. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
