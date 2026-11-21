@@ -421,7 +421,9 @@ void main() {
     });
 
     test('nunca deja el daño por debajo de 0', () {
-      final debil = pokemon('r', ataques: [ataque(1, 10)]);
+      final debil = pokemon('r', ataques: const [
+        AtaqueCampana(nombre: 'Flojo', tipo: TipoCampana.normal, coste: 1, dano: 10)
+      ]);
       var e = aplicarCombate(
           nuevo(jugador: [capullo], rival: [debil]), const Atacar(Bando.jugador, 0));
       e = aplicarCombate(e, const Atacar(Bando.rival, 0));
