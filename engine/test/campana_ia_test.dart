@@ -260,4 +260,54 @@ void main() {
       }
     });
   });
+
+  group('Gruñido', () {
+    const grunido = AtaqueCampana(
+      nombre: 'Gruñido',
+      tipo: TipoCampana.normal,
+      coste: 1,
+      dano: 0,
+      efecto: ReduceDanoRival(10),
+    );
+    PokemonCampana conGrunido() => pokemon('g', ps: 90, ataques: [
+          grunido,
+          ataque(2, 30),
+        ]);
+
+    test('lo usa contra un rival que pega poco', () {
+      final e = combate([conGrunido()], [pokemon('r', ataques: [ataque(1, 10)])]);
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('no lo usa contra un rival que pega fuerte', () {
+      final e = combate([conGrunido()], [pokemon('r', ataques: [ataque(2, 60)])]);
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('no lo repite mientras el mismo rival siga activo', () {
+      var e = combate([conGrunido()], [pokemon('r', ataques: [ataque(1, 10)])]);
+      e = aplicarCombate(e, decidirAccion(e, Bando.jugador));
+      e = aplicarCombate(e, decidirAccion(e, Bando.rival));
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('todos los emparejamientos con Gruñido terminan', () {
+      final a = [conGrunido(), pokemon('b', ps: 80, ataques: [ataque(1, 10)])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.turno));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
 }

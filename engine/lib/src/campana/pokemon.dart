@@ -1,7 +1,23 @@
 import 'tipos.dart';
 
-/// Un ataque de un Pokémon de campaña. Los efectos (monedas, estados…) llegan
-/// más adelante (D-20 §2).
+/// Efecto de un ataque (D-20 §3.6). Hoy solo existe uno; los demás (monedas,
+/// estados…) llegan con las cartas que los necesiten.
+sealed class EfectoAtaque {
+  const EfectoAtaque();
+}
+
+/// Mientras el Pokémon activo del rival siga activo, sus ataques hacen
+/// [valor] puntos menos de daño, antes de aplicar debilidad y resistencia.
+/// No se acumula: un segundo uso no quita más. Se acaba cuando ese Pokémon cae
+/// o se cambia a la banca (Gruñido).
+class ReduceDanoRival extends EfectoAtaque {
+  final int valor;
+
+  const ReduceDanoRival(this.valor);
+}
+
+/// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener
+/// [dano] 0 (solo hace el efecto).
 class AtaqueCampana {
   final String nombre;
   final TipoCampana tipo;
@@ -9,12 +25,14 @@ class AtaqueCampana {
   /// Energía que gasta.
   final int coste;
   final int dano;
+  final EfectoAtaque? efecto;
 
   const AtaqueCampana({
     required this.nombre,
     required this.tipo,
     required this.coste,
     required this.dano,
+    this.efecto,
   });
 }
 

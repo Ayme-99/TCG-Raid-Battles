@@ -44,6 +44,19 @@ EvolucionCampana _evolucionDesdeJson(Map<String, dynamic> json) {
   }
 }
 
+EfectoAtaque? _efectoDesdeJson(dynamic json) {
+  if (json == null) return null;
+  if (json is! Map<String, dynamic>) {
+    throw const FormatException('"efecto" no es un objeto.');
+  }
+  final tipo = _campo<String>(json, 'tipo');
+  switch (tipo) {
+    case 'reduceDanoRival':
+      return ReduceDanoRival(_campo<int>(json, 'valor'));
+  }
+  throw FormatException('Efecto de ataque desconocido: "$tipo".');
+}
+
 /// Un Pokémon de campaña a partir de su JSON del catálogo
 /// (`catalog/campana/pokemon/*.json`).
 PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
@@ -80,6 +93,7 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
           tipo: tipoCampanaDeTexto(_campo<String>(a, 'tipo')),
           coste: _campo<int>(a, 'coste'),
           dano: _campo<int>(a, 'dano'),
+          efecto: _efectoDesdeJson(a['efecto']),
         ),
     ],
   );

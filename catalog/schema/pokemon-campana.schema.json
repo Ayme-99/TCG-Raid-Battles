@@ -102,10 +102,54 @@
           },
           "dano": {
             "type": "integer",
-            "minimum": 10,
-            "multipleOf": 10
+            "minimum": 0,
+            "multipleOf": 10,
+            "description": "0 solo si el ataque lleva un efecto."
+          },
+          "efecto": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tipo",
+              "valor"
+            ],
+            "properties": {
+              "tipo": {
+                "enum": [
+                  "reduceDanoRival"
+                ],
+                "description": "Mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (antes de debilidad y resistencia). No se acumula (D-20 §3.6)."
+              },
+              "valor": {
+                "type": "integer",
+                "minimum": 10,
+                "multipleOf": 10
+              },
+              "texto": {
+                "type": "string",
+                "description": "Texto de la carta."
+              }
+            }
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "not": {
+                "required": [
+                  "efecto"
+                ]
+              }
+            },
+            "then": {
+              "properties": {
+                "dano": {
+                  "minimum": 10
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "ex": {

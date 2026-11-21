@@ -53,11 +53,24 @@ void main() {
         expect(p.ps, inInclusiveRange(30, 340), reason: '${p.id}: PS de la escala real');
         for (final a in p.ataques) {
           expect(a.coste, inInclusiveRange(1, 4), reason: '${p.id}/${a.nombre}');
-          expect(a.dano, greaterThan(0), reason: '${p.id}/${a.nombre}');
+          expect(a.dano > 0 || a.efecto != null, isTrue,
+              reason: '${p.id}/${a.nombre}: sin daño solo con efecto');
           expect(a.dano % 10, 0,
               reason: '${p.id}/${a.nombre}: daño en múltiplos de 10');
         }
       }
+    });
+
+    test('Bulbasaur: Gruñido reduce 10 el daño del rival y no hace daño', () {
+      final b = pokemon['bulbasaur']!;
+      expect(b.ps, 90);
+      expect(b.debilidad!.tipo, TipoCampana.fuego);
+      expect(b.resistencia, isNull);
+      final grunido = b.ataques.first;
+      expect(grunido.dano, 0);
+      expect(grunido.coste, 1);
+      expect(grunido.efecto, isA<ReduceDanoRival>()
+          .having((e) => e.valor, 'valor', 10));
     });
 
     test('Onix lleva debilidad, resistencia y retirada con coste', () {
