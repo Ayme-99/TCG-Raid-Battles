@@ -219,10 +219,10 @@ void main() {
     final equipos = <List<PokemonCampana>>[
       [
         pokemon('roca',
-            tipo: TipoCampana.roca,
+            tipo: TipoCampana.lucha,
             ps: 120,
             debilidad: const Debilidad(TipoCampana.agua),
-            ataques: [ataque(1, 20, TipoCampana.roca), ataque(4, 80, TipoCampana.roca)]),
+            ataques: [ataque(1, 20, TipoCampana.lucha), ataque(4, 80, TipoCampana.lucha)]),
         pokemon('lucha',
             tipo: TipoCampana.lucha,
             ps: 90,

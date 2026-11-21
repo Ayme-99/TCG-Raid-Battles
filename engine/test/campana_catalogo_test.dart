@@ -152,7 +152,7 @@ void main() {
 
     test('Onix lleva debilidad, resistencia y retirada con coste', () {
       final onix = pokemon['onix']!;
-      expect(onix.tipo, TipoCampana.roca);
+      expect(onix.tipo, TipoCampana.lucha);
       expect(onix.debilidad!.tipo, TipoCampana.agua);
       expect(onix.debilidad!.multiplicador, 2);
       expect(onix.resistencia!.tipo, TipoCampana.normal);

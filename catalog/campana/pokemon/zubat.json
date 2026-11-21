@@ -5,7 +5,7 @@
   "tipo": "veneno",
   "ps": 60,
   "debilidad": {
-    "tipo": "tierra",
+    "tipo": "lucha",
     "multiplicador": 2
   },
   "retirada": 0,

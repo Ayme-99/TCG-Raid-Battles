@@ -81,7 +81,7 @@ Empieza el **jugador**. En su turno, un bando hace **una acción, y las tres gas
 
 ### 3.3 Debilidades y resistencias
 
-No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de cartas. Un Pokémon puede tener una **debilidad** (el daño de ese tipo se multiplica, ×2 de salida) y una **resistencia** (el daño de ese tipo baja, −30 de salida), o ninguna. Primero se aplica la debilidad y luego la resistencia, y el daño nunca baja de 0 (**sin suelo**, decidido el 2026-11-21). Cada Pokémon tiene **un solo tipo**. No existen las inmunidades. Si dos cartas se bloquean entre sí por resistencias, se corrige la carta, no el motor; el test «todos contra todos» lo detecta.
+No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de cartas. Un Pokémon puede tener una **debilidad** (el daño de ese tipo se multiplica, ×2 de salida) y una **resistencia** (el daño de ese tipo baja, −30 de salida), o ninguna. Primero se aplica la debilidad y luego la resistencia, y el daño nunca baja de 0 (**sin suelo**, decidido el 2026-11-21). Cada Pokémon tiene **un solo tipo**. Los tipos siguen al TCG: **no hay tipo tierra ni roca**, esos Pokémon (Geodude, Onix, Diglett, Sandshrew, Cubone…) son de tipo **lucha** (decidido el 2026-11-21). No existen las inmunidades. Si dos cartas se bloquean entre sí por resistencias, se corrige la carta, no el motor; el test «todos contra todos» lo detecta.
 
 **Victoria:** gana el bando que deja sin Pokémon en pie al otro.
 
@@ -143,9 +143,9 @@ Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2
 | Pikachu (jefe 01/20) | 100 | lucha | — |
 | Diglett | 50 | agua | — |
 | Sandshrew | 70 | agua | — |
-| Spearow | 60 | eléctrico | tierra |
-| Nidoran♀ | 60 | tierra | — |
-| Nidoran♂ | 60 | tierra | — |
+| Spearow | 60 | eléctrico | lucha |
+| Nidoran♀ | 60 | lucha | — |
+| Nidoran♂ | 60 | lucha | — |
 | Mankey | 70 | volador | — |
 | Geodude | 80 | agua | normal |
 | Onix | 110 | agua | normal |

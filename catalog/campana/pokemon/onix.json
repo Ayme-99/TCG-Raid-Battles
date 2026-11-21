@@ -2,7 +2,7 @@
   "id": "onix",
   "numero": 95,
   "nombre": "Onix",
-  "tipo": "roca",
+  "tipo": "lucha",
   "ps": 110,
   "debilidad": {
     "tipo": "agua",
@@ -22,7 +22,7 @@
     },
     {
       "nombre": "Lanzarrocas",
-      "tipo": "roca",
+      "tipo": "lucha",
       "coste": 3,
       "dano": 60
     }
