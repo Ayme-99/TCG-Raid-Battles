@@ -101,7 +101,7 @@
           "dano": {
             "type": "integer",
             "minimum": 10,
-            "multipleOf": 5
+            "multipleOf": 10
           }
         }
       }
