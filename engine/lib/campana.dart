@@ -4,5 +4,6 @@
 library campana;
 
 export 'src/campana/combate.dart';
+export 'src/campana/ia.dart';
 export 'src/campana/pokemon.dart';
 export 'src/campana/tipos.dart';
