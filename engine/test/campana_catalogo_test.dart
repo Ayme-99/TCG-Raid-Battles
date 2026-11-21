@@ -61,12 +61,13 @@ void main() {
       }
     });
 
-    test('ninguna carta queda anulada por Grunido: un ataque de 20 o mas', () {
+    test('ninguna carta queda anulada por Grunido: un ataque de 20 o mas '
+        'o con veneno', () {
       for (final p in pokemon.values) {
-        final mejor =
-            p.ataques.map((a) => a.dano).reduce((a, b) => a > b ? a : b);
-        expect(mejor, greaterThanOrEqualTo(20),
-            reason: '${p.id}: su mejor ataque hace $mejor');
+        final valido = p.ataques
+            .any((a) => a.dano >= 20 || a.efecto is EnvenenaDefensor);
+        expect(valido, isTrue,
+            reason: '${p.id}: ningún ataque de 20+ ni con veneno');
       }
     });
 
@@ -80,6 +81,138 @@ void main() {
       expect(grunido.coste, 1);
       expect(grunido.efecto, isA<ReduceDanoRival>()
           .having((e) => e.valor, 'valor', 10));
+    });
+
+    test('Metapod: Fortaleza protege 10 y Placaje hace 20', () {
+      final m = pokemon['metapod']!;
+      expect(m.ps, 80);
+      final f = m.ataques.first;
+      expect(f.dano, 0);
+      expect(f.coste, 1);
+      expect(f.efecto, isA<ReduceDanoPropio>()
+          .having((e) => e.valor, 'valor', 10));
+      expect(m.ataques.last.dano, 20);
+      expect(m.ataques.last.coste, 1);
+    });
+
+    test('Pikachu (025/150): Látigo y Impactrueno, 60 PS', () {
+      final p = pokemon['pikachu']!;
+      expect(p.ps, 60);
+      expect(p.tipo, TipoCampana.electrico);
+      expect(p.debilidad!.tipo, TipoCampana.lucha);
+      expect(p.ataques.first.efecto, isA<AumentaDanoRecibido>());
+      expect(p.ataques.last.dano, 30);
+      expect(p.ataques.last.coste, 2);
+    });
+
+    test('Diglett (050/150): 50 PS, lucha y Bofetón Lodo con moneda de fallo', () {
+      final d = pokemon['diglett']!;
+      expect(d.ps, 50);
+      expect(d.tipo, TipoCampana.lucha);
+      expect(d.debilidad!.tipo, TipoCampana.planta);
+      expect(d.ataques.first.dano, 10);
+      expect(d.ataques.last.dano, 30);
+      expect(d.ataques.last.efecto, isA<MonedaFalloRival>());
+    });
+
+    test('Sandshrew (027/150): Rizo Defensa y Rodar por racha', () {
+      final s = pokemon['sandshrew']!;
+      expect(s.ps, 70);
+      expect(s.tipo, TipoCampana.lucha);
+      expect(s.debilidad!.tipo, TipoCampana.planta);
+      expect(s.ataques.first.efecto, isA<ReduceDanoPropio>());
+      expect(s.ataques.last.dano, 20);
+      expect(s.ataques.last.efecto, isA<DanoPorRacha>());
+    });
+
+    test('Spearow (021/150): resiste lucha y Ataque Furia lanza 3 monedas', () {
+      final s = pokemon['spearow']!;
+      expect(s.ps, 60);
+      expect(s.tipo, TipoCampana.normal);
+      expect(s.debilidad!.tipo, TipoCampana.electrico);
+      expect(s.resistencia!.tipo, TipoCampana.lucha);
+      final furia = s.ataques.last.efecto as MonedasDano;
+      expect(furia.monedas, 3);
+      expect(furia.danoPorCaras, [50, 20, 30, 40]);
+      // Toda tirada hace 20 o más, así que cumple la regla del ataque de 20.
+      expect(furia.danoPorCaras.every((d) => d >= 20), isTrue);
+    });
+
+    test('Nidoran♀ (029/150): oscuridad, Golpes Furia y Doble Patada', () {
+      final n = pokemon['nidoran-f']!;
+      expect(n.ps, 60);
+      expect(n.tipo, TipoCampana.oscuridad);
+      expect(n.debilidad!.tipo, TipoCampana.lucha);
+      expect(n.ataques.first.efecto, isA<MonedasDano>());
+      expect(n.ataques.last.coste, 3);
+      expect(n.ataques.last.dano, 30);
+      expect(n.ataques.last.efecto, isA<RepiteDanoAlDerribar>());
+    });
+
+    test('Nidoran♂ (032/150): oscuridad, Picotazo veneno y Ataque Furia', () {
+      final n = pokemon['nidoran-m']!;
+      expect(n.ps, 60);
+      expect(n.tipo, TipoCampana.oscuridad);
+      expect(n.ataques.first.coste, 1);
+      expect(n.ataques.first.dano, 10);
+      expect(n.ataques.first.efecto, isA<EnvenenaDefensor>());
+      expect(n.ataques.last.efecto, isA<MonedasDano>());
+    });
+
+    test('Mankey (056/150): lucha, Foco Energía y Golpe Kárate', () {
+      final m = pokemon['mankey']!;
+      expect(m.ps, 70);
+      expect(m.tipo, TipoCampana.lucha);
+      expect(m.debilidad!.tipo, TipoCampana.psiquico);
+      expect(m.retirada, 1);
+      final h = m.habilidad as MonedaDanoExtraAlAtacar;
+      expect(h.nombre, 'Foco Energía');
+      expect(h.valor, 20);
+      expect(m.ataques.single.coste, 2);
+      expect(m.ataques.single.dano, 30);
+      expect(m.ataques.single.efecto, isA<MonedaDanoExtra>());
+    });
+
+    test('Kakuna: Fortaleza y Picotazo Veneno', () {
+      final k = pokemon['kakuna']!;
+      expect(k.ps, 70);
+      expect(k.ataques.first.efecto, isA<ReduceDanoPropio>());
+      expect(k.ataques.last.dano, 10);
+      expect(k.ataques.last.efecto, isA<EnvenenaDefensor>());
+    });
+
+    test('Weedle: Picotazo Veneno hace 10 y envenena', () {
+      final w = pokemon['weedle']!;
+      expect(w.ps, 50);
+      expect(w.ataques, hasLength(1));
+      final a = w.ataques.single;
+      expect(a.coste, 2);
+      expect(a.dano, 10);
+      expect(a.efecto, isA<EnvenenaDefensor>()
+          .having((e) => e.valor, 'valor', 10));
+    });
+
+    test('Rattata: Hiper Colmillo hace 20 y 20 más si sale cara', () {
+      final r = pokemon['rattata']!;
+      expect(r.ps, 60);
+      expect(r.debilidad!.tipo, TipoCampana.lucha);
+      final colmillo = r.ataques.last;
+      expect(colmillo.dano, 20);
+      expect(colmillo.efecto, isA<MonedaDanoExtra>()
+          .having((e) => e.valor, 'valor', 20));
+    });
+
+    test('Caterpie: Disparo Demora quita 1 de energía y no hace daño', () {
+      final c = pokemon['caterpie']!;
+      expect(c.ps, 50);
+      expect(c.debilidad!.tipo, TipoCampana.fuego);
+      expect(c.resistencia, isNull);
+      final demora = c.ataques.first;
+      expect(demora.dano, 0);
+      expect(demora.coste, 1);
+      expect(demora.efecto, isA<QuitaEnergiaRival>()
+          .having((e) => e.valor, 'valor', 1));
+      expect(c.ataques.last.dano, 20);
     });
 
     test('Squirtle: Látigo hace que el rival reciba 10 más y no hace daño', () {
@@ -97,7 +230,7 @@ void main() {
 
     test('Onix lleva debilidad, resistencia y retirada con coste', () {
       final onix = pokemon['onix']!;
-      expect(onix.tipo, TipoCampana.roca);
+      expect(onix.tipo, TipoCampana.lucha);
       expect(onix.debilidad!.tipo, TipoCampana.agua);
       expect(onix.debilidad!.multiplicador, 2);
       expect(onix.resistencia!.tipo, TipoCampana.normal);
@@ -169,6 +302,72 @@ void main() {
     });
   });
 
+  group('jefes', () {
+    final carpeta = Directory('../catalog/campana/jefes');
+    final archivosJefes = carpeta
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.json'))
+        .toList()
+      ..sort((a, b) => a.path.compareTo(b.path));
+    final jefes = [for (final f in archivosJefes) jefeCampanaDesdeJson(leer(f))];
+
+    test('hay jefes y su número es único y está dentro de la serie', () {
+      expect(jefes, isNotEmpty);
+      final numeros = jefes.map((j) => j.numero).toList();
+      expect(numeros.toSet(), hasLength(numeros.length));
+      for (final j in jefes) {
+        expect(j.numero, inInclusiveRange(1, totalJefesCampana));
+      }
+    });
+
+    test('el id del archivo coincide con el del Pokémon', () {
+      for (var i = 0; i < jefes.length; i++) {
+        final id = archivosJefes[i].uri.pathSegments.last.replaceAll('.json', '');
+        expect(jefes[i].pokemon.id, id);
+      }
+    });
+
+    test('sus aliados existen en el catálogo y no son el propio jefe', () {
+      for (final j in jefes) {
+        final l = j.llamaAliado;
+        if (l == null) continue;
+        expect(l.alBajarDePorcentaje, inInclusiveRange(1, 99));
+        for (final a in l.aliados) {
+          expect(pokemon.containsKey(a), isTrue, reason: '${j.pokemon.id}: $a');
+        }
+      }
+    });
+
+    test('Pikachu (01/20): 100 PS, Impactrueno 30 y llama a un aliado a la mitad', () {
+      final p = jefes.firstWhere((j) => j.numero == 1);
+      expect(p.pokemon.nombre, 'Pikachu');
+      expect(p.pokemon.ps, 100);
+      expect(p.pokemon.debilidad!.tipo, TipoCampana.lucha);
+      expect(p.pokemon.ataques.map((a) => a.dano), [10, 30]);
+      expect(p.llamaAliado!.alBajarDePorcentaje, 50);
+      expect(p.llamaAliado!.aliados,
+          ['weedle', 'caterpie', 'metapod', 'kakuna']);
+    });
+
+    test('el jefe tiene un ataque de 20 o más y cualquier inicial puede con él '
+        'o termina el combate', () {
+      for (final j in jefes) {
+        expect(j.pokemon.ataques.any((a) => a.dano >= 20), isTrue,
+            reason: j.pokemon.id);
+      }
+      final pikachu = jefes.firstWhere((j) => j.numero == 1).pokemon;
+      for (final inicial in ['bulbasaur', 'charmander', 'squirtle']) {
+        var e = EstadoCombate.inicial(
+            equipoJugador: [pokemon[inicial]!], equipoRival: [pikachu]);
+        for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+          e = aplicarCombate(e, decidirAccion(e, e.actua));
+        }
+        expect(e.fase, FaseCombate.terminado, reason: inicial);
+      }
+    });
+  });
+
   group('zonas', () {
     final zonas = carpetaZonas
         .listSync()
@@ -202,7 +401,7 @@ void main() {
         for (final b in pokemon.values) {
           var e = EstadoCombate.inicial(equipoJugador: [a], equipoRival: [b]);
           for (var i = 0; i < 1000 && e.fase != FaseCombate.terminado; i++) {
-            e = aplicarCombate(e, decidirAccion(e, e.turno));
+            e = aplicarCombate(e, decidirAccion(e, e.actua));
           }
           expect(e.fase, FaseCombate.terminado, reason: '${a.id} vs ${b.id}');
           expect(e.ganador, isNotNull);

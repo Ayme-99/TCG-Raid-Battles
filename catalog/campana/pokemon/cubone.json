@@ -2,7 +2,7 @@
   "id": "cubone",
   "numero": 104,
   "nombre": "Cubone",
-  "tipo": "tierra",
+  "tipo": "lucha",
   "ps": 60,
   "debilidad": {
     "tipo": "agua",
@@ -18,7 +18,7 @@
     },
     {
       "nombre": "Golpe Hueso",
-      "tipo": "tierra",
+      "tipo": "lucha",
       "coste": 2,
       "dano": 30
     }

@@ -33,23 +33,8 @@ Cada Pokémon es un registro del catálogo:
 | `rareza` | cuánto cuesta encontrarlo en las rutas |
 | imagen | no va en el JSON: es `app/assets/campana/cartas/<id>.webp` (480×670) |
 
-- El equipo tiene un **máximo de Pokémon por definir** (propuesta provisional: 6; es un parámetro).
+- El equipo lleva **hasta 6 Pokémon: 1 activo y 5 en la banca** (decidido el 2026-11-21; es un parámetro). Los demás están en el **PC** (§4, Descanso). Un Pokémon capturado se une al equipo si hay hueco; si el equipo está lleno, la app pregunta si se **cambia por uno del equipo**, y el que se descarta (el capturado o el sustituido) **va al PC**: no se pierde ningún Pokémon.
 - Los efectos de los ataques (§3.6) empiezan por uno: reducir el daño del rival. Los siguientes (monedas, curar, estados) reutilizarán las piezas que ya existen en las cartas de los aliados, sin inventar un sistema nuevo.
-
-### 2.1 Progresión: sin niveles, con XP y evolución
-
-Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos PS y daños; se mejora evolucionando.
-
-- **Las victorias en combate dan puntos** (los mismos puntos del juego, §5).
-- En un **centro Pokémon** (el nodo de descanso) se pueden **convertir puntos en XP** de un Pokémon del equipo. Cuántos puntos cuesta cada XP queda por equilibrar.
-- Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xp: N` en la carta). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4).
-- **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`).
-- **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): cuesta **puntos**, por usar la máquina de intercambio (`via: "intercambio"`, `puntos: N`).
-- **Cartas ex.** La **última fase de cada Pokémon es una carta ex**. Un Pokémon que no evoluciona (Onix…) puede hacerse ex **gastando puntos** (`via: "puntos"`, `puntos: N`), con el mismo proceso. Cada carta ex es una **entrada propia del catálogo** (`"ex": true`).
-- **La carta evolucionada sustituye a la anterior** y recupera todos sus PS. Una forma evolucionada también puede aparecer salvaje en una zona si el catálogo la incluye, y entonces se captura aparte.
-- Un Pokémon puede tener **varias** evoluciones (Eevee con sus piedras), por eso `evoluciones` es una lista.
-
-Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo**.
 
 ### 2.1 Progresión: sin niveles, con XP y evolución
 
@@ -96,7 +81,7 @@ Empieza el **jugador**. En su turno, un bando hace **una acción, y las tres gas
 
 ### 3.3 Debilidades y resistencias
 
-No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de cartas. Un Pokémon puede tener una **debilidad** (el daño de ese tipo se multiplica, ×2 de salida) y una **resistencia** (el daño de ese tipo baja, −30 de salida), o ninguna. Primero se aplica la debilidad y luego la resistencia, y el daño nunca baja de 0 (**sin suelo**, decidido el 2026-11-21). Cada Pokémon tiene **un solo tipo**. No existen las inmunidades. Si dos cartas se bloquean entre sí por resistencias, se corrige la carta, no el motor; el test «todos contra todos» lo detecta.
+No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de cartas. Un Pokémon puede tener una **debilidad** (el daño de ese tipo se multiplica, ×2 de salida) y una **resistencia** (el daño de ese tipo baja, −30 de salida), o ninguna. Primero se aplica la debilidad y luego la resistencia, y el daño nunca baja de 0 (**sin suelo**, decidido el 2026-11-21). Cada Pokémon tiene **un solo tipo**. Los tipos siguen al TCG: **no hay tipo tierra ni roca**, esos Pokémon (Geodude, Onix, Diglett, Sandshrew, Cubone…) son de tipo **lucha** (decidido el 2026-11-21). No existen las inmunidades. Si dos cartas se bloquean entre sí por resistencias, se corrige la carta, no el motor; el test «todos contra todos» lo detecta.
 
 **Victoria:** gana el bando que deja sin Pokémon en pie al otro.
 
@@ -109,6 +94,7 @@ El rival juega con **las mismas reglas** (la misma energía y las mismas debilid
 3. Si su activo es **débil** a un ataque del rival, o no llega a ningún ataque, **cambia** a un relevo que no sea débil y sí pueda atacar (si le llega la energía de la retirada).
 4. Si tiene un ataque que **reduce el daño del rival** (Gruñido) y compensa (evita más daño, en los golpes que el rival necesita para derribarlo, que el que haría atacando), lo usa; no lo repite mientras siga activo el mismo rival (§3.6).
 5. Si tiene un ataque que hace que el rival **reciba más daño** (Látigo) y lo derriba en menos golpes contando el turno que gasta, lo usa; no lo repite mientras siga activo el mismo rival.
+5b. Si tiene un ataque que **quita energía al rival** (Disparo Demora) y con ello el rival deja de poder dar un golpe mayor que el suyo, lo usa (§3.6).
 6. Si con la carga extra podría **rematar** al turno siguiente un ataque que hoy no le llega, **carga**.
 7. Ataca: con el de **más daño** si la reserva está llena (la energía sobrante se perdería) y, si no, con el de **más daño por energía gastada**.
 8. Si no llega a nada, **carga**.
@@ -134,33 +120,34 @@ Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2
 **Reglas de calibración**
 - El ataque de **coste 2** es el golpe principal: quita del 40 al 50 % de los PS de un rival de su misma fase, así que un duelo igualado dura unos 3 golpes. Con debilidad ×2 baja a 1–2.
 - Los ataques de coste 3 y 4 matan en 2 golpes, pero vacían la reserva y obligan a Cargar o Cambiar.
-- **1 a 2 ataques** por carta, con coste de 1 a 4. Metapod y Kakuna llevan uno.
-- **Siempre un ataque de 20 o más** (decidido el 2026-11-21): así Gruñido (−10, §3.6) nunca deja a una carta sin poder hacer daño. Un ataque de coste 1 de 10 sí se anula, pero es el de relleno. El esquema y un test lo comprueban. Metapod y Kakuna llevan un único ataque de 20 (coste 1).
+- **1 a 2 ataques** por carta, con coste de 1 a 4. Pidgey y Weedle llevan uno.
+- **Siempre un ataque de 20 o más, o con veneno** (decidido el 2026-11-21): así Gruñido (−10, §3.6) nunca deja a una carta sin poder hacer daño. Un ataque de coste 1 de 10 sí se anula, pero es el de relleno. El esquema y un test lo comprueban. Weedle lleva un único ataque de 10, que vale porque envenena.
 - **Retirada:** 0–1 en los básicos, 1–2 en las fases evolucionadas, 2–3 en los pesados y los ex.
 - **Jefes:** pueden salirse de la tabla en PS (Pikachu 100, Onix 110) pero hacen daño de su fase; un ataque que mate al inicial de un golpe no entra.
-- **Resistencia (−30):** solo en pocas cartas (de salida Squirtle, Pidgey, Spearow, Geodude y Onix).
+- **Resistencia (−30):** solo en pocas cartas (de salida Spearow, Geodude y Onix).
 - Los números son **provisionales** hasta calibrarlos con el simulador (D-20 §9, tarea 4).
 
 **Cartas del primer tramo (Pueblo Paleta → Ciudad Plateada)**
 
 | Pokémon | PS | Debilidad | Resistencia |
 |---|---|---|---|
-| Bulbasaur | 80 | fuego | — |
+| Bulbasaur | 90 | fuego | — |
 | Charmander | 70 | agua | — |
-| Squirtle | 80 | eléctrico | fuego |
-| Pidgey | 60 | eléctrico | tierra |
+| Squirtle | 80 | eléctrico | — |
+| Pidgey | 60 | eléctrico | — |
 | Rattata | 60 | lucha | — |
 | Caterpie | 50 | fuego | — |
-| Weedle | 50 | tierra | — |
+| Weedle | 50 | fuego | — |
 | Metapod | 80 | fuego | — |
-| Kakuna | 80 | tierra | — |
-| Pikachu (jefe) | 100 | tierra | — |
+| Kakuna | 70 | fuego | — |
+| Pikachu | 60 | lucha | — |
+| Pikachu (jefe 01/20) | 100 | lucha | — |
 | Diglett | 50 | agua | — |
 | Sandshrew | 70 | agua | — |
-| Spearow | 60 | eléctrico | tierra |
-| Nidoran♀ | 60 | tierra | — |
-| Nidoran♂ | 60 | tierra | — |
-| Mankey | 70 | volador | — |
+| Spearow | 60 | eléctrico | lucha |
+| Nidoran♀ | 60 | lucha | — |
+| Nidoran♂ | 60 | lucha | — |
+| Mankey | 70 | psíquico | — |
 | Geodude | 80 | agua | normal |
 | Onix | 110 | agua | normal |
 
@@ -176,61 +163,20 @@ Decidido el 2026-11-21. Un ataque puede llevar un `efecto` y entonces puede tene
 - **No se acumula:** si el rival ya tiene una reducción igual o mayor, usarlo otra vez no hace nada. Cuenta la mayor.
 - **Por qué no se acumula** (a diferencia de los juegos, donde Gruñido llega a 6 etapas): allí cada etapa multiplica el daño y nunca llega a cero; aquí el daño es plano y no hay suelo, y como cuesta 1 de energía (que se recupera cada turno), tres usos anularían los ataques de coste 1 y 2. El efecto simétrico (Malicioso: «el Defensor recibe 10 más de daño») seguirá la misma regla.
 - **`aumentaDanoRecibido` (Látigo de Squirtle):** «Mientras el Pokémon Defensor siga activo, recibe 10 puntos más de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula.» Es el efecto simétrico: mismas reglas (dura mientras ese Pokémon siga activo, se quita al cambiarlo o cuando cae, no se acumula) pero sobre el daño que **recibe**. Se suma antes de la debilidad y la resistencia; un ataque sin daño no gana el extra. Los dos efectos se combinan. Estado del bando afectado: `BandoCombate.danoExtra`.
+- **`quitaEnergiaRival` (Disparo Demora de Caterpie):** «El rival pierde 1 de energía (si le queda alguna). No se acumula con nada: se aplica una vez, al usar el ataque.» Es instantáneo: baja la reserva del rival en `valor` (mínimo 0) en el momento de atacar y no deja estado, así que no hay nada que acumular ni que quitar al cambiar de Pokémon. Vale como ataque de 0 de daño (coste 1). La IA lo usa solo si con ello el rival deja de poder dar un golpe mayor que el que haría ella atacando.
+- **`monedaDanoExtra` (Hiper Colmillo de Rattata):** «Lanza una moneda, si sale cara este ataque hace 20 puntos de daño más.» Decidido el 2026-11-21: **el azar entra en el motor**, pero sin perder el determinismo. `EstadoCombate.semilla` (generador Park-Miller, mismas cuentas en la VM y en web) avanza solo al lanzar una moneda, y el resultado queda en `EstadoCombate.ultimaMoneda` para que la interfaz lo muestre. El `dano` de la carta es el de **cruz**; con cara se le suma el extra al daño base, antes de reducciones, debilidad y resistencia. La semilla se elige al empezar el combate (`EstadoCombate.inicial(semilla: …)`); con la misma semilla y las mismas acciones el combate sale igual, así que los tests y el simulador siguen siendo reproducibles. La IA **cuenta solo el daño de cruz** (no apuesta a la moneda) al decidir.
+- **Habilidades pasivas — `monedaDanoExtraAlAtacar` (Foco Energía de Mankey):** «Mientras este Pokémon siga activo, cada vez que ataque, lanza una moneda. Si sale cara, ese ataque hace 20 puntos más.» Decidido el 2026-11-22. Es la primera **habilidad**: va en el campo `habilidad` de la carta (`PokemonCampana.habilidad`), no en un ataque, y actúa sola, sin gastar energía ni turno. En `_atacar` se lanza una moneda más con la semilla del combate (se suma a `ultimasMonedas` después de las del propio ataque) y con cara se suman 20 al daño base, antes de reducciones, debilidad y resistencia. Se acumula con la moneda de Golpe Kárate (hasta +40). La IA no cuenta esta moneda: decide con el daño base del ataque. Mankey queda en 70 PS, debilidad psíquico y retirada 1.
+- **`repiteDanoAlDerribar` (Doble Patada de Nidoran♀):** «Si el Pokémon Defensor queda fuera de combate por el daño de este ataque, el nuevo Pokémon Defensor recibe de nuevo ese daño.» Decidido el 2026-11-21. Si el ataque derriba al activo rival y le quedan Pokémon, el motor guarda el ataque (`EstadoCombate.repetirDano`) y, **en cuanto el rival elige a su relevo**, ese relevo lo recibe otra vez, calculado contra **su propia** debilidad y resistencia. Se repite **una sola vez**: si el relevo también cae, no se encadena. Si era el último Pokémon, el combate termina por el primer golpe. La IA no lo tiene en cuenta.
+- **Nuevo tipo `oscuridad`:** Nidoran♀ es de tipo oscuridad (los Pokémon de veneno pasan a este tipo en el TCG). Es otro paso para alinear los tipos con el TCG, junto con la decisión de que tierra y roca son lucha.
+- **`monedasDano` (Ataque Furia de Spearow):** «Lanza 3 monedas. Con 1 cara, hace 20 puntos de daño; con 2 caras, 30; con 3 caras, 40; con 0 caras, 50.» Decidido el 2026-11-21. El ataque lanza `monedas` monedas con la semilla del combate (`EstadoCombate.ultimasMonedas` guarda todas, en orden, para mostrarlas) y hace el daño de `danoPorCaras[caras]`. El `dano` del JSON es el **daño esperado** (30: 50·1/8 + 20·3/8 + 30·3/8 + 40·1/8), que solo usa la IA y el baremo; el daño real sale de la tabla. Toda tirada hace 20 o más, así que cumple la regla del ataque de 20. La IA decide con el daño esperado, no con la tirada.
+- **`danoPorRacha` (Rodar de Sandshrew):** decidido el 2026-11-21. El `dano` del ataque se multiplica por las **veces seguidas** que el Pokémon lo ha usado, contando la actual: 20, 40, 60… Se reinicia si usa **otro ataque**, **carga**, **cambia** de Pokémon o cae. Estado del bando que ataca: `ultimoAtaque` y `racha`. La IA ya cuenta el daño que haría ahora (con la racha), así que lo encadena cuando supera a su otro ataque. **Ajuste pendiente del texto de la carta:** la carta de Sandshrew dice «20 puntos de daño más por cada vez que usó Rodar en su turno anterior», que literalmente da 20 o 40; el efecto implementado es el acumulado (20, 40, 60…).
+- **`monedaFalloRival` (Bofetón Lodo de Diglett):** «En su próximo turno, si el Pokémon Defensor ataca, lanza una moneda. Si sale cruz, ese ataque no hace nada (la energía se gasta igual).» Decidido el 2026-11-21. El ataque hace su daño y marca al rival (`BandoCombate.cegado`). En su siguiente turno, **si ataca**, se lanza la moneda con la semilla del combate: cara, el ataque funciona con normalidad; cruz, **no hace nada** (ni daño ni efectos) y gasta su energía y su turno. Dura **solo ese turno**, pase lo que pase en él: si carga, cambia de Pokémon o cae, se quita. No se acumula. La IA no lo tiene en cuenta (no sabe que va a fallar la mitad de las veces) y, al estar el azar en el motor, el resultado queda en `ultimaMoneda` para mostrarlo.
+- **`reduceDanoPropio` (Fortaleza de Metapod):** «Mientras este Pokémon siga activo, recibe 10 puntos menos de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula.» Es el espejo de Gruñido, pero sobre uno mismo: se pone en el bando que ataca (`BandoCombate.proteccion`), dura mientras ese Pokémon siga activo y se quita al cambiarlo o cuando cae. Se combina con Látigo sumando (+10 y −10 se compensan; `extraRecibido`) y el daño nunca baja de 0. La IA la usa con el mismo criterio que Gruñido: solo si evita más daño, en los golpes que el rival necesita para derribarla, que el que haría atacando.
+- **`envenenaDefensor` (Picotazo Veneno de Weedle):** «El Pokémon Defensor pasa a estar Envenenado.» Decidido el 2026-11-21: hay un **chequeo Pokémon cada vez que cambia el turno** (tras el turno de cualquiera de los dos), y en cada chequeo el activo envenenado pierde 10 PS; es decir, 20 por ronda. Va primero el bando que acaba de jugar. Dura mientras ese Pokémon siga activo (se quita al cambiarlo, o cuando cae), no se acumula, y el ataque que envenena ya sufre el primer chequeo al acabar su turno. Estado: `BandoCombate.veneno`. Si el veneno derriba a un activo, su dueño elige relevo; si era su último Pokémon, pierde y el combate termina (si el último Pokémon de quien acaba el turno cae por veneno, pierde él, aunque el otro también fuera a caer en ese mismo chequeo). Como en esa fase puede tener que elegir el bando que **no** tiene el turno, quien pide la acción usa `EstadoCombate.actua` (en lugar de `turno`) y `debenElegir`. La IA usa el ataque que envenena siempre que el rival no esté ya envenenado (aunque el golpe quede en 0 por Fortaleza o Gruñido) y no lo repite mientras siga envenenado; no valora el veneno al cambiar de Pokémon.
+- **Regla de «siempre un ataque de 20 o más» (cambio 2026-11-21):** pasa a «un ataque de 20 o más, **o** un ataque con veneno», porque Gruñido no anula el veneno. Esquema y test actualizados. Weedle lleva un único ataque de 10 con veneno.
 - Es un estado del **bando afectado** (`BandoCombate.danoReducido`), que se pone a 0 al cambiar de activo.
 - **Ninguna carta queda anulada:** todas llevan al menos un ataque de 20 o más (§3.5), de modo que Gruñido deja siempre un ataque de 10 como mínimo.
 - La IA lo usa solo si compensa; contra un rival que pega poco (10 de daño) lo deja sin hacer daño; contra uno que pega fuerte no lo usa.
-
-### 3.5 Baremo de PS y daños
-
-Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2026-27** (marcas H, I y J), de modo que las cartas de campaña se parezcan a las físicas.
-
-**Escala real de referencia**
-- Básico: 30–90 PS; los que evolucionan, en torno a 70. Fase 1: 90–130. Fase 2 sin ex: 150–190. Pokémon ex: 200–340.
-- Un básico pega 10–30 con una energía y 30–50 con dos. Un ex de Fase 1 como Lucario ex (260 PS) pega 60 con dos energías y 160 con tres.
-- La debilidad es ×2 y casi ninguna carta lleva resistencia.
-
-**Baremo de campaña** (PS y daño por coste de energía)
-
-| Fase | PS | Coste 1 | Coste 2 | Coste 3 | Coste 4 |
-|---|---|---|---|---|---|
-| Básico | 50–90 | 10–20 | 30–40 | 50–60 | — |
-| Fase 1 | 90–130 | 20–30 | 50–60 | 80–100 | 110–130 |
-| ex (línea de 2 fases o sin evolución) | 200–260 | 30–60 | 80–110 | 130–160 | 180–200 |
-| ex (línea de 3 fases) | 270–340 | 40–60 | 90–120 | 150–190 | 220–300 |
-
-**Reglas de calibración**
-- El ataque de **coste 2** es el golpe principal: quita del 40 al 50 % de los PS de un rival de su misma fase, así que un duelo igualado dura unos 3 golpes. Con debilidad ×2 baja a 1–2.
-- Los ataques de coste 3 y 4 matan en 2 golpes, pero vacían la reserva y obligan a Cargar o Cambiar.
-- **1 a 2 ataques** por carta, con coste de 1 a 4. Metapod y Kakuna llevan uno.
-- **Retirada:** 0–1 en los básicos, 1–2 en las fases evolucionadas, 2–3 en los pesados y los ex.
-- **Jefes:** pueden salirse de la tabla en PS (Pikachu 100, Onix 110) pero hacen daño de su fase; un ataque que mate al inicial de un golpe no entra.
-- **Resistencia (−30):** solo en pocas cartas (de salida Squirtle, Pidgey, Spearow, Geodude y Onix).
-- Los números son **provisionales** hasta calibrarlos con el simulador (D-20 §9, tarea 4).
-
-**Cartas del primer tramo (Pueblo Paleta → Ciudad Plateada)**
-
-| Pokémon | PS | Debilidad | Resistencia |
-|---|---|---|---|
-| Bulbasaur | 80 | fuego | — |
-| Charmander | 70 | agua | — |
-| Squirtle | 80 | eléctrico | fuego |
-| Pidgey | 60 | eléctrico | tierra |
-| Rattata | 60 | lucha | — |
-| Caterpie | 50 | fuego | — |
-| Weedle | 50 | tierra | — |
-| Metapod | 80 | fuego | — |
-| Kakuna | 80 | tierra | — |
-| Pikachu (jefe) | 100 | tierra | — |
-| Diglett | 50 | agua | — |
-| Sandshrew | 70 | agua | — |
-| Spearow | 60 | eléctrico | tierra |
-| Nidoran♀ | 60 | tierra | — |
-| Nidoran♂ | 60 | tierra | — |
-| Mankey | 70 | volador | — |
-| Geodude | 80 | agua | normal |
-| Onix | 110 | agua | normal |
-
-Evoluciones: Fase 1 de 90 a 110 PS (Ivysaur 100, Charmeleon 90, Wartortle 100, Pidgeotto 90, Nidorina 90, Nidorino 90, Graveler 110). ex de 3 fases de 270 a 340 (Venusaur 340, Charizard 330, Blastoise 330, Golem 330, Nidoqueen 310, Nidoking 310, Pidgeot 280, Butterfree 270, Beedrill 270). ex de 2 fases o sin evolución de 210 a 240 (Onix 240, Sandslash 230, Fearow 230, Raichu 220, Primeape 220, Raticate 210, Dugtrio 210). Heredan tipo, debilidad y resistencia de su base. Los rivales de zonas avanzadas tendrán que usar también cartas ex para que siga habiendo reto.
 
 ## 4. Mapa
 
@@ -239,17 +185,27 @@ La campaña inicial es **Kanto** (decidido el 2026-11-21). La región se recorre
 | Nodo | Qué pasa |
 |---|---|
 | **Inicio** | Elegir un Pokémon inicial entre tres (cuáles, por decidir). |
-| **Ruta** | Combate contra un Pokémon salvaje. Al derrotarlo se pregunta si se añade al equipo (si hay hueco; si no, hay que soltar uno). |
-| **Descanso** | Cura el equipo, permite gestionar el equipo, **evolucionar 1 Pokémon** y comprar (qué se vende, por decidir). |
+| **Ruta** | Combate contra un Pokémon salvaje. Al derrotarlo se pregunta si se captura: si hay hueco se une al equipo, y si está lleno se elige a quién sustituir y el descartado va al PC (§2). |
+| **Descanso** | El **centro Pokémon**: cura el equipo, da acceso al **PC** (guarda los Pokémon que no caben en el equipo y permite cambiarlos por los del equipo), permite **evolucionar 1 Pokémon** y comprar (qué se vende, por decidir). |
 | **Gimnasio** | Combate contra un entrenador. Da una **medalla** y puntos. |
-| **Jefe** | Con la medalla, se puede retar a un **Pokémon jefe con sus aliados**. Da muchos puntos. |
+| **Jefe** | Un **Pokémon salvaje** con su carta de la serie NN/20 (§4, Jefes). Da muchos puntos. |
 | **Liga** | Tras reunir todas las medallas. **Fase 2.** |
 
-Estructura de una región: `Inicio → rutas → descanso → gimnasio (medalla) → jefe → vuelta a las rutas → medalla → jefe → …→ Liga`. Hay ramas: en una bifurcación se elige por qué ruta seguir.
+Estructura de una región: `Inicio → rutas → jefe del tramo → descanso → gimnasio (medalla) → rutas → jefe del tramo → … → Liga` (más jefes en rutas clave y los 4 legendarios). Hay ramas: en una bifurcación se elige por qué ruta seguir.
 
-### Jefe con aliados
+### Jefes
 
-El jefe se enfrenta como un **equipo rival**: sus aliados salen primero y el jefe al final, en combates 1 contra 1 seguidos. Usa los nombres y el mapa del catálogo de incursiones, pero con **estadísticas de campaña propias** (los 2300 PS de Onix no tienen sentido en un combate 1 contra 1). El número de aliados depende del nivel del jefe, igual que en las incursiones (Lv1: 1, Lv2: 2…).
+Decidido el 2026-11-21. Los jefes son **Pokémon salvajes**, no entrenadores: los líderes de gimnasio y el Alto Mando no son jefes y usan cartas normales (el Geodude y el Onix de Brock, por ejemplo). Tienen una **serie propia de 20 cartas, NN/20** (la carta de Pikachu lleva impreso 01/20), distinta de la 001/150 de los Pokémon:
+
+- **01–08, uno por tramo**, entre una medalla y la siguiente (Pikachu es el primero, antes de Brock).
+- **09–16, rutas clave.** Plazas abiertas: las que sobren se quedan libres sin renumerar.
+- **17–20, los cuatro legendarios:** Articuno, Zapdos, Moltres y Mewtwo. Mew queda fuera (es la 151/150, secreta).
+
+Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar): 01 Pikachu, 02 Clefairy, 03 Dugtrio, 04 Marowak, 05 Kangaskhan, 06 Lapras, 07 Muk, 08 Gyarados, 09 Snorlax, 10 Electrode, 11 Dodrio, 12 Golem, 13 Alakazam, 14 Aerodactyl, 15 Scyther, 16 Dragonite, 17 Articuno, 18 Zapdos, 19 Moltres, 20 Mewtwo.
+
+**Combate:** es un 1 contra 1 con el mismo motor y la misma IA. **Capturable** (decidido el 2026-11-21): al derrotarlo se ofrece la carta **normal** del Pokémon (la 025/150 en el caso de Pikachu, con 60 PS), no la del jefe, con las mismas reglas de equipo y PC que cualquier captura (§2). **Solo se captura la primera vez**: si se repite el jefe, ya no se puede volver a capturar. **Los aliados que llama el jefe no se capturan.** Los puntos del jefe se dan solo la primera vez. Si lleva `llamaAliado`, al **bajar de ese porcentaje de PS** (Pikachu: la mitad) el jefe se retira a la banca y entra un **aliado elegido al azar** con la semilla del combate (Pikachu: Weedle, Caterpie, Metapod o Kakuna); cuando el aliado cae, **vuelve el jefe con los PS que tenía**. Los PS de los jefes pueden salirse de la tabla de §3.5, pero su daño es el de su fase. Los datos están en `catalog/campana/jefes/*.json`.
+
+**Pikachu (01/20):** 100 PS, eléctrico, debilidad lucha ×2, sin resistencia, retirada 0. Ataque Rápido (1, 10) e Impactrueno (2, 30). Estimación de dificultad: unos 20 de daño por turno, de modo que el inicial aguanta 4–5 turnos; se calibrará con el simulador. **Pendiente de implementar en el motor:** la llamada del aliado a mitad de combate (hoy el combate contra Pikachu es un 1 contra 1 normal).
 
 ## 5. Puntos y tienda
 
@@ -264,7 +220,7 @@ El jefe se enfrenta como un **equipo rival**: sus aliados salen primero y el jef
 | Motor | Librería nueva `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho el combate 1 contra 1 (#336)**: energía, atacar, cambiar, cargar, elegir siguiente, debilidad y resistencia; **IA rival (#338)**. |
 | Catálogo | `catalog/campana/`: `pokemon/*.json` (uno por Pokémon, con su número de la Pokédex), `zonas/*.json` (qué aparece en cada zona) y sus esquemas en `catalog/schema/`. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
-| Guardado | Progreso de campaña (región, nodo, equipo, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
+| Guardado | Progreso de campaña (región, nodo, equipo, **PC**, jefes ya capturados, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
 | Servidor | Recibe los puntos ganados al terminar un jefe o una medalla. Al ser un solo jugador y coste 0, se acepta lo que reporta el cliente con un tope por hito (no hay competición). |
 | App | Pantallas nuevas: mapa de región, combate, equipo, descanso y tienda. Reutiliza los fondos de mesa por mapa y los avisos. |
 
@@ -290,12 +246,13 @@ Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, ev
 ## 8. Preguntas abiertas
 
 1. **Derrota.** ¿Qué pasa al perder un combate? Propuesta: volver al último descanso con el equipo curado y sin perder lo ganado, para que no frustre. Alternativa más dura: perder una parte del dinero.
-2. **Máximo de Pokémon en el equipo** y qué pasa con los que se sueltan.
+2. ~~Máximo de Pokémon en el equipo~~ **Decidido (§2):** 6 (1 activo y 5 en banca); los demás van al PC, el PC no tiene límite de capacidad por ahora.
 3. **Qué se vende en el descanso** (curas, objetos, Pokémon).
 4. ~~Cuántos ataques~~ **Decidido (§3.5):** 1 a 2 ataques por carta, coste de 1 a 4.
 5. **Cifras de progresión:** cuántos puntos cuesta cada XP, cuántas XP necesita cada Pokémon para evolucionar, y cuánto cuestan el intercambio y hacerse ex.
 6. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex).
-7. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
+7. ~~Capacidad del PC~~ **Decidido por ahora (2026-11-21): ilimitada.** Se revisará si hace falta un tope.
+8. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
 
 ## 9. Tareas derivadas (para crear tras aprobar)
 

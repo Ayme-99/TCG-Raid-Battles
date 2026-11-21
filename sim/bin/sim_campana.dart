@@ -70,19 +70,21 @@ Resultado jugar(
   List<PokemonCampana> jugador,
   List<PokemonCampana> rival,
   Bando empieza,
-  ParametrosCombate parametros,
-) {
+  ParametrosCombate parametros, [
+  int semilla = 1,
+]) {
   var e = EstadoCombate.inicial(
     equipoJugador: jugador,
     equipoRival: rival,
     empieza: empieza,
     parametros: parametros,
+    semilla: semilla,
   );
   var atacar = 0;
   var cambiar = 0;
   var cargar = 0;
   for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
-    final accion = decidirAccion(e, e.turno);
+    final accion = decidirAccion(e, e.actua);
     switch (accion) {
       case Atacar _:
         atacar++;
@@ -162,10 +164,11 @@ void duelos(Config c, Map<String, PokemonCampana> catalogo) {
   final total = Acumulado();
   final lineas = ['jugador,rival,empieza,ganador,turnos,ps_restantes'];
   var sinTerminar = 0;
+  var semilla = 1;
   for (final a in lista) {
     for (final b in lista) {
       for (final empieza in Bando.values) {
-        final r = jugar([a], [b], empieza, c.parametros);
+        final r = jugar([a], [b], empieza, c.parametros, semilla++);
         if (!r.terminado) sinTerminar++;
         final gana = r.ganador == Bando.jugador;
         lineas.add('${a.id},${b.id},${empieza.name},${r.ganador?.name ?? "-"},'
@@ -226,7 +229,7 @@ void equipos(Config c, Map<String, PokemonCampana> catalogo) {
   for (var i = 0; i < c.partidas; i++) {
     final a = equipo();
     final b = equipo();
-    final r = jugar(a, b, Bando.jugador, c.parametros);
+    final r = jugar(a, b, Bando.jugador, c.parametros, i + 1);
     if (!r.terminado) sinTerminar++;
     total.sumar(r, r.ganador == Bando.jugador);
     for (final p in a) {

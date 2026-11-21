@@ -2,7 +2,7 @@
   "id": "geodude",
   "numero": 74,
   "nombre": "Geodude",
-  "tipo": "roca",
+  "tipo": "lucha",
   "ps": 80,
   "debilidad": {
     "tipo": "agua",
@@ -22,7 +22,7 @@
     },
     {
       "nombre": "Lanzarrocas",
-      "tipo": "roca",
+      "tipo": "lucha",
       "coste": 2,
       "dano": 30
     }

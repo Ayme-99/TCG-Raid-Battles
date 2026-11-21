@@ -1,0 +1,36 @@
+{
+  "id": "kakuna",
+  "numero": 14,
+  "nombre": "Kakuna",
+  "tipo": "planta",
+  "ps": 70,
+  "debilidad": {
+    "tipo": "fuego",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Fortaleza",
+      "tipo": "planta",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "reduceDanoPropio",
+        "valor": 10,
+        "texto": "Mientras este Pokémon siga activo, recibe 10 puntos menos de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula."
+      }
+    },
+    {
+      "nombre": "Picotazo Veneno",
+      "tipo": "planta",
+      "coste": 2,
+      "dano": 10,
+      "efecto": {
+        "tipo": "envenenaDefensor",
+        "valor": 10,
+        "texto": "El Pokémon Defensor pasa a estar Envenenado."
+      }
+    }
+  ]
+}

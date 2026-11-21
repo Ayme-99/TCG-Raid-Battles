@@ -1,4 +1,5 @@
-/// Tipos de los Pokémon de campaña: los 15 de la 1.ª generación (D-20).
+/// Tipos de los Pokémon de campaña (D-20). Siguen al TCG: no hay tipo tierra ni
+/// roca, los Pokémon de tierra y de roca son de tipo [lucha].
 ///
 /// El nombre de cada valor es el que se escribe en el catálogo JSON.
 enum TipoCampana {
@@ -10,11 +11,10 @@ enum TipoCampana {
   hielo,
   lucha,
   veneno,
-  tierra,
   volador,
   psiquico,
+  oscuridad,
   bicho,
-  roca,
   fantasma,
   dragon,
 }

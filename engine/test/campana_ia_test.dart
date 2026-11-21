@@ -211,7 +211,7 @@ void main() {
     EstadoCombate jugar(EstadoCombate inicial) {
       var e = inicial;
       for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
-        e = aplicarCombate(e, decidirAccion(e, e.turno));
+        e = aplicarCombate(e, decidirAccion(e, e.actua));
       }
       return e;
     }
@@ -219,10 +219,10 @@ void main() {
     final equipos = <List<PokemonCampana>>[
       [
         pokemon('roca',
-            tipo: TipoCampana.roca,
+            tipo: TipoCampana.lucha,
             ps: 120,
             debilidad: const Debilidad(TipoCampana.agua),
-            ataques: [ataque(1, 20, TipoCampana.roca), ataque(4, 80, TipoCampana.roca)]),
+            ataques: [ataque(1, 20, TipoCampana.lucha), ataque(4, 80, TipoCampana.lucha)]),
         pokemon('lucha',
             tipo: TipoCampana.lucha,
             ps: 90,
@@ -302,7 +302,285 @@ void main() {
           for (final empieza in Bando.values) {
             var e = combate(x, y, empieza: empieza);
             for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
-              e = aplicarCombate(e, decidirAccion(e, e.turno));
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
+  group('Doble Patada', () {
+    const patada = AtaqueCampana(
+      nombre: 'Doble Patada',
+      tipo: TipoCampana.oscuridad,
+      coste: 3,
+      dano: 30,
+      efecto: RepiteDanoAlDerribar(),
+    );
+
+    test('todos los emparejamientos con Doble Patada terminan', () {
+      final a = [pokemon('n', ps: 60, ataques: [ataque(2, 20), patada])];
+      final b = [
+        pokemon('c', ps: 30, ataques: [ataque(1, 10), ataque(2, 30)]),
+        pokemon('d', ps: 50, ataques: [ataque(2, 30)]),
+      ];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
+  group('Ataque Furia', () {
+    const furia = AtaqueCampana(
+      nombre: 'Ataque Furia',
+      tipo: TipoCampana.normal,
+      coste: 2,
+      dano: 30,
+      efecto: MonedasDano(3, [50, 20, 30, 40]),
+    );
+
+    test('todos los emparejamientos con Ataque Furia terminan', () {
+      final a = [pokemon('s', ps: 60, ataques: [ataque(1, 10), furia])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (var semilla = 1; semilla <= 20; semilla++) {
+        for (final x in [a, b]) {
+          for (final y in [a, b]) {
+            for (final empieza in Bando.values) {
+              var e = EstadoCombate.inicial(
+                  equipoJugador: x,
+                  equipoRival: y,
+                  empieza: empieza,
+                  semilla: semilla);
+              for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+                e = aplicarCombate(e, decidirAccion(e, e.actua));
+              }
+              expect(e.fase, FaseCombate.terminado);
+            }
+          }
+        }
+      }
+    });
+  });
+
+  group('Rodar', () {
+    const rodar = AtaqueCampana(
+      nombre: 'Rodar',
+      tipo: TipoCampana.lucha,
+      coste: 2,
+      dano: 20,
+      efecto: DanoPorRacha(),
+    );
+
+    test('aprovecha una racha empezada y no la empieza si pega más el otro', () {
+      final e = combate([
+        pokemon('s', ps: 70, ataques: [rodar, ataque(1, 30)])
+      ], [
+        pokemon('b', ps: 500, ataques: [ataque(1, 10)])
+      ]);
+      // Sin racha, Rodar (20) pega menos que el otro (30): no lo empieza.
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+      // Con racha de 2, Rodar haría 60: lo encadena.
+      final enRacha = e.copiarCon(
+          jugador: e.jugador.copiarCon(ultimoAtaque: 0, racha: 2));
+      expect(decidirAccion(enRacha, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('todos los emparejamientos con Rodar terminan', () {
+      final a = [pokemon('s', ps: 70, ataques: [rodar])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
+  group('Bofetón Lodo', () {
+    const bofeton = AtaqueCampana(
+      nombre: 'Bofetón Lodo',
+      tipo: TipoCampana.lucha,
+      coste: 2,
+      dano: 30,
+      efecto: MonedaFalloRival(),
+    );
+
+    test('todos los emparejamientos con Bofetón Lodo terminan', () {
+      final a = [pokemon('d', ps: 50, ataques: [ataque(1, 10), bofeton])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (var semilla = 1; semilla <= 20; semilla++) {
+        for (final x in [a, b]) {
+          for (final y in [a, b]) {
+            for (final empieza in Bando.values) {
+              var e = EstadoCombate.inicial(
+                  equipoJugador: x,
+                  equipoRival: y,
+                  empieza: empieza,
+                  semilla: semilla);
+              for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+                e = aplicarCombate(e, decidirAccion(e, e.actua));
+              }
+              expect(e.fase, FaseCombate.terminado);
+            }
+          }
+        }
+      }
+    });
+  });
+
+  group('Fortaleza', () {
+    const fortaleza = AtaqueCampana(
+      nombre: 'Fortaleza',
+      tipo: TipoCampana.planta,
+      coste: 1,
+      dano: 0,
+      efecto: ReduceDanoPropio(10),
+    );
+    PokemonCampana capullo() =>
+        pokemon('m', ps: 80, ataques: [fortaleza, ataque(1, 20)]);
+
+    test('la usa contra un rival que pega poco', () {
+      final e = combate([capullo()], [pokemon('r', ataques: [ataque(1, 10)])]);
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('no la usa contra un rival que pega fuerte', () {
+      final e = combate([capullo()], [pokemon('r', ataques: [ataque(2, 60)])]);
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('no la repite mientras siga activo', () {
+      var e = combate([capullo()], [pokemon('r', ataques: [ataque(1, 20)])]);
+      e = aplicarCombate(e, decidirAccion(e, Bando.jugador));
+      e = aplicarCombate(e, decidirAccion(e, Bando.rival));
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('todos los emparejamientos con Fortaleza terminan', () {
+      final a = [capullo()];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
+  group('Veneno', () {
+    const veneno = AtaqueCampana(
+      nombre: 'Picotazo Veneno',
+      tipo: TipoCampana.planta,
+      coste: 2,
+      dano: 10,
+      efecto: EnvenenaDefensor(10),
+    );
+
+    test('envenena aunque el golpe quede en 0 por Fortaleza', () {
+      final e = combate([
+        pokemon('w', ps: 50, ataques: [veneno])
+      ], [
+        pokemon('m', ps: 80, ataques: [ataque(1, 20)])
+      ]);
+      final protegido = e.copiarCon(
+          rival: e.rival.copiarCon(proteccion: 10));
+      expect(decidirAccion(protegido, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('no repite el veneno si el rival ya está envenenado', () {
+      final e = combate([
+        pokemon('w', ps: 50, ataques: [veneno, ataque(1, 20)])
+      ], [
+        pokemon('m', ps: 80, ataques: [ataque(1, 10)])
+      ]);
+      final ya = e.copiarCon(rival: e.rival.copiarCon(veneno: 10));
+      expect(decidirAccion(ya, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('todos los emparejamientos con veneno terminan', () {
+      final a = [pokemon('w', ps: 50, ataques: [veneno])];
+      final b = [
+        pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(3, 60)]),
+        pokemon('d', ps: 60, ataques: [ataque(2, 30)]),
+      ];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
+  group('Disparo Demora', () {
+    const demora = AtaqueCampana(
+      nombre: 'Disparo Demora',
+      tipo: TipoCampana.normal,
+      coste: 1,
+      dano: 0,
+      efecto: QuitaEnergiaRival(1),
+    );
+    PokemonCampana oruga() =>
+        pokemon('o', ps: 90, ataques: [demora, ataque(2, 20)]);
+    EstadoCombate conRivalJusto(int energia) {
+      final e = combate([oruga()], [pokemon('r', ataques: [ataque(3, 60)])]);
+      return e.copiarCon(
+          rival: e.rival.copiarCon(energia: energia));
+    }
+
+    test('lo usa si con ello el rival deja de llegar a su ataque fuerte', () {
+      expect(decidirAccion(conRivalJusto(3), Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('no lo usa si el rival llega de sobra', () {
+      expect(decidirAccion(conRivalJusto(10), Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('todos los emparejamientos con Disparo Demora terminan', () {
+      final a = [oruga(), pokemon('b', ps: 80, ataques: [ataque(1, 10), ataque(2, 20)])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(3, 60)])];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
             }
             expect(e.fase, FaseCombate.terminado);
           }
@@ -350,7 +628,7 @@ void main() {
           for (final empieza in Bando.values) {
             var e = combate(x, y, empieza: empieza);
             for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
-              e = aplicarCombate(e, decidirAccion(e, e.turno));
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
             }
             expect(e.fase, FaseCombate.terminado);
           }

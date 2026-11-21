@@ -20,6 +20,13 @@ import 'pokemon.dart';
 ///    atacando), lo usa; nunca lo repite mientras siga activo el mismo rival.
 /// 5. Si tiene un ataque que hace que el rival reciba más daño (Látigo) y lo
 ///    derriba en menos golpes contando el turno que gasta, lo usa.
+///    Si tiene un ataque que envenena al rival y este no lo está ya, lo usa
+///    (antes que Gruñido y compañía: el veneno cuenta aunque el golpe quede
+///    en 0).
+///    Si tiene un ataque que reduce el daño que recibe su activo (Fortaleza) y
+///    compensa igual que Gruñido, lo usa.
+///    Si tiene un ataque que quita energía al rival (Disparo Demora) y con ello
+///    el rival deja de poder dar un golpe mayor que el suyo, lo usa.
 /// 6. Si con la carga extra podría rematar al turno siguiente algo que hoy no
 ///    le llega, carga.
 /// 7. Ataca: con el de más daño si la reserva está llena (la energía
@@ -29,7 +36,11 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
   if (estado.fase == FaseCombate.terminado) {
     throw const ReglaIncumplida('El combate ha terminado.');
   }
-  if (estado.turno != bando) {
+  if (estado.fase == FaseCombate.eligiendoActivo) {
+    if (!estado.debenElegir.contains(bando)) {
+      throw const ReglaIncumplida('Ese bando no tiene que elegir Pokémon.');
+    }
+  } else if (estado.turno != bando) {
     throw const ReglaIncumplida('No es el turno de ese bando.');
   }
   final yo = estado.bando(bando);
@@ -39,17 +50,17 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
 
   if (estado.fase == FaseCombate.eligiendoActivo) {
     final i = _mejorRelevo(yo, objetivo, yo.energia, p,
-        exigirAtaque: false, extra: rival.danoExtra);
+        exigirAtaque: false, extra: rival.extraRecibido);
     return ElegirSiguiente(bando, i ?? yo.relevos.first);
   }
 
-  final activo = yo.pokemonActivo.especie;
+  final activo = _conRacha(yo);
   final ataque = _mejorAtaque(
-      activo, yo.energia, objetivo, p, yo.danoReducido, rival.danoExtra);
+      activo, yo.energia, objetivo, p, yo.danoReducido, rival.extraRecibido);
   final danoMio = ataque == null
       ? 0
       : danoDeAtaque(activo.ataques[ataque], objetivo.especie,
-          reduccion: yo.danoReducido, extra: rival.danoExtra);
+          reduccion: yo.danoReducido, extra: rival.extraRecibido);
   if (ataque != null && danoMio >= objetivo.ps) {
     return Atacar(bando, ataque);
   }
@@ -64,20 +75,29 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
         p,
         exigirAtaque: true,
         exigirNoDebil: debil,
-        extra: rival.danoExtra,
+        extra: rival.extraRecibido,
       );
       if (relevo != null) return Cambiar(bando, relevo);
     }
   }
 
+  final veneno = _ataqueDeVeneno(yo, rival);
+  if (veneno != null) return Atacar(bando, veneno);
+
   final reduccion = _ataqueDeReduccion(yo, rival, danoMio);
   if (reduccion != null) return Atacar(bando, reduccion);
+
+  final proteccion = _ataqueDeProteccion(yo, rival, danoMio);
+  if (proteccion != null) return Atacar(bando, proteccion);
 
   final masDano = _ataqueDeDanoExtra(yo, rival, danoMio);
   if (masDano != null) return Atacar(bando, masDano);
 
+  final sinEnergia = _ataqueDeQuitaEnergia(yo, rival, danoMio);
+  if (sinEnergia != null) return Atacar(bando, sinEnergia);
+
   if (_remataCargando(
-      activo, yo.energia, objetivo, p, yo.danoReducido, rival.danoExtra)) {
+      activo, yo.energia, objetivo, p, yo.danoReducido, rival.extraRecibido)) {
     return Cargar(bando);
   }
   if (ataque != null) return Atacar(bando, ataque);
@@ -116,7 +136,7 @@ int? _ataqueDeReduccion(BandoCombate yo, BandoCombate rival, int danoMio) {
   var danoRival = 0;
   for (final a in rival.pokemonActivo.especie.ataques) {
     final d = danoDeAtaque(a, activo.especie,
-        reduccion: actual, extra: yo.danoExtra);
+        reduccion: actual, extra: yo.extraRecibido);
     if (d > danoRival) danoRival = d;
   }
   if (danoRival <= 0) return null;
@@ -127,6 +147,60 @@ int? _ataqueDeReduccion(BandoCombate yo, BandoCombate rival, int danoMio) {
     final a = activo.especie.ataques[i];
     final e = a.efecto;
     if (e is! ReduceDanoRival || a.coste > yo.energia) continue;
+    final extra = e.valor - actual;
+    if (extra <= 0) continue;
+    final evitado = (danoRival < extra ? danoRival : extra) * golpes;
+    if (evitado > danoMio && evitado > mejorEvitado) {
+      mejor = i;
+      mejorEvitado = evitado;
+    }
+  }
+  return mejor;
+}
+
+/// Índice de un ataque que envenena al activo rival (Picotazo Veneno), o null.
+///
+/// Siempre compensa mientras el rival no esté envenenado (o lo esté con menos
+/// daño): el veneno quita PS en cada chequeo aunque el golpe quede en 0 por
+/// Fortaleza o Gruñido. No se repite mientras siga envenenado.
+int? _ataqueDeVeneno(BandoCombate yo, BandoCombate rival) {
+  final ataques = yo.pokemonActivo.especie.ataques;
+  int? mejor;
+  var mejorValor = rival.veneno;
+  for (var i = 0; i < ataques.length; i++) {
+    final a = ataques[i];
+    final e = a.efecto;
+    if (e is! EnvenenaDefensor || a.coste > yo.energia) continue;
+    if (e.valor > mejorValor) {
+      mejor = i;
+      mejorValor = e.valor;
+    }
+  }
+  return mejor;
+}
+
+/// Índice de un ataque que reduce el daño que recibe el propio activo
+/// (Fortaleza) y compensa usarlo ahora, o null. Mismo criterio que
+/// [_ataqueDeReduccion]: evita más daño, en los golpes que el rival necesita
+/// para derribarlo, que el que haría atacando. No sirve si ya tiene una
+/// protección igual o mayor.
+int? _ataqueDeProteccion(BandoCombate yo, BandoCombate rival, int danoMio) {
+  final activo = yo.pokemonActivo;
+  final actual = yo.proteccion;
+  var danoRival = 0;
+  for (final a in rival.pokemonActivo.especie.ataques) {
+    final d = danoDeAtaque(a, activo.especie,
+        reduccion: rival.danoReducido, extra: yo.extraRecibido);
+    if (d > danoRival) danoRival = d;
+  }
+  if (danoRival <= 0) return null;
+  final golpes = (activo.ps + danoRival - 1) ~/ danoRival;
+  int? mejor;
+  var mejorEvitado = 0;
+  for (var i = 0; i < activo.especie.ataques.length; i++) {
+    final a = activo.especie.ataques[i];
+    final e = a.efecto;
+    if (e is! ReduceDanoPropio || a.coste > yo.energia) continue;
     final extra = e.valor - actual;
     if (extra <= 0) continue;
     final evitado = (danoRival < extra ? danoRival : extra) * golpes;
@@ -161,6 +235,42 @@ int? _ataqueDeDanoExtra(BandoCombate yo, BandoCombate rival, int danoMio) {
     if (golpes < mejorGolpes) {
       mejor = i;
       mejorGolpes = golpes;
+    }
+  }
+  return mejor;
+}
+
+/// Índice de un ataque que quita energía al rival (Disparo Demora) y compensa
+/// usarlo ahora, o null.
+///
+/// Compensa si el mejor golpe que el rival puede dar en su turno baja (por no
+/// llegarle ya la energía a un ataque) en más de lo que yo haría atacando.
+int? _ataqueDeQuitaEnergia(BandoCombate yo, BandoCombate rival, int danoMio) {
+  final activo = yo.pokemonActivo;
+  int mejorGolpe(int energia) {
+    var mejor = 0;
+    for (final a in rival.pokemonActivo.especie.ataques) {
+      if (a.coste > energia) continue;
+      final d = danoDeAtaque(a, activo.especie,
+          reduccion: rival.danoReducido, extra: yo.extraRecibido);
+      if (d > mejor) mejor = d;
+    }
+    return mejor;
+  }
+
+  final ahora = mejorGolpe(rival.energia);
+  int? mejor;
+  var mejorEvitado = 0;
+  final ataques = activo.especie.ataques;
+  for (var i = 0; i < ataques.length; i++) {
+    final a = ataques[i];
+    final e = a.efecto;
+    if (e is! QuitaEnergiaRival || a.coste > yo.energia) continue;
+    final resto = rival.energia - e.valor;
+    final evitado = ahora - mejorGolpe(resto < 0 ? 0 : resto);
+    if (evitado > danoMio && evitado > mejorEvitado) {
+      mejor = i;
+      mejorEvitado = evitado;
     }
   }
   return mejor;
@@ -257,4 +367,36 @@ int? _mejorRelevo(
     }
   }
   return mejor;
+}
+
+/// El Pokémon activo de [yo] con el daño de sus ataques de racha (Rodar) ya
+/// escalado a lo que harían si los usara ahora. Los índices no cambian.
+PokemonCampana _conRacha(BandoCombate yo) {
+  final e = yo.pokemonActivo.especie;
+  if (!e.ataques.any((a) => a.efecto is DanoPorRacha)) return e;
+  return PokemonCampana(
+    id: e.id,
+    nombre: e.nombre,
+    tipo: e.tipo,
+    ps: e.ps,
+    debilidad: e.debilidad,
+    resistencia: e.resistencia,
+    retirada: e.retirada,
+    ex: e.ex,
+    evoluciones: e.evoluciones,
+    ataques: [
+      for (var i = 0; i < e.ataques.length; i++)
+        if (e.ataques[i].efecto is DanoPorRacha)
+          AtaqueCampana(
+            nombre: e.ataques[i].nombre,
+            tipo: e.ataques[i].tipo,
+            coste: e.ataques[i].coste,
+            dano: e.ataques[i].dano *
+                (yo.ultimoAtaque == i ? yo.racha + 1 : 1),
+            efecto: e.ataques[i].efecto,
+          )
+        else
+          e.ataques[i],
+    ],
+  );
 }

@@ -368,6 +368,537 @@ void main() {
     });
   });
 
+  group('habilidad: moneda de daño extra al atacar (Foco Energía)', () {
+  PokemonCampana mono({List<AtaqueCampana>? ataques}) => PokemonCampana(
+        id: 'm',
+        nombre: 'm',
+        tipo: TipoCampana.lucha,
+        ps: 100,
+        habilidad: const MonedaDanoExtraAlAtacar('Foco Energía', 20),
+        ataques: ataques ??
+            const [
+              AtaqueCampana(
+                  nombre: 'Golpe',
+                  tipo: TipoCampana.lucha,
+                  coste: 2,
+                  dano: 30),
+            ],
+      );
+
+    test('lanza una moneda y con cara suma 20; con cruz no', () {
+      final danos = <int>{};
+      for (var semilla = 1; semilla < 40; semilla++) {
+        final e = aplicarCombate(
+            EstadoCombate.inicial(
+                equipoJugador: [mono()],
+                equipoRival: [pokemon('r')],
+                semilla: semilla),
+            const Atacar(Bando.jugador, 0));
+        final dano = 100 - e.rival.pokemonActivo.ps;
+        expect(dano, e.ultimaMoneda! ? 50 : 30);
+        danos.add(dano);
+      }
+      expect(danos, {30, 50});
+    });
+
+    test('es una moneda aparte de la del ataque', () {
+      final golpe = mono(ataques: const [
+        AtaqueCampana(
+            nombre: 'Golpe Kárate',
+            tipo: TipoCampana.lucha,
+            coste: 2,
+            dano: 30,
+            efecto: MonedaDanoExtra(20)),
+      ]);
+      final vistos = <int>{};
+      for (var semilla = 1; semilla < 60; semilla++) {
+        final e = aplicarCombate(
+            EstadoCombate.inicial(
+                equipoJugador: [golpe],
+                equipoRival: [pokemon('r')],
+                semilla: semilla),
+            const Atacar(Bando.jugador, 0));
+        expect(e.ultimasMonedas!.length, 2);
+        final caras = e.ultimasMonedas!.where((c) => c).length;
+        final dano = 100 - e.rival.pokemonActivo.ps;
+        expect(dano, 30 + 20 * caras);
+        vistos.add(dano);
+      }
+      expect(vistos, {30, 50, 70});
+    });
+  });
+
+  group('efecto: repetir el daño al derribar (Doble Patada)', () {
+    const patada = AtaqueCampana(
+      nombre: 'Doble Patada',
+      tipo: TipoCampana.oscuridad,
+      coste: 3,
+      dano: 30,
+      efecto: RepiteDanoAlDerribar(),
+    );
+    final nido = pokemon('n', tipo: TipoCampana.oscuridad, ataques: const [patada]);
+
+    EstadoCombate atacar(List<PokemonCampana> rival) => aplicarCombate(
+        nuevo(jugador: [nido], rival: rival), const Atacar(Bando.jugador, 0));
+
+    test('si derriba, el que sale recibe de nuevo el daño', () {
+      var e = atacar([pokemon('r1', ps: 20), pokemon('r2')]);
+      expect(e.fase, FaseCombate.eligiendoActivo);
+      expect(e.repetirDano, isNotNull);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.rival.pokemonActivo.ps, 70);
+      expect(e.repetirDano, isNull);
+      expect(e.fase, FaseCombate.enCurso);
+    });
+
+    test('si no derriba, no se repite nada', () {
+      final e = atacar([pokemon('r1', ps: 100), pokemon('r2')]);
+      expect(e.repetirDano, isNull);
+    });
+
+    test('el nuevo activo aplica su propia debilidad', () {
+      final debil = pokemon('r2',
+          debilidad: const Debilidad(TipoCampana.oscuridad));
+      var e = atacar([pokemon('r1', ps: 20), debil]);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.rival.pokemonActivo.ps, 40); // 100 - 30 x2
+    });
+
+    test('solo se repite una vez, aunque el segundo también caiga', () {
+      var e = atacar([
+        pokemon('r1', ps: 20),
+        pokemon('r2', ps: 20),
+        pokemon('r3'),
+      ]);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.fase, FaseCombate.eligiendoActivo);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 2));
+      expect(e.rival.pokemonActivo.ps, 100);
+    });
+
+    test('si el segundo era el último, el combate termina', () {
+      var e = atacar([pokemon('r1', ps: 20), pokemon('r2', ps: 20)]);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.fase, FaseCombate.terminado);
+      expect(e.ganador, Bando.jugador);
+    });
+  });
+
+  group('efecto: varias monedas (Ataque Furia)', () {
+    const furia = AtaqueCampana(
+      nombre: 'Ataque Furia',
+      tipo: TipoCampana.normal,
+      coste: 2,
+      dano: 30,
+      efecto: MonedasDano(3, [50, 20, 30, 40]),
+    );
+    final ave = pokemon('a', ps: 60, ataques: const [furia]);
+
+    EstadoCombate golpe(int semilla) => aplicarCombate(
+          EstadoCombate.inicial(
+              equipoJugador: [ave],
+              equipoRival: [pokemon('d', ps: 500)],
+              semilla: semilla),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('el daño sale de la tabla según las caras y quedan las 3 monedas', () {
+      const tabla = [50, 20, 30, 40];
+      final vistos = <int>{};
+      for (var s = 1; s <= 100; s++) {
+        final e = golpe(s);
+        expect(e.ultimasMonedas, hasLength(3));
+        final caras = e.ultimasMonedas!.where((c) => c).length;
+        final dano = 500 - e.rival.pokemonActivo.ps;
+        expect(dano, tabla[caras], reason: 'semilla $s');
+        vistos.add(dano);
+      }
+      expect(vistos, {20, 30, 40, 50});
+    });
+
+    test('el daño medio es el esperado (30)', () {
+      var total = 0;
+      for (var s = 1; s <= 400; s++) {
+        total += 500 - golpe(s).rival.pokemonActivo.ps;
+      }
+      expect(total / 400, inInclusiveRange(26, 34));
+    });
+
+    test('misma semilla, mismo resultado', () {
+      expect(golpe(9).rival.pokemonActivo.ps, golpe(9).rival.pokemonActivo.ps);
+    });
+  });
+
+  group('efecto: daño por racha (Rodar)', () {
+    const rodar = AtaqueCampana(
+      nombre: 'Rodar',
+      tipo: TipoCampana.lucha,
+      coste: 2,
+      dano: 20,
+      efecto: DanoPorRacha(),
+    );
+    const otro = AtaqueCampana(
+        nombre: 'Otro', tipo: TipoCampana.lucha, coste: 1, dano: 10);
+    final rueda = pokemon('s', tipo: TipoCampana.lucha, ps: 70, ataques: const [rodar, otro]);
+    final blanco = pokemon('b', ps: 500, ataques: const [
+      AtaqueCampana(nombre: 'Nada', tipo: TipoCampana.normal, coste: 1, dano: 10)
+    ]);
+
+    EstadoCombate turno(EstadoCombate e, AccionCombate a) {
+      e = aplicarCombate(e, a);
+      return e.fase == FaseCombate.terminado
+          ? e
+          : aplicarCombate(e, const Cargar(Bando.rival));
+    }
+
+    EstadoCombate inicio() => nuevo(jugador: [rueda, pokemon('s2')], rival: [blanco, pokemon('b2')]);
+
+    test('20, 40, 60… con usos seguidos', () {
+      var e = inicio();
+      final danos = <int>[];
+      for (var i = 0; i < 3; i++) {
+        final antes = e.rival.pokemonActivo.ps;
+        e = turno(e, const Atacar(Bando.jugador, 0));
+        danos.add(antes - e.rival.pokemonActivo.ps);
+      }
+      expect(danos, [20, 40, 60]);
+    });
+
+    test('usar otro ataque reinicia la racha', () {
+      var e = inicio();
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      e = turno(e, const Atacar(Bando.jugador, 1));
+      final antes = e.rival.pokemonActivo.ps;
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      expect(antes - e.rival.pokemonActivo.ps, 20);
+    });
+
+    test('cargar o cambiar de Pokémon reinicia la racha', () {
+      var e = inicio();
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      e = turno(e, const Cargar(Bando.jugador));
+      expect(e.jugador.racha, 0);
+      var antes = e.rival.pokemonActivo.ps;
+      e = turno(e, const Atacar(Bando.jugador, 0));
+      expect(antes - e.rival.pokemonActivo.ps, 20);
+      e = turno(e, const Cambiar(Bando.jugador, 1));
+      expect(e.jugador.ultimoAtaque, -1);
+    });
+  });
+
+  group('efecto: moneda de fallo (Bofetón Lodo)', () {
+    const bofeton = AtaqueCampana(
+      nombre: 'Bofetón Lodo',
+      tipo: TipoCampana.lucha,
+      coste: 2,
+      dano: 30,
+      efecto: MonedaFalloRival(),
+    );
+    const golpe = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.normal, coste: 1, dano: 40);
+    final topo = pokemon('d', tipo: TipoCampana.lucha, ps: 100, ataques: const [bofeton]);
+    final rival = pokemon('r', ps: 200, ataques: const [golpe]);
+
+    EstadoCombate marcado([int semilla = 1]) => aplicarCombate(
+          EstadoCombate.inicial(
+              equipoJugador: [topo, pokemon('t2')],
+              equipoRival: [rival, pokemon('r2')],
+              semilla: semilla),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('hace su daño y marca al rival', () {
+      final e = marcado();
+      expect(e.rival.pokemonActivo.ps, 170);
+      expect(e.rival.cegado, isTrue);
+      expect(e.jugador.cegado, isFalse);
+      expect(e.ultimaMoneda, isNull); // la moneda se lanza cuando el rival ataca
+    });
+
+    test('con cara el ataque del rival funciona y con cruz no hace nada', () {
+      final resultados = <bool, EstadoCombate>{};
+      for (var s = 1; s <= 40; s++) {
+        final e = aplicarCombate(marcado(s), const Atacar(Bando.rival, 0));
+        resultados[e.ultimaMoneda!] = e;
+      }
+      final cara = resultados[true]!;
+      final cruz = resultados[false]!;
+      expect(cara.jugador.pokemonActivo.ps, 60);
+      expect(cruz.jugador.pokemonActivo.ps, 100);
+      // La energía se gasta igual (10 - 1 + 1 de fin de turno).
+      expect(cruz.rival.energia, cara.rival.energia);
+      expect(cruz.rival.cegado, isFalse);
+      expect(cara.rival.cegado, isFalse);
+    });
+
+    test('solo dura su próximo turno aunque no ataque', () {
+      var e = marcado();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(e.rival.cegado, isFalse);
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 60); // sin moneda, hace su daño
+    });
+
+    test('cambiar de Pokémon también lo quita', () {
+      var e = marcado();
+      e = aplicarCombate(e, const Cambiar(Bando.rival, 1));
+      expect(e.rival.cegado, isFalse);
+    });
+  });
+
+  group('efecto: protección propia (Fortaleza)', () {
+    const fortaleza = AtaqueCampana(
+      nombre: 'Fortaleza',
+      tipo: TipoCampana.planta,
+      coste: 1,
+      dano: 0,
+      efecto: ReduceDanoPropio(10),
+    );
+    final capullo = pokemon('c', tipo: TipoCampana.planta, ps: 80, ataques: const [fortaleza]);
+
+    EstadoCombate protegido({List<PokemonCampana>? jugador}) => aplicarCombate(
+          nuevo(jugador: jugador ?? [capullo, pokemon('c2')], rival: [pokemon('r1'), pokemon('r2')]),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('marca al propio activo y no hace daño', () {
+      final e = protegido();
+      expect(e.jugador.proteccion, 10);
+      expect(e.rival.proteccion, 0);
+      expect(e.rival.pokemonActivo.ps, 100);
+    });
+
+    test('los ataques que recibe hacen 10 menos', () {
+      var e = protegido();
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0)); // Placaje 30 → 20
+      expect(e.jugador.pokemonActivo.ps, 60);
+    });
+
+    test('no se acumula', () {
+      var e = protegido();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.jugador.proteccion, 10);
+    });
+
+    test('cambiar de Pokémon lo quita', () {
+      var e = protegido();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Cambiar(Bando.jugador, 1));
+      expect(e.jugador.proteccion, 0);
+    });
+
+    test('se combina con Látigo: +10 y -10 se compensan', () {
+      var e = protegido(jugador: [
+        pokemon('c', ps: 80, ataques: const [fortaleza]),
+      ]);
+      e = e.copiarCon(jugador: e.jugador.copiarCon(danoExtra: 10));
+      expect(e.jugador.extraRecibido, 0);
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 50);
+    });
+
+    test('nunca deja el daño por debajo de 0', () {
+      final debil = pokemon('r', ataques: const [
+        AtaqueCampana(nombre: 'Flojo', tipo: TipoCampana.normal, coste: 1, dano: 10)
+      ]);
+      var e = aplicarCombate(
+          nuevo(jugador: [capullo], rival: [debil]), const Atacar(Bando.jugador, 0));
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 80);
+    });
+  });
+
+  group('efecto: veneno (Picotazo Veneno)', () {
+    const picotazo = AtaqueCampana(
+      nombre: 'Picotazo Veneno',
+      tipo: TipoCampana.planta,
+      coste: 2,
+      dano: 10,
+      efecto: EnvenenaDefensor(10),
+    );
+    const golpe = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.normal, coste: 1, dano: 10);
+    final bicho = pokemon('w', tipo: TipoCampana.planta, ps: 50, ataques: const [picotazo]);
+    final sano = pokemon('r', ps: 100, ataques: const [golpe]);
+
+    EstadoCombate envenenado() => aplicarCombate(
+        nuevo(jugador: [bicho], rival: [sano, pokemon('r2')]),
+        const Atacar(Bando.jugador, 0));
+
+    test('el chequeo al acabar el turno quita 10 más al envenenado', () {
+      final e = envenenado();
+      expect(e.rival.veneno, 10);
+      expect(e.rival.pokemonActivo.ps, 80); // 100 - 10 del golpe - 10 de veneno
+    });
+
+    test('hay chequeo en cada cambio de turno: 10 por turno de cualquiera', () {
+      var e = envenenado();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(e.rival.pokemonActivo.ps, 70);
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      expect(e.rival.pokemonActivo.ps, 60);
+    });
+
+    test('no se acumula', () {
+      var e = envenenado();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.rival.veneno, 10);
+    });
+
+    test('cambiar de Pokémon lo quita', () {
+      var e = envenenado();
+      e = aplicarCombate(e, const Cambiar(Bando.rival, 1));
+      expect(e.rival.veneno, 0);
+      expect(e.rival.pokemonActivo.especie.id, 'r2');
+      final ps = e.rival.pokemonActivo.ps;
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      expect(e.rival.pokemonActivo.ps, ps);
+    });
+
+    test('el veneno puede derribar al activo y el dueño elige relevo', () {
+      var e = envenenado();
+      e = e.copiarCon(
+        rival: e.rival.copiarCon(equipo: [
+          e.rival.equipo[0].conPs(10),
+          e.rival.equipo[1],
+        ]),
+      );
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      // El chequeo tras el turno del rival envenena y derriba a su activo.
+      expect(e.fase, FaseCombate.eligiendoActivo);
+      expect(e.actua, Bando.rival);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.fase, FaseCombate.enCurso);
+      expect(e.rival.veneno, 0);
+      expect(e.turno, Bando.jugador);
+    });
+
+    test('si cae su último Pokémon por veneno, gana el otro', () {
+      var e = aplicarCombate(
+          nuevo(jugador: [bicho], rival: [sano]), const Atacar(Bando.jugador, 0));
+      e = e.copiarCon(
+          rival: e.rival.copiarCon(equipo: [e.rival.equipo[0].conPs(10)]));
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(e.fase, FaseCombate.terminado);
+      expect(e.ganador, Bando.jugador);
+    });
+
+    test('si cae quien acaba el turno por veneno, elige y luego juega el otro', () {
+      // El jugador está envenenado y su último turno le deja en 10 PS.
+      var e = nuevo(
+          jugador: [pokemon('a', ps: 100), pokemon('a2')],
+          rival: [pokemon('b')]);
+      e = e.copiarCon(
+          jugador: e.jugador.copiarCon(
+              veneno: 10, equipo: [e.jugador.equipo[0].conPs(10), e.jugador.equipo[1]]));
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      expect(e.fase, FaseCombate.eligiendoActivo);
+      expect(e.turno, Bando.rival);
+      expect(e.actua, Bando.jugador);
+      expect(() => aplicarCombate(e, const ElegirSiguiente(Bando.rival, 0)),
+          throwsA(isA<ReglaIncumplida>()));
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.jugador, 1));
+      expect(e.fase, FaseCombate.enCurso);
+      expect(e.turno, Bando.rival);
+    });
+  });
+
+  group('efecto: moneda (Hiper Colmillo)', () {
+    const colmillo = AtaqueCampana(
+      nombre: 'Hiper Colmillo',
+      tipo: TipoCampana.normal,
+      coste: 1,
+      dano: 20,
+      efecto: MonedaDanoExtra(20),
+    );
+    final rata = pokemon('r', ataques: const [colmillo]);
+
+    EstadoCombate atacarCon(int semilla) => aplicarCombate(
+          EstadoCombate.inicial(
+              equipoJugador: [rata],
+              equipoRival: [pokemon('d', ps: 200)],
+              semilla: semilla),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('cara hace 40 y cruz hace 20, y se anota la moneda', () {
+      final danos = {
+        for (var s = 1; s <= 40; s++)
+          atacarCon(s).ultimaMoneda!: 200 - atacarCon(s).rival.pokemonActivo.ps,
+      };
+      expect(danos[true], 40);
+      expect(danos[false], 20);
+    });
+
+    test('misma semilla, mismo resultado; la semilla avanza', () {
+      final a = atacarCon(7);
+      final b = atacarCon(7);
+      expect(a.ultimaMoneda, b.ultimaMoneda);
+      expect(a.rival.pokemonActivo.ps, b.rival.pokemonActivo.ps);
+      expect(a.semilla, isNot(7));
+    });
+
+    test('sale cara y cruz con proporción razonable', () {
+      var caras = 0;
+      for (var s = 1; s <= 200; s++) {
+        if (atacarCon(s).ultimaMoneda!) caras++;
+      }
+      expect(caras, inInclusiveRange(70, 130));
+    });
+
+    test('un ataque sin moneda no toca la semilla', () {
+      final e = aplicarCombate(
+          nuevo(jugador: [pokemon('a')]), const Atacar(Bando.jugador, 0));
+      expect(e.semilla, 1);
+      expect(e.ultimaMoneda, isNull);
+    });
+  });
+
+  group('efecto: el rival pierde energía (Disparo Demora)', () {
+    const demora = AtaqueCampana(
+      nombre: 'Disparo Demora',
+      tipo: TipoCampana.planta,
+      coste: 1,
+      dano: 0,
+      efecto: QuitaEnergiaRival(1),
+    );
+    final oruga = pokemon('o', tipo: TipoCampana.planta, ataques: const [demora]);
+
+    test('quita 1 de energía al rival y no le hace daño', () {
+      final e = aplicarCombate(
+          nuevo(jugador: [oruga]), const Atacar(Bando.jugador, 0));
+      expect(e.rival.energia, 9);
+      expect(e.rival.pokemonActivo.ps, 100);
+      expect(e.jugador.energia, 10); // -1 del coste, +1 al acabar el turno
+    });
+
+    test('no baja de 0 si no le queda energía', () {
+      final e = aplicarCombate(
+        nuevo(
+          jugador: [oruga],
+          parametros: const ParametrosCombate(energiaInicial: 0),
+        ).copiarCon(
+            jugador: nuevo(jugador: [oruga]).jugador.copiarCon(energia: 1)),
+        const Atacar(Bando.jugador, 0),
+      );
+      expect(e.rival.energia, 0);
+    });
+
+    test('no se acumula ni deja estado: dos usos quitan 1 cada uno', () {
+      var e = aplicarCombate(nuevo(jugador: [oruga]), const Atacar(Bando.jugador, 0));
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      final antes = e.rival.energia;
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.rival.energia, antes - 1);
+      expect(e.rival.danoReducido, 0);
+      expect(e.rival.danoExtra, 0);
+    });
+  });
+
   group('efecto: el rival recibe más daño (Látigo)', () {
     const latigo = AtaqueCampana(
       nombre: 'Látigo',

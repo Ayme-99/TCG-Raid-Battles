@@ -110,21 +110,43 @@
             "type": "object",
             "additionalProperties": false,
             "required": [
-              "tipo",
-              "valor"
+              "tipo"
             ],
             "properties": {
               "tipo": {
                 "enum": [
                   "reduceDanoRival",
-                  "aumentaDanoRecibido"
+                  "aumentaDanoRecibido",
+                  "quitaEnergiaRival",
+                  "monedaDanoExtra",
+                  "envenenaDefensor",
+                  "reduceDanoPropio",
+                  "monedaFalloRival",
+                  "danoPorRacha",
+                  "monedasDano",
+                  "repiteDanoAlDerribar"
                 ],
-                "description": "reduceDanoRival: mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (Gruñido). aumentaDanoRecibido: mientras siga activo, recibe `valor` más de daño de los ataques (Látigo). Ambos, antes de debilidad y resistencia, sin acumular (D-20 §3.6)."
+                "description": "reduceDanoRival: mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (Gruñido). aumentaDanoRecibido: mientras siga activo, recibe `valor` más de daño de los ataques (Látigo). Ambos, antes de debilidad y resistencia, sin acumular. quitaEnergiaRival: el rival pierde `valor` de energía (si le queda) al usar el ataque, una sola vez. monedaDanoExtra: lanza una moneda; si sale cara el ataque hace `valor` más de daño (el `dano` de la carta es el de cruz). envenenaDefensor: el activo rival pierde `valor` PS en cada chequeo Pokémon (cada cambio de turno) mientras siga activo, sin acumular. reduceDanoPropio: mientras el propio Pokémon siga activo, recibe `valor` menos de daño de los ataques, antes de debilidad y resistencia, sin acumular. monedaFalloRival (sin `valor`): en su próximo turno, si el rival ataca lanza una moneda y con cruz ese ataque no hace nada, con la energía gastada. danoPorRacha (sin `valor`): el `dano` se multiplica por las veces seguidas que este Pokémon ha usado el ataque, contando la actual. monedasDano: lanza `monedas` monedas y hace `danoPorCaras[n]` con n caras; el `dano` del ataque es el daño esperado, solo para la IA. repiteDanoAlDerribar (sin `valor`): si el ataque derriba al activo rival, el nuevo activo recibe de nuevo ese ataque al salir, una sola vez (D-20 §3.6)."
+              },
+              "monedas": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 6,
+                "description": "monedasDano: cuántas monedas se lanzan."
+              },
+              "danoPorCaras": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "multipleOf": 10
+                },
+                "description": "monedasDano: el daño con 0, 1, 2… caras (monedas + 1 valores)."
               },
               "valor": {
                 "type": "integer",
-                "minimum": 10,
-                "multipleOf": 10
+                "minimum": 1,
+                "description": "Tamaño del efecto: PS o daño en múltiplos de 10; para quitaEnergiaRival, puntos de energía."
               },
               "texto": {
                 "type": "string",
@@ -153,16 +175,49 @@
         ]
       },
       "contains": {
-        "properties": {
-          "dano": {
-            "minimum": 20
+        "anyOf": [
+          {
+            "properties": {
+              "dano": {
+                "minimum": 20
+              }
+            },
+            "required": [
+              "dano"
+            ]
+          },
+          {
+            "properties": {
+              "efecto": {
+                "properties": {
+                  "tipo": {
+                    "const": "envenenaDefensor"
+                  }
+                },
+                "required": [
+                  "tipo"
+                ]
+              }
+            },
+            "required": [
+              "efecto"
+            ]
           }
-        },
-        "required": [
-          "dano"
         ]
       },
-      "description": "Al menos un ataque de 20 o más de daño, para que Gruñido (−10) nunca anule a la carta (D-20 §3.6)."
+      "description": "Al menos un ataque de 20 o más de daño, o con un efecto de estado (veneno) que Gruñido no anula (D-20 §3.6)."
+    },
+    "habilidad": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nombre", "tipo", "valor"],
+      "properties": {
+        "nombre": { "type": "string" },
+        "tipo": { "enum": ["monedaDanoExtraAlAtacar"] },
+        "valor": { "type": "integer", "minimum": 1 },
+        "texto": { "type": "string" }
+      },
+      "description": "Habilidad pasiva. monedaDanoExtraAlAtacar: mientras el Pokémon siga activo, cada vez que ataca lanza una moneda y con cara el ataque hace `valor` más de daño (D-20 §3.6)."
     },
     "ex": {
       "type": "boolean",
@@ -360,11 +415,10 @@
         "hielo",
         "lucha",
         "veneno",
-        "tierra",
         "volador",
         "psiquico",
+        "oscuridad",
         "bicho",
-        "roca",
         "fantasma",
         "dragon"
       ]

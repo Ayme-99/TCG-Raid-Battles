@@ -1,0 +1,42 @@
+{
+  "id": "nidoran-m",
+  "numero": 32,
+  "nombre": "Nidoran♂",
+  "tipo": "oscuridad",
+  "ps": 60,
+  "debilidad": {
+    "tipo": "lucha",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Picotazo veneno",
+      "tipo": "oscuridad",
+      "coste": 1,
+      "dano": 10,
+      "efecto": {
+        "tipo": "envenenaDefensor",
+        "valor": 10,
+        "texto": "El Pokémon Defensor pasa a estar Envenenado."
+      }
+    },
+    {
+      "nombre": "Ataque Furia",
+      "tipo": "oscuridad",
+      "coste": 2,
+      "dano": 30,
+      "efecto": {
+        "tipo": "monedasDano",
+        "monedas": 3,
+        "danoPorCaras": [
+          50,
+          20,
+          30,
+          40
+        ],
+        "texto": "Lanza 3 monedas. Con 1 cara, hace 20 puntos de daño; con 2 caras, 30; con 3 caras, 40; con 0 caras, 50."
+      }
+    }
+  ]
+}

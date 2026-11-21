@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy solo existe uno; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay diez; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -23,6 +23,94 @@ class AumentaDanoRecibido extends EfectoAtaque {
   final int valor;
 
   const AumentaDanoRecibido(this.valor);
+}
+
+/// El rival pierde [valor] de energía (si le queda alguna) en el momento de
+/// usar el ataque. Se aplica una vez y no deja estado (Disparo Demora).
+class QuitaEnergiaRival extends EfectoAtaque {
+  final int valor;
+
+  const QuitaEnergiaRival(this.valor);
+}
+
+/// Lanza una moneda al atacar: si sale cara, el ataque hace [valor] puntos de
+/// daño más (Hiper Colmillo). El daño de la carta ([AtaqueCampana.dano]) es el
+/// de cruz; el extra se suma al daño base, antes de reducciones, debilidad y
+/// resistencia. La moneda sale de la semilla del combate: mismo estado y misma
+/// semilla, mismo resultado.
+class MonedaDanoExtra extends EfectoAtaque {
+  final int valor;
+
+  const MonedaDanoExtra(this.valor);
+}
+
+/// Deja al Pokémon activo del rival envenenado: en cada chequeo Pokémon (cada
+/// vez que cambia el turno) pierde [valor] PS. Dura mientras siga activo: se
+/// quita cuando cae o se cambia a la banca. No se acumula (Picotazo Veneno).
+class EnvenenaDefensor extends EfectoAtaque {
+  final int valor;
+
+  const EnvenenaDefensor(this.valor);
+}
+
+/// Mientras este Pokémon siga activo, recibe [valor] puntos menos de daño de
+/// los ataques, antes de aplicar debilidad y resistencia. No se acumula. Se
+/// acaba cuando cae o se cambia a la banca (Fortaleza). Es el efecto «propio»
+/// de [ReduceDanoRival].
+class ReduceDanoPropio extends EfectoAtaque {
+  final int valor;
+
+  const ReduceDanoPropio(this.valor);
+}
+
+/// En su próximo turno, si el Pokémon activo del rival ataca, lanza una moneda:
+/// con cruz ese ataque no hace nada (la energía se gasta igual). Solo afecta a
+/// ese turno, pase lo que pase en él (Bofetón Lodo).
+class MonedaFalloRival extends EfectoAtaque {
+  const MonedaFalloRival();
+}
+
+/// El daño del ataque se multiplica por las veces **seguidas** que este
+/// Pokémon lo ha usado, contando la actual: [AtaqueCampana.dano] la primera
+/// vez, el doble la segunda, el triple la tercera… Se reinicia si el Pokémon usa
+/// otro ataque, carga, se cambia o cae (Rodar).
+class DanoPorRacha extends EfectoAtaque {
+  const DanoPorRacha();
+}
+
+/// Lanza [monedas] monedas y el ataque hace el daño que toca según las caras
+/// que salgan: [danoPorCaras] tiene [monedas] + 1 valores, y el de la posición
+/// n es el daño con n caras (Ataque Furia). [AtaqueCampana.dano] no es el daño
+/// real, sino el **daño esperado** que usa la IA y el baremo.
+class MonedasDano extends EfectoAtaque {
+  final int monedas;
+  final List<int> danoPorCaras;
+
+  const MonedasDano(this.monedas, this.danoPorCaras);
+}
+
+/// Si el ataque deja fuera de combate al Pokémon activo del rival, el nuevo
+/// activo recibe de nuevo ese mismo ataque (con su propia debilidad y
+/// resistencia) en cuanto sale. Solo se repite una vez (Doble Patada).
+class RepiteDanoAlDerribar extends EfectoAtaque {
+  const RepiteDanoAlDerribar();
+}
+
+/// Habilidad pasiva de una carta (D-20 §3.6). Hoy hay una.
+sealed class HabilidadCampana {
+  final String nombre;
+
+  const HabilidadCampana(this.nombre);
+}
+
+/// Mientras el Pokémon siga activo, cada vez que ataca lanza una moneda: con
+/// cara, ese ataque hace [valor] puntos más de daño, antes de reducciones,
+/// debilidad y resistencia (Foco Energía). Es una moneda aparte de las que
+/// pueda lanzar el propio ataque.
+class MonedaDanoExtraAlAtacar extends HabilidadCampana {
+  final int valor;
+
+  const MonedaDanoExtraAlAtacar(super.nombre, this.valor);
 }
 
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener
@@ -101,6 +189,9 @@ class PokemonCampana {
   final int retirada;
   final List<AtaqueCampana> ataques;
 
+  /// Habilidad pasiva, si la tiene.
+  final HabilidadCampana? habilidad;
+
   /// Carta ex: la última fase de cada Pokémon.
   final bool ex;
 
@@ -116,6 +207,7 @@ class PokemonCampana {
     this.resistencia,
     this.retirada = 0,
     required this.ataques,
+    this.habilidad,
     this.ex = false,
     this.evoluciones = const [],
   });

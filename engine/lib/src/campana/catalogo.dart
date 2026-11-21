@@ -55,6 +55,30 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
       return ReduceDanoRival(_campo<int>(json, 'valor'));
     case 'aumentaDanoRecibido':
       return AumentaDanoRecibido(_campo<int>(json, 'valor'));
+    case 'monedasDano':
+      final monedas = _campo<int>(json, 'monedas');
+      final tabla = [
+        for (final d in _campo<List<dynamic>>(json, 'danoPorCaras')) d as int,
+      ];
+      if (tabla.length != monedas + 1) {
+        throw const FormatException(
+            '"danoPorCaras" necesita un valor por cada número de caras (de 0 a monedas).');
+      }
+      return MonedasDano(monedas, tabla);
+    case 'repiteDanoAlDerribar':
+      return const RepiteDanoAlDerribar();
+    case 'danoPorRacha':
+      return const DanoPorRacha();
+    case 'monedaFalloRival':
+      return const MonedaFalloRival();
+    case 'reduceDanoPropio':
+      return ReduceDanoPropio(_campo<int>(json, 'valor'));
+    case 'envenenaDefensor':
+      return EnvenenaDefensor(_campo<int>(json, 'valor'));
+    case 'monedaDanoExtra':
+      return MonedaDanoExtra(_campo<int>(json, 'valor'));
+    case 'quitaEnergiaRival':
+      return QuitaEnergiaRival(_campo<int>(json, 'valor'));
   }
   throw FormatException('Efecto de ataque desconocido: "$tipo".');
 }
@@ -83,6 +107,7 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
           )
         : null,
     retirada: (json['retirada'] as int?) ?? 0,
+    habilidad: _habilidadDesdeJson(json['habilidad']),
     ex: (json['ex'] as bool?) ?? false,
     evoluciones: [
       for (final e in (json['evoluciones'] as List<dynamic>?) ?? const [])
@@ -98,6 +123,64 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
           efecto: _efectoDesdeJson(a['efecto']),
         ),
     ],
+  );
+}
+
+HabilidadCampana? _habilidadDesdeJson(dynamic json) {
+  if (json == null) return null;
+  final h = json as Map<String, dynamic>;
+  final nombre = _campo<String>(h, 'nombre');
+  switch (_campo<String>(h, 'tipo')) {
+    case 'monedaDanoExtraAlAtacar':
+      return MonedaDanoExtraAlAtacar(nombre, _campo<int>(h, 'valor'));
+  }
+  throw FormatException('Habilidad desconocida: ${h['tipo']}');
+}
+
+/// Total de la serie de jefes de campaña (cartas NN/20): 8 de tramo, 8 de
+/// rutas clave y 4 legendarios (D-20 §4).
+const totalJefesCampana = 20;
+
+/// Cuándo y quién llama a un aliado durante el combate contra un jefe: al
+/// bajar de [alBajarDePorcentaje] % de sus PS, el jefe se retira a la banca y
+/// entra uno de los [aliados] (ids de Pokémon del catálogo).
+class LlamadaDeAliado {
+  final int alBajarDePorcentaje;
+  final List<String> aliados;
+
+  const LlamadaDeAliado(this.alBajarDePorcentaje, this.aliados);
+}
+
+/// Un jefe de campaña: un Pokémon salvaje con su carta de la serie NN/20.
+class JefeCampana {
+  /// Posición en la serie de jefes (1 a [totalJefesCampana]).
+  final int numero;
+  final PokemonCampana pokemon;
+  final LlamadaDeAliado? llamaAliado;
+
+  const JefeCampana({
+    required this.numero,
+    required this.pokemon,
+    this.llamaAliado,
+  });
+}
+
+/// Un jefe de campaña a partir de su JSON del catálogo
+/// (`catalog/campana/jefes/*.json`).
+JefeCampana jefeCampanaDesdeJson(Map<String, dynamic> json) {
+  final llamada = json['llamaAliado'];
+  return JefeCampana(
+    numero: _campo<int>(json, 'numero'),
+    pokemon: pokemonCampanaDesdeJson(_campo<Map<String, dynamic>>(json, 'pokemon')),
+    llamaAliado: llamada == null
+        ? null
+        : LlamadaDeAliado(
+            _campo<int>(llamada as Map<String, dynamic>, 'alBajarDePorcentaje'),
+            [
+              for (final a in _campo<List<dynamic>>(llamada, 'aliados'))
+                a as String,
+            ],
+          ),
   );
 }
 
