@@ -224,6 +224,72 @@ void main() {
     });
   });
 
+  group('jefes', () {
+    final carpeta = Directory('../catalog/campana/jefes');
+    final archivosJefes = carpeta
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.json'))
+        .toList()
+      ..sort((a, b) => a.path.compareTo(b.path));
+    final jefes = [for (final f in archivosJefes) jefeCampanaDesdeJson(leer(f))];
+
+    test('hay jefes y su número es único y está dentro de la serie', () {
+      expect(jefes, isNotEmpty);
+      final numeros = jefes.map((j) => j.numero).toList();
+      expect(numeros.toSet(), hasLength(numeros.length));
+      for (final j in jefes) {
+        expect(j.numero, inInclusiveRange(1, totalJefesCampana));
+      }
+    });
+
+    test('el id del archivo coincide con el del Pokémon', () {
+      for (var i = 0; i < jefes.length; i++) {
+        final id = archivosJefes[i].uri.pathSegments.last.replaceAll('.json', '');
+        expect(jefes[i].pokemon.id, id);
+      }
+    });
+
+    test('sus aliados existen en el catálogo y no son el propio jefe', () {
+      for (final j in jefes) {
+        final l = j.llamaAliado;
+        if (l == null) continue;
+        expect(l.alBajarDePorcentaje, inInclusiveRange(1, 99));
+        for (final a in l.aliados) {
+          expect(pokemon.containsKey(a), isTrue, reason: '${j.pokemon.id}: $a');
+        }
+      }
+    });
+
+    test('Pikachu (01/20): 100 PS, Impactrueno 30 y llama a un aliado a la mitad', () {
+      final p = jefes.firstWhere((j) => j.numero == 1);
+      expect(p.pokemon.nombre, 'Pikachu');
+      expect(p.pokemon.ps, 100);
+      expect(p.pokemon.debilidad!.tipo, TipoCampana.lucha);
+      expect(p.pokemon.ataques.map((a) => a.dano), [10, 30]);
+      expect(p.llamaAliado!.alBajarDePorcentaje, 50);
+      expect(p.llamaAliado!.aliados,
+          ['weedle', 'caterpie', 'metapod', 'kakuna']);
+    });
+
+    test('el jefe tiene un ataque de 20 o más y cualquier inicial puede con él '
+        'o termina el combate', () {
+      for (final j in jefes) {
+        expect(j.pokemon.ataques.any((a) => a.dano >= 20), isTrue,
+            reason: j.pokemon.id);
+      }
+      final pikachu = jefes.firstWhere((j) => j.numero == 1).pokemon;
+      for (final inicial in ['bulbasaur', 'charmander', 'squirtle']) {
+        var e = EstadoCombate.inicial(
+            equipoJugador: [pokemon[inicial]!], equipoRival: [pikachu]);
+        for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+          e = aplicarCombate(e, decidirAccion(e, e.actua));
+        }
+        expect(e.fase, FaseCombate.terminado, reason: inicial);
+      }
+    });
+  });
+
   group('zonas', () {
     final zonas = carpetaZonas
         .listSync()

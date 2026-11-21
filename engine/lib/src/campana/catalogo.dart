@@ -109,6 +109,53 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
   );
 }
 
+/// Total de la serie de jefes de campaña (cartas NN/20): 8 de tramo, 8 de
+/// rutas clave y 4 legendarios (D-20 §4).
+const totalJefesCampana = 20;
+
+/// Cuándo y quién llama a un aliado durante el combate contra un jefe: al
+/// bajar de [alBajarDePorcentaje] % de sus PS, el jefe se retira a la banca y
+/// entra uno de los [aliados] (ids de Pokémon del catálogo).
+class LlamadaDeAliado {
+  final int alBajarDePorcentaje;
+  final List<String> aliados;
+
+  const LlamadaDeAliado(this.alBajarDePorcentaje, this.aliados);
+}
+
+/// Un jefe de campaña: un Pokémon salvaje con su carta de la serie NN/20.
+class JefeCampana {
+  /// Posición en la serie de jefes (1 a [totalJefesCampana]).
+  final int numero;
+  final PokemonCampana pokemon;
+  final LlamadaDeAliado? llamaAliado;
+
+  const JefeCampana({
+    required this.numero,
+    required this.pokemon,
+    this.llamaAliado,
+  });
+}
+
+/// Un jefe de campaña a partir de su JSON del catálogo
+/// (`catalog/campana/jefes/*.json`).
+JefeCampana jefeCampanaDesdeJson(Map<String, dynamic> json) {
+  final llamada = json['llamaAliado'];
+  return JefeCampana(
+    numero: _campo<int>(json, 'numero'),
+    pokemon: pokemonCampanaDesdeJson(_campo<Map<String, dynamic>>(json, 'pokemon')),
+    llamaAliado: llamada == null
+        ? null
+        : LlamadaDeAliado(
+            _campo<int>(llamada as Map<String, dynamic>, 'alBajarDePorcentaje'),
+            [
+              for (final a in _campo<List<dynamic>>(llamada, 'aliados'))
+                a as String,
+            ],
+          ),
+  );
+}
+
 /// Un grupo de entrenadores de una zona (por ejemplo, los PokéManiacos).
 class EntrenadoresDeZona {
   final String clase;

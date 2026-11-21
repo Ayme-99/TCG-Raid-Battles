@@ -51,21 +51,6 @@ Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos
 
 Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo**.
 
-### 2.1 Progresión: sin niveles, con XP y evolución
-
-Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos PS y daños; se mejora evolucionando.
-
-- **Las victorias en combate dan puntos** (los mismos puntos del juego, §5).
-- En un **centro Pokémon** (el nodo de descanso) se pueden **convertir puntos en XP** de un Pokémon del equipo. Cuántos puntos cuesta cada XP queda por equilibrar.
-- Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xp: N` en la carta). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4).
-- **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`).
-- **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): cuesta **puntos**, por usar la máquina de intercambio (`via: "intercambio"`, `puntos: N`).
-- **Cartas ex.** La **última fase de cada Pokémon es una carta ex**. Un Pokémon que no evoluciona (Onix…) puede hacerse ex **gastando puntos** (`via: "puntos"`, `puntos: N`), con el mismo proceso. Cada carta ex es una **entrada propia del catálogo** (`"ex": true`).
-- **La carta evolucionada sustituye a la anterior** y recupera todos sus PS. Una forma evolucionada también puede aparecer salvaje en una zona si el catálogo la incluye, y entonces se captura aparte.
-- Un Pokémon puede tener **varias** evoluciones (Eevee con sus piedras), por eso `evoluciones` es una lista.
-
-Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo**.
-
 ## 3. Combate
 
 **1 contra 1.** Cada bando tiene un Pokémon activo y el resto de su equipo en reserva. Gana quien deja sin Pokémon al otro.
@@ -135,27 +120,27 @@ Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2
 **Reglas de calibración**
 - El ataque de **coste 2** es el golpe principal: quita del 40 al 50 % de los PS de un rival de su misma fase, así que un duelo igualado dura unos 3 golpes. Con debilidad ×2 baja a 1–2.
 - Los ataques de coste 3 y 4 matan en 2 golpes, pero vacían la reserva y obligan a Cargar o Cambiar.
-- **1 a 2 ataques** por carta, con coste de 1 a 4. Metapod y Kakuna llevan uno.
-- **Siempre un ataque de 20 o más** (decidido el 2026-11-21): así Gruñido (−10, §3.6) nunca deja a una carta sin poder hacer daño. Un ataque de coste 1 de 10 sí se anula, pero es el de relleno. El esquema y un test lo comprueban. Metapod y Kakuna llevan un único ataque de 20 (coste 1).
+- **1 a 2 ataques** por carta, con coste de 1 a 4. Pidgey y Weedle llevan uno.
+- **Siempre un ataque de 20 o más, o con veneno** (decidido el 2026-11-21): así Gruñido (−10, §3.6) nunca deja a una carta sin poder hacer daño. Un ataque de coste 1 de 10 sí se anula, pero es el de relleno. El esquema y un test lo comprueban. Weedle lleva un único ataque de 10, que vale porque envenena.
 - **Retirada:** 0–1 en los básicos, 1–2 en las fases evolucionadas, 2–3 en los pesados y los ex.
 - **Jefes:** pueden salirse de la tabla en PS (Pikachu 100, Onix 110) pero hacen daño de su fase; un ataque que mate al inicial de un golpe no entra.
-- **Resistencia (−30):** solo en pocas cartas (de salida Squirtle, Pidgey, Spearow, Geodude y Onix).
+- **Resistencia (−30):** solo en pocas cartas (de salida Spearow, Geodude y Onix).
 - Los números son **provisionales** hasta calibrarlos con el simulador (D-20 §9, tarea 4).
 
 **Cartas del primer tramo (Pueblo Paleta → Ciudad Plateada)**
 
 | Pokémon | PS | Debilidad | Resistencia |
 |---|---|---|---|
-| Bulbasaur | 80 | fuego | — |
+| Bulbasaur | 90 | fuego | — |
 | Charmander | 70 | agua | — |
-| Squirtle | 80 | eléctrico | fuego |
-| Pidgey | 60 | eléctrico | tierra |
+| Squirtle | 80 | eléctrico | — |
+| Pidgey | 60 | eléctrico | — |
 | Rattata | 60 | lucha | — |
 | Caterpie | 50 | fuego | — |
-| Weedle | 50 | tierra | — |
+| Weedle | 50 | fuego | — |
 | Metapod | 80 | fuego | — |
-| Kakuna | 80 | tierra | — |
-| Pikachu (jefe) | 100 | tierra | — |
+| Kakuna | 70 | fuego | — |
+| Pikachu (jefe 01/20) | 100 | lucha | — |
 | Diglett | 50 | agua | — |
 | Sandshrew | 70 | agua | — |
 | Spearow | 60 | eléctrico | tierra |
@@ -186,58 +171,6 @@ Decidido el 2026-11-21. Un ataque puede llevar un `efecto` y entonces puede tene
 - **Ninguna carta queda anulada:** todas llevan al menos un ataque de 20 o más (§3.5), de modo que Gruñido deja siempre un ataque de 10 como mínimo.
 - La IA lo usa solo si compensa; contra un rival que pega poco (10 de daño) lo deja sin hacer daño; contra uno que pega fuerte no lo usa.
 
-### 3.5 Baremo de PS y daños
-
-Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2026-27** (marcas H, I y J), de modo que las cartas de campaña se parezcan a las físicas.
-
-**Escala real de referencia**
-- Básico: 30–90 PS; los que evolucionan, en torno a 70. Fase 1: 90–130. Fase 2 sin ex: 150–190. Pokémon ex: 200–340.
-- Un básico pega 10–30 con una energía y 30–50 con dos. Un ex de Fase 1 como Lucario ex (260 PS) pega 60 con dos energías y 160 con tres.
-- La debilidad es ×2 y casi ninguna carta lleva resistencia.
-
-**Baremo de campaña** (PS y daño por coste de energía)
-
-| Fase | PS | Coste 1 | Coste 2 | Coste 3 | Coste 4 |
-|---|---|---|---|---|---|
-| Básico | 50–90 | 10–20 | 30–40 | 50–60 | — |
-| Fase 1 | 90–130 | 20–30 | 50–60 | 80–100 | 110–130 |
-| ex (línea de 2 fases o sin evolución) | 200–260 | 30–60 | 80–110 | 130–160 | 180–200 |
-| ex (línea de 3 fases) | 270–340 | 40–60 | 90–120 | 150–190 | 220–300 |
-
-**Reglas de calibración**
-- El ataque de **coste 2** es el golpe principal: quita del 40 al 50 % de los PS de un rival de su misma fase, así que un duelo igualado dura unos 3 golpes. Con debilidad ×2 baja a 1–2.
-- Los ataques de coste 3 y 4 matan en 2 golpes, pero vacían la reserva y obligan a Cargar o Cambiar.
-- **1 a 2 ataques** por carta, con coste de 1 a 4. Metapod y Kakuna llevan uno.
-- **Retirada:** 0–1 en los básicos, 1–2 en las fases evolucionadas, 2–3 en los pesados y los ex.
-- **Jefes:** pueden salirse de la tabla en PS (Pikachu 100, Onix 110) pero hacen daño de su fase; un ataque que mate al inicial de un golpe no entra.
-- **Resistencia (−30):** solo en pocas cartas (de salida Squirtle, Pidgey, Spearow, Geodude y Onix).
-- Los números son **provisionales** hasta calibrarlos con el simulador (D-20 §9, tarea 4).
-
-**Cartas del primer tramo (Pueblo Paleta → Ciudad Plateada)**
-
-| Pokémon | PS | Debilidad | Resistencia |
-|---|---|---|---|
-| Bulbasaur | 80 | fuego | — |
-| Charmander | 70 | agua | — |
-| Squirtle | 80 | eléctrico | fuego |
-| Pidgey | 60 | eléctrico | tierra |
-| Rattata | 60 | lucha | — |
-| Caterpie | 50 | fuego | — |
-| Weedle | 50 | tierra | — |
-| Metapod | 80 | fuego | — |
-| Kakuna | 80 | tierra | — |
-| Pikachu (jefe) | 100 | tierra | — |
-| Diglett | 50 | agua | — |
-| Sandshrew | 70 | agua | — |
-| Spearow | 60 | eléctrico | tierra |
-| Nidoran♀ | 60 | tierra | — |
-| Nidoran♂ | 60 | tierra | — |
-| Mankey | 70 | volador | — |
-| Geodude | 80 | agua | normal |
-| Onix | 110 | agua | normal |
-
-Evoluciones: Fase 1 de 90 a 110 PS (Ivysaur 100, Charmeleon 90, Wartortle 100, Pidgeotto 90, Nidorina 90, Nidorino 90, Graveler 110). ex de 3 fases de 270 a 340 (Venusaur 340, Charizard 330, Blastoise 330, Golem 330, Nidoqueen 310, Nidoking 310, Pidgeot 280, Butterfree 270, Beedrill 270). ex de 2 fases o sin evolución de 210 a 240 (Onix 240, Sandslash 230, Fearow 230, Raichu 220, Primeape 220, Raticate 210, Dugtrio 210). Heredan tipo, debilidad y resistencia de su base. Los rivales de zonas avanzadas tendrán que usar también cartas ex para que siga habiendo reto.
-
 ## 4. Mapa
 
 La campaña inicial es **Kanto** (decidido el 2026-11-21). La región se recorre por **zonas** (rutas, cuevas, ciudades), como en los juegos, y cada zona define qué Pokémon salvajes aparecen y qué entrenadores hay. El **Túnel Roca** es una de esas zonas. El recorrido es un grafo de **nodos**:
@@ -248,14 +181,24 @@ La campaña inicial es **Kanto** (decidido el 2026-11-21). La región se recorre
 | **Ruta** | Combate contra un Pokémon salvaje. Al derrotarlo se pregunta si se añade al equipo (si hay hueco; si no, hay que soltar uno). |
 | **Descanso** | Cura el equipo, permite gestionar el equipo, **evolucionar 1 Pokémon** y comprar (qué se vende, por decidir). |
 | **Gimnasio** | Combate contra un entrenador. Da una **medalla** y puntos. |
-| **Jefe** | Con la medalla, se puede retar a un **Pokémon jefe con sus aliados**. Da muchos puntos. |
+| **Jefe** | Un **Pokémon salvaje** con su carta de la serie NN/20 (§4, Jefes). Da muchos puntos. |
 | **Liga** | Tras reunir todas las medallas. **Fase 2.** |
 
-Estructura de una región: `Inicio → rutas → descanso → gimnasio (medalla) → jefe → vuelta a las rutas → medalla → jefe → …→ Liga`. Hay ramas: en una bifurcación se elige por qué ruta seguir.
+Estructura de una región: `Inicio → rutas → jefe del tramo → descanso → gimnasio (medalla) → rutas → jefe del tramo → … → Liga` (más jefes en rutas clave y los 4 legendarios). Hay ramas: en una bifurcación se elige por qué ruta seguir.
 
-### Jefe con aliados
+### Jefes
 
-El jefe se enfrenta como un **equipo rival**: sus aliados salen primero y el jefe al final, en combates 1 contra 1 seguidos. Usa los nombres y el mapa del catálogo de incursiones, pero con **estadísticas de campaña propias** (los 2300 PS de Onix no tienen sentido en un combate 1 contra 1). El número de aliados depende del nivel del jefe, igual que en las incursiones (Lv1: 1, Lv2: 2…).
+Decidido el 2026-11-21. Los jefes son **Pokémon salvajes**, no entrenadores: los líderes de gimnasio y el Alto Mando no son jefes y usan cartas normales (el Geodude y el Onix de Brock, por ejemplo). Tienen una **serie propia de 20 cartas, NN/20** (la carta de Pikachu lleva impreso 01/20), distinta de la 001/150 de los Pokémon:
+
+- **01–08, uno por tramo**, entre una medalla y la siguiente (Pikachu es el primero, antes de Brock).
+- **09–16, rutas clave.** Plazas abiertas: las que sobren se quedan libres sin renumerar.
+- **17–20, los cuatro legendarios:** Articuno, Zapdos, Moltres y Mewtwo. Mew queda fuera (es la 151/150, secreta).
+
+Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar): 01 Pikachu, 02 Clefairy, 03 Dugtrio, 04 Marowak, 05 Kangaskhan, 06 Lapras, 07 Muk, 08 Gyarados, 09 Snorlax, 10 Electrode, 11 Dodrio, 12 Golem, 13 Alakazam, 14 Aerodactyl, 15 Scyther, 16 Dragonite, 17 Articuno, 18 Zapdos, 19 Moltres, 20 Mewtwo.
+
+**Combate:** es un 1 contra 1 con el mismo motor y la misma IA. El jefe **no se captura** y da puntos solo la primera vez. Si lleva `llamaAliado`, al **bajar de ese porcentaje de PS** (Pikachu: la mitad) el jefe se retira a la banca y entra un **aliado elegido al azar** con la semilla del combate (Pikachu: Weedle, Caterpie, Metapod o Kakuna); cuando el aliado cae, **vuelve el jefe con los PS que tenía**. Los PS de los jefes pueden salirse de la tabla de §3.5, pero su daño es el de su fase. Los datos están en `catalog/campana/jefes/*.json`.
+
+**Pikachu (01/20):** 100 PS, eléctrico, debilidad lucha ×2, sin resistencia, retirada 0. Ataque Rápido (1, 10) e Impactrueno (2, 30). Estimación de dificultad: unos 20 de daño por turno, de modo que el inicial aguanta 4–5 turnos; se calibrará con el simulador. **Pendiente de implementar en el motor:** la llamada del aliado a mitad de combate (hoy el combate contra Pikachu es un 1 contra 1 normal).
 
 ## 5. Puntos y tienda
 
