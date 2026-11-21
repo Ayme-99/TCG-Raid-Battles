@@ -320,21 +320,20 @@ void main() {
       efecto: DanoPorRacha(),
     );
 
-    test('lo encadena cuando la racha ya supera a su otro ataque', () {
-      var e = combate([
+    test('aprovecha una racha empezada y no la empieza si pega más el otro', () {
+      final e = combate([
         pokemon('s', ps: 70, ataques: [rodar, ataque(1, 30)])
       ], [
         pokemon('b', ps: 500, ataques: [ataque(1, 10)])
       ]);
-      final usados = <int>[];
-      for (var i = 0; i < 6; i++) {
-        final a = decidirAccion(e, Bando.jugador);
-        if (a is Atacar) usados.add(a.indice);
-        e = aplicarCombate(e, a);
-        e = aplicarCombate(e, decidirAccion(e, Bando.rival));
-      }
-      // Al principio pega más el otro (30 > 20); cuando Rodar llega a 40, lo encadena.
-      expect(usados.last, 0);
+      // Sin racha, Rodar (20) pega menos que el otro (30): no lo empieza.
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+      // Con racha de 2, Rodar haría 60: lo encadena.
+      final enRacha = e.copiarCon(
+          jugador: e.jugador.copiarCon(ultimoAtaque: 0, racha: 2));
+      expect(decidirAccion(enRacha, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
     });
 
     test('todos los emparejamientos con Rodar terminan', () {
