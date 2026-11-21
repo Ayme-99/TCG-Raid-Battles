@@ -311,6 +311,54 @@ void main() {
     });
   });
 
+  group('Fortaleza', () {
+    const fortaleza = AtaqueCampana(
+      nombre: 'Fortaleza',
+      tipo: TipoCampana.planta,
+      coste: 1,
+      dano: 0,
+      efecto: ReduceDanoPropio(10),
+    );
+    PokemonCampana capullo() =>
+        pokemon('m', ps: 80, ataques: [fortaleza, ataque(1, 20)]);
+
+    test('la usa contra un rival que pega poco', () {
+      final e = combate([capullo()], [pokemon('r', ataques: [ataque(1, 10)])]);
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('no la usa contra un rival que pega fuerte', () {
+      final e = combate([capullo()], [pokemon('r', ataques: [ataque(2, 60)])]);
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('no la repite mientras siga activo', () {
+      var e = combate([capullo()], [pokemon('r', ataques: [ataque(1, 20)])]);
+      e = aplicarCombate(e, decidirAccion(e, Bando.jugador));
+      e = aplicarCombate(e, decidirAccion(e, Bando.rival));
+      expect(decidirAccion(e, Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('todos los emparejamientos con Fortaleza terminan', () {
+      final a = [capullo()];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
   group('Veneno', () {
     const veneno = AtaqueCampana(
       nombre: 'Picotazo Veneno',

@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy hay cinco; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay seis; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -51,6 +51,16 @@ class EnvenenaDefensor extends EfectoAtaque {
   final int valor;
 
   const EnvenenaDefensor(this.valor);
+}
+
+/// Mientras este Pokémon siga activo, recibe [valor] puntos menos de daño de
+/// los ataques, antes de aplicar debilidad y resistencia. No se acumula. Se
+/// acaba cuando cae o se cambia a la banca (Fortaleza). Es el efecto «propio»
+/// de [ReduceDanoRival].
+class ReduceDanoPropio extends EfectoAtaque {
+  final int valor;
+
+  const ReduceDanoPropio(this.valor);
 }
 
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener

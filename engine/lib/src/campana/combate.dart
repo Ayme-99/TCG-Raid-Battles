@@ -61,6 +61,10 @@ class BandoCombate {
   /// por estar envenenado (0 = no lo está). Se quita al cambiar de activo.
   final int veneno;
 
+  /// Daño que se resta a los ataques que recibe el Pokémon activo de este
+  /// bando por un efecto propio (Fortaleza). Se quita al cambiar de activo.
+  final int proteccion;
+
   const BandoCombate({
     required this.equipo,
     required this.activo,
@@ -68,9 +72,14 @@ class BandoCombate {
     this.danoReducido = 0,
     this.danoExtra = 0,
     this.veneno = 0,
+    this.proteccion = 0,
   });
 
   PokemonEnCombate get pokemonActivo => equipo[activo];
+
+  /// Ajuste neto al daño que recibe el activo: el extra de Látigo menos la
+  /// protección de Fortaleza (puede ser negativo).
+  int get extraRecibido => danoExtra - proteccion;
 
   /// Sin ningún Pokémon en pie.
   bool get derrotado => !equipo.any((p) => p.enPie);
@@ -88,6 +97,7 @@ class BandoCombate {
     int? danoReducido,
     int? danoExtra,
     int? veneno,
+    int? proteccion,
   }) =>
       BandoCombate(
         equipo: equipo ?? this.equipo,
@@ -96,6 +106,7 @@ class BandoCombate {
         danoReducido: danoReducido ?? this.danoReducido,
         danoExtra: danoExtra ?? this.danoExtra,
         veneno: veneno ?? this.veneno,
+        proteccion: proteccion ?? this.proteccion,
       );
 }
 
@@ -303,7 +314,11 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
   final nuevo = estado.conBando(
       a.bando,
       b.copiarCon(
-          activo: a.indice, danoReducido: 0, danoExtra: 0, veneno: 0));
+          activo: a.indice,
+          danoReducido: 0,
+          danoExtra: 0,
+          veneno: 0,
+          proteccion: 0));
   return nuevo.copiarCon(
       fase: nuevo.debenElegir.isEmpty
           ? FaseCombate.enCurso
@@ -339,7 +354,7 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   }
   final golpeado = defensor.pokemonActivo.conPs(defensor.pokemonActivo.ps -
       danoDeAtaque(golpe, defensor.pokemonActivo.especie,
-          reduccion: atacante.danoReducido, extra: defensor.danoExtra));
+          reduccion: atacante.danoReducido, extra: defensor.extraRecibido));
   final equipo = [...defensor.equipo]..[defensor.activo] = golpeado;
   var defensorNuevo = defensor.copiarCon(equipo: equipo);
   if (efecto is ReduceDanoRival && efecto.valor > defensor.danoReducido) {
@@ -356,9 +371,13 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
     final resto = defensorNuevo.energia - efecto.valor;
     defensorNuevo = defensorNuevo.copiarCon(energia: resto < 0 ? 0 : resto);
   }
+  var atacanteNuevo =
+      atacante.copiarCon(energia: atacante.energia - ataque.coste);
+  if (efecto is ReduceDanoPropio && efecto.valor > atacante.proteccion) {
+    atacanteNuevo = atacanteNuevo.copiarCon(proteccion: efecto.valor);
+  }
   var nuevo = estado
-      .conBando(
-          a.bando, atacante.copiarCon(energia: atacante.energia - ataque.coste))
+      .conBando(a.bando, atacanteNuevo)
       .conBando(rivalBando, defensorNuevo)
       .copiarCon(semilla: semilla, ultimaMoneda: moneda);
   if (defensorNuevo.derrotado) {
@@ -385,7 +404,8 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
         energia: b.energia - retirada,
         danoReducido: 0,
         danoExtra: 0,
-        veneno: 0),
+        veneno: 0,
+        proteccion: 0),
   ));
 }
 

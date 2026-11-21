@@ -55,6 +55,8 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
       return ReduceDanoRival(_campo<int>(json, 'valor'));
     case 'aumentaDanoRecibido':
       return AumentaDanoRecibido(_campo<int>(json, 'valor'));
+    case 'reduceDanoPropio':
+      return ReduceDanoPropio(_campo<int>(json, 'valor'));
     case 'envenenaDefensor':
       return EnvenenaDefensor(_campo<int>(json, 'valor'));
     case 'monedaDanoExtra':

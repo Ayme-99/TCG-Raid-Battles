@@ -368,6 +368,67 @@ void main() {
     });
   });
 
+  group('efecto: protección propia (Fortaleza)', () {
+    const fortaleza = AtaqueCampana(
+      nombre: 'Fortaleza',
+      tipo: TipoCampana.planta,
+      coste: 1,
+      dano: 0,
+      efecto: ReduceDanoPropio(10),
+    );
+    final capullo = pokemon('c', tipo: TipoCampana.planta, ps: 80, ataques: const [fortaleza]);
+
+    EstadoCombate protegido({List<PokemonCampana>? jugador}) => aplicarCombate(
+          nuevo(jugador: jugador ?? [capullo, pokemon('c2')], rival: [pokemon('r1'), pokemon('r2')]),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('marca al propio activo y no hace daño', () {
+      final e = protegido();
+      expect(e.jugador.proteccion, 10);
+      expect(e.rival.proteccion, 0);
+      expect(e.rival.pokemonActivo.ps, 100);
+    });
+
+    test('los ataques que recibe hacen 10 menos', () {
+      var e = protegido();
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0)); // Placaje 30 → 20
+      expect(e.jugador.pokemonActivo.ps, 60);
+    });
+
+    test('no se acumula', () {
+      var e = protegido();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.jugador.proteccion, 10);
+    });
+
+    test('cambiar de Pokémon lo quita', () {
+      var e = protegido();
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Cambiar(Bando.jugador, 1));
+      expect(e.jugador.proteccion, 0);
+    });
+
+    test('se combina con Látigo: +10 y -10 se compensan', () {
+      var e = protegido(jugador: [
+        pokemon('c', ps: 80, ataques: const [fortaleza]),
+      ]);
+      e = e.copiarCon(jugador: e.jugador.copiarCon(danoExtra: 10));
+      expect(e.jugador.extraRecibido, 0);
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 50);
+    });
+
+    test('nunca deja el daño por debajo de 0', () {
+      final debil = pokemon('r', ataques: [ataque(1, 10)]);
+      var e = aplicarCombate(
+          nuevo(jugador: [capullo], rival: [debil]), const Atacar(Bando.jugador, 0));
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 80);
+    });
+  });
+
   group('efecto: veneno (Picotazo Veneno)', () {
     const picotazo = AtaqueCampana(
       nombre: 'Picotazo Veneno',

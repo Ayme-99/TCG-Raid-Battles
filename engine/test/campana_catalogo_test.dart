@@ -83,6 +83,18 @@ void main() {
           .having((e) => e.valor, 'valor', 10));
     });
 
+    test('Metapod: Fortaleza protege 10 y Placaje hace 20', () {
+      final m = pokemon['metapod']!;
+      expect(m.ps, 80);
+      final f = m.ataques.first;
+      expect(f.dano, 0);
+      expect(f.coste, 1);
+      expect(f.efecto, isA<ReduceDanoPropio>()
+          .having((e) => e.valor, 'valor', 10));
+      expect(m.ataques.last.dano, 20);
+      expect(m.ataques.last.coste, 1);
+    });
+
     test('Weedle: Picotazo Veneno hace 10 y envenena', () {
       final w = pokemon['weedle']!;
       expect(w.ps, 50);
