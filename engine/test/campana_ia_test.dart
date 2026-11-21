@@ -311,6 +311,38 @@ void main() {
     });
   });
 
+  group('Ataque Furia', () {
+    const furia = AtaqueCampana(
+      nombre: 'Ataque Furia',
+      tipo: TipoCampana.normal,
+      coste: 2,
+      dano: 30,
+      efecto: MonedasDano(3, [50, 20, 30, 40]),
+    );
+
+    test('todos los emparejamientos con Ataque Furia terminan', () {
+      final a = [pokemon('s', ps: 60, ataques: [ataque(1, 10), furia])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(2, 30)])];
+      for (var semilla = 1; semilla <= 20; semilla++) {
+        for (final x in [a, b]) {
+          for (final y in [a, b]) {
+            for (final empieza in Bando.values) {
+              var e = EstadoCombate.inicial(
+                  equipoJugador: x,
+                  equipoRival: y,
+                  empieza: empieza,
+                  semilla: semilla);
+              for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+                e = aplicarCombate(e, decidirAccion(e, e.actua));
+              }
+              expect(e.fase, FaseCombate.terminado);
+            }
+          }
+        }
+      }
+    });
+  });
+
   group('Rodar', () {
     const rodar = AtaqueCampana(
       nombre: 'Rodar',

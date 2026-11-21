@@ -125,6 +125,19 @@ void main() {
       expect(s.ataques.last.efecto, isA<DanoPorRacha>());
     });
 
+    test('Spearow (021/150): resiste lucha y Ataque Furia lanza 3 monedas', () {
+      final s = pokemon['spearow']!;
+      expect(s.ps, 60);
+      expect(s.tipo, TipoCampana.normal);
+      expect(s.debilidad!.tipo, TipoCampana.electrico);
+      expect(s.resistencia!.tipo, TipoCampana.lucha);
+      final furia = s.ataques.last.efecto as MonedasDano;
+      expect(furia.monedas, 3);
+      expect(furia.danoPorCaras, [50, 20, 30, 40]);
+      // Toda tirada hace 20 o más, así que cumple la regla del ataque de 20.
+      expect(furia.danoPorCaras.every((d) => d >= 20), isTrue);
+    });
+
     test('Kakuna: Fortaleza y Picotazo Veneno', () {
       final k = pokemon['kakuna']!;
       expect(k.ps, 70);

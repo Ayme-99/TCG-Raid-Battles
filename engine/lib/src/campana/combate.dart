@@ -151,6 +151,10 @@ class EstadoCombate {
   /// no se ha lanzado ninguna. La interfaz lo usa para mostrarla.
   final bool? ultimaMoneda;
 
+  /// Todas las monedas del último ataque que lanzó alguna, en orden (true =
+  /// cara). Null si todavía no se ha lanzado ninguna.
+  final List<bool>? ultimasMonedas;
+
   const EstadoCombate({
     required this.jugador,
     required this.rival,
@@ -161,6 +165,7 @@ class EstadoCombate {
     required this.parametros,
     this.semilla = 1,
     this.ultimaMoneda,
+    this.ultimasMonedas,
   });
 
   /// Combate nuevo: el primer Pokémon de cada equipo sale activo.
@@ -217,6 +222,7 @@ class EstadoCombate {
     int? numeroTurno,
     int? semilla,
     bool? ultimaMoneda,
+    List<bool>? ultimasMonedas,
   }) =>
       EstadoCombate(
         jugador: jugador ?? this.jugador,
@@ -228,6 +234,7 @@ class EstadoCombate {
         parametros: parametros,
         semilla: semilla ?? this.semilla,
         ultimaMoneda: ultimaMoneda ?? this.ultimaMoneda,
+        ultimasMonedas: ultimasMonedas ?? this.ultimasMonedas,
       );
 
   EstadoCombate conBando(Bando b, BandoCombate nuevo) => b == Bando.jugador
@@ -361,10 +368,12 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   final racha = atacante.ultimoAtaque == a.indice ? atacante.racha + 1 : 1;
   var semilla = estado.semilla;
   bool? moneda;
+  final monedas = <bool>[];
   if (atacante.cegado) {
     // Bofetón Lodo del rival: con cruz este ataque no hace nada.
     semilla = _siguienteSemilla(semilla);
     moneda = (semilla >> 8) & 1 == 1;
+    monedas.add(moneda);
     if (!moneda) {
       final fallido = estado
           .conBando(
@@ -374,7 +383,8 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
                   cegado: false,
                   ultimoAtaque: a.indice,
                   racha: racha))
-          .copiarCon(semilla: semilla, ultimaMoneda: moneda);
+          .copiarCon(
+              semilla: semilla, ultimaMoneda: moneda, ultimasMonedas: monedas);
       return _terminarTurno(fallido);
     }
   }
@@ -387,9 +397,24 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
         coste: ataque.coste,
         dano: ataque.dano * racha);
   }
+  if (efecto is MonedasDano) {
+    var caras = 0;
+    for (var i = 0; i < efecto.monedas; i++) {
+      semilla = _siguienteSemilla(semilla);
+      moneda = (semilla >> 8) & 1 == 1;
+      monedas.add(moneda);
+      if (moneda) caras++;
+    }
+    golpe = AtaqueCampana(
+        nombre: ataque.nombre,
+        tipo: ataque.tipo,
+        coste: ataque.coste,
+        dano: efecto.danoPorCaras[caras]);
+  }
   if (efecto is MonedaDanoExtra) {
     semilla = _siguienteSemilla(semilla);
     moneda = (semilla >> 8) & 1 == 1;
+    monedas.add(moneda);
     if (moneda) {
       golpe = AtaqueCampana(
           nombre: ataque.nombre,
@@ -430,7 +455,10 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   var nuevo = estado
       .conBando(a.bando, atacanteNuevo)
       .conBando(rivalBando, defensorNuevo)
-      .copiarCon(semilla: semilla, ultimaMoneda: moneda);
+      .copiarCon(
+          semilla: semilla,
+          ultimaMoneda: moneda,
+          ultimasMonedas: monedas.isEmpty ? null : monedas);
   if (defensorNuevo.derrotado) {
     return nuevo.copiarCon(fase: FaseCombate.terminado, ganador: a.bando);
   }

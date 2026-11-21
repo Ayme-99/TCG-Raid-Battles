@@ -368,6 +368,51 @@ void main() {
     });
   });
 
+  group('efecto: varias monedas (Ataque Furia)', () {
+    const furia = AtaqueCampana(
+      nombre: 'Ataque Furia',
+      tipo: TipoCampana.normal,
+      coste: 2,
+      dano: 30,
+      efecto: MonedasDano(3, [50, 20, 30, 40]),
+    );
+    final ave = pokemon('a', ps: 60, ataques: const [furia]);
+
+    EstadoCombate golpe(int semilla) => aplicarCombate(
+          EstadoCombate.inicial(
+              equipoJugador: [ave],
+              equipoRival: [pokemon('d', ps: 500)],
+              semilla: semilla),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('el daño sale de la tabla según las caras y quedan las 3 monedas', () {
+      const tabla = [50, 20, 30, 40];
+      final vistos = <int>{};
+      for (var s = 1; s <= 100; s++) {
+        final e = golpe(s);
+        expect(e.ultimasMonedas, hasLength(3));
+        final caras = e.ultimasMonedas!.where((c) => c).length;
+        final dano = 500 - e.rival.pokemonActivo.ps;
+        expect(dano, tabla[caras], reason: 'semilla $s');
+        vistos.add(dano);
+      }
+      expect(vistos, {20, 30, 40, 50});
+    });
+
+    test('el daño medio es el esperado (30)', () {
+      var total = 0;
+      for (var s = 1; s <= 400; s++) {
+        total += 500 - golpe(s).rival.pokemonActivo.ps;
+      }
+      expect(total / 400, inInclusiveRange(26, 34));
+    });
+
+    test('misma semilla, mismo resultado', () {
+      expect(golpe(9).rival.pokemonActivo.ps, golpe(9).rival.pokemonActivo.ps);
+    });
+  });
+
   group('efecto: daño por racha (Rodar)', () {
     const rodar = AtaqueCampana(
       nombre: 'Rodar',

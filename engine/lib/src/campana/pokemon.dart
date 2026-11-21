@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy hay ocho; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay nueve; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -76,6 +76,17 @@ class MonedaFalloRival extends EfectoAtaque {
 /// otro ataque, carga, se cambia o cae (Rodar).
 class DanoPorRacha extends EfectoAtaque {
   const DanoPorRacha();
+}
+
+/// Lanza [monedas] monedas y el ataque hace el daño que toca según las caras
+/// que salgan: [danoPorCaras] tiene [monedas] + 1 valores, y el de la posición
+/// n es el daño con n caras (Ataque Furia). [AtaqueCampana.dano] no es el daño
+/// real, sino el **daño esperado** que usa la IA y el baremo.
+class MonedasDano extends EfectoAtaque {
+  final int monedas;
+  final List<int> danoPorCaras;
+
+  const MonedasDano(this.monedas, this.danoPorCaras);
 }
 
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener

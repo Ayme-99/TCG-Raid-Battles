@@ -55,6 +55,16 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
       return ReduceDanoRival(_campo<int>(json, 'valor'));
     case 'aumentaDanoRecibido':
       return AumentaDanoRecibido(_campo<int>(json, 'valor'));
+    case 'monedasDano':
+      final monedas = _campo<int>(json, 'monedas');
+      final tabla = [
+        for (final d in _campo<List<dynamic>>(json, 'danoPorCaras')) d as int,
+      ];
+      if (tabla.length != monedas + 1) {
+        throw const FormatException(
+            '"danoPorCaras" necesita un valor por cada número de caras (de 0 a monedas).');
+      }
+      return MonedasDano(monedas, tabla);
     case 'danoPorRacha':
       return const DanoPorRacha();
     case 'monedaFalloRival':
