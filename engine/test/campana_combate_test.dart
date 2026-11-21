@@ -368,6 +368,62 @@ void main() {
     });
   });
 
+  group('efecto: repetir el daño al derribar (Doble Patada)', () {
+    const patada = AtaqueCampana(
+      nombre: 'Doble Patada',
+      tipo: TipoCampana.oscuridad,
+      coste: 3,
+      dano: 30,
+      efecto: RepiteDanoAlDerribar(),
+    );
+    final nido = pokemon('n', tipo: TipoCampana.oscuridad, ataques: const [patada]);
+
+    EstadoCombate atacar(List<PokemonCampana> rival) => aplicarCombate(
+        nuevo(jugador: [nido], rival: rival), const Atacar(Bando.jugador, 0));
+
+    test('si derriba, el que sale recibe de nuevo el daño', () {
+      var e = atacar([pokemon('r1', ps: 20), pokemon('r2')]);
+      expect(e.fase, FaseCombate.eligiendoActivo);
+      expect(e.repetirDano, isNotNull);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.rival.pokemonActivo.ps, 70);
+      expect(e.repetirDano, isNull);
+      expect(e.fase, FaseCombate.enCurso);
+    });
+
+    test('si no derriba, no se repite nada', () {
+      final e = atacar([pokemon('r1', ps: 100), pokemon('r2')]);
+      expect(e.repetirDano, isNull);
+    });
+
+    test('el nuevo activo aplica su propia debilidad', () {
+      final debil = pokemon('r2',
+          debilidad: const Debilidad(TipoCampana.oscuridad));
+      var e = atacar([pokemon('r1', ps: 20), debil]);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.rival.pokemonActivo.ps, 40); // 100 - 30 x2
+    });
+
+    test('solo se repite una vez, aunque el segundo también caiga', () {
+      var e = atacar([
+        pokemon('r1', ps: 20),
+        pokemon('r2', ps: 20),
+        pokemon('r3'),
+      ]);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.fase, FaseCombate.eligiendoActivo);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 2));
+      expect(e.rival.pokemonActivo.ps, 100);
+    });
+
+    test('si el segundo era el último, el combate termina', () {
+      var e = atacar([pokemon('r1', ps: 20), pokemon('r2', ps: 20)]);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.fase, FaseCombate.terminado);
+      expect(e.ganador, Bando.jugador);
+    });
+  });
+
   group('efecto: varias monedas (Ataque Furia)', () {
     const furia = AtaqueCampana(
       nombre: 'Ataque Furia',

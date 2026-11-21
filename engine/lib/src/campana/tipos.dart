@@ -13,6 +13,7 @@ enum TipoCampana {
   veneno,
   volador,
   psiquico,
+  oscuridad,
   bicho,
   fantasma,
   dragon,

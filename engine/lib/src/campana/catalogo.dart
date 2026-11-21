@@ -65,6 +65,8 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
             '"danoPorCaras" necesita un valor por cada número de caras (de 0 a monedas).');
       }
       return MonedasDano(monedas, tabla);
+    case 'repiteDanoAlDerribar':
+      return const RepiteDanoAlDerribar();
     case 'danoPorRacha':
       return const DanoPorRacha();
     case 'monedaFalloRival':

@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy hay nueve; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay diez; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -87,6 +87,13 @@ class MonedasDano extends EfectoAtaque {
   final List<int> danoPorCaras;
 
   const MonedasDano(this.monedas, this.danoPorCaras);
+}
+
+/// Si el ataque deja fuera de combate al Pokémon activo del rival, el nuevo
+/// activo recibe de nuevo ese mismo ataque (con su propia debilidad y
+/// resistencia) en cuanto sale. Solo se repite una vez (Doble Patada).
+class RepiteDanoAlDerribar extends EfectoAtaque {
+  const RepiteDanoAlDerribar();
 }
 
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener

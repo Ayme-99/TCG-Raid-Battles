@@ -138,6 +138,17 @@ void main() {
       expect(furia.danoPorCaras.every((d) => d >= 20), isTrue);
     });
 
+    test('Nidoran♀ (029/150): oscuridad, Golpes Furia y Doble Patada', () {
+      final n = pokemon['nidoran-f']!;
+      expect(n.ps, 60);
+      expect(n.tipo, TipoCampana.oscuridad);
+      expect(n.debilidad!.tipo, TipoCampana.lucha);
+      expect(n.ataques.first.efecto, isA<MonedasDano>());
+      expect(n.ataques.last.coste, 3);
+      expect(n.ataques.last.dano, 30);
+      expect(n.ataques.last.efecto, isA<RepiteDanoAlDerribar>());
+    });
+
     test('Kakuna: Fortaleza y Picotazo Veneno', () {
       final k = pokemon['kakuna']!;
       expect(k.ps, 70);

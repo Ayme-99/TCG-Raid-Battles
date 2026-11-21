@@ -128,6 +128,16 @@ class BandoCombate {
       );
 }
 
+/// Un ataque que se repite sobre el Pokémon que salga tras caer el activo
+/// (Doble Patada): quién lo lanzó, con qué daño y la reducción que llevaba.
+class DanoRepetido {
+  final Bando atacante;
+  final AtaqueCampana ataque;
+  final int reduccion;
+
+  const DanoRepetido(this.atacante, this.ataque, this.reduccion);
+}
+
 /// Estado inmutable de un combate 1 contra 1.
 class EstadoCombate {
   final BandoCombate jugador;
@@ -155,6 +165,10 @@ class EstadoCombate {
   /// cara). Null si todavía no se ha lanzado ninguna.
   final List<bool>? ultimasMonedas;
 
+  /// Daño pendiente de aplicar al Pokémon que salga tras caer el activo, o
+  /// null (Doble Patada).
+  final DanoRepetido? repetirDano;
+
   const EstadoCombate({
     required this.jugador,
     required this.rival,
@@ -166,6 +180,7 @@ class EstadoCombate {
     this.semilla = 1,
     this.ultimaMoneda,
     this.ultimasMonedas,
+    this.repetirDano,
   });
 
   /// Combate nuevo: el primer Pokémon de cada equipo sale activo.
@@ -223,6 +238,8 @@ class EstadoCombate {
     int? semilla,
     bool? ultimaMoneda,
     List<bool>? ultimasMonedas,
+    DanoRepetido? repetirDano,
+    bool limpiarRepetirDano = false,
   }) =>
       EstadoCombate(
         jugador: jugador ?? this.jugador,
@@ -235,6 +252,8 @@ class EstadoCombate {
         semilla: semilla ?? this.semilla,
         ultimaMoneda: ultimaMoneda ?? this.ultimaMoneda,
         ultimasMonedas: ultimasMonedas ?? this.ultimasMonedas,
+        repetirDano:
+            limpiarRepetirDano ? null : (repetirDano ?? this.repetirDano),
       );
 
   EstadoCombate conBando(Bando b, BandoCombate nuevo) => b == Bando.jugador
@@ -347,8 +366,28 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
           cegado: false,
           ultimoAtaque: -1,
           racha: 0));
-  return nuevo.copiarCon(
-      fase: nuevo.debenElegir.isEmpty
+  final rep = estado.repetirDano;
+  if (rep == null || rep.atacante == a.bando) {
+    return nuevo.copiarCon(
+        fase: nuevo.debenElegir.isEmpty
+            ? FaseCombate.enCurso
+            : FaseCombate.eligiendoActivo);
+  }
+  // Doble Patada: el que sale recibe de nuevo el ataque que derribó al anterior.
+  final bando = nuevo.bando(a.bando);
+  final activo = bando.pokemonActivo;
+  final dano = danoDeAtaque(rep.ataque, activo.especie,
+      reduccion: rep.reduccion, extra: bando.extraRecibido);
+  final equipo = [...bando.equipo]..[bando.activo] = activo.conPs(activo.ps - dano);
+  final golpeado = nuevo
+      .conBando(a.bando, bando.copiarCon(equipo: equipo))
+      .copiarCon(limpiarRepetirDano: true);
+  if (golpeado.bando(a.bando).derrotado) {
+    return golpeado.copiarCon(
+        fase: FaseCombate.terminado, ganador: rep.atacante);
+  }
+  return golpeado.copiarCon(
+      fase: golpeado.debenElegir.isEmpty
           ? FaseCombate.enCurso
           : FaseCombate.eligiendoActivo);
 }
@@ -461,6 +500,10 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
           ultimasMonedas: monedas.isEmpty ? null : monedas);
   if (defensorNuevo.derrotado) {
     return nuevo.copiarCon(fase: FaseCombate.terminado, ganador: a.bando);
+  }
+  if (efecto is RepiteDanoAlDerribar && !golpeado.enPie) {
+    nuevo = nuevo.copiarCon(
+        repetirDano: DanoRepetido(a.bando, golpe, atacante.danoReducido));
   }
   return _terminarTurno(nuevo);
 }
