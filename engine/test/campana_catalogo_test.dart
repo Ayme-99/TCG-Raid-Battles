@@ -61,6 +61,15 @@ void main() {
       }
     });
 
+    test('ninguna carta queda anulada por Grunido: un ataque de 20 o mas', () {
+      for (final p in pokemon.values) {
+        final mejor =
+            p.ataques.map((a) => a.dano).reduce((a, b) => a > b ? a : b);
+        expect(mejor, greaterThanOrEqualTo(20),
+            reason: '${p.id}: su mejor ataque hace $mejor');
+      }
+    });
+
     test('Bulbasaur: Gruñido reduce 10 el daño del rival y no hace daño', () {
       final b = pokemon['bulbasaur']!;
       expect(b.ps, 90);

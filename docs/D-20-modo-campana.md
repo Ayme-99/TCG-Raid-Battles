@@ -119,6 +119,7 @@ Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2
 - El ataque de **coste 2** es el golpe principal: quita del 40 al 50 % de los PS de un rival de su misma fase, así que un duelo igualado dura unos 3 golpes. Con debilidad ×2 baja a 1–2.
 - Los ataques de coste 3 y 4 matan en 2 golpes, pero vacían la reserva y obligan a Cargar o Cambiar.
 - **1 a 2 ataques** por carta, con coste de 1 a 4. Metapod y Kakuna llevan uno.
+- **Siempre un ataque de 20 o más** (decidido el 2026-11-21): así Gruñido (−10, §3.6) nunca deja a una carta sin poder hacer daño. Un ataque de coste 1 de 10 sí se anula, pero es el de relleno. El esquema y un test lo comprueban. Metapod y Kakuna llevan un único ataque de 20 (coste 1).
 - **Retirada:** 0–1 en los básicos, 1–2 en las fases evolucionadas, 2–3 en los pesados y los ex.
 - **Jefes:** pueden salirse de la tabla en PS (Pikachu 100, Onix 110) pero hacen daño de su fase; un ataque que mate al inicial de un golpe no entra.
 - **Resistencia (−30):** solo en pocas cartas (de salida Squirtle, Pidgey, Spearow, Geodude y Onix).
@@ -159,6 +160,7 @@ Decidido el 2026-11-21. Un ataque puede llevar un `efecto` y entonces puede tene
 - **No se acumula:** si el rival ya tiene una reducción igual o mayor, usarlo otra vez no hace nada. Cuenta la mayor.
 - **Por qué no se acumula** (a diferencia de los juegos, donde Gruñido llega a 6 etapas): allí cada etapa multiplica el daño y nunca llega a cero; aquí el daño es plano y no hay suelo, y como cuesta 1 de energía (que se recupera cada turno), tres usos anularían los ataques de coste 1 y 2. El efecto simétrico (Malicioso: «el Defensor recibe 10 más de daño») seguirá la misma regla.
 - Es un estado del **bando afectado** (`BandoCombate.danoReducido`), que se pone a 0 al cambiar de activo.
+- **Ninguna carta queda anulada:** todas llevan al menos un ataque de 20 o más (§3.5), de modo que Gruñido deja siempre un ataque de 10 como mínimo.
 - La IA lo usa solo si compensa; contra un rival que pega poco (10 de daño) lo deja sin hacer daño; contra uno que pega fuerte no lo usa.
 
 ## 4. Mapa

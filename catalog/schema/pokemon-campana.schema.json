@@ -150,7 +150,18 @@
             }
           }
         ]
-      }
+      },
+      "contains": {
+        "properties": {
+          "dano": {
+            "minimum": 20
+          }
+        },
+        "required": [
+          "dano"
+        ]
+      },
+      "description": "Al menos un ataque de 20 o más de daño, para que Gruñido (−10) nunca anule a la carta (D-20 §3.6)."
     },
     "ex": {
       "type": "boolean",
