@@ -4,7 +4,7 @@ Arte de la interfaz del modo campaña (Pueblo Paleta → Brock). La estructura d
 
 Lienzo de trabajo (kit y pantallas de combate de muestra): https://claude.ai/artifact/X1g6QDJp8cnZg9CtWb71Df
 
-Los archivos están en `app/assets/campana/ui/`.
+Los archivos propios están en `app/assets/campana/ui/` y los sprites ajenos, aislados, en `app/assets/campana/sprites_ajenos/` (ver «Aviso de derechos»).
 
 ## Dirección de estilo
 
@@ -28,12 +28,12 @@ Colorido de videojuego, la mesa como tapete y «no es una app, es un juego». Co
 
 Los SVG no llevan texto: nombres, PS y costes los pinta la app.
 
-**Sprites aportados por el autor (PNG):**
+**Sprites ajenos (PNG), todos en `app/assets/campana/sprites_ajenos/`:**
 - `iconos_tipo/`: 10 iconos de tipo del TCG, de 20×20 px (se ven bien entre 20 y 28 px).
-- `energia_arcoiris.png`: la ficha de energía, 20×20 px. Se muestra a tamaño nativo; la vacía es la misma imagen en gris oscuro apagado.
-- `bola_poke`, `bola_super`, `bola_ultra`, `bola_master`: 160×160 px.
-- `pocion`, `superpocion`, `hiperpocion`: 160×160 px.
-- `repelente`, `superrepelente`, `repelente_maximo`: 160×160 px.
+- `energia/energia_arcoiris.png`: la ficha de energía, 20×20 px. Se muestra a tamaño nativo; la vacía es la misma imagen en gris oscuro apagado.
+- `objetos/`: `bola_poke`, `bola_super`, `bola_ultra`, `bola_master`, `pocion`, `superpocion`, `hiperpocion`, `repelente`, `superrepelente` y `repelente_maximo`, de 160×160 px.
+
+Los sprites de Pokémon, medallas y personajes que lleguen después irán también en esa carpeta.
 
 ## Decisiones cerradas
 
@@ -58,5 +58,7 @@ Los SVG no llevan texto: nombres, PS y costes los pinta la app.
 Los iconos de tipo, la energía, las bolas, las pociones, los repelentes y los sprites de Pokémon y personajes son material de Nintendo / Game Freak / The Pokémon Company, tomado de Pokémon Escarlata y Púrpura a través de WikiDex.
 
 **Decisión de Ayme (2026-11-22, #389):** es un proyecto personal, de uso privado para él y sus amigos, sin fines comerciales. El repositorio sigue siendo público y los sprites de Pokémon Escarlata y Púrpura se incluyen en él. Si GitHub o los titulares de los derechos piden retirarlos, Ayme los quita en cuanto se le avise. Esto no es una licencia: los derechos siguen siendo de sus titulares.
+
+**Aislamiento:** todo el material ajeno vive en `app/assets/campana/sprites_ajenos/` y se declara en `app/pubspec.yaml` con las líneas `assets/campana/sprites_ajenos/…`. Para retirarlo de una vez basta con borrar esa carpeta y esas líneas; el arte propio de `app/assets/campana/ui/` no depende de él.
 
 El arte propio se limita a la interfaz y a los fondos de escena.
