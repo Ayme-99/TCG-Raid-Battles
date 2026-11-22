@@ -383,6 +383,28 @@ class PartidaCampana {
     return _copiar(progreso: progreso.avanzar(c.region, destino));
   }
 
+  /// Vuelve a [destino], un nodo en el que ya se ha estado (D-20 §10.7).
+  PartidaCampana retroceder(CatalogoCampana c, String destino) {
+    if (capturaPendiente != null) {
+      throw const ReglaIncumplida('Antes hay que decidir la captura.');
+    }
+    return _copiar(progreso: progreso.retroceder(c.region, destino));
+  }
+
+  /// Si se puede repetir el combate del nodo actual: un salvaje ya vencido.
+  bool puedeRepetir(CatalogoCampana c) =>
+      capturaPendiente == null && progreso.puedeRepetir(c.region);
+
+  /// Vuelve a combatir contra un salvaje ya vencido (D-20 §10.7): da XP a la
+  /// reserva y se puede capturar, pero no da puntos ni dinero. El rival sale
+  /// de nuevo de la zona con la semilla, que ya ha avanzado.
+  PartidaCampana repetirCombate(CatalogoCampana c) {
+    if (capturaPendiente != null) {
+      throw const ReglaIncumplida('Antes hay que decidir la captura.');
+    }
+    return _copiar(progreso: progreso.repetir(c.region));
+  }
+
   /// El rival del nodo actual. Con la misma partida sale siempre el mismo.
   ///
   /// - Salvaje: el que fija el nodo o, si no, uno al azar de los salvajes de la
@@ -415,7 +437,8 @@ class PartidaCampana {
             equipo: [especie],
             nombre: '${especie.nombre} salvaje',
             captura: especie.id,
-            puntos: parametros.puntosSalvaje,
+            // Repetir un salvaje no da puntos (se dan una vez por combate).
+            puntos: progreso.repitiendo ? 0 : parametros.puntosSalvaje,
             xp: _xpDeEquipo([especie]),
           );
         }

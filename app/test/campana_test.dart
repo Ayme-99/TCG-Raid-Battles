@@ -308,6 +308,39 @@ void main() {
     expect(c.read(campanaProvider).partida!.equipo.single.id, 'pidgey');
   });
 
+  testWidgets('se vuelve a un nodo visitado y se repite el salvaje',
+      (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ciudad-verde',
+          resuelto: true,
+          superados: {'pueblo-paleta', 'ruta-1', 'ruta-1-pidgey', 'ciudad-verde'},
+          visitados: {'pueblo-paleta', 'ruta-1', 'ruta-1-pidgey', 'ciudad-verde'},
+          inicial: 'squirtle'),
+      equipo: [PokemonGuardado('squirtle', 80)],
+      dinero: 1000,
+    );
+    final almacen = AlmacenMemoria();
+    final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
+    // Un nodo sin visitar no lleva a ningún sitio.
+    await tester.tap(find.byKey(const Key('nodo-ruta-22')));
+    await tester.pumpAndSettle();
+    expect(c.read(campanaProvider).partida!.progreso.nodoActual, 'ciudad-verde');
+    await tester.ensureVisible(find.byKey(const Key('nodo-ruta-1-pidgey')));
+    await tester.tap(find.byKey(const Key('nodo-ruta-1-pidgey')));
+    await tester.pumpAndSettle();
+    expect(c.read(campanaProvider).partida!.progreso.nodoActual,
+        'ruta-1-pidgey');
+    expect(hay('campana-combatir'), isFalse, reason: 'ya se ganó');
+    await tocar(tester, 'campana-repetir');
+    final p = c.read(campanaProvider).partida!;
+    expect(hay('campana-combatir'), isTrue);
+    expect(p.progreso.repitiendo, isTrue);
+    expect(find.textContaining('Recompensa'), findsNothing,
+        reason: 'repetir no da puntos');
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('con una campaña guardada se continúa donde estaba',
       (tester) async {
     const guardada = PartidaCampana(
