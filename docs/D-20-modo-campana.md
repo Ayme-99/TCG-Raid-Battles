@@ -9,7 +9,7 @@ Estado: **en desarrollo** (revisado el 2026-11-22). Issue #334 (diseño) y una i
 | Catálogo: 22 Pokémon, 1 jefe, 6 zonas y la región de Kanto, con sus esquemas (§12) | **Hecho** (#340, #344, #346, #352, #354) |
 | Simulador de combates (`sim/bin/sim_campana.dart`) | Hecho (#342); modos `nodos`, `tramo` y `realista` y **primer informe de calibrado** (#383): objetivo 75 %; con equipo realista el muro es Brock |
 | Modelo de ruta por nodos y progreso del jugador (§4) | **Hecho** (#354) |
-| Jefe que llama a un aliado a mitad de combate (§4, Jefes) | Pendiente |
+| Jefe que llama a un aliado a mitad de combate (§4, Jefes) | **Hecho** (#372) |
 | Captura, equipo de 6 y PC, centro Pokémon (§2, §4) | Pendiente |
 | XP, evolución y cartas ex: modelo de datos (§2.1) | Hecho (#346); sin cartas evolucionadas ni ex todavía |
 | Guardado local del progreso (§6) | Parcial: `ProgresoRuta` ya se convierte a JSON; falta guardarlo en el dispositivo |
@@ -107,7 +107,7 @@ El rival juega con **las mismas reglas** (la misma energía y las mismas debilid
 
 1. Si cae su activo, saca al relevo que no sea débil al rival, haga más daño y tenga más salud.
 2. Si puede **rematar** al Pokémon rival, ataca con lo más barato que lo consiga.
-3. Si su activo es **débil** a un ataque del rival, o no llega a ningún ataque, **cambia** a un relevo que no sea débil y sí pueda atacar (si le llega la energía de la retirada).
+3. Si su activo es **débil** a un ataque del rival, o no llega a ningún ataque, **cambia** a un relevo que no sea débil y sí pueda atacar (si le llega la energía de la retirada). Nunca cambia al jefe que espera a que caiga su aliado (§4, Jefes).
 4. Si tiene un ataque que **envenena** y el rival no lo está ya, lo usa, aunque el golpe quede en 0 (el veneno quita PS en cada chequeo); no lo repite mientras siga envenenado (§3.6).
 5. Si tiene un ataque que **reduce el daño del rival** (Gruñido) y compensa (evita más daño, en los golpes que el rival necesita para derribarlo, que el que haría atacando), lo usa; no lo repite mientras siga activo el mismo rival (§3.6).
 6. Si tiene un ataque que **reduce el daño que recibe su activo** (Fortaleza, Rizo Defensa) y compensa con el mismo criterio, lo usa.
@@ -251,9 +251,9 @@ Decidido el 2026-11-21. Los jefes son **Pokémon salvajes**, no entrenadores: lo
 
 Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar): 01 Pikachu, 02 Clefairy, 03 Dugtrio, 04 Marowak, 05 Kangaskhan, 06 Lapras, 07 Muk, 08 Gyarados, 09 Snorlax, 10 Electrode, 11 Dodrio, 12 Golem, 13 Alakazam, 14 Aerodactyl, 15 Scyther, 16 Dragonite, 17 Articuno, 18 Zapdos, 19 Moltres, 20 Mewtwo.
 
-**Combate:** es un 1 contra 1 con el mismo motor y la misma IA. **Capturable** (decidido el 2026-11-21): al derrotarlo se ofrece la carta **normal** del Pokémon (la 025/150 en el caso de Pikachu, con 60 PS), no la del jefe, con las mismas reglas de equipo y PC que cualquier captura (§2). **Solo se captura la primera vez**: si se repite el jefe, ya no se puede volver a capturar. **Los aliados que llama el jefe no se capturan.** Los puntos del jefe se dan solo la primera vez. Si lleva `llamaAliado`, al **bajar de ese porcentaje de PS** (Pikachu: la mitad) el jefe se retira a la banca y entra un **aliado elegido al azar** con la semilla del combate (Pikachu: Weedle, Caterpie, Metapod o Kakuna); cuando el aliado cae, **vuelve el jefe con los PS que tenía**. Los PS de los jefes pueden salirse de la tabla de §3.5, pero su daño es el de su fase. Los datos están en `catalog/campana/jefes/*.json`.
+**Combate:** es un 1 contra 1 con el mismo motor y la misma IA. **Capturable** (decidido el 2026-11-21): al derrotarlo se ofrece la carta **normal** del Pokémon (la 025/150 en el caso de Pikachu, con 60 PS), no la del jefe, con las mismas reglas de equipo y PC que cualquier captura (§2). **Solo se captura la primera vez**: si se repite el jefe, ya no se puede volver a capturar. **Los aliados que llama el jefe no se capturan.** Los puntos del jefe se dan solo la primera vez. Si lleva `llamaAliado`, la llamada va **en dos pasos** (decidido el 2026-11-22, §10.8). Al **llegar a `alBajarDePorcentaje`** de sus PS o bajar de él (Pikachu: 50 %; con 50 PS justos ya llama), el jefe **invoca** a un **aliado elegido al azar** con la semilla del combate (Pikachu: Weedle, Caterpie, Metapod o Kakuna), que aparece **en la banca**. Al **llegar a `alFrenteAlPorcentaje`** (Pikachu: 40 %), el jefe se retira a la banca y el aliado pasa al **puesto activo**. Así, unos ataques solo lo invocan y otros, los que cruzan los dos umbrales de un golpe, lo ponen delante directamente. Cuando el aliado cae, **vuelve el jefe con los PS que tenía**. Más detalles: cuenta **cualquier daño**, también el del veneno (se comprueba al acabar cada turno, tras el chequeo Pokémon); si el golpe lo deja a 0, no llama, porque ya está derrotado; llama **una sola vez por combate**; al retirarse **pierde todos sus efectos**, también los propios como Fortaleza (mientras el aliado solo espera en la banca, el jefe los conserva); el aliado juega con la misma energía del bando; ni el aliado que espera ni el jefe retirado pueden salir con «Cambiar»; y **se gana cuando cae el jefe**: aunque caiga el aliado no se gana, y si el jefe cae con el aliado en la banca, se gana igual. En el motor: `LlamadaEnCombate` (`EstadoCombate.inicial(llamadaRival: …)`, que se construye desde el catálogo con `llamadaEnCombate(jefe, pokemon)`), `EstadoCombate.aliado` (posición del aliado en el equipo rival, para que la captura lo excluya), `EstadoCombate.aliadoAlFrente` y `BandoCombate.enEspera`. El campo `alBajarDePorcentaje` conserva su nombre aunque basta con llegar; sin `alFrenteAlPorcentaje`, el aliado entra directamente al invocarlo. Los PS de los jefes pueden salirse de la tabla de §3.5, pero su daño es el de su fase. Los datos están en `catalog/campana/jefes/*.json`.
 
-**Pikachu (01/20):** 100 PS, eléctrico, debilidad lucha ×2, sin resistencia, retirada 0. Ataque Rápido (1, 10) e Impactrueno (2, 30). Estimación de dificultad: unos 20 de daño por turno, de modo que el inicial aguanta 4–5 turnos; se calibrará con el simulador. **Pendiente de implementar en el motor:** la llamada del aliado a mitad de combate (hoy el combate contra Pikachu es un 1 contra 1 normal).
+**Pikachu (01/20):** 100 PS, eléctrico, debilidad lucha ×2, sin resistencia, retirada 0. Ataque Rápido (1, 10) e Impactrueno (2, 30). Estimación de dificultad: unos 20 de daño por turno, de modo que el inicial aguanta 4–5 turnos; se calibrará con el simulador. La llamada de aliado está en el motor desde #372.
 
 ## 5. Puntos y tienda
 
@@ -266,7 +266,7 @@ Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar
 
 | Pieza | Propuesta |
 |---|---|
-| Motor | Librería `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho:** combate 1 contra 1 con energía, atacar, cambiar, cargar, elegir siguiente, debilidad y resistencia (#336); IA rival (#338); efectos, habilidades y azar con semilla (#350, #352); modelo de ruta y progreso (#354). **Pendiente:** llamada de aliado del jefe, captura y equipo, descanso. |
+| Motor | Librería `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho:** combate 1 contra 1 con energía, atacar, cambiar, cargar, elegir siguiente, debilidad y resistencia (#336); IA rival (#338); efectos, habilidades y azar con semilla (#350, #352); modelo de ruta y progreso (#354). Llamada de aliado del jefe (#372). **Pendiente:** captura y equipo, descanso. |
 | Catálogo | `catalog/campana/`: `pokemon/*.json` (uno por Pokémon, con su número de la Pokédex), `zonas/*.json` (qué aparece en cada zona), `regiones/*.json` (el grafo de nodos de la ruta) y sus esquemas en `catalog/schema/`. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
 | Guardado | Progreso de campaña (región, nodo, equipo, **PC**, jefes ya capturados, medallas, XP de cada Pokémon, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. `ProgresoRuta` ya guarda lo de la ruta (nodo, superados, medallas, jefes derrotados, inicial) con `aJson`/`desdeJson`; falta el equipo, el PC y la XP. |
@@ -290,7 +290,7 @@ Contenido de la primera entrega:
 - Captura, equipo, PC y descanso (pendiente).
 - Guardado local del progreso (parcial).
 
-Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, tienda, sincronización con la cuenta, los combates 2 contra 2 y 3 contra 3 y la llamada de aliado, si no llega a tiempo.
+Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, tienda, sincronización con la cuenta y los combates 2 contra 2 y 3 contra 3. (La llamada de aliado ya está, #372.)
 
 ## 8. Preguntas abiertas
 
@@ -323,7 +323,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 **Equilibrado y producto**
 
 19. **Calibrar con el simulador.** Objetivo fijado (75 %, §10.5) y medido en `balance/informes/campana_calibrar_2026-11-22.md` (#383): con un equipo realista (inicial + 3 capturas) las rutas, los Cazabichos, Pikachu y el Entrenador Joven pasan del 90 %, pero **Brock** se queda en el 0–7 % y el tramo entero en el 0–7 %; solo con el inicial sale al 0 %. Falta que Ayme elija qué se ajusta (el informe propone palancas) y con qué cifras.
-20. **Llamada de aliado.** Pikachu la lleva en el JSON, pero el motor no la implementa (§4, Jefes).
+20. ~~Llamada de aliado~~ **Hecha (#372)**, con los detalles decididos el 2026-11-22 (§10.8). Decidido además que el jefe pierde **todos** sus efectos al irse a la banca, también los propios.
 21. **Capacidad del PC.** Ilimitada por ahora; se revisará si hace falta un tope.
 22. **Pantallas de la app** (mapa de región, combate, equipo, descanso) y **tienda**: sin diseño. Se propone hacer varias propuestas visuales antes de implementar (como en el resto de la app).
 23. **Kanban.** Las tarjetas del GitHub Project (`users/Ayme-99/projects/10`) no se pueden comprobar ni mover desde las sesiones de trabajo (la API del proyecto está bloqueada), y las issues #334 a #354 siguen abiertas aunque su PR ya está fusionado.
@@ -342,7 +342,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 4 | Simulador de combates de campaña (#342) y **primer equilibrado** (#383) | Simulador hecho; informe hecho; ajuste de cartas pendiente de decisión |
 | 5 | Modelo de región y de nodos, y avance por el mapa (#354) | Hecho |
 | 6 | Captura, equipo, PC y descanso | Pendiente |
-| 7 | Jefe con aliados (llamada a mitad de combate) y medalla | Pendiente |
+| 7 | Jefe con aliados (llamada a mitad de combate, #372) y medalla | Llamada hecha |
 | 8 | Guardado de progreso de campaña en el dispositivo | Pendiente (`ProgresoRuta` ya se convierte a JSON) |
 | 9 | Pantallas de la app: mapa, combate, equipo, descanso | Pendiente |
 | 10 | Puntos al servidor y tienda (después de la porción vertical) | Pendiente |
@@ -454,6 +454,8 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-21 | **Serie propia de 20 cartas, NN/20**: 1–8 uno por tramo entre medallas, 9–16 rutas clave, 17–20 los cuatro legendarios (Articuno, Zapdos, Moltres, Mewtwo; Mew fuera). Pikachu es el 01/20. | §4; #352 |
 | 2026-11-21 | El jefe **llama a un aliado a mitad de combate**: al bajar de la mitad de PS se retira a la banca, entra el aliado y, cuando cae, vuelve el jefe con sus PS. Llama a **un solo aliado**. Pikachu: Weedle, Caterpie, Metapod o Kakuna. | §4 |
 | 2026-11-21 | **Pikachu jefe:** 100 PS, eléctrico, debilidad lucha, Ataque Rápido 10 e Impactrueno 30. | §12; #352 |
+| 2026-11-22 | **Llamada de aliado, detalles:** llama al **llegar** al porcentaje (con 50 PS justos de 100 ya llama), no solo al bajar de él; cuenta cualquier daño, también el veneno; una sola vez por combate; al retirarse el jefe pierde los estados negativos; aunque caiga el aliado, no se gana hasta que cae el jefe. Aceptó además que si el golpe lo deja a 0 no llama, que el aliado usa la energía del bando y que el jefe no vuelve con «Cambiar» mientras el aliado siga en pie. | §4, Jefes; #372 |
+| 2026-11-22 | **Llamada en dos pasos:** al 50 % el jefe invoca al aliado, que aparece **en la banca**; al **40 %** el jefe se cambia y el aliado pasa al puesto activo, de modo que unos ataques solo lo invocan y otros lo ponen delante directamente. Al irse a la banca el jefe pierde **todos** los efectos, también Fortaleza y demás. Campo nuevo `alFrenteAlPorcentaje` (Pikachu: 40). | §4, Jefes; `pikachu-jefe.json`; #372 |
 | 2026-11-21 | **El jefe es capturable** (sustituye a «no capturable»), con la carta **normal** del Pokémon (Pikachu 025/150, 60 PS, Látigo e Impactrueno 30). Solo la primera vez; **los aliados no se capturan**. | §4; #352 |
 
 ### 10.9 Decisiones sustituidas o corregidas
@@ -531,7 +533,7 @@ Las cartas sin imagen (Zubat, Geodude, Machop, Onix, Cubone y Slowpoke) vienen d
 
 | Serie | Id | Pokémon | Tipo | PS | Debilidad | Ataques (coste: daño) | Llama a un aliado |
 |---|---|---|---|---|---|---|---|
-| 01/20 | `pikachu-jefe` | Pikachu | electrico | 100 | lucha | Ataque Rápido (1: 10); Impactrueno (2: 30) | 50 % → weedle, caterpie, metapod, kakuna |
+| 01/20 | `pikachu-jefe` | Pikachu | electrico | 100 | lucha | Ataque Rápido (1: 10); Impactrueno (2: 30) | 50 % a la banca, 40 % al frente → weedle, caterpie, metapod, kakuna |
 
 ### Zonas
 

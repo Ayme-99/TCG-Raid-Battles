@@ -25,9 +25,16 @@
         "alBajarDePorcentaje",
         "aliados"
       ],
-      "description": "Cuando el jefe baja de ese porcentaje de PS se retira a la banca y entra un aliado elegido al azar (semilla del combate); al caer el aliado vuelve el jefe con los PS que tenía.",
+      "description": "Llamada de aliado en dos pasos (D-20 §4, Jefes). Cuando el jefe llega a `alBajarDePorcentaje` de sus PS o baja de él sin caer (por un ataque o por el veneno), invoca a un aliado elegido al azar (semilla del combate), que aparece en la banca. Cuando llega a `alFrenteAlPorcentaje`, el jefe se retira a la banca (pierde todos sus efectos) y el aliado pasa al puesto activo; un golpe que cruce los dos umbrales hace las dos cosas. Llama una vez por combate. El jefe no vuelve hasta que cae el aliado, con los PS que tenía. Los aliados no se capturan y se gana cuando cae el jefe.",
       "properties": {
         "alBajarDePorcentaje": {
+          "description": "Porcentaje de los PS del jefe al que llama (llegar a él basta). El nombre es anterior a la decisión del 2026-11-22.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "alFrenteAlPorcentaje": {
+          "description": "Porcentaje de los PS del jefe al que el aliado pasa de la banca al puesto activo (llegar a él basta). Igual o menor que `alBajarDePorcentaje`; sin él, el aliado entra directamente al invocarlo.",
           "type": "integer",
           "minimum": 1,
           "maximum": 99
