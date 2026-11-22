@@ -1,6 +1,10 @@
 /// Tipos de los Pokémon de campaña (D-20). Siguen al TCG: no hay tipo tierra ni
 /// roca, los Pokémon de tierra y de roca son de tipo [lucha].
 ///
+/// Tampoco hay hielo, veneno, volador, bicho ni fantasma (D-20 §10.3): pasan a
+/// agua, oscuridad, normal, planta y oscuridad. [metal] está aunque aún no lo
+/// lleve ninguna carta.
+///
 /// El nombre de cada valor es el que se escribe en el catálogo JSON.
 enum TipoCampana {
   normal,
@@ -8,15 +12,11 @@ enum TipoCampana {
   agua,
   planta,
   electrico,
-  hielo,
   lucha,
-  veneno,
-  volador,
   psiquico,
   oscuridad,
-  bicho,
-  fantasma,
   dragon,
+  metal,
 }
 
 /// Debilidad de una carta: los ataques de [tipo] le hacen [multiplicador]
