@@ -324,7 +324,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 
 **Tipos**
 
-10. ~~Tipos que no existen en el TCG~~ **Decidido el 2026-11-22** (§10.3): `veneno` pasa a `oscuridad`, `bicho` a `planta`, `volador` a `normal`, `fantasma` a `psiquico` y `hielo` a `agua`, y se añade `metal` al enum. Pendiente de implementar (#366); falta decidir el color y el icono de `metal` en la app.
+10. ~~Tipos que no existen en el TCG~~ **Decidido el 2026-11-22** (§10.3): `veneno` pasa a `oscuridad`, `bicho` a `planta`, `volador` a `normal`, `fantasma` a `oscuridad` y `hielo` a `agua`, y se añade `metal` al enum. Pendiente de implementar (#366); falta decidir el color y el icono de `metal` en la app.
 
 **Cartas y catálogo**
 
@@ -343,6 +343,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 21. **Capacidad del PC.** Ilimitada por ahora; se revisará si hace falta un tope.
 22. **Pantallas de la app** (mapa de región, combate, equipo, descanso) y **tienda**: sin diseño. Se propone hacer varias propuestas visuales antes de implementar (como en el resto de la app).
 23. **Kanban.** Las tarjetas del GitHub Project (`users/Ayme-99/projects/10`) no se pueden comprobar ni mover desde las sesiones de trabajo (la API del proyecto está bloqueada), y las issues #334 a #354 siguen abiertas aunque su PR ya está fusionado.
+24. **Medallas y líderes de gimnasio en estilo Escarlata y Púrpura** (#416). Los sprites de Pokémon, objetos y personajes serán de EP (§10.1, decisión de Ayme del 2026-11-22, #389), pero las **8 medallas de Kanto y los líderes no existen en ese estilo**. Propuesta, **sin decidir, para que Ayme elija**: **A)** medallas con **icono propio sencillo** (una forma por medalla, en el color de su tipo) y líderes sin retrato, representados por su **Pokémon más fuerte y su tipo** (la carta del líder ya es un Pokémon): es lo más barato y no depende de ningún arte ajeno; **B)** medallas y retratos de líderes **propios**, dibujados en un estilo coherente con la interfaz: más trabajo para el artista, más identidad; **C)** usar el arte de los juegos de Kanto: da el mismo problema de derechos que EP, con un estilo distinto que no casa con los sprites de EP. Recomendación: **A** ahora y B más adelante si hay presupuesto de arte.
 
 Resueltas (se dejan para no repetir la pregunta; los números de arriba no se renumeran): derrota → vuelves al último punto de curación; Fortaleza y Gruñido → se suman; texto de Rodar → 20 más por cada uso consecutivo; máximo de Pokémon en el equipo → 6; cuántos ataques → 1 a 2; PC → ilimitado por ahora; si las cartas de campaña valen en la partida libre → no; qué primer tramo → Pueblo Paleta a Ciudad Plateada; si los jefes son capturables → sí.
 
@@ -381,6 +382,7 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 | 2026-11-21 | **Cambio de rumbo:** en vez de una zona suelta (Túnel Roca con Onix), la primera entrega es una **porción vertical de Kanto, de Pueblo Paleta a Ciudad Plateada**, con los Pokémon que crea él a mano, que además sirven para el simulador. | §7 |
 | 2026-11-21 | Los puntos de la campaña compran en la tienda monedas, dados, sobres y cartas sueltas del formato digital, y quizá campañas (lo normal es que estén abiertas de primeras). Cuántos puntos da cada cosa es irrelevante salvo que haya compras dentro de la campaña; lo que sobre al terminarla se conserva. | §5 |
 | 2026-11-21 | Rechazó **robar energía** como mecánica (obligaría a los rivales a usar la misma para igualar los combates) y vio demasiado simple un «perfil de daño» como carta digital. | §3 |
+| 2026-11-22 | **Arte y derechos (decisión de Ayme, #389).** Los **sprites de Pokémon, objetos y personajes son de Pokémon Escarlata y Púrpura (EP)**, tomados de WikiDex. Es un **proyecto personal, de uso privado para él y sus amigos, sin fines comerciales**. El repositorio sigue siendo **público** y los sprites van incluidos; **si GitHub o los titulares de los derechos piden retirarlos, Ayme los quita en cuanto se le avise.** El **arte propio** se limita a la **interfaz y los fondos de escena**. Medallas y líderes de gimnasio no existen en estilo EP: pendiente (§8, 24). Esto no es una licencia: los derechos siguen siendo de sus titulares. | §4, §8; #389, #416 |
 
 ### 10.2 Combate y energía
 
@@ -404,8 +406,9 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 |---|---|---|
 | 2026-11-21 | Los tipos **siguen al TCG**: no hay tipo tierra ni roca, esos Pokémon (Geodude, Onix, Diglett, Sandshrew, Cubone) son de tipo **lucha**. | §3.3; #352 |
 | 2026-11-22 | Se añade el tipo **oscuridad** (Nidoran♀ y ♂ lo llevan impreso). | §3.6; #352 |
-| 2026-11-22 | **Tipos fuera del TCG:** `veneno` pasa a **oscuridad** (Zubat, que es el único dato real que cambia), `bicho` a **planta**, `volador` a **normal**, `fantasma` a **psíquico** y `hielo` a **agua**. Esos cinco tipos desaparecen del enum. | §3.3; #366 |
+| 2026-11-22 | **Tipos fuera del TCG:** `veneno` pasa a **oscuridad** (Zubat, que es el único dato real que cambia), `bicho` a **planta**, `volador` a **normal**, `fantasma` a **oscuridad** y `hielo` a **agua**. Esos cinco tipos desaparecen del enum. (`fantasma` pasaba a psíquico en la primera versión; Ayme lo cambió a oscuridad el 2026-11-22, §10.9.) | §3.3; #366, #404 |
 | 2026-11-22 | **`metal` entra ya en el enum**, aunque no haya ninguna carta de ese tipo, por si se añaden Pokémon como Steelix, que no son de la primera generación. Falta decidir su color y su icono. No hay tabla de tipos global, así que no toca el motor. | §3.3; #366 |
+| 2026-11-22 | **Revisión de huecos de la oscuridad** (#416). Con `oscuridad` cubriendo `veneno` y `fantasma`, el catálogo actual **no tiene huecos**: ninguna carta tiene debilidad ni resistencia a veneno o fantasma (las debilidades usadas son agua, fuego, planta, eléctrico, lucha y psíquico), y hay atacantes de oscuridad (Nidoran♀ y ♂ y, tras #404, Zubat). **Avisos:** (1) **`lucha` ya agrupa lucha, tierra y roca** (7 de los 22 Pokémon) y oscuridad es débil a lucha: **Agatha, monotipo oscuridad, caerá ante el equipo de lucha** si Calidad no lo compensa con sus cartas; (2) los fantasmas de los juegos (Gastly, Haunter, Gengar) pasan de ser inmunes a lucha a ser **débiles** a ella; (3) hoy solo **Slowpoke** ataca con psíquico, así que la debilidad a psíquico de Machop y Mankey casi no se activa; (4) `zubat.json` aún lleva `veneno` y ataques de tipo `volador` hasta #404. | §3.3; #404, #416 |
 
 ### 10.4 Efectos y habilidades de los ataques
 
@@ -439,7 +442,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-21 | Las cartas se numeran **001/150** (Mew será 151/150, secreta). | §2 |
 | 2026-11-21 | Las crea él, en PokeCardMaker (perfil «Aymedex»), a partir de ataques propuestos por otro chat desde WikiDex entre los que elige 1 o 2. Primeras del catálogo: Bulbasaur, Charmander y Squirtle. | §11 |
 | 2026-11-22 | El tramo de Pueblo Paleta a Ciudad Plateada queda con todos sus Pokémon (se acabó la lista). | §12 |
-| 2026-11-22 | **Tasa de victoria objetivo: 75 %.** | §8, 19; `balance/informes/campana_calibrar_2026-11-22.md`; #383 |
+| 2026-11-22 | **Tasa de victoria objetivo: 75 %** por combate. No vale para la Liga, que tiene su propio objetivo del 25 % sobre toda la cadena (§10.7). | §8, 19; `balance/informes/campana_calibrar_2026-11-22.md`; #383 |
 
 ### 10.6 Equipo, captura y progresión
 
@@ -466,6 +469,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | **Puntos de curación del primer tramo:** los que hay hoy (centro de Ciudad Verde, conversación antes de Pikachu y centro de Plateada). Si el simulador dice que Brock es demasiado difícil, se añade un NPC que cure (por ejemplo tras Pikachu o antes de Brock). | §4; #362 |
 | 2026-11-22 | **PC:** el equipo y el PC se cambian **solo en un centro Pokémon**; los NPC de conversación, aunque curen, no dan acceso. Con el equipo lleno, capturar sigue obligando a elegir a quién mandar al PC (§10.6, 2026-11-21). | §2, §4; #362 |
 | 2026-11-22 | **Evolucionar se hace fuera de combate, desde el menú del equipo,** tantas veces como dé la reserva de XP; no hace falta un centro ni hay límite por visita. La carta evolucionada sustituye a la anterior y el Pokémon queda con **10 PS siempre**, también si tenía más o estaba debilitado (**evolucionar revive a 10 PS**). Así evolucionar no es una curación: lo normal es hacerlo justo antes de curar en un centro. Pendiente de implementar. | §2.1; #362, #363 |
+| 2026-11-22 | **Evolución por medalla.** Cada evolución se desbloquea con la **medalla que le corresponde según los juegos**; si faltan medallas, no se ofrece aunque haya XP, y el menú del equipo muestra el motivo («requiere N medallas»). Antes de Brock solo pueden evolucionar **Caterpie → Metapod**, **Weedle → Kakuna** y, opcionalmente, **el inicial**; no Raticate, Pidgeotto ni Fearow. **La XP no tiene límite; el techo lo pone esta regla**, así que no hace falta recortar la XP de los salvajes repetibles (§10.7). Catálogo: campo `medallasMinimas` (entero) en la ficha de cada evolución. La tabla con las medallas mínimas está en §10.11, **propuesta pendiente de que Ayme la confirme**. | §2.1, §10.11; #414, #416 |
 
 ### 10.7 Mapa y ruta
 
@@ -477,11 +481,11 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | La región **solo acaba en un gimnasio o un jefe**; un nodo de combate puede fijar su Pokémon. (La primera versión de `kanto.json` no seguía el recorrido de arriba; se corrigió en #356, §10.9.) | §4; #356 |
 | 2026-11-22 | Reglas de diseño de la región: **un jefe y al menos una bifurcación** entre medallas (y desde el inicio hasta la primera). | §4; test |
 | 2026-11-22 | **Liga:** fase 2. | §4 |
-| 2026-11-22 | **Liga: estructura.** Se abre con las 8 medallas. Son **cinco rivales seguidos** (Alto Mando y Campeón) con **tres Pokémon cada uno**, o sea **15 combates seguidos**, y **un centro Pokémon solo a la entrada**: entre rivales solo se pueden gastar Pociones o evolucionar (que deja a 10 PS). No hace falta un tipo de nodo nuevo: es una cadena de nodos de gimnasio sin descanso entre ellos. Fase 2, pendiente de implementar. | §4; #367 |
+| 2026-11-22 | **Liga: estructura.** Se abre con las 8 medallas. Son **cinco rivales** (Alto Mando y Campeón) con **tres Pokémon cada uno**, **sin descanso entre ellos**: **un centro Pokémon solo a la entrada**. Lo que importa es el **desgaste acumulado**: los PS y la energía de Pociones se arrastran de un rival al siguiente, y entre rivales solo se pueden gastar Pociones o evolucionar (que deja a 10 PS). No hace falta un tipo de nodo nuevo: es una cadena de nodos de gimnasio sin descanso entre ellos. Fase 2, pendiente de implementar. Texto reescrito el 2026-11-22 (#416): decía «15 combates seguidos». | §4; #367, #416 |
 | 2026-11-22 | **Liga: derrota.** Al perder se vuelve al centro de la entrada y se **repiten todos los combates**, con el equipo curado y conservando capturas, XP, dinero y medallas; los puntos y el dinero de un combate se dan **una sola vez**. Es la regla de derrota que ya existe (§10.2). | §4; #367 |
-| 2026-11-22 | **Liga: rivales.** Los de los juegos con los tipos pasados al TCG: Lorelei (agua), Bruno (lucha), Agatha (psíquico), Lance (dragón) y el Campeón, que es el rival del jugador (equipo variado). Los líderes y el Alto Mando no son jefes: usan cartas normales (§10.8). | §4; #367 |
+| 2026-11-22 | **Liga: rivales.** Los de los juegos con los tipos pasados al TCG: Lorelei (agua), Bruno (lucha), Agatha (oscuridad), Lance (dragón) y el Campeón, que es el rival del jugador (equipo variado). Los líderes y el Alto Mando no son jefes: usan cartas normales (§10.8). | §4; #367 |
 | 2026-11-22 | **Liga: recompensa.** Cada rival paga **dinero y puntos propios**, como un líder, y el Campeón más. Al vencerlo **termina la campaña** con una pantalla de final. Las cifras por rival se fijan al diseñar ese tramo. | §4, §5; #367 |
-| 2026-11-22 | **Liga: dificultad.** Objetivo: **completar la Liga a la primera en un 25 %** (unos 4 intentos de media), medido por Calidad con el simulador. Sustituye al 75 % por combate (§10.5) solo para la Liga, porque 15 combates seguidos darían un 1 % con aquel objetivo. | §10.5; #367 |
+| 2026-11-22 | **Liga: dificultad.** Objetivo: **completar la Liga a la primera en un 25 %** (unos 4 intentos de media), medido por Calidad con el simulador **sobre la Liga entera**, con su desgaste acumulado, y no combate a combate. Sustituye al 75 % por combate (§10.5) solo para la Liga: ese 75 % no sirve como objetivo de una cadena de cinco rivales sin descanso. Texto reescrito el 2026-11-22 (#416); el objetivo del 25 % se mantiene. | §10.5; #367, #416 |
 | 2026-11-22 | **Nodo «Conversación»** (nuevo tipo `conversacion`: hablar y, si lo dice, curar). En el Bosque Verde, **justo antes de Pikachu**, sale **siempre** un Cazabichos que avisa sin combatir de que Pikachu se come la comida de los demás y se ha hecho más fuerte, y cura al equipo. **Si pierdes contra Pikachu, vuelves a ese Cazabichos.** El texto lo propone Claude y Ayme lo aprueba. | §4; `kanto.json` (`aviso-pikachu`) |
 
 ### 10.8 Jefes
@@ -500,6 +504,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 
 | Fecha | Antes | Ahora |
 |---|---|---|
+| 2026-11-22 | `fantasma` pasaba a **psíquico** (§10.3) y Agatha era de tipo psíquico. | `fantasma` pasa a **oscuridad**, igual que `veneno`, y Agatha es de tipo **oscuridad** (§10.3, §10.7; #416). |
 | 2026-11-21 | La tercera acción era «Pasar». | «Cargar» (§10.2). |
 | 2026-11-21 | Primera entrega: el Túnel Roca con Onix de jefe. | Porción vertical de Kanto de Pueblo Paleta a Ciudad Plateada (§10.1). La zona Túnel Roca y sus cartas se quedan en el catálogo (§8, 15). |
 | 2026-11-21 | Los jefes eran **no capturables**. | Capturables la primera vez (§10.8). |
@@ -509,7 +514,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-21 | Regla de la carta: «un ataque de 20 o más». | «20 o más, **o** un ataque con veneno» (§10.5). |
 | 2026-11-22 | #355 incluyó una versión de `kanto.json` que **no seguía** el recorrido que Ayme había definido el 2026-11-21: había una **Cueva Diglett** inventada (zona y nodo), un solo Cazabichos, Diglett y Sandshrew sin sitio, sin las bifurcaciones de la Ruta 1 y de la Ruta 2 sur y con Ciudad Verde sin su centro Pokémon. | Corregido en #356: sin Cueva Diglett; Diglett y Sandshrew son el Entrenador Joven del gimnasio; dos Cazabichos; Ruta 1 con bifurcación; centro en Ciudad Verde; Ruta 2 sur con bifurcación y Ruta 2 norte con un salvaje opcional. |
 | 2026-11-22 | La tabla de §3.5 daba **debilidad agua** a Diglett y Sandshrew. | Las cartas dicen **planta**; el JSON manda (§12). |
-| 2026-11-22 | Los tipos que no existen en el TCG se decidían «Pokémon a Pokémon» (§8, 10). | Tabla fija: `veneno` → oscuridad, `bicho` → planta, `volador` → normal, `fantasma` → psíquico, `hielo` → agua; y entra `metal` (§10.3). |
+| 2026-11-22 | Los tipos que no existen en el TCG se decidían «Pokémon a Pokémon» (§8, 10). | Tabla fija: `veneno` → oscuridad, `bicho` → planta, `volador` → normal, `fantasma` → oscuridad (primero fue psíquico, ver arriba), `hielo` → agua; y entra `metal` (§10.3). |
 | 2026-11-22 | La XP iba **por Pokémon** (10 por rival a cada Pokémon que siguiera en pie) y las victorias daban **puntos que en el centro se convertían en XP** (§10.6, 2026-11-21). | La evolución usa **solo XP de combate**, en una **reserva común** que el jugador reparte; se gasta entera para evolucionar (§10.6). |
 | 2026-11-22 | La evolución se hacía **en el centro Pokémon, un Pokémon por visita**, y la carta evolucionada **recuperaba todos los PS** (§10.6, 2026-11-21 y §2.1). | Se evoluciona **fuera de combate**, desde el menú del equipo, sin límite por visita, y el Pokémon **queda con 10 PS**, también si estaba debilitado (§10.6). |
 
@@ -521,6 +526,41 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | **No se fusiona hasta que él lo ordena** («Fusiona»), y puede pedir ajustes antes. Tras fusionar se puede seguir ajustando la misma pieza con un PR nuevo (lo preguntó antes de autorizar la primera fusión). | Tanda de cartas: «No fusiones aún, vamos a tener primero todos los Pokémon de este sprint». |
 | **CI en cada PR:** Motor (`dart test`), App (`flutter test`), App web (build), Simulador, Contrato JSON y Hoja de balance. | Una rama sin PR no lanza el CI. |
 | **El JSON manda** sobre este documento. | Si algo de §12 no coincide con `catalog/campana/`, vale el JSON. |
+
+### 10.11 Evoluciones: medallas mínimas (propuesta)
+
+**Propuesta de Diseño, pendiente de que Ayme la confirme** (#416). La implementa #414, que necesita el campo `medallasMinimas` en el catálogo. Método: la medalla mínima es el número de medallas con las que, en los juegos, se suele alcanzar el **nivel de referencia** de la evolución (Brock tiene Pokémon de nivel 12 a 14, así que antes de la 1.ª medalla se está en torno a ese nivel). Los niveles son los de los juegos de Kanto (Rojo, Azul y FireRed/LeafGreen) y conviene **comprobarlos al implementar**. Ayme fijó dos puntos de partida, que la tabla respeta: antes de Brock solo hay primeras fases y, opcionalmente, el inicial.
+
+**Catálogo actual**
+
+| Evolución | Nivel de referencia | Medallas mínimas | Carta de la evolución | Nota |
+|---|---|---|---|---|
+| Caterpie → Metapod | 7 | **0** | En el catálogo | Antes de Brock (decidido). |
+| Weedle → Kakuna | 7 | **0** | En el catálogo | Antes de Brock (decidido). |
+| Metapod → Butterfree | 10 | **1** | Falta | En los juegos se alcanza antes de Brock, pero Ayme limita ese tramo a las primeras fases. |
+| Kakuna → Beedrill | 10 | **1** | Falta | Igual que el anterior. |
+| Bulbasaur → Ivysaur | 16 | **0** (opcional) | Falta | Es el «inicial opcional» de Ayme y el plan B si Brock resulta demasiado difícil (§10.6). Según los juegos serían 1 medalla; **decide Ayme: 0 o 1.** |
+| Charmander → Charmeleon | 16 | **0** (opcional) | Falta | Igual que el anterior. |
+| Squirtle → Wartortle | 16 | **0** (opcional) | Falta | Igual que el anterior. |
+
+**Resto de Pokémon del catálogo** (primeras evoluciones, para que el campo esté completo cuando haya cartas)
+
+| Evolución | Nivel de referencia | Medallas mínimas |
+|---|---|---|
+| Nidoran♀ → Nidorina, Nidoran♂ → Nidorino | 16 | 1 |
+| Pidgey → Pidgeotto | 18 | 2 |
+| Rattata → Raticate | 20 | 2 |
+| Spearow → Fearow | 20 | 2 |
+| Zubat → Golbat | 22 | 2 |
+| Sandshrew → Sandslash | 22 | 2 |
+| Geodude → Graveler | 25 | 3 |
+| Diglett → Dugtrio | 26 | 3 |
+| Machop → Machoke, Mankey → Primeape, Cubone → Marowak | 28 | 3 |
+| Slowpoke → Slowbro | 37 | 5 |
+| Pikachu → Raichu | Piedra Trueno | Por decidir: depende de cuándo se pueda comprar la piedra |
+| Onix → Steelix | Intercambio con Revestimiento Metálico | Por decidir (no es de la primera generación, §10.3) |
+
+Las terceras fases de los iniciales (nivel 32 y 36 en los juegos) serían 4 y 5 medallas si se hacen; no hay cartas todavía.
 
 ## 11. Cómo se crea una carta
 
