@@ -329,7 +329,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 **Cartas y catálogo**
 
 12. **Spearow.** Con 0 caras hace 50 (así lo dice la carta: la tirada peor es la que más daño hace). Se señaló como inusual y se dejó como está impreso.
-13. **Nidoran♂.** Su carta lleva impreso 029/150, que es el número de la hembra; el catálogo guarda 32 (número de la Pokédex). Falta saber si se reimprime.
+13. ~~Nidoran♂~~ **Resuelto el 2026-11-22:** la carta se reimprimió con el número correcto, 032/150 (la anterior llevaba el 029/150 de la hembra). El catálogo guarda 32, el número de la Pokédex. La misma reimpresión de Mankey la deja **sin coste de retirada** (antes llevaba 1).
 14. **Jefes 02 a 16.** La lista de §4 es una propuesta mía; solo está cerrado el total (20), el 01 (Pikachu) y los cuatro legendarios.
 15. **Túnel Roca.** La zona sigue listando a Onix como jefe y no tiene sitio en el recorrido; hay que rehacerla (el jefe de la zona es un salvaje de la serie NN/20) y decidir en qué tramo entra.
 16. **Listas de Pokémon por zona.** Las de Ruta 1, Ruta 2, Bosque Verde, Ruta 22 y el gimnasio de Ciudad Plateada salen de los juegos Rojo y Azul **por contrastar con Serebii o Bulbapedia**.
@@ -619,7 +619,7 @@ Generado a partir de `catalog/campana/` el 2026-11-22. Si algo de aquí no coinc
 
 **Efectos y habilidades** (columna de ataques): `reduceDanoRival`, `aumentaDanoRecibido`, `quitaEnergiaRival`, `monedaDanoExtra`, `envenenaDefensor`, `reduceDanoPropio`, `monedaFalloRival`, `danoPorRacha`, `monedasDano` y `repiteDanoAlDerribar` (§3.6); `+` es una moneda que suma daño; `esp.` es el daño esperado de las tiradas. La única habilidad es `monedaDanoExtraAlAtacar` (Foco Energía).
 
-Las cartas sin imagen (Zubat, Geodude, Machop, Onix, Cubone y Slowpoke) vienen del primer catálogo del Túnel Roca (#340): tienen datos pero no carta impresa. Nidoran♂ guarda el número 32 de la Pokédex; su carta lleva impreso 029/150 (§8, 13).
+Las cartas sin imagen (Zubat, Geodude, Machop, Onix, Cubone y Slowpoke) vienen del primer catálogo del Túnel Roca (#340): tienen datos pero no carta impresa. Nidoran♂ guarda el número 32 de la Pokédex y su carta lleva impreso 032/150 (§8, 13).
 
 ### Jefes (1)
 

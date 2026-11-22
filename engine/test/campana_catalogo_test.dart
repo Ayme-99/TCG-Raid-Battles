@@ -164,7 +164,7 @@ void main() {
       expect(m.ps, 70);
       expect(m.tipo, TipoCampana.lucha);
       expect(m.debilidad!.tipo, TipoCampana.psiquico);
-      expect(m.retirada, 1);
+      expect(m.retirada, 0);
       final h = m.habilidad as MonedaDanoExtraAlAtacar;
       expect(h.nombre, 'Foco Energía');
       expect(h.valor, 20);

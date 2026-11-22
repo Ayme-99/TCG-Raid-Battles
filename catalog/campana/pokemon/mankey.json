@@ -8,7 +8,7 @@
     "tipo": "psiquico",
     "multiplicador": 2
   },
-  "retirada": 1,
+  "retirada": 0,
   "habilidad": {
     "nombre": "Foco Energía",
     "tipo": "monedaDanoExtraAlAtacar",
