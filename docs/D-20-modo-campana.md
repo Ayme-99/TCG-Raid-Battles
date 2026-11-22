@@ -11,7 +11,7 @@ Estado: **en desarrollo** (revisado el 2026-11-22). Issue #334 (diseño) y una i
 | Modelo de ruta por nodos y progreso del jugador (§4) | **Hecho** (#354) |
 | Jefe que llama a un aliado a mitad de combate (§4, Jefes) | **Hecho** (#372) |
 | Captura, equipo de 6 y PC, centro Pokémon (§2, §4) | **Primera versión hecha** (§4, Partida de campaña); falta la Pokéball |
-| XP, evolución y cartas ex: modelo de datos (§2.1) | Hecho (#346); sin cartas evolucionadas ni ex todavía |
+| XP, evolución y cartas ex: modelo de datos (§2.1) | Hecho (#346); **reserva común de XP y evolución desde el equipo** hechas (#403): Caterpie → Metapod y Weedle → Kakuna; sin cartas ex ni fase 1 de los iniciales todavía |
 | Guardado local del progreso (§6) | **Hecho** en el dispositivo (`PartidaCampana`, clave `campana_kanto`); sin sincronizar con la cuenta |
 | Pantallas de la app (mapa, combate, equipo, centro Pokémon) | **Primera versión hecha**, sin diseño visual definitivo |
 | Puntos al servidor y tienda con puntos | Pendiente (la tienda del centro usa dinero, §4 Partida de campaña) |
@@ -59,14 +59,14 @@ Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos
 
 - **Las victorias en combate dan puntos** (los mismos puntos del juego, §5).
 - En un **centro Pokémon** (el nodo de descanso) se pueden **convertir puntos en XP** de un Pokémon del equipo. Cuántos puntos cuesta cada XP queda por equilibrar.
-- Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xp: N` en la carta). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4). **Sustituido el 2026-11-22** (§10.6): la XP es una reserva común y se evoluciona fuera de combate, desde el menú del equipo, sin límite por visita.
+- Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xpEvolucion: N` en la carta; el campo se llamaba `xp` hasta #403). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4). **Sustituido el 2026-11-22** (§10.6): la XP es una reserva común y se evoluciona fuera de combate, desde el menú del equipo, sin límite por visita.
 - **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`).
 - **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): cuesta **puntos**, por usar la máquina de intercambio (`via: "intercambio"`, `puntos: N`).
 - **Cartas ex.** La **última fase de cada Pokémon es una carta ex**. Un Pokémon que no evoluciona (Onix…) puede hacerse ex **gastando puntos** (`via: "puntos"`, `puntos: N`), con el mismo proceso. Cada carta ex es una **entrada propia del catálogo** (`"ex": true`).
 - **La carta evolucionada sustituye a la anterior** y recupera todos sus PS (**sustituido el 2026-11-22**, §10.6: queda con **10 PS**, también si estaba debilitado). Una forma evolucionada también puede aparecer salvaje en una zona si el catálogo la incluye, y entonces se captura aparte.
 - Un Pokémon puede tener **varias** evoluciones (Eevee con sus piedras), por eso `evoluciones` es una lista.
 
-Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo**.
+Datos que hay que guardar en el progreso de campaña: la **reserva común de XP** (`xp` en la partida guardada, versión 2 desde #403; una partida de la versión 1 suma la XP que llevaba cada Pokémon).
 
 ## 3. Combate
 
@@ -246,13 +246,13 @@ Decididas por Ayme el 2026-11-21 al definir el primer tramo:
 
 ### Partida de campaña
 
-Hecho el 2026-11-22 (tareas 6, 8 y 9, primera versión). `PartidaCampana` (`engine/lib/src/campana/partida.dart`) junta el progreso de la ruta, el **equipo** (con los PS actuales y la XP de cada Pokémon), el **PC**, los **puntos**, el **dinero**, la **mochila** y la semilla. Es inmutable, se guarda en JSON (con versión) y las cifras sin cerrar están todas en `ParametrosCampana`.
+Hecho el 2026-11-22 (tareas 6, 8 y 9, primera versión). `PartidaCampana` (`engine/lib/src/campana/partida.dart`) junta el progreso de la ruta, el **equipo** (con los PS actuales), la **reserva común de XP** (#403), el **PC**, los **puntos**, el **dinero**, la **mochila** y la semilla. Es inmutable, se guarda en JSON (con versión) y las cifras sin cerrar están todas en `ParametrosCampana`.
 
-- **Rival de cada nodo:** el salvaje sale al azar de la zona con la semilla de la partida; un entrenador sin equipo fijo en el nodo saca **2** Pokémon de su lista (suposición); el gimnasio, los del líder en orden; el jefe, su carta NN/20 con su **llamada de aliado** (#372): el aliado entra en el combate, no se captura y no cuenta como rival derrotado para la XP si sigue en pie. Si el nodo fija el Pokémon (`pokemon` en `kanto.json`), sale ese; si no, sale de la zona o de la clase de entrenador con la semilla.
+- **Rival de cada nodo:** el salvaje sale al azar de la zona con la semilla de la partida; un entrenador sin equipo fijo en el nodo saca **2** Pokémon de su lista (suposición); el gimnasio, los del líder en orden; el jefe, su carta NN/20 con su **llamada de aliado** (#372): el aliado entra en el combate, no se captura y no cuenta como rival derrotado para la XP si sigue en pie (si cae, suma la XP de su categoría). Si el nodo fija el Pokémon (`pokemon` en `kanto.json`), sale ese; si no, sale de la zona o de la clase de entrenador con la semilla.
 - **PS entre combates:** el daño se arrastra de un combate a otro y la energía vuelve a 10 al empezar cada combate (decidido por Ayme el 2026-11-22). Solo cura el centro Pokémon o una Poción.
 - **Captura:** al vencer a un salvaje, o a un jefe la primera vez (su carta normal, `pikachu-jefe` → `pikachu`), se ofrece capturarlo; **hoy siempre funciona**. Decidido el 2026-11-22 (§10.6): pasará a **Pokéball con moneda** y categoría de captura, pendiente de implementar (#368). Hay hueco: entra al equipo; equipo lleno: se elige a quién mandar al PC, o va al PC el capturado.
 - **Derrota** (decidido el 2026-11-22): se vuelve al **último sitio donde se curó** el equipo (el inicio, el último centro Pokémon usado o la última conversación que curó, como el aviso antes de Pikachu; una Poción no cuenta), con el equipo curado. Se conserva lo ganado: capturas, puntos, dinero, XP y medallas. Los nodos de después se vuelven a pasar; un jefe ya derrotado ya no da puntos ni captura.
-- **XP y dinero** (decidido el 2026-11-22): la XP se gana al derrotar Pokémon (10 por rival, para cada Pokémon del equipo que siga en pie al acabar: suposición; **sustituida el 2026-11-22**, §10.6: la XP va a una reserva común) y el dinero, al vencer a entrenadores (200) y líderes (500). Se empieza con 300 (suposición). La evolución con XP aún no está. **Esas cifras de dinero están sustituidas** (decidido el 2026-11-22, §10.6): dinero de salida 1000 y pago por clase de entrenador y líder, pendiente de implementar (#362).
+- **XP y dinero** (decidido el 2026-11-22): la XP se gana al derrotar Pokémon y va a una **reserva común** (§10.6, hecho en #403): cada rival derrotado suma la de su **categoría de captura** (`categoriaCaptura`: Común 10, Intermedio 20, Fuerte y Jefe 30; el jefe puede llevar `xp` propio, Pikachu jefe 30). Perder un combate no da XP. Desde el **menú del equipo** se evoluciona gastando de la reserva (`xpEvolucion`: 50 para Caterpie y Weedle) y el Pokémon queda con 10 PS, también si estaba debilitado y el dinero, al vencer a entrenadores (200) y líderes (500). Se empieza con 300 (suposición). **Esas cifras de dinero están sustituidas** (decidido el 2026-11-22, §10.6): dinero de salida 1000 y pago por clase de entrenador y líder, pendiente de implementar (#362).
 - **Tienda del centro Pokémon:** Poción (100, cura 20 PS a un Pokémon en pie, fuera de combate, sin revivir) y Repelente (150, evita un combate contra un salvaje, sin puntos, XP ni captura). La Pokéball queda pendiente de implementar (#368). **Precios sustituidos** (decidido el 2026-11-22, §10.6): Poción 300 y Pokéball 200; en el primer tramo la tienda vende solo Pokéball y Poción, y el Repelente (350) llega después.
 - **Puntos** (provisionales): salvaje 100, entrenador 200, jefe 1000 (la primera vez), medalla 1500. Se guardan en el dispositivo; todavía no se envían al servidor (tarea 10).
 - **App:** «Nueva partida → Modo campaña» abre el mapa (`app/lib/campana/`). Pantallas: mapa con la ruta y el nodo actual, elección de inicial, combate (la máquina responde al momento y hay un registro de lo que pasa), captura, equipo (ordenar, Poción), centro Pokémon (curar, tienda, PC). La partida se guarda en el dispositivo tras cada cambio (`shared_preferences`, clave `campana_kanto`); un combate a medias no se guarda y, al volver, empieza de nuevo contra el mismo rival.
@@ -285,7 +285,7 @@ Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar
 | Motor | Librería `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho:** combate 1 contra 1 con energía, atacar, cambiar, cargar, elegir siguiente, debilidad y resistencia (#336); IA rival (#338); efectos, habilidades y azar con semilla (#350, #352); modelo de ruta y progreso (#354). Llamada de aliado del jefe (#372). **Pendiente:** captura y equipo, descanso. |
 | Catálogo | `catalog/campana/`: `pokemon/*.json` (uno por Pokémon, con su número de la Pokédex), `zonas/*.json` (qué aparece en cada zona), `regiones/*.json` (el grafo de nodos de la ruta) y sus esquemas en `catalog/schema/`. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
-| Guardado | Progreso de campaña (región, nodo, equipo, **PC**, jefes ya capturados, medallas, XP de cada Pokémon, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. `ProgresoRuta` ya guarda lo de la ruta (nodo, superados, medallas, jefes derrotados, inicial) con `aJson`/`desdeJson`; falta el equipo, el PC y la XP. |
+| Guardado | Progreso de campaña (región, nodo, equipo, **PC**, jefes ya capturados, medallas, reserva de XP, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. `ProgresoRuta` ya guarda lo de la ruta (nodo, superados, medallas, jefes derrotados, inicial) con `aJson`/`desdeJson`; `PartidaCampana` guarda además el equipo, el PC y la reserva de XP. |
 | Servidor | Recibe los puntos ganados al terminar un jefe o una medalla. Al ser un solo jugador y coste 0, se acepta lo que reporta el cliente con un tope por hito (no hay competición). |
 | App | Pantallas nuevas: mapa de región, combate, equipo, descanso y tienda. Reutiliza los fondos de mesa por mapa y los avisos. |
 
@@ -317,7 +317,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 3. ~~Cómo se captura~~ **Decidido el 2026-11-22** (§10.6): Pokéball con moneda y categoría de captura.
 4. **Qué se vende en el descanso.** En el primer tramo, solo Pokéball y Poción (§10.6); falta decidir el resto (Repelente, Super y Ultra Ball, objetos, Pokémon) para los tramos siguientes.
 5. **Dinero.** Cerradas las cifras del primer tramo (§10.6); falta decidir para qué sirve el dinero frente a los puntos y las cifras de los tramos siguientes.
-6. **Cifras de progresión:** cuántos puntos cuesta cada XP, cuántas XP necesita cada Pokémon para evolucionar, y cuánto cuestan el intercambio y hacerse ex.
+6. **Cifras de progresión.** La XP de cada rival y el coste de evolucionar a fase 1 están **decididos** (§10.6) y hechos en #403 (los puntos ya no se convierten en XP). Falta el `xpEvolucion` de las demás fases cuando tengan carta, y cuánto cuestan el intercambio y hacerse ex.
 7. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex). Todavía no hay ninguna carta evolucionada ni ex.
 8. ~~Liga~~ **Decidida el 2026-11-22** (§10.7): cinco rivales seguidos, tres Pokémon cada uno, un centro solo a la entrada. Es fase 2; faltan las cartas de sus rivales y las cifras de dinero y puntos por rival.
 9. **Combates 2 contra 2 y 3 contra 3.** Futuro, sin diseño.
@@ -465,11 +465,11 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | **Dinero.** Cada clase de entrenador y cada líder paga una cifra propia guardada en el catálogo (campo `dinero`), para ajustarlo a cada tramo. Referencia: al conseguir la 1ª medalla el jugador ha ganado unos **2.060** (en FireRed/LeafGreen son 2.064 solo con entrenadores). Primer tramo: Cazabichos 200 (×2), Entrenador Joven 260 y Brock 1.400. Dinero de salida: **1.000**. Los salvajes no dan dinero. Pendiente de implementar. | §5; #362 |
 | 2026-11-22 | **Evoluciones del primer tramo.** Por ahora solo las que ya tienen carta en el catálogo: **Caterpie → Metapod** y **Weedle → Kakuna**, que se capturan en la Ruta 2 sur. Lo que da Brock (puntos) se guarda para evolucionar a uno más después. **Si Brock resulta muy difícil con ese equipo, se puede evolucionar también un inicial antes de Brock** (Bulbasaur, Charmander o Squirtle), lo que exige crear sus cartas de fase 1. Es **opcional, no obligatorio**, y se medirá con el simulador contra el objetivo del 75 % (§10.5). Las cifras de XP y de coste de evolución quedan por cerrar con cálculos (§8, 6). | #363 |
 | 2026-11-22 | **Solo XP de combate para evolucionar, en una reserva común.** Cada combate suma XP a una **reserva** que se guarda; el jugador decide a qué Pokémon se la gasta y cuándo (en el centro Pokémon). La XP se gasta **entera para evolucionar**: no se puede dejar a medias ni repartir en parte. Los puntos no intervienen en la evolución (solo en la tienda de la cuenta y en el intercambio y hacerse ex, §10.6). | §2.1, §5; #363 |
-| 2026-11-22 | **Cifras de XP.** Cada rival derrotado suma XP a la reserva (una sola vez, no por Pokémon): **10, 20 o 30 según su categoría de captura** (Común 10, Intermedio 20, Fuerte y Jefe 30; un jefe puede llevar `xp` propio en su JSON, y Pikachu jefe da 30). Coste de evolucionar a fase 1: **50 XP** para Caterpie → Metapod y Weedle → Kakuna (≈ 5 KO, la proporción de los juegos: nivel 7, unos 220–316 XP frente a unos 58 por KO), y **70 XP** para un inicial (**abaratado a propósito**: en los juegos serían ≈ 410, nivel 16, y no cabría antes de Brock). Con 10 XP por rival, la reserva era de 70–90 XP en Plateada y de 110–130 tras Brock; con la regla de 10, 20 o 30 es de unos **110 XP en Plateada (90–130) y unos 180 tras Brock (160–200)**, y **los costes se quedan en 50 y 70** (decidido el 2026-11-22): con ellos, casi siempre se puede evolucionar un inicial y un insecto antes de Brock, y Calidad medirá con el simulador si eso es demasiado fácil. Dato nuevo del catálogo: `xpEvolucion` en cada Pokémon que evoluciona. Las demás fases se fijan cuando tengan carta (referencia de los juegos: Metapod y Kakuna ≈ 110). Si el simulador dice que es demasiado fácil o difícil, se ajustan estas cifras. Pendiente de implementar. | §2.1; #363 |
+| 2026-11-22 | **Cifras de XP.** Cada rival derrotado suma XP a la reserva (una sola vez, no por Pokémon): **10, 20 o 30 según su categoría de captura** (Común 10, Intermedio 20, Fuerte y Jefe 30; un jefe puede llevar `xp` propio en su JSON, y Pikachu jefe da 30). Coste de evolucionar a fase 1: **50 XP** para Caterpie → Metapod y Weedle → Kakuna (≈ 5 KO, la proporción de los juegos: nivel 7, unos 220–316 XP frente a unos 58 por KO), y **70 XP** para un inicial (**abaratado a propósito**: en los juegos serían ≈ 410, nivel 16, y no cabría antes de Brock). Con 10 XP por rival, la reserva era de 70–90 XP en Plateada y de 110–130 tras Brock; con la regla de 10, 20 o 30 es de unos **110 XP en Plateada (90–130) y unos 180 tras Brock (160–200)**, y **los costes se quedan en 50 y 70** (decidido el 2026-11-22): con ellos, casi siempre se puede evolucionar un inicial y un insecto antes de Brock, y Calidad medirá con el simulador si eso es demasiado fácil. Dato nuevo del catálogo: `xpEvolucion` en cada Pokémon que evoluciona. Las demás fases se fijan cuando tengan carta (referencia de los juegos: Metapod y Kakuna ≈ 110). Si el simulador dice que es demasiado fácil o difícil, se ajustan estas cifras. **Hecho (#403)**, salvo el `xpEvolucion` de los iniciales, que espera a sus cartas de fase 1. | §2.1; #363 |
 | 2026-11-22 | **Centro Pokémon: curar es gratis y sin límite.** Cura a todo el equipo, incluidos los debilitados. No es el único sitio donde se cura sin Poción: los **NPC de los nodos de conversación** también pueden curar durante la historia (como el aviso antes de Pikachu, #395). | §4; #362 |
 | 2026-11-22 | **Puntos de curación del primer tramo:** los que hay hoy (centro de Ciudad Verde, conversación antes de Pikachu y centro de Plateada). Si el simulador dice que Brock es demasiado difícil, se añade un NPC que cure (por ejemplo tras Pikachu o antes de Brock). | §4; #362 |
 | 2026-11-22 | **PC:** el equipo y el PC se cambian **solo en un centro Pokémon**; los NPC de conversación, aunque curen, no dan acceso. Con el equipo lleno, capturar sigue obligando a elegir a quién mandar al PC (§10.6, 2026-11-21). | §2, §4; #362 |
-| 2026-11-22 | **Evolucionar se hace fuera de combate, desde el menú del equipo,** tantas veces como dé la reserva de XP; no hace falta un centro ni hay límite por visita. La carta evolucionada sustituye a la anterior y el Pokémon queda con **10 PS siempre**, también si tenía más o estaba debilitado (**evolucionar revive a 10 PS**). Así evolucionar no es una curación: lo normal es hacerlo justo antes de curar en un centro. Pendiente de implementar. | §2.1; #362, #363 |
+| 2026-11-22 | **Evolucionar se hace fuera de combate, desde el menú del equipo,** tantas veces como dé la reserva de XP; no hace falta un centro ni hay límite por visita. La carta evolucionada sustituye a la anterior y el Pokémon queda con **10 PS siempre**, también si tenía más o estaba debilitado (**evolucionar revive a 10 PS**). Así evolucionar no es una curación: lo normal es hacerlo justo antes de curar en un centro. **Hecho (#403).** | §2.1; #362, #363 |
 | 2026-11-22 | **Evolución por medalla.** Cada evolución se desbloquea con la **medalla que le corresponde según los juegos**; si faltan medallas, no se ofrece aunque haya XP, y el menú del equipo muestra el motivo («requiere N medallas»). Antes de Brock pueden evolucionar **Caterpie → Metapod**, **Weedle → Kakuna** y, **opcionalmente, el inicial**; no pueden Raticate, Pidgeotto ni Fearow. **La XP no tiene límite; el techo lo pone esta regla**, así que no hace falta recortar la XP de los salvajes repetibles (§10.7). Catálogo: campo `medallasMinimas` (entero) en la ficha de cada evolución. La tabla con las medallas mínimas está en §10.11, **confirmada por Ayme el 2026-11-22**. | §2.1, §10.11; #414, #416 |
 
 ### 10.7 Mapa y ruta
@@ -592,30 +592,30 @@ Generado a partir de `catalog/campana/` el 2026-11-22. Si algo de aquí no coinc
 
 ### Pokémon (22)
 
-| Nº | Id | Pokémon | Tipo | PS | Debilidad | Resistencia | Retirada | Habilidad | Ataques (coste: daño) | Imagen |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 001 | `bulbasaur` | Bulbasaur | planta | 90 | fuego | — | 0 | — | Gruñido (1: efecto `reduceDanoRival`); Placaje (2: 20) | sí |
-| 004 | `charmander` | Charmander | fuego | 70 | agua | — | 0 | — | Gruñido (1: efecto `reduceDanoRival`); Ascuas (2: 30) | sí |
-| 007 | `squirtle` | Squirtle | agua | 80 | electrico | — | 0 | — | Látigo (1: efecto `aumentaDanoRecibido`); Burbuja (2: 20) | sí |
-| 010 | `caterpie` | Caterpie | planta | 50 | fuego | — | 0 | — | Disparo Demora (1: efecto `quitaEnergiaRival`); Placaje (2: 20) | sí |
-| 011 | `metapod` | Metapod | planta | 80 | fuego | — | 0 | — | Fortaleza (1: efecto `reduceDanoPropio`); Placaje (1: 20) | sí |
-| 013 | `weedle` | Weedle | planta | 50 | fuego | — | 0 | — | Picotazo Veneno (2: 10 `envenenaDefensor`) | sí |
-| 014 | `kakuna` | Kakuna | planta | 70 | fuego | — | 0 | — | Fortaleza (1: efecto `reduceDanoPropio`); Picotazo Veneno (2: 10 `envenenaDefensor`) | sí |
-| 016 | `pidgey` | Pidgey | normal | 60 | electrico | — | 0 | — | Tornado (2: 30) | sí |
-| 019 | `rattata` | Rattata | normal | 60 | lucha | — | 0 | — | Ataque Rápido (1: 10); Hiper Colmillo (2: 20+ `monedaDanoExtra`) | sí |
-| 021 | `spearow` | Spearow | normal | 60 | electrico | lucha | 0 | — | Picotazo (1: 10); Ataque Furia (2: 30 esp. `monedasDano`) | sí |
-| 025 | `pikachu` | Pikachu | electrico | 60 | lucha | — | 0 | — | Látigo (1: efecto `aumentaDanoRecibido`); Impactrueno (2: 30) | sí |
-| 027 | `sandshrew` | Sandshrew | lucha | 70 | planta | — | 0 | — | Rizo Defensa (1: efecto `reduceDanoPropio`); Rodar (2: 20×racha `danoPorRacha`) | sí |
-| 029 | `nidoran-f` | Nidoran♀ | oscuridad | 60 | lucha | — | 0 | — | Golpes Furia (2: 30 esp. `monedasDano`); Doble Patada (3: 30 `repiteDanoAlDerribar`) | sí |
-| 032 | `nidoran-m` | Nidoran♂ | oscuridad | 60 | lucha | — | 0 | — | Picotazo veneno (1: 10 `envenenaDefensor`); Ataque Furia (2: 30 esp. `monedasDano`) | sí |
-| 041 | `zubat` | Zubat | veneno | 60 | lucha | — | 0 | — | Mordisco (1: 10); Ataque Ala (2: 30) | no |
-| 050 | `diglett` | Diglett | lucha | 50 | planta | — | 0 | — | Arañazo (1: 10); Bofetón Lodo (2: 30 `monedaFalloRival`) | sí |
-| 056 | `mankey` | Mankey | lucha | 70 | psiquico | — | 1 | Foco Energía | Golpe Kárate (2: 30+ `monedaDanoExtra`) | sí |
-| 066 | `machop` | Machop | lucha | 70 | psiquico | — | 0 | — | Golpe Kárate (2: 30); Patada Baja (3: 50) | no |
-| 074 | `geodude` | Geodude | lucha | 80 | agua | normal | 0 | — | Placaje (1: 10); Lanzarrocas (2: 30) | no |
-| 079 | `slowpoke` | Slowpoke | agua | 80 | electrico | — | 1 | — | Pistola Agua (1: 20); Confusión (2: 30) | no |
-| 095 | `onix` | Onix | lucha | 110 | agua | normal | 1 | — | Atadura (2: 30); Lanzarrocas (3: 60) | no |
-| 104 | `cubone` | Cubone | lucha | 60 | agua | — | 0 | — | Garra (1: 10); Golpe Hueso (2: 30) | no |
+| Nº | Id | Pokémon | Tipo | PS | Debilidad | Resistencia | Retirada | Habilidad | Ataques (coste: daño) | Categoría | Evoluciona | Imagen |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 001 | `bulbasaur` | Bulbasaur | planta | 90 | fuego | — | 0 | — | Gruñido (1: efecto `reduceDanoRival`); Placaje (2: 20) | — | — | sí |
+| 004 | `charmander` | Charmander | fuego | 70 | agua | — | 0 | — | Gruñido (1: efecto `reduceDanoRival`); Ascuas (2: 30) | — | — | sí |
+| 007 | `squirtle` | Squirtle | agua | 80 | electrico | — | 0 | — | Látigo (1: efecto `aumentaDanoRecibido`); Burbuja (2: 20) | — | — | sí |
+| 010 | `caterpie` | Caterpie | planta | 50 | fuego | — | 0 | — | Disparo Demora (1: efecto `quitaEnergiaRival`); Placaje (2: 20) | Común | metapod (50 XP) | sí |
+| 011 | `metapod` | Metapod | planta | 80 | fuego | — | 0 | — | Fortaleza (1: efecto `reduceDanoPropio`); Placaje (1: 20) | Intermedio | — | sí |
+| 013 | `weedle` | Weedle | planta | 50 | fuego | — | 0 | — | Picotazo Veneno (2: 10 `envenenaDefensor`) | Común | kakuna (50 XP) | sí |
+| 014 | `kakuna` | Kakuna | planta | 70 | fuego | — | 0 | — | Fortaleza (1: efecto `reduceDanoPropio`); Picotazo Veneno (2: 10 `envenenaDefensor`) | Intermedio | — | sí |
+| 016 | `pidgey` | Pidgey | normal | 60 | electrico | — | 0 | — | Tornado (2: 30) | Común | — | sí |
+| 019 | `rattata` | Rattata | normal | 60 | lucha | — | 0 | — | Ataque Rápido (1: 10); Hiper Colmillo (2: 20+ `monedaDanoExtra`) | Común | — | sí |
+| 021 | `spearow` | Spearow | normal | 60 | electrico | lucha | 0 | — | Picotazo (1: 10); Ataque Furia (2: 30 esp. `monedasDano`) | Común | — | sí |
+| 025 | `pikachu` | Pikachu | electrico | 60 | lucha | — | 0 | — | Látigo (1: efecto `aumentaDanoRecibido`); Impactrueno (2: 30) | Común | — | sí |
+| 027 | `sandshrew` | Sandshrew | lucha | 70 | planta | — | 0 | — | Rizo Defensa (1: efecto `reduceDanoPropio`); Rodar (2: 20×racha `danoPorRacha`) | Común | — | sí |
+| 029 | `nidoran-f` | Nidoran♀ | oscuridad | 60 | lucha | — | 0 | — | Golpes Furia (2: 30 esp. `monedasDano`); Doble Patada (3: 30 `repiteDanoAlDerribar`) | Común | — | sí |
+| 032 | `nidoran-m` | Nidoran♂ | oscuridad | 60 | lucha | — | 0 | — | Picotazo veneno (1: 10 `envenenaDefensor`); Ataque Furia (2: 30 esp. `monedasDano`) | Común | — | sí |
+| 041 | `zubat` | Zubat | veneno | 60 | lucha | — | 0 | — | Mordisco (1: 10); Ataque Ala (2: 30) | Común | — | no |
+| 050 | `diglett` | Diglett | lucha | 50 | planta | — | 0 | — | Arañazo (1: 10); Bofetón Lodo (2: 30 `monedaFalloRival`) | Común | — | sí |
+| 056 | `mankey` | Mankey | lucha | 70 | psiquico | — | 1 | Foco Energía | Golpe Kárate (2: 30+ `monedaDanoExtra`) | Intermedio | — | sí |
+| 066 | `machop` | Machop | lucha | 70 | psiquico | — | 0 | — | Golpe Kárate (2: 30); Patada Baja (3: 50) | Común | — | no |
+| 074 | `geodude` | Geodude | lucha | 80 | agua | normal | 0 | — | Placaje (1: 10); Lanzarrocas (2: 30) | Intermedio | — | no |
+| 079 | `slowpoke` | Slowpoke | agua | 80 | electrico | — | 1 | — | Pistola Agua (1: 20); Confusión (2: 30) | Común | — | no |
+| 095 | `onix` | Onix | lucha | 110 | agua | normal | 1 | — | Atadura (2: 30); Lanzarrocas (3: 60) | Fuerte | — | no |
+| 104 | `cubone` | Cubone | lucha | 60 | agua | — | 0 | — | Garra (1: 10); Golpe Hueso (2: 30) | Común | — | no |
 
 **Efectos y habilidades** (columna de ataques): `reduceDanoRival`, `aumentaDanoRecibido`, `quitaEnergiaRival`, `monedaDanoExtra`, `envenenaDefensor`, `reduceDanoPropio`, `monedaFalloRival`, `danoPorRacha`, `monedasDano` y `repiteDanoAlDerribar` (§3.6); `+` es una moneda que suma daño; `esp.` es el daño esperado de las tiradas. La única habilidad es `monedaDanoExtraAlAtacar` (Foco Energía).
 
@@ -623,9 +623,9 @@ Las cartas sin imagen (Zubat, Geodude, Machop, Onix, Cubone y Slowpoke) vienen d
 
 ### Jefes (1)
 
-| Serie | Id | Pokémon | Tipo | PS | Debilidad | Ataques (coste: daño) | Llama a un aliado |
-|---|---|---|---|---|---|---|---|
-| 01/20 | `pikachu-jefe` | Pikachu | electrico | 100 | lucha | Ataque Rápido (1: 10); Impactrueno (2: 30) | 50 % a la banca, 40 % al frente → weedle, caterpie, metapod, kakuna |
+| Serie | Id | Pokémon | Tipo | PS | Debilidad | Ataques (coste: daño) | Llama a un aliado | XP |
+|---|---|---|---|---|---|---|---|---|
+| 01/20 | `pikachu-jefe` | Pikachu | electrico | 100 | lucha | Ataque Rápido (1: 10); Impactrueno (2: 30) | 50 % a la banca, 40 % al frente → weedle, caterpie, metapod, kakuna | 30 |
 
 ### Zonas
 

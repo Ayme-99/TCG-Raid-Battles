@@ -13,6 +13,7 @@
     "reduccion": 30
   },
   "retirada": 0,
+  "categoriaCaptura": "intermedio",
   "ataques": [
     {
       "nombre": "Placaje",

@@ -104,6 +104,10 @@ class ControladorCampana extends Notifier<EstadoCampana> {
   String? usarPocion(CatalogoCampana c, int indice) => _intentar(
       () => _partida.usarPocion(c, indice, parametros: parametrosCampana));
 
+  /// Evoluciona al Pokémon [indice] del equipo gastando XP de la reserva.
+  String? evolucionar(CatalogoCampana c, int indice, String destino) =>
+      _intentar(() => _partida.evolucionar(c, indice, destino));
+
   String? usarRepelente(CatalogoCampana c) =>
       _intentar(() => _partida.usarRepelente(c));
 

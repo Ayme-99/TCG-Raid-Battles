@@ -219,97 +219,14 @@
       },
       "description": "Habilidad pasiva. monedaDanoExtraAlAtacar: mientras el Pokémon siga activo, cada vez que ataca lanza una moneda y con cara el ataque hace `valor` más de daño (D-20 §3.6)."
     },
-    "ex": {
-      "type": "boolean",
-      "default": false,
-      "description": "Carta ex: la última fase de cada Pokémon (D-20 §2.1)."
-    },
-    "evoluciones": {
-      "type": "array",
-      "default": [],
-      "description": "Cómo evoluciona (D-20 §2.1). La carta evolucionada sustituye a la anterior.",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "a",
-          "via"
-        ],
-        "properties": {
-          "a": {
-            "type": "string",
-            "description": "Id del Pokémon en que evoluciona."
-          },
-          "via": {
-            "enum": [
-              "xp",
-              "objeto",
-              "intercambio",
-              "puntos"
-            ]
-          },
-          "xp": {
-            "type": "integer",
-            "minimum": 10,
-            "multipleOf": 10
-          },
-          "objeto": {
-            "type": "string"
-          },
-          "puntos": {
-            "type": "integer",
-            "minimum": 10,
-            "multipleOf": 10
-          }
-        },
-        "allOf": [
-          {
-            "if": {
-              "properties": {
-                "via": {
-                  "const": "xp"
-                }
-              }
-            },
-            "then": {
-              "required": [
-                "xp"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "via": {
-                  "const": "objeto"
-                }
-              }
-            },
-            "then": {
-              "required": [
-                "objeto"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "via": {
-                  "enum": [
-                    "intercambio",
-                    "puntos"
-                  ]
-                }
-              }
-            },
-            "then": {
-              "required": [
-                "puntos"
-              ]
-            }
-          }
-        ]
-      }
+    "categoriaCaptura": {
+      "enum": [
+        "comun",
+        "intermedio",
+        "fuerte",
+        "jefe"
+      ],
+      "description": "Categoría de captura (D-20 §10.6): fija la XP que da derrotarlo (Común 10, Intermedio 20, Fuerte y Jefe 30) y, con la Ball, la probabilidad de capturarlo. Todo Pokémon que sale como rival la necesita; los iniciales no la llevan."
     },
     "ex": {
       "type": "boolean",
@@ -340,10 +257,11 @@
               "puntos"
             ]
           },
-          "xp": {
+          "xpEvolucion": {
             "type": "integer",
             "minimum": 10,
-            "multipleOf": 10
+            "multipleOf": 10,
+            "description": "XP que gasta de la reserva común de la partida al evolucionar (D-20 §10.6): 50 para Caterpie y Weedle, 70 para un inicial."
           },
           "objeto": {
             "type": "string"
@@ -365,7 +283,7 @@
             },
             "then": {
               "required": [
-                "xp"
+                "xpEvolucion"
               ]
             }
           },

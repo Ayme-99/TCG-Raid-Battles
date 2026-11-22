@@ -26,12 +26,22 @@ ViaEvolucion _viaDeTexto(String texto) {
   throw FormatException('Vía de evolución desconocida: "$texto".');
 }
 
+/// Lee una categoría de captura del catálogo (`"comun"`, `"intermedio"`…).
+CategoriaCaptura categoriaCapturaDeTexto(String texto) {
+  for (final c in CategoriaCaptura.values) {
+    if (c.name == texto) return c;
+  }
+  throw FormatException('Categoría de captura desconocida: "$texto".');
+}
+
 EvolucionCampana _evolucionDesdeJson(Map<String, dynamic> json) {
   final via = _viaDeTexto(_campo<String>(json, 'via'));
   switch (via) {
     case ViaEvolucion.xp:
       return EvolucionCampana(
-          a: _campo<String>(json, 'a'), via: via, xp: _campo<int>(json, 'xp'));
+          a: _campo<String>(json, 'a'),
+          via: via,
+          xpEvolucion: _campo<int>(json, 'xpEvolucion'));
     case ViaEvolucion.objeto:
       return EvolucionCampana(
           a: _campo<String>(json, 'a'),
@@ -111,6 +121,9 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
     retirada: (json['retirada'] as int?) ?? 0,
     habilidad: _habilidadDesdeJson(json['habilidad']),
     ex: (json['ex'] as bool?) ?? false,
+    categoriaCaptura: json['categoriaCaptura'] == null
+        ? null
+        : categoriaCapturaDeTexto(_campo<String>(json, 'categoriaCaptura')),
     evoluciones: [
       for (final e in (json['evoluciones'] as List<dynamic>?) ?? const [])
         _evolucionDesdeJson(e as Map<String, dynamic>),
@@ -168,11 +181,19 @@ class JefeCampana {
   final PokemonCampana pokemon;
   final LlamadaDeAliado? llamaAliado;
 
+  /// XP que da derrotarlo, si lleva una propia en su JSON (`xp`); si no, la
+  /// de la categoría Jefe (D-20 §10.6).
+  final int? xpPropia;
+
   const JefeCampana({
     required this.numero,
     required this.pokemon,
     this.llamaAliado,
+    this.xpPropia,
   });
+
+  /// XP que suma a la reserva derrotarlo.
+  int get xp => xpPropia ?? xpDeCategoria(CategoriaCaptura.jefe);
 }
 
 /// Un jefe de campaña a partir de su JSON del catálogo
@@ -193,6 +214,7 @@ JefeCampana jefeCampanaDesdeJson(Map<String, dynamic> json) {
             ],
             alFrenteAlPorcentaje: llamada['alFrenteAlPorcentaje'] as int?,
           ),
+    xpPropia: json['xp'] as int?,
   );
 }
 
