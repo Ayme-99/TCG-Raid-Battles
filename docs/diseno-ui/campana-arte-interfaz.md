@@ -38,7 +38,7 @@ Los SVG no llevan texto: nombres, PS y costes los pinta la app.
 ## Decisiones cerradas
 
 - **Fuente de sprites:** todos los sprites de objetos y Pokémon serán de Pokémon Escarlata y Púrpura (EP). En WikiDex el patrón de búsqueda es «Nombre EP.png» (objetos de 160×160, Pokémon de unos 250×250).
-- **Tipos de la campaña → icono:** bicho → planta, volador → incoloro, veneno → oscuridad, tierra → lucha, hielo → agua, roca → lucha, fantasma → oscuridad, normal → incoloro. Los 15 tipos del motor se guardan con su tipo real; el icono es solo presentación.
+- **Tipos de la campaña → icono:** bicho → planta, volador → incoloro, veneno → oscuridad, tierra → lucha, hielo → agua, roca → lucha, fantasma → oscuridad, normal → incoloro. Los tipos del motor se guardan con su tipo real; el icono es solo presentación. La lista de tipos del motor cambia al aplicar #404 (salen `bicho`, `volador`, `veneno`, `fantasma` e `hielo`, y entra `metal`, cuyo icono falta), por lo que no se cuenta aquí.
 - **Energía:** fichas de 0 a 10 (no barra).
 - **Miniatura de banca:** la imagen de la carta en pequeño (60×84 px) con una barra de vida fina encima. La carta ya lleva su tipo, así que no hay borde de color. Debilitado: gris oscuro.
 - **Carta completa:** siempre es la imagen exportada de PokeCardMaker; no se dibuja ningún marco de carta.
@@ -48,10 +48,14 @@ Los SVG no llevan texto: nombres, PS y costes los pinta la app.
 
 - Escenas: Pueblo Paleta, Ruta 1, Ciudad Verde (con su centro), Ruta 22, Ruta 2, Bosque Verde, Ruta 2 norte, Ciudad Plateada (con su centro) y gimnasio de Brock; interior del Centro Pokémon.
 - Sprites de Pokémon (se subirán cuando esté el mapa), enfermera y entrenadores.
-- Medallas y líderes de gimnasio: no existen en estilo EP; hay que elegir otra versión o un estilo propio.
+- Medallas y líderes de gimnasio: no existen en estilo EP; hay que elegir otra versión o un estilo propio. Hay una propuesta de Diseño pendiente de que Ayme elija (D-20 §8, pregunta 24).
 - Pantalla del PC (sin wireframe todavía).
 - Mayor resolución de los iconos de tipo y de la energía si se quieren más grandes de 28 px.
 
 ## Aviso de derechos
 
-Los iconos de tipo, la energía, las bolas, las pociones y los repelentes son material de Nintendo / Game Freak / The Pokémon Company. El repositorio es público: antes de publicar la app hay que decidir si se sustituyen por arte propio.
+Los iconos de tipo, la energía, las bolas, las pociones, los repelentes y los sprites de Pokémon y personajes son material de Nintendo / Game Freak / The Pokémon Company, tomado de Pokémon Escarlata y Púrpura a través de WikiDex.
+
+**Decisión de Ayme (2026-11-22, #389):** es un proyecto personal, de uso privado para él y sus amigos, sin fines comerciales. El repositorio sigue siendo público y los sprites de Pokémon Escarlata y Púrpura se incluyen en él. Si GitHub o los titulares de los derechos piden retirarlos, Ayme los quita en cuanto se le avise. Esto no es una licencia: los derechos siguen siendo de sus titulares.
+
+El arte propio se limita a la interfaz y a los fondos de escena.
