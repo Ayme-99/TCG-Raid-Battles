@@ -25,8 +25,9 @@
 //             de aliado (salvo --aliado=no).
 //   tramo     el tramo entero de seguido, --partidas veces por inicial: el
 //             daño se arrastra, la energía vuelve a 10 en cada combate, los
-//             descansos curan, las bifurcaciones se eligen al azar y los
-//             desvíos opcionales se saltan y el jefe llama a su aliado. Se gana si se llega al final sin
+//             descansos y las conversaciones que curan lo hacen, las
+//             bifurcaciones se eligen al azar, los desvíos opcionales se
+//             saltan y el jefe llama a su aliado. Se gana si se llega al final sin
 //             perder ningún combate. Dos variantes: solo el inicial y
 //             capturando todos los salvajes vencidos (hasta 6, con los PS
 //             llenos). Son cotas para medir, no reglas del juego.
@@ -518,6 +519,12 @@ Recorrido recorrer(String inicial, bool capturar, Random rnd, Config c,
     switch (n.tipo) {
       case TipoNodo.descanso:
         equipo = [for (final p in equipo) PokemonEnCombate.completo(p.especie)];
+      case TipoNodo.conversacion:
+        if (n.cura) {
+          equipo = [
+            for (final p in equipo) PokemonEnCombate.completo(p.especie)
+          ];
+        }
       case TipoNodo.gimnasio:
         rival = n.lider!.pokemon;
       case TipoNodo.jefe:

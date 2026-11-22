@@ -222,6 +222,7 @@ IconData _icono(TipoNodo t) => switch (t) {
       TipoNodo.descanso => Icons.local_hospital_rounded,
       TipoNodo.gimnasio => Icons.emoji_events_rounded,
       TipoNodo.jefe => Icons.whatshot_rounded,
+      TipoNodo.conversacion => Icons.forum_rounded,
     };
 
 String _tipo(NodoRuta n) => switch (n.tipo) {
@@ -232,6 +233,7 @@ String _tipo(NodoRuta n) => switch (n.tipo) {
       TipoNodo.descanso => 'centro Pokémon',
       TipoNodo.gimnasio => 'gimnasio',
       TipoNodo.jefe => 'jefe',
+      TipoNodo.conversacion => n.cura ? 'conversación · cura' : 'conversación',
     };
 
 /// Lo que se hace en el nodo actual.
@@ -285,7 +287,7 @@ class _PanelNodo extends ConsumerWidget {
             style: tema.textTheme.bodySmall),
         if (r.puntos > 0) Text('Recompensa: ${r.puntos} puntos'),
         if (r.llamada != null)
-          Text('Al bajar de la mitad de PS, el jefe llama a un aliado.',
+          Text('Al llegar a la mitad de sus PS, el jefe llama a un aliado.',
               style: tema.textTheme.bodySmall),
         if (r.dinero > 0) Text('Dinero: ${r.dinero} \$'),
         Text(
@@ -313,6 +315,26 @@ class _PanelNodo extends ConsumerWidget {
       ]);
     } else if (nodo.tipo == TipoNodo.descanso) {
       hijos.add(_Descanso(catalogo: c, partida: p));
+    } else if (nodo.tipo == TipoNodo.conversacion) {
+      hijos.addAll([
+        if (nodo.personaje != null)
+          Text(nodo.personaje!, style: tema.textTheme.titleMedium),
+        for (final linea in nodo.texto)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text('«$linea»'),
+          ),
+        const SizedBox(height: 12),
+        if (!p.progreso.resuelto)
+          FilledButton.icon(
+            key: const Key('campana-conversar'),
+            icon: Icon(nodo.cura ? Icons.healing_rounded : Icons.check_rounded),
+            label: Text(nodo.cura ? 'Curar al equipo y seguir' : 'Seguir'),
+            onPressed: () => control.conversar(c),
+          )
+        else if (nodo.cura)
+          const Text('Tu equipo está como nuevo.'),
+      ]);
     }
 
     final opciones = p.opciones(c);

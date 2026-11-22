@@ -260,7 +260,17 @@ void main() {
       final c2 = kanto.nodo('cazabichos-2');
       expect([c1.rival, c2.rival], everyElement(RivalDeCombate.entrenador));
       expect([c1.clase, c2.clase], everyElement('Cazabichos'));
-      expect(c2.salidas, ['jefe-pikachu']);
+      expect(c2.salidas, ['aviso-pikachu']);
+    });
+
+    test('antes de Pikachu, un Cazabichos avisa y cura sin combatir', () {
+      final aviso = kanto.nodo('aviso-pikachu');
+      expect(aviso.tipo, TipoNodo.conversacion);
+      expect(aviso.cura, isTrue);
+      expect(aviso.curaEquipo, isTrue);
+      expect(aviso.personaje, isNotNull);
+      expect(aviso.texto, isNotEmpty);
+      expect(aviso.salidas, ['jefe-pikachu']);
     });
 
     test('el jefe es Pikachu y después hay un salvaje opcional o seguir', () {
@@ -304,6 +314,98 @@ void main() {
       }
 
       recorre(kanto.inicio, 0, 0);
+    });
+  });
+
+  group('conversación', () {
+    NodoRuta charla({String? personaje = 'P', List<String> texto = const ['Hola'],
+            bool cura = true}) =>
+        NodoRuta(
+            id: 'h',
+            tipo: TipoNodo.conversacion,
+            nombre: 'h',
+            salidas: const ['g'],
+            personaje: personaje,
+            texto: texto,
+            cura: cura);
+
+    test('con personaje y texto es válida, cure o no', () {
+      expect(region([ini(['h']), charla(), gim('g')]).problemas(), isEmpty);
+      expect(region([ini(['h']), charla(cura: false), gim('g')]).problemas(),
+          isEmpty);
+      expect(charla().curaEquipo, isTrue);
+      expect(charla(cura: false).curaEquipo, isFalse);
+    });
+
+    test('necesita personaje y texto', () {
+      expect(
+          region([ini(['h']), charla(personaje: null), gim('g')])
+              .problemas()
+              .join(),
+          contains('necesita "personaje" y "texto"'));
+      expect(region([ini(['h']), charla(texto: const []), gim('g')])
+          .problemas()
+          .join(), contains('necesita "personaje" y "texto"'));
+    });
+
+    test('solo una conversación lleva texto, personaje o cura', () {
+      final r = region([
+        ini(['d']),
+        const NodoRuta(
+            id: 'd',
+            tipo: TipoNodo.descanso,
+            nombre: 'd',
+            salidas: ['g'],
+            texto: ['x'],
+            cura: true),
+        gim('g'),
+      ]);
+      expect(r.problemas().join(), allOf(contains('no lleva "texto"'),
+          contains('no lleva "cura"')));
+      expect(r.nodo('d').curaEquipo, isTrue, reason: 'un descanso siempre cura');
+    });
+
+    test('no puede ser opcional ni el final de la región', () {
+      final opcional = region([
+        ini(['h']),
+        const NodoRuta(
+            id: 'h',
+            tipo: TipoNodo.conversacion,
+            nombre: 'h',
+            salidas: ['g'],
+            opcional: true,
+            personaje: 'P',
+            texto: ['x']),
+        gim('g'),
+      ]);
+      expect(opcional.problemas().join(), contains('puede ser opcional'));
+      final final_ = region([
+        ini(['h']),
+        const NodoRuta(
+            id: 'h',
+            tipo: TipoNodo.conversacion,
+            nombre: 'h',
+            personaje: 'P',
+            texto: ['x']),
+      ]);
+      expect(final_.problemas().join(),
+          contains('solo acaba en un gimnasio o un jefe'));
+    });
+
+    test('se lee del JSON', () {
+      final n = nodoRutaDesdeJson({
+        'id': 'h',
+        'tipo': 'conversacion',
+        'nombre': 'H',
+        'salidas': ['g'],
+        'personaje': 'P',
+        'texto': ['Uno', 'Dos'],
+        'cura': true,
+      });
+      expect(n.tipo, TipoNodo.conversacion);
+      expect(n.personaje, 'P');
+      expect(n.texto, ['Uno', 'Dos']);
+      expect(n.cura, isTrue);
     });
   });
 
@@ -411,6 +513,7 @@ void main() {
         'ruta-2-weedle',
         'cazabichos-1',
         'cazabichos-2',
+        'aviso-pikachu',
         'jefe-pikachu',
         'ruta-2-norte',
         'centro-plateada',

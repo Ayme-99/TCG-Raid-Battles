@@ -89,6 +89,8 @@ class ControladorCampana extends Notifier<EstadoCampana> {
 
   void descansar(CatalogoCampana c) => _guardar(_partida.descansar(c));
 
+  void conversar(CatalogoCampana c) => _guardar(_partida.conversar(c));
+
   void moverPc(CatalogoCampana c, {int? deEquipo, int? dePc}) =>
       _guardar(_partida.moverPc(c,
           deEquipo: deEquipo, dePc: dePc, parametros: parametrosCampana));

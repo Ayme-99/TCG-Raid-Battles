@@ -92,6 +92,11 @@ PartidaCampana hasta(CatalogoCampana c, PartidaCampana p, String nodo) {
       s = robusto(s.descansar(c));
       continue;
     }
+    if (s.nodoActual(c).tipo == TipoNodo.conversacion &&
+        !s.progreso.resuelto) {
+      s = robusto(s.conversar(c));
+      continue;
+    }
     final op = s.opciones(c);
     s = s.avanzar(c, op.last);
   }
@@ -198,6 +203,55 @@ void main() {
     expect(p.progreso.nodoActual, 'centro-plateada');
     expect(p.progreso.medallas, isEmpty);
     expect(p.opciones(c), ['gimnasio-joven']);
+  });
+
+  group('conversación (aviso de Pikachu)', () {
+    PartidaCampana enAviso() => PartidaCampana(
+          progreso: const ProgresoRuta(
+              nodoActual: 'aviso-pikachu',
+              superados: {'pueblo-paleta', 'cazabichos-2'}),
+          equipo: [const PokemonGuardado('bulbasaur', 10)],
+          pc: [const PokemonGuardado('pidgey', 5)],
+          ultimaCura: 'ciudad-verde',
+        );
+
+    test('no hay combate y hasta hablar no se puede seguir', () {
+      final p = enAviso();
+      expect(p.hayCombate(c), isFalse);
+      expect(p.opciones(c), isEmpty);
+      expect(() => p.rival(c), throwsA(isA<ReglaIncumplida>()));
+    });
+
+    test('hablar cura al equipo, resuelve el nodo y pasa a ser donde se vuelve',
+        () {
+      final p = enAviso().conversar(c);
+      expect(p.equipo.single.ps, 90);
+      expect(p.pc.single.ps, 5, reason: 'el PC solo se cura en un centro');
+      expect(p.progreso.resuelto, isTrue);
+      expect(p.ultimaCura, 'aviso-pikachu');
+      expect(p.opciones(c), ['jefe-pikachu']);
+      expect(() => p.conversar(c), throwsA(isA<ReglaIncumplida>()));
+    });
+
+    test('perder contra Pikachu devuelve al Cazabichos que avisa', () {
+      var p = enAviso().conversar(c).avanzar(c, 'jefe-pikachu');
+      final e = p.empezarCombate(c);
+      p = p.terminarCombate(
+          c,
+          e.copiarCon(
+              jugador:
+                  e.jugador.copiarCon(equipo: [e.jugador.equipo[0].conPs(0)]),
+              fase: FaseCombate.terminado,
+              ganador: Bando.rival));
+      expect(p.progreso.nodoActual, 'aviso-pikachu');
+      expect(p.equipo.single.ps, 90);
+      expect(p.opciones(c), ['jefe-pikachu']);
+    });
+
+    test('conversar fuera de una conversación no vale', () {
+      final p = PartidaCampana.nueva(c.region).elegirInicial(c, 'bulbasaur');
+      expect(() => p.conversar(c), throwsA(isA<ReglaIncumplida>()));
+    });
   });
 
   test('ganar da XP a los que siguen en pie y dinero con un entrenador', () {
@@ -405,6 +459,11 @@ void main() {
         }
         if (p.nodoActual(c).tipo == TipoNodo.descanso && !p.progreso.resuelto) {
           p = robusto(p.descansar(c));
+          continue;
+        }
+        if (p.nodoActual(c).tipo == TipoNodo.conversacion &&
+            !p.progreso.resuelto) {
+          p = robusto(p.conversar(c));
           continue;
         }
         // Coge siempre los desvíos opcionales.
