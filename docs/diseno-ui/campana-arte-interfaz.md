@@ -39,6 +39,7 @@ Los SVG no llevan texto: nombres, PS y costes los pinta la app.
 
 - **Fuente de sprites:** todos los sprites de objetos y Pokémon serán de Pokémon Escarlata y Púrpura (EP). En WikiDex el patrón de búsqueda es «Nombre EP.png» (objetos de 160×160, Pokémon de unos 250×250).
 - **Tipos de la campaña → icono:** bicho → planta, volador → incoloro, veneno → oscuridad, tierra → lucha, hielo → agua, roca → lucha, fantasma → oscuridad, normal → incoloro. Los tipos del motor se guardan con su tipo real; el icono es solo presentación. La lista de tipos del motor cambia al aplicar #404 (salen `bicho`, `volador`, `veneno`, `fantasma` e `hielo`, y entra `metal`, cuyo icono falta), por lo que no se cuenta aquí.
+- **Medallas:** las de Pokémon: Let's Go, Pikachu! y Let's Go, Eevee! (LGPE), decididas por Ayme el 2026-11-22. Sprites en WikiDex: https://www.wikidex.net/wiki/Categor%C3%ADa:Sprites_de_medallas_de_Kanto
 - **Energía:** fichas de 0 a 10 (no barra).
 - **Miniatura de banca:** la imagen de la carta en pequeño (60×84 px) con una barra de vida fina encima. La carta ya lleva su tipo, así que no hay borde de color. Debilitado: gris oscuro.
 - **Carta completa:** siempre es la imagen exportada de PokeCardMaker; no se dibuja ningún marco de carta.
@@ -48,7 +49,7 @@ Los SVG no llevan texto: nombres, PS y costes los pinta la app.
 
 - Escenas: Pueblo Paleta, Ruta 1, Ciudad Verde (con su centro), Ruta 22, Ruta 2, Bosque Verde, Ruta 2 norte, Ciudad Plateada (con su centro) y gimnasio de Brock; interior del Centro Pokémon.
 - Sprites de Pokémon (se subirán cuando esté el mapa), enfermera y entrenadores.
-- Medallas y líderes de gimnasio: no existen en estilo EP; hay que elegir otra versión o un estilo propio. Hay una propuesta de Diseño pendiente de que Ayme elija (D-20 §8, pregunta 24).
+- Líderes de gimnasio: no existen en estilo EP; falta decidir si salen de LGPE o se representan de otra forma (D-20 §8, pregunta 24).
 - Pantalla del PC (sin wireframe todavía).
 - Mayor resolución de los iconos de tipo y de la energía si se quieren más grandes de 28 px.
 
