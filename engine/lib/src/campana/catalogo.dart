@@ -193,12 +193,22 @@ class JefeCampana {
   /// de la categoría Jefe (D-20 §10.6).
   final int? xpPropia;
 
+  /// La moneda de captura sale siempre cara (Pikachu jefe, por ser el
+  /// tutorial: D-20 §10.6). La tirada gasta su Ball igualmente.
+  final bool capturaAsegurada;
+
   const JefeCampana({
     required this.numero,
     required this.pokemon,
     this.llamaAliado,
     this.xpPropia,
+    this.capturaAsegurada = false,
   });
+
+  /// Categoría con la que se captura: la de su carta (`categoriaCaptura` del
+  /// `pokemon` del JSON) o, si no la lleva, Jefe.
+  CategoriaCaptura get categoriaCaptura =>
+      pokemon.categoriaCaptura ?? CategoriaCaptura.jefe;
 
   /// XP que suma a la reserva derrotarlo.
   int get xp => xpPropia ?? xpDeCategoria(CategoriaCaptura.jefe);
@@ -223,6 +233,7 @@ JefeCampana jefeCampanaDesdeJson(Map<String, dynamic> json) {
             alFrenteAlPorcentaje: llamada['alFrenteAlPorcentaje'] as int?,
           ),
     xpPropia: json['xp'] as int?,
+    capturaAsegurada: (json['capturaAsegurada'] as bool?) ?? false,
   );
 }
 
@@ -272,6 +283,10 @@ class ZonaCampana {
   /// Id del Pokémon jefe de la zona, si lo hay.
   final String? jefe;
 
+  /// Si sus salvajes se pueden capturar. La Ruta 1 no deja: solo se aprende
+  /// a combatir (D-20 §10.6). En el JSON, `captura` (true si no está).
+  final bool permiteCaptura;
+
   const ZonaCampana({
     required this.id,
     required this.nombre,
@@ -279,6 +294,7 @@ class ZonaCampana {
     required this.salvajes,
     this.entrenadores = const [],
     this.jefe,
+    this.permiteCaptura = true,
   });
 
   /// Todos los ids de Pokémon que aparecen en la zona, sin repetir.
@@ -313,6 +329,7 @@ ZonaCampana zonaCampanaDesdeJson(Map<String, dynamic> json) {
           ]
         : const [],
     jefe: json['jefe'] as String?,
+    permiteCaptura: (json['captura'] as bool?) ?? true,
   );
 }
 

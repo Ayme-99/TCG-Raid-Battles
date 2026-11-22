@@ -71,6 +71,7 @@ PartidaCampana robusto(PartidaCampana p) => PartidaCampana(
       puntos: p.puntos,
       semilla: p.semilla,
       capturaPendiente: p.capturaPendiente,
+      capturaLograda: p.capturaLograda,
       derrotas: p.derrotas,
       dinero: p.dinero,
       xp: p.xp,
@@ -78,15 +79,39 @@ PartidaCampana robusto(PartidaCampana p) => PartidaCampana(
       ultimaCura: p.ultimaCura,
     );
 
-/// Avanza hasta el combate de [nodo] por el camino principal.
+/// Lanza Pokéballs al pendiente hasta capturarlo (y lo coloca) o hasta que
+/// no queden; sin Balls lo deja ir.
+PartidaCampana capturarSiPuede(CatalogoCampana c, PartidaCampana p) {
+  while (!p.capturaLograda && p.ballsEnMochila().isNotEmpty) {
+    p = p.lanzarBall(c, p.ballsEnMochila().first);
+  }
+  return p.capturaLograda ? p.capturar(c) : p.noCapturar();
+}
+
+/// Con Pokéballs de sobra para los tests de punta a punta.
+PartidaCampana conBalls(PartidaCampana p) => PartidaCampana(
+      progreso: p.progreso,
+      equipo: p.equipo,
+      semilla: p.semilla,
+      dinero: p.dinero,
+      mochila: {...p.mochila, ObjetoCampana.pokeball: 99},
+      ultimaCura: p.ultimaCura,
+    );
+
+/// Avanza hasta el combate de [nodo], cogiendo los desvíos opcionales para
+/// capturar más (con un solo inicial y lo que da el camino corto, el Entrenador
+/// Joven gana a veces: lo mide el simulador, no este test).
 PartidaCampana hasta(CatalogoCampana c, PartidaCampana p, String nodo) {
-  var s = robusto(p);
+  var s = robusto(conBalls(p));
   var combates = 0;
   while (s.progreso.nodoActual != nodo) {
     if (s.hayCombate(c)) {
       s = robusto(s.terminarCombate(c, jugarSolo(s.empezarCombate(c))));
-      if (s.capturaPendiente != null) s = robusto(s.capturar(c));
-      if (++combates > 300) fail('No llega a $nodo.');
+      if (s.capturaPendiente != null) s = robusto(capturarSiPuede(c, s));
+      if (++combates > 300) {
+        fail('No llega a $nodo: ${s.progreso.nodoActual}, '
+            '${s.equipo.map((e) => e.id)}, ${s.derrotas} derrotas.');
+      }
       continue;
     }
     if (s.nodoActual(c).tipo == TipoNodo.descanso && !s.progreso.resuelto) {
@@ -98,7 +123,7 @@ PartidaCampana hasta(CatalogoCampana c, PartidaCampana p, String nodo) {
       continue;
     }
     final op = s.opciones(c);
-    s = s.avanzar(c, op.last);
+    s = s.avanzar(c, op.first);
   }
   return s;
 }
@@ -126,7 +151,7 @@ void main() {
         .avanzar(c, 'ruta-1-pidgey');
     final r = p.rival(c);
     expect(r.equipo.single.id, 'pidgey');
-    expect(r.captura, 'pidgey');
+    expect(r.captura, isNull, reason: 'la Ruta 1 no deja capturar');
     expect(r.puntos, 100);
     expect(p.rival(c).equipo.single.id, r.equipo.single.id);
   });
@@ -144,13 +169,8 @@ void main() {
     expect(p.progreso.resuelto, isTrue);
     expect(p.puntos, 100);
     expect(p.equipo.single.ps, fin.jugador.equipo.single.ps);
-    expect(p.capturaPendiente, isNotNull);
     expect(p.semilla, isNot(semilla));
-    expect(p.opciones(c), isEmpty, reason: 'antes hay que decidir la captura');
-    expect(() => p.avanzar(c, 'ciudad-verde'), throwsA(isA<ReglaIncumplida>()));
-    expect(p.capturaPendiente, 'pidgey');
-    p = p.capturar(c);
-    expect(p.equipo.map((e) => e.id), ['bulbasaur', 'pidgey']);
+    expect(p.capturaPendiente, isNull, reason: 'la Ruta 1 no deja capturar');
     expect(p.opciones(c), ['ciudad-verde']);
   });
 
@@ -479,6 +499,7 @@ void main() {
           PokemonGuardado.completo(c.especie(id)),
       ],
       capturaPendiente: 'kakuna',
+      capturaLograda: true,
     );
     expect(p.equipoLleno(), isTrue);
     final alPc = p.capturar(c);
@@ -487,7 +508,8 @@ void main() {
     final cambio = p.capturar(c, sustituir: 1);
     expect(cambio.equipo[1].id, 'kakuna');
     expect(cambio.pc.single.id, 'pidgey');
-    expect(p.noCapturar().capturaPendiente, isNull);
+    expect(() => p.noCapturar(), throwsA(isA<ReglaIncumplida>()),
+        reason: 'ya está capturado');
   });
 
   test('el jefe solo se captura la primera vez y da su carta normal', () {
@@ -595,13 +617,13 @@ void main() {
 
   test('el tramo se puede jugar entero hasta la medalla de Brock', () {
     for (final inicial in ['bulbasaur', 'charmander', 'squirtle']) {
-      var p = robusto(PartidaCampana.nueva(c.region, semilla: 42)
-          .elegirInicial(c, inicial));
+      var p = robusto(conBalls(PartidaCampana.nueva(c.region, semilla: 42)
+          .elegirInicial(c, inicial)));
       var combates = 0;
       while (!p.terminada(c)) {
         if (p.hayCombate(c)) {
           p = robusto(p.terminarCombate(c, jugarSolo(p.empezarCombate(c))));
-          if (p.capturaPendiente != null) p = robusto(p.capturar(c));
+          if (p.capturaPendiente != null) p = robusto(capturarSiPuede(c, p));
           if (++combates > 300) fail('$inicial no acaba el tramo.');
           continue;
         }
@@ -947,6 +969,141 @@ void main() {
         {'a': 'x', 'via': 'xp', 'xpEvolucion': 50, 'medallasMinimas': -1},
       ];
       expect(() => pokemonCampanaDesdeJson(json), throwsFormatException);
+    });
+  });
+
+  group('captura con Ball y moneda (D-20 §10.6, #368)', () {
+    PartidaCampana pendiente(String nodo, String id,
+            {Map<ObjetoCampana, int> mochila = const {}, int semilla = 1}) =>
+        PartidaCampana(
+          progreso: ProgresoRuta(nodoActual: nodo, resuelto: true),
+          equipo: const [PokemonGuardado('squirtle', 80)],
+          capturaPendiente: id,
+          mochila: mochila,
+          semilla: semilla,
+        );
+
+    test('la tabla de probabilidades es la decidida', () {
+      int pr(CategoriaCaptura k, int b) => probabilidadCaptura(k, b);
+      expect([for (var b = 0; b < 3; b++) pr(CategoriaCaptura.comun, b)],
+          [750, 1000, 1000]);
+      expect([for (var b = 0; b < 3; b++) pr(CategoriaCaptura.intermedio, b)],
+          [500, 750, 1000]);
+      expect([for (var b = 0; b < 3; b++) pr(CategoriaCaptura.fuerte, b)],
+          [250, 500, 750]);
+      expect([for (var b = 0; b < 3; b++) pr(CategoriaCaptura.jefe, b)],
+          [125, 250, 500]);
+    });
+
+    test('cada tirada gasta 1 Ball, también si sale cara', () {
+      final p = pendiente('ruta-2-weedle', 'weedle',
+          mochila: const {ObjetoCampana.superBall: 2});
+      expect(p.probabilidadConBall(c, ObjetoCampana.superBall), 1000);
+      final q = p.lanzarBall(c, ObjetoCampana.superBall);
+      expect(q.capturaLograda, isTrue);
+      expect(q.cuantos(ObjetoCampana.superBall), 1);
+      expect(q.semilla, isNot(p.semilla));
+      expect(q.capturar(c).equipo.last.id, 'weedle');
+    });
+
+    test('con cruz se reintenta mientras queden Balls, y es determinista', () {
+      // Onix (Fuerte) con Pokéball: 25 %.
+      var p = pendiente('ruta-2-weedle', 'onix',
+          mochila: const {ObjetoCampana.pokeball: 50}, semilla: 99);
+      expect(p.probabilidadConBall(c, ObjetoCampana.pokeball), 250);
+      var tiradas = 0;
+      var fallos = 0;
+      while (!p.capturaLograda) {
+        final antes = p;
+        p = p.lanzarBall(c, ObjetoCampana.pokeball);
+        tiradas++;
+        if (!p.capturaLograda) fallos++;
+        expect(antes.lanzarBall(c, ObjetoCampana.pokeball).capturaLograda,
+            p.capturaLograda,
+            reason: 'misma semilla, misma moneda');
+      }
+      expect(p.cuantos(ObjetoCampana.pokeball), 50 - tiradas);
+      expect(fallos, tiradas - 1);
+    });
+
+    test('sin Balls no se lanza y el combate acaba sin captura', () {
+      final p = pendiente('ruta-2-weedle', 'weedle');
+      expect(p.ballsEnMochila(), isEmpty);
+      expect(() => p.lanzarBall(c, ObjetoCampana.pokeball),
+          throwsA(isA<ReglaIncumplida>()));
+      expect(() => p.capturar(c), throwsA(isA<ReglaIncumplida>()),
+          reason: 'sin acertar no se captura');
+      final q = p.noCapturar();
+      expect(q.capturaPendiente, isNull);
+      expect(q.opciones(c), isNotEmpty);
+    });
+
+    test('la mochila de salida no lleva Pokéballs', () {
+      expect(PartidaCampana.nueva(c.region).ballsEnMochila(), isEmpty);
+    });
+
+    test('la Ruta 1 no deja capturar; la Ruta 2 sí', () {
+      expect(c.zonas['ruta-1']!.permiteCaptura, isFalse);
+      expect(c.zonas['ruta-2']!.permiteCaptura, isTrue);
+      const r1 = PartidaCampana(
+          progreso: ProgresoRuta(nodoActual: 'ruta-1-rattata'),
+          equipo: [PokemonGuardado('squirtle', 80)]);
+      expect(r1.rival(c).captura, isNull);
+      const r2 = PartidaCampana(
+          progreso: ProgresoRuta(nodoActual: 'ruta-2-caterpie'),
+          equipo: [PokemonGuardado('squirtle', 80)]);
+      expect(r2.rival(c).captura, 'caterpie');
+    });
+
+    test('Pikachu jefe es Común y su captura es segura, pero gasta la Ball', () {
+      final jefe = c.jefes['pikachu-jefe']!;
+      expect(jefe.categoriaCaptura, CategoriaCaptura.comun);
+      expect(jefe.capturaAsegurada, isTrue);
+      for (var semilla = 1; semilla < 40; semilla++) {
+        final p = pendiente('jefe-pikachu', 'pikachu',
+            mochila: const {ObjetoCampana.pokeball: 1}, semilla: semilla);
+        final q = p.lanzarBall(c, ObjetoCampana.pokeball);
+        expect(q.capturaLograda, isTrue, reason: 'semilla $semilla');
+        expect(q.cuantos(ObjetoCampana.pokeball), 0);
+      }
+    });
+
+    test('un jefe sin categoría en su carta se captura como Jefe', () {
+      final j = jefeCampanaDesdeJson({
+        'numero': 2,
+        'pokemon': {
+          'id': 'x',
+          'nombre': 'X',
+          'tipo': 'normal',
+          'ps': 60,
+          'ataques': [
+            {'nombre': 'Placaje', 'tipo': 'normal', 'coste': 1, 'dano': 20},
+          ],
+        },
+      });
+      expect(j.categoriaCaptura, CategoriaCaptura.jefe);
+      expect(j.capturaAsegurada, isFalse);
+    });
+
+    test('un jefe que se deja ir no se puede capturar después', () {
+      final p = pendiente('jefe-pikachu', 'pikachu');
+      final q = PartidaCampana(
+        progreso: const ProgresoRuta(
+            nodoActual: 'jefe-pikachu', jefesDerrotados: {'pikachu-jefe'}),
+        equipo: p.equipo,
+      );
+      expect(p.noCapturar().capturaPendiente, isNull);
+      expect(q.rival(c).captura, isNull);
+    });
+
+    test('la captura lograda se guarda en la partida', () {
+      final p = pendiente('ruta-2-weedle', 'weedle',
+              mochila: const {ObjetoCampana.ultraBall: 1})
+          .lanzarBall(c, ObjetoCampana.ultraBall);
+      final q = PartidaCampana.desdeJson(
+          jsonDecode(jsonEncode(p.aJson())) as Map<String, dynamic>);
+      expect(q.capturaLograda, isTrue);
+      expect(q.capturaPendiente, 'weedle');
     });
   });
 

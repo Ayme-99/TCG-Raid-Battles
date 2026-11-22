@@ -195,6 +195,20 @@ int xpDeCategoria(CategoriaCaptura categoria) => switch (categoria) {
       CategoriaCaptura.jefe => 30,
     };
 
+/// Probabilidad de capturar, en tanto por mil, a un Pokémon de [categoria]
+/// con una Ball de [nivelBall] (0 Pokéball, 1 Super Ball, 2 Ultra Ball). D-20
+/// §10.6, decidido el 2026-11-22: Común 75/100/100 %, Intermedio 50/75/100 %,
+/// Fuerte 25/50/75 % y Jefe 12,5/25/50 %.
+int probabilidadCaptura(CategoriaCaptura categoria, int nivelBall) {
+  const tabla = {
+    CategoriaCaptura.comun: [750, 1000, 1000],
+    CategoriaCaptura.intermedio: [500, 750, 1000],
+    CategoriaCaptura.fuerte: [250, 500, 750],
+    CategoriaCaptura.jefe: [125, 250, 500],
+  };
+  return tabla[categoria]![nivelBall];
+}
+
 /// Un Pokémon de campaña tal como está en el catálogo.
 class PokemonCampana {
   final String id;
