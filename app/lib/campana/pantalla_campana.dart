@@ -658,9 +658,8 @@ class _Equipo extends ConsumerWidget {
                   leading: const Icon(Icons.auto_awesome_rounded),
                   title: Text('Evolucionar en '
                       '${catalogo.especie(e.a).nombre} (${e.xpEvolucion} XP)'),
-                  subtitle: Text(partida.puedeEvolucionar(e)
-                      ? 'Queda con ${PartidaCampana.psAlEvolucionar} PS.'
-                      : 'Faltan ${e.xpEvolucion! - partida.xp} XP.'),
+                  subtitle: Text(partida.motivoSinEvolucion(e) ??
+                      'Queda con ${PartidaCampana.psAlEvolucionar} PS.'),
                   enabled: partida.puedeEvolucionar(e),
                   onTap: () {
                     Navigator.of(context).pop();
