@@ -783,12 +783,26 @@ class PartidaCampana {
     ];
   }
 
-  /// Si la reserva llega para [evolucion] (D-20 §10.6).
+  /// Por qué no se puede hacer [evolucion] ahora, o null si se puede: faltan
+  /// medallas (D-20 §10.11, #414) o la reserva no llega (§10.6).
+  String? motivoSinEvolucion(EvolucionCampana evolucion) {
+    if (evolucion.via != ViaEvolucion.xp) return 'No evoluciona con XP.';
+    final medallas = evolucion.medallasMinimas ?? 0;
+    if (progreso.medallas.length < medallas) {
+      return 'Requiere $medallas ${medallas == 1 ? 'medalla' : 'medallas'}.';
+    }
+    final coste = evolucion.xpEvolucion ?? 0;
+    if (xp < coste) return 'Faltan ${coste - xp} XP.';
+    return null;
+  }
+
+  /// Si [evolucion] se puede hacer ahora: hay medallas y XP suficientes.
   bool puedeEvolucionar(EvolucionCampana evolucion) =>
-      evolucion.via == ViaEvolucion.xp && xp >= (evolucion.xpEvolucion ?? 0);
+      motivoSinEvolucion(evolucion) == null;
 
   /// Evoluciona al Pokémon [indice] del equipo en [destino] gastando de la
-  /// reserva la XP de esa evolución (D-20 §10.6, decidido el 2026-11-22). Se
+  /// reserva la XP de esa evolución (D-20 §10.6, decidido el 2026-11-22), si
+  /// se tienen las medallas que pide (`medallasMinimas`, §10.11). Se
   /// hace fuera de combate, desde el menú del equipo, sin límite por visita. La
   /// carta evolucionada sustituye a la anterior y queda con **10 PS**, aunque
   /// tuviera más o estuviera debilitado (evolucionar revive a 10 PS).
@@ -803,10 +817,8 @@ class PartidaCampana {
       throw ReglaIncumplida(
           '${c.especie(equipo[indice].id).nombre} no evoluciona en "$destino" con XP.');
     }
-    if (!puedeEvolucionar(evolucion)) {
-      throw ReglaIncumplida(
-          'Hacen falta ${evolucion.xpEvolucion} XP y la reserva tiene $xp.');
-    }
+    final motivo = motivoSinEvolucion(evolucion);
+    if (motivo != null) throw ReglaIncumplida(motivo);
     return _copiar(
       equipo: [...equipo]..[indice] = PokemonGuardado(destino, psAlEvolucionar),
       xp: xp - evolucion.xpEvolucion!,

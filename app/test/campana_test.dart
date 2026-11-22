@@ -20,6 +20,7 @@ Future<ProviderContainer> abrirCampana(
   required AlmacenMemoria almacen,
   Size tamano = const Size(1280, 800),
   PartidaCampana? guardada,
+  CatalogoCampana? catalogo,
 }) async {
   tester.view.physicalSize = tamano;
   tester.view.devicePixelRatio = 1.0;
@@ -29,6 +30,8 @@ Future<ProviderContainer> abrirCampana(
       overrides: [
         ...sobrescribir(almacen: almacen, conInicio: true),
         campanaInicialProvider.overrideWithValue(guardada),
+        if (catalogo != null)
+          catalogoCampanaProvider.overrideWith((ref) async => catalogo),
       ],
       child: const MaterialApp(home: PantallaCampana()),
     ),
@@ -270,6 +273,39 @@ void main() {
     final json = jsonDecode(almacen.datos[claveCampana]!) as Map;
     expect(json['xp'], 10);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('una evolución sin las medallas que pide muestra el motivo',
+      (tester) async {
+    // Pidgey → Rattata de mentira con 2 medallas (Pidgeotto no tiene carta).
+    final almacen = AlmacenMemoria();
+    final real = (await tester.runAsync(() => cargarCatalogoCampana(rootBundle)))!;
+    final pidgey = jsonDecode(
+            File('assets/catalogo/campana/pokemon/pidgey.json').readAsStringSync())
+        as Map<String, dynamic>;
+    pidgey['evoluciones'] = [
+      {'a': 'rattata', 'via': 'xp', 'xpEvolucion': 50, 'medallasMinimas': 2},
+    ];
+    final catalogo = CatalogoCampana(
+      pokemon: {...real.pokemon, 'pidgey': pokemonCampanaDesdeJson(pidgey)},
+      zonas: real.zonas,
+      jefes: real.jefes,
+      region: real.region,
+    );
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ruta-2-norte', superados: {'pueblo-paleta'}),
+      equipo: [PokemonGuardado('pidgey', 60)],
+      xp: 200,
+    );
+    final c = await abrirCampana(tester,
+        almacen: almacen, guardada: guardada, catalogo: catalogo);
+    await tocar(tester, 'equipo-0');
+    expect(find.text('Requiere 2 medallas.'), findsOneWidget);
+    final tile = tester.widget<ListTile>(
+        find.byKey(const Key('equipo-evolucionar-rattata')));
+    expect(tile.enabled, isFalse);
+    expect(c.read(campanaProvider).partida!.equipo.single.id, 'pidgey');
   });
 
   testWidgets('con una campaña guardada se continúa donde estaba',

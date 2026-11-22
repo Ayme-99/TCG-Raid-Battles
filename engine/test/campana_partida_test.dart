@@ -863,6 +863,93 @@ void main() {
     });
   });
 
+  group('evolución limitada por medalla (D-20 §10.11, #414)', () {
+    // Pidgey → Rattata de mentira, con 2 medallas, porque Pidgeotto aún no
+    // tiene carta (en la tabla, Pidgey → Pidgeotto pide 2 medallas).
+    CatalogoCampana conPidgeyDeDosMedallas() {
+      final json = leer(File('../catalog/campana/pokemon/pidgey.json'));
+      json['evoluciones'] = [
+        {'a': 'rattata', 'via': 'xp', 'xpEvolucion': 50, 'medallasMinimas': 2},
+      ];
+      return CatalogoCampana(
+        pokemon: {...c.pokemon, 'pidgey': pokemonCampanaDesdeJson(json)},
+        zonas: c.zonas,
+        jefes: c.jefes,
+        region: c.region,
+      );
+    }
+
+    PartidaCampana conMedallas(Set<String> medallas) => PartidaCampana(
+          progreso:
+              ProgresoRuta(nodoActual: 'centro-plateada', medallas: medallas),
+          equipo: const [PokemonGuardado('pidgey', 60)],
+          xp: 200,
+        );
+
+    test('con 0 medallas no se evoluciona uno que pide 2, aunque haya XP', () {
+      final c2 = conPidgeyDeDosMedallas();
+      final p = conMedallas({});
+      final e = p.evolucionesPorXp(c2, 0).single;
+      expect(e.medallasMinimas, 2);
+      expect(p.puedeEvolucionar(e), isFalse);
+      expect(p.motivoSinEvolucion(e), 'Requiere 2 medallas.');
+      expect(() => p.evolucionar(c2, 0, 'rattata'),
+          throwsA(isA<ReglaIncumplida>()));
+      expect(p.motivoSinEvolucion(e),
+          isNot(contains('XP')), reason: 'el motivo son las medallas');
+    });
+
+    test('con una sola medalla tampoco', () {
+      final c2 = conPidgeyDeDosMedallas();
+      final p = conMedallas({'roca'});
+      expect(p.puedeEvolucionar(p.evolucionesPorXp(c2, 0).single), isFalse);
+    });
+
+    test('con las medallas, sí', () {
+      final c2 = conPidgeyDeDosMedallas();
+      final p = conMedallas({'roca', 'cascada'}).evolucionar(c2, 0, 'rattata');
+      expect(p.equipo.single.id, 'rattata');
+      expect(p.xp, 150);
+    });
+
+    test('con medallas pero sin XP, el motivo es la XP', () {
+      final c2 = conPidgeyDeDosMedallas();
+      final p = PartidaCampana(
+        progreso: const ProgresoRuta(
+            nodoActual: 'centro-plateada', medallas: {'roca', 'cascada'}),
+        equipo: const [PokemonGuardado('pidgey', 60)],
+        xp: 20,
+      );
+      expect(p.motivoSinEvolucion(p.evolucionesPorXp(c2, 0).single),
+          'Faltan 30 XP.');
+    });
+
+    test('Caterpie y Weedle evolucionan con 0 medallas', () {
+      for (final id in ['caterpie', 'weedle']) {
+        expect(c.pokemon[id]!.evoluciones.single.medallasMinimas, 0,
+            reason: id);
+      }
+    });
+
+    test('toda evolución por XP del catálogo lleva medallasMinimas', () {
+      for (final p in c.pokemon.values) {
+        for (final e in p.evoluciones) {
+          if (e.via == ViaEvolucion.xp) {
+            expect(e.medallasMinimas, isNotNull, reason: '${p.id} → ${e.a}');
+          }
+        }
+      }
+    });
+
+    test('medallasMinimas negativo se rechaza', () {
+      final json = leer(File('../catalog/campana/pokemon/pidgey.json'));
+      json['evoluciones'] = [
+        {'a': 'x', 'via': 'xp', 'xpEvolucion': 50, 'medallasMinimas': -1},
+      ];
+      expect(() => pokemonCampanaDesdeJson(json), throwsFormatException);
+    });
+  });
+
   test('hasta() llega a un nodo concreto', () {
     final p = hasta(
         c,
