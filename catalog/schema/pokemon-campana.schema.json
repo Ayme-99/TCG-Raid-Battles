@@ -330,15 +330,11 @@
         "agua",
         "planta",
         "electrico",
-        "hielo",
         "lucha",
-        "veneno",
-        "volador",
         "psiquico",
         "oscuridad",
-        "bicho",
-        "fantasma",
-        "dragon"
+        "dragon",
+        "metal"
       ]
     }
   }
