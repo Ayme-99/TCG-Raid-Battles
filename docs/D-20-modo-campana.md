@@ -1,6 +1,6 @@
 # D-20 · Modo campaña
 
-Estado: **diseño, pendiente de aprobar** (2026-11-21). Issue #334. Nada de esto está implementado.
+Estado: **diseño, pendiente de aprobar** (2026-11-21). Issue #334. El 2026-11-22 Ayme cerró la mayoría de las preguntas abiertas (§8); quedan las que se indican allí. Implementado: combate, IA, catálogo del primer tramo, modelo de ruta y simulador (§6).
 
 ## 1. Idea
 
@@ -33,23 +33,22 @@ Cada Pokémon es un registro del catálogo:
 | `rareza` | cuánto cuesta encontrarlo en las rutas |
 | imagen | no va en el JSON: es `app/assets/campana/cartas/<id>.webp` (480×670) |
 
-- El equipo lleva **hasta 6 Pokémon: 1 activo y 5 en la banca** (decidido el 2026-11-21; es un parámetro). Los demás están en el **PC** (§4, Descanso). Un Pokémon capturado se une al equipo si hay hueco; si el equipo está lleno, la app pregunta si se **cambia por uno del equipo**, y el que se descarta (el capturado o el sustituido) **va al PC**: no se pierde ningún Pokémon.
+- El equipo lleva **hasta 6 Pokémon: 1 activo y 5 en la banca** (decidido el 2026-11-21; es un parámetro). Los demás están en el **PC** (§4, Descanso). Para capturar hace falta una **Poké Ball** (§4, Ruta). Un Pokémon capturado se une al equipo si hay hueco; si el equipo está lleno, la app pregunta si se **cambia por uno del equipo**, y el que se descarta (el capturado o el sustituido) **va al PC**: no se pierde ningún Pokémon.
 - Los efectos de los ataques (§3.6) empiezan por uno: reducir el daño del rival. Los siguientes (monedas, curar, estados) reutilizarán las piezas que ya existen en las cartas de los aliados, sin inventar un sistema nuevo.
 
 ### 2.1 Progresión: sin niveles, con XP y evolución
 
-Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos PS y daños; se mejora evolucionando.
+Decidido el 2026-11-21 y cambiado el 2026-11-22. **No hay niveles**: las cartas tienen siempre los mismos PS y daños; se mejora evolucionando.
 
-- **Las victorias en combate dan puntos** (los mismos puntos del juego, §5).
-- En un **centro Pokémon** (el nodo de descanso) se pueden **convertir puntos en XP** de un Pokémon del equipo. Cuántos puntos cuesta cada XP queda por equilibrar.
+- **La XP se gana derrotando Pokémon**, salvajes o de entrenador (decidido el 2026-11-22: ya **no** se compra XP con puntos). Cuánta XP da cada Pokémon y a quién se le apunta (propuesta: al Pokémon que lo derriba) queda por cerrar (§8).
 - Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xp: N` en la carta). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4).
 - **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`).
-- **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): cuesta **puntos**, por usar la máquina de intercambio (`via: "intercambio"`, `puntos: N`).
-- **Cartas ex.** La **última fase de cada Pokémon es una carta ex**. Un Pokémon que no evoluciona (Onix…) puede hacerse ex **gastando puntos** (`via: "puntos"`, `puntos: N`), con el mismo proceso. Cada carta ex es una **entrada propia del catálogo** (`"ex": true`).
+- **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): cuesta **dinero**, por usar la máquina de intercambio (`via: "intercambio"`).
+- **Cartas ex.** La **última fase de cada Pokémon es una carta ex**. Cómo se hace ex un Pokémon que no evoluciona (Onix…) queda por cerrar (§8): antes era gastando puntos; ahora que la XP se gana combatiendo, la propuesta es por XP (`via: "xp"`). Cada carta ex es una **entrada propia del catálogo** (`"ex": true`).
 - **La carta evolucionada sustituye a la anterior** y recupera todos sus PS. Una forma evolucionada también puede aparecer salvaje en una zona si el catálogo la incluye, y entonces se captura aparte.
 - Un Pokémon puede tener **varias** evoluciones (Eevee con sus piedras), por eso `evoluciones` es una lista.
 
-Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo**.
+Datos que hay que guardar en el progreso de campaña: **XP acumulada por cada Pokémon del equipo** (y del PC).
 
 ## 3. Combate
 
@@ -77,7 +76,7 @@ Empieza el **jugador**. En su turno, un bando hace **una acción, y las tres gas
 
 **Elegir el siguiente Pokémon** cuando cae el activo **no** gasta turno: su dueño lo elige y sigue su turno.
 
-**Cambiar: turno o energía.** Se decidió que cambiar **gasta el turno**. La carta puede añadir además una **retirada con coste de energía** (el campo `retirada`; es 0 de salida, es decir, «retirada gratis»). Así, la retirada gratis significa que cambiar no cuesta energía, y un Pokémon pesado podría costar turno **y** energía. Si preferís que la retirada sea solo energía y no turno, es cambiar una línea del motor; queda a validar con el simulador.
+**Cambiar: turno o energía.** Se decidió que cambiar **gasta el turno**. La carta puede añadir además una **retirada con coste de energía** (el campo `retirada`; es 0 de salida, es decir, «retirada gratis»). Así, la retirada gratis significa que cambiar no cuesta energía, y un Pokémon pesado cuesta turno **y** energía. **Confirmado el 2026-11-22:** cambiar gasta el turno y, además, la energía de retirada si la tiene.
 
 ### 3.3 Debilidades y resistencias
 
@@ -169,7 +168,7 @@ Decidido el 2026-11-21. Un ataque puede llevar un `efecto` y entonces puede tene
 - **`repiteDanoAlDerribar` (Doble Patada de Nidoran♀):** «Si el Pokémon Defensor queda fuera de combate por el daño de este ataque, el nuevo Pokémon Defensor recibe de nuevo ese daño.» Decidido el 2026-11-21. Si el ataque derriba al activo rival y le quedan Pokémon, el motor guarda el ataque (`EstadoCombate.repetirDano`) y, **en cuanto el rival elige a su relevo**, ese relevo lo recibe otra vez, calculado contra **su propia** debilidad y resistencia. Se repite **una sola vez**: si el relevo también cae, no se encadena. Si era el último Pokémon, el combate termina por el primer golpe. La IA no lo tiene en cuenta.
 - **Nuevo tipo `oscuridad`:** Nidoran♀ es de tipo oscuridad (los Pokémon de veneno pasan a este tipo en el TCG). Es otro paso para alinear los tipos con el TCG, junto con la decisión de que tierra y roca son lucha.
 - **`monedasDano` (Ataque Furia de Spearow):** «Lanza 3 monedas. Con 1 cara, hace 20 puntos de daño; con 2 caras, 30; con 3 caras, 40; con 0 caras, 50.» Decidido el 2026-11-21. El ataque lanza `monedas` monedas con la semilla del combate (`EstadoCombate.ultimasMonedas` guarda todas, en orden, para mostrarlas) y hace el daño de `danoPorCaras[caras]`. El `dano` del JSON es el **daño esperado** (30: 50·1/8 + 20·3/8 + 30·3/8 + 40·1/8), que solo usa la IA y el baremo; el daño real sale de la tabla. Toda tirada hace 20 o más, así que cumple la regla del ataque de 20. La IA decide con el daño esperado, no con la tirada.
-- **`danoPorRacha` (Rodar de Sandshrew):** decidido el 2026-11-21. El `dano` del ataque se multiplica por las **veces seguidas** que el Pokémon lo ha usado, contando la actual: 20, 40, 60… Se reinicia si usa **otro ataque**, **carga**, **cambia** de Pokémon o cae. Estado del bando que ataca: `ultimoAtaque` y `racha`. La IA ya cuenta el daño que haría ahora (con la racha), así que lo encadena cuando supera a su otro ataque. **Ajuste pendiente del texto de la carta:** la carta de Sandshrew dice «20 puntos de daño más por cada vez que usó Rodar en su turno anterior», que literalmente da 20 o 40; el efecto implementado es el acumulado (20, 40, 60…).
+- **`danoPorRacha` (Rodar de Sandshrew):** decidido el 2026-11-21. El `dano` del ataque se multiplica por las **veces seguidas** que el Pokémon lo ha usado, contando la actual: 20, 40, 60… Se reinicia si usa **otro ataque**, **carga**, **cambia** de Pokémon o cae. Estado del bando que ataca: `ultimoAtaque` y `racha`. La IA ya cuenta el daño que haría ahora (con la racha), así que lo encadena cuando supera a su otro ataque. **Texto de la carta** (decidido el 2026-11-22): «Este ataque hace 20 puntos de daño, y 20 más por cada vez consecutiva que se use.» Coincide con el efecto implementado (20, 40, 60…).
 - **`monedaFalloRival` (Bofetón Lodo de Diglett):** «En su próximo turno, si el Pokémon Defensor ataca, lanza una moneda. Si sale cruz, ese ataque no hace nada (la energía se gasta igual).» Decidido el 2026-11-21. El ataque hace su daño y marca al rival (`BandoCombate.cegado`). En su siguiente turno, **si ataca**, se lanza la moneda con la semilla del combate: cara, el ataque funciona con normalidad; cruz, **no hace nada** (ni daño ni efectos) y gasta su energía y su turno. Dura **solo ese turno**, pase lo que pase en él: si carga, cambia de Pokémon o cae, se quita. No se acumula. La IA no lo tiene en cuenta (no sabe que va a fallar la mitad de las veces) y, al estar el azar en el motor, el resultado queda en `ultimaMoneda` para mostrarlo.
 - **`reduceDanoPropio` (Fortaleza de Metapod):** «Mientras este Pokémon siga activo, recibe 10 puntos menos de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula.» Es el espejo de Gruñido, pero sobre uno mismo: se pone en el bando que ataca (`BandoCombate.proteccion`), dura mientras ese Pokémon siga activo y se quita al cambiarlo o cuando cae. Se combina con Látigo sumando (+10 y −10 se compensan; `extraRecibido`) y el daño nunca baja de 0. La IA la usa con el mismo criterio que Gruñido: solo si evita más daño, en los golpes que el rival necesita para derribarla, que el que haría atacando.
 - **`envenenaDefensor` (Picotazo Veneno de Weedle):** «El Pokémon Defensor pasa a estar Envenenado.» Decidido el 2026-11-21: hay un **chequeo Pokémon cada vez que cambia el turno** (tras el turno de cualquiera de los dos), y en cada chequeo el activo envenenado pierde 10 PS; es decir, 20 por ronda. Va primero el bando que acaba de jugar. Dura mientras ese Pokémon siga activo (se quita al cambiarlo, o cuando cae), no se acumula, y el ataque que envenena ya sufre el primer chequeo al acabar su turno. Estado: `BandoCombate.veneno`. Si el veneno derriba a un activo, su dueño elige relevo; si era su último Pokémon, pierde y el combate termina (si el último Pokémon de quien acaba el turno cae por veneno, pierde él, aunque el otro también fuera a caer en ese mismo chequeo). Como en esa fase puede tener que elegir el bando que **no** tiene el turno, quien pide la acción usa `EstadoCombate.actua` (en lugar de `turno`) y `debenElegir`. La IA usa el ataque que envenena siempre que el rival no esté ya envenenado (aunque el golpe quede en 0 por Fortaleza o Gruñido) y no lo repite mientras siga envenenado; no valora el veneno al cambiar de Pokémon.
@@ -178,16 +177,25 @@ Decidido el 2026-11-21. Un ataque puede llevar un `efecto` y entonces puede tene
 - **Ninguna carta queda anulada:** todas llevan al menos un ataque de 20 o más (§3.5), de modo que Gruñido deja siempre un ataque de 10 como mínimo.
 - La IA lo usa solo si compensa; contra un rival que pega poco (10 de daño) lo deja sin hacer daño; contra uno que pega fuerte no lo usa.
 
+### 3.7 Entre combates
+
+Decidido el 2026-11-22.
+
+- **El daño se arrastra** de un combate al siguiente: cada Pokémon empieza con los PS con los que acabó el anterior.
+- Se cura en un **punto de curación** (centro Pokémon, zona de descanso…), que cura todo el equipo, o fuera de combate con **objetos** (Pociones y demás). Usar un objeto fuera de combate no es un punto de curación (§4, Derrota).
+- Un Pokémon debilitado (0 PS) no puede salir a combatir hasta que se cure. Propuesta: la Poción no reanima a un debilitado, solo lo hace el punto de curación.
+- **La energía empieza siempre en 10** en cada combate nuevo.
+
 ## 4. Mapa
 
 La campaña inicial es **Kanto** (decidido el 2026-11-21). La región se recorre por **zonas** (rutas, cuevas, ciudades), como en los juegos, y cada zona define qué Pokémon salvajes aparecen y qué entrenadores hay. El **Túnel Roca** es una de esas zonas. El recorrido es un grafo de **nodos**:
 
 | Nodo | Qué pasa |
 |---|---|
-| **Inicio** | Elegir un Pokémon inicial entre tres (cuáles, por decidir). |
-| **Ruta** | Combate contra un Pokémon salvaje. Al derrotarlo se pregunta si se captura: si hay hueco se une al equipo, y si está lleno se elige a quién sustituir y el descartado va al PC (§2). |
-| **Descanso** | El **centro Pokémon**: cura el equipo, da acceso al **PC** (guarda los Pokémon que no caben en el equipo y permite cambiarlos por los del equipo), permite **evolucionar 1 Pokémon** y comprar (qué se vende, por decidir). |
-| **Gimnasio** | Combate contra un entrenador. Da una **medalla** y puntos. |
+| **Inicio** | Elegir un Pokémon inicial entre tres: **Bulbasaur, Charmander o Squirtle** (como en `kanto.json`). |
+| **Ruta** | Combate contra un Pokémon salvaje. Al derrotarlo, si se tiene una **Poké Ball**, se puede lanzar: captura con cierta probabilidad (por cerrar, §8). Si hay hueco se une al equipo, y si está lleno se elige a quién sustituir y el descartado va al PC (§2). Un **Repelente** evita el combate y deja el nodo superado. |
+| **Descanso** | El **centro Pokémon**: cura el equipo, da acceso al **PC** (guarda los Pokémon que no caben en el equipo y permite cambiarlos por los del equipo), permite **evolucionar 1 Pokémon** y comprar objetos con dinero (§5). Es un **punto de curación** (§4, Derrota). |
+| **Gimnasio** | Combate contra un entrenador. Da una **medalla**, dinero y puntos. |
 | **Jefe** | Un **Pokémon salvaje** con su carta de la serie NN/20 (§4, Jefes). Da muchos puntos. |
 | **Liga** | Tras reunir todas las medallas. **Fase 2.** |
 
@@ -212,7 +220,9 @@ Decidido el 2026-11-22. Una región es un **grafo dirigido sin ciclos** que se r
 - **Qué rival toca:** el nodo de combate dice la zona y si es salvaje o entrenador; el Pokémon concreto lo elige el combate con la semilla de la partida (tarea 6, captura). El gimnasio usa sus Pokémon en orden.
 - **La Liga:** fase 2; todavía no hay tipo de nodo.
 
-**Progreso** (`ProgresoRuta`, es lo que se guarda en el dispositivo, §6): nodo actual, si está resuelto, nodos superados, medallas, jefes derrotados y el inicial elegido; con `aJson`/`desdeJson`. Es inmutable y avanza con tres operaciones: `resolver` (da por hecho el nodo: elegir inicial, ganar el combate, usar el descanso; un gimnasio da su medalla y un jefe queda anotado como derrotado), `opciones` (a dónde se puede ir: nada hasta resolver) y `avanzar(destino)`, que solo admite una salida del nodo actual ya resuelto. Una bifurcación se da por resuelta al llegar. No se puede volver atrás. `puedeCapturarJefe` dice si el jefe se captura (solo la primera vez, §4 Jefes). Qué pasa al perder es la pregunta 1 de §8.
+**Progreso** (`ProgresoRuta`, es lo que se guarda en el dispositivo, §6): nodo actual, si está resuelto, nodos superados, medallas, jefes derrotados y el inicial elegido; con `aJson`/`desdeJson`. Es inmutable y avanza con tres operaciones: `resolver` (da por hecho el nodo: elegir inicial, ganar el combate, usar el descanso; un gimnasio da su medalla y un jefe queda anotado como derrotado), `opciones` (a dónde se puede ir: nada hasta resolver) y `avanzar(destino)`, que solo admite una salida del nodo actual ya resuelto. Una bifurcación se da por resuelta al llegar. No se puede volver atrás. `puedeCapturarJefe` dice si el jefe se captura (solo la primera vez, §4 Jefes).
+
+**Derrota** (decidido el 2026-11-22): al perder un combate se **vuelve al último punto de curación** por el que se pasó (centro Pokémon, zona de descanso…; curarse con una Poción no cuenta), o al inicio si todavía no se ha pasado por ninguno, con el equipo curado. Los nodos posteriores a ese punto vuelven a estar sin superar. Esto pide un cambio en `ProgresoRuta`, que hoy solo avanza: guardar el último punto de curación y poder volver a él. Qué se conserva de lo ganado desde ese punto (XP, dinero, capturas) queda por cerrar (§8); la propuesta es conservarlo todo, para que no frustre.
 
 **Primer tramo de Kanto** (`catalog/campana/regiones/kanto.json`, propuesta): `Pueblo Paleta (inicio) → Ruta 1 → Ciudad Verde (bifurcación: Ruta 22 opcional, o seguir) → Ruta 2 → Bosque Verde → Cazabichos → Pikachu (jefe 01/20) → Salida del Bosque (bifurcación: Cueva Diglett opcional, o seguir) → Centro Pokémon de Ciudad Plateada → Gimnasio de Brock (medalla Roca)`. Las zonas nuevas (`ruta-1`, `ruta-2`, `bosque-verde`, `ruta-22`, `cueva-diglett`) siguen las listas de Rojo y Azul de memoria y están por revisar con Serebii o Bulbapedia; Sandshrew todavía no aparece en ninguna.
 
@@ -230,11 +240,15 @@ Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar
 
 **Pikachu (01/20):** 100 PS, eléctrico, debilidad lucha ×2, sin resistencia, retirada 0. Ataque Rápido (1, 10) e Impactrueno (2, 30). Estimación de dificultad: unos 20 de daño por turno, de modo que el inicial aguanta 4–5 turnos; se calibrará con el simulador. **Pendiente de implementar en el motor:** la llamada del aliado a mitad de combate (hoy el combate contra Pikachu es un 1 contra 1 normal).
 
-## 5. Puntos y tienda
+## 5. XP, dinero y puntos
 
-- La campaña da puntos por **victoria en combate**, por **medalla** y por **jefe**, más una cantidad menor por ruta superada (las cifras son provisionales y se ajustan al final; solo importan si hay compras dentro de la campaña).
-- Los puntos van a la **cuenta** (hace falta sesión) y se gastan en la **tienda** de la pantalla de inicio: monedas, dados, sobres y cartas sueltas del formato digital.
-- Compras dentro de la campaña (el descanso), la **XP de evolución** y la evolución por intercambio o a ex se pagan con los mismos puntos, y lo que sobra al terminar se conserva. Gastar puntos en evolucionar es renunciar a gastarlos en la tienda.
+Cambiado el 2026-11-22.
+
+- **XP:** al derrotar Pokémon, salvajes o de entrenador (§2.1).
+- **Dinero:** al derrotar **entrenadores** (los salvajes no dan dinero). Se gasta en las **tiendas de la campaña** (objetos e intercambio).
+- **Objetos de salida** (lista inicial, por ampliar): **Poción** (restaura 20 PS), **Poké Ball** (permite intentar capturar un Pokémon, con cierta probabilidad) y **Repelente** (evita 1 combate contra un Pokémon salvaje). Los precios quedan por cerrar. Propuesta: los objetos se usan fuera de combate, nunca como acción dentro de él (se mantienen las 3 acciones de §3.2).
+- **Puntos de la cuenta:** la campaña sigue dando los puntos del juego (§1) para la tienda de la pantalla de inicio (monedas, dados, sobres y cartas sueltas del formato digital). Si el dinero de la campaña es una moneda aparte de esos puntos, y qué hitos dan puntos (propuesta: medallas y jefes), queda por cerrar (§8).
+- **Desbloqueos y gasto** (decidido el 2026-11-22, corrige D-10): los desbloqueos de jefes de D-10 cuentan los **puntos ganados en total**, que nunca bajan; las compras gastan del **saldo**. Así gastar nunca quita un jefe ya desbloqueado.
 
 ## 6. Cómo encaja en el proyecto
 
@@ -243,7 +257,7 @@ Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar
 | Motor | Librería nueva `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho el combate 1 contra 1 (#336)**: energía, atacar, cambiar, cargar, elegir siguiente, debilidad y resistencia; **IA rival (#338)**. |
 | Catálogo | `catalog/campana/`: `pokemon/*.json` (uno por Pokémon, con su número de la Pokédex), `zonas/*.json` (qué aparece en cada zona), `regiones/*.json` (el grafo de nodos de la ruta) y sus esquemas en `catalog/schema/`. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
-| Guardado | Progreso de campaña (región, nodo, equipo, **PC**, jefes ya capturados, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
+| Guardado | Progreso de campaña (región, nodo, **último punto de curación**, equipo con sus **PS actuales** y su **XP**, **PC**, **objetos**, **dinero**, jefes ya capturados, medallas, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. |
 | Servidor | Recibe los puntos ganados al terminar un jefe o una medalla. Al ser un solo jugador y coste 0, se acepta lo que reporta el cliente con un tope por hito (no hay competición). |
 | App | Pantallas nuevas: mapa de región, combate, equipo, descanso y tienda. Reutiliza los fondos de mesa por mapa y los avisos. |
 
@@ -251,11 +265,7 @@ Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar
 
 ## 7. Primera entrega
 
-**El primer set tendrá los 151 Pokémon de Kanto, pero se rellena por zonas:** de cada zona solo entran los Pokémon que aparecen en ella. La primera zona es el **Túnel Roca**, con datos de Serebii y Bulbapedia (Rojo, Azul y Amarillo):
-
-- **Salvajes:** Zubat, Geodude, Machop y Onix. El Onix salvaje se puede capturar y es distinto del Onix jefe.
-- **Entrenadores (PokéManiacos):** Cubone y Slowpoke.
-- El jefe de la zona es **Onix**, con sus aliados.
+**El primer set tendrá los 151 Pokémon de Kanto, pero se rellena por zonas:** de cada zona solo entran los Pokémon que aparecen en ella. La primera entrega es el **primer tramo de Kanto, de Pueblo Paleta a Ciudad Plateada** (§4, Modelo de la ruta), con Pikachu (01/20) de jefe y Brock de gimnasio. Corregido el 2026-11-22: antes decía Túnel Roca, que pasa a un tramo posterior (sus cartas, Zubat, Geodude, Machop, Onix, Cubone y Slowpoke, ya están en el catálogo).
 
 Contenido de la primera entrega, además:
 
@@ -268,14 +278,27 @@ Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, ev
 
 ## 8. Preguntas abiertas
 
-1. **Derrota.** ¿Qué pasa al perder un combate? Propuesta: volver al último descanso con el equipo curado y sin perder lo ganado, para que no frustre. Alternativa más dura: perder una parte del dinero.
-2. ~~Máximo de Pokémon en el equipo~~ **Decidido (§2):** 6 (1 activo y 5 en banca); los demás van al PC, el PC no tiene límite de capacidad por ahora.
-3. **Qué se vende en el descanso** (curas, objetos, Pokémon).
+Decididas el 2026-11-22 (Ayme):
+
+1. ~~Derrota~~ **Decidido (§4, Derrota):** se vuelve al último punto de curación con el equipo curado.
+2. ~~Máximo de Pokémon en el equipo~~ **Decidido (§2):** 6 (1 activo y 5 en banca); los demás van al PC.
+3. ~~Qué se vende en el descanso~~ **Decidido de salida (§5):** Poción (20 PS), Poké Ball y Repelente. La lista se ampliará.
 4. ~~Cuántos ataques~~ **Decidido (§3.5):** 1 a 2 ataques por carta, coste de 1 a 4.
-5. **Cifras de progresión:** cuántos puntos cuesta cada XP, cuántas XP necesita cada Pokémon para evolucionar, y cuánto cuestan el intercambio y hacerse ex.
-6. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex).
-7. ~~Capacidad del PC~~ **Decidido por ahora (2026-11-21): ilimitada.** Se revisará si hace falta un tope.
-8. **Contenido:** cada Pokémon necesita sus datos y su imagen, y ese es el cuello de botella (la creación de cartas es manual).
+5. ~~Cómo se consigue la XP~~ **Decidido (§2.1, §5):** la XP se gana derrotando Pokémon y el dinero derrotando entrenadores; ya no se compra XP con puntos.
+7. ~~Capacidad del PC~~ **Decidido por ahora (2026-11-21): ilimitada.**
+9. ~~Cambiar de Pokémon~~ **Confirmado (§3.2):** gasta el turno y la energía de retirada, si tiene.
+10. ~~Texto de Rodar~~ **Decidido (§3.6).**
+11. ~~Puntos gastados frente a desbloqueos de D-10~~ **Decidido (§5):** los desbloqueos cuentan el total ganado; las compras, el saldo.
+12. ~~PS y energía entre combates~~ **Decidido (§3.7):** el daño se arrastra (se cura con objetos o en un punto de curación) y la energía empieza en 10 en cada combate.
+
+Siguen abiertas (con propuesta):
+
+6. **Cartas ex.** Propuesta: PS y daños según el baremo de §3.5; las cadenas siguen las líneas oficiales (Machop → Machoke → Machamp ex, Pikachu → Raichu ex con piedra trueno), coste de 1 a 4 y retirada 2–3.
+8. **Contenido.** Propuesta: una carta sin imagen se muestra con una imagen genérica de su tipo, para que el arte no frene al motor ni a la app.
+13. **Cifras de XP.** Cuánta XP da cada Pokémon derrotado, a quién se apunta (propuesta: al que lo derriba), cuánta necesita cada fase y cómo se hace ex un Pokémon sin evolución (propuesta: por XP).
+14. **Dinero y puntos.** Si el dinero de la campaña es una moneda aparte de los puntos de la cuenta, cuánto da cada entrenador, los precios de los objetos y qué hitos dan puntos de cuenta (propuesta: medallas y jefes).
+15. **Captura.** La probabilidad de la Poké Ball (propuesta: fija según la `rareza` del Pokémon, porque al lanzarla el rival ya está derrotado), si se pierde la Poké Ball al fallar y si los jefes también la necesitan.
+16. **Qué se conserva al perder** (XP, dinero y capturas desde el último punto de curación). Propuesta: todo.
 
 ## 9. Tareas derivadas (para crear tras aprobar)
 
@@ -284,7 +307,7 @@ Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, ev
 3. IA rival determinista.
 4. Simulador de combates de campaña y primer equilibrado.
 5. ~~Modelo de región y de nodos, y avance por el mapa.~~ **Hecho (§4, Modelo de la ruta).**
-6. Captura, equipo y descanso.
+6. Captura (con Poké Ball), equipo, descanso, objetos y vuelta al punto de curación al perder.
 7. Jefe con aliados y medalla.
 8. Guardado de progreso de campaña en el dispositivo.
 9. Pantallas de la app: mapa, combate, equipo, descanso.

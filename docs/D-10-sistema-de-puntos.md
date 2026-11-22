@@ -77,7 +77,7 @@ Se guarda el **registro de partidas** y los totales se **calculan** a partir de 
 - El `puntos` de cada fila se calcula al cerrar la partida con las tablas vigentes y se guarda, para que cambios futuros de las tablas no reescriban el historial.
 - Los invitados no tienen `jugador_id`: sus filas se guardan sin cuenta (`jugador_id` vacío, nombre de mesa, `puntos` calculados pero no abonados) para poder auditar el reparto (decidido en D-11).
 - Total de una cuenta = suma de sus `partida_jugadores.puntos` abonados.
-- Los 7 jefes de lanzamiento están disponibles desde el principio. Un jefe nuevo se desbloquea al llegar a su coste. Los puntos no se gastan.
+- Los 7 jefes de lanzamiento están disponibles desde el principio. Un jefe nuevo se desbloquea al llegar a su coste. Los puntos no se gastan. Desde el 2026-11-22 (D-20 §5) los puntos sí se gastan en la tienda: el desbloqueo cuenta los puntos **ganados en total**, que nunca bajan, y las compras gastan del saldo.
 - Una partida se guarda una sola vez (clave `_id` del cliente) para que los reintentos de red no sumen dos veces.
 - `jugador_id` es el id de usuario de Deck Tracker (decidido en D-11, `docs/D-11-identidad-jugadores.md`).
 
