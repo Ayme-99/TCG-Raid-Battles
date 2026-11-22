@@ -20,6 +20,7 @@ Future<ProviderContainer> abrirCampana(
   required AlmacenMemoria almacen,
   Size tamano = const Size(1280, 800),
   PartidaCampana? guardada,
+  CatalogoCampana? catalogo,
 }) async {
   tester.view.physicalSize = tamano;
   tester.view.devicePixelRatio = 1.0;
@@ -29,6 +30,8 @@ Future<ProviderContainer> abrirCampana(
       overrides: [
         ...sobrescribir(almacen: almacen, conInicio: true),
         campanaInicialProvider.overrideWithValue(guardada),
+        if (catalogo != null)
+          catalogoCampanaProvider.overrideWith((ref) async => catalogo),
       ],
       child: const MaterialApp(home: PantallaCampana()),
     ),
@@ -234,6 +237,110 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('desde el equipo se evoluciona con la XP de la reserva',
+      (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ruta-2-norte',
+          superados: {'pueblo-paleta'},
+          inicial: 'charmander'),
+      equipo: [
+        PokemonGuardado('charmander', 70),
+        PokemonGuardado('caterpie', 0),
+        PokemonGuardado('weedle', 50),
+      ],
+      xp: 60,
+    );
+    final almacen = AlmacenMemoria();
+    final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
+    expect(find.text('Reserva de XP: 60'), findsOneWidget);
+    // Caterpie está debilitado: evolucionar lo revive a 10 PS.
+    await tocar(tester, 'equipo-1');
+    expect(find.text('Evolucionar en Metapod (50 XP)'), findsOneWidget);
+    await tocar(tester, 'equipo-evolucionar-metapod');
+    final p = c.read(campanaProvider).partida!;
+    expect(p.equipo[1].id, 'metapod');
+    expect(p.equipo[1].ps, 10);
+    expect(p.xp, 10);
+    expect(find.text('Reserva de XP: 10'), findsOneWidget);
+    // Weedle ya no llega: la opción sale pero desactivada.
+    await tocar(tester, 'equipo-2');
+    expect(find.text('Faltan 40 XP.'), findsOneWidget);
+    final tile = tester.widget<ListTile>(
+        find.byKey(const Key('equipo-evolucionar-kakuna')));
+    expect(tile.enabled, isFalse);
+    // Se guarda en el dispositivo.
+    final json = jsonDecode(almacen.datos[claveCampana]!) as Map;
+    expect(json['xp'], 10);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('una evolución sin las medallas que pide muestra el motivo',
+      (tester) async {
+    // Pidgey → Rattata de mentira con 2 medallas (Pidgeotto no tiene carta).
+    final almacen = AlmacenMemoria();
+    final real = (await tester.runAsync(() => cargarCatalogoCampana(rootBundle)))!;
+    final pidgey = jsonDecode(
+            File('assets/catalogo/campana/pokemon/pidgey.json').readAsStringSync())
+        as Map<String, dynamic>;
+    pidgey['evoluciones'] = [
+      {'a': 'rattata', 'via': 'xp', 'xpEvolucion': 50, 'medallasMinimas': 2},
+    ];
+    final catalogo = CatalogoCampana(
+      pokemon: {...real.pokemon, 'pidgey': pokemonCampanaDesdeJson(pidgey)},
+      zonas: real.zonas,
+      jefes: real.jefes,
+      region: real.region,
+    );
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ruta-2-norte', superados: {'pueblo-paleta'}),
+      equipo: [PokemonGuardado('pidgey', 60)],
+      xp: 200,
+    );
+    final c = await abrirCampana(tester,
+        almacen: almacen, guardada: guardada, catalogo: catalogo);
+    await tocar(tester, 'equipo-0');
+    expect(find.text('Requiere 2 medallas.'), findsOneWidget);
+    final tile = tester.widget<ListTile>(
+        find.byKey(const Key('equipo-evolucionar-rattata')));
+    expect(tile.enabled, isFalse);
+    expect(c.read(campanaProvider).partida!.equipo.single.id, 'pidgey');
+  });
+
+  testWidgets('se vuelve a un nodo visitado y se repite el salvaje',
+      (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ciudad-verde',
+          resuelto: true,
+          superados: {'pueblo-paleta', 'ruta-1', 'ruta-1-pidgey', 'ciudad-verde'},
+          visitados: {'pueblo-paleta', 'ruta-1', 'ruta-1-pidgey', 'ciudad-verde'},
+          inicial: 'squirtle'),
+      equipo: [PokemonGuardado('squirtle', 80)],
+      dinero: 1000,
+    );
+    final almacen = AlmacenMemoria();
+    final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
+    // Un nodo sin visitar no lleva a ningún sitio.
+    await tester.tap(find.byKey(const Key('nodo-ruta-22')));
+    await tester.pumpAndSettle();
+    expect(c.read(campanaProvider).partida!.progreso.nodoActual, 'ciudad-verde');
+    await tester.ensureVisible(find.byKey(const Key('nodo-ruta-1-pidgey')));
+    await tester.tap(find.byKey(const Key('nodo-ruta-1-pidgey')));
+    await tester.pumpAndSettle();
+    expect(c.read(campanaProvider).partida!.progreso.nodoActual,
+        'ruta-1-pidgey');
+    expect(hay('campana-combatir'), isFalse, reason: 'ya se ganó');
+    await tocar(tester, 'campana-repetir');
+    final p = c.read(campanaProvider).partida!;
+    expect(hay('campana-combatir'), isTrue);
+    expect(p.progreso.repitiendo, isTrue);
+    expect(find.textContaining('Recompensa'), findsNothing,
+        reason: 'repetir no da puntos');
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('con una campaña guardada se continúa donde estaba',
       (tester) async {
     const guardada = PartidaCampana(
@@ -247,14 +354,23 @@ void main() {
       ],
       pc: [PokemonGuardado('rattata', 60)],
       puntos: 1200,
-      dinero: 300,
+      dinero: 500,
     );
     final almacen = AlmacenMemoria();
     final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
-    expect(find.text('1200 puntos · 300 \$ · 0 medallas'), findsOneWidget);
-    // Tienda: una Poción, y se usa con Charmander antes de curar.
+    expect(find.text('1200 puntos · 500 \$ · 0 medallas'), findsOneWidget);
+    // Tienda del primer tramo: solo Pokéball y Poción (D-20 §10.6).
+    expect(hay('tienda-pokeball'), isTrue);
+    expect(hay('tienda-pocion'), isTrue);
+    expect(hay('tienda-repelente'), isFalse);
+    expect(hay('tienda-superBall'), isFalse);
+    // Una Poción (300), y se usa con Charmander antes de curar.
     await tocar(tester, 'comprar-pocion');
     expect(c.read(campanaProvider).partida!.dinero, 200);
+    await tocar(tester, 'comprar-pokeball');
+    expect(c.read(campanaProvider).partida!.dinero, 0);
+    expect(
+        c.read(campanaProvider).partida!.cuantos(ObjetoCampana.pokeball), 1);
     await tocar(tester, 'equipo-0');
     await tocar(tester, 'equipo-pocion');
     expect(c.read(campanaProvider).partida!.equipo.first.ps, 30);

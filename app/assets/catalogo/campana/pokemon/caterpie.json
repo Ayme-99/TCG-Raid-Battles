@@ -9,6 +9,7 @@
     "multiplicador": 2
   },
   "retirada": 0,
+  "categoriaCaptura": "comun",
   "ataques": [
     {
       "nombre": "Disparo Demora",
@@ -26,6 +27,14 @@
       "tipo": "planta",
       "coste": 2,
       "dano": 20
+    }
+  ],
+  "evoluciones": [
+    {
+      "a": "metapod",
+      "via": "xp",
+      "xpEvolucion": 50,
+      "medallasMinimas": 0
     }
   ]
 }

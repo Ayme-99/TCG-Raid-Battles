@@ -135,7 +135,7 @@ class AtaqueCampana {
 
 /// Cómo se consigue una evolución (D-20 §2.1).
 enum ViaEvolucion {
-  /// Acumulando XP (convertida de puntos en un centro Pokémon).
+  /// Gastando XP de la reserva común de la partida (D-20 §10.6).
   xp,
 
   /// Con un objeto de evolución (una piedra…).
@@ -155,8 +155,9 @@ class EvolucionCampana {
   final String a;
   final ViaEvolucion via;
 
-  /// XP necesaria (con [ViaEvolucion.xp]).
-  final int? xp;
+  /// XP que gasta de la reserva (con [ViaEvolucion.xp]); en el JSON,
+  /// `xpEvolucion`.
+  final int? xpEvolucion;
 
   /// Id del objeto (con [ViaEvolucion.objeto]).
   final String? objeto;
@@ -165,14 +166,34 @@ class EvolucionCampana {
   /// [ViaEvolucion.puntos]).
   final int? puntos;
 
+  /// Medallas que hacen falta para que se ofrezca (D-20 §10.6 y §10.11): sin
+  /// ellas no se evoluciona aunque haya XP. Null si está por decidir (no
+  /// limita).
+  final int? medallasMinimas;
+
   const EvolucionCampana({
     required this.a,
     required this.via,
-    this.xp,
+    this.xpEvolucion,
     this.objeto,
     this.puntos,
+    this.medallasMinimas,
   });
 }
+
+/// Categoría de captura de un Pokémon (D-20 §10.6). Fija la probabilidad de
+/// capturarlo (#368) y la XP que da derrotarlo: Común 10, Intermedio 20, Fuerte
+/// y Jefe 30. En el JSON, `categoriaCaptura`.
+enum CategoriaCaptura { comun, intermedio, fuerte, jefe }
+
+/// XP que suma a la reserva derrotar a un Pokémon de [categoria] (D-20 §10.6,
+/// decidido el 2026-11-22).
+int xpDeCategoria(CategoriaCaptura categoria) => switch (categoria) {
+      CategoriaCaptura.comun => 10,
+      CategoriaCaptura.intermedio => 20,
+      CategoriaCaptura.fuerte => 30,
+      CategoriaCaptura.jefe => 30,
+    };
 
 /// Un Pokémon de campaña tal como está en el catálogo.
 class PokemonCampana {
@@ -198,6 +219,9 @@ class PokemonCampana {
   /// Las formas en que puede evolucionar (vacía si no evoluciona).
   final List<EvolucionCampana> evoluciones;
 
+  /// Categoría de captura, o null si no aplica (los iniciales).
+  final CategoriaCaptura? categoriaCaptura;
+
   const PokemonCampana({
     required this.id,
     required this.nombre,
@@ -210,6 +234,7 @@ class PokemonCampana {
     this.habilidad,
     this.ex = false,
     this.evoluciones = const [],
+    this.categoriaCaptura,
   });
 }
 

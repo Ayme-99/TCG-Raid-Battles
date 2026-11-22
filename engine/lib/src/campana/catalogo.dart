@@ -26,23 +26,41 @@ ViaEvolucion _viaDeTexto(String texto) {
   throw FormatException('Vía de evolución desconocida: "$texto".');
 }
 
+/// Lee una categoría de captura del catálogo (`"comun"`, `"intermedio"`…).
+CategoriaCaptura categoriaCapturaDeTexto(String texto) {
+  for (final c in CategoriaCaptura.values) {
+    if (c.name == texto) return c;
+  }
+  throw FormatException('Categoría de captura desconocida: "$texto".');
+}
+
 EvolucionCampana _evolucionDesdeJson(Map<String, dynamic> json) {
   final via = _viaDeTexto(_campo<String>(json, 'via'));
+  final a = _campo<String>(json, 'a');
+  final medallas = json['medallasMinimas'] as int?;
+  if (medallas != null && medallas < 0) {
+    throw const FormatException('"medallasMinimas" no puede ser negativo.');
+  }
   switch (via) {
     case ViaEvolucion.xp:
       return EvolucionCampana(
-          a: _campo<String>(json, 'a'), via: via, xp: _campo<int>(json, 'xp'));
+          a: a,
+          via: via,
+          xpEvolucion: _campo<int>(json, 'xpEvolucion'),
+          medallasMinimas: medallas);
     case ViaEvolucion.objeto:
       return EvolucionCampana(
-          a: _campo<String>(json, 'a'),
+          a: a,
           via: via,
-          objeto: _campo<String>(json, 'objeto'));
+          objeto: _campo<String>(json, 'objeto'),
+          medallasMinimas: medallas);
     case ViaEvolucion.intercambio:
     case ViaEvolucion.puntos:
       return EvolucionCampana(
-          a: _campo<String>(json, 'a'),
+          a: a,
           via: via,
-          puntos: _campo<int>(json, 'puntos'));
+          puntos: _campo<int>(json, 'puntos'),
+          medallasMinimas: medallas);
   }
 }
 
@@ -111,6 +129,9 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
     retirada: (json['retirada'] as int?) ?? 0,
     habilidad: _habilidadDesdeJson(json['habilidad']),
     ex: (json['ex'] as bool?) ?? false,
+    categoriaCaptura: json['categoriaCaptura'] == null
+        ? null
+        : categoriaCapturaDeTexto(_campo<String>(json, 'categoriaCaptura')),
     evoluciones: [
       for (final e in (json['evoluciones'] as List<dynamic>?) ?? const [])
         _evolucionDesdeJson(e as Map<String, dynamic>),
@@ -168,11 +189,19 @@ class JefeCampana {
   final PokemonCampana pokemon;
   final LlamadaDeAliado? llamaAliado;
 
+  /// XP que da derrotarlo, si lleva una propia en su JSON (`xp`); si no, la
+  /// de la categoría Jefe (D-20 §10.6).
+  final int? xpPropia;
+
   const JefeCampana({
     required this.numero,
     required this.pokemon,
     this.llamaAliado,
+    this.xpPropia,
   });
+
+  /// XP que suma a la reserva derrotarlo.
+  int get xp => xpPropia ?? xpDeCategoria(CategoriaCaptura.jefe);
 }
 
 /// Un jefe de campaña a partir de su JSON del catálogo
@@ -193,6 +222,7 @@ JefeCampana jefeCampanaDesdeJson(Map<String, dynamic> json) {
             ],
             alFrenteAlPorcentaje: llamada['alFrenteAlPorcentaje'] as int?,
           ),
+    xpPropia: json['xp'] as int?,
   );
 }
 
@@ -222,7 +252,11 @@ class EntrenadoresDeZona {
   /// Ids de sus Pokémon.
   final List<String> pokemon;
 
-  const EntrenadoresDeZona(this.clase, this.pokemon);
+  /// Dinero que paga cada entrenador de la clase al ser vencido (D-20 §10.6),
+  /// o null si aún no tiene cifra.
+  final int? dinero;
+
+  const EntrenadoresDeZona(this.clase, this.pokemon, {this.dinero});
 }
 
 /// Una zona de la campaña: qué aparece en ella.
@@ -274,6 +308,7 @@ ZonaCampana zonaCampanaDesdeJson(Map<String, dynamic> json) {
                   for (final p in _campo<List<dynamic>>(e, 'pokemon'))
                     p as String
                 ],
+                dinero: e['dinero'] as int?,
               ),
           ]
         : const [],
@@ -342,7 +377,8 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
     pokemon: _textos(json, 'pokemon'),
     lider: lider is Map<String, dynamic>
         ? LiderDeGimnasio(
-            _campo<String>(lider, 'nombre'), _textos(lider, 'pokemon'))
+            _campo<String>(lider, 'nombre'), _textos(lider, 'pokemon'),
+            dinero: lider['dinero'] as int?)
         : null,
     medalla: json['medalla'] as String?,
     jefe: json['jefe'] as String?,
@@ -350,6 +386,7 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
     texto: _textos(json, 'texto'),
     cura: (json['cura'] as bool?) ?? false,
     escena: _escenaDesdeJson(json['escena']),
+    tienda: _textos(json, 'tienda'),
   );
 }
 

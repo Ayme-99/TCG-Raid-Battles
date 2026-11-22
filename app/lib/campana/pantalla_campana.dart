@@ -173,14 +173,17 @@ class _SinPartida extends ConsumerWidget {
 }
 
 /// La ruta, nodo a nodo, en el orden del catálogo.
-class _Ruta extends StatelessWidget {
+/// La ruta. Se puede volver a cualquier nodo ya visitado tocándolo (D-20
+/// §10.7, retroceso).
+class _Ruta extends ConsumerWidget {
   const _Ruta({required this.catalogo, required this.partida});
 
   final CatalogoCampana catalogo;
   final PartidaCampana partida;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final control = ref.read(campanaProvider.notifier);
     final nodos = catalogo.region.nodos.values.toList();
     final actual = partida.progreso.nodoActual;
     final indiceActual = nodos.indexWhere((n) => n.id == actual);
@@ -195,6 +198,9 @@ class _Ruta extends StatelessWidget {
         final n = nodos[i];
         final hecho = partida.progreso.superados.contains(n.id);
         final aqui = n.id == actual;
+        final sePuedeVolver = !aqui &&
+            partida.capturaPendiente == null &&
+            partida.progreso.visitados.contains(n.id);
         return ListTile(
           key: Key('nodo-${n.id}'),
           dense: true,
@@ -208,7 +214,11 @@ class _Ruta extends StatelessWidget {
             _tipo(n),
             if (n.opcional) 'opcional',
             if (aqui) 'estás aquí',
+            if (sePuedeVolver) 'toca para volver',
           ].join(' · ')),
+          onTap: sePuedeVolver
+              ? () => _avisar(context, control.retroceder(catalogo, n.id))
+              : null,
         );
       },
     );
@@ -312,6 +322,20 @@ class _PanelNodo extends ConsumerWidget {
             onPressed: () => _avisar(context, control.usarRepelente(c)),
           ),
         ],
+      ]);
+    } else if (p.puedeRepetir(c)) {
+      // Un salvaje ya vencido se puede repetir: XP y captura, sin dinero ni
+      // puntos (D-20 §10.7).
+      hijos.addAll([
+        const Text('Ya venciste aquí. Puedes volver a buscar un Pokémon '
+            'salvaje: da XP y se puede capturar, pero no da dinero ni puntos.'),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          key: const Key('campana-repetir'),
+          icon: const Icon(Icons.grass_rounded),
+          label: const Text('Buscar otro salvaje'),
+          onPressed: () => control.repetirCombate(c),
+        ),
       ]);
     } else if (nodo.tipo == TipoNodo.descanso) {
       hijos.add(_Descanso(catalogo: c, partida: p));
@@ -510,19 +534,21 @@ class _Descanso extends ConsumerWidget {
         const SizedBox(height: 16),
         Text('Tienda · tienes ${p.dinero} \$',
             style: Theme.of(context).textTheme.titleMedium),
-        for (final e in parametrosCampana.precios.entries)
+        // Lo que vende este centro (D-20 §10.6): en el primer tramo, Pokéball
+        // y Poción; las Balls mejores piden medallas.
+        for (final o in p.tienda(c, parametros: parametrosCampana))
           ListTile(
-            key: Key('tienda-${e.key.name}'),
+            key: Key('tienda-${o.name}'),
             contentPadding: EdgeInsets.zero,
-            title: Text(nombreObjeto(e.key)),
-            subtitle: Text('${descripcionObjeto(e.key)} · '
-                'en la mochila: ${p.cuantos(e.key)}'),
+            title: Text(nombreObjeto(o)),
+            subtitle: Text('${descripcionObjeto(o)} · '
+                'en la mochila: ${p.cuantos(o)}'),
             trailing: FilledButton.tonal(
-              key: Key('comprar-${e.key.name}'),
-              onPressed: p.dinero >= e.value
-                  ? () => _avisar(context, control.comprar(c, e.key))
+              key: Key('comprar-${o.name}'),
+              onPressed: p.dinero >= parametrosCampana.precios[o]!
+                  ? () => _avisar(context, control.comprar(c, o))
                   : null,
-              child: Text('${e.value} \$'),
+              child: Text('${parametrosCampana.precios[o]} \$'),
             ),
           ),
         const SizedBox(height: 16),
@@ -582,9 +608,14 @@ class _Equipo extends ConsumerWidget {
       children: [
         Text('Tu equipo (${p.equipo.length}/${parametrosCampana.tamanoEquipo})',
             style: Theme.of(context).textTheme.titleMedium),
+        Text('Reserva de XP: ${p.xp}',
+            key: const Key('campana-xp'),
+            style: Theme.of(context).textTheme.bodyMedium),
         Text(
-            'El primero sale a combatir. Toca uno para ponerlo primero o '
-            'darle una Poción. Mochila: '
+            'El primero sale a combatir. Toca uno para ponerlo primero, '
+            'darle una Poción o evolucionarlo con la XP de la reserva. '
+            'Mochila: '
+            '${p.cuantos(ObjetoCampana.pokeball)} Pokéballs, '
             '${p.cuantos(ObjetoCampana.pocion)} Pociones, '
             '${p.cuantos(ObjetoCampana.repelente)} Repelentes.',
             style: Theme.of(context).textTheme.bodySmall),
@@ -599,10 +630,7 @@ class _Equipo extends ConsumerWidget {
                 especie: c.especie(p.equipo[i].id),
                 ps: p.equipo[i].ps,
                 destacada: i == 0,
-                detalle: [
-                  '${p.equipo[i].xp} XP',
-                  if (i == 0) 'sale primero',
-                ].join(' · '),
+                detalle: i == 0 ? 'sale primero' : null,
                 onTap: () => _opciones(context, control, i, enCentro),
               ),
           ],
@@ -649,6 +677,22 @@ class _Equipo extends ConsumerWidget {
                     _avisar(context, control.usarPocion(catalogo, i));
                   },
                 ),
+              // Evolucionar (D-20 §10.6): gasta XP de la reserva y deja al
+              // Pokémon con 10 PS, también si estaba debilitado.
+              for (final e in partida.evolucionesPorXp(catalogo, i))
+                ListTile(
+                  key: Key('equipo-evolucionar-${e.a}'),
+                  leading: const Icon(Icons.auto_awesome_rounded),
+                  title: Text('Evolucionar en '
+                      '${catalogo.especie(e.a).nombre} (${e.xpEvolucion} XP)'),
+                  subtitle: Text(partida.motivoSinEvolucion(e) ??
+                      'Queda con ${PartidaCampana.psAlEvolucionar} PS.'),
+                  enabled: partida.puedeEvolucionar(e),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _avisar(context, control.evolucionar(catalogo, i, e.a));
+                  },
+                ),
               if (enCentro && partida.equipo.length > 1)
                 ListTile(
                   key: const Key('equipo-al-pc'),
@@ -675,11 +719,18 @@ void _avisar(BuildContext context, String? motivo) {
 }
 
 String nombreObjeto(ObjetoCampana o) => switch (o) {
+      ObjetoCampana.pokeball => 'Pokéball',
+      ObjetoCampana.superBall => 'Super Ball',
+      ObjetoCampana.ultraBall => 'Ultra Ball',
       ObjetoCampana.pocion => 'Poción',
       ObjetoCampana.repelente => 'Repelente',
     };
 
 String descripcionObjeto(ObjetoCampana o) => switch (o) {
+      ObjetoCampana.pokeball ||
+      ObjetoCampana.superBall ||
+      ObjetoCampana.ultraBall =>
+        'Para capturar; cada intento gasta una',
       ObjetoCampana.pocion =>
         'Cura ${parametrosCampana.psPocion} PS fuera de combate',
       ObjetoCampana.repelente => 'Evita un combate contra un Pokémon salvaje',

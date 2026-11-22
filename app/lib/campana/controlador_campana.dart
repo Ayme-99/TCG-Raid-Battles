@@ -97,12 +97,24 @@ class ControladorCampana extends Notifier<EstadoCampana> {
 
   void ponerPrimero(int indice) => _guardar(_partida.ponerPrimero(indice));
 
+  /// Vuelve a un nodo ya visitado (D-20 §10.7).
+  String? retroceder(CatalogoCampana c, String destino) =>
+      _intentar(() => _partida.retroceder(c, destino));
+
+  /// Vuelve a combatir contra el salvaje ya vencido del nodo actual.
+  void repetirCombate(CatalogoCampana c) =>
+      _guardar(_partida.repetirCombate(c));
+
   /// Devuelven el motivo si el motor no lo permite (sin dinero, sin objetos…).
   String? comprar(CatalogoCampana c, ObjetoCampana objeto) => _intentar(
       () => _partida.comprar(c, objeto, parametros: parametrosCampana));
 
   String? usarPocion(CatalogoCampana c, int indice) => _intentar(
       () => _partida.usarPocion(c, indice, parametros: parametrosCampana));
+
+  /// Evoluciona al Pokémon [indice] del equipo gastando XP de la reserva.
+  String? evolucionar(CatalogoCampana c, int indice, String destino) =>
+      _intentar(() => _partida.evolucionar(c, indice, destino));
 
   String? usarRepelente(CatalogoCampana c) =>
       _intentar(() => _partida.usarRepelente(c));

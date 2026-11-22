@@ -9,6 +9,7 @@
     "multiplicador": 2
   },
   "retirada": 0,
+  "categoriaCaptura": "comun",
   "ataques": [
     {
       "nombre": "Picotazo Veneno",
@@ -20,6 +21,14 @@
         "valor": 10,
         "texto": "El Pokémon Defensor pasa a estar Envenenado."
       }
+    }
+  ],
+  "evoluciones": [
+    {
+      "a": "kakuna",
+      "via": "xp",
+      "xpEvolucion": 50,
+      "medallasMinimas": 0
     }
   ]
 }

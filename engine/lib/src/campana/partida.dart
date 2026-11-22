@@ -8,9 +8,11 @@ import 'ruta.dart';
 /// §8). Están todas aquí para cambiarlas en un solo sitio.
 ///
 /// Decidido por Ayme el 2026-11-22: la XP se gana al derrotar Pokémon
-/// (salvajes o de entrenador) y el dinero, al derrotar entrenadores; la tienda
-/// del descanso vende, de salida, Poción, Pokéball y Repelente. **Las cifras son
-/// provisionales.**
+/// (salvajes o de entrenador) y el dinero, al derrotar entrenadores. El dinero
+/// de salida y los precios están decididos (D-20 §10.6); lo que paga cada
+/// entrenador y cada líder está en el catálogo (`dinero`). **Los puntos son
+/// provisionales.** La XP de cada rival no está aquí: la fija su categoría de
+/// captura ([xpDeCategoria]) o el `xp` del jefe (D-20 §10.6).
 class ParametrosCampana {
   /// Puntos (de la cuenta) por vencer a un Pokémon salvaje.
   final int puntosSalvaje;
@@ -24,19 +26,15 @@ class ParametrosCampana {
   /// Puntos por ganar una medalla.
   final int puntosMedalla;
 
-  /// XP por cada Pokémon rival derrotado. Se la llevan los Pokémon del equipo
-  /// que siguen en pie al acabar el combate (suposición).
-  final int xpPorPokemon;
-
-  /// Dinero por vencer a un entrenador de zona y a un líder de gimnasio.
-  final int dineroEntrenador;
-  final int dineroLider;
-
-  /// Dinero con el que se empieza la campaña (suposición).
+  /// Dinero con el que se empieza la campaña: 1.000 (D-20 §10.6).
   final int dineroInicial;
 
-  /// Precio de cada objeto de la tienda.
+  /// Precio de cada objeto de la tienda (D-20 §10.6, los de los juegos).
   final Map<ObjetoCampana, int> precios;
+
+  /// Medallas que hacen falta para que la tienda venda un objeto: Super Ball
+  /// con la 1.ª y Ultra Ball con 5 (D-20 §10.6). Los que no están, ninguna.
+  final Map<ObjetoCampana, int> medallasParaComprar;
 
   /// PS que cura una Poción.
   final int psPocion;
@@ -53,13 +51,17 @@ class ParametrosCampana {
     this.puntosEntrenador = 200,
     this.puntosJefe = 1000,
     this.puntosMedalla = 1500,
-    this.xpPorPokemon = 10,
-    this.dineroEntrenador = 200,
-    this.dineroLider = 500,
-    this.dineroInicial = 300,
+    this.dineroInicial = 1000,
     this.precios = const {
-      ObjetoCampana.pocion: 100,
-      ObjetoCampana.repelente: 150,
+      ObjetoCampana.pokeball: 200,
+      ObjetoCampana.superBall: 600,
+      ObjetoCampana.ultraBall: 1200,
+      ObjetoCampana.pocion: 300,
+      ObjetoCampana.repelente: 350,
+    },
+    this.medallasParaComprar = const {
+      ObjetoCampana.superBall: 1,
+      ObjetoCampana.ultraBall: 5,
     },
     this.psPocion = 20,
     this.tamanoEquipo = 6,
@@ -67,9 +69,16 @@ class ParametrosCampana {
   });
 }
 
-/// Objetos de la tienda del descanso (D-20 §8, pregunta 3). La Pokéball
-/// (probabilidad de capturar) todavía no está: hoy capturar siempre funciona.
+/// Objetos de la tienda del centro Pokémon (D-20 §10.6). Lo que vende cada
+/// centro está en su nodo (`tienda`). Las Balls se compran ya, pero capturar
+/// con ellas llega con #368: hoy capturar siempre funciona.
 enum ObjetoCampana {
+  /// Pokéball, Super Ball y Ultra Ball: cada tirada de captura gasta una
+  /// (#368).
+  pokeball,
+  superBall,
+  ultraBall,
+
   /// Cura [ParametrosCampana.psPocion] PS a un Pokémon en pie, fuera de
   /// combate. No cuenta como «sitio donde te curaste».
   pocion,
@@ -143,17 +152,42 @@ class CatalogoCampana {
         for (final z in zonas.values)
           for (final id in z.todosLosPokemon)
             if (!pokemon.containsKey(id)) 'zona ${z.id}: falta "$id".',
+        for (final n in region.nodos.values) ...[
+          for (final id in n.tienda)
+            if (!ObjetoCampana.values.any((o) => o.name == id))
+              '${n.id}: la tienda vende "$id", que no es un objeto.',
+          // Lo que paga cada entrenador y cada líder (D-20 §10.6).
+          if (n.lider != null && n.lider!.dinero == null)
+            '${n.id}: el líder no tiene "dinero".',
+          if (n.clase != null &&
+              zonas[n.zona]?.entrenadores
+                      .where((e) => e.clase == n.clase)
+                      .firstOrNull
+                      ?.dinero ==
+                  null)
+            '${n.id}: la clase "${n.clase}" no tiene "dinero" en su zona.',
+        ],
+        // Todo rival necesita categoría de captura: fija su XP (D-20 §10.6).
+        for (final id in {
+          for (final z in zonas.values) ...z.todosLosPokemon,
+          for (final n in region.nodos.values) ...[
+            ...n.pokemon,
+            ...?n.lider?.pokemon,
+          ],
+        })
+          if (pokemon[id] != null && pokemon[id]!.categoriaCaptura == null)
+            'Pokémon "$id": es rival y no tiene categoriaCaptura.',
       ];
 }
 
-/// Un Pokémon del jugador: su especie, sus PS actuales (se conservan entre
-/// combates hasta descansar) y su XP (D-20 §2.1).
+/// Un Pokémon del jugador: su especie y sus PS actuales (se conservan entre
+/// combates hasta descansar). La XP no es de cada Pokémon: está en la reserva
+/// común de la partida ([PartidaCampana.xp], D-20 §10.6).
 class PokemonGuardado {
   final String id;
   final int ps;
-  final int xp;
 
-  const PokemonGuardado(this.id, this.ps, {this.xp = 0});
+  const PokemonGuardado(this.id, this.ps);
 
   factory PokemonGuardado.completo(PokemonCampana especie) =>
       PokemonGuardado(especie.id, especie.ps);
@@ -161,13 +195,12 @@ class PokemonGuardado {
   bool get enPie => ps > 0;
 
   PokemonGuardado conPs(int nuevos) =>
-      PokemonGuardado(id, nuevos < 0 ? 0 : nuevos, xp: xp);
+      PokemonGuardado(id, nuevos < 0 ? 0 : nuevos);
 
-  Map<String, dynamic> aJson() => {'id': id, 'ps': ps, 'xp': xp};
+  Map<String, dynamic> aJson() => {'id': id, 'ps': ps};
 
   factory PokemonGuardado.desdeJson(Map<String, dynamic> json) =>
-      PokemonGuardado(json['id'] as String, json['ps'] as int,
-          xp: (json['xp'] as int?) ?? 0);
+      PokemonGuardado(json['id'] as String, json['ps'] as int);
 }
 
 /// Contra quién se combate en el nodo actual.
@@ -188,6 +221,11 @@ class RivalDelNodo {
   /// Dinero que da ganar (solo entrenadores y líderes).
   final int dinero;
 
+  /// XP que suma a la reserva ganar: la de cada Pokémon del [equipo] según su
+  /// categoría de captura, o la del jefe. Un aliado del jefe que cae suma
+  /// además la de su categoría ([terminarCombate]).
+  final int xp;
+
   /// La llamada de aliado del jefe (D-20 §4, Jefes), o null.
   final LlamadaEnCombate? llamada;
 
@@ -197,16 +235,28 @@ class RivalDelNodo {
     required this.captura,
     required this.puntos,
     this.dinero = 0,
+    this.xp = 0,
     this.llamada,
   });
 }
+
+/// XP de derrotar a [equipo] (D-20 §10.6): la de la categoría de captura de
+/// cada uno. Un Pokémon sin categoría no da XP (el catálogo lo avisa en
+/// [CatalogoCampana.problemas]).
+int _xpDeEquipo(List<PokemonCampana> equipo) => equipo.fold(
+    0,
+    (t, p) =>
+        t +
+        (p.categoriaCaptura == null ? 0 : xpDeCategoria(p.categoriaCaptura!)));
 
 /// Una partida de la campaña de un jugador: dónde está, su equipo, su PC y sus
 /// puntos. Es lo que se guarda en el dispositivo (D-20 §6). Inmutable: cada
 /// operación devuelve una partida nueva.
 class PartidaCampana {
-  /// Versión del formato guardado.
-  static const version = 1;
+  /// Versión del formato guardado. La 2 (#403) pasa la XP de cada Pokémon a
+  /// la reserva común; una partida de la versión 1 se sigue leyendo y su
+  /// reserva es la suma de la XP que llevaba cada Pokémon.
+  static const version = 2;
 
   final ProgresoRuta progreso;
 
@@ -230,6 +280,10 @@ class PartidaCampana {
   /// Dinero, que se gana a entrenadores y se gasta en la tienda.
   final int dinero;
 
+  /// Reserva común de XP (D-20 §10.6): la suman los rivales derrotados y se
+  /// gasta al evolucionar. Sin tope.
+  final int xp;
+
   /// Objetos de la mochila y cuántos hay de cada uno.
   final Map<ObjetoCampana, int> mochila;
 
@@ -249,6 +303,7 @@ class PartidaCampana {
     this.capturaPendiente,
     this.derrotas = 0,
     this.dinero = 0,
+    this.xp = 0,
     this.mochila = const {},
     this.ultimaCura,
   });
@@ -274,6 +329,7 @@ class PartidaCampana {
     bool limpiarCaptura = false,
     int? derrotas,
     int? dinero,
+    int? xp,
     Map<ObjetoCampana, int>? mochila,
     String? ultimaCura,
   }) =>
@@ -287,6 +343,7 @@ class PartidaCampana {
             limpiarCaptura ? null : (capturaPendiente ?? this.capturaPendiente),
         derrotas: derrotas ?? this.derrotas,
         dinero: dinero ?? this.dinero,
+        xp: xp ?? this.xp,
         mochila: mochila ?? this.mochila,
         ultimaCura: ultimaCura ?? this.ultimaCura,
       );
@@ -326,6 +383,28 @@ class PartidaCampana {
     return _copiar(progreso: progreso.avanzar(c.region, destino));
   }
 
+  /// Vuelve a [destino], un nodo en el que ya se ha estado (D-20 §10.7).
+  PartidaCampana retroceder(CatalogoCampana c, String destino) {
+    if (capturaPendiente != null) {
+      throw const ReglaIncumplida('Antes hay que decidir la captura.');
+    }
+    return _copiar(progreso: progreso.retroceder(c.region, destino));
+  }
+
+  /// Si se puede repetir el combate del nodo actual: un salvaje ya vencido.
+  bool puedeRepetir(CatalogoCampana c) =>
+      capturaPendiente == null && progreso.puedeRepetir(c.region);
+
+  /// Vuelve a combatir contra un salvaje ya vencido (D-20 §10.7): da XP a la
+  /// reserva y se puede capturar, pero no da puntos ni dinero. El rival sale
+  /// de nuevo de la zona con la semilla, que ya ha avanzado.
+  PartidaCampana repetirCombate(CatalogoCampana c) {
+    if (capturaPendiente != null) {
+      throw const ReglaIncumplida('Antes hay que decidir la captura.');
+    }
+    return _copiar(progreso: progreso.repetir(c.region));
+  }
+
   /// El rival del nodo actual. Con la misma partida sale siempre el mismo.
   ///
   /// - Salvaje: el que fija el nodo o, si no, uno al azar de los salvajes de la
@@ -358,7 +437,9 @@ class PartidaCampana {
             equipo: [especie],
             nombre: '${especie.nombre} salvaje',
             captura: especie.id,
-            puntos: parametros.puntosSalvaje,
+            // Repetir un salvaje no da puntos (se dan una vez por combate).
+            puntos: progreso.repitiendo ? 0 : parametros.puntosSalvaje,
+            xp: _xpDeEquipo([especie]),
           );
         }
         final grupo = zona.entrenadores.firstWhere((e) => e.clase == nodo.clase,
@@ -372,21 +453,25 @@ class PartidaCampana {
             lista.isNotEmpty) {
           elegidos.add(lista.removeAt(azar(lista.length)));
         }
+        final equipoRival = [for (final id in elegidos) c.especie(id)];
         return RivalDelNodo(
-          equipo: [for (final id in elegidos) c.especie(id)],
+          equipo: equipoRival,
           nombre: grupo.clase,
           captura: null,
           puntos: parametros.puntosEntrenador,
-          dinero: parametros.dineroEntrenador,
+          dinero: grupo.dinero ?? 0,
+          xp: _xpDeEquipo(equipoRival),
         );
       case TipoNodo.gimnasio:
         final lider = nodo.lider!;
+        final equipoLider = [for (final id in lider.pokemon) c.especie(id)];
         return RivalDelNodo(
-          equipo: [for (final id in lider.pokemon) c.especie(id)],
+          equipo: equipoLider,
           nombre: lider.nombre,
           captura: null,
           puntos: parametros.puntosMedalla,
-          dinero: parametros.dineroLider,
+          dinero: lider.dinero ?? 0,
+          xp: _xpDeEquipo(equipoLider),
         );
       case TipoNodo.jefe:
         final jefe = c.jefes[nodo.jefe];
@@ -399,6 +484,7 @@ class PartidaCampana {
               '${jefe.numero.toString().padLeft(2, '0')}/$totalJefesCampana)',
           captura: primera ? cartaNormalDeJefe(c, nodo.jefe!) : null,
           puntos: primera ? parametros.puntosJefe : 0,
+          xp: jefe.xp,
           llamada: llamadaEnCombate(jefe, c.pokemon),
         );
       case TipoNodo.inicio:
@@ -438,12 +524,14 @@ class PartidaCampana {
   /// Aplica el final de un combate empezado con [empezarCombate].
   ///
   /// - Victoria: el equipo se queda con los PS del combate, el nodo se
-  ///   resuelve (un gimnasio da su medalla), se suman puntos y dinero, los
-  ///   Pokémon en pie ganan XP por cada rival derrotado y, si el rival se puede
-  ///   capturar, queda como [capturaPendiente].
+  ///   resuelve (un gimnasio da su medalla), se suman puntos y dinero, la XP
+  ///   del rival ([RivalDelNodo.xp], más la de los aliados del jefe que hayan
+  ///   caído) va a la reserva común y, si el rival se puede capturar, queda
+  ///   como [capturaPendiente].
   /// - Derrota (decidido el 2026-11-22, D-20 §8 pregunta 1): se vuelve al
   ///   último sitio donde se curó el equipo ([ultimaCura]) con el equipo
-  ///   curado. Se conserva lo ganado (capturas, puntos, dinero, medallas).
+  ///   curado. Se conserva lo ganado (capturas, puntos, dinero, XP, medallas);
+  ///   el combate perdido no da XP.
   ///
   /// En los dos casos avanza la semilla.
   PartidaCampana terminarCombate(CatalogoCampana c, EstadoCombate fin,
@@ -465,23 +553,45 @@ class PartidaCampana {
     }
     final r = rival(c, parametros: parametros);
     final tras = fin.jugador.equipo;
-    final derrotados = fin.rival.equipo.where((p) => !p.enPie).length;
-    final xp = parametros.xpPorPokemon * derrotados;
+    // Los aliados que llamó el jefe van detrás de su equipo; los que caen
+    // cuentan como rivales derrotados (D-20 §4, Partida de campaña).
+    final aliadosCaidos = [
+      for (final a in fin.rival.equipo.skip(r.equipo.length))
+        if (!a.enPie) a.especie,
+    ];
     return _copiar(
       equipo: [
         for (var i = 0; i < equipo.length; i++)
-          PokemonGuardado(equipo[i].id, tras[i].ps,
-              xp: equipo[i].xp + (tras[i].enPie ? xp : 0)),
+          PokemonGuardado(equipo[i].id, tras[i].ps),
       ],
       progreso: progreso.resolver(c.region),
       puntos: puntos + r.puntos,
       dinero: dinero + r.dinero,
+      xp: xp + r.xp + _xpDeEquipo(aliadosCaidos),
       semilla: siguiente,
       capturaPendiente: r.captura,
     );
   }
 
-  /// Compra [cantidad] de [objeto] en un centro Pokémon.
+  /// Lo que vende la tienda del nodo actual, en el orden del catálogo: lo que
+  /// lista el centro (`tienda`) y tiene precio, menos lo que pide más
+  /// medallas de las que hay (D-20 §10.6). Vacía fuera de un centro.
+  List<ObjetoCampana> tienda(CatalogoCampana c,
+      {ParametrosCampana parametros = const ParametrosCampana()}) {
+    final nodo = nodoActual(c);
+    if (nodo.tipo != TipoNodo.descanso) return const [];
+    return [
+      for (final id in nodo.tienda)
+        for (final o in ObjetoCampana.values)
+          if (o.name == id &&
+              parametros.precios.containsKey(o) &&
+              progreso.medallas.length >=
+                  (parametros.medallasParaComprar[o] ?? 0))
+            o,
+    ];
+  }
+
+  /// Compra [cantidad] de [objeto] en un centro Pokémon que lo venda.
   PartidaCampana comprar(CatalogoCampana c, ObjetoCampana objeto,
       {int cantidad = 1,
       ParametrosCampana parametros = const ParametrosCampana()}) {
@@ -489,7 +599,16 @@ class PartidaCampana {
       throw const ReglaIncumplida('La tienda está en los centros Pokémon.');
     }
     final precio = parametros.precios[objeto];
-    if (precio == null) throw const ReglaIncumplida('Eso no se vende.');
+    final medallas = parametros.medallasParaComprar[objeto] ?? 0;
+    if (precio != null &&
+        nodoActual(c).tienda.contains(objeto.name) &&
+        progreso.medallas.length < medallas) {
+      throw ReglaIncumplida(
+          'Se vende a partir de $medallas ${medallas == 1 ? 'medalla' : 'medallas'}.');
+    }
+    if (precio == null || !tienda(c, parametros: parametros).contains(objeto)) {
+      throw const ReglaIncumplida('Eso no se vende aquí.');
+    }
     if (cantidad < 1)
       throw const ReglaIncumplida('Hay que comprar al menos uno.');
     if (dinero < precio * cantidad) {
@@ -677,6 +796,61 @@ class PartidaCampana {
     throw const ReglaIncumplida('No hay nada que mover.');
   }
 
+  /// Las evoluciones por XP del Pokémon [indice] del equipo, con su coste.
+  /// Puede haberlas aunque no llegue la reserva: [puedeEvolucionar] lo dice.
+  List<EvolucionCampana> evolucionesPorXp(CatalogoCampana c, int indice) {
+    if (indice < 0 || indice >= equipo.length) return const [];
+    return [
+      for (final e in c.especie(equipo[indice].id).evoluciones)
+        if (e.via == ViaEvolucion.xp && c.pokemon.containsKey(e.a)) e,
+    ];
+  }
+
+  /// Por qué no se puede hacer [evolucion] ahora, o null si se puede: faltan
+  /// medallas (D-20 §10.11, #414) o la reserva no llega (§10.6).
+  String? motivoSinEvolucion(EvolucionCampana evolucion) {
+    if (evolucion.via != ViaEvolucion.xp) return 'No evoluciona con XP.';
+    final medallas = evolucion.medallasMinimas ?? 0;
+    if (progreso.medallas.length < medallas) {
+      return 'Requiere $medallas ${medallas == 1 ? 'medalla' : 'medallas'}.';
+    }
+    final coste = evolucion.xpEvolucion ?? 0;
+    if (xp < coste) return 'Faltan ${coste - xp} XP.';
+    return null;
+  }
+
+  /// Si [evolucion] se puede hacer ahora: hay medallas y XP suficientes.
+  bool puedeEvolucionar(EvolucionCampana evolucion) =>
+      motivoSinEvolucion(evolucion) == null;
+
+  /// Evoluciona al Pokémon [indice] del equipo en [destino] gastando de la
+  /// reserva la XP de esa evolución (D-20 §10.6, decidido el 2026-11-22), si
+  /// se tienen las medallas que pide (`medallasMinimas`, §10.11). Se
+  /// hace fuera de combate, desde el menú del equipo, sin límite por visita. La
+  /// carta evolucionada sustituye a la anterior y queda con **10 PS**, aunque
+  /// tuviera más o estuviera debilitado (evolucionar revive a 10 PS).
+  PartidaCampana evolucionar(CatalogoCampana c, int indice, String destino) {
+    if (indice < 0 || indice >= equipo.length) {
+      throw const ReglaIncumplida('Ese Pokémon no está en el equipo.');
+    }
+    final evolucion = evolucionesPorXp(c, indice)
+        .where((e) => e.a == destino)
+        .firstOrNull;
+    if (evolucion == null) {
+      throw ReglaIncumplida(
+          '${c.especie(equipo[indice].id).nombre} no evoluciona en "$destino" con XP.');
+    }
+    final motivo = motivoSinEvolucion(evolucion);
+    if (motivo != null) throw ReglaIncumplida(motivo);
+    return _copiar(
+      equipo: [...equipo]..[indice] = PokemonGuardado(destino, psAlEvolucionar),
+      xp: xp - evolucion.xpEvolucion!,
+    );
+  }
+
+  /// PS con los que queda un Pokémon al evolucionar (D-20 §10.6).
+  static const psAlEvolucionar = 10;
+
   Map<String, dynamic> aJson() => {
         'version': version,
         'progreso': progreso.aJson(),
@@ -687,15 +861,24 @@ class PartidaCampana {
         if (capturaPendiente != null) 'capturaPendiente': capturaPendiente,
         'derrotas': derrotas,
         'dinero': dinero,
+        'xp': xp,
         'mochila': {for (final e in mochila.entries) e.key.name: e.value},
         if (ultimaCura != null) 'ultimaCura': ultimaCura,
       };
 
   factory PartidaCampana.desdeJson(Map<String, dynamic> json) {
-    if (json['version'] != version) {
-      throw FormatException(
-          'Versión de partida de campaña desconocida: ${json['version']}.');
+    final v = json['version'];
+    if (v != version && v != 1) {
+      throw FormatException('Versión de partida de campaña desconocida: $v.');
     }
+    // Versión 1: la XP iba por Pokémon; pasa entera a la reserva.
+    final xpAntigua = v == 1
+        ? [
+            for (final clave in ['equipo', 'pc'])
+              for (final p in json[clave] as List<dynamic>)
+                ((p as Map<String, dynamic>)['xp'] as int?) ?? 0,
+          ].fold(0, (a, b) => a + b)
+        : 0;
     List<PokemonGuardado> lista(String clave) => [
           for (final p in json[clave] as List<dynamic>)
             PokemonGuardado.desdeJson(p as Map<String, dynamic>),
@@ -710,6 +893,7 @@ class PartidaCampana {
       capturaPendiente: json['capturaPendiente'] as String?,
       derrotas: (json['derrotas'] as int?) ?? 0,
       dinero: (json['dinero'] as int?) ?? 0,
+      xp: v == 1 ? xpAntigua : (json['xp'] as int?) ?? 0,
       mochila: {
         for (final e
             in ((json['mochila'] as Map<String, dynamic>?) ?? const {}).entries)

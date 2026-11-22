@@ -212,7 +212,11 @@
             "alto": 0.8
           }
         ]
-      }
+      },
+      "tienda": [
+        "pokeball",
+        "pocion"
+      ]
     },
     {
       "id": "ciudad-verde-salida",
@@ -719,7 +723,11 @@
             "alto": 0.8
           }
         ]
-      }
+      },
+      "tienda": [
+        "pokeball",
+        "pocion"
+      ]
     },
     {
       "id": "gimnasio-joven",
@@ -773,7 +781,8 @@
         "pokemon": [
           "geodude",
           "onix"
-        ]
+        ],
+        "dinero": 1400
       },
       "medalla": "roca",
       "escena": {

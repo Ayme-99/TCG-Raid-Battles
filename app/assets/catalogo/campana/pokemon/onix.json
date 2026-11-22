@@ -13,6 +13,7 @@
     "reduccion": 30
   },
   "retirada": 1,
+  "categoriaCaptura": "fuerte",
   "ataques": [
     {
       "nombre": "Atadura",
