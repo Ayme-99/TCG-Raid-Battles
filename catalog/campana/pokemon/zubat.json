@@ -2,13 +2,14 @@
   "id": "zubat",
   "numero": 41,
   "nombre": "Zubat",
-  "tipo": "veneno",
+  "tipo": "oscuridad",
   "ps": 60,
   "debilidad": {
     "tipo": "lucha",
     "multiplicador": 2
   },
   "retirada": 0,
+  "categoriaCaptura": "comun",
   "ataques": [
     {
       "nombre": "Mordisco",
@@ -18,7 +19,7 @@
     },
     {
       "nombre": "Ataque Ala",
-      "tipo": "volador",
+      "tipo": "normal",
       "coste": 2,
       "dano": 30
     }

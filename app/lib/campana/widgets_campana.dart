@@ -10,15 +10,12 @@ Color colorTipo(TipoCampana t) => switch (t) {
       TipoCampana.agua => const Color(0xFF1E88E5),
       TipoCampana.planta => const Color(0xFF43A047),
       TipoCampana.electrico => const Color(0xFFFDD835),
-      TipoCampana.hielo => const Color(0xFF4DD0E1),
       TipoCampana.lucha => const Color(0xFF8D6E63),
-      TipoCampana.veneno => const Color(0xFF8E24AA),
-      TipoCampana.volador => const Color(0xFF90A4AE),
       TipoCampana.psiquico => const Color(0xFFEC407A),
       TipoCampana.oscuridad => const Color(0xFF455A64),
-      TipoCampana.bicho => const Color(0xFF9CCC65),
-      TipoCampana.fantasma => const Color(0xFF5E35B1),
       TipoCampana.dragon => const Color(0xFF3949AB),
+      // Provisional: el color y el icono de metal son de Arte (D-20 §10.3).
+      TipoCampana.metal => const Color(0xFF78909C),
     };
 
 /// Nombre de cada tipo para mostrarlo.

@@ -234,6 +234,44 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('desde el equipo se evoluciona con la XP de la reserva',
+      (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ruta-2-norte',
+          superados: {'pueblo-paleta'},
+          inicial: 'charmander'),
+      equipo: [
+        PokemonGuardado('charmander', 70),
+        PokemonGuardado('caterpie', 0),
+        PokemonGuardado('weedle', 50),
+      ],
+      xp: 60,
+    );
+    final almacen = AlmacenMemoria();
+    final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
+    expect(find.text('Reserva de XP: 60'), findsOneWidget);
+    // Caterpie está debilitado: evolucionar lo revive a 10 PS.
+    await tocar(tester, 'equipo-1');
+    expect(find.text('Evolucionar en Metapod (50 XP)'), findsOneWidget);
+    await tocar(tester, 'equipo-evolucionar-metapod');
+    final p = c.read(campanaProvider).partida!;
+    expect(p.equipo[1].id, 'metapod');
+    expect(p.equipo[1].ps, 10);
+    expect(p.xp, 10);
+    expect(find.text('Reserva de XP: 10'), findsOneWidget);
+    // Weedle ya no llega: la opción sale pero desactivada.
+    await tocar(tester, 'equipo-2');
+    expect(find.text('Faltan 40 XP.'), findsOneWidget);
+    final tile = tester.widget<ListTile>(
+        find.byKey(const Key('equipo-evolucionar-kakuna')));
+    expect(tile.enabled, isFalse);
+    // Se guarda en el dispositivo.
+    final json = jsonDecode(almacen.datos[claveCampana]!) as Map;
+    expect(json['xp'], 10);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('con una campaña guardada se continúa donde estaba',
       (tester) async {
     const guardada = PartidaCampana(

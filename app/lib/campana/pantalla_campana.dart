@@ -584,9 +584,13 @@ class _Equipo extends ConsumerWidget {
       children: [
         Text('Tu equipo (${p.equipo.length}/${parametrosCampana.tamanoEquipo})',
             style: Theme.of(context).textTheme.titleMedium),
+        Text('Reserva de XP: ${p.xp}',
+            key: const Key('campana-xp'),
+            style: Theme.of(context).textTheme.bodyMedium),
         Text(
-            'El primero sale a combatir. Toca uno para ponerlo primero o '
-            'darle una Poción. Mochila: '
+            'El primero sale a combatir. Toca uno para ponerlo primero, '
+            'darle una Poción o evolucionarlo con la XP de la reserva. '
+            'Mochila: '
             '${p.cuantos(ObjetoCampana.pokeball)} Pokéballs, '
             '${p.cuantos(ObjetoCampana.pocion)} Pociones, '
             '${p.cuantos(ObjetoCampana.repelente)} Repelentes.',
@@ -602,10 +606,7 @@ class _Equipo extends ConsumerWidget {
                 especie: c.especie(p.equipo[i].id),
                 ps: p.equipo[i].ps,
                 destacada: i == 0,
-                detalle: [
-                  '${p.equipo[i].xp} XP',
-                  if (i == 0) 'sale primero',
-                ].join(' · '),
+                detalle: i == 0 ? 'sale primero' : null,
                 onTap: () => _opciones(context, control, i, enCentro),
               ),
           ],
@@ -650,6 +651,23 @@ class _Equipo extends ConsumerWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                     _avisar(context, control.usarPocion(catalogo, i));
+                  },
+                ),
+              // Evolucionar (D-20 §10.6): gasta XP de la reserva y deja al
+              // Pokémon con 10 PS, también si estaba debilitado.
+              for (final e in partida.evolucionesPorXp(catalogo, i))
+                ListTile(
+                  key: Key('equipo-evolucionar-${e.a}'),
+                  leading: const Icon(Icons.auto_awesome_rounded),
+                  title: Text('Evolucionar en '
+                      '${catalogo.especie(e.a).nombre} (${e.xpEvolucion} XP)'),
+                  subtitle: Text(partida.puedeEvolucionar(e)
+                      ? 'Queda con ${PartidaCampana.psAlEvolucionar} PS.'
+                      : 'Faltan ${e.xpEvolucion! - partida.xp} XP.'),
+                  enabled: partida.puedeEvolucionar(e),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _avisar(context, control.evolucionar(catalogo, i, e.a));
                   },
                 ),
               if (enCentro && partida.equipo.length > 1)
