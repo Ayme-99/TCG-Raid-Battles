@@ -272,6 +272,28 @@ void main() {
     expect(find.textContaining('Entrenador Joven'), findsWidgets);
   });
 
+  testWidgets('antes de Pikachu, un Cazabichos avisa y cura al equipo',
+      (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'aviso-pikachu',
+          superados: {'pueblo-paleta', 'cazabichos-2'},
+          inicial: 'bulbasaur'),
+      equipo: [PokemonGuardado('bulbasaur', 10)],
+      ultimaCura: 'ciudad-verde',
+    );
+    final almacen = AlmacenMemoria();
+    final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
+    expect(find.textContaining('comiendo la comida'), findsOneWidget);
+    expect(find.byKey(const Key('ir-jefe-pikachu')), findsNothing);
+    await tocar(tester, 'campana-conversar');
+    final p = c.read(campanaProvider).partida!;
+    expect(p.equipo.single.ps, 90);
+    expect(p.ultimaCura, 'aviso-pikachu');
+    expect(find.byKey(const Key('ir-jefe-pikachu')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   test('una campaña guardada dañada se descarta', () async {
     final almacen = AlmacenMemoria()..datos[claveCampana] = '{"version": 99}';
     expect(await leerCampana(almacen), isNull);

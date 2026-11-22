@@ -125,6 +125,17 @@ Sin aliado, inicial + 2 ganaba el 99–100 %.
 
 Reproducir: `dart run bin/sim_campana.dart --modo=realista --partidas=5000 --capturas=3 [--entrenador=2] [--aliado=no]`.
 
+## Resultado 5: el Cazabichos que avisa y cura antes de Pikachu
+
+Ayme añadió el 2026-11-22 un nodo de conversación justo antes de Pikachu (`aviso-pikachu`) que cura al equipo. Victorias contra Pikachu, con aliado, entre los que llegan a él (modo `realista`, Cazabichos con 1 Pokémon):
+
+| Equipo | Bulbasaur | Charmander | Squirtle | Sin el aviso (resultado 4) |
+|---|---|---|---|---|
+| Inicial + 2 | 77 % | 99 % | 78 % | 26–79 % |
+| Inicial + 3 | 97 % | 100 % | 98 % | 69–99 % |
+
+Con inicial + 3, Pikachu pasa del objetivo del 75 % con los tres iniciales. Brock sigue en el 0–7 %, y el tramo entero también. Los CSV del repositorio se han regenerado con el aviso.
+
 ## Cosas que no cuadran con D-20 §3.5 (para que Ayme decida, no se han tocado)
 
 - **Bulbasaur (Placaje) y Squirtle (Burbuja)** pegan 20 con coste 2; el baremo de un básico es 30–40. Charmander (Ascuas 30) sí está dentro, y es el inicial que mejor sale.

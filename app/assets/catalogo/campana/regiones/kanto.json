@@ -130,11 +130,27 @@
       "tipo": "combate",
       "nombre": "Bosque Verde: segundo Cazabichos",
       "salidas": [
-        "jefe-pikachu"
+        "aviso-pikachu"
       ],
       "zona": "bosque-verde",
       "rival": "entrenador",
       "clase": "Cazabichos"
+    },
+    {
+      "id": "aviso-pikachu",
+      "tipo": "conversacion",
+      "nombre": "Bosque Verde: un Cazabichos te avisa",
+      "salidas": [
+        "jefe-pikachu"
+      ],
+      "personaje": "Cazabichos",
+      "texto": [
+        "¡Eh, espera! No sigas sin prepararte.",
+        "Más adelante hay un Pikachu que se está comiendo la comida de todos los Pokémon del bosque, y eso lo ha hecho mucho más fuerte.",
+        "Cuando se ve en apuros, llama a otros Pokémon del bosque para que lo ayuden.",
+        "Déjame curar a tu equipo. ¡Suerte!"
+      ],
+      "cura": true
     },
     {
       "id": "jefe-pikachu",

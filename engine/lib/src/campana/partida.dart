@@ -404,6 +404,7 @@ class PartidaCampana {
       case TipoNodo.inicio:
       case TipoNodo.bifurcacion:
       case TipoNodo.descanso:
+      case TipoNodo.conversacion:
         throw const ReglaIncumplida('En este nodo no hay combate.');
     }
   }
@@ -610,6 +611,26 @@ class PartidaCampana {
       pc: [for (final p in pc) p.conPs(c.especie(p.id).ps)],
       progreso: progreso.resuelto ? null : progreso.resolver(c.region),
       ultimaCura: progreso.nodoActual,
+    );
+  }
+
+  /// En una conversación: el jugador escucha al personaje y sigue. Si el nodo
+  /// cura, cura a todo el equipo y pasa a ser el sitio al que se vuelve al
+  /// perder (D-20 §4, decidido el 2026-11-22). Da el nodo por resuelto.
+  PartidaCampana conversar(CatalogoCampana c) {
+    final nodo = nodoActual(c);
+    if (nodo.tipo != TipoNodo.conversacion) {
+      throw const ReglaIncumplida('Aquí no hay nadie con quien hablar.');
+    }
+    if (progreso.resuelto) {
+      throw const ReglaIncumplida('Ya has hablado con este personaje.');
+    }
+    return _copiar(
+      equipo: nodo.cura
+          ? [for (final p in equipo) p.conPs(c.especie(p.id).ps)]
+          : null,
+      progreso: progreso.resolver(c.region),
+      ultimaCura: nodo.cura ? progreso.nodoActual : null,
     );
   }
 

@@ -187,6 +187,7 @@ La campaña inicial es **Kanto** (decidido el 2026-11-21) y la estructura del ma
 | **Combate** | Contra un **Pokémon salvaje** (ruta) o un **entrenador** de una zona. Al derrotar a un salvaje se pregunta si se captura: si hay hueco se une al equipo, y si está lleno se elige a quién sustituir y el descartado va al PC (§2). |
 | **Bifurcación** | Sin evento: se elige por qué camino seguir. Puede ofrecer un desvío opcional o dos combates entre los que elegir. |
 | **Descanso** | El **centro Pokémon**: cura el equipo, da acceso al **PC** (guarda los Pokémon que no caben en el equipo y permite cambiarlos por los del equipo), permite **evolucionar 1 Pokémon** y comprar (qué se vende, por decidir). |
+| **Conversación** | Sin combate: un personaje habla con el jugador (por ejemplo, le avisa de lo que viene) y, si el nodo lo dice, **cura al equipo**. Una conversación que cura es un **punto de curación**: al perder se vuelve a ella. No da acceso al PC ni a la tienda. Decidido el 2026-11-22 (§10.7). |
 | **Gimnasio** | Combate contra el líder. Da una **medalla** y puntos. |
 | **Jefe** | Un **Pokémon salvaje** con su carta de la serie NN/20 (§4, Jefes). Da muchos puntos. |
 | **Liga** | Tras reunir todas las medallas. **Fase 2**; todavía no hay tipo de nodo. |
@@ -203,6 +204,7 @@ Decidido el 2026-11-22. Una región es un **grafo dirigido sin ciclos** que se r
 | `combate` | `zona`, `rival` (`salvaje` o `entrenador`) y, con un entrenador, su `clase` en la zona; `pokemon` opcional (los Pokémon **fijos** del rival: uno si es salvaje, su equipo si es un entrenador; sin él, sale de la zona al llegar) | 1 |
 | `bifurcacion` | — (no tiene evento: solo se elige camino) | 2 o más |
 | `descanso` | — | 1 |
+| `conversacion` | `personaje` (quién habla), `texto` (lista de líneas) y `cura` (si cura al equipo; `false` de salida) | 1 |
 | `gimnasio` | `lider` (nombre y Pokémon) y `medalla` | 1, o 0 si es el final |
 | `jefe` | `jefe` (id del archivo de `jefes/`) | 1, o 0 si es el final |
 
@@ -225,7 +227,7 @@ Recorrido que Ayme definió el 2026-11-21 y que recoge `catalog/campana/regiones
 | 3 | **Ciudad Verde** | Centro Pokémon, de presentación. |
 | 4 | **Ruta 22** (desvío **opcional**) | Un salvaje de la Ruta 22, que da puntos. |
 | 5 | **Ruta 2 sur** (bifurcación) | Elegir entre un **Weedle** y un **Caterpie** salvajes. |
-| 6 | **Bosque Verde** | Dos **Cazabichos** y el primer jefe, **Pikachu** (01/20). |
+| 6 | **Bosque Verde** | Dos **Cazabichos**; justo antes del jefe, **otro Cazabichos avisa** sin combatir de que Pikachu se come la comida de los demás Pokémon y se ha hecho más fuerte, y **cura al equipo** (2026-11-22); después, el primer jefe, **Pikachu** (01/20). |
 | 7 | **Ruta 2 norte** (bifurcación) | Un salvaje **opcional**, o seguir directo. |
 | 8 | **Ciudad Plateada** | Centro Pokémon, y el **gimnasio**: el **Entrenador Joven** (Diglett y Sandshrew, como en los juegos) y **Brock** (Geodude y Onix), que da la medalla Roca. |
 
@@ -249,7 +251,7 @@ Hecho el 2026-11-22 (tareas 6, 8 y 9, primera versión). `PartidaCampana` (`engi
 - **Rival de cada nodo:** el salvaje sale al azar de la zona con la semilla de la partida; un entrenador sin equipo fijo en el nodo saca **2** Pokémon de su lista (suposición); el gimnasio, los del líder en orden; el jefe, su carta NN/20 con su **llamada de aliado** (#372): el aliado entra en el combate, no se captura y no cuenta como rival derrotado para la XP si sigue en pie. Si el nodo fija el Pokémon (`pokemon` en `kanto.json`), sale ese; si no, sale de la zona o de la clase de entrenador con la semilla.
 - **PS entre combates:** el daño se arrastra de un combate a otro y la energía vuelve a 10 al empezar cada combate (decidido por Ayme el 2026-11-22). Solo cura el centro Pokémon o una Poción.
 - **Captura:** al vencer a un salvaje, o a un jefe la primera vez (su carta normal, `pikachu-jefe` → `pikachu`), se ofrece capturarlo; **siempre funciona** mientras no exista la Pokéball. Hay hueco: entra al equipo; equipo lleno: se elige a quién mandar al PC, o va al PC el capturado.
-- **Derrota** (decidido el 2026-11-22): se vuelve al **último sitio donde se curó** el equipo (el inicio o el último centro Pokémon usado; una Poción no cuenta), con el equipo curado. Se conserva lo ganado: capturas, puntos, dinero, XP y medallas. Los nodos de después se vuelven a pasar; un jefe ya derrotado ya no da puntos ni captura.
+- **Derrota** (decidido el 2026-11-22): se vuelve al **último sitio donde se curó** el equipo (el inicio, el último centro Pokémon usado o la última conversación que curó, como el aviso antes de Pikachu; una Poción no cuenta), con el equipo curado. Se conserva lo ganado: capturas, puntos, dinero, XP y medallas. Los nodos de después se vuelven a pasar; un jefe ya derrotado ya no da puntos ni captura.
 - **XP y dinero** (decidido el 2026-11-22): la XP se gana al derrotar Pokémon (10 por rival, para cada Pokémon del equipo que siga en pie al acabar: suposición) y el dinero, al vencer a entrenadores (200) y líderes (500). Se empieza con 300 (suposición). La evolución con XP aún no está.
 - **Tienda del centro Pokémon:** Poción (100, cura 20 PS a un Pokémon en pie, fuera de combate, sin revivir) y Repelente (150, evita un combate contra un salvaje, sin puntos, XP ni captura). La Pokéball queda pendiente porque falta decidir la probabilidad de captura.
 - **Puntos** (provisionales): salvaje 100, entrenador 200, jefe 1000 (la primera vez), medalla 1500. Se guardan en el dispositivo; todavía no se envían al servidor (tarea 10).
@@ -299,7 +301,7 @@ Contenido de la primera entrega:
 
 - Los tipos del motor, alineados con el TCG (§3.3; qué hacer con los que sobran está en §8).
 - Esquema JSON de Pokémon, de jefe, de zona y de región, y su carga en el motor (**hecho**).
-- Combate completo con energía, cambio de Pokémon, IA rival y victoria o derrota (**hecho**; al perder se vuelve al último punto de curación, aún sin implementar).
+- Combate completo con energía, cambio de Pokémon, IA rival y victoria o derrota (**hecho**; al perder se vuelve al último punto de curación).
 - El recorrido del primer tramo, con su jefe y su gimnasio (**hecho y jugable en la app**).
 - Captura, equipo, PC y descanso (**primera versión hecha**, §4 Partida de campaña).
 - Guardado local del progreso (**hecho**).
@@ -459,6 +461,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | La región **solo acaba en un gimnasio o un jefe**; un nodo de combate puede fijar su Pokémon. (La primera versión de `kanto.json` no seguía el recorrido de arriba; se corrigió en #356, §10.9.) | §4; #356 |
 | 2026-11-22 | Reglas de diseño de la región: **un jefe y al menos una bifurcación** entre medallas (y desde el inicio hasta la primera). | §4; test |
 | 2026-11-22 | **Liga:** fase 2. | §4 |
+| 2026-11-22 | **Nodo «Conversación»** (nuevo tipo `conversacion`: hablar y, si lo dice, curar). En el Bosque Verde, **justo antes de Pikachu**, sale **siempre** un Cazabichos que avisa sin combatir de que Pikachu se come la comida de los demás y se ha hecho más fuerte, y cura al equipo. **Si pierdes contra Pikachu, vuelves a ese Cazabichos.** El texto lo propone Claude y Ayme lo aprueba. | §4; `kanto.json` (`aviso-pikachu`) |
 
 ### 10.8 Jefes
 
@@ -577,7 +580,8 @@ Las listas de Pokémon por zona están por contrastar con Serebii o Bulbapedia (
 | `ruta-2-weedle` | combate | Ruta 2: Weedle | salvaje en `ruta-2`; fijo: weedle | `cazabichos-1` |
 | `ruta-2-caterpie` | combate | Ruta 2: Caterpie | salvaje en `ruta-2`; fijo: caterpie | `cazabichos-1` |
 | `cazabichos-1` | combate | Bosque Verde: primer Cazabichos | entrenador en `bosque-verde`, clase Cazabichos | `cazabichos-2` |
-| `cazabichos-2` | combate | Bosque Verde: segundo Cazabichos | entrenador en `bosque-verde`, clase Cazabichos | `jefe-pikachu` |
+| `cazabichos-2` | combate | Bosque Verde: segundo Cazabichos | entrenador en `bosque-verde`, clase Cazabichos | `aviso-pikachu` |
+| `aviso-pikachu` | conversacion | Bosque Verde: un Cazabichos te avisa | Cazabichos; avisa de Pikachu y **cura** | `jefe-pikachu` |
 | `jefe-pikachu` | jefe | Pikachu | jefe `pikachu-jefe` | `ruta-2-norte` |
 | `ruta-2-norte` | bifurcacion | Ruta 2 (norte) | — | `ruta-2-norte-salvaje`, `centro-plateada` |
 | `ruta-2-norte-salvaje` | combate | Ruta 2 (norte) | salvaje en `ruta-2`; **opcional** | `centro-plateada` |

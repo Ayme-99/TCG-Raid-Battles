@@ -316,6 +316,9 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
         : null,
     medalla: json['medalla'] as String?,
     jefe: json['jefe'] as String?,
+    personaje: json['personaje'] as String?,
+    texto: _textos(json, 'texto'),
+    cura: (json['cura'] as bool?) ?? false,
   );
 }
 

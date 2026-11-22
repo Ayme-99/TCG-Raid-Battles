@@ -19,6 +19,11 @@ enum TipoNodo {
 
   /// Un Pokémon salvaje de la serie NN/20.
   jefe,
+
+  /// Sin combate: un personaje habla con el jugador (por ejemplo, le avisa de
+  /// lo que viene) y, si el nodo lo dice, cura al equipo. Un nodo que cura es
+  /// un punto de curación: al perder se vuelve a él (D-20 §4).
+  conversacion,
 }
 
 /// Contra quién se combate en un nodo de combate.
@@ -70,6 +75,18 @@ class NodoRuta {
   /// Id del jefe en `catalog/campana/jefes/` (solo [TipoNodo.jefe]).
   final String? jefe;
 
+  /// Quién habla y lo que dice, línea a línea (solo [TipoNodo.conversacion]).
+  final String? personaje;
+  final List<String> texto;
+
+  /// Si la conversación cura al equipo (solo [TipoNodo.conversacion]).
+  final bool cura;
+
+  /// Si en este nodo se cura el equipo y pasa a ser el sitio al que se vuelve
+  /// al perder: un descanso o una conversación que cura.
+  bool get curaEquipo =>
+      tipo == TipoNodo.descanso || (tipo == TipoNodo.conversacion && cura);
+
   const NodoRuta({
     required this.id,
     required this.tipo,
@@ -84,6 +101,9 @@ class NodoRuta {
     this.lider,
     this.medalla,
     this.jefe,
+    this.personaje,
+    this.texto = const [],
+    this.cura = false,
   });
 }
 
@@ -263,6 +283,14 @@ class RegionCampana {
       sin(n.medalla == null, 'medalla');
     }
     if (n.tipo != TipoNodo.jefe) sin(n.jefe == null, 'jefe');
+    final esConversacion = n.tipo == TipoNodo.conversacion;
+    exige(!esConversacion || (n.personaje != null && n.texto.isNotEmpty),
+        'necesita "personaje" y "texto"');
+    if (!esConversacion) {
+      sin(n.personaje == null, 'personaje');
+      sin(n.texto.isEmpty, 'texto');
+      sin(!n.cura, 'cura');
+    }
     return p;
   }
 

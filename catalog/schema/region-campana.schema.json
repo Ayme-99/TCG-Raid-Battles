@@ -23,7 +23,7 @@
       "required": ["id", "tipo", "nombre"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
-        "tipo": { "enum": ["inicio", "combate", "bifurcacion", "descanso", "gimnasio", "jefe"] },
+        "tipo": { "enum": ["inicio", "combate", "bifurcacion", "descanso", "gimnasio", "jefe", "conversacion"] },
         "nombre": { "type": "string" },
         "salidas": {
           "type": "array",
@@ -52,7 +52,10 @@
           }
         },
         "medalla": { "$ref": "#/$defs/id" },
-        "jefe": { "$ref": "#/$defs/id", "description": "jefe: id del archivo de catalog/campana/jefes/." }
+        "jefe": { "$ref": "#/$defs/id", "description": "jefe: id del archivo de catalog/campana/jefes/." },
+        "personaje": { "type": "string", "description": "conversacion: quién habla." },
+        "texto": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "conversacion: lo que dice, línea a línea." },
+        "cura": { "type": "boolean", "default": false, "description": "conversacion: si cura al equipo. Un nodo que cura es un punto de curación: al perder se vuelve a él." }
       }
     }
   }
