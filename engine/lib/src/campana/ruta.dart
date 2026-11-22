@@ -39,6 +39,73 @@ class LiderDeGimnasio {
   const LiderDeGimnasio(this.nombre, this.pokemon);
 }
 
+/// Qué hace una zona pulsable de una escena (D-20 §4, Escenas).
+enum AccionZona {
+  /// Ir a otro nodo ([ZonaPulsable.destino]): un borde de la escena.
+  ir,
+
+  /// Empezar el combate del nodo: la hierba alta, el entrenador, el líder o
+  /// el jefe.
+  combate,
+
+  /// Elegir el Pokémon inicial (inicio).
+  inicial,
+
+  /// Hablar con el personaje (conversación).
+  hablar,
+
+  /// En un centro Pokémon: el mostrador, la estantería y el PC.
+  curar,
+  tienda,
+  pc,
+}
+
+/// Una zona pulsable de una escena: un rectángulo en coordenadas relativas a
+/// la imagen (0 a 1; 0,0 es la esquina de arriba a la izquierda).
+class ZonaPulsable {
+  final AccionZona accion;
+
+  /// Id del nodo al que lleva (solo [AccionZona.ir]).
+  final String? destino;
+  final double x;
+  final double y;
+  final double ancho;
+  final double alto;
+
+  const ZonaPulsable({
+    required this.accion,
+    this.destino,
+    required this.x,
+    required this.y,
+    required this.ancho,
+    required this.alto,
+  });
+}
+
+/// La escena ilustrada de un nodo (D-20 §10.7, #365): la imagen de fondo y lo
+/// que se puede pulsar en ella. La imagen es un id: la app la busca en
+/// `assets/campana/escenas/<imagen>` y, mientras Arte no la entrega, pinta un
+/// marcador. Varios nodos pueden compartir imagen (los dos centros Pokémon).
+class EscenaNodo {
+  final String imagen;
+  final List<ZonaPulsable> zonas;
+
+  const EscenaNodo({required this.imagen, this.zonas = const []});
+}
+
+/// Las acciones que necesita la escena de un nodo de [tipo]: sin ellas no se
+/// podría hacer lo que se hace en él.
+Set<AccionZona> accionesDeTipo(TipoNodo tipo) => switch (tipo) {
+      TipoNodo.inicio => {AccionZona.inicial},
+      TipoNodo.combate ||
+      TipoNodo.gimnasio ||
+      TipoNodo.jefe =>
+        {AccionZona.combate},
+      TipoNodo.conversacion => {AccionZona.hablar},
+      TipoNodo.descanso => {AccionZona.curar, AccionZona.tienda, AccionZona.pc},
+      TipoNodo.bifurcacion => const {},
+    };
+
 /// Un nodo de la ruta. Los campos que no son de su [tipo] van vacíos.
 class NodoRuta {
   final String id;
@@ -82,6 +149,10 @@ class NodoRuta {
   /// Si la conversación cura al equipo (solo [TipoNodo.conversacion]).
   final bool cura;
 
+  /// La escena ilustrada del nodo, o null si aún no la tiene (el catálogo lo
+  /// avisa en [RegionCampana.problemasDeEscenas]).
+  final EscenaNodo? escena;
+
   /// Si en este nodo se cura el equipo y pasa a ser el sitio al que se vuelve
   /// al perder: un descanso o una conversación que cura.
   bool get curaEquipo =>
@@ -104,6 +175,7 @@ class NodoRuta {
     this.personaje,
     this.texto = const [],
     this.cura = false,
+    this.escena,
   });
 }
 
@@ -336,6 +408,64 @@ class RegionCampana {
       }
       if (n.jefe != null && !jefes.contains(n.jefe)) {
         p.add('${n.id}: el jefe "${n.jefe}" no existe.');
+      }
+    }
+    return [...p, ...problemasDeEscenas()];
+  }
+
+  /// Lo que está mal en las escenas (D-20 §4, Escenas; #413): todo nodo tiene
+  /// escena con imagen; cada zona está dentro de la imagen (0 a 1) y tiene
+  /// tamaño; una zona `ir` lleva a un nodo vecino que existe y solo ella lleva
+  /// destino; cada salida del nodo tiene su zona (así a ningún nodo le falta
+  /// una zona de acceso); y están las acciones de su tipo ([accionesDeTipo]).
+  List<String> problemasDeEscenas() {
+    final p = <String>[];
+    for (final n in nodos.values) {
+      final e = n.escena;
+      if (e == null) {
+        p.add('${n.id}: no tiene escena.');
+        continue;
+      }
+      if (e.imagen.trim().isEmpty) p.add('${n.id}: la escena no tiene imagen.');
+      final vecinos = {...n.salidas, ...entradas(n.id)};
+      for (final z in e.zonas) {
+        final dentro = z.x >= 0 &&
+            z.y >= 0 &&
+            z.ancho > 0 &&
+            z.alto > 0 &&
+            z.x + z.ancho <= 1 &&
+            z.y + z.alto <= 1;
+        if (!dentro) {
+          p.add('${n.id}: la zona ${z.accion.name} se sale de la imagen.');
+        }
+        if (z.accion == AccionZona.ir) {
+          final d = z.destino;
+          if (d == null) {
+            p.add('${n.id}: una zona "ir" necesita "destino".');
+          } else if (!nodos.containsKey(d)) {
+            p.add('${n.id}: la zona lleva a "$d", que no existe.');
+          } else if (!vecinos.contains(d)) {
+            p.add('${n.id}: la zona lleva a "$d", que no está al lado.');
+          }
+        } else if (z.destino != null) {
+          p.add('${n.id}: solo una zona "ir" lleva "destino".');
+        }
+      }
+      final destinos = {
+        for (final z in e.zonas)
+          if (z.accion == AccionZona.ir) z.destino
+      };
+      for (final s in n.salidas) {
+        if (!destinos.contains(s)) {
+          p.add('${n.id}: la salida "$s" no tiene zona en la escena.');
+        }
+      }
+      final acciones = {for (final z in e.zonas) z.accion};
+      for (final a in accionesDeTipo(n.tipo)) {
+        if (!acciones.contains(a)) {
+          p.add('${n.id}: la escena de un ${n.tipo.name} necesita una zona '
+              '"${a.name}".');
+        }
       }
     }
     return p;
