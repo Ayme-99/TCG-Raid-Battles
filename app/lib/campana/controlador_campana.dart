@@ -97,6 +97,14 @@ class ControladorCampana extends Notifier<EstadoCampana> {
 
   void ponerPrimero(int indice) => _guardar(_partida.ponerPrimero(indice));
 
+  /// Vuelve a un nodo ya visitado (D-20 §10.7).
+  String? retroceder(CatalogoCampana c, String destino) =>
+      _intentar(() => _partida.retroceder(c, destino));
+
+  /// Vuelve a combatir contra el salvaje ya vencido del nodo actual.
+  void repetirCombate(CatalogoCampana c) =>
+      _guardar(_partida.repetirCombate(c));
+
   /// Devuelven el motivo si el motor no lo permite (sin dinero, sin objetos…).
   String? comprar(CatalogoCampana c, ObjetoCampana objeto) => _intentar(
       () => _partida.comprar(c, objeto, parametros: parametrosCampana));
