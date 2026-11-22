@@ -1,4 +1,5 @@
 import 'pokemon.dart';
+import 'ruta.dart';
 import 'tipos.dart';
 
 /// Lee un tipo del catálogo (`"agua"`, `"electrico"`…).
@@ -244,5 +245,59 @@ ZonaCampana zonaCampanaDesdeJson(Map<String, dynamic> json) {
           ]
         : const [],
     jefe: json['jefe'] as String?,
+  );
+}
+
+T _enumDeTexto<T extends Enum>(List<T> valores, String texto, String que) {
+  for (final v in valores) {
+    if (v.name == texto) return v;
+  }
+  throw FormatException('$que desconocido: "$texto".');
+}
+
+List<String> _textos(Map<String, dynamic> json, String clave) => [
+      for (final s in (json[clave] as List<dynamic>?) ?? const []) s as String,
+    ];
+
+/// Un nodo de la ruta a partir de su JSON.
+NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
+  final lider = json['lider'];
+  final rival = json['rival'] as String?;
+  return NodoRuta(
+    id: _campo<String>(json, 'id'),
+    tipo: _enumDeTexto(TipoNodo.values, _campo<String>(json, 'tipo'), 'Tipo de nodo'),
+    nombre: _campo<String>(json, 'nombre'),
+    salidas: _textos(json, 'salidas'),
+    opcional: (json['opcional'] as bool?) ?? false,
+    iniciales: _textos(json, 'iniciales'),
+    zona: json['zona'] as String?,
+    rival: rival == null
+        ? null
+        : _enumDeTexto(RivalDeCombate.values, rival, 'Rival'),
+    clase: json['clase'] as String?,
+    lider: lider is Map<String, dynamic>
+        ? LiderDeGimnasio(
+            _campo<String>(lider, 'nombre'), _textos(lider, 'pokemon'))
+        : null,
+    medalla: json['medalla'] as String?,
+    jefe: json['jefe'] as String?,
+  );
+}
+
+/// Una región a partir de su JSON (`catalog/campana/regiones/*.json`).
+RegionCampana regionCampanaDesdeJson(Map<String, dynamic> json) {
+  final nodos = <String, NodoRuta>{};
+  for (final n in _campo<List<dynamic>>(json, 'nodos')) {
+    final nodo = nodoRutaDesdeJson(n as Map<String, dynamic>);
+    if (nodos.containsKey(nodo.id)) {
+      throw FormatException('El nodo "${nodo.id}" está repetido.');
+    }
+    nodos[nodo.id] = nodo;
+  }
+  return RegionCampana(
+    id: _campo<String>(json, 'id'),
+    nombre: _campo<String>(json, 'nombre'),
+    inicio: _campo<String>(json, 'inicio'),
+    nodos: nodos,
   );
 }
