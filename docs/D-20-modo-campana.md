@@ -622,7 +622,7 @@ Generado a partir de `catalog/campana/` el 2026-11-22. Si algo de aquí no coinc
 | 095 | `onix` | Onix | lucha | 110 | agua | normal | 1 | — | Atadura (2: 30); Lanzarrocas (3: 60) | Fuerte | — | no |
 | 104 | `cubone` | Cubone | lucha | 60 | agua | — | 0 | — | Garra (1: 10); Golpe Hueso (2: 30) | Común | — | no |
 
-**Efectos y habilidades** (columna de ataques): `reduceDanoRival`, `aumentaDanoRecibido`, `quitaEnergiaRival`, `ganaEnergia`, `monedaDanoExtra`, `envenenaDefensor`, `reduceDanoPropio`, `monedaFalloRival`, `danoPorRacha`, `monedasDano` y `repiteDanoAlDerribar` (§3.6); `+` es una moneda que suma daño; `esp.` es el daño esperado de las tiradas. La única habilidad es `monedaDanoExtraAlAtacar` (Foco Energía).
+**Efectos y habilidades** (columna de ataques): `reduceDanoRival`, `aumentaDanoRecibido`, `quitaEnergiaRival`, `ganaEnergia`, `monedaDanoExtra`, `envenenaDefensor`, `reduceDanoPropio`, `monedaFalloRival`, `danoPorRacha`, `monedasDano` y `repiteDanoAlDerribar` (§3.6); `+` es una moneda que suma daño; `esp.` es el daño esperado de las tiradas. La única habilidad es `monedaDanoExtraAlAtacar` (Foco Energía, de Mankey y Machop).
 
 Geodude ya sigue a su carta impresa (2026-11-22, tarea 14): Pulimento (1: `ganaEnergia` 2) y Lanzarrocas (3: 50), sin resistencia y con retirada 1; son valores provisionales hasta que Calidad los mida contra Brock. Las cartas sin imagen (Zubat, Machop, Onix, Cubone y Slowpoke) vienen del primer catálogo del Túnel Roca (#340): tienen datos pero no carta impresa. Nidoran♂ guarda el número 32 de la Pokédex; su carta lleva impreso 029/150 (§8, 13).
 

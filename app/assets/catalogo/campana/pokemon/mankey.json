@@ -14,7 +14,7 @@
     "nombre": "Foco Energía",
     "tipo": "monedaDanoExtraAlAtacar",
     "valor": 20,
-    "texto": "Mientras este Pokémon siga activo, cada vez que ataque, lanza una moneda. Si sale cara, ese ataque hace 20 puntos más."
+    "texto": "Mientras este Pokémon esté en el Puesto Activo. Cada vez que ataque, lanza una moneda. Si sale cara, ese ataque hace 20 puntos más."
   },
   "ataques": [
     {
