@@ -15,13 +15,18 @@
       "nombre": "Golpe Kárate",
       "tipo": "lucha",
       "coste": 2,
-      "dano": 30
-    },
-    {
-      "nombre": "Patada Baja",
-      "tipo": "lucha",
-      "coste": 3,
-      "dano": 50
+      "dano": 30,
+      "efecto": {
+        "tipo": "monedaDanoExtra",
+        "valor": 20,
+        "texto": "Lanza una moneda. Si sale cara, este ataque hace 20 puntos de daño más."
+      }
     }
-  ]
+  ],
+  "habilidad": {
+    "nombre": "Foco Energía",
+    "tipo": "monedaDanoExtraAlAtacar",
+    "valor": 20,
+    "texto": "Mientras este Pokémon esté en el Puesto Activo. Cada vez que ataque, lanza una moneda. Si sale cara, ese ataque hace 20 puntos más."
+  }
 }

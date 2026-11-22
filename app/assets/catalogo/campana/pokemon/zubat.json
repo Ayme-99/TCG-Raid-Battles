@@ -5,7 +5,7 @@
   "tipo": "oscuridad",
   "ps": 60,
   "debilidad": {
-    "tipo": "lucha",
+    "tipo": "electrico",
     "multiplicador": 2
   },
   "retirada": 0,
