@@ -267,6 +267,11 @@
           "objeto": {
             "type": "string"
           },
+          "medallasMinimas": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Medallas que hacen falta para que se ofrezca la evolución (D-20 §10.6; tabla en §10.11). Sin ellas no se evoluciona aunque haya XP. Sin este campo, por decidir: no limita."
+          },
           "puntos": {
             "type": "integer",
             "minimum": 10,

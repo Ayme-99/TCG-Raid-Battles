@@ -510,19 +510,21 @@ class _Descanso extends ConsumerWidget {
         const SizedBox(height: 16),
         Text('Tienda · tienes ${p.dinero} \$',
             style: Theme.of(context).textTheme.titleMedium),
-        for (final e in parametrosCampana.precios.entries)
+        // Lo que vende este centro (D-20 §10.6): en el primer tramo, Pokéball
+        // y Poción; las Balls mejores piden medallas.
+        for (final o in p.tienda(c, parametros: parametrosCampana))
           ListTile(
-            key: Key('tienda-${e.key.name}'),
+            key: Key('tienda-${o.name}'),
             contentPadding: EdgeInsets.zero,
-            title: Text(nombreObjeto(e.key)),
-            subtitle: Text('${descripcionObjeto(e.key)} · '
-                'en la mochila: ${p.cuantos(e.key)}'),
+            title: Text(nombreObjeto(o)),
+            subtitle: Text('${descripcionObjeto(o)} · '
+                'en la mochila: ${p.cuantos(o)}'),
             trailing: FilledButton.tonal(
-              key: Key('comprar-${e.key.name}'),
-              onPressed: p.dinero >= e.value
-                  ? () => _avisar(context, control.comprar(c, e.key))
+              key: Key('comprar-${o.name}'),
+              onPressed: p.dinero >= parametrosCampana.precios[o]!
+                  ? () => _avisar(context, control.comprar(c, o))
                   : null,
-              child: Text('${e.value} \$'),
+              child: Text('${parametrosCampana.precios[o]} \$'),
             ),
           ),
         const SizedBox(height: 16),
@@ -589,6 +591,7 @@ class _Equipo extends ConsumerWidget {
             'El primero sale a combatir. Toca uno para ponerlo primero, '
             'darle una Poción o evolucionarlo con la XP de la reserva. '
             'Mochila: '
+            '${p.cuantos(ObjetoCampana.pokeball)} Pokéballs, '
             '${p.cuantos(ObjetoCampana.pocion)} Pociones, '
             '${p.cuantos(ObjetoCampana.repelente)} Repelentes.',
             style: Theme.of(context).textTheme.bodySmall),
@@ -658,9 +661,8 @@ class _Equipo extends ConsumerWidget {
                   leading: const Icon(Icons.auto_awesome_rounded),
                   title: Text('Evolucionar en '
                       '${catalogo.especie(e.a).nombre} (${e.xpEvolucion} XP)'),
-                  subtitle: Text(partida.puedeEvolucionar(e)
-                      ? 'Queda con ${PartidaCampana.psAlEvolucionar} PS.'
-                      : 'Faltan ${e.xpEvolucion! - partida.xp} XP.'),
+                  subtitle: Text(partida.motivoSinEvolucion(e) ??
+                      'Queda con ${PartidaCampana.psAlEvolucionar} PS.'),
                   enabled: partida.puedeEvolucionar(e),
                   onTap: () {
                     Navigator.of(context).pop();
@@ -693,11 +695,18 @@ void _avisar(BuildContext context, String? motivo) {
 }
 
 String nombreObjeto(ObjetoCampana o) => switch (o) {
+      ObjetoCampana.pokeball => 'Pokéball',
+      ObjetoCampana.superBall => 'Super Ball',
+      ObjetoCampana.ultraBall => 'Ultra Ball',
       ObjetoCampana.pocion => 'Poción',
       ObjetoCampana.repelente => 'Repelente',
     };
 
 String descripcionObjeto(ObjetoCampana o) => switch (o) {
+      ObjetoCampana.pokeball ||
+      ObjetoCampana.superBall ||
+      ObjetoCampana.ultraBall =>
+        'Para capturar; cada intento gasta una',
       ObjetoCampana.pocion =>
         'Cura ${parametrosCampana.psPocion} PS fuera de combate',
       ObjetoCampana.repelente => 'Evita un combate contra un Pokémon salvaje',

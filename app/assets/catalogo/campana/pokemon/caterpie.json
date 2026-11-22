@@ -33,7 +33,8 @@
     {
       "a": "metapod",
       "via": "xp",
-      "xpEvolucion": 50
+      "xpEvolucion": 50,
+      "medallasMinimas": 0
     }
   ]
 }

@@ -36,23 +36,31 @@ CategoriaCaptura categoriaCapturaDeTexto(String texto) {
 
 EvolucionCampana _evolucionDesdeJson(Map<String, dynamic> json) {
   final via = _viaDeTexto(_campo<String>(json, 'via'));
+  final a = _campo<String>(json, 'a');
+  final medallas = json['medallasMinimas'] as int?;
+  if (medallas != null && medallas < 0) {
+    throw const FormatException('"medallasMinimas" no puede ser negativo.');
+  }
   switch (via) {
     case ViaEvolucion.xp:
       return EvolucionCampana(
-          a: _campo<String>(json, 'a'),
+          a: a,
           via: via,
-          xpEvolucion: _campo<int>(json, 'xpEvolucion'));
+          xpEvolucion: _campo<int>(json, 'xpEvolucion'),
+          medallasMinimas: medallas);
     case ViaEvolucion.objeto:
       return EvolucionCampana(
-          a: _campo<String>(json, 'a'),
+          a: a,
           via: via,
-          objeto: _campo<String>(json, 'objeto'));
+          objeto: _campo<String>(json, 'objeto'),
+          medallasMinimas: medallas);
     case ViaEvolucion.intercambio:
     case ViaEvolucion.puntos:
       return EvolucionCampana(
-          a: _campo<String>(json, 'a'),
+          a: a,
           via: via,
-          puntos: _campo<int>(json, 'puntos'));
+          puntos: _campo<int>(json, 'puntos'),
+          medallasMinimas: medallas);
   }
 }
 
@@ -246,7 +254,11 @@ class EntrenadoresDeZona {
   /// Ids de sus Pokémon.
   final List<String> pokemon;
 
-  const EntrenadoresDeZona(this.clase, this.pokemon);
+  /// Dinero que paga cada entrenador de la clase al ser vencido (D-20 §10.6),
+  /// o null si aún no tiene cifra.
+  final int? dinero;
+
+  const EntrenadoresDeZona(this.clase, this.pokemon, {this.dinero});
 }
 
 /// Una zona de la campaña: qué aparece en ella.
@@ -298,6 +310,7 @@ ZonaCampana zonaCampanaDesdeJson(Map<String, dynamic> json) {
                   for (final p in _campo<List<dynamic>>(e, 'pokemon'))
                     p as String
                 ],
+                dinero: e['dinero'] as int?,
               ),
           ]
         : const [],
@@ -336,13 +349,15 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
     pokemon: _textos(json, 'pokemon'),
     lider: lider is Map<String, dynamic>
         ? LiderDeGimnasio(
-            _campo<String>(lider, 'nombre'), _textos(lider, 'pokemon'))
+            _campo<String>(lider, 'nombre'), _textos(lider, 'pokemon'),
+            dinero: lider['dinero'] as int?)
         : null,
     medalla: json['medalla'] as String?,
     jefe: json['jefe'] as String?,
     personaje: json['personaje'] as String?,
     texto: _textos(json, 'texto'),
     cura: (json['cura'] as bool?) ?? false,
+    tienda: _textos(json, 'tienda'),
   );
 }
 
