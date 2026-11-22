@@ -190,7 +190,7 @@ La campaña inicial es **Kanto** (decidido el 2026-11-21) y la estructura del ma
 | **Conversación** | Sin combate: un personaje habla con el jugador (por ejemplo, le avisa de lo que viene) y, si el nodo lo dice, **cura al equipo**. Una conversación que cura es un **punto de curación**: al perder se vuelve a ella. No da acceso al PC ni a la tienda. Decidido el 2026-11-22 (§10.7). |
 | **Gimnasio** | Combate contra el líder. Da una **medalla** y puntos. |
 | **Jefe** | Un **Pokémon salvaje** con su carta de la serie NN/20 (§4, Jefes). Da muchos puntos. |
-| **Liga** | Tras reunir todas las medallas. **Fase 2**; todavía no hay tipo de nodo. |
+| **Liga** | Tras reunir todas las medallas. **Fase 2**; no hace falta un tipo de nodo propio: es una cadena de nodos de gimnasio seguidos (decidido el 2026-11-22, §10.7). |
 
 Estructura de una región: `Inicio → rutas → jefe del tramo → descanso → gimnasio (medalla) → rutas → jefe del tramo → … → Liga` (más jefes en rutas clave y los 4 legendarios). Hay ramas: en una bifurcación se elige por qué ruta seguir.
 
@@ -319,7 +319,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 5. **Dinero.** Cerradas las cifras del primer tramo (§10.6); falta decidir para qué sirve el dinero frente a los puntos y las cifras de los tramos siguientes.
 6. **Cifras de progresión:** cuántos puntos cuesta cada XP, cuántas XP necesita cada Pokémon para evolucionar, y cuánto cuestan el intercambio y hacerse ex.
 7. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex). Todavía no hay ninguna carta evolucionada ni ex.
-8. **Liga.** Es fase 2 y no tiene tipo de nodo; falta decidir cómo se juega (varios combates seguidos, sin descanso…).
+8. ~~Liga~~ **Decidida el 2026-11-22** (§10.7): cinco rivales seguidos, tres Pokémon cada uno, un centro solo a la entrada. Es fase 2; faltan las cartas de sus rivales y las cifras de dinero y puntos por rival.
 9. **Combates 2 contra 2 y 3 contra 3.** Futuro, sin diseño.
 
 **Tipos**
@@ -475,6 +475,11 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | La región **solo acaba en un gimnasio o un jefe**; un nodo de combate puede fijar su Pokémon. (La primera versión de `kanto.json` no seguía el recorrido de arriba; se corrigió en #356, §10.9.) | §4; #356 |
 | 2026-11-22 | Reglas de diseño de la región: **un jefe y al menos una bifurcación** entre medallas (y desde el inicio hasta la primera). | §4; test |
 | 2026-11-22 | **Liga:** fase 2. | §4 |
+| 2026-11-22 | **Liga: estructura.** Se abre con las 8 medallas. Son **cinco rivales seguidos** (Alto Mando y Campeón) con **tres Pokémon cada uno**, o sea **15 combates seguidos**, y **un centro Pokémon solo a la entrada**: entre rivales solo se pueden gastar Pociones o evolucionar (que deja a 10 PS). No hace falta un tipo de nodo nuevo: es una cadena de nodos de gimnasio sin descanso entre ellos. Fase 2, pendiente de implementar. | §4; #367 |
+| 2026-11-22 | **Liga: derrota.** Al perder se vuelve al centro de la entrada y se **repiten todos los combates**, con el equipo curado y conservando capturas, XP, dinero y medallas; los puntos y el dinero de un combate se dan **una sola vez**. Es la regla de derrota que ya existe (§10.2). | §4; #367 |
+| 2026-11-22 | **Liga: rivales.** Los de los juegos con los tipos pasados al TCG: Lorelei (agua), Bruno (lucha), Agatha (psíquico), Lance (dragón) y el Campeón, que es el rival del jugador (equipo variado). Los líderes y el Alto Mando no son jefes: usan cartas normales (§10.8). | §4; #367 |
+| 2026-11-22 | **Liga: recompensa.** Cada rival paga **dinero y puntos propios**, como un líder, y el Campeón más. Al vencerlo **termina la campaña** con una pantalla de final. Las cifras por rival se fijan al diseñar ese tramo. | §4, §5; #367 |
+| 2026-11-22 | **Liga: dificultad.** Objetivo: **completar la Liga a la primera en un 25 %** (unos 4 intentos de media), medido por Calidad con el simulador. Sustituye al 75 % por combate (§10.5) solo para la Liga, porque 15 combates seguidos darían un 1 % con aquel objetivo. | §10.5; #367 |
 | 2026-11-22 | **Nodo «Conversación»** (nuevo tipo `conversacion`: hablar y, si lo dice, curar). En el Bosque Verde, **justo antes de Pikachu**, sale **siempre** un Cazabichos que avisa sin combatir de que Pikachu se come la comida de los demás y se ha hecho más fuerte, y cura al equipo. **Si pierdes contra Pikachu, vuelves a ese Cazabichos.** El texto lo propone Claude y Ayme lo aprueba. | §4; `kanto.json` (`aviso-pikachu`) |
 
 ### 10.8 Jefes
