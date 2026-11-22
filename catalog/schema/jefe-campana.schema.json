@@ -25,9 +25,10 @@
         "alBajarDePorcentaje",
         "aliados"
       ],
-      "description": "Cuando el jefe baja de ese porcentaje de PS se retira a la banca y entra un aliado elegido al azar (semilla del combate); al caer el aliado vuelve el jefe con los PS que tenía.",
+      "description": "Cuando el jefe llega a ese porcentaje de PS o baja de él (con 100 PS y 50, al quedarse en 50 o menos) sin caer, por un ataque o por el veneno, se retira a la banca y entra un aliado elegido al azar (semilla del combate). Llama una vez por combate. El jefe no vuelve hasta que cae el aliado, y entonces vuelve con los PS que tenía. Los aliados no se capturan y no se gana hasta que cae el jefe.",
       "properties": {
         "alBajarDePorcentaje": {
+          "description": "Porcentaje de los PS del jefe al que llama (llegar a él basta). El nombre es anterior a la decisión del 2026-11-22.",
           "type": "integer",
           "minimum": 1,
           "maximum": 99
