@@ -14,8 +14,9 @@ Límites (son de la medida, no reglas del juego):
 - **Pikachu jefe va sin la llamada de aliado** (#372 no está hecho). Con aliado será más difícil.
 - Cuántos Pokémon saca un Cazabichos no está decidido: se mide con 1 (y abajo con 2 como comparación).
 - La captura no está diseñada (#361). El tramo se mide de dos formas: **solo con el inicial** y **capturando todos los salvajes vencidos** (hasta 6, con los PS llenos). Son cotas inferior y superior.
+- **`--modo=realista`**: el resultado 3, con un equipo de inicial + 2 o 3 capturas y la IA eligiendo el activo.
 
-Reproducir: `cd sim && dart run bin/sim_campana.dart --modo=nodos --partidas=200` y `dart run bin/sim_campana.dart --modo=tramo --partidas=5000 [--entrenador=2]`. Los CSV están en `balance/informes/campana_nodos.csv` y `campana_tramo.csv`.
+Reproducir: `cd sim && dart run bin/sim_campana.dart --modo=nodos --partidas=200` y `dart run bin/sim_campana.dart --modo=tramo --partidas=5000 [--entrenador=2]` y `dart run bin/sim_campana.dart --modo=realista --partidas=5000 --capturas=3 [--entrenador=2]`. Los CSV están en `balance/informes/campana_nodos.csv`, `campana_tramo.csv` y `campana_realista.csv`.
 
 ## Resultado 1: cada combate por separado (PS llenos)
 
@@ -45,12 +46,55 @@ Los combates de ruta están en el objetivo o por encima. Los cuatro muros son Ka
 | Solo el inicial, Cazabichos con 2 | 0 % | 0 % | 0 % | Cazabichos |
 | Capturando, Cazabichos con 2 | 0 % | 0 % | 0 % | Cazabichos y Pikachu |
 
-Hoy **nadie completa el tramo**: estamos a 75 puntos del objetivo. Capturando solo se pueden sumar 2 Pokémon (uno de la Ruta 1 y uno de la Ruta 2 sur), así que el equipo no pasa de 3.
+Solo con el inicial **nadie completa el tramo**, pero es un escenario irreal (en el juego se captura): el resultado 3 mide un equipo realista. Capturando solo se pueden sumar 2 Pokémon (uno de la Ruta 1 y uno de la Ruta 2 sur), así que el equipo no pasa de 3.
+
+## Resultado 3: el tramo con un equipo realista (`--modo=realista`)
+
+El inicial y 2 o 3 Pokémon distintos al azar entre los salvajes de las rutas del tramo (Caterpie, Mankey, Nidoran♀, Nidoran♂, Pidgey, Rattata, Spearow y Weedle), con los PS llenos desde el principio. La IA elige quién sale en cada combate con el mismo criterio que usa para sus relevos. El resto, como en el resultado 2. Sigue sin XP, Pociones ni evolución, porque no están diseñadas. 5000 recorridos por inicial y variante.
+
+**Completan el tramo:**
+
+| Equipo | Cazabichos con | Bulbasaur | Charmander | Squirtle |
+|---|---|---|---|---|
+| Inicial + 2 | 1 | 0 % | 0,2 % | 0,3 % |
+| Inicial + 2 | 2 | 0 % | 0,2 % | 0,1 % |
+| Inicial + 3 | 1 | 0 % | 5,7 % | 6,7 % |
+| Inicial + 3 | 2 | 0 % | 5,2 % | 4,2 % |
+
+**Victorias en cada combate entre los que llegan a él** (inicial + 3, Cazabichos con 1):
+
+| Combate | Bulbasaur | Charmander | Squirtle |
+|---|---|---|---|
+| Rutas y Cazabichos | 100 % | 100 % | 100 % |
+| Pikachu (sin aliado) | 97,6 % | 100 % | 97,2 % |
+| Entrenador Joven | 97,0 % | 91,5 % | 96,0 % |
+| **Brock** | **0 %** | **6,2 %** | **7,2 %** |
+
+Con inicial + 2 y Cazabichos con 2, Pikachu baja al 37–59 % y el segundo Cazabichos al 28–89 %, porque **el daño se arrastra y no hay centro Pokémon entre el Bosque Verde y Pikachu**. Lo mismo pasa entre el Entrenador Joven y Brock, que van seguidos sin curar.
+
+**Lectura:** con equipo, el muro claro es **Brock**. Pikachu y el Entrenador Joven solo fallan cuando el equipo llega tocado.
 
 ## Pruebas aparte (sin cambiar el catálogo)
 
-- **PS de Pikachu jefe** (1 contra 1, PS llenos): con 100 no gana ningún inicial; con 90 gana Charmander; con 80 o menos ganan Bulbasaur y Charmander. **Squirtle no gana ni con 50**: es débil a eléctrico (×2) y Pikachu lo derriba antes.
-- **Equipo de 3 con los PS llenos** (inicial + Pidgey + Weedle) contra el gimnasio: el Entrenador Joven cae un 76 % de las veces con Bulbasaur o Charmander y un 25 % con Squirtle; **Brock, nunca** (0 %).
+Cifras para decidir, no propuestas. Equipos al azar, 2000 combates, la IA elige el activo.
+
+**Brock contra inicial + 3 capturas con los PS llenos** (como si se curase justo antes):
+
+| Brock | Bulbasaur | Charmander | Squirtle |
+|---|---|---|---|
+| Actual: Geodude 80 + Onix 110 | 24 % | 30 % | 30 % |
+| Onix a 90 | 40 % | 42 % | 42 % |
+| Onix a 80 | 52 % | 58 % | 58 % |
+| Onix a 70 | 52 % | 59 % | 59 % |
+| Geodude 60 + Onix 90 | 44 % | 42 % | 42 % |
+| Solo Onix (110) | 59 % | 71 % | 73 % |
+| Solo Geodude (80) | 100 % | 100 % | 100 % |
+
+Ni con el equipo curado se llega al 75 % sin quitarle un Pokémon a Brock, y por la vía de bajar los PS de Onix no se pasa del 59 %. En el tramo real además llega el equipo tocado por el Entrenador Joven.
+
+**Pikachu jefe contra inicial + 2 capturas con los PS llenos:** 99–100 % con 100, 90 u 80 PS. Su problema en el tramo es el daño que trae el equipo, no sus PS.
+
+**Solo el inicial** (resultado 1, como referencia): Pikachu con 100 PS no cae con ningún inicial; con 90 cae con Charmander, con 80 o menos con Bulbasaur y Charmander, y **Squirtle no gana ni con 50** (débil a eléctrico). Inicial + Pidgey + Weedle contra el Entrenador Joven: 76 % con Bulbasaur o Charmander y 25 % con Squirtle.
 
 ## Cosas que no cuadran con D-20 §3.5 (para que Ayme decida, no se han tocado)
 
@@ -59,13 +103,11 @@ Hoy **nadie completa el tramo**: estamos a 75 puntos del objetivo. Capturando so
 - **Onix** tiene 110 PS; el baremo de un básico es 50–90 (§3.5 permite salirse de la tabla solo a los jefes).
 - **Kakuna** combina Fortaleza (−10) y veneno: contra un ataque de 20, el inicial pega 10 por golpe mientras se envenena, y por eso Bulbasaur y Squirtle no ganan nunca.
 
-## Palancas posibles (Ayme elige)
+## Palancas, de menos a más coste (Ayme elige con estas cifras)
 
-1. Ajustar los ataques de coste 2 de Bulbasaur y Squirtle al baremo (30).
-2. Bajar los PS o el daño de Pikachu jefe, o contar con que se le llegue con equipo (ojo: Squirtle tiene debilidad eléctrico).
-3. Rebajar a Brock (PS de Onix dentro del baremo, o solo un Pokémon) o meter más capturas antes del gimnasio.
-4. Más salvajes capturables antes de Pikachu (hoy solo hay 2) o un centro Pokémon antes del Bosque Verde.
-5. Fijar cuántos Pokémon saca un Cazabichos y si Kakuna puede salir en el primero.
-6. Parámetros de energía (`--energia-*`), que afectan a todos por igual.
+1. **JSON de los rivales, sin reimprimir:** PS de los rivales (Onix, Geodude, Pikachu jefe), cuántos Pokémon lleva cada equipo (Brock con uno solo, el número de Pokémon de los Cazabichos) y si Kakuna puede salir en el primer Cazabichos.
+2. **Recorrido** (también JSON): un centro Pokémon o un descanso entre el Bosque Verde y Pikachu, o entre el Entrenador Joven y Brock.
+3. **Parámetros del motor** (`--energia-*`), sin tocar cartas, que afectan a todos por igual.
+4. **Daño de los iniciales** (Placaje y Burbuja a 30): obliga a reimprimir, así que va al final.
 
-Siguiente paso: cuando Ayme decida qué palanca y qué cifras, se aplica en un PR aparte y se vuelve a medir con estos dos modos.
+Siguiente paso: cuando Ayme decida qué palanca y qué cifras, se aplica en un PR aparte y se vuelve a medir con estos modos.

@@ -7,7 +7,7 @@ Estado: **en desarrollo** (revisado el 2026-11-22). Issue #334 (diseño) y una i
 | Combate 1 contra 1: energía, acciones, debilidad y resistencia, diez efectos y una habilidad, azar con semilla, veneno (§3) | **Hecho** (#336, #350, #352) |
 | IA rival determinista (§3.4) | **Hecho** (#338; ampliada en #350 y #352) |
 | Catálogo: 22 Pokémon, 1 jefe, 6 zonas y la región de Kanto, con sus esquemas (§12) | **Hecho** (#340, #344, #346, #352, #354) |
-| Simulador de combates (`sim/bin/sim_campana.dart`) | Hecho (#342); modos `nodos` y `tramo` y **primer informe de calibrado** (#383): objetivo 75 %, hoy nadie completa el tramo |
+| Simulador de combates (`sim/bin/sim_campana.dart`) | Hecho (#342); modos `nodos`, `tramo` y `realista` y **primer informe de calibrado** (#383): objetivo 75 %; con equipo realista el muro es Brock |
 | Modelo de ruta por nodos y progreso del jugador (§4) | **Hecho** (#354) |
 | Jefe que llama a un aliado a mitad de combate (§4, Jefes) | Pendiente |
 | Captura, equipo de 6 y PC, centro Pokémon (§2, §4) | Pendiente |
@@ -322,7 +322,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 
 **Equilibrado y producto**
 
-19. **Calibrar con el simulador.** Objetivo fijado (75 %, §10.5) y medido en `balance/informes/campana_calibrar_2026-11-22.md` (#383): los combates de ruta llegan, pero Kakuna, Pikachu jefe, el Entrenador Joven y Brock no, y el tramo entero sale al 0 % con los tres iniciales. Falta que Ayme elija qué se ajusta (el informe propone palancas) y con qué cifras.
+19. **Calibrar con el simulador.** Objetivo fijado (75 %, §10.5) y medido en `balance/informes/campana_calibrar_2026-11-22.md` (#383): con un equipo realista (inicial + 3 capturas) las rutas, los Cazabichos, Pikachu y el Entrenador Joven pasan del 90 %, pero **Brock** se queda en el 0–7 % y el tramo entero en el 0–7 %; solo con el inicial sale al 0 %. Falta que Ayme elija qué se ajusta (el informe propone palancas) y con qué cifras.
 20. **Llamada de aliado.** Pikachu la lleva en el JSON, pero el motor no la implementa (§4, Jefes).
 21. **Capacidad del PC.** Ilimitada por ahora; se revisará si hace falta un tope.
 22. **Pantallas de la app** (mapa de región, combate, equipo, descanso) y **tienda**: sin diseño. Se propone hacer varias propuestas visuales antes de implementar (como en el resto de la app).

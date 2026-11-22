@@ -10,6 +10,7 @@
 //   dart run bin/sim_campana.dart --modo=equipos --tamano=3 --partidas=2000
 //   dart run bin/sim_campana.dart --modo=nodos                   # #383
 //   dart run bin/sim_campana.dart --modo=tramo --partidas=5000   # #383
+//   dart run bin/sim_campana.dart --modo=realista --capturas=3   # #383
 //
 // Modos:
 //   duelos    cada Pokémon contra cada Pokémon (también contra sí mismo) con
@@ -29,6 +30,10 @@
 //             perder ningún combate. Dos variantes: solo el inicial y
 //             capturando todos los salvajes vencidos (hasta 6, con los PS
 //             llenos). Son cotas para medir, no reglas del juego.
+//   realista  como tramo, pero con un equipo realista desde el principio: el
+//             inicial y --capturas Pokémon distintos al azar entre los
+//             salvajes de las rutas del tramo, y la IA elige quién sale en
+//             cada combate. Da, por nodo, cuántos llegan y cuántos ganan.
 //
 // Opciones:
 //   --catalogo=RUTA        carpeta con pokemon/ (defecto ../catalog/campana)
@@ -39,6 +44,7 @@
 //   --energia-maxima=N     máximo de la reserva (10)
 //   --energia-turno=N      energía que se recupera al terminar el turno (1)
 //   --energia-cargar=N     energía extra al cargar (1)
+//   --capturas=N           capturas del equipo en el modo realista (2)
 //   --entrenador=N         Pokémon de un entrenador sin Pokémon fijos en el
 //                          modo tramo (1; sin decidir en D-20)
 //   --informe=RUTA         CSV de salida (defecto
@@ -61,6 +67,7 @@ class Config {
   int energiaCargar = 1;
   String? informe;
   int entrenador = 1;
+  int capturas = 2;
 
   ParametrosCombate get parametros => ParametrosCombate(
         energiaInicial: energiaInicial,
@@ -304,6 +311,8 @@ void main(List<String> args) {
       c.energiaTurno = int.parse(a.substring(16));
     } else if (a.startsWith('--energia-cargar=')) {
       c.energiaCargar = int.parse(a.substring(17));
+    } else if (a.startsWith('--capturas=')) {
+      c.capturas = int.parse(a.substring(11));
     } else if (a.startsWith('--entrenador=')) {
       c.entrenador = int.parse(a.substring(13));
     } else if (a.startsWith('--informe=')) {
@@ -323,8 +332,10 @@ void main(List<String> args) {
       nodos(c, catalogo);
     case 'tramo':
       tramo(c, catalogo);
+    case 'realista':
+      realista(c, catalogo);
     default:
-      stderr.writeln('--modo: usa «duelos», «equipos», «nodos» o «tramo»');
+      stderr.writeln('--modo: usa «duelos», «equipos», «nodos», «tramo» o «realista»');
       exit(2);
   }
 }
@@ -472,9 +483,15 @@ class Recorrido {
 }
 
 Recorrido recorrer(String inicial, bool capturar, Random rnd, Config c,
-    Map<String, PokemonCampana> catalogo, DatosTramo d) {
+    Map<String, PokemonCampana> catalogo, DatosTramo d,
+    {List<PokemonCampana> capturas = const [],
+    bool elegirActivo = false,
+    Map<String, Acumulado>? porNodo}) {
   final region = d.region;
-  var equipo = [PokemonEnCombate.completo(catalogo[inicial]!)];
+  var equipo = [
+    PokemonEnCombate.completo(catalogo[inicial]!),
+    for (final p in capturas) PokemonEnCombate.completo(p),
+  ];
   var id = region.nodo(region.inicio).salidas.first;
   var combates = 0;
   while (true) {
@@ -508,18 +525,27 @@ Recorrido recorrer(String inicial, bool capturar, Random rnd, Config c,
     if (rival != null) {
       combates++;
       // Los que han caído no salen; el primero en pie es el activo.
-      final enPie = [for (final p in equipo) if (p.enPie) p];
+      var enPie = [for (final p in equipo) if (p.enPie) p];
       final caidos = [for (final p in equipo) if (!p.enPie) p];
+      final equipoRival = [for (final r in rival) especie(r, catalogo, d)];
+      final semilla = rnd.nextInt(1 << 30) + 1;
+      if (elegirActivo && enPie.length > 1) {
+        enPie = ordenarConActivo(enPie, equipoRival, c.parametros);
+      }
       final inicialRival = EstadoCombate.inicial(
         equipoJugador: [for (final p in enPie) p.especie],
-        equipoRival: [for (final r in rival) especie(r, catalogo, d)],
+        equipoRival: equipoRival,
         parametros: c.parametros,
-        semilla: rnd.nextInt(1 << 30) + 1,
+        semilla: semilla,
       );
       final arranque = inicialRival.copiarCon(
           jugador: inicialRival.jugador.copiarCon(equipo: enPie));
       final fin = hastaElFinal(arranque);
-      if (fin.ganador != Bando.jugador) {
+      final gana = fin.ganador == Bando.jugador;
+      porNodo?.putIfAbsent(n.id, Acumulado.new)
+        ?..combates += 1
+        ..victorias += gana ? 1 : 0;
+      if (!gana) {
         return Recorrido(false, n.id, combates);
       }
       equipo = [...fin.jugador.equipo, ...caidos];
@@ -582,4 +608,70 @@ void tramo(Config c, Map<String, PokemonCampana> catalogo) {
     }
   }
   escribirCsv(c.informe ?? '../balance/informes/campana_tramo.csv', lineas);
+}
+
+/// Pone primero el Pokémon que la IA sacaría contra el primer rival: el mismo
+/// criterio que al elegir relevo (no ser débil, más daño, más salud). Se le
+/// pregunta a la IA con un activo ficticio ya caído delante del equipo.
+List<PokemonEnCombate> ordenarConActivo(List<PokemonEnCombate> enPie,
+    List<PokemonCampana> rival, ParametrosCombate parametros) {
+  final base = EstadoCombate.inicial(
+      equipoJugador: [enPie.first.especie, for (final p in enPie) p.especie],
+      equipoRival: rival,
+      parametros: parametros);
+  final pregunta = base.copiarCon(
+      jugador: base.jugador.copiarCon(
+          equipo: [PokemonEnCombate(enPie.first.especie, 0), ...enPie]),
+      fase: FaseCombate.eligiendoActivo);
+  final accion = decidirAccion(pregunta, Bando.jugador) as ElegirSiguiente;
+  final i = accion.indice - 1;
+  return [enPie[i], for (var k = 0; k < enPie.length; k++) if (k != i) enPie[k]];
+}
+
+/// Modo «realista» (#383, tercer modo): el inicial más --capturas Pokémon
+/// distintos de los salvajes de las rutas del tramo, con los PS llenos desde
+/// el principio, y la IA eligiendo quién sale en cada combate.
+void realista(Config c, Map<String, PokemonCampana> catalogo) {
+  final d = cargarTramo(c.catalogo);
+  final iniciales = d.region.nodo(d.region.inicio).iniciales;
+  final salvajes = <String>{
+    for (final n in d.region.nodos.values)
+      if (n.tipo == TipoNodo.combate && n.rival == RivalDeCombate.salvaje)
+        ...d.zonas[n.zona]!.salvajes,
+  }.toList()
+    ..sort();
+  final lineas = ['inicial,capturas,completos,recorridos,nodo,llegan,ganan'];
+  stdout.writeln('Tramo con equipo realista: inicial + ${c.capturas} capturas '
+      'al azar entre ${salvajes.join(", ")}');
+  stdout.writeln('${c.partidas} recorridos por inicial, semilla ${c.semilla}, '
+      'Cazabichos con ${c.entrenador} Pokémon; la IA elige el activo de cada '
+      'combate; daño arrastrado, curar en los descansos, sin opcionales, jefe '
+      'sin llamada de aliado');
+  for (final i in iniciales) {
+    final rnd = Random(c.semilla);
+    var completos = 0;
+    final porNodo = <String, Acumulado>{};
+    for (var k = 0; k < c.partidas; k++) {
+      final lista = salvajes.toList()..shuffle(rnd);
+      final capturas = [
+        for (final id in lista.take(c.capturas)) catalogo[id]!
+      ];
+      final r = recorrer(i, false, rnd, c, catalogo, d,
+          capturas: capturas, elegirActivo: true, porNodo: porNodo);
+      if (r.completo) completos++;
+    }
+    stdout.writeln('');
+    stdout.writeln('${catalogo[i]!.nombre}: completa el tramo '
+        '${pct(completos / c.partidas)}');
+    for (final n in nodosConCombate(d.region)) {
+      final a = porNodo[n.id];
+      if (a == null) continue;
+      stdout.writeln('  ${n.nombre.padRight(36)} llegan '
+          '${pct(a.combates / c.partidas).padLeft(8)}   ganan '
+          '${pct(a.tasa).padLeft(8)}');
+      lineas.add('$i,${c.capturas},$completos,${c.partidas},${n.id},'
+          '${a.combates},${a.victorias}');
+    }
+  }
+  escribirCsv(c.informe ?? '../balance/informes/campana_realista.csv', lineas);
 }
