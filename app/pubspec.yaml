@@ -34,6 +34,7 @@ flutter:
     - assets/cartas/
     - assets/campana/cartas/
     - assets/campana/ui/
+    - assets/campana/escenas/
     - assets/campana/sprites_ajenos/iconos_tipo/
     - assets/campana/sprites_ajenos/energia/
     - assets/campana/sprites_ajenos/objetos/
