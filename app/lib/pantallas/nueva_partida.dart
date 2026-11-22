@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import '../campana/pantalla_campana.dart';
 import 'fondo_menu.dart';
 import 'inicio.dart';
 
@@ -75,6 +76,14 @@ class _PantallaNuevaPartidaState extends ConsumerState<PantallaNuevaPartida> {
   void _elegirModo(ModoPreparacion modo) => setState(() => _modo = modo);
 
   void _ir(int paso) => setState(() => _paso = paso);
+
+  /// El modo campaña (D-20) no pasa por los pasos de formato y preparación:
+  /// es digital y de un jugador. Sustituye al selector.
+  void _campana() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(builder: (_) => const PantallaCampana()),
+    );
+  }
 
   Future<void> _siguiente() async {
     if (_paso < _pasos.length - 1) {
@@ -339,6 +348,7 @@ List<Widget> _opciones(
   required ModoPreparacion modo,
   required ValueChanged<ModoPreparacion> alElegir,
   required VoidCallback alSeguir,
+  required VoidCallback alCampana,
 }) {
   switch (paso) {
     case 0:
@@ -355,10 +365,10 @@ List<Widget> _opciones(
         _Opcion(
           clave: 'opcion-campana',
           titulo: 'Modo campaña',
-          detalle: 'Historia, mapas y recompensas.',
-          arte: _icono(Icons.map_outlined, activo: false),
-          bloqueada: true,
+          detalle: 'Kanto para un jugador: rutas, capturas y medallas.',
+          arte: _icono(Icons.map_outlined),
           horizontal: horizontal,
+          onTap: alCampana,
         ),
       ];
     case 1:
@@ -508,7 +518,8 @@ class _Asistente extends StatelessWidget {
                       horizontal: false,
                       modo: estado._modo,
                       alElegir: estado._elegirModo,
-                      alSeguir: estado._siguiente)) ...[
+                      alSeguir: estado._siguiente,
+                      alCampana: estado._campana)) ...[
                     o,
                     const SizedBox(height: 14),
                   ],
@@ -588,7 +599,8 @@ class _ConCarril extends StatelessWidget {
                             horizontal: true,
                             modo: estado._modo,
                             alElegir: estado._elegirModo,
-                      alSeguir: estado._siguiente)) ...[
+                      alSeguir: estado._siguiente,
+                      alCampana: estado._campana)) ...[
                           o,
                           const SizedBox(height: 18),
                         ],

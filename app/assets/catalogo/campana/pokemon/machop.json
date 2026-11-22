@@ -1,0 +1,26 @@
+{
+  "id": "machop",
+  "numero": 66,
+  "nombre": "Machop",
+  "tipo": "lucha",
+  "ps": 70,
+  "debilidad": {
+    "tipo": "psiquico",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Golpe Kárate",
+      "tipo": "lucha",
+      "coste": 2,
+      "dano": 30
+    },
+    {
+      "nombre": "Patada Baja",
+      "tipo": "lucha",
+      "coste": 3,
+      "dano": 50
+    }
+  ]
+}

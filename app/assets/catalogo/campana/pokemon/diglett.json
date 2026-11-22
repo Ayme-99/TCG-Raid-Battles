@@ -1,0 +1,30 @@
+{
+  "id": "diglett",
+  "numero": 50,
+  "nombre": "Diglett",
+  "tipo": "lucha",
+  "ps": 50,
+  "debilidad": {
+    "tipo": "planta",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Arañazo",
+      "tipo": "lucha",
+      "coste": 1,
+      "dano": 10
+    },
+    {
+      "nombre": "Bofetón Lodo",
+      "tipo": "lucha",
+      "coste": 2,
+      "dano": 30,
+      "efecto": {
+        "tipo": "monedaFalloRival",
+        "texto": "En su próximo turno, si el Pokémon Defensor ataca, lanza una moneda. Si sale cruz, ese ataque no hace nada (la energía se gasta igual)."
+      }
+    }
+  ]
+}

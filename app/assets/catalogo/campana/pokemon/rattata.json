@@ -1,0 +1,31 @@
+{
+  "id": "rattata",
+  "numero": 19,
+  "nombre": "Rattata",
+  "tipo": "normal",
+  "ps": 60,
+  "debilidad": {
+    "tipo": "lucha",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Ataque Rápido",
+      "tipo": "normal",
+      "coste": 1,
+      "dano": 10
+    },
+    {
+      "nombre": "Hiper Colmillo",
+      "tipo": "normal",
+      "coste": 2,
+      "dano": 20,
+      "efecto": {
+        "tipo": "monedaDanoExtra",
+        "valor": 20,
+        "texto": "Lanza una moneda, si sale cara este ataque hace 20 puntos de daño más."
+      }
+    }
+  ]
+}

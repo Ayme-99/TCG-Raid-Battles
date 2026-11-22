@@ -1,0 +1,31 @@
+{
+  "id": "squirtle",
+  "numero": 7,
+  "nombre": "Squirtle",
+  "tipo": "agua",
+  "ps": 80,
+  "debilidad": {
+    "tipo": "electrico",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Látigo",
+      "tipo": "agua",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "aumentaDanoRecibido",
+        "valor": 10,
+        "texto": "Mientras el Pokémon Defensor siga activo, recibe 10 puntos más de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula."
+      }
+    },
+    {
+      "nombre": "Burbuja",
+      "tipo": "agua",
+      "coste": 2,
+      "dano": 20
+    }
+  ]
+}

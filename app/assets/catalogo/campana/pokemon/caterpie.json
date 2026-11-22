@@ -1,0 +1,31 @@
+{
+  "id": "caterpie",
+  "numero": 10,
+  "nombre": "Caterpie",
+  "tipo": "planta",
+  "ps": 50,
+  "debilidad": {
+    "tipo": "fuego",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Disparo Demora",
+      "tipo": "planta",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "quitaEnergiaRival",
+        "valor": 1,
+        "texto": "El rival pierde 1 de energía (si le queda alguna). No se acumula con nada: se aplica una vez, al usar el ataque."
+      }
+    },
+    {
+      "nombre": "Placaje",
+      "tipo": "planta",
+      "coste": 2,
+      "dano": 20
+    }
+  ]
+}

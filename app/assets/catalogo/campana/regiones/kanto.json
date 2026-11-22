@@ -1,0 +1,131 @@
+{
+  "id": "kanto",
+  "nombre": "Kanto",
+  "inicio": "pueblo-paleta",
+  "nodos": [
+    {
+      "id": "pueblo-paleta",
+      "tipo": "inicio",
+      "nombre": "Pueblo Paleta",
+      "salidas": [
+        "ruta-1"
+      ],
+      "iniciales": [
+        "bulbasaur",
+        "charmander",
+        "squirtle"
+      ]
+    },
+    {
+      "id": "ruta-1",
+      "tipo": "combate",
+      "nombre": "Ruta 1",
+      "salidas": [
+        "ciudad-verde"
+      ],
+      "zona": "ruta-1",
+      "rival": "salvaje"
+    },
+    {
+      "id": "ciudad-verde",
+      "tipo": "bifurcacion",
+      "nombre": "Ciudad Verde",
+      "salidas": [
+        "ruta-22",
+        "ruta-2"
+      ]
+    },
+    {
+      "id": "ruta-22",
+      "tipo": "combate",
+      "nombre": "Ruta 22",
+      "salidas": [
+        "ruta-2"
+      ],
+      "opcional": true,
+      "zona": "ruta-22",
+      "rival": "salvaje"
+    },
+    {
+      "id": "ruta-2",
+      "tipo": "combate",
+      "nombre": "Ruta 2",
+      "salidas": [
+        "bosque-verde"
+      ],
+      "zona": "ruta-2",
+      "rival": "salvaje"
+    },
+    {
+      "id": "bosque-verde",
+      "tipo": "combate",
+      "nombre": "Bosque Verde",
+      "salidas": [
+        "cazabichos"
+      ],
+      "zona": "bosque-verde",
+      "rival": "salvaje"
+    },
+    {
+      "id": "cazabichos",
+      "tipo": "combate",
+      "nombre": "Bosque Verde: Cazabichos",
+      "salidas": [
+        "jefe-pikachu"
+      ],
+      "zona": "bosque-verde",
+      "rival": "entrenador",
+      "clase": "Cazabichos"
+    },
+    {
+      "id": "jefe-pikachu",
+      "tipo": "jefe",
+      "nombre": "Pikachu",
+      "salidas": [
+        "salida-bosque"
+      ],
+      "jefe": "pikachu-jefe"
+    },
+    {
+      "id": "salida-bosque",
+      "tipo": "bifurcacion",
+      "nombre": "Salida del Bosque Verde",
+      "salidas": [
+        "cueva-diglett",
+        "centro-plateada"
+      ]
+    },
+    {
+      "id": "cueva-diglett",
+      "tipo": "combate",
+      "nombre": "Cueva Diglett",
+      "salidas": [
+        "centro-plateada"
+      ],
+      "opcional": true,
+      "zona": "cueva-diglett",
+      "rival": "salvaje"
+    },
+    {
+      "id": "centro-plateada",
+      "tipo": "descanso",
+      "nombre": "Centro Pokémon de Ciudad Plateada",
+      "salidas": [
+        "gimnasio-plateada"
+      ]
+    },
+    {
+      "id": "gimnasio-plateada",
+      "tipo": "gimnasio",
+      "nombre": "Gimnasio de Ciudad Plateada",
+      "lider": {
+        "nombre": "Brock",
+        "pokemon": [
+          "geodude",
+          "onix"
+        ]
+      },
+      "medalla": "roca"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "metapod",
+  "numero": 11,
+  "nombre": "Metapod",
+  "tipo": "planta",
+  "ps": 80,
+  "debilidad": {
+    "tipo": "fuego",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Fortaleza",
+      "tipo": "planta",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "reduceDanoPropio",
+        "valor": 10,
+        "texto": "Mientras este Pokémon siga activo, recibe 10 puntos menos de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula."
+      }
+    },
+    {
+      "nombre": "Placaje",
+      "tipo": "planta",
+      "coste": 1,
+      "dano": 20
+    }
+  ]
+}

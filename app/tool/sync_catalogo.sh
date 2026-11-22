@@ -9,3 +9,10 @@ mkdir -p assets/catalogo/bosses
 cp ../catalog/catalogo.json assets/catalogo/
 cp ../catalog/bosses/*.json assets/catalogo/bosses/
 echo "Catálogo copiado a app/assets/catalogo"
+
+# Catálogo de campaña (D-20): Pokémon, zonas, jefes y regiones.
+for carpeta in pokemon zonas jefes regiones; do
+  mkdir -p assets/catalogo/campana/$carpeta
+  cp ../catalog/campana/$carpeta/*.json assets/catalogo/campana/$carpeta/
+done
+echo "Catálogo de campaña copiado a app/assets/catalogo/campana"

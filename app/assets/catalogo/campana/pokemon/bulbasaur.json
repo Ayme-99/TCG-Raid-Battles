@@ -1,0 +1,31 @@
+{
+  "id": "bulbasaur",
+  "numero": 1,
+  "nombre": "Bulbasaur",
+  "tipo": "planta",
+  "ps": 90,
+  "debilidad": {
+    "tipo": "fuego",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Gruñido",
+      "tipo": "planta",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "reduceDanoRival",
+        "valor": 10,
+        "texto": "Mientras el Pokémon Defensor siga activo, sus ataques hacen 10 puntos menos de daño (antes de aplicar debilidad y resistencia). No se acumula."
+      }
+    },
+    {
+      "nombre": "Placaje",
+      "tipo": "planta",
+      "coste": 2,
+      "dano": 20
+    }
+  ]
+}

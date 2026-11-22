@@ -211,6 +211,40 @@ class EstadoCombate {
     );
   }
 
+  /// Combate nuevo con equipos que ya traen sus PS (la campaña conserva los
+  /// PS entre combates). Sale activo el primer Pokémon en pie de cada equipo.
+  factory EstadoCombate.conEquipos({
+    required List<PokemonEnCombate> equipoJugador,
+    required List<PokemonEnCombate> equipoRival,
+    Bando empieza = Bando.jugador,
+    ParametrosCombate parametros = const ParametrosCombate(),
+    int semilla = 1,
+  }) {
+    BandoCombate bando(List<PokemonEnCombate> equipo) {
+      final activo = equipo.indexWhere((p) => p.enPie);
+      if (activo < 0) {
+        throw const ReglaIncumplida(
+            'Cada bando necesita al menos un Pokémon en pie.');
+      }
+      return BandoCombate(
+        equipo: List.of(equipo),
+        activo: activo,
+        energia: parametros.energiaInicial,
+      );
+    }
+
+    return EstadoCombate(
+      jugador: bando(equipoJugador),
+      rival: bando(equipoRival),
+      turno: empieza,
+      fase: FaseCombate.enCurso,
+      ganador: null,
+      numeroTurno: 1,
+      parametros: parametros,
+      semilla: _normalizarSemilla(semilla),
+    );
+  }
+
   /// Bandos cuyo Pokémon activo ha caído y tienen que elegir el siguiente
   /// (el del turno primero). Puede haber dos a la vez si el chequeo de veneno
   /// derriba a uno mientras el otro ya había caído.

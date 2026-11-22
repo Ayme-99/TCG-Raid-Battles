@@ -216,6 +216,19 @@ Decidido el 2026-11-22. Una región es un **grafo dirigido sin ciclos** que se r
 
 **Primer tramo de Kanto** (`catalog/campana/regiones/kanto.json`, propuesta): `Pueblo Paleta (inicio) → Ruta 1 → Ciudad Verde (bifurcación: Ruta 22 opcional, o seguir) → Ruta 2 → Bosque Verde → Cazabichos → Pikachu (jefe 01/20) → Salida del Bosque (bifurcación: Cueva Diglett opcional, o seguir) → Centro Pokémon de Ciudad Plateada → Gimnasio de Brock (medalla Roca)`. Las zonas nuevas (`ruta-1`, `ruta-2`, `bosque-verde`, `ruta-22`, `cueva-diglett`) siguen las listas de Rojo y Azul de memoria y están por revisar con Serebii o Bulbapedia; Sandshrew todavía no aparece en ninguna.
 
+### Partida de campaña
+
+Hecho el 2026-11-22 (tareas 6, 8 y 9, primera versión). `PartidaCampana` (`engine/lib/src/campana/partida.dart`) junta el progreso de la ruta, el **equipo** (con los PS actuales y la XP de cada Pokémon), el **PC**, los **puntos**, el **dinero**, la **mochila** y la semilla. Es inmutable, se guarda en JSON (con versión) y las cifras sin cerrar están todas en `ParametrosCampana`.
+
+- **Rival de cada nodo:** el salvaje sale al azar de la zona con la semilla de la partida; un entrenador de zona saca **2** Pokémon de su lista (suposición); el gimnasio, los del líder en orden; el jefe, su carta NN/20 (todavía **sin** la llamada del aliado, tarea 7).
+- **PS entre combates:** el daño se arrastra de un combate a otro y la energía vuelve a 10 al empezar cada combate (decidido por Ayme el 2026-11-22). Solo cura el centro Pokémon o una Poción.
+- **Captura:** al vencer a un salvaje, o a un jefe la primera vez (su carta normal, `pikachu-jefe` → `pikachu`), se ofrece capturarlo; **siempre funciona** mientras no exista la Pokéball. Hay hueco: entra al equipo; equipo lleno: se elige a quién mandar al PC, o va al PC el capturado.
+- **Derrota** (decidido el 2026-11-22): se vuelve al **último sitio donde se curó** el equipo (el inicio o el último centro Pokémon usado; una Poción no cuenta), con el equipo curado. Se conserva lo ganado: capturas, puntos, dinero, XP y medallas. Los nodos de después se vuelven a pasar; un jefe ya derrotado ya no da puntos ni captura.
+- **XP y dinero** (decidido el 2026-11-22): la XP se gana al derrotar Pokémon (10 por rival, para cada Pokémon del equipo que siga en pie al acabar: suposición) y el dinero, al vencer a entrenadores (200) y líderes (500). Se empieza con 300 (suposición). La evolución con XP aún no está.
+- **Tienda del centro Pokémon:** Poción (100, cura 20 PS a un Pokémon en pie, fuera de combate, sin revivir) y Repelente (150, evita un combate contra un salvaje, sin puntos, XP ni captura). La Pokéball queda pendiente porque falta decidir la probabilidad de captura.
+- **Puntos** (provisionales): salvaje 100, entrenador 200, jefe 1000 (la primera vez), medalla 1500. Se guardan en el dispositivo; todavía no se envían al servidor (tarea 10).
+- **App:** «Nueva partida → Modo campaña» abre el mapa (`app/lib/campana/`). Pantallas: mapa con la ruta y el nodo actual, elección de inicial, combate (la máquina responde al momento y hay un registro de lo que pasa), captura, equipo (ordenar, Poción), centro Pokémon (curar, tienda, PC). La partida se guarda en el dispositivo tras cada cambio (`shared_preferences`, clave `campana_kanto`); un combate a medias no se guarda y, al volver, empieza de nuevo contra el mismo rival.
+
 ### Jefes
 
 Decidido el 2026-11-21. Los jefes son **Pokémon salvajes**, no entrenadores: los líderes de gimnasio y el Alto Mando no son jefes y usan cartas normales (el Geodude y el Onix de Brock, por ejemplo). Tienen una **serie propia de 20 cartas, NN/20** (la carta de Pikachu lleva impreso 01/20), distinta de la 001/150 de los Pokémon:
@@ -284,8 +297,8 @@ Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, ev
 3. IA rival determinista.
 4. Simulador de combates de campaña y primer equilibrado.
 5. ~~Modelo de región y de nodos, y avance por el mapa.~~ **Hecho (§4, Modelo de la ruta).**
-6. Captura, equipo y descanso.
+6. Captura, equipo y descanso. **Primera versión hecha (§4, Partida de campaña)**; falta la Pokéball y la evolución.
 7. Jefe con aliados y medalla.
-8. Guardado de progreso de campaña en el dispositivo.
-9. Pantallas de la app: mapa, combate, equipo, descanso.
+8. Guardado de progreso de campaña en el dispositivo. **Hecho** (sin sincronizar con la cuenta).
+9. Pantallas de la app: mapa, combate, equipo, descanso. **Primera versión hecha**, funcional y sin el diseño visual definitivo.
 10. Puntos al servidor y tienda (después de la porción vertical).

@@ -1,0 +1,30 @@
+{
+  "id": "onix",
+  "numero": 95,
+  "nombre": "Onix",
+  "tipo": "lucha",
+  "ps": 110,
+  "debilidad": {
+    "tipo": "agua",
+    "multiplicador": 2
+  },
+  "resistencia": {
+    "tipo": "normal",
+    "reduccion": 30
+  },
+  "retirada": 1,
+  "ataques": [
+    {
+      "nombre": "Atadura",
+      "tipo": "normal",
+      "coste": 2,
+      "dano": 30
+    },
+    {
+      "nombre": "Lanzarrocas",
+      "tipo": "lucha",
+      "coste": 3,
+      "dano": 60
+    }
+  ]
+}

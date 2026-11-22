@@ -378,6 +378,18 @@ class ProgresoRuta {
     );
   }
 
+  /// Vuelve a [nodo], uno ya superado (el último sitio donde el equipo se
+  /// curó, tras perder un combate: D-20 §8, pregunta 1). Se queda resuelto,
+  /// así que se puede seguir desde él; los nodos de después hay que pasarlos
+  /// otra vez. Medallas y jefes derrotados se conservan.
+  ProgresoRuta volverA(RegionCampana region, String nodo) {
+    region.nodo(nodo);
+    if (!superados.contains(nodo)) {
+      throw ReglaIncumplida('No se puede volver a "$nodo": no se ha pasado.');
+    }
+    return _copiar(nodoActual: nodo, resuelto: true);
+  }
+
   Map<String, dynamic> aJson() => {
         'nodoActual': nodoActual,
         'resuelto': resuelto,
