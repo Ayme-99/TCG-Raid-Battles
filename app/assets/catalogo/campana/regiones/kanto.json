@@ -57,6 +57,10 @@
       "nombre": "Centro Pokémon de Ciudad Verde",
       "salidas": [
         "ciudad-verde-salida"
+      ],
+      "tienda": [
+        "pokeball",
+        "pocion"
       ]
     },
     {
@@ -187,6 +191,10 @@
       "nombre": "Centro Pokémon de Ciudad Plateada",
       "salidas": [
         "gimnasio-joven"
+      ],
+      "tienda": [
+        "pokeball",
+        "pocion"
       ]
     },
     {
@@ -213,7 +221,8 @@
         "pokemon": [
           "geodude",
           "onix"
-        ]
+        ],
+        "dinero": 1400
       },
       "medalla": "roca"
     }

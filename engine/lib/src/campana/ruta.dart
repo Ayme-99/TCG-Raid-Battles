@@ -36,7 +36,11 @@ class LiderDeGimnasio {
   /// Ids de sus Pokémon, en el orden en que salen.
   final List<String> pokemon;
 
-  const LiderDeGimnasio(this.nombre, this.pokemon);
+  /// Dinero que paga al ser vencido (D-20 §10.6), o null si aún no tiene
+  /// cifra.
+  final int? dinero;
+
+  const LiderDeGimnasio(this.nombre, this.pokemon, {this.dinero});
 }
 
 /// Un nodo de la ruta. Los campos que no son de su [tipo] van vacíos.
@@ -82,6 +86,11 @@ class NodoRuta {
   /// Si la conversación cura al equipo (solo [TipoNodo.conversacion]).
   final bool cura;
 
+  /// Lo que vende la tienda del centro (solo [TipoNodo.descanso]): ids de
+  /// objeto (`pokeball`, `pocion`…). Vacía: el centro no tiene tienda. Las
+  /// Balls mejores piden además medallas (D-20 §10.6).
+  final List<String> tienda;
+
   /// Si en este nodo se cura el equipo y pasa a ser el sitio al que se vuelve
   /// al perder: un descanso o una conversación que cura.
   bool get curaEquipo =>
@@ -104,6 +113,7 @@ class NodoRuta {
     this.personaje,
     this.texto = const [],
     this.cura = false,
+    this.tienda = const [],
   });
 }
 
@@ -283,6 +293,7 @@ class RegionCampana {
       sin(n.medalla == null, 'medalla');
     }
     if (n.tipo != TipoNodo.jefe) sin(n.jefe == null, 'jefe');
+    if (n.tipo != TipoNodo.descanso) sin(n.tienda.isEmpty, 'tienda');
     final esConversacion = n.tipo == TipoNodo.conversacion;
     exige(!esConversacion || (n.personaje != null && n.texto.isNotEmpty),
         'necesita "personaje" y "texto"');

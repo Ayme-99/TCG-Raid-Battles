@@ -8,8 +8,9 @@ import 'ruta.dart';
 /// §8). Están todas aquí para cambiarlas en un solo sitio.
 ///
 /// Decidido por Ayme el 2026-11-22: la XP se gana al derrotar Pokémon
-/// (salvajes o de entrenador) y el dinero, al derrotar entrenadores; la tienda
-/// del descanso vende, de salida, Poción, Pokéball y Repelente. **Las cifras son
+/// (salvajes o de entrenador) y el dinero, al derrotar entrenadores. El dinero
+/// de salida y los precios están decididos (D-20 §10.6); lo que paga cada
+/// entrenador y cada líder está en el catálogo (`dinero`). **Los puntos son
 /// provisionales.** La XP de cada rival no está aquí: la fija su categoría de
 /// captura ([xpDeCategoria]) o el `xp` del jefe (D-20 §10.6).
 class ParametrosCampana {
@@ -25,15 +26,15 @@ class ParametrosCampana {
   /// Puntos por ganar una medalla.
   final int puntosMedalla;
 
-  /// Dinero por vencer a un entrenador de zona y a un líder de gimnasio.
-  final int dineroEntrenador;
-  final int dineroLider;
-
-  /// Dinero con el que se empieza la campaña (suposición).
+  /// Dinero con el que se empieza la campaña: 1.000 (D-20 §10.6).
   final int dineroInicial;
 
-  /// Precio de cada objeto de la tienda.
+  /// Precio de cada objeto de la tienda (D-20 §10.6, los de los juegos).
   final Map<ObjetoCampana, int> precios;
+
+  /// Medallas que hacen falta para que la tienda venda un objeto: Super Ball
+  /// con la 1.ª y Ultra Ball con 5 (D-20 §10.6). Los que no están, ninguna.
+  final Map<ObjetoCampana, int> medallasParaComprar;
 
   /// PS que cura una Poción.
   final int psPocion;
@@ -50,12 +51,17 @@ class ParametrosCampana {
     this.puntosEntrenador = 200,
     this.puntosJefe = 1000,
     this.puntosMedalla = 1500,
-    this.dineroEntrenador = 200,
-    this.dineroLider = 500,
-    this.dineroInicial = 300,
+    this.dineroInicial = 1000,
     this.precios = const {
-      ObjetoCampana.pocion: 100,
-      ObjetoCampana.repelente: 150,
+      ObjetoCampana.pokeball: 200,
+      ObjetoCampana.superBall: 600,
+      ObjetoCampana.ultraBall: 1200,
+      ObjetoCampana.pocion: 300,
+      ObjetoCampana.repelente: 350,
+    },
+    this.medallasParaComprar = const {
+      ObjetoCampana.superBall: 1,
+      ObjetoCampana.ultraBall: 5,
     },
     this.psPocion = 20,
     this.tamanoEquipo = 6,
@@ -63,9 +69,16 @@ class ParametrosCampana {
   });
 }
 
-/// Objetos de la tienda del descanso (D-20 §8, pregunta 3). La Pokéball
-/// (probabilidad de capturar) todavía no está: hoy capturar siempre funciona.
+/// Objetos de la tienda del centro Pokémon (D-20 §10.6). Lo que vende cada
+/// centro está en su nodo (`tienda`). Las Balls se compran ya, pero capturar
+/// con ellas llega con #368: hoy capturar siempre funciona.
 enum ObjetoCampana {
+  /// Pokéball, Super Ball y Ultra Ball: cada tirada de captura gasta una
+  /// (#368).
+  pokeball,
+  superBall,
+  ultraBall,
+
   /// Cura [ParametrosCampana.psPocion] PS a un Pokémon en pie, fuera de
   /// combate. No cuenta como «sitio donde te curaste».
   pocion,
@@ -139,6 +152,21 @@ class CatalogoCampana {
         for (final z in zonas.values)
           for (final id in z.todosLosPokemon)
             if (!pokemon.containsKey(id)) 'zona ${z.id}: falta "$id".',
+        for (final n in region.nodos.values) ...[
+          for (final id in n.tienda)
+            if (!ObjetoCampana.values.any((o) => o.name == id))
+              '${n.id}: la tienda vende "$id", que no es un objeto.',
+          // Lo que paga cada entrenador y cada líder (D-20 §10.6).
+          if (n.lider != null && n.lider!.dinero == null)
+            '${n.id}: el líder no tiene "dinero".',
+          if (n.clase != null &&
+              zonas[n.zona]?.entrenadores
+                      .where((e) => e.clase == n.clase)
+                      .firstOrNull
+                      ?.dinero ==
+                  null)
+            '${n.id}: la clase "${n.clase}" no tiene "dinero" en su zona.',
+        ],
         // Todo rival necesita categoría de captura: fija su XP (D-20 §10.6).
         for (final id in {
           for (final z in zonas.values) ...z.todosLosPokemon,
@@ -408,7 +436,7 @@ class PartidaCampana {
           nombre: grupo.clase,
           captura: null,
           puntos: parametros.puntosEntrenador,
-          dinero: parametros.dineroEntrenador,
+          dinero: grupo.dinero ?? 0,
           xp: _xpDeEquipo(equipoRival),
         );
       case TipoNodo.gimnasio:
@@ -419,7 +447,7 @@ class PartidaCampana {
           nombre: lider.nombre,
           captura: null,
           puntos: parametros.puntosMedalla,
-          dinero: parametros.dineroLider,
+          dinero: lider.dinero ?? 0,
           xp: _xpDeEquipo(equipoLider),
         );
       case TipoNodo.jefe:
@@ -522,7 +550,25 @@ class PartidaCampana {
     );
   }
 
-  /// Compra [cantidad] de [objeto] en un centro Pokémon.
+  /// Lo que vende la tienda del nodo actual, en el orden del catálogo: lo que
+  /// lista el centro (`tienda`) y tiene precio, menos lo que pide más
+  /// medallas de las que hay (D-20 §10.6). Vacía fuera de un centro.
+  List<ObjetoCampana> tienda(CatalogoCampana c,
+      {ParametrosCampana parametros = const ParametrosCampana()}) {
+    final nodo = nodoActual(c);
+    if (nodo.tipo != TipoNodo.descanso) return const [];
+    return [
+      for (final id in nodo.tienda)
+        for (final o in ObjetoCampana.values)
+          if (o.name == id &&
+              parametros.precios.containsKey(o) &&
+              progreso.medallas.length >=
+                  (parametros.medallasParaComprar[o] ?? 0))
+            o,
+    ];
+  }
+
+  /// Compra [cantidad] de [objeto] en un centro Pokémon que lo venda.
   PartidaCampana comprar(CatalogoCampana c, ObjetoCampana objeto,
       {int cantidad = 1,
       ParametrosCampana parametros = const ParametrosCampana()}) {
@@ -530,7 +576,16 @@ class PartidaCampana {
       throw const ReglaIncumplida('La tienda está en los centros Pokémon.');
     }
     final precio = parametros.precios[objeto];
-    if (precio == null) throw const ReglaIncumplida('Eso no se vende.');
+    final medallas = parametros.medallasParaComprar[objeto] ?? 0;
+    if (precio != null &&
+        nodoActual(c).tienda.contains(objeto.name) &&
+        progreso.medallas.length < medallas) {
+      throw ReglaIncumplida(
+          'Se vende a partir de $medallas ${medallas == 1 ? 'medalla' : 'medallas'}.');
+    }
+    if (precio == null || !tienda(c, parametros: parametros).contains(objeto)) {
+      throw const ReglaIncumplida('Eso no se vende aquí.');
+    }
     if (cantidad < 1)
       throw const ReglaIncumplida('Hay que comprar al menos uno.');
     if (dinero < precio * cantidad) {

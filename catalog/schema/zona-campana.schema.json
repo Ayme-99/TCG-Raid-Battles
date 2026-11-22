@@ -46,6 +46,11 @@
             "items": {
               "type": "string"
             }
+          },
+          "dinero": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Dinero que paga cada entrenador de la clase al ser vencido (D-20 §10.6): Cazabichos 200, Entrenador Joven 260."
           }
         }
       }
