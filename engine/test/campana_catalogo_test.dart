@@ -263,6 +263,34 @@ void main() {
     test('un tipo desconocido se rechaza', () {
       expect(() => tipoCampanaDeTexto('acero'), throwsFormatException);
     });
+
+    test('los tipos son los del TCG (D-20 §10.3)', () {
+      expect(TipoCampana.values.map((t) => t.name), [
+        'normal', 'fuego', 'agua', 'planta', 'electrico', 'lucha', //
+        'psiquico', 'oscuridad', 'dragon', 'metal',
+      ]);
+      expect(tipoCampanaDeTexto('metal'), TipoCampana.metal);
+      for (final fuera in ['hielo', 'veneno', 'volador', 'bicho', 'fantasma']) {
+        expect(() => tipoCampanaDeTexto(fuera), throwsFormatException,
+            reason: fuera);
+      }
+    });
+
+    test('el esquema lista los mismos tipos que el motor', () {
+      final esquema =
+          leer(File('../catalog/schema/pokemon-campana.schema.json'));
+      final enumEsquema =
+          (esquema[r'$defs'] as Map)['tipo']['enum'] as List<dynamic>;
+      expect(enumEsquema, TipoCampana.values.map((t) => t.name).toList());
+    });
+
+    test('Zubat es de oscuridad y Ataque Ala es normal', () {
+      final zubat = pokemon['zubat']!;
+      expect(zubat.tipo, TipoCampana.oscuridad);
+      final ala = zubat.ataques.firstWhere((a) => a.nombre == 'Ataque Ala');
+      expect(ala.tipo, TipoCampana.normal);
+      expect(ala.dano, 30);
+    });
   });
 
   group('evolución y cartas ex', () {
