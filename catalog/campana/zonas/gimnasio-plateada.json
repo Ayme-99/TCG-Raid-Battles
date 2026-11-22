@@ -1,0 +1,15 @@
+{
+  "id": "gimnasio-plateada",
+  "nombre": "Gimnasio de Ciudad Plateada",
+  "region": "kanto",
+  "salvajes": [],
+  "entrenadores": [
+    {
+      "clase": "Entrenador Joven",
+      "pokemon": [
+        "diglett",
+        "sandshrew"
+      ]
+    }
+  ]
+}

@@ -36,6 +36,12 @@
         "zona": { "$ref": "#/$defs/id" },
         "rival": { "enum": ["salvaje", "entrenador"] },
         "clase": { "type": "string", "description": "combate contra un entrenador: su clase en la zona." },
+        "pokemon": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/id" },
+          "description": "combate: los Pokémon fijos del rival (uno si es salvaje, su equipo si es un entrenador). Sin él, el rival sale de la zona al llegar."
+        },
         "lider": {
           "type": "object",
           "additionalProperties": false,
