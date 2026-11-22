@@ -324,7 +324,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 
 **Tipos**
 
-10. **Tipos que no existen en el TCG.** Ayme: «dependerá del Pokémon, estudiaremos cada caso». El enum aún tiene `hielo`, `veneno`, `volador`, `bicho` y `fantasma`, y Zubat es de `veneno`. Ayme dijo que los tipos siguen al TCG (tierra y roca son lucha, y Nidoran es oscuridad), pero no ha dicho a cuál pasa cada uno de esos cinco (volador y bicho, ¿a normal y planta?; fantasma, ¿a psíquico?; hielo, ¿a agua?; Zubat, ¿a oscuridad?). Los otros nueve (`normal`, `fuego`, `agua`, `planta`, `electrico`, `lucha`, `psiquico`, `oscuridad`, `dragon`) sí existen en el TCG. Falta también decidir si entran `metal` y los demás del TCG que el enum no tiene.
+10. ~~Tipos que no existen en el TCG~~ **Decidido el 2026-11-22** (§10.3): `veneno` pasa a `oscuridad`, `bicho` a `planta`, `volador` a `normal`, `fantasma` a `psiquico` y `hielo` a `agua`, y se añade `metal` al enum. Pendiente de implementar (#366); falta decidir el color y el icono de `metal` en la app.
 
 **Cartas y catálogo**
 
@@ -363,7 +363,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 9 | Pantallas de la app: mapa, combate, equipo, descanso | **Primera versión hecha**, funcional y sin diseño visual definitivo |
 | 10 | Puntos al servidor y tienda (después de la porción vertical) | Pendiente |
 | 11 | Reponer el resto de Pokémon y zonas (Túnel Roca, Ciudad Plateada en adelante) | Pendiente |
-| 12 | Tipos del TCG: decidir qué pasa con `hielo`, `veneno`, `volador`, `bicho` y `fantasma` (§8, pregunta 10) | Pendiente de decisión |
+| 12 | Tipos del TCG: `hielo`, `veneno`, `volador`, `bicho` y `fantasma` pasan a otros tipos y entra `metal` (§8, pregunta 10; §10.3) | Decidido el 2026-11-22; pendiente de implementar (#366) |
 
 ## 10. Registro de decisiones
 
@@ -404,6 +404,8 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 |---|---|---|
 | 2026-11-21 | Los tipos **siguen al TCG**: no hay tipo tierra ni roca, esos Pokémon (Geodude, Onix, Diglett, Sandshrew, Cubone) son de tipo **lucha**. | §3.3; #352 |
 | 2026-11-22 | Se añade el tipo **oscuridad** (Nidoran♀ y ♂ lo llevan impreso). | §3.6; #352 |
+| 2026-11-22 | **Tipos fuera del TCG:** `veneno` pasa a **oscuridad** (Zubat, que es el único dato real que cambia), `bicho` a **planta**, `volador` a **normal**, `fantasma` a **psíquico** y `hielo` a **agua**. Esos cinco tipos desaparecen del enum. | §3.3; #366 |
+| 2026-11-22 | **`metal` entra ya en el enum**, aunque no haya ninguna carta de ese tipo, por si se añaden Pokémon como Steelix, que no son de la primera generación. Falta decidir su color y su icono. No hay tabla de tipos global, así que no toca el motor. | §3.3; #366 |
 
 ### 10.4 Efectos y habilidades de los ataques
 
@@ -502,6 +504,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-21 | Regla de la carta: «un ataque de 20 o más». | «20 o más, **o** un ataque con veneno» (§10.5). |
 | 2026-11-22 | #355 incluyó una versión de `kanto.json` que **no seguía** el recorrido que Ayme había definido el 2026-11-21: había una **Cueva Diglett** inventada (zona y nodo), un solo Cazabichos, Diglett y Sandshrew sin sitio, sin las bifurcaciones de la Ruta 1 y de la Ruta 2 sur y con Ciudad Verde sin su centro Pokémon. | Corregido en #356: sin Cueva Diglett; Diglett y Sandshrew son el Entrenador Joven del gimnasio; dos Cazabichos; Ruta 1 con bifurcación; centro en Ciudad Verde; Ruta 2 sur con bifurcación y Ruta 2 norte con un salvaje opcional. |
 | 2026-11-22 | La tabla de §3.5 daba **debilidad agua** a Diglett y Sandshrew. | Las cartas dicen **planta**; el JSON manda (§12). |
+| 2026-11-22 | Los tipos que no existen en el TCG se decidían «Pokémon a Pokémon» (§8, 10). | Tabla fija: `veneno` → oscuridad, `bicho` → planta, `volador` → normal, `fantasma` → psíquico, `hielo` → agua; y entra `metal` (§10.3). |
 | 2026-11-22 | La XP iba **por Pokémon** (10 por rival a cada Pokémon que siguiera en pie) y las victorias daban **puntos que en el centro se convertían en XP** (§10.6, 2026-11-21). | La evolución usa **solo XP de combate**, en una **reserva común** que el jugador reparte; se gasta entera para evolucionar (§10.6). |
 | 2026-11-22 | La evolución se hacía **en el centro Pokémon, un Pokémon por visita**, y la carta evolucionada **recuperaba todos los PS** (§10.6, 2026-11-21 y §2.1). | Se evoluciona **fuera de combate**, desde el menú del equipo, sin límite por visita, y el Pokémon **queda con 10 PS**, también si estaba debilitado (§10.6). |
 
