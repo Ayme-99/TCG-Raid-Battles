@@ -117,8 +117,10 @@ class RegionCampana {
       ];
 
   /// Nodos en los que acaba la región: los que no tienen salidas.
-  List<NodoRuta> get finales =>
-      [for (final n in nodos.values) if (n.salidas.isEmpty) n];
+  List<NodoRuta> get finales => [
+        for (final n in nodos.values)
+          if (n.salidas.isEmpty) n
+      ];
 
   /// Lo que está mal en la estructura de la región (vacía si es válida):
   /// un solo inicio sin entradas, salidas que existen, el número de salidas de
@@ -174,7 +176,10 @@ class RegionCampana {
     final pendientes = {
       for (final n in nodos.values) n.id: entradas(n.id).length,
     };
-    final listos = [for (final e in pendientes.entries) if (e.value == 0) e.key];
+    final listos = [
+      for (final e in pendientes.entries)
+        if (e.value == 0) e.key
+    ];
     var ordenados = 0;
     while (listos.isNotEmpty) {
       final id = listos.removeLast();
@@ -236,8 +241,9 @@ class RegionCampana {
     exige(!esGimnasio || (n.lider?.pokemon.isNotEmpty ?? true),
         'necesita Pokémon en el líder');
     exige(n.tipo != TipoNodo.jefe || n.jefe != null, 'necesita "jefe"');
-    exige(!(esCombate && n.rival == RivalDeCombate.entrenador) ||
-        n.clase != null, 'necesita "clase" con un entrenador');
+    exige(
+        !(esCombate && n.rival == RivalDeCombate.entrenador) || n.clase != null,
+        'necesita "clase" con un entrenador');
     if (!esInicio) sin(n.iniciales.isEmpty, 'iniciales');
     if (!esCombate) {
       sin(n.zona == null, 'zona');
@@ -245,9 +251,12 @@ class RegionCampana {
       sin(n.pokemon.isEmpty, 'pokemon');
       sin(n.clase == null, 'clase');
     }
-    exige(!(esCombate && n.rival == RivalDeCombate.salvaje) ||
-        n.pokemon.length <= 1, 'salvaje lleva un solo Pokémon');
-    exige(!(esCombate && n.clase != null) || n.rival == RivalDeCombate.entrenador,
+    exige(
+        !(esCombate && n.rival == RivalDeCombate.salvaje) ||
+            n.pokemon.length <= 1,
+        'salvaje lleva un solo Pokémon');
+    exige(
+        !(esCombate && n.clase != null) || n.rival == RivalDeCombate.entrenador,
         'solo lleva "clase" con un entrenador');
     if (!esGimnasio) {
       sin(n.lider == null, 'lider');
@@ -270,7 +279,8 @@ class RegionCampana {
     final p = <String>[];
     for (final n in nodos.values) {
       for (final id in [...n.iniciales, ...n.pokemon, ...?n.lider?.pokemon]) {
-        if (!pokemon.contains(id)) p.add('${n.id}: el Pokémon "$id" no existe.');
+        if (!pokemon.contains(id))
+          p.add('${n.id}: el Pokémon "$id" no existe.');
       }
       final zona = n.zona;
       if (zona != null) {
@@ -285,7 +295,8 @@ class RegionCampana {
         } else if (n.clase != null) {
           final equipo = entrenadoresPorZona[zona]?[n.clase];
           if (equipo == null) {
-            p.add('${n.id}: la zona "$zona" no tiene entrenadores "${n.clase}".');
+            p.add(
+                '${n.id}: la zona "$zona" no tiene entrenadores "${n.clase}".');
           } else {
             for (final id in n.pokemon) {
               if (!equipo.contains(id)) {
@@ -399,6 +410,18 @@ class ProgresoRuta {
       resuelto: sinEvento,
       superados: sinEvento ? {...superados, destino} : null,
     );
+  }
+
+  /// Vuelve a [nodo], uno ya superado (el último sitio donde el equipo se
+  /// curó, tras perder un combate: D-20 §8, pregunta 1). Se queda resuelto,
+  /// así que se puede seguir desde él; los nodos de después hay que pasarlos
+  /// otra vez. Medallas y jefes derrotados se conservan.
+  ProgresoRuta volverA(RegionCampana region, String nodo) {
+    region.nodo(nodo);
+    if (!superados.contains(nodo)) {
+      throw ReglaIncumplida('No se puede volver a "$nodo": no se ha pasado.');
+    }
+    return _copiar(nodoActual: nodo, resuelto: true);
   }
 
   Map<String, dynamic> aJson() => {

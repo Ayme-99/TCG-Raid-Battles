@@ -30,6 +30,15 @@ Partida completa en local, con inicio de sesión y envío de resultados (T-09):
 
 Las pantallas no duplican ninguna regla: toda decisión de juego es del motor, y si rechaza un evento la app muestra el motivo.
 
+## Modo campaña (D-20)
+
+«Nueva partida → Modo campaña» abre la campaña de Kanto (primer tramo, Pueblo Paleta → Gimnasio de Brock). Toda la regla está en `engine/lib/src/campana/` (`PartidaCampana`); la app solo encadena acciones:
+
+- `lib/campana/controlador_campana.dart`: la partida y el combate en curso (Riverpod). Juega el turno de la máquina con `decidirAccion`, describe lo que pasa y guarda la partida en el dispositivo tras cada cambio (clave `campana_kanto`; `main.dart` la recupera al abrir).
+- `lib/campana/pantalla_campana.dart`: mapa, inicial, captura, equipo, centro Pokémon (curar, tienda, PC).
+- `lib/campana/pantalla_combate.dart`: combate 1 contra 1.
+- El catálogo de campaña va en `assets/catalogo/campana/` (copia de `catalog/campana/` con `tool/sync_catalogo.sh`; `test/campana_test.dart` falla si se desincroniza). Las cartas sin imagen se dibujan con el color de su tipo.
+
 ## Ejecutar la app
 
 Las carpetas de plataforma (`android/`, `windows/`, `web/`) ya están en el repo, generadas con:

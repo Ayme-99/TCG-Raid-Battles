@@ -1,0 +1,26 @@
+{
+  "id": "cubone",
+  "numero": 104,
+  "nombre": "Cubone",
+  "tipo": "lucha",
+  "ps": 60,
+  "debilidad": {
+    "tipo": "agua",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Garra",
+      "tipo": "normal",
+      "coste": 1,
+      "dano": 10
+    },
+    {
+      "nombre": "Golpe Hueso",
+      "tipo": "lucha",
+      "coste": 2,
+      "dano": 30
+    }
+  ]
+}

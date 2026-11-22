@@ -181,7 +181,8 @@ JefeCampana jefeCampanaDesdeJson(Map<String, dynamic> json) {
   final llamada = json['llamaAliado'];
   return JefeCampana(
     numero: _campo<int>(json, 'numero'),
-    pokemon: pokemonCampanaDesdeJson(_campo<Map<String, dynamic>>(json, 'pokemon')),
+    pokemon:
+        pokemonCampanaDesdeJson(_campo<Map<String, dynamic>>(json, 'pokemon')),
     llamaAliado: llamada == null
         ? null
         : LlamadaDeAliado(
@@ -208,7 +209,8 @@ LlamadaEnCombate? llamadaEnCombate(
       [
         for (final id in l.aliados)
           pokemon[id] ??
-              (throw FormatException('El aliado "$id" no está en el catálogo.')),
+              (throw FormatException(
+                  'El aliado "$id" no está en el catálogo.')),
       ],
       alFrente: l.alFrenteAlPorcentaje);
 }
@@ -268,7 +270,10 @@ ZonaCampana zonaCampanaDesdeJson(Map<String, dynamic> json) {
             for (final e in entrenadores)
               EntrenadoresDeZona(
                 _campo<String>(e as Map<String, dynamic>, 'clase'),
-                [for (final p in _campo<List<dynamic>>(e, 'pokemon')) p as String],
+                [
+                  for (final p in _campo<List<dynamic>>(e, 'pokemon'))
+                    p as String
+                ],
               ),
           ]
         : const [],
@@ -293,7 +298,8 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
   final rival = json['rival'] as String?;
   return NodoRuta(
     id: _campo<String>(json, 'id'),
-    tipo: _enumDeTexto(TipoNodo.values, _campo<String>(json, 'tipo'), 'Tipo de nodo'),
+    tipo: _enumDeTexto(
+        TipoNodo.values, _campo<String>(json, 'tipo'), 'Tipo de nodo'),
     nombre: _campo<String>(json, 'nombre'),
     salidas: _textos(json, 'salidas'),
     opcional: (json['opcional'] as bool?) ?? false,

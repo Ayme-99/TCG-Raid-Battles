@@ -7,6 +7,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'almacen/almacen.dart';
 import 'app.dart';
+import 'campana/controlador_campana.dart';
 import 'partida/controlador_partida.dart';
 import 'partida/persistencia.dart';
 
@@ -17,11 +18,13 @@ Future<void> main() async {
   final preferencias = await SharedPreferences.getInstance();
   final almacen = AlmacenPreferencias(preferencias);
   final partidaEnCurso = await leerPartidaEnCurso(almacen);
+  final campana = await leerCampana(almacen);
   runApp(
     ProviderScope(
       overrides: [
         almacenProvider.overrideWithValue(almacen),
         partidaInicialProvider.overrideWithValue(partidaEnCurso),
+        campanaInicialProvider.overrideWithValue(campana),
       ],
       child: const IncursionesApp(),
     ),

@@ -1,0 +1,205 @@
+{
+  "id": "kanto",
+  "nombre": "Kanto",
+  "inicio": "pueblo-paleta",
+  "nodos": [
+    {
+      "id": "pueblo-paleta",
+      "tipo": "inicio",
+      "nombre": "Pueblo Paleta",
+      "salidas": [
+        "ruta-1"
+      ],
+      "iniciales": [
+        "bulbasaur",
+        "charmander",
+        "squirtle"
+      ]
+    },
+    {
+      "id": "ruta-1",
+      "tipo": "bifurcacion",
+      "nombre": "Ruta 1",
+      "salidas": [
+        "ruta-1-pidgey",
+        "ruta-1-rattata"
+      ]
+    },
+    {
+      "id": "ruta-1-pidgey",
+      "tipo": "combate",
+      "nombre": "Ruta 1: Pidgey",
+      "salidas": [
+        "ciudad-verde"
+      ],
+      "zona": "ruta-1",
+      "rival": "salvaje",
+      "pokemon": [
+        "pidgey"
+      ]
+    },
+    {
+      "id": "ruta-1-rattata",
+      "tipo": "combate",
+      "nombre": "Ruta 1: Rattata",
+      "salidas": [
+        "ciudad-verde"
+      ],
+      "zona": "ruta-1",
+      "rival": "salvaje",
+      "pokemon": [
+        "rattata"
+      ]
+    },
+    {
+      "id": "ciudad-verde",
+      "tipo": "descanso",
+      "nombre": "Centro Pokémon de Ciudad Verde",
+      "salidas": [
+        "ciudad-verde-salida"
+      ]
+    },
+    {
+      "id": "ciudad-verde-salida",
+      "tipo": "bifurcacion",
+      "nombre": "Salida de Ciudad Verde",
+      "salidas": [
+        "ruta-22",
+        "ruta-2"
+      ]
+    },
+    {
+      "id": "ruta-22",
+      "tipo": "combate",
+      "nombre": "Ruta 22",
+      "salidas": [
+        "ruta-2"
+      ],
+      "zona": "ruta-22",
+      "rival": "salvaje",
+      "opcional": true
+    },
+    {
+      "id": "ruta-2",
+      "tipo": "bifurcacion",
+      "nombre": "Ruta 2 (sur)",
+      "salidas": [
+        "ruta-2-weedle",
+        "ruta-2-caterpie"
+      ]
+    },
+    {
+      "id": "ruta-2-weedle",
+      "tipo": "combate",
+      "nombre": "Ruta 2: Weedle",
+      "salidas": [
+        "cazabichos-1"
+      ],
+      "zona": "ruta-2",
+      "rival": "salvaje",
+      "pokemon": [
+        "weedle"
+      ]
+    },
+    {
+      "id": "ruta-2-caterpie",
+      "tipo": "combate",
+      "nombre": "Ruta 2: Caterpie",
+      "salidas": [
+        "cazabichos-1"
+      ],
+      "zona": "ruta-2",
+      "rival": "salvaje",
+      "pokemon": [
+        "caterpie"
+      ]
+    },
+    {
+      "id": "cazabichos-1",
+      "tipo": "combate",
+      "nombre": "Bosque Verde: primer Cazabichos",
+      "salidas": [
+        "cazabichos-2"
+      ],
+      "zona": "bosque-verde",
+      "rival": "entrenador",
+      "clase": "Cazabichos"
+    },
+    {
+      "id": "cazabichos-2",
+      "tipo": "combate",
+      "nombre": "Bosque Verde: segundo Cazabichos",
+      "salidas": [
+        "jefe-pikachu"
+      ],
+      "zona": "bosque-verde",
+      "rival": "entrenador",
+      "clase": "Cazabichos"
+    },
+    {
+      "id": "jefe-pikachu",
+      "tipo": "jefe",
+      "nombre": "Pikachu",
+      "salidas": [
+        "ruta-2-norte"
+      ],
+      "jefe": "pikachu-jefe"
+    },
+    {
+      "id": "ruta-2-norte",
+      "tipo": "bifurcacion",
+      "nombre": "Ruta 2 (norte)",
+      "salidas": [
+        "ruta-2-norte-salvaje",
+        "centro-plateada"
+      ]
+    },
+    {
+      "id": "ruta-2-norte-salvaje",
+      "tipo": "combate",
+      "nombre": "Ruta 2 (norte)",
+      "salidas": [
+        "centro-plateada"
+      ],
+      "zona": "ruta-2",
+      "rival": "salvaje",
+      "opcional": true
+    },
+    {
+      "id": "centro-plateada",
+      "tipo": "descanso",
+      "nombre": "Centro Pokémon de Ciudad Plateada",
+      "salidas": [
+        "gimnasio-joven"
+      ]
+    },
+    {
+      "id": "gimnasio-joven",
+      "tipo": "combate",
+      "nombre": "Gimnasio: Entrenador Joven",
+      "salidas": [
+        "gimnasio-brock"
+      ],
+      "zona": "gimnasio-plateada",
+      "rival": "entrenador",
+      "clase": "Entrenador Joven",
+      "pokemon": [
+        "diglett",
+        "sandshrew"
+      ]
+    },
+    {
+      "id": "gimnasio-brock",
+      "tipo": "gimnasio",
+      "nombre": "Gimnasio de Ciudad Plateada",
+      "lider": {
+        "nombre": "Brock",
+        "pokemon": [
+          "geodude",
+          "onix"
+        ]
+      },
+      "medalla": "roca"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "geodude",
+  "numero": 74,
+  "nombre": "Geodude",
+  "tipo": "lucha",
+  "ps": 80,
+  "debilidad": {
+    "tipo": "agua",
+    "multiplicador": 2
+  },
+  "resistencia": {
+    "tipo": "normal",
+    "reduccion": 30
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Placaje",
+      "tipo": "normal",
+      "coste": 1,
+      "dano": 10
+    },
+    {
+      "nombre": "Lanzarrocas",
+      "tipo": "lucha",
+      "coste": 2,
+      "dano": 30
+    }
+  ]
+}

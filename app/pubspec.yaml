@@ -27,6 +27,10 @@ flutter:
   assets:
     - assets/catalogo/
     - assets/catalogo/bosses/
+    - assets/catalogo/campana/pokemon/
+    - assets/catalogo/campana/zonas/
+    - assets/catalogo/campana/jefes/
+    - assets/catalogo/campana/regiones/
     - assets/cartas/
     - assets/campana/cartas/
     - assets/mapas/

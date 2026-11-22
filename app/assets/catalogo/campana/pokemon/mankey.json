@@ -1,0 +1,31 @@
+{
+  "id": "mankey",
+  "numero": 56,
+  "nombre": "Mankey",
+  "tipo": "lucha",
+  "ps": 70,
+  "debilidad": {
+    "tipo": "psiquico",
+    "multiplicador": 2
+  },
+  "retirada": 1,
+  "habilidad": {
+    "nombre": "Foco Energía",
+    "tipo": "monedaDanoExtraAlAtacar",
+    "valor": 20,
+    "texto": "Mientras este Pokémon siga activo, cada vez que ataque, lanza una moneda. Si sale cara, ese ataque hace 20 puntos más."
+  },
+  "ataques": [
+    {
+      "nombre": "Golpe Kárate",
+      "tipo": "lucha",
+      "coste": 2,
+      "dano": 30,
+      "efecto": {
+        "tipo": "monedaDanoExtra",
+        "valor": 20,
+        "texto": "Lanza una moneda. Si sale cara, este ataque hace 20 puntos de daño más."
+      }
+    }
+  ]
+}

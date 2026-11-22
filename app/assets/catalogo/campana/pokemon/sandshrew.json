@@ -1,0 +1,35 @@
+{
+  "id": "sandshrew",
+  "numero": 27,
+  "nombre": "Sandshrew",
+  "tipo": "lucha",
+  "ps": 70,
+  "debilidad": {
+    "tipo": "planta",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "ataques": [
+    {
+      "nombre": "Rizo Defensa",
+      "tipo": "lucha",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "reduceDanoPropio",
+        "valor": 10,
+        "texto": "Mientras este Pokémon siga activo, recibe 10 puntos menos de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula."
+      }
+    },
+    {
+      "nombre": "Rodar",
+      "tipo": "lucha",
+      "coste": 2,
+      "dano": 20,
+      "efecto": {
+        "tipo": "danoPorRacha",
+        "texto": "Este ataque hace 20 puntos de daño más por cada vez que este Pokémon usó Rodar en su turno anterior."
+      }
+    }
+  ]
+}

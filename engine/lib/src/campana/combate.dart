@@ -278,6 +278,49 @@ class EstadoCombate {
     );
   }
 
+  /// Combate nuevo con equipos que ya traen sus PS (la campaña conserva los
+  /// PS entre combates). Sale activo el primer Pokémon en pie de cada equipo.
+  factory EstadoCombate.conEquipos({
+    required List<PokemonEnCombate> equipoJugador,
+    required List<PokemonEnCombate> equipoRival,
+    Bando empieza = Bando.jugador,
+    ParametrosCombate parametros = const ParametrosCombate(),
+    int semilla = 1,
+    LlamadaEnCombate? llamadaRival,
+  }) {
+    if (llamadaRival != null &&
+        (llamadaRival.aliados.isEmpty ||
+            llamadaRival.alFrente > llamadaRival.porcentaje ||
+            llamadaRival.jefe < 0 ||
+            llamadaRival.jefe >= equipoRival.length)) {
+      throw const ReglaIncumplida('La llamada de aliado no es válida.');
+    }
+    BandoCombate bando(List<PokemonEnCombate> equipo) {
+      final activo = equipo.indexWhere((p) => p.enPie);
+      if (activo < 0) {
+        throw const ReglaIncumplida(
+            'Cada bando necesita al menos un Pokémon en pie.');
+      }
+      return BandoCombate(
+        equipo: List.of(equipo),
+        activo: activo,
+        energia: parametros.energiaInicial,
+      );
+    }
+
+    return EstadoCombate(
+      jugador: bando(equipoJugador),
+      rival: bando(equipoRival),
+      turno: empieza,
+      fase: FaseCombate.enCurso,
+      ganador: null,
+      numeroTurno: 1,
+      parametros: parametros,
+      semilla: _normalizarSemilla(semilla),
+      llamada: llamadaRival,
+    );
+  }
+
   /// Bandos cuyo Pokémon activo ha caído y tienen que elegir el siguiente
   /// (el del turno primero). Puede haber dos a la vez si el chequeo de veneno
   /// derriba a uno mientras el otro ya había caído.
@@ -328,9 +371,8 @@ class EstadoCombate {
         aliadoAlFrente: aliadoAlFrente ?? this.aliadoAlFrente,
       );
 
-  EstadoCombate conBando(Bando b, BandoCombate nuevo) => b == Bando.jugador
-      ? copiarCon(jugador: nuevo)
-      : copiarCon(rival: nuevo);
+  EstadoCombate conBando(Bando b, BandoCombate nuevo) =>
+      b == Bando.jugador ? copiarCon(jugador: nuevo) : copiarCon(rival: nuevo);
 }
 
 /// Una acción de un bando en el combate.
@@ -391,7 +433,8 @@ EstadoCombate aplicarCombate(EstadoCombate estado, AccionCombate accion) {
   }
   if (estado.fase == FaseCombate.eligiendoActivo) {
     if (accion is! ElegirSiguiente) {
-      throw const ReglaIncumplida('Primero hay que elegir el siguiente Pokémon.');
+      throw const ReglaIncumplida(
+          'Primero hay que elegir el siguiente Pokémon.');
     }
     if (!estado.debenElegir.contains(accion.bando)) {
       throw const ReglaIncumplida('Ese bando no tiene que elegir Pokémon.');
@@ -451,7 +494,8 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
   final activo = bando.pokemonActivo;
   final dano = danoDeAtaque(rep.ataque, activo.especie,
       reduccion: rep.reduccion, extra: bando.extraRecibido);
-  final equipo = [...bando.equipo]..[bando.activo] = activo.conPs(activo.ps - dano);
+  final equipo = [...bando.equipo]..[bando.activo] =
+      activo.conPs(activo.ps - dano);
   final golpeado = nuevo
       .conBando(a.bando, bando.copiarCon(equipo: equipo))
       .copiarCon(limpiarRepetirDano: true);
@@ -600,8 +644,8 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
   final b = estado.bando(a.bando);
   if (a.indice == b.enEspera && b.relevos.contains(a.indice)) {
     throw ReglaIncumplida(estado.aliadoAlFrente
-            ? 'El jefe no vuelve hasta que caiga su aliado.'
-            : 'El aliado espera en la banca hasta que el jefe lo saque.');
+        ? 'El jefe no vuelve hasta que caiga su aliado.'
+        : 'El aliado espera en la banca hasta que el jefe lo saque.');
   }
   if (!b.cambiables.contains(a.indice)) {
     throw const ReglaIncumplida('Ese Pokémon no puede salir.');
@@ -670,8 +714,8 @@ EstadoCombate _chequeoPokemon(EstadoCombate estado, Bando primero) {
     final bando = s.bando(b);
     final activo = bando.pokemonActivo;
     if (bando.veneno <= 0 || !activo.enPie) continue;
-    final equipo = [...bando.equipo]
-      ..[bando.activo] = activo.conPs(activo.ps - bando.veneno);
+    final equipo = [...bando.equipo]..[bando.activo] =
+        activo.conPs(activo.ps - bando.veneno);
     final nuevo = bando.copiarCon(equipo: equipo);
     s = s.conBando(b, nuevo);
     if (nuevo.derrotado) {

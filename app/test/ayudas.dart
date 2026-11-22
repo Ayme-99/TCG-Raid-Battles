@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:incursiones_app/almacen/almacen.dart';
 import 'package:incursiones_app/app.dart';
+import 'package:incursiones_app/campana/catalogo_campana.dart';
 import 'package:incursiones_app/cuenta/cliente_api.dart';
 import 'package:incursiones_app/cuenta/sesion.dart';
 import 'package:incursiones_app/envios/controlador_envios.dart';
@@ -15,6 +17,7 @@ import 'package:incursiones_app/pantallas/inicio.dart';
 import 'package:incursiones_app/partida/ataque_mesa.dart';
 import 'package:incursiones_app/partida/controlador_partida.dart';
 import 'package:incursiones_app/sala/canal_sala.dart';
+import 'package:incursiones_engine/campana.dart' show CatalogoCampana;
 import 'package:incursiones_engine/incursiones_engine.dart';
 
 const sesionDePrueba = Sesion(
@@ -82,6 +85,7 @@ List<Override> sobrescribir({
     if (!conInicio) enPartidaProvider.overrideWith(() => EnPartida(true)),
     mazoAtaquesJefeProvider.overrideWithValue(mazo ?? MazoFijo()),
     almacenProvider.overrideWithValue(almacen ?? AlmacenMemoria()),
+    catalogoCampanaProvider.overrideWith((ref) => catalogoCampanaDeDisco()),
     clienteApiProvider.overrideWithValue(
       ClienteApi(
         base: 'http://prueba/api',
@@ -224,4 +228,26 @@ Future<void> esperarAtaques(WidgetTester tester, ProviderContainer c) async {
     await tester.pump(const Duration(milliseconds: 100));
   }
   await tester.pump();
+}
+
+/// El catálogo de campaña empaquetado en la app, leído de disco (los tests se
+/// ejecutan en app/).
+CatalogoCampana catalogoCampanaDeDisco() {
+  Map<String, dynamic> leer(File f) =>
+      jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
+  List<File> de(String carpeta) => Directory('$carpetaCampana/$carpeta')
+      .listSync()
+      .whereType<File>()
+      .where((f) => f.path.endsWith('.json'))
+      .toList()
+    ..sort((a, b) => a.path.compareTo(b.path));
+  return CatalogoCampana.desdeJson(
+    pokemon: [for (final f in de('pokemon')) leer(f)],
+    zonas: [for (final f in de('zonas')) leer(f)],
+    jefes: {
+      for (final f in de('jefes'))
+        f.uri.pathSegments.last.replaceAll('.json', ''): leer(f),
+    },
+    region: leer(File('$carpetaCampana/regiones/$regionCampana.json')),
+  );
 }

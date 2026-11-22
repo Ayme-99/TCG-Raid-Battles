@@ -323,7 +323,8 @@ int? _mejorAtaque(
       // Daño por energía: dano / coste, comparado sin dividir.
       final izquierda = dano * mejorCoste;
       final derecha = mejorDano * coste;
-      mejora = izquierda > derecha || (izquierda == derecha && dano > mejorDano);
+      mejora =
+          izquierda > derecha || (izquierda == derecha && dano > mejorDano);
     }
     if (mejora) {
       mejor = i;
@@ -394,8 +395,7 @@ PokemonCampana _conRacha(BandoCombate yo) {
             nombre: e.ataques[i].nombre,
             tipo: e.ataques[i].tipo,
             coste: e.ataques[i].coste,
-            dano: e.ataques[i].dano *
-                (yo.ultimoAtaque == i ? yo.racha + 1 : 1),
+            dano: e.ataques[i].dano * (yo.ultimoAtaque == i ? yo.racha + 1 : 1),
             efecto: e.ataques[i].efecto,
           )
         else

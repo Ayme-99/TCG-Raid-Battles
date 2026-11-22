@@ -10,10 +10,11 @@ Estado: **en desarrollo** (revisado el 2026-11-22). Issue #334 (diseño) y una i
 | Simulador de combates (`sim/bin/sim_campana.dart`) | Hecho (#342); modos `nodos`, `tramo` y `realista` y **primer informe de calibrado** (#383): objetivo 75 %; con equipo realista el muro es Brock |
 | Modelo de ruta por nodos y progreso del jugador (§4) | **Hecho** (#354) |
 | Jefe que llama a un aliado a mitad de combate (§4, Jefes) | **Hecho** (#372) |
-| Captura, equipo de 6 y PC, centro Pokémon (§2, §4) | Pendiente |
+| Captura, equipo de 6 y PC, centro Pokémon (§2, §4) | **Primera versión hecha** (§4, Partida de campaña); falta la Pokéball |
 | XP, evolución y cartas ex: modelo de datos (§2.1) | Hecho (#346); sin cartas evolucionadas ni ex todavía |
-| Guardado local del progreso (§6) | Parcial: `ProgresoRuta` ya se convierte a JSON; falta guardarlo en el dispositivo |
-| Pantallas de la app, puntos al servidor y tienda | Pendiente |
+| Guardado local del progreso (§6) | **Hecho** en el dispositivo (`PartidaCampana`, clave `campana_kanto`); sin sincronizar con la cuenta |
+| Pantallas de la app (mapa, combate, equipo, centro Pokémon) | **Primera versión hecha**, sin diseño visual definitivo |
+| Puntos al servidor y tienda con puntos | Pendiente (la tienda del centro usa dinero, §4 Partida de campaña) |
 
 Para saber **por qué** algo es como es, mira el [registro de decisiones (§10)](#10-registro-de-decisiones); para crear una carta nueva, [§11](#11-cómo-se-crea-una-carta); para ver lo que hay hoy en el catálogo, [§12](#12-catálogo-actual).
 
@@ -241,6 +242,19 @@ Decididas por Ayme el 2026-11-21 al definir el primer tramo:
 - **Capturar es opcional** (quizá con Pokéball, por decidir).
 - **Cada combate da puntos una sola vez.**
 
+### Partida de campaña
+
+Hecho el 2026-11-22 (tareas 6, 8 y 9, primera versión). `PartidaCampana` (`engine/lib/src/campana/partida.dart`) junta el progreso de la ruta, el **equipo** (con los PS actuales y la XP de cada Pokémon), el **PC**, los **puntos**, el **dinero**, la **mochila** y la semilla. Es inmutable, se guarda en JSON (con versión) y las cifras sin cerrar están todas en `ParametrosCampana`.
+
+- **Rival de cada nodo:** el salvaje sale al azar de la zona con la semilla de la partida; un entrenador sin equipo fijo en el nodo saca **2** Pokémon de su lista (suposición); el gimnasio, los del líder en orden; el jefe, su carta NN/20 con su **llamada de aliado** (#372): el aliado entra en el combate, no se captura y no cuenta como rival derrotado para la XP si sigue en pie. Si el nodo fija el Pokémon (`pokemon` en `kanto.json`), sale ese; si no, sale de la zona o de la clase de entrenador con la semilla.
+- **PS entre combates:** el daño se arrastra de un combate a otro y la energía vuelve a 10 al empezar cada combate (decidido por Ayme el 2026-11-22). Solo cura el centro Pokémon o una Poción.
+- **Captura:** al vencer a un salvaje, o a un jefe la primera vez (su carta normal, `pikachu-jefe` → `pikachu`), se ofrece capturarlo; **siempre funciona** mientras no exista la Pokéball. Hay hueco: entra al equipo; equipo lleno: se elige a quién mandar al PC, o va al PC el capturado.
+- **Derrota** (decidido el 2026-11-22): se vuelve al **último sitio donde se curó** el equipo (el inicio o el último centro Pokémon usado; una Poción no cuenta), con el equipo curado. Se conserva lo ganado: capturas, puntos, dinero, XP y medallas. Los nodos de después se vuelven a pasar; un jefe ya derrotado ya no da puntos ni captura.
+- **XP y dinero** (decidido el 2026-11-22): la XP se gana al derrotar Pokémon (10 por rival, para cada Pokémon del equipo que siga en pie al acabar: suposición) y el dinero, al vencer a entrenadores (200) y líderes (500). Se empieza con 300 (suposición). La evolución con XP aún no está.
+- **Tienda del centro Pokémon:** Poción (100, cura 20 PS a un Pokémon en pie, fuera de combate, sin revivir) y Repelente (150, evita un combate contra un salvaje, sin puntos, XP ni captura). La Pokéball queda pendiente porque falta decidir la probabilidad de captura.
+- **Puntos** (provisionales): salvaje 100, entrenador 200, jefe 1000 (la primera vez), medalla 1500. Se guardan en el dispositivo; todavía no se envían al servidor (tarea 10).
+- **App:** «Nueva partida → Modo campaña» abre el mapa (`app/lib/campana/`). Pantallas: mapa con la ruta y el nodo actual, elección de inicial, combate (la máquina responde al momento y hay un registro de lo que pasa), captura, equipo (ordenar, Poción), centro Pokémon (curar, tienda, PC). La partida se guarda en el dispositivo tras cada cambio (`shared_preferences`, clave `campana_kanto`); un combate a medias no se guarda y, al volver, empieza de nuevo contra el mismo rival.
+
 ### Jefes
 
 Decidido el 2026-11-21. Los jefes son **Pokémon salvajes**, no entrenadores: los líderes de gimnasio y el Alto Mando no son jefes y usan cartas normales (el Geodude y el Onix de Brock, por ejemplo). Tienen una **serie propia de 20 cartas, NN/20** (la carta de Pikachu lleva impreso 01/20), distinta de la 001/150 de los Pokémon:
@@ -286,9 +300,9 @@ Contenido de la primera entrega:
 - Los tipos del motor, alineados con el TCG (§3.3; qué hacer con los que sobran está en §8).
 - Esquema JSON de Pokémon, de jefe, de zona y de región, y su carga en el motor (**hecho**).
 - Combate completo con energía, cambio de Pokémon, IA rival y victoria o derrota (**hecho**; al perder se vuelve al último punto de curación, aún sin implementar).
-- El recorrido del primer tramo, con su jefe y su gimnasio (**datos y modelo hechos**; falta jugarlo en la app).
-- Captura, equipo, PC y descanso (pendiente).
-- Guardado local del progreso (parcial).
+- El recorrido del primer tramo, con su jefe y su gimnasio (**hecho y jugable en la app**).
+- Captura, equipo, PC y descanso (**primera versión hecha**, §4 Partida de campaña).
+- Guardado local del progreso (**hecho**).
 
 Fuera de la primera entrega: el resto de las zonas y los 151 completos, Liga, tienda, sincronización con la cuenta y los combates 2 contra 2 y 3 contra 3. (La llamada de aliado ya está, #372.)
 
@@ -341,10 +355,10 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 3 | IA rival determinista (#338) | Hecho |
 | 4 | Simulador de combates de campaña (#342) y **primer equilibrado** (#383) | Simulador hecho; informe hecho; ajuste de cartas pendiente de decisión |
 | 5 | Modelo de región y de nodos, y avance por el mapa (#354) | Hecho |
-| 6 | Captura, equipo, PC y descanso | Pendiente |
+| 6 | Captura, equipo, PC y descanso | **Primera versión hecha** (§4, Partida de campaña); falta la Pokéball |
 | 7 | Jefe con aliados (llamada a mitad de combate, #372) y medalla | Llamada hecha |
-| 8 | Guardado de progreso de campaña en el dispositivo | Pendiente (`ProgresoRuta` ya se convierte a JSON) |
-| 9 | Pantallas de la app: mapa, combate, equipo, descanso | Pendiente |
+| 8 | Guardado de progreso de campaña en el dispositivo | Hecho (sin sincronizar con la cuenta) |
+| 9 | Pantallas de la app: mapa, combate, equipo, descanso | **Primera versión hecha**, funcional y sin diseño visual definitivo |
 | 10 | Puntos al servidor y tienda (después de la porción vertical) | Pendiente |
 | 11 | Reponer el resto de Pokémon y zonas (Túnel Roca, Ciudad Plateada en adelante) | Pendiente |
 | 12 | Tipos del TCG: decidir qué pasa con `hielo`, `veneno`, `volador`, `bicho` y `fantasma` (§8, pregunta 10) | Pendiente de decisión |
