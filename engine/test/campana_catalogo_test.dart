@@ -164,7 +164,7 @@ void main() {
       expect(m.ps, 70);
       expect(m.tipo, TipoCampana.lucha);
       expect(m.debilidad!.tipo, TipoCampana.psiquico);
-      expect(m.retirada, 1);
+      expect(m.retirada, 0);
       final h = m.habilidad as MonedaDanoExtraAlAtacar;
       expect(h.nombre, 'Foco Energía');
       expect(h.valor, 20);
@@ -284,12 +284,24 @@ void main() {
       expect(enumEsquema, TipoCampana.values.map((t) => t.name).toList());
     });
 
-    test('Zubat es de oscuridad y Ataque Ala es normal', () {
+    test('Zubat sigue a su carta impresa (041/150)', () {
       final zubat = pokemon['zubat']!;
       expect(zubat.tipo, TipoCampana.oscuridad);
-      final ala = zubat.ataques.firstWhere((a) => a.nombre == 'Ataque Ala');
-      expect(ala.tipo, TipoCampana.normal);
-      expect(ala.dano, 30);
+      expect(zubat.ps, 60);
+      expect(zubat.debilidad?.tipo, TipoCampana.electrico);
+      expect(zubat.debilidad?.multiplicador, 2);
+      expect(zubat.resistencia, isNull);
+      expect(zubat.retirada, 0);
+      expect(zubat.ataques.map((a) => a.nombre), ['Supersónico', 'Mordisco']);
+      final sonico = zubat.ataques.first;
+      expect(sonico.tipo, TipoCampana.oscuridad);
+      expect(sonico.coste, 1);
+      expect(sonico.dano, 0);
+      expect(sonico.efecto, isA<ConfundeDefensor>());
+      final mordisco = zubat.ataques.last;
+      expect(mordisco.tipo, TipoCampana.oscuridad);
+      expect(mordisco.coste, 2);
+      expect(mordisco.dano, 30);
     });
   });
 

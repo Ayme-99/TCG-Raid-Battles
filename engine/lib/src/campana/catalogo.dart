@@ -91,6 +91,8 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
       return const DanoPorRacha();
     case 'monedaFalloRival':
       return const MonedaFalloRival();
+    case 'confundeDefensor':
+      return const ConfundeDefensor();
     case 'reduceDanoPropio':
       return ReduceDanoPropio(_campo<int>(json, 'valor'));
     case 'envenenaDefensor':
