@@ -459,6 +459,153 @@ void main() {
     });
   });
 
+  group('escenas (D-20 §4, #413)', () {
+    ZonaPulsable ir(String destino, {double x = 0.9}) => ZonaPulsable(
+        accion: AccionZona.ir,
+        destino: destino,
+        x: x,
+        y: 0.1,
+        ancho: 0.1,
+        alto: 0.8);
+    ZonaPulsable hacer(AccionZona a) =>
+        ZonaPulsable(accion: a, x: 0.3, y: 0.3, ancho: 0.4, alto: 0.4);
+    NodoRuta conEscena(NodoRuta n, List<ZonaPulsable> zonas,
+            {String imagen = 'fondo'}) =>
+        NodoRuta(
+          id: n.id,
+          tipo: n.tipo,
+          nombre: n.nombre,
+          salidas: n.salidas,
+          iniciales: n.iniciales,
+          zona: n.zona,
+          rival: n.rival,
+          lider: n.lider,
+          medalla: n.medalla,
+          escena: EscenaNodo(imagen: imagen, zonas: zonas),
+        );
+    RegionCampana valida({
+      List<ZonaPulsable>? zonasA,
+      List<ZonaPulsable>? zonasB,
+      List<ZonaPulsable>? zonasG,
+      String imagenA = 'fondo',
+    }) =>
+        region([
+          conEscena(
+              ini(['b']), zonasA ?? [hacer(AccionZona.inicial), ir('b')],
+              imagen: imagenA),
+          conEscena(comb('b', ['g']),
+              zonasB ?? [hacer(AccionZona.combate), ir('a', x: 0), ir('g')]),
+          conEscena(gim('g'), zonasG ?? [hacer(AccionZona.combate), ir('b', x: 0)]),
+        ]);
+
+    test('las escenas de Kanto son válidas', () {
+      expect(kanto.problemasDeEscenas(), isEmpty);
+    });
+
+    test('cada nodo de Kanto tiene imagen y hay 9 escenas distintas', () {
+      final imagenes = {
+        for (final n in kanto.nodos.values) n.escena!.imagen,
+      };
+      expect(imagenes, hasLength(9));
+      expect(kanto.nodo('ciudad-verde').escena!.imagen,
+          kanto.nodo('centro-plateada').escena!.imagen,
+          reason: 'los dos centros comparten imagen');
+    });
+
+    test('una región con sus escenas bien hechas no da problemas', () {
+      expect(valida().problemasDeEscenas(), isEmpty);
+    });
+
+    test('un nodo sin escena o sin imagen se avisa', () {
+      final sin = region([ini(['b']), comb('b', ['g']), gim('g')]);
+      expect(sin.problemasDeEscenas(), contains('a: no tiene escena.'));
+      expect(valida(imagenA: ' ').problemasDeEscenas(),
+          contains('a: la escena no tiene imagen.'));
+    });
+
+    test('una zona fuera de 0–1 o sin tamaño se avisa', () {
+      final fuera = ZonaPulsable(
+          accion: AccionZona.combate, x: 0.8, y: 0.1, ancho: 0.3, alto: 0.2);
+      final plana = ZonaPulsable(
+          accion: AccionZona.combate, x: 0.1, y: 0.1, ancho: 0, alto: 0.2);
+      for (final z in [fuera, plana]) {
+        expect(
+            valida(zonasB: [z, ir('a', x: 0), ir('g')]).problemasDeEscenas(),
+            contains('b: la zona combate se sale de la imagen.'));
+      }
+    });
+
+    test('una zona que lleva a un nodo que no existe o no está al lado', () {
+      expect(
+          valida(zonasA: [hacer(AccionZona.inicial), ir('b'), ir('nada')])
+              .problemasDeEscenas(),
+          contains('a: la zona lleva a "nada", que no existe.'));
+      expect(
+          valida(zonasA: [hacer(AccionZona.inicial), ir('b'), ir('g')])
+              .problemasDeEscenas(),
+          contains('a: la zona lleva a "g", que no está al lado.'));
+    });
+
+    test('una salida sin zona deja el nodo siguiente sin acceso', () {
+      expect(valida(zonasA: [hacer(AccionZona.inicial)]).problemasDeEscenas(),
+          contains('a: la salida "b" no tiene zona en la escena.'));
+    });
+
+    test('falta la acción del tipo de nodo', () {
+      expect(
+          valida(zonasB: [ir('a', x: 0), ir('g')]).problemasDeEscenas(),
+          contains('b: la escena de un combate necesita una zona "combate".'));
+    });
+
+    test('destino solo con ir, e ir sin destino', () {
+      final conDestino = ZonaPulsable(
+          accion: AccionZona.combate,
+          destino: 'g',
+          x: 0.3,
+          y: 0.3,
+          ancho: 0.2,
+          alto: 0.2);
+      expect(
+          valida(zonasB: [conDestino, ir('a', x: 0), ir('g')])
+              .problemasDeEscenas(),
+          contains('b: solo una zona "ir" lleva "destino".'));
+      const sinDestino =
+          ZonaPulsable(accion: AccionZona.ir, x: 0, y: 0, ancho: 0.1, alto: 1);
+      expect(
+          valida(zonasG: [hacer(AccionZona.combate), sinDestino])
+              .problemasDeEscenas(),
+          contains('g: una zona "ir" necesita "destino".'));
+    });
+
+    test('el centro Pokémon necesita mostrador, tienda y PC', () {
+      expect(accionesDeTipo(TipoNodo.descanso),
+          {AccionZona.curar, AccionZona.tienda, AccionZona.pc});
+      final centro = kanto.nodo('ciudad-verde').escena!;
+      expect(centro.zonas.map((z) => z.accion),
+          containsAll([AccionZona.curar, AccionZona.tienda, AccionZona.pc]));
+    });
+
+    test('se lee del JSON y una acción desconocida se rechaza', () {
+      final json = {
+        'id': 'a',
+        'tipo': 'bifurcacion',
+        'nombre': 'A',
+        'escena': {
+          'imagen': 'ruta-1',
+          'zonas': [
+            {'accion': 'ir', 'destino': 'b', 'x': 0.9, 'y': 0, 'ancho': 0.1, 'alto': 1},
+          ],
+        },
+      };
+      final n = nodoRutaDesdeJson(json);
+      expect(n.escena!.imagen, 'ruta-1');
+      expect(n.escena!.zonas.single.destino, 'b');
+      expect(n.escena!.zonas.single.x, 0.9);
+      ((json['escena'] as Map)['zonas'] as List).first['accion'] = 'volar';
+      expect(() => nodoRutaDesdeJson(json), throwsFormatException);
+    });
+  });
+
   group('progreso por el mapa', () {
     test('al empezar hay que elegir inicial antes de avanzar', () {
       var p = ProgresoRuta.inicial(kanto);

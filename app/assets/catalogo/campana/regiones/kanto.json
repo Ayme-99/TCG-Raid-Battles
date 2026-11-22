@@ -14,7 +14,27 @@
         "bulbasaur",
         "charmander",
         "squirtle"
-      ]
+      ],
+      "escena": {
+        "imagen": "pueblo-paleta",
+        "zonas": [
+          {
+            "accion": "inicial",
+            "x": 0.3,
+            "y": 0.3,
+            "ancho": 0.4,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-1",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "ruta-1",
@@ -23,7 +43,36 @@
       "salidas": [
         "ruta-1-pidgey",
         "ruta-1-rattata"
-      ]
+      ],
+      "escena": {
+        "imagen": "ruta-1",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "pueblo-paleta",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-1-pidgey",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-1-rattata",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
     },
     {
       "id": "ruta-1-pidgey",
@@ -36,7 +85,35 @@
       "rival": "salvaje",
       "pokemon": [
         "pidgey"
-      ]
+      ],
+      "escena": {
+        "imagen": "ruta-1",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-1",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ciudad-verde",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "ruta-1-rattata",
@@ -49,7 +126,35 @@
       "rival": "salvaje",
       "pokemon": [
         "rattata"
-      ]
+      ],
+      "escena": {
+        "imagen": "ruta-1",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-1",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ciudad-verde",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "ciudad-verde",
@@ -58,6 +163,56 @@
       "salidas": [
         "ciudad-verde-salida"
       ],
+      "escena": {
+        "imagen": "centro-pokemon",
+        "zonas": [
+          {
+            "accion": "curar",
+            "x": 0.4,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.3
+          },
+          {
+            "accion": "tienda",
+            "x": 0.15,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "pc",
+            "x": 0.65,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-1-pidgey",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-1-rattata",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ciudad-verde-salida",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      },
       "tienda": [
         "pokeball",
         "pocion"
@@ -70,7 +225,36 @@
       "salidas": [
         "ruta-22",
         "ruta-2"
-      ]
+      ],
+      "escena": {
+        "imagen": "ciudad-verde",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "ciudad-verde",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-22",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
     },
     {
       "id": "ruta-22",
@@ -81,7 +265,35 @@
       ],
       "zona": "ruta-22",
       "rival": "salvaje",
-      "opcional": true
+      "opcional": true,
+      "escena": {
+        "imagen": "ruta-22",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ciudad-verde-salida",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "ruta-2",
@@ -90,7 +302,44 @@
       "salidas": [
         "ruta-2-weedle",
         "ruta-2-caterpie"
-      ]
+      ],
+      "escena": {
+        "imagen": "ruta-2",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "ciudad-verde-salida",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-22",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2-weedle",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2-caterpie",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
     },
     {
       "id": "ruta-2-weedle",
@@ -103,7 +352,35 @@
       "rival": "salvaje",
       "pokemon": [
         "weedle"
-      ]
+      ],
+      "escena": {
+        "imagen": "ruta-2",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "cazabichos-1",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "ruta-2-caterpie",
@@ -116,7 +393,35 @@
       "rival": "salvaje",
       "pokemon": [
         "caterpie"
-      ]
+      ],
+      "escena": {
+        "imagen": "ruta-2",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "cazabichos-1",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "cazabichos-1",
@@ -127,7 +432,43 @@
       ],
       "zona": "bosque-verde",
       "rival": "entrenador",
-      "clase": "Cazabichos"
+      "clase": "Cazabichos",
+      "escena": {
+        "imagen": "bosque-verde",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2-weedle",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2-caterpie",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "cazabichos-2",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "cazabichos-2",
@@ -138,7 +479,35 @@
       ],
       "zona": "bosque-verde",
       "rival": "entrenador",
-      "clase": "Cazabichos"
+      "clase": "Cazabichos",
+      "escena": {
+        "imagen": "bosque-verde",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "cazabichos-1",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "aviso-pikachu",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "aviso-pikachu",
@@ -154,7 +523,35 @@
         "Cuando se ve en apuros, llama a otros Pokémon del bosque para que lo ayuden.",
         "Déjame curar a tu equipo. ¡Suerte!"
       ],
-      "cura": true
+      "cura": true,
+      "escena": {
+        "imagen": "bosque-verde",
+        "zonas": [
+          {
+            "accion": "hablar",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "cazabichos-2",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "jefe-pikachu",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "jefe-pikachu",
@@ -163,7 +560,35 @@
       "salidas": [
         "ruta-2-norte"
       ],
-      "jefe": "pikachu-jefe"
+      "jefe": "pikachu-jefe",
+      "escena": {
+        "imagen": "bosque-verde",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "aviso-pikachu",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2-norte",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "ruta-2-norte",
@@ -172,7 +597,36 @@
       "salidas": [
         "ruta-2-norte-salvaje",
         "centro-plateada"
-      ]
+      ],
+      "escena": {
+        "imagen": "ruta-2-norte",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "jefe-pikachu",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2-norte-salvaje",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "centro-plateada",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
     },
     {
       "id": "ruta-2-norte-salvaje",
@@ -183,7 +637,35 @@
       ],
       "zona": "ruta-2",
       "rival": "salvaje",
-      "opcional": true
+      "opcional": true,
+      "escena": {
+        "imagen": "ruta-2-norte",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2-norte",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "centro-plateada",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "centro-plateada",
@@ -192,6 +674,56 @@
       "salidas": [
         "gimnasio-joven"
       ],
+      "escena": {
+        "imagen": "centro-pokemon",
+        "zonas": [
+          {
+            "accion": "curar",
+            "x": 0.4,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.3
+          },
+          {
+            "accion": "tienda",
+            "x": 0.15,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "pc",
+            "x": 0.65,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2-norte",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-2-norte-salvaje",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "gimnasio-joven",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      },
       "tienda": [
         "pokeball",
         "pocion"
@@ -210,7 +742,35 @@
       "pokemon": [
         "diglett",
         "sandshrew"
-      ]
+      ],
+      "escena": {
+        "imagen": "gimnasio-plateada",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "centro-plateada",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "gimnasio-brock",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     },
     {
       "id": "gimnasio-brock",
@@ -224,7 +784,27 @@
         ],
         "dinero": 1400
       },
-      "medalla": "roca"
+      "medalla": "roca",
+      "escena": {
+        "imagen": "gimnasio-plateada",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "gimnasio-joven",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
     }
   ]
 }

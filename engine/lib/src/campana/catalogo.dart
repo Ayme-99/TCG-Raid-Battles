@@ -327,6 +327,36 @@ List<String> _textos(Map<String, dynamic> json, String clave) => [
       for (final s in (json[clave] as List<dynamic>?) ?? const []) s as String,
     ];
 
+double _relativa(Map<String, dynamic> json, String clave) {
+  final v = json[clave];
+  if (v is! num) {
+    throw FormatException('Falta "$clave" o no es un número.');
+  }
+  return v.toDouble();
+}
+
+EscenaNodo? _escenaDesdeJson(dynamic json) {
+  if (json == null) return null;
+  if (json is! Map<String, dynamic>) {
+    throw const FormatException('"escena" no es un objeto.');
+  }
+  return EscenaNodo(
+    imagen: _campo<String>(json, 'imagen'),
+    zonas: [
+      for (final z in (json['zonas'] as List<dynamic>?) ?? const [])
+        ZonaPulsable(
+          accion: _enumDeTexto(AccionZona.values,
+              _campo<String>(z as Map<String, dynamic>, 'accion'), 'Acción'),
+          destino: z['destino'] as String?,
+          x: _relativa(z, 'x'),
+          y: _relativa(z, 'y'),
+          ancho: _relativa(z, 'ancho'),
+          alto: _relativa(z, 'alto'),
+        ),
+    ],
+  );
+}
+
 /// Un nodo de la ruta a partir de su JSON.
 NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
   final lider = json['lider'];
@@ -355,6 +385,7 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
     personaje: json['personaje'] as String?,
     texto: _textos(json, 'texto'),
     cura: (json['cura'] as bool?) ?? false,
+    escena: _escenaDesdeJson(json['escena']),
     tienda: _textos(json, 'tienda'),
   );
 }

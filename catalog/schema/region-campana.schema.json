@@ -17,6 +17,32 @@
   },
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "relativa": { "type": "number", "minimum": 0, "maximum": 1 },
+    "escena": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["imagen", "zonas"],
+      "description": "La escena ilustrada del nodo (D-20 §4, Escenas; #413). Las reglas que no caben aquí (zonas dentro de la imagen, destinos vecinos, una zona por salida, las acciones de cada tipo de nodo) las comprueba el motor con `RegionCampana.problemasDeEscenas()`.",
+      "properties": {
+        "imagen": { "$ref": "#/$defs/id", "description": "Id de la imagen de fondo: la app la busca en assets/campana/escenas/ y, si Arte aún no la ha entregado, pinta un marcador. Varios nodos pueden compartirla." },
+        "zonas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["accion", "x", "y", "ancho", "alto"],
+            "properties": {
+              "accion": { "enum": ["ir", "combate", "inicial", "hablar", "curar", "tienda", "pc"], "description": "ir: un borde que lleva a destino. combate: hierba alta, entrenador, líder o jefe. inicial: elegir el inicial. hablar: el personaje de una conversación. curar, tienda y pc: el mostrador, la estantería y el PC de un centro." },
+              "destino": { "$ref": "#/$defs/id", "description": "Solo con ir: un nodo vecino (una salida o una entrada)." },
+              "x": { "$ref": "#/$defs/relativa" },
+              "y": { "$ref": "#/$defs/relativa" },
+              "ancho": { "$ref": "#/$defs/relativa" },
+              "alto": { "$ref": "#/$defs/relativa" }
+            }
+          }
+        }
+      }
+    },
     "nodo": {
       "type": "object",
       "additionalProperties": false,
@@ -57,6 +83,7 @@
         "personaje": { "type": "string", "description": "conversacion: quién habla." },
         "texto": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "conversacion: lo que dice, línea a línea." },
         "cura": { "type": "boolean", "default": false, "description": "conversacion: si cura al equipo. Un nodo que cura es un punto de curación: al perder se vuelve a él." },
+        "escena": { "$ref": "#/$defs/escena" },
         "tienda": { "type": "array", "items": { "enum": ["pokeball", "superBall", "ultraBall", "pocion", "repelente"] }, "description": "descanso: lo que vende la tienda del centro (D-20 §10.6). En el primer tramo, pokeball y pocion. Super Ball pide además 1 medalla y Ultra Ball 5. Sin él, el centro no tiene tienda." }
       }
     }
