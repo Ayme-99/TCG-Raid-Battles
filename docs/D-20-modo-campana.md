@@ -145,7 +145,7 @@ Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2
 - **Siempre un ataque de 20 o más, o con veneno** (decidido el 2026-11-21): así Gruñido (−10, §3.6) nunca deja a una carta sin poder hacer daño. Un ataque de coste 1 de 10 sí se anula, pero es el de relleno. El esquema y un test lo comprueban. Weedle lleva un único ataque de 10, que vale porque envenena.
 - **Retirada:** 0–1 en los básicos, 1–2 en las fases evolucionadas, 2–3 en los pesados y los ex.
 - **Jefes:** pueden salirse de la tabla en PS (Pikachu 100) pero hacen daño de su fase; un ataque que mate al inicial de un golpe no entra.
-- **Resistencia (−30):** solo en pocas cartas (de salida Spearow y Onix; Geodude se imprimió sin resistencia el 2026-11-22).
+- **Resistencia (−30):** solo en pocas cartas (de salida solo Spearow; Geodude y Onix se imprimieron sin resistencia el 2026-11-22).
 - Los números son **provisionales** hasta calibrarlos con el simulador (D-20 §9, tarea 4).
 
 **Cartas del catálogo:** la tabla completa, generada desde los JSON, está en [§12](#12-catálogo-actual).
@@ -451,6 +451,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-21 | Las crea él, en PokeCardMaker (perfil «Aymedex»), a partir de ataques propuestos por otro chat desde WikiDex entre los que elige 1 o 2. Primeras del catálogo: Bulbasaur, Charmander y Squirtle. | §11 |
 | 2026-11-22 | El tramo de Pueblo Paleta a Ciudad Plateada queda con todos sus Pokémon (se acabó la lista). | §12 |
 | 2026-11-22 | **Geodude impreso (074/150):** lucha, 80 PS, debilidad agua ×2, **sin resistencia**, retirada 1. **Pulimento** (1: 0 de daño, `ganaEnergia` 2) y **Lanzarrocas** (3: 50). Sustituye a Placaje; `geodude.json` pasa a la carta impresa en la tarea 14 (valores provisionales hasta que Calidad los mida contra Brock). Lanzarrocas de 3 energías y 50 entra en el baremo de básico (§3.5) pero endurece a Brock; Calidad lo mide y, si es demasiado duro, baja a 40. | §12; imagen `geodude.webp` |
+| 2026-11-22 | **Onix impreso (095/150, carta normal, no de jefe):** lucha, 110 PS, debilidad agua ×2, **sin resistencia**, retirada 1, **un solo ataque**: **Tumba Rocas** (3: 50, `quitaEnergiaRival` 1: «El rival pierde 1 energía (si le queda alguna)»). Sustituye a Atadura y Lanzarrocas; Tumba Rocas traslada a energía el «baja la Velocidad» de los juegos, sin motor nuevo. Los 110 PS salen del baremo de básico (50–90) como excepción del as de Brock; Calidad lo mide y, si Brock sale demasiado duro, se baja a 90 antes de imprimir de nuevo. | §12; imagen `onix.webp`; `onix.json` |
 | 2026-11-22 | **Tasa de victoria objetivo: 75 %** por combate. No vale para la Liga, que tiene su propio objetivo del 25 % sobre toda la cadena (§10.7). | §8, 19; `balance/informes/campana_calibrar_2026-11-22.md`; #383 |
 | 2026-11-23 | **Machop impreso (066/150) como Mankey:** mismos 70 PS, debilidad psíquico ×2 y sin resistencia, la **misma habilidad Foco Energía** y el **mismo ataque Golpe Kárate** (2: 30+, `monedaDanoExtra` 20). Retirada 0. Sustituye a Golpe Kárate sin efecto y a Patada Baja (3: 50) del catálogo. Mankey se reimprimió para corregir el texto de la habilidad («esté en el Puesto Activo. Cada vez que ataque…»). | §12; imágenes `machop.webp`, `mankey.webp` |
 | 2026-11-23 | **Mankey: retirada 0.** La carta reimpresa lleva retirada 0 y Ayme la da por buena; sustituye a «retirada 1» (decidida el 2026-11-22). | §12; `mankey.json` |
@@ -627,12 +628,12 @@ Generado a partir de `catalog/campana/` el 2026-11-22. Si algo de aquí no coinc
 | 066 | `machop` | Machop | lucha | 70 | psiquico | — | 0 | Foco Energía | Golpe Kárate (2: 30+ `monedaDanoExtra`) | Común | — | sí |
 | 074 | `geodude` | Geodude | lucha | 80 | agua | — | 1 | — | Pulimento (1: efecto `ganaEnergia`); Lanzarrocas (3: 50) | Intermedio | — | sí |
 | 079 | `slowpoke` | Slowpoke | agua | 80 | electrico | — | 1 | — | Pistola Agua (1: 20); Confusión (2: 30) | Común | — | sí (desfasada) |
-| 095 | `onix` | Onix | lucha | 110 | agua | normal | 1 | — | Atadura (2: 30); Lanzarrocas (3: 60) | Fuerte | — | no |
+| 095 | `onix` | Onix | lucha | 110 | agua | — | 1 | — | Tumba Rocas (3: 50, `quitaEnergiaRival`) | Fuerte | — | sí |
 | 104 | `cubone` | Cubone | lucha | 60 | planta | — | 0 | — | Hueso Palo (2: 30) | Común | — | sí |
 
-**Efectos y habilidades** (columna de ataques): `reduceDanoRival`, `aumentaDanoRecibido`, `quitaEnergiaRival`, `ganaEnergia`, `monedaDanoExtra`, `envenenaDefensor`, `reduceDanoPropio`, `monedaFalloRival`, `danoPorRacha`, `monedasDano` y `repiteDanoAlDerribar` (§3.6); `+` es una moneda que suma daño; `esp.` es el daño esperado de las tiradas. La única habilidad es `monedaDanoExtraAlAtacar` (Foco Energía, de Mankey y Machop).
+**Efectos y habilidades** (columna de ataques): `reduceDanoRival`, `aumentaDanoRecibido`, `quitaEnergiaRival`, `ganaEnergia`, `confundeDefensor` (pendiente), `monedaDanoExtra`, `envenenaDefensor`, `reduceDanoPropio`, `monedaFalloRival`, `danoPorRacha`, `monedasDano` y `repiteDanoAlDerribar` (§3.6); `+` es una moneda que suma daño; `esp.` es el daño esperado de las tiradas. La única habilidad es `monedaDanoExtraAlAtacar` (Foco Energía, de Mankey y Machop).
 
-Geodude ya sigue a su carta impresa (2026-11-22, tarea 14): Pulimento (1: `ganaEnergia` 2) y Lanzarrocas (3: 50), sin resistencia y con retirada 1; son valores provisionales hasta que Calidad los mida contra Brock. Las cartas sin imagen (Zubat, Machop, Onix, Cubone y Slowpoke) vienen del primer catálogo del Túnel Roca (#340): tienen datos pero no carta impresa. Nidoran♂ guarda el número 32 de la Pokédex; su carta lleva impreso 029/150 (§8, 13).
+Geodude ya sigue a su carta impresa (2026-11-22, tarea 14): Pulimento (1: `ganaEnergia` 2) y Lanzarrocas (3: 50), sin resistencia y con retirada 1; son valores provisionales hasta que Calidad los mida contra Brock. **Las 22 cartas ya están impresas** (2026-11-23). Las del Túnel Roca (Zubat, Machop, Onix, Cubone y Slowpoke) venían del primer catálogo (#340) con datos y sin carta. **Zubat y Slowpoke** llevan en la carta un efecto que todavía no existe, `confundeDefensor` (Supersónico e Hidropulso), así que su JSON sigue con los datos antiguos hasta la tarea 15 (§9); en Zubat solo se cambió la debilidad a eléctrico. Nidoran♂ guarda el número 32 de la Pokédex; su carta lleva impreso 029/150 (§8, 13).
 
 ### Jefes (1)
 
