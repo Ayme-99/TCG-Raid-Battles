@@ -275,6 +275,7 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
         ? null
         : _enumDeTexto(RivalDeCombate.values, rival, 'Rival'),
     clase: json['clase'] as String?,
+    pokemon: _textos(json, 'pokemon'),
     lider: lider is Map<String, dynamic>
         ? LiderDeGimnasio(
             _campo<String>(lider, 'nombre'), _textos(lider, 'pokemon'))

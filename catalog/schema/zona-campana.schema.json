@@ -22,11 +22,10 @@
     },
     "salvajes": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "string"
       },
-      "description": "Ids de los Pokémon que aparecen salvajes."
+      "description": "Ids de los Pokémon que aparecen salvajes. Vacío en una zona sin salvajes (un gimnasio)."
     },
     "entrenadores": {
       "type": "array",
