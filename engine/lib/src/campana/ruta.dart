@@ -363,6 +363,16 @@ class ProgresoRuta {
   /// El Pokémon inicial que se eligió.
   final String? inicial;
 
+  /// Ids de los nodos en los que ya se ha estado: se puede volver a ellos
+  /// ([retroceder], D-20 §10.7). Si no se dan, son los [superados] y el
+  /// actual (partidas guardadas antes de #412).
+  Set<String> get visitados =>
+      _visitados ?? {...superados, nodoActual};
+
+  /// Si el combate del nodo actual es la repetición de un salvaje ya
+  /// vencido ([repetir]): no da puntos (D-20 §10.7).
+  final bool repitiendo;
+
   const ProgresoRuta({
     required this.nodoActual,
     this.resuelto = false,
@@ -370,11 +380,15 @@ class ProgresoRuta {
     this.medallas = const {},
     this.jefesDerrotados = const {},
     this.inicial,
-  });
+    Set<String>? visitados,
+    this.repitiendo = false,
+  }) : _visitados = visitados;
+
+  final Set<String>? _visitados;
 
   /// Al empezar: en el nodo de inicio, sin resolver.
   factory ProgresoRuta.inicial(RegionCampana region) =>
-      ProgresoRuta(nodoActual: region.inicio);
+      ProgresoRuta(nodoActual: region.inicio, visitados: {region.inicio});
 
   ProgresoRuta _copiar({
     String? nodoActual,
@@ -383,6 +397,8 @@ class ProgresoRuta {
     Set<String>? medallas,
     Set<String>? jefesDerrotados,
     String? inicial,
+    Set<String>? visitados,
+    bool? repitiendo,
   }) =>
       ProgresoRuta(
         nodoActual: nodoActual ?? this.nodoActual,
@@ -391,6 +407,8 @@ class ProgresoRuta {
         medallas: medallas ?? this.medallas,
         jefesDerrotados: jefesDerrotados ?? this.jefesDerrotados,
         inicial: inicial ?? this.inicial,
+        visitados: visitados ?? this.visitados,
+        repitiendo: repitiendo ?? this.repitiendo,
       );
 
   /// Si el jefe todavía se puede capturar al derrotarlo.
@@ -420,11 +438,14 @@ class ProgresoRuta {
       jefesDerrotados:
           nodo.jefe == null ? null : {...jefesDerrotados, nodo.jefe!},
       inicial: nodo.tipo == TipoNodo.inicio ? inicial : null,
+      repitiendo: false,
     );
   }
 
   /// Pasa a [destino], que tiene que ser una salida del nodo actual ya
-  /// resuelto. Una bifurcación no tiene evento y se da por resuelta al llegar.
+  /// resuelto. Una bifurcación no tiene evento y se da por resuelta al llegar,
+  /// y un nodo ya superado también: solo los salvajes se repiten, y a mano
+  /// ([repetir], D-20 §10.7).
   ProgresoRuta avanzar(RegionCampana region, String destino) {
     if (!resuelto) {
       throw const ReglaIncumplida('Antes hay que resolver este nodo.');
@@ -435,9 +456,53 @@ class ProgresoRuta {
     final sinEvento = region.nodo(destino).tipo == TipoNodo.bifurcacion;
     return _copiar(
       nodoActual: destino,
-      resuelto: sinEvento,
+      resuelto: sinEvento || superados.contains(destino),
       superados: sinEvento ? {...superados, destino} : null,
+      visitados: {...visitados, destino},
+      repitiendo: false,
     );
+  }
+
+  /// Vuelve a [destino], cualquier nodo en el que ya se ha estado (D-20
+  /// §10.7, retroceso; el grafo sigue sin ciclos). Si estaba superado se
+  /// queda resuelto, así que no se repite su combate; un nodo al que se llegó
+  /// sin resolverlo (un combate del que se volvió atrás) se encuentra igual.
+  /// Lo ganado (medallas, jefes, superados) no se pierde.
+  ProgresoRuta retroceder(RegionCampana region, String destino) {
+    final nodo = region.nodo(destino);
+    if (destino == nodoActual) {
+      throw const ReglaIncumplida('Ya estás aquí.');
+    }
+    if (!visitados.contains(destino)) {
+      throw ReglaIncumplida(
+          'No se puede ir a "${nodo.nombre}": todavía no has llegado.');
+    }
+    return _copiar(
+      nodoActual: destino,
+      resuelto: superados.contains(destino) ||
+          nodo.tipo == TipoNodo.bifurcacion,
+      repitiendo: false,
+    );
+  }
+
+  /// Si el combate del nodo actual se puede repetir: es contra un Pokémon
+  /// salvaje y ya se ganó (D-20 §10.7). Entrenadores, gimnasios y jefes no se
+  /// repiten.
+  bool puedeRepetir(RegionCampana region) {
+    final n = region.nodo(nodoActual);
+    return resuelto &&
+        superados.contains(n.id) &&
+        n.tipo == TipoNodo.combate &&
+        n.rival == RivalDeCombate.salvaje;
+  }
+
+  /// Vuelve a abrir el combate del salvaje del nodo actual ([puedeRepetir]).
+  ProgresoRuta repetir(RegionCampana region) {
+    if (!puedeRepetir(region)) {
+      throw const ReglaIncumplida(
+          'Solo se repiten los combates contra Pokémon salvajes ya ganados.');
+    }
+    return _copiar(resuelto: false, repitiendo: true);
   }
 
   /// Vuelve a [nodo], uno ya superado (el último sitio donde el equipo se
@@ -449,7 +514,7 @@ class ProgresoRuta {
     if (!superados.contains(nodo)) {
       throw ReglaIncumplida('No se puede volver a "$nodo": no se ha pasado.');
     }
-    return _copiar(nodoActual: nodo, resuelto: true);
+    return _copiar(nodoActual: nodo, resuelto: true, repitiendo: false);
   }
 
   Map<String, dynamic> aJson() => {
@@ -459,6 +524,8 @@ class ProgresoRuta {
         'medallas': medallas.toList()..sort(),
         'jefesDerrotados': jefesDerrotados.toList()..sort(),
         if (inicial != null) 'inicial': inicial,
+        'visitados': visitados.toList()..sort(),
+        if (repitiendo) 'repitiendo': true,
       };
 
   factory ProgresoRuta.desdeJson(Map<String, dynamic> json) => ProgresoRuta(
@@ -470,5 +537,9 @@ class ProgresoRuta {
           ...(json['jefesDerrotados'] as List<dynamic>).cast<String>()
         },
         inicial: json['inicial'] as String?,
+        visitados: json['visitados'] == null
+            ? null
+            : {...(json['visitados'] as List<dynamic>).cast<String>()},
+        repitiendo: (json['repitiendo'] as bool?) ?? false,
       );
 }

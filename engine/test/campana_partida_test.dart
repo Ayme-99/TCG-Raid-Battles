@@ -809,6 +809,131 @@ void main() {
     });
   });
 
+  group('retroceso y repetición de salvajes (D-20 §10.7, #412)', () {
+    EstadoCombate ganar(EstadoCombate e) => e.copiarCon(
+          rival: e.rival
+              .copiarCon(equipo: [for (final r in e.rival.equipo) r.conPs(0)]),
+          fase: FaseCombate.terminado,
+          ganador: Bando.jugador,
+        );
+    // Pueblo Paleta → Ruta 1 → Pidgey ganado → Ciudad Verde.
+    PartidaCampana enVerde() {
+      var p = PartidaCampana.nueva(c.region).elegirInicial(c, 'squirtle');
+      p = p.avanzar(c, 'ruta-1').avanzar(c, 'ruta-1-pidgey');
+      p = p.terminarCombate(c, ganar(p.empezarCombate(c))).noCapturar();
+      return p.avanzar(c, 'ciudad-verde');
+    }
+
+    test('se guardan los nodos visitados', () {
+      expect(enVerde().progreso.visitados,
+          {'pueblo-paleta', 'ruta-1', 'ruta-1-pidgey', 'ciudad-verde'});
+    });
+
+    test('se puede volver a un nodo visitado, no a uno sin alcanzar', () {
+      final p = enVerde();
+      final atras = p.retroceder(c, 'ruta-1-pidgey');
+      expect(atras.progreso.nodoActual, 'ruta-1-pidgey');
+      expect(atras.progreso.resuelto, isTrue, reason: 'ya se ganó');
+      expect(atras.hayCombate(c), isFalse);
+      expect(atras.retroceder(c, 'pueblo-paleta').progreso.nodoActual,
+          'pueblo-paleta');
+      for (final no in ['ruta-1-rattata', 'ruta-22', 'gimnasio-brock']) {
+        expect(() => p.retroceder(c, no), throwsA(isA<ReglaIncumplida>()),
+            reason: no);
+      }
+      expect(() => p.retroceder(c, 'ciudad-verde'),
+          throwsA(isA<ReglaIncumplida>()),
+          reason: 'ya estás aquí');
+    });
+
+    test('volver atrás no pierde el progreso ni repite lo ganado', () {
+      final p = enVerde().retroceder(c, 'ruta-1');
+      expect(p.progreso.superados, enVerde().progreso.superados);
+      // Volviendo hacia delante, el Pidgey ganado no se vuelve a pelear.
+      final q = p.avanzar(c, 'ruta-1-pidgey');
+      expect(q.progreso.resuelto, isTrue);
+      expect(q.opciones(c), ['ciudad-verde']);
+    });
+
+    test('un entrenador ganado no se repite al volver', () {
+      final p = PartidaCampana(
+        progreso: const ProgresoRuta(
+            nodoActual: 'cazabichos-2',
+            resuelto: true,
+            superados: {'pueblo-paleta', 'cazabichos-1', 'cazabichos-2'},
+            visitados: {'pueblo-paleta', 'cazabichos-1', 'cazabichos-2'}),
+        equipo: const [PokemonGuardado('squirtle', 80)],
+      ).retroceder(c, 'cazabichos-1');
+      expect(p.hayCombate(c), isFalse);
+      expect(p.puedeRepetir(c), isFalse);
+      expect(() => p.repetirCombate(c), throwsA(isA<ReglaIncumplida>()));
+    });
+
+    test('repetir un salvaje da XP, se puede capturar y no da dinero ni puntos',
+        () {
+      var p = enVerde().retroceder(c, 'ruta-1-pidgey');
+      final antes = p;
+      expect(p.puedeRepetir(c), isTrue);
+      p = p.repetirCombate(c);
+      expect(p.hayCombate(c), isTrue);
+      expect(p.rival(c).puntos, 0);
+      expect(p.rival(c).dinero, 0);
+      p = p.terminarCombate(c, ganar(p.empezarCombate(c)));
+      expect(p.xp, antes.xp + 10, reason: 'Pidgey es Común');
+      expect(p.dinero, antes.dinero);
+      expect(p.puntos, antes.puntos);
+      expect(p.capturaPendiente, 'pidgey');
+      expect(p.progreso.repitiendo, isFalse);
+      // Y se puede repetir otra vez, sin tope de XP.
+      p = p.noCapturar().repetirCombate(c);
+      p = p.terminarCombate(c, ganar(p.empezarCombate(c)));
+      expect(p.xp, antes.xp + 20);
+    });
+
+    test('solo se repiten salvajes ya ganados', () {
+      final p = enVerde();
+      expect(p.puedeRepetir(c), isFalse, reason: 'un centro no es un combate');
+      expect(() => p.repetirCombate(c), throwsA(isA<ReglaIncumplida>()));
+      final brock = PartidaCampana(
+        progreso: const ProgresoRuta(
+            nodoActual: 'gimnasio-brock',
+            resuelto: true,
+            superados: {'gimnasio-brock'}),
+        equipo: const [PokemonGuardado('squirtle', 80)],
+      );
+      expect(brock.puedeRepetir(c), isFalse);
+    });
+
+    test('perder la repetición devuelve al último sitio donde se curó', () {
+      var p = enVerde().descansar(c).retroceder(c, 'ruta-1-pidgey');
+      p = p.repetirCombate(c);
+      final e = p.empezarCombate(c);
+      p = p.terminarCombate(
+          c,
+          e.copiarCon(
+              jugador:
+                  e.jugador.copiarCon(equipo: [e.jugador.equipo[0].conPs(0)]),
+              fase: FaseCombate.terminado,
+              ganador: Bando.rival));
+      expect(p.progreso.nodoActual, 'ciudad-verde');
+      expect(p.progreso.repitiendo, isFalse);
+    });
+
+    test('se guarda y se lee una partida antigua sin visitados', () {
+      final p = enVerde().retroceder(c, 'ruta-1-pidgey').repetirCombate(c);
+      final json = jsonDecode(jsonEncode(p.aJson())) as Map<String, dynamic>;
+      final q = PartidaCampana.desdeJson(json);
+      expect(q.progreso.visitados, p.progreso.visitados);
+      expect(q.progreso.repitiendo, isTrue);
+      final viejo = {...json['progreso'] as Map<String, dynamic>}
+        ..remove('visitados')
+        ..remove('repitiendo');
+      final r = ProgresoRuta.desdeJson(viejo);
+      expect(r.visitados, {...r.superados, r.nodoActual});
+      expect(r.repitiendo, isFalse);
+    });
+  });
+
   test('hasta() llega a un nodo concreto', () {
     final p = hasta(
         c,

@@ -173,14 +173,17 @@ class _SinPartida extends ConsumerWidget {
 }
 
 /// La ruta, nodo a nodo, en el orden del catálogo.
-class _Ruta extends StatelessWidget {
+/// La ruta. Se puede volver a cualquier nodo ya visitado tocándolo (D-20
+/// §10.7, retroceso).
+class _Ruta extends ConsumerWidget {
   const _Ruta({required this.catalogo, required this.partida});
 
   final CatalogoCampana catalogo;
   final PartidaCampana partida;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final control = ref.read(campanaProvider.notifier);
     final nodos = catalogo.region.nodos.values.toList();
     final actual = partida.progreso.nodoActual;
     final indiceActual = nodos.indexWhere((n) => n.id == actual);
@@ -195,6 +198,9 @@ class _Ruta extends StatelessWidget {
         final n = nodos[i];
         final hecho = partida.progreso.superados.contains(n.id);
         final aqui = n.id == actual;
+        final sePuedeVolver = !aqui &&
+            partida.capturaPendiente == null &&
+            partida.progreso.visitados.contains(n.id);
         return ListTile(
           key: Key('nodo-${n.id}'),
           dense: true,
@@ -208,7 +214,11 @@ class _Ruta extends StatelessWidget {
             _tipo(n),
             if (n.opcional) 'opcional',
             if (aqui) 'estás aquí',
+            if (sePuedeVolver) 'toca para volver',
           ].join(' · ')),
+          onTap: sePuedeVolver
+              ? () => _avisar(context, control.retroceder(catalogo, n.id))
+              : null,
         );
       },
     );
@@ -312,6 +322,20 @@ class _PanelNodo extends ConsumerWidget {
             onPressed: () => _avisar(context, control.usarRepelente(c)),
           ),
         ],
+      ]);
+    } else if (p.puedeRepetir(c)) {
+      // Un salvaje ya vencido se puede repetir: XP y captura, sin dinero ni
+      // puntos (D-20 §10.7).
+      hijos.addAll([
+        const Text('Ya venciste aquí. Puedes volver a buscar un Pokémon '
+            'salvaje: da XP y se puede capturar, pero no da dinero ni puntos.'),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          key: const Key('campana-repetir'),
+          icon: const Icon(Icons.grass_rounded),
+          label: const Text('Buscar otro salvaje'),
+          onPressed: () => control.repetirCombate(c),
+        ),
       ]);
     } else if (nodo.tipo == TipoNodo.descanso) {
       hijos.add(_Descanso(catalogo: c, partida: p));
