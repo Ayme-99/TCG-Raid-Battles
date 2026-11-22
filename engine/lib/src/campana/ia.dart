@@ -33,6 +33,11 @@ import 'pokemon.dart';
 /// 7. Ataca: con el de más daño si la reserva está llena (la energía
 ///    sobrante se perdería) y, si no, con el de más daño por energía gastada.
 /// 8. Si no llega a nada, carga.
+///
+/// Cuando le toca cargar (pasos 6 y 8), si tiene un ataque que da energía a
+/// su bando (Pulimento) lo usa en su lugar, siempre que la reserva no esté
+/// llena, le falte energía para algún ataque suyo y acabe con al menos la
+/// misma energía que cargando.
 AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
   if (estado.fase == FaseCombate.terminado) {
     throw const ReglaIncumplida('El combate ha terminado.');
@@ -100,10 +105,45 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
 
   if (_remataCargando(
       activo, yo.energia, objetivo, p, yo.danoReducido, rival.extraRecibido)) {
-    return Cargar(bando);
+    return _cargarOGanar(yo, bando, p);
   }
   if (ataque != null) return Atacar(bando, ataque);
-  return Cargar(bando);
+  return _cargarOGanar(yo, bando, p);
+}
+
+/// Carga, o usa en su lugar un ataque que da energía a su bando (Pulimento)
+/// si le sale igual o mejor.
+AccionCombate _cargarOGanar(BandoCombate yo, Bando bando, ParametrosCombate p) {
+  final gana = _ataqueDeGanaEnergia(yo, p);
+  return gana == null ? Cargar(bando) : Atacar(bando, gana);
+}
+
+/// Índice de un ataque que da energía al propio bando (Pulimento) y compensa
+/// usarlo en vez de cargar, o null.
+///
+/// Solo sirve si la reserva no está llena y al activo le falta energía para
+/// alguno de sus ataques (normalmente el grande). Compensa si, pagado el coste
+/// y sumado el efecto (con tope), la reserva queda igual o mejor que cargando.
+/// Entre varios, el que más energía deja.
+int? _ataqueDeGanaEnergia(BandoCombate yo, ParametrosCombate p) {
+  final energia = yo.energia;
+  if (energia >= p.energiaMaxima) return null;
+  final ataques = yo.pokemonActivo.especie.ataques;
+  if (!ataques.any((a) => a.coste > energia)) return null;
+  int tope(int e) => e > p.energiaMaxima ? p.energiaMaxima : e;
+  var mejorEnergia = tope(energia + p.energiaAlCargar);
+  int? mejor;
+  for (var i = 0; i < ataques.length; i++) {
+    final a = ataques[i];
+    final e = a.efecto;
+    if (e is! GanaEnergia || a.coste > energia) continue;
+    final tras = tope(energia - a.coste + e.valor);
+    if (tras >= mejorEnergia && (mejor == null || tras > mejorEnergia)) {
+      mejor = i;
+      mejorEnergia = tras;
+    }
+  }
+  return mejor;
 }
 
 /// ¿Hay un ataque que remata al [objetivo], hoy no le llega la energía y

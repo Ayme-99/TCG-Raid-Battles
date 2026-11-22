@@ -589,6 +589,70 @@ void main() {
     });
   });
 
+  group('Pulimento', () {
+    const pulimento = AtaqueCampana(
+      nombre: 'Pulimento',
+      tipo: TipoCampana.normal,
+      coste: 1,
+      dano: 0,
+      efecto: GanaEnergia(2),
+    );
+    PokemonCampana roca() =>
+        pokemon('g', ps: 80, ataques: [pulimento, ataque(3, 50)]);
+    EstadoCombate conEnergia(int energia, {List<PokemonCampana>? equipo}) {
+      final e = combate(equipo ?? [roca()], [pokemon('r', ps: 200)]);
+      return e.copiarCon(jugador: e.jugador.copiarCon(energia: energia));
+    }
+
+    test('lo usa en vez de cargar si no llega a su ataque grande', () {
+      expect(decidirAccion(conEnergia(2), Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 0));
+    });
+
+    test('con la reserva llena no lo usa: ataca', () {
+      expect(decidirAccion(conEnergia(10), Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('si llega al ataque grande, ataca', () {
+      expect(decidirAccion(conEnergia(3), Bando.jugador),
+          isA<Atacar>().having((x) => x.indice, 'indice', 1));
+    });
+
+    test('sin energía para pagarlo, carga', () {
+      expect(decidirAccion(conEnergia(0), Bando.jugador), isA<Cargar>());
+    });
+
+    test('si le sale peor que cargar (cerca del tope), carga', () {
+      // Coste 2 y valor 2: deja 1 menos que cargar.
+      const caro = AtaqueCampana(
+          nombre: 'Caro',
+          tipo: TipoCampana.normal,
+          coste: 2,
+          dano: 0,
+          efecto: GanaEnergia(2));
+      final p = pokemon('x', ps: 80, ataques: [caro, ataque(4, 60)]);
+      expect(decidirAccion(conEnergia(3, equipo: [p]), Bando.jugador),
+          isA<Cargar>());
+    });
+
+    test('todos los emparejamientos con Pulimento terminan', () {
+      final a = [roca(), pokemon('b', ps: 80, ataques: [ataque(1, 10), ataque(2, 20)])];
+      final b = [pokemon('c', ps: 70, ataques: [ataque(1, 10), ataque(3, 60)])];
+      for (final x in [a, b]) {
+        for (final y in [a, b]) {
+          for (final empieza in Bando.values) {
+            var e = combate(x, y, empieza: empieza);
+            for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+              e = aplicarCombate(e, decidirAccion(e, e.actua));
+            }
+            expect(e.fase, FaseCombate.terminado);
+          }
+        }
+      }
+    });
+  });
+
   group('Látigo', () {
     const latigo = AtaqueCampana(
       nombre: 'Látigo',
