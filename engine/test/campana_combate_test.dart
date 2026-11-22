@@ -899,6 +899,64 @@ void main() {
     });
   });
 
+  group('efecto: el propio bando gana energía (Pulimento)', () {
+    const pulimento = AtaqueCampana(
+      nombre: 'Pulimento',
+      tipo: TipoCampana.normal,
+      coste: 1,
+      dano: 0,
+      efecto: GanaEnergia(2),
+    );
+    final roca =
+        pokemon('g', tipo: TipoCampana.lucha, ataques: const [pulimento]);
+    EstadoCombate conEnergia(int energia) {
+      final e = nuevo(jugador: [roca]);
+      return e.copiarCon(jugador: e.jugador.copiarCon(energia: energia));
+    }
+
+    test('paga el coste, suma 2 y no hace daño', () {
+      final e = aplicarCombate(conEnergia(4), const Atacar(Bando.jugador, 0));
+      // 4 - 1 del coste + 2 del efecto + 1 al acabar el turno.
+      expect(e.jugador.energia, 6);
+      expect(e.rival.pokemonActivo.ps, 100);
+      expect(e.rival.energia, 10);
+    });
+
+    test('no pasa del máximo de 10', () {
+      final e = aplicarCombate(conEnergia(9), const Atacar(Bando.jugador, 0));
+      expect(e.jugador.energia, 10);
+      final lleno =
+          aplicarCombate(conEnergia(10), const Atacar(Bando.jugador, 0));
+      expect(lleno.jugador.energia, 10);
+    });
+
+    test('respeta un máximo distinto en los parámetros', () {
+      final base = nuevo(
+          jugador: [roca],
+          parametros: const ParametrosCombate(energiaMaxima: 6));
+      final e = aplicarCombate(
+          base.copiarCon(jugador: base.jugador.copiarCon(energia: 5)),
+          const Atacar(Bando.jugador, 0));
+      expect(e.jugador.energia, 6);
+    });
+
+    test('sin energía para el coste no se puede usar', () {
+      expect(() => aplicarCombate(conEnergia(0), const Atacar(Bando.jugador, 0)),
+          throwsA(isA<ReglaIncumplida>()));
+    });
+
+    test('no deja estado: dos usos suman 2 cada uno', () {
+      var e = aplicarCombate(conEnergia(2), const Atacar(Bando.jugador, 0));
+      expect(e.jugador.energia, 4); // 2 - 1 + 2 + 1
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.jugador.energia, 6); // 4 - 1 + 2 + 1
+      expect(e.jugador.danoReducido, 0);
+      expect(e.jugador.proteccion, 0);
+      expect(e.rival.danoExtra, 0);
+    });
+  });
+
   group('efecto: el rival recibe más daño (Látigo)', () {
     const latigo = AtaqueCampana(
       nombre: 'Látigo',

@@ -144,11 +144,8 @@ void main() {
       await tocar(tester, 'campana-combatir');
       expect(find.byKey(const Key('campana-combate')), findsOneWidget);
       await jugarCombate(tester);
-      final p = c.read(campanaProvider).partida!;
-      if (p.capturaPendiente != null) {
-        await tocar(tester, 'campana-capturar');
-        expect(c.read(campanaProvider).partida!.equipo.length, 2);
-      }
+      // La Ruta 1 no deja capturar (D-20 §10.6).
+      expect(c.read(campanaProvider).partida!.capturaPendiente, isNull);
       expect(tester.takeException(), isNull);
       // Se ha guardado en el dispositivo y se recupera igual.
       final guardada = PartidaCampana.desdeJson(
@@ -169,7 +166,7 @@ void main() {
       final p = c.read(campanaProvider).partida!;
       if (p.progreso.nodoActual == 'ciudad-verde' && p.progreso.resuelto) break;
       if (p.capturaPendiente != null) {
-        await tocar(tester, 'campana-capturar');
+        await tocar(tester, 'campana-no-capturar');
       } else if (p.hayCombate(catalogo)) {
         await tocar(tester, 'campana-combatir');
         await jugarCombate(tester);
@@ -185,7 +182,7 @@ void main() {
     expect(p.progreso.resuelto, isTrue);
     expect(p.ultimaCura, 'ciudad-verde');
     expect(p.equipo.every((e) => e.ps == catalogo.especie(e.id).ps), isTrue);
-    expect(p.equipo.length, greaterThanOrEqualTo(2));
+    expect(p.equipo.length, 1, reason: 'en la Ruta 1 no se captura');
     expect(tester.takeException(), isNull);
   });
 
@@ -233,7 +230,71 @@ void main() {
     final p = c.read(campanaProvider).partida!;
     expect(p.progreso.jefesDerrotados, {'pikachu-jefe'});
     expect(p.capturaPendiente, 'pikachu', reason: 'el aliado no se captura');
-    expect(find.byKey(const Key('campana-capturar')), findsOneWidget);
+    // Sin Balls, el combate acaba sin captura.
+    expect(find.text('No te quedan Balls: este combate acaba sin captura.'),
+        findsOneWidget);
+    expect(hay('campana-no-capturar'), isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('se lanza una Ball: gasta una y Pikachu jefe cae seguro',
+      (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+        nodoActual: 'jefe-pikachu',
+        resuelto: true,
+        superados: {'pueblo-paleta', 'jefe-pikachu'},
+        jefesDerrotados: {'pikachu-jefe'},
+        inicial: 'bulbasaur',
+      ),
+      equipo: [PokemonGuardado('bulbasaur', 90)],
+      capturaPendiente: 'pikachu',
+      mochila: {ObjetoCampana.pokeball: 2},
+    );
+    final c = await abrirCampana(tester,
+        almacen: AlmacenMemoria(), guardada: guardada);
+    expect(find.textContaining('Pokéball (2) · 100 %'), findsOneWidget);
+    await tocar(tester, 'lanzar-pokeball');
+    var p = c.read(campanaProvider).partida!;
+    expect(p.capturaLograda, isTrue);
+    expect(p.cuantos(ObjetoCampana.pokeball), 1);
+    expect(hay('campana-no-capturar'), isFalse,
+        reason: 'ya capturado, solo queda colocarlo');
+    await tocar(tester, 'campana-capturar');
+    p = c.read(campanaProvider).partida!;
+    expect(p.equipo.map((e) => e.id), ['bulbasaur', 'pikachu']);
+    expect(p.capturaPendiente, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('con cruz se avisa y se puede volver a lanzar', (tester) async {
+    // Onix (Fuerte) con Pokéball: 25 %. Se busca una semilla que falle.
+    final catalogo = catalogoCampanaDeDisco();
+    var semilla = 1;
+    PartidaCampana base(int s) => PartidaCampana(
+          progreso: const ProgresoRuta(
+              nodoActual: 'ruta-2-weedle',
+              resuelto: true,
+              superados: {'pueblo-paleta', 'ruta-2-weedle'}),
+          equipo: const [PokemonGuardado('squirtle', 80)],
+          capturaPendiente: 'onix',
+          mochila: const {ObjetoCampana.pokeball: 3},
+          semilla: s,
+        );
+    while (base(semilla)
+        .lanzarBall(catalogo, ObjetoCampana.pokeball)
+        .capturaLograda) {
+      semilla++;
+    }
+    final c = await abrirCampana(tester,
+        almacen: AlmacenMemoria(), guardada: base(semilla));
+    expect(find.textContaining('Pokéball (3) · 25 %'), findsOneWidget);
+    await tocar(tester, 'lanzar-pokeball');
+    expect(find.text('¡Se ha escapado de la Ball!'), findsOneWidget);
+    final p = c.read(campanaProvider).partida!;
+    expect(p.capturaLograda, isFalse);
+    expect(p.cuantos(ObjetoCampana.pokeball), 2);
+    expect(hay('lanzar-pokeball'), isTrue);
     expect(tester.takeException(), isNull);
   });
 
@@ -306,6 +367,39 @@ void main() {
         find.byKey(const Key('equipo-evolucionar-rattata')));
     expect(tile.enabled, isFalse);
     expect(c.read(campanaProvider).partida!.equipo.single.id, 'pidgey');
+  });
+
+  testWidgets('se vuelve a un nodo visitado y se repite el salvaje',
+      (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ciudad-verde',
+          resuelto: true,
+          superados: {'pueblo-paleta', 'ruta-1', 'ruta-1-pidgey', 'ciudad-verde'},
+          visitados: {'pueblo-paleta', 'ruta-1', 'ruta-1-pidgey', 'ciudad-verde'},
+          inicial: 'squirtle'),
+      equipo: [PokemonGuardado('squirtle', 80)],
+      dinero: 1000,
+    );
+    final almacen = AlmacenMemoria();
+    final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
+    // Un nodo sin visitar no lleva a ningún sitio.
+    await tester.tap(find.byKey(const Key('nodo-ruta-22')));
+    await tester.pumpAndSettle();
+    expect(c.read(campanaProvider).partida!.progreso.nodoActual, 'ciudad-verde');
+    await tester.ensureVisible(find.byKey(const Key('nodo-ruta-1-pidgey')));
+    await tester.tap(find.byKey(const Key('nodo-ruta-1-pidgey')));
+    await tester.pumpAndSettle();
+    expect(c.read(campanaProvider).partida!.progreso.nodoActual,
+        'ruta-1-pidgey');
+    expect(hay('campana-combatir'), isFalse, reason: 'ya se ganó');
+    await tocar(tester, 'campana-repetir');
+    final p = c.read(campanaProvider).partida!;
+    expect(hay('campana-combatir'), isTrue);
+    expect(p.progreso.repitiendo, isTrue);
+    expect(find.textContaining('Recompensa'), findsNothing,
+        reason: 'repetir no da puntos');
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('con una campaña guardada se continúa donde estaba',

@@ -20,6 +20,11 @@
       "multipleOf": 10,
       "description": "XP que suma a la reserva derrotarlo (D-20 §10.6). Sin este campo, la de la categoría Jefe (30). Un aliado que cae suma además la de su categoría."
     },
+    "capturaAsegurada": {
+      "type": "boolean",
+      "default": false,
+      "description": "La moneda de captura sale siempre cara (Pikachu jefe, por ser el tutorial: D-20 §10.6). La tirada gasta su Ball igualmente. La categoría de captura es la de `pokemon.categoriaCaptura` o, sin ella, Jefe."
+    },
     "pokemon": {
       "$ref": "pokemon-campana.schema.json",
       "description": "La carta del jefe, con el formato de un Pokémon de campaña."

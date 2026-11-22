@@ -87,6 +87,14 @@ class ControladorCampana extends Notifier<EstadoCampana> {
 
   void noCapturar() => _guardar(_partida.noCapturar());
 
+  /// Lanza una Ball al Pokémon pendiente. Devuelve el motivo si no se puede, o
+  /// «se ha escapado» si sale cruz.
+  String? lanzarBall(CatalogoCampana c, ObjetoCampana ball) {
+    final motivo = _intentar(() => _partida.lanzarBall(c, ball));
+    if (motivo != null) return motivo;
+    return _partida.capturaLograda ? null : '¡Se ha escapado de la Ball!';
+  }
+
   void descansar(CatalogoCampana c) => _guardar(_partida.descansar(c));
 
   void conversar(CatalogoCampana c) => _guardar(_partida.conversar(c));
@@ -96,6 +104,14 @@ class ControladorCampana extends Notifier<EstadoCampana> {
           deEquipo: deEquipo, dePc: dePc, parametros: parametrosCampana));
 
   void ponerPrimero(int indice) => _guardar(_partida.ponerPrimero(indice));
+
+  /// Vuelve a un nodo ya visitado (D-20 §10.7).
+  String? retroceder(CatalogoCampana c, String destino) =>
+      _intentar(() => _partida.retroceder(c, destino));
+
+  /// Vuelve a combatir contra el salvaje ya vencido del nodo actual.
+  void repetirCombate(CatalogoCampana c) =>
+      _guardar(_partida.repetirCombate(c));
 
   /// Devuelven el motivo si el motor no lo permite (sin dinero, sin objetos…).
   String? comprar(CatalogoCampana c, ObjetoCampana objeto) => _intentar(

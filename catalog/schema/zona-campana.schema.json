@@ -27,6 +27,11 @@
       },
       "description": "Ids de los Pokémon que aparecen salvajes. Vacío en una zona sin salvajes (un gimnasio)."
     },
+    "captura": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si sus salvajes se pueden capturar. La Ruta 1 lleva false: solo se aprende a combatir (D-20 §10.6)."
+    },
     "entrenadores": {
       "type": "array",
       "items": {

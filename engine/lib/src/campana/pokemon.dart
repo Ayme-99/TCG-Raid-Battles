@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy hay diez; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay once; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -31,6 +31,16 @@ class QuitaEnergiaRival extends EfectoAtaque {
   final int valor;
 
   const QuitaEnergiaRival(this.valor);
+}
+
+/// El propio bando suma [valor] de energía a su reserva en el momento de usar
+/// el ataque, después de pagar su coste y con tope en
+/// la energía máxima del combate (10). Se aplica una vez y no deja estado
+/// (Pulimento). Es el efecto «propio» de [QuitaEnergiaRival].
+class GanaEnergia extends EfectoAtaque {
+  final int valor;
+
+  const GanaEnergia(this.valor);
 }
 
 /// Lanza una moneda al atacar: si sale cara, el ataque hace [valor] puntos de
@@ -194,6 +204,20 @@ int xpDeCategoria(CategoriaCaptura categoria) => switch (categoria) {
       CategoriaCaptura.fuerte => 30,
       CategoriaCaptura.jefe => 30,
     };
+
+/// Probabilidad de capturar, en tanto por mil, a un Pokémon de [categoria]
+/// con una Ball de [nivelBall] (0 Pokéball, 1 Super Ball, 2 Ultra Ball). D-20
+/// §10.6, decidido el 2026-11-22: Común 75/100/100 %, Intermedio 50/75/100 %,
+/// Fuerte 25/50/75 % y Jefe 12,5/25/50 %.
+int probabilidadCaptura(CategoriaCaptura categoria, int nivelBall) {
+  const tabla = {
+    CategoriaCaptura.comun: [750, 1000, 1000],
+    CategoriaCaptura.intermedio: [500, 750, 1000],
+    CategoriaCaptura.fuerte: [250, 500, 750],
+    CategoriaCaptura.jefe: [125, 250, 500],
+  };
+  return tabla[categoria]![nivelBall];
+}
 
 /// Un Pokémon de campaña tal como está en el catálogo.
 class PokemonCampana {

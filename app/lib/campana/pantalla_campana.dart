@@ -173,14 +173,17 @@ class _SinPartida extends ConsumerWidget {
 }
 
 /// La ruta, nodo a nodo, en el orden del catálogo.
-class _Ruta extends StatelessWidget {
+/// La ruta. Se puede volver a cualquier nodo ya visitado tocándolo (D-20
+/// §10.7, retroceso).
+class _Ruta extends ConsumerWidget {
   const _Ruta({required this.catalogo, required this.partida});
 
   final CatalogoCampana catalogo;
   final PartidaCampana partida;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final control = ref.read(campanaProvider.notifier);
     final nodos = catalogo.region.nodos.values.toList();
     final actual = partida.progreso.nodoActual;
     final indiceActual = nodos.indexWhere((n) => n.id == actual);
@@ -195,6 +198,9 @@ class _Ruta extends StatelessWidget {
         final n = nodos[i];
         final hecho = partida.progreso.superados.contains(n.id);
         final aqui = n.id == actual;
+        final sePuedeVolver = !aqui &&
+            partida.capturaPendiente == null &&
+            partida.progreso.visitados.contains(n.id);
         return ListTile(
           key: Key('nodo-${n.id}'),
           dense: true,
@@ -208,7 +214,11 @@ class _Ruta extends StatelessWidget {
             _tipo(n),
             if (n.opcional) 'opcional',
             if (aqui) 'estás aquí',
+            if (sePuedeVolver) 'toca para volver',
           ].join(' · ')),
+          onTap: sePuedeVolver
+              ? () => _avisar(context, control.retroceder(catalogo, n.id))
+              : null,
         );
       },
     );
@@ -312,6 +322,20 @@ class _PanelNodo extends ConsumerWidget {
             onPressed: () => _avisar(context, control.usarRepelente(c)),
           ),
         ],
+      ]);
+    } else if (p.puedeRepetir(c)) {
+      // Un salvaje ya vencido se puede repetir: XP y captura, sin dinero ni
+      // puntos (D-20 §10.7).
+      hijos.addAll([
+        const Text('Ya venciste aquí. Puedes volver a buscar un Pokémon '
+            'salvaje: da XP y se puede capturar, pero no da dinero ni puntos.'),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          key: const Key('campana-repetir'),
+          icon: const Icon(Icons.grass_rounded),
+          label: const Text('Buscar otro salvaje'),
+          onPressed: () => control.repetirCombate(c),
+        ),
       ]);
     } else if (nodo.tipo == TipoNodo.descanso) {
       hijos.add(_Descanso(catalogo: c, partida: p));
@@ -440,46 +464,75 @@ class _Captura extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 12),
-        if (lleno) ...[
-          const Text('Tu equipo está lleno. Elige a quién mandas al PC, o '
-              'manda allí al nuevo.'),
+        // Primero hay que acertar con una Ball (D-20 §10.6): cada tirada gasta
+        // una y se puede repetir mientras queden.
+        if (!p.capturaLograda) ...[
+          if (p.ballsEnMochila().isEmpty)
+            const Text('No te quedan Balls: este combate acaba sin captura.')
+          else
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final b in p.ballsEnMochila())
+                  FilledButton.icon(
+                    key: Key('lanzar-${b.name}'),
+                    icon: const Icon(Icons.catching_pokemon),
+                    label: Text('${nombreObjeto(b)} (${p.cuantos(b)}) · '
+                        '${_porcentaje(p.probabilidadConBall(c, b))}'),
+                    onPressed: () => _avisar(context, control.lanzarBall(c, b)),
+                  ),
+              ],
+            ),
           const SizedBox(height: 8),
+          TextButton(
+            key: const Key('campana-no-capturar'),
+            onPressed: control.noCapturar,
+            child: Text(p.ballsEnMochila().isEmpty ? 'Seguir' : 'Dejarlo ir'),
+          ),
+        ] else ...[
+          Text('¡${especie.nombre} capturado!'),
+          const SizedBox(height: 8),
+          if (lleno) ...[
+            const Text('Tu equipo está lleno. Elige a quién mandas al PC, o '
+                'manda allí al nuevo.'),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (var i = 0; i < p.equipo.length; i++)
+                  OutlinedButton(
+                    key: Key('sustituir-$i'),
+                    onPressed: () => control.capturar(c, sustituir: i),
+                    child:
+                        Text('Sustituir a ${c.especie(p.equipo[i].id).nombre}'),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              for (var i = 0; i < p.equipo.length; i++)
-                OutlinedButton(
-                  key: Key('sustituir-$i'),
-                  onPressed: () => control.capturar(c, sustituir: i),
-                  child:
-                      Text('Sustituir a ${c.especie(p.equipo[i].id).nombre}'),
-                ),
+              FilledButton.icon(
+                key: const Key('campana-capturar'),
+                icon: const Icon(Icons.catching_pokemon),
+                label: Text(lleno ? 'Mandarlo al PC' : 'Al equipo'),
+                onPressed: () => control.capturar(c),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
         ],
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            FilledButton.icon(
-              key: const Key('campana-capturar'),
-              icon: const Icon(Icons.catching_pokemon),
-              label: Text(lleno ? 'Capturar y mandar al PC' : 'Capturar'),
-              onPressed: () => control.capturar(c),
-            ),
-            TextButton(
-              key: const Key('campana-no-capturar'),
-              onPressed: control.noCapturar,
-              child: const Text('Dejarlo ir'),
-            ),
-          ],
-        ),
       ],
     );
   }
 }
+
+/// 750 → «75 %», 125 → «12,5 %».
+String _porcentaje(int porMil) =>
+    porMil % 10 == 0 ? '${porMil ~/ 10} %' : '${porMil ~/ 10},${porMil % 10} %';
 
 /// El centro Pokémon: curar y el PC.
 class _Descanso extends ConsumerWidget {
