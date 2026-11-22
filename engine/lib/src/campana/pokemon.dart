@@ -166,12 +166,18 @@ class EvolucionCampana {
   /// [ViaEvolucion.puntos]).
   final int? puntos;
 
+  /// Medallas que hacen falta para que se ofrezca (D-20 §10.6 y §10.11): sin
+  /// ellas no se evoluciona aunque haya XP. Null si está por decidir (no
+  /// limita).
+  final int? medallasMinimas;
+
   const EvolucionCampana({
     required this.a,
     required this.via,
     this.xpEvolucion,
     this.objeto,
     this.puntos,
+    this.medallasMinimas,
   });
 }
 
