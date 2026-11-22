@@ -98,7 +98,7 @@ Empieza el **jugador**. En su turno, un bando hace **una acción, y las tres gas
 
 ### 3.3 Debilidades y resistencias
 
-No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de cartas. Un Pokémon puede tener una **debilidad** (el daño de ese tipo se multiplica, ×2 de salida) y una **resistencia** (el daño de ese tipo baja, −30 de salida), o ninguna. Primero se aplica la debilidad y luego la resistencia, y el daño nunca baja de 0 (**sin suelo**, decidido el 2026-11-21). Cada Pokémon tiene **un solo tipo**. Los tipos siguen al TCG: **no hay tipo tierra ni roca**, esos Pokémon (Geodude, Onix, Diglett, Sandshrew, Cubone…) son de tipo **lucha** (decidido el 2026-11-21). Se añadió **oscuridad** el 2026-11-22 (Nidoran♀ y ♂ la llevan impresa). El enum todavía conserva tipos que **no existen en el TCG** (`hielo`, `veneno`, `volador`, `bicho`, `fantasma`) y Zubat sigue siendo `veneno`: falta decidir a qué tipo pasa cada uno (§8). No existen las inmunidades. Si dos cartas se bloquean entre sí por resistencias, se corrige la carta, no el motor; el test «todos contra todos» lo detecta.
+No hay una tabla de tipos global: **lo escribe cada carta**, como en el juego de cartas. Un Pokémon puede tener una **debilidad** (el daño de ese tipo se multiplica, ×2 de salida) y una **resistencia** (el daño de ese tipo baja, −30 de salida), o ninguna. Primero se aplica la debilidad y luego la resistencia, y el daño nunca baja de 0 (**sin suelo**, decidido el 2026-11-21). Cada Pokémon tiene **un solo tipo**. Los tipos siguen al TCG: **no hay tipo tierra ni roca**, esos Pokémon (Geodude, Onix, Diglett, Sandshrew, Cubone…) son de tipo **lucha** (decidido el 2026-11-21). Se añadió **oscuridad** el 2026-11-22 (Nidoran♀ y ♂ la llevan impresa). Los tipos que **no existen en el TCG** salieron del enum el 2026-11-22 (#404, §10.3): `veneno` y `fantasma` pasan a **oscuridad**, `bicho` a **planta**, `volador` a **normal** y `hielo` a **agua**; Zubat es ahora de oscuridad y su Ataque Ala es normal. Entra **metal**, que aún no lleva ninguna carta. El enum queda en normal, fuego, agua, planta, eléctrico, lucha, psíquico, oscuridad, dragón y metal. No existen las inmunidades. Si dos cartas se bloquean entre sí por resistencias, se corrige la carta, no el motor; el test «todos contra todos» lo detecta.
 
 **Victoria:** gana el bando que deja sin Pokémon en pie al otro.
 
@@ -324,7 +324,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 
 **Tipos**
 
-10. ~~Tipos que no existen en el TCG~~ **Decidido el 2026-11-22** (§10.3): `veneno` pasa a `oscuridad`, `bicho` a `planta`, `volador` a `normal`, `fantasma` a `oscuridad` y `hielo` a `agua`, y se añade `metal` al enum. Pendiente de implementar (#366); falta decidir el color y el icono de `metal` en la app.
+10. ~~Tipos que no existen en el TCG~~ **Decidido el 2026-11-22** (§10.3): `veneno` pasa a `oscuridad`, `bicho` a `planta`, `volador` a `normal`, `fantasma` a `oscuridad` y `hielo` a `agua`, y se añade `metal` al enum. **Hecho (#404).** Falta decidir el color y el icono de `metal` en la app (de momento lleva un gris provisional).
 
 **Cartas y catálogo**
 
@@ -364,7 +364,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 9 | Pantallas de la app: mapa, combate, equipo, descanso | **Primera versión hecha**, funcional y sin diseño visual definitivo |
 | 10 | Puntos al servidor y tienda (después de la porción vertical) | Pendiente |
 | 11 | Reponer el resto de Pokémon y zonas (Túnel Roca, Ciudad Plateada en adelante) | Pendiente |
-| 12 | Tipos del TCG: `hielo`, `veneno`, `volador`, `bicho` y `fantasma` pasan a otros tipos y entra `metal` (§8, pregunta 10; §10.3) | Decidido el 2026-11-22; pendiente de implementar (#366) |
+| 12 | Tipos del TCG: `hielo`, `veneno`, `volador`, `bicho` y `fantasma` pasan a otros tipos y entra `metal` (§8, pregunta 10; §10.3) | Hecho (#404) |
 | 13 | Pantalla del mapa como escenas interactivas (hierba alta, bordes y edificios pulsables) y retroceso entre escenas; sprites de EP, e interfaz y fondos propios (#365; §10.7); combate (tocar la carta activa y elegir acción) equipo (rejilla de cartas, PC aparte) y centro Pokémon (escena interactiva) (§10.7) | Decidido el 2026-11-22; pendiente de implementar. Wireframes cerrados; el acabado visual es del artista (§10.10) |
 
 ## 10. Registro de decisiones
@@ -409,7 +409,7 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 | 2026-11-22 | Se añade el tipo **oscuridad** (Nidoran♀ y ♂ lo llevan impreso). | §3.6; #352 |
 | 2026-11-22 | **Tipos fuera del TCG:** `veneno` pasa a **oscuridad** (Zubat, que es el único dato real que cambia), `bicho` a **planta**, `volador` a **normal**, `fantasma` a **oscuridad** y `hielo` a **agua**. Esos cinco tipos desaparecen del enum. (`fantasma` pasaba a psíquico en la primera versión; Ayme lo cambió a oscuridad el 2026-11-22, §10.9.) | §3.3; #366, #404 |
 | 2026-11-22 | **`metal` entra ya en el enum**, aunque no haya ninguna carta de ese tipo, por si se añaden Pokémon como Steelix, que no son de la primera generación. Falta decidir su color y su icono. No hay tabla de tipos global, así que no toca el motor. | §3.3; #366 |
-| 2026-11-22 | **Revisión de huecos de la oscuridad** (#416). Con `oscuridad` cubriendo `veneno` y `fantasma`, el catálogo actual **no tiene huecos**: ninguna carta tiene debilidad ni resistencia a veneno o fantasma (las debilidades usadas son agua, fuego, planta, eléctrico, lucha y psíquico), y hay atacantes de oscuridad (Nidoran♀ y ♂ y, tras #404, Zubat). **La debilidad y la resistencia las escribe cada carta** (§3.3), así que no todos los Pokémon de oscuridad son débiles a lucha, igual que no todos los incoloros lo son (los pájaros son débiles al eléctrico). Por eso **Agatha y los fantasmas (Gastly, Haunter, Gengar) dependen de lo que lleve cada carta**; no hay una regla de tipo que los vuelva débiles a lucha (Ayme, 2026-11-22). **Avisos que siguen en pie:** (1) `lucha` ya agrupa lucha, tierra y roca (7 de los 22 Pokémon), así que si muchas cartas de oscuridad eligen lucha como debilidad, Calidad debería medir a Agatha; (2) hoy solo **Slowpoke** ataca con psíquico, así que la debilidad a psíquico de Machop y Mankey casi no se activa; (3) `zubat.json` (datos del catálogo; su carta aún no está hecha) sigue con `veneno` y un ataque de tipo `volador` hasta #404. | §3.3; #404, #416 |
+| 2026-11-22 | **Revisión de huecos de la oscuridad** (#416). Con `oscuridad` cubriendo `veneno` y `fantasma`, el catálogo actual **no tiene huecos**: ninguna carta tiene debilidad ni resistencia a veneno o fantasma (las debilidades usadas son agua, fuego, planta, eléctrico, lucha y psíquico), y hay atacantes de oscuridad (Nidoran♀ y ♂ y, tras #404, Zubat). **La debilidad y la resistencia las escribe cada carta** (§3.3), así que no todos los Pokémon de oscuridad son débiles a lucha, igual que no todos los incoloros lo son (los pájaros son débiles al eléctrico). Por eso **Agatha y los fantasmas (Gastly, Haunter, Gengar) dependen de lo que lleve cada carta**; no hay una regla de tipo que los vuelva débiles a lucha (Ayme, 2026-11-22). **Avisos que siguen en pie:** (1) `lucha` ya agrupa lucha, tierra y roca (7 de los 22 Pokémon), así que si muchas cartas de oscuridad eligen lucha como debilidad, Calidad debería medir a Agatha; (2) hoy solo **Slowpoke** ataca con psíquico, así que la debilidad a psíquico de Machop y Mankey casi no se activa; (3) `zubat.json` (datos del catálogo; su carta aún no está hecha) ya es de `oscuridad` y su Ataque Ala es `normal` (#404). | §3.3; #404, #416 |
 
 ### 10.4 Efectos y habilidades de los ataques
 
@@ -608,7 +608,7 @@ Generado a partir de `catalog/campana/` el 2026-11-22. Si algo de aquí no coinc
 | 027 | `sandshrew` | Sandshrew | lucha | 70 | planta | — | 0 | — | Rizo Defensa (1: efecto `reduceDanoPropio`); Rodar (2: 20×racha `danoPorRacha`) | sí |
 | 029 | `nidoran-f` | Nidoran♀ | oscuridad | 60 | lucha | — | 0 | — | Golpes Furia (2: 30 esp. `monedasDano`); Doble Patada (3: 30 `repiteDanoAlDerribar`) | sí |
 | 032 | `nidoran-m` | Nidoran♂ | oscuridad | 60 | lucha | — | 0 | — | Picotazo veneno (1: 10 `envenenaDefensor`); Ataque Furia (2: 30 esp. `monedasDano`) | sí |
-| 041 | `zubat` | Zubat | veneno | 60 | lucha | — | 0 | — | Mordisco (1: 10); Ataque Ala (2: 30) | no |
+| 041 | `zubat` | Zubat | oscuridad | 60 | lucha | — | 0 | — | Mordisco (1: 10); Ataque Ala (2: 30) | no |
 | 050 | `diglett` | Diglett | lucha | 50 | planta | — | 0 | — | Arañazo (1: 10); Bofetón Lodo (2: 30 `monedaFalloRival`) | sí |
 | 056 | `mankey` | Mankey | lucha | 70 | psiquico | — | 1 | Foco Energía | Golpe Kárate (2: 30+ `monedaDanoExtra`) | sí |
 | 066 | `machop` | Machop | lucha | 70 | psiquico | — | 0 | — | Golpe Kárate (2: 30); Patada Baja (3: 50) | no |
