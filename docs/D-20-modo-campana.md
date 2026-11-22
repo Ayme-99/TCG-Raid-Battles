@@ -457,6 +457,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | **Super Ball** se desbloquea con la 1ª medalla y **Ultra Ball** con 5 medallas. | #361 |
 | 2026-11-22 | **Precios** (los de los juegos Rojo, Azul, Amarillo y FireRed/LeafGreen): Pokéball 200, Super Ball 600, Ultra Ball 1200, Poción 300 y Repelente 350. En el primer tramo la tienda vende **solo Pokéball y Poción**. | #362 |
 | 2026-11-22 | **Dinero.** Cada clase de entrenador y cada líder paga una cifra propia guardada en el catálogo (campo `dinero`), para ajustarlo a cada tramo. Referencia: al conseguir la 1ª medalla el jugador ha ganado unos **2.060** (en FireRed/LeafGreen son 2.064 solo con entrenadores). Primer tramo: Cazabichos 200 (×2), Entrenador Joven 260 y Brock 1.400. Dinero de salida: **1.000**. Los salvajes no dan dinero. Pendiente de implementar. | §5; #362 |
+| 2026-11-22 | **Evoluciones del primer tramo.** Por ahora solo las que ya tienen carta en el catálogo: **Caterpie → Metapod** y **Weedle → Kakuna**, que se capturan en la Ruta 2 sur. Lo que da Brock (puntos) se guarda para evolucionar a uno más después. **Si Brock resulta muy difícil con ese equipo, se pasa a evolucionar también un inicial** (Bulbasaur, Charmander o Squirtle), lo que exige crear sus cartas de fase 1; se medirá con el simulador contra el objetivo del 75 % (§10.5). Las cifras de XP y de coste de evolución quedan por cerrar con cálculos (§8, 6). | #363 |
 
 ### 10.7 Mapa y ruta
 
