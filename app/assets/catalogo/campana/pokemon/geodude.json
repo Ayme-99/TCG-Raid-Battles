@@ -9,6 +9,7 @@
     "multiplicador": 2
   },
   "retirada": 1,
+  "categoriaCaptura": "intermedio",
   "ataques": [
     {
       "nombre": "Pulimento",

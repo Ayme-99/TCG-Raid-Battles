@@ -428,6 +428,7 @@ PokemonCampana _conRacha(BandoCombate yo) {
     retirada: e.retirada,
     ex: e.ex,
     evoluciones: e.evoluciones,
+    categoriaCaptura: e.categoriaCaptura,
     ataques: [
       for (var i = 0; i < e.ataques.length; i++)
         if (e.ataques[i].efecto is DanoPorRacha)

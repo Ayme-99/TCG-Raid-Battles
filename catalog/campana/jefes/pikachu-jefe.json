@@ -1,5 +1,6 @@
 {
   "numero": 1,
+  "xp": 30,
   "pokemon": {
     "id": "pikachu-jefe",
     "numero": 25,

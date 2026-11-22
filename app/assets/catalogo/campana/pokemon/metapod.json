@@ -9,6 +9,7 @@
     "multiplicador": 2
   },
   "retirada": 0,
+  "categoriaCaptura": "intermedio",
   "ataques": [
     {
       "nombre": "Fortaleza",

@@ -10,7 +10,8 @@ import 'ruta.dart';
 /// Decidido por Ayme el 2026-11-22: la XP se gana al derrotar Pokémon
 /// (salvajes o de entrenador) y el dinero, al derrotar entrenadores; la tienda
 /// del descanso vende, de salida, Poción, Pokéball y Repelente. **Las cifras son
-/// provisionales.**
+/// provisionales.** La XP de cada rival no está aquí: la fija su categoría de
+/// captura ([xpDeCategoria]) o el `xp` del jefe (D-20 §10.6).
 class ParametrosCampana {
   /// Puntos (de la cuenta) por vencer a un Pokémon salvaje.
   final int puntosSalvaje;
@@ -23,10 +24,6 @@ class ParametrosCampana {
 
   /// Puntos por ganar una medalla.
   final int puntosMedalla;
-
-  /// XP por cada Pokémon rival derrotado. Se la llevan los Pokémon del equipo
-  /// que siguen en pie al acabar el combate (suposición).
-  final int xpPorPokemon;
 
   /// Dinero por vencer a un entrenador de zona y a un líder de gimnasio.
   final int dineroEntrenador;
@@ -53,7 +50,6 @@ class ParametrosCampana {
     this.puntosEntrenador = 200,
     this.puntosJefe = 1000,
     this.puntosMedalla = 1500,
-    this.xpPorPokemon = 10,
     this.dineroEntrenador = 200,
     this.dineroLider = 500,
     this.dineroInicial = 300,
@@ -143,17 +139,27 @@ class CatalogoCampana {
         for (final z in zonas.values)
           for (final id in z.todosLosPokemon)
             if (!pokemon.containsKey(id)) 'zona ${z.id}: falta "$id".',
+        // Todo rival necesita categoría de captura: fija su XP (D-20 §10.6).
+        for (final id in {
+          for (final z in zonas.values) ...z.todosLosPokemon,
+          for (final n in region.nodos.values) ...[
+            ...n.pokemon,
+            ...?n.lider?.pokemon,
+          ],
+        })
+          if (pokemon[id] != null && pokemon[id]!.categoriaCaptura == null)
+            'Pokémon "$id": es rival y no tiene categoriaCaptura.',
       ];
 }
 
-/// Un Pokémon del jugador: su especie, sus PS actuales (se conservan entre
-/// combates hasta descansar) y su XP (D-20 §2.1).
+/// Un Pokémon del jugador: su especie y sus PS actuales (se conservan entre
+/// combates hasta descansar). La XP no es de cada Pokémon: está en la reserva
+/// común de la partida ([PartidaCampana.xp], D-20 §10.6).
 class PokemonGuardado {
   final String id;
   final int ps;
-  final int xp;
 
-  const PokemonGuardado(this.id, this.ps, {this.xp = 0});
+  const PokemonGuardado(this.id, this.ps);
 
   factory PokemonGuardado.completo(PokemonCampana especie) =>
       PokemonGuardado(especie.id, especie.ps);
@@ -161,13 +167,12 @@ class PokemonGuardado {
   bool get enPie => ps > 0;
 
   PokemonGuardado conPs(int nuevos) =>
-      PokemonGuardado(id, nuevos < 0 ? 0 : nuevos, xp: xp);
+      PokemonGuardado(id, nuevos < 0 ? 0 : nuevos);
 
-  Map<String, dynamic> aJson() => {'id': id, 'ps': ps, 'xp': xp};
+  Map<String, dynamic> aJson() => {'id': id, 'ps': ps};
 
   factory PokemonGuardado.desdeJson(Map<String, dynamic> json) =>
-      PokemonGuardado(json['id'] as String, json['ps'] as int,
-          xp: (json['xp'] as int?) ?? 0);
+      PokemonGuardado(json['id'] as String, json['ps'] as int);
 }
 
 /// Contra quién se combate en el nodo actual.
@@ -188,6 +193,11 @@ class RivalDelNodo {
   /// Dinero que da ganar (solo entrenadores y líderes).
   final int dinero;
 
+  /// XP que suma a la reserva ganar: la de cada Pokémon del [equipo] según su
+  /// categoría de captura, o la del jefe. Un aliado del jefe que cae suma
+  /// además la de su categoría ([terminarCombate]).
+  final int xp;
+
   /// La llamada de aliado del jefe (D-20 §4, Jefes), o null.
   final LlamadaEnCombate? llamada;
 
@@ -197,16 +207,28 @@ class RivalDelNodo {
     required this.captura,
     required this.puntos,
     this.dinero = 0,
+    this.xp = 0,
     this.llamada,
   });
 }
+
+/// XP de derrotar a [equipo] (D-20 §10.6): la de la categoría de captura de
+/// cada uno. Un Pokémon sin categoría no da XP (el catálogo lo avisa en
+/// [CatalogoCampana.problemas]).
+int _xpDeEquipo(List<PokemonCampana> equipo) => equipo.fold(
+    0,
+    (t, p) =>
+        t +
+        (p.categoriaCaptura == null ? 0 : xpDeCategoria(p.categoriaCaptura!)));
 
 /// Una partida de la campaña de un jugador: dónde está, su equipo, su PC y sus
 /// puntos. Es lo que se guarda en el dispositivo (D-20 §6). Inmutable: cada
 /// operación devuelve una partida nueva.
 class PartidaCampana {
-  /// Versión del formato guardado.
-  static const version = 1;
+  /// Versión del formato guardado. La 2 (#403) pasa la XP de cada Pokémon a
+  /// la reserva común; una partida de la versión 1 se sigue leyendo y su
+  /// reserva es la suma de la XP que llevaba cada Pokémon.
+  static const version = 2;
 
   final ProgresoRuta progreso;
 
@@ -230,6 +252,10 @@ class PartidaCampana {
   /// Dinero, que se gana a entrenadores y se gasta en la tienda.
   final int dinero;
 
+  /// Reserva común de XP (D-20 §10.6): la suman los rivales derrotados y se
+  /// gasta al evolucionar. Sin tope.
+  final int xp;
+
   /// Objetos de la mochila y cuántos hay de cada uno.
   final Map<ObjetoCampana, int> mochila;
 
@@ -249,6 +275,7 @@ class PartidaCampana {
     this.capturaPendiente,
     this.derrotas = 0,
     this.dinero = 0,
+    this.xp = 0,
     this.mochila = const {},
     this.ultimaCura,
   });
@@ -274,6 +301,7 @@ class PartidaCampana {
     bool limpiarCaptura = false,
     int? derrotas,
     int? dinero,
+    int? xp,
     Map<ObjetoCampana, int>? mochila,
     String? ultimaCura,
   }) =>
@@ -287,6 +315,7 @@ class PartidaCampana {
             limpiarCaptura ? null : (capturaPendiente ?? this.capturaPendiente),
         derrotas: derrotas ?? this.derrotas,
         dinero: dinero ?? this.dinero,
+        xp: xp ?? this.xp,
         mochila: mochila ?? this.mochila,
         ultimaCura: ultimaCura ?? this.ultimaCura,
       );
@@ -359,6 +388,7 @@ class PartidaCampana {
             nombre: '${especie.nombre} salvaje',
             captura: especie.id,
             puntos: parametros.puntosSalvaje,
+            xp: _xpDeEquipo([especie]),
           );
         }
         final grupo = zona.entrenadores.firstWhere((e) => e.clase == nodo.clase,
@@ -372,21 +402,25 @@ class PartidaCampana {
             lista.isNotEmpty) {
           elegidos.add(lista.removeAt(azar(lista.length)));
         }
+        final equipoRival = [for (final id in elegidos) c.especie(id)];
         return RivalDelNodo(
-          equipo: [for (final id in elegidos) c.especie(id)],
+          equipo: equipoRival,
           nombre: grupo.clase,
           captura: null,
           puntos: parametros.puntosEntrenador,
           dinero: parametros.dineroEntrenador,
+          xp: _xpDeEquipo(equipoRival),
         );
       case TipoNodo.gimnasio:
         final lider = nodo.lider!;
+        final equipoLider = [for (final id in lider.pokemon) c.especie(id)];
         return RivalDelNodo(
-          equipo: [for (final id in lider.pokemon) c.especie(id)],
+          equipo: equipoLider,
           nombre: lider.nombre,
           captura: null,
           puntos: parametros.puntosMedalla,
           dinero: parametros.dineroLider,
+          xp: _xpDeEquipo(equipoLider),
         );
       case TipoNodo.jefe:
         final jefe = c.jefes[nodo.jefe];
@@ -399,6 +433,7 @@ class PartidaCampana {
               '${jefe.numero.toString().padLeft(2, '0')}/$totalJefesCampana)',
           captura: primera ? cartaNormalDeJefe(c, nodo.jefe!) : null,
           puntos: primera ? parametros.puntosJefe : 0,
+          xp: jefe.xp,
           llamada: llamadaEnCombate(jefe, c.pokemon),
         );
       case TipoNodo.inicio:
@@ -438,12 +473,14 @@ class PartidaCampana {
   /// Aplica el final de un combate empezado con [empezarCombate].
   ///
   /// - Victoria: el equipo se queda con los PS del combate, el nodo se
-  ///   resuelve (un gimnasio da su medalla), se suman puntos y dinero, los
-  ///   Pokémon en pie ganan XP por cada rival derrotado y, si el rival se puede
-  ///   capturar, queda como [capturaPendiente].
+  ///   resuelve (un gimnasio da su medalla), se suman puntos y dinero, la XP
+  ///   del rival ([RivalDelNodo.xp], más la de los aliados del jefe que hayan
+  ///   caído) va a la reserva común y, si el rival se puede capturar, queda
+  ///   como [capturaPendiente].
   /// - Derrota (decidido el 2026-11-22, D-20 §8 pregunta 1): se vuelve al
   ///   último sitio donde se curó el equipo ([ultimaCura]) con el equipo
-  ///   curado. Se conserva lo ganado (capturas, puntos, dinero, medallas).
+  ///   curado. Se conserva lo ganado (capturas, puntos, dinero, XP, medallas);
+  ///   el combate perdido no da XP.
   ///
   /// En los dos casos avanza la semilla.
   PartidaCampana terminarCombate(CatalogoCampana c, EstadoCombate fin,
@@ -465,17 +502,21 @@ class PartidaCampana {
     }
     final r = rival(c, parametros: parametros);
     final tras = fin.jugador.equipo;
-    final derrotados = fin.rival.equipo.where((p) => !p.enPie).length;
-    final xp = parametros.xpPorPokemon * derrotados;
+    // Los aliados que llamó el jefe van detrás de su equipo; los que caen
+    // cuentan como rivales derrotados (D-20 §4, Partida de campaña).
+    final aliadosCaidos = [
+      for (final a in fin.rival.equipo.skip(r.equipo.length))
+        if (!a.enPie) a.especie,
+    ];
     return _copiar(
       equipo: [
         for (var i = 0; i < equipo.length; i++)
-          PokemonGuardado(equipo[i].id, tras[i].ps,
-              xp: equipo[i].xp + (tras[i].enPie ? xp : 0)),
+          PokemonGuardado(equipo[i].id, tras[i].ps),
       ],
       progreso: progreso.resolver(c.region),
       puntos: puntos + r.puntos,
       dinero: dinero + r.dinero,
+      xp: xp + r.xp + _xpDeEquipo(aliadosCaidos),
       semilla: siguiente,
       capturaPendiente: r.captura,
     );
@@ -677,6 +718,49 @@ class PartidaCampana {
     throw const ReglaIncumplida('No hay nada que mover.');
   }
 
+  /// Las evoluciones por XP del Pokémon [indice] del equipo, con su coste.
+  /// Puede haberlas aunque no llegue la reserva: [puedeEvolucionar] lo dice.
+  List<EvolucionCampana> evolucionesPorXp(CatalogoCampana c, int indice) {
+    if (indice < 0 || indice >= equipo.length) return const [];
+    return [
+      for (final e in c.especie(equipo[indice].id).evoluciones)
+        if (e.via == ViaEvolucion.xp && c.pokemon.containsKey(e.a)) e,
+    ];
+  }
+
+  /// Si la reserva llega para [evolucion] (D-20 §10.6).
+  bool puedeEvolucionar(EvolucionCampana evolucion) =>
+      evolucion.via == ViaEvolucion.xp && xp >= (evolucion.xpEvolucion ?? 0);
+
+  /// Evoluciona al Pokémon [indice] del equipo en [destino] gastando de la
+  /// reserva la XP de esa evolución (D-20 §10.6, decidido el 2026-11-22). Se
+  /// hace fuera de combate, desde el menú del equipo, sin límite por visita. La
+  /// carta evolucionada sustituye a la anterior y queda con **10 PS**, aunque
+  /// tuviera más o estuviera debilitado (evolucionar revive a 10 PS).
+  PartidaCampana evolucionar(CatalogoCampana c, int indice, String destino) {
+    if (indice < 0 || indice >= equipo.length) {
+      throw const ReglaIncumplida('Ese Pokémon no está en el equipo.');
+    }
+    final evolucion = evolucionesPorXp(c, indice)
+        .where((e) => e.a == destino)
+        .firstOrNull;
+    if (evolucion == null) {
+      throw ReglaIncumplida(
+          '${c.especie(equipo[indice].id).nombre} no evoluciona en "$destino" con XP.');
+    }
+    if (!puedeEvolucionar(evolucion)) {
+      throw ReglaIncumplida(
+          'Hacen falta ${evolucion.xpEvolucion} XP y la reserva tiene $xp.');
+    }
+    return _copiar(
+      equipo: [...equipo]..[indice] = PokemonGuardado(destino, psAlEvolucionar),
+      xp: xp - evolucion.xpEvolucion!,
+    );
+  }
+
+  /// PS con los que queda un Pokémon al evolucionar (D-20 §10.6).
+  static const psAlEvolucionar = 10;
+
   Map<String, dynamic> aJson() => {
         'version': version,
         'progreso': progreso.aJson(),
@@ -687,15 +771,24 @@ class PartidaCampana {
         if (capturaPendiente != null) 'capturaPendiente': capturaPendiente,
         'derrotas': derrotas,
         'dinero': dinero,
+        'xp': xp,
         'mochila': {for (final e in mochila.entries) e.key.name: e.value},
         if (ultimaCura != null) 'ultimaCura': ultimaCura,
       };
 
   factory PartidaCampana.desdeJson(Map<String, dynamic> json) {
-    if (json['version'] != version) {
-      throw FormatException(
-          'Versión de partida de campaña desconocida: ${json['version']}.');
+    final v = json['version'];
+    if (v != version && v != 1) {
+      throw FormatException('Versión de partida de campaña desconocida: $v.');
     }
+    // Versión 1: la XP iba por Pokémon; pasa entera a la reserva.
+    final xpAntigua = v == 1
+        ? [
+            for (final clave in ['equipo', 'pc'])
+              for (final p in json[clave] as List<dynamic>)
+                ((p as Map<String, dynamic>)['xp'] as int?) ?? 0,
+          ].fold(0, (a, b) => a + b)
+        : 0;
     List<PokemonGuardado> lista(String clave) => [
           for (final p in json[clave] as List<dynamic>)
             PokemonGuardado.desdeJson(p as Map<String, dynamic>),
@@ -710,6 +803,7 @@ class PartidaCampana {
       capturaPendiente: json['capturaPendiente'] as String?,
       derrotas: (json['derrotas'] as int?) ?? 0,
       dinero: (json['dinero'] as int?) ?? 0,
+      xp: v == 1 ? xpAntigua : (json['xp'] as int?) ?? 0,
       mochila: {
         for (final e
             in ((json['mochila'] as Map<String, dynamic>?) ?? const {}).entries)
