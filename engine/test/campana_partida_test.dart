@@ -284,12 +284,12 @@ void main() {
         const PokemonGuardado('bulbasaur', 80),
         const PokemonGuardado('pidgey', 0),
       ],
-      dinero: 400,
+      dinero: 700,
+      // El Repelente no se vende en el primer tramo (D-20 §10.6).
+      mochila: const {ObjetoCampana.repelente: 1},
     );
-    expect(PartidaCampana.nueva(c.region).dinero, 300);
     p = p.comprar(c, ObjetoCampana.pocion, cantidad: 2);
-    p = p.comprar(c, ObjetoCampana.repelente);
-    expect(p.dinero, 50);
+    expect(p.dinero, 100);
     expect(p.cuantos(ObjetoCampana.pocion), 2);
     expect(() => p.comprar(c, ObjetoCampana.pocion),
         throwsA(isA<ReglaIncumplida>()));
@@ -315,6 +315,147 @@ void main() {
         equipo: p.equipo,
         mochila: p.mochila);
     expect(() => gimnasio.usarRepelente(c), throwsA(isA<ReglaIncumplida>()));
+  });
+
+  group('dinero y tienda (D-20 §10.6, #402)', () {
+    EstadoCombate ganar(EstadoCombate e) => e.copiarCon(
+          rival: e.rival
+              .copiarCon(equipo: [for (final r in e.rival.equipo) r.conPs(0)]),
+          fase: FaseCombate.terminado,
+          ganador: Bando.jugador,
+        );
+    PartidaCampana en(String nodo, {int dinero = 0, Set<String>? medallas}) =>
+        PartidaCampana(
+          progreso: ProgresoRuta(
+              nodoActual: nodo, medallas: medallas ?? const {}),
+          equipo: const [PokemonGuardado('squirtle', 80)],
+          dinero: dinero,
+        );
+    int pago(String nodo) {
+      final p = en(nodo);
+      return p.terminarCombate(c, ganar(p.empezarCombate(c))).dinero;
+    }
+
+    test('se empieza con 1.000 y la mochila sin Pokéballs', () {
+      final p = PartidaCampana.nueva(c.region);
+      expect(p.dinero, 1000);
+      expect(p.cuantos(ObjetoCampana.pokeball), 0);
+    });
+
+    test('Cazabichos 200 cada uno, Entrenador Joven 260 y Brock 1.400', () {
+      expect(pago('cazabichos-1'), 200);
+      expect(pago('cazabichos-2'), 200);
+      expect(pago('gimnasio-joven'), 260);
+      expect(pago('gimnasio-brock'), 1400);
+    });
+
+    test('los salvajes y los jefes no dan dinero', () {
+      expect(pago('ruta-1-pidgey'), 0);
+      expect(pago('ruta-2-caterpie'), 0);
+      expect(pago('jefe-pikachu'), 0);
+    });
+
+    test('los precios son los de los juegos', () {
+      const precios = ParametrosCampana();
+      expect(precios.precios, {
+        ObjetoCampana.pokeball: 200,
+        ObjetoCampana.superBall: 600,
+        ObjetoCampana.ultraBall: 1200,
+        ObjetoCampana.pocion: 300,
+        ObjetoCampana.repelente: 350,
+      });
+    });
+
+    test('la tienda del primer tramo vende solo Pokéball y Poción', () {
+      for (final centro in ['ciudad-verde', 'centro-plateada']) {
+        expect(en(centro).tienda(c),
+            [ObjetoCampana.pokeball, ObjetoCampana.pocion],
+            reason: centro);
+      }
+      final p = en('ciudad-verde', dinero: 1000);
+      expect(() => p.comprar(c, ObjetoCampana.repelente),
+          throwsA(isA<ReglaIncumplida>()));
+      expect(() => p.comprar(c, ObjetoCampana.superBall),
+          throwsA(isA<ReglaIncumplida>()));
+      final q = p.comprar(c, ObjetoCampana.pokeball, cantidad: 2);
+      expect(q.cuantos(ObjetoCampana.pokeball), 2);
+      expect(q.dinero, 600);
+    });
+
+    test('Super Ball con 1 medalla y Ultra Ball con 5', () {
+      // Un centro de mentira que lo lista todo.
+      final nodos = {...c.region.nodos};
+      final verde = nodos['ciudad-verde']!;
+      nodos['ciudad-verde'] = NodoRuta(
+        id: verde.id,
+        tipo: verde.tipo,
+        nombre: verde.nombre,
+        salidas: verde.salidas,
+        tienda: const ['pokeball', 'superBall', 'ultraBall', 'pocion'],
+      );
+      final c2 = CatalogoCampana(
+        pokemon: c.pokemon,
+        zonas: c.zonas,
+        jefes: c.jefes,
+        region: RegionCampana(
+            id: c.region.id,
+            nombre: c.region.nombre,
+            inicio: c.region.inicio,
+            nodos: nodos),
+      );
+      List<ObjetoCampana> conMedallas(int n) =>
+          en('ciudad-verde', medallas: {for (var i = 0; i < n; i++) 'm$i'})
+              .tienda(c2);
+      expect(conMedallas(0), [ObjetoCampana.pokeball, ObjetoCampana.pocion]);
+      expect(conMedallas(1), [
+        ObjetoCampana.pokeball,
+        ObjetoCampana.superBall,
+        ObjetoCampana.pocion,
+      ]);
+      expect(conMedallas(4), isNot(contains(ObjetoCampana.ultraBall)));
+      expect(conMedallas(5), contains(ObjetoCampana.ultraBall));
+      expect(
+          () => en('ciudad-verde', dinero: 5000)
+              .comprar(c2, ObjetoCampana.superBall),
+          throwsA(isA<ReglaIncumplida>().having(
+              (e) => e.mensaje, 'mensaje', contains('1 medalla'))));
+    });
+
+    test('curar en el centro es gratis, también a los debilitados', () {
+      final p = PartidaCampana(
+        progreso: const ProgresoRuta(nodoActual: 'ciudad-verde'),
+        equipo: const [
+          PokemonGuardado('squirtle', 0),
+          PokemonGuardado('pidgey', 10),
+        ],
+        dinero: 0,
+      ).descansar(c).descansar(c);
+      expect(p.equipo.map((e) => e.ps), [80, 60]);
+      expect(p.dinero, 0);
+    });
+
+    test('un entrenador o un líder sin dinero en el catálogo se avisa', () {
+      final nodos = {...c.region.nodos};
+      final brock = nodos['gimnasio-brock']!;
+      nodos['gimnasio-brock'] = NodoRuta(
+        id: brock.id,
+        tipo: brock.tipo,
+        nombre: brock.nombre,
+        lider: LiderDeGimnasio('Brock', brock.lider!.pokemon),
+        medalla: brock.medalla,
+      );
+      final c2 = CatalogoCampana(
+        pokemon: c.pokemon,
+        zonas: c.zonas,
+        jefes: c.jefes,
+        region: RegionCampana(
+            id: c.region.id,
+            nombre: c.region.nombre,
+            inicio: c.region.inicio,
+            nodos: nodos),
+      );
+      expect(c2.problemas(), contains('gimnasio-brock: el líder no tiene "dinero".'));
+    });
   });
 
   test('con el equipo lleno, el capturado o el sustituido van al PC', () {

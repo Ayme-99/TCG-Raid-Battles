@@ -222,7 +222,11 @@ class EntrenadoresDeZona {
   /// Ids de sus Pokémon.
   final List<String> pokemon;
 
-  const EntrenadoresDeZona(this.clase, this.pokemon);
+  /// Dinero que paga cada entrenador de la clase al ser vencido (D-20 §10.6),
+  /// o null si aún no tiene cifra.
+  final int? dinero;
+
+  const EntrenadoresDeZona(this.clase, this.pokemon, {this.dinero});
 }
 
 /// Una zona de la campaña: qué aparece en ella.
@@ -274,6 +278,7 @@ ZonaCampana zonaCampanaDesdeJson(Map<String, dynamic> json) {
                   for (final p in _campo<List<dynamic>>(e, 'pokemon'))
                     p as String
                 ],
+                dinero: e['dinero'] as int?,
               ),
           ]
         : const [],
@@ -312,13 +317,15 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
     pokemon: _textos(json, 'pokemon'),
     lider: lider is Map<String, dynamic>
         ? LiderDeGimnasio(
-            _campo<String>(lider, 'nombre'), _textos(lider, 'pokemon'))
+            _campo<String>(lider, 'nombre'), _textos(lider, 'pokemon'),
+            dinero: lider['dinero'] as int?)
         : null,
     medalla: json['medalla'] as String?,
     jefe: json['jefe'] as String?,
     personaje: json['personaje'] as String?,
     texto: _textos(json, 'texto'),
     cura: (json['cura'] as bool?) ?? false,
+    tienda: _textos(json, 'tienda'),
   );
 }
 

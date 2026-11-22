@@ -247,14 +247,23 @@ void main() {
       ],
       pc: [PokemonGuardado('rattata', 60)],
       puntos: 1200,
-      dinero: 300,
+      dinero: 500,
     );
     final almacen = AlmacenMemoria();
     final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
-    expect(find.text('1200 puntos · 300 \$ · 0 medallas'), findsOneWidget);
-    // Tienda: una Poción, y se usa con Charmander antes de curar.
+    expect(find.text('1200 puntos · 500 \$ · 0 medallas'), findsOneWidget);
+    // Tienda del primer tramo: solo Pokéball y Poción (D-20 §10.6).
+    expect(hay('tienda-pokeball'), isTrue);
+    expect(hay('tienda-pocion'), isTrue);
+    expect(hay('tienda-repelente'), isFalse);
+    expect(hay('tienda-superBall'), isFalse);
+    // Una Poción (300), y se usa con Charmander antes de curar.
     await tocar(tester, 'comprar-pocion');
     expect(c.read(campanaProvider).partida!.dinero, 200);
+    await tocar(tester, 'comprar-pokeball');
+    expect(c.read(campanaProvider).partida!.dinero, 0);
+    expect(
+        c.read(campanaProvider).partida!.cuantos(ObjetoCampana.pokeball), 1);
     await tocar(tester, 'equipo-0');
     await tocar(tester, 'equipo-pocion');
     expect(c.read(campanaProvider).partida!.equipo.first.ps, 30);
