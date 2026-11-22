@@ -42,6 +42,8 @@ jobs:
       # Humo del simulador de campaña (D-20): duelos y equipos.
       - run: dart run bin/sim_campana.dart --informe=/tmp/campana_duelos.csv
       - run: dart run bin/sim_campana.dart --modo=equipos --partidas=50 --informe=/tmp/campana_equipos.csv
+      - run: dart run bin/sim_campana.dart --modo=nodos --partidas=5 --informe=/tmp/campana_nodos.csv
+      - run: dart run bin/sim_campana.dart --modo=tramo --partidas=50 --informe=/tmp/campana_tramo.csv
 
   contrato:
     name: Contrato JSON (esquema del backend)

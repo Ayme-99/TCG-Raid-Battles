@@ -7,7 +7,7 @@ Estado: **en desarrollo** (revisado el 2026-11-22). Issue #334 (diseño) y una i
 | Combate 1 contra 1: energía, acciones, debilidad y resistencia, diez efectos y una habilidad, azar con semilla, veneno (§3) | **Hecho** (#336, #350, #352) |
 | IA rival determinista (§3.4) | **Hecho** (#338; ampliada en #350 y #352) |
 | Catálogo: 22 Pokémon, 1 jefe, 6 zonas y la región de Kanto, con sus esquemas (§12) | **Hecho** (#340, #344, #346, #352, #354) |
-| Simulador de combates (`sim/bin/sim_campana.dart`) | Hecho (#342); **sin calibrar** |
+| Simulador de combates (`sim/bin/sim_campana.dart`) | Hecho (#342); modos `nodos` y `tramo` y **primer informe de calibrado** (#383): objetivo 75 %, hoy nadie completa el tramo |
 | Modelo de ruta por nodos y progreso del jugador (§4) | **Hecho** (#354) |
 | Jefe que llama a un aliado a mitad de combate (§4, Jefes) | Pendiente |
 | Captura, equipo de 6 y PC, centro Pokémon (§2, §4) | Pendiente |
@@ -322,7 +322,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 
 **Equilibrado y producto**
 
-19. **Calibrar con el simulador.** El simulador existe (duelos entre todos los Pokémon y equipos aleatorios), pero no se han calibrado PS, daños ni costes con las cartas actuales ni con la ruta completa, y falta fijar qué tasa de victoria se busca.
+19. **Calibrar con el simulador.** Objetivo fijado (75 %, §10.5) y medido en `balance/informes/campana_calibrar_2026-11-22.md` (#383): los combates de ruta llegan, pero Kakuna, Pikachu jefe, el Entrenador Joven y Brock no, y el tramo entero sale al 0 % con los tres iniciales. Falta que Ayme elija qué se ajusta (el informe propone palancas) y con qué cifras.
 20. **Llamada de aliado.** Pikachu la lleva en el JSON, pero el motor no la implementa (§4, Jefes).
 21. **Capacidad del PC.** Ilimitada por ahora; se revisará si hace falta un tope.
 22. **Pantallas de la app** (mapa de región, combate, equipo, descanso) y **tienda**: sin diseño. Se propone hacer varias propuestas visuales antes de implementar (como en el resto de la app).
@@ -339,7 +339,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 1 | Catálogo de campaña: esquema y primeros Pokémon (#340) | Hecho |
 | 2 | Motor de combate 1 contra 1: energía, acciones, debilidades y resistencias (#336) | Hecho |
 | 3 | IA rival determinista (#338) | Hecho |
-| 4 | Simulador de combates de campaña (#342) y **primer equilibrado** | Simulador hecho; equilibrado pendiente |
+| 4 | Simulador de combates de campaña (#342) y **primer equilibrado** (#383) | Simulador hecho; informe hecho; ajuste de cartas pendiente de decisión |
 | 5 | Modelo de región y de nodos, y avance por el mapa (#354) | Hecho |
 | 6 | Captura, equipo, PC y descanso | Pendiente |
 | 7 | Jefe con aliados (llamada a mitad de combate) y medalla | Pendiente |
@@ -421,6 +421,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-21 | Las cartas se numeran **001/150** (Mew será 151/150, secreta). | §2 |
 | 2026-11-21 | Las crea él, en PokeCardMaker (perfil «Aymedex»), a partir de ataques propuestos por otro chat desde WikiDex entre los que elige 1 o 2. Primeras del catálogo: Bulbasaur, Charmander y Squirtle. | §11 |
 | 2026-11-22 | El tramo de Pueblo Paleta a Ciudad Plateada queda con todos sus Pokémon (se acabó la lista). | §12 |
+| 2026-11-22 | **Tasa de victoria objetivo: 75 %.** | §8, 19; `balance/informes/campana_calibrar_2026-11-22.md`; #383 |
 
 ### 10.6 Equipo, captura y progresión
 

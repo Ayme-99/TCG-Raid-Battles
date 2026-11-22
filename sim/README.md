@@ -50,9 +50,11 @@ Con `--calibrar` busca, por jefe, el mayor HP (en centenas) con el que la polít
 
 ## Combate de campaña (D-20)
 
-`bin/sim_campana.dart` juega combates 1 contra 1 del modo campaña con el motor `engine/lib/campana.dart` y la IA rival en los dos bandos, con los Pokémon de `catalog/campana/`. No usa cartas ni imágenes, solo los datos (provisionales). Modo `duelos` (cada Pokémon contra cada uno, empezando cada bando) y modo `equipos` (equipos aleatorios). Muestra victorias por Pokémon, turnos medios, la mezcla de acciones (atacar, cargar, cambiar) y la ventaja de empezar; la energía se puede cambiar con `--energia-inicial`, `--energia-maxima`, `--energia-turno` y `--energia-cargar`.
+`bin/sim_campana.dart` juega combates 1 contra 1 del modo campaña con el motor `engine/lib/campana.dart` y la IA rival en los dos bandos, con los Pokémon de `catalog/campana/`. No usa cartas ni imágenes, solo los datos (provisionales). Modo `duelos` (cada Pokémon contra cada uno, empezando cada bando) modo `equipos` (equipos aleatorios), modo `nodos` (cada inicial contra cada rival posible de cada combate de `regiones/kanto.json`, con los PS llenos) y modo `tramo` (el tramo entero de seguido con el daño arrastrado, solo con el inicial y capturando los salvajes vencidos; `--entrenador=N` fija cuántos Pokémon saca un entrenador sin Pokémon fijos). El objetivo es un **75 %** de victorias (#383, D-20 §10.5); el informe está en `balance/informes/campana_calibrar_2026-11-22.md`. Muestra victorias por Pokémon, turnos medios, la mezcla de acciones (atacar, cargar, cambiar) y la ventaja de empezar; la energía se puede cambiar con `--energia-inicial`, `--energia-maxima`, `--energia-turno` y `--energia-cargar`.
 
 ```
 dart run bin/sim_campana.dart
 dart run bin/sim_campana.dart --modo=equipos --tamano=3 --partidas=2000
+dart run bin/sim_campana.dart --modo=nodos --partidas=200     # cada inicial contra cada rival del tramo
+dart run bin/sim_campana.dart --modo=tramo --partidas=5000    # el tramo entero de seguido
 ```
