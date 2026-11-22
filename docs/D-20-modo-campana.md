@@ -322,7 +322,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 
 **Equilibrado y producto**
 
-19. **Calibrar con el simulador.** Objetivo fijado (75 %, §10.5) y medido en `balance/informes/campana_calibrar_2026-11-22.md` (#383): con un equipo realista (inicial + 3 capturas) las rutas, los Cazabichos, Pikachu y el Entrenador Joven pasan del 90 %, pero **Brock** se queda en el 0–7 % y el tramo entero en el 0–7 %; solo con el inicial sale al 0 %. Falta que Ayme elija qué se ajusta (el informe propone palancas) y con qué cifras.
+19. **Calibrar con el simulador.** Objetivo fijado (75 %, §10.5) y medido en `balance/informes/campana_calibrar_2026-11-22.md` (#383): con un equipo realista (inicial + 3 capturas) las rutas, los Cazabichos, Pikachu y el Entrenador Joven pasan del 90 %, pero **Brock** se queda en el 0–7 % y el tramo entero en el 0–7 %; con la llamada de aliado (#393), Pikachu baja al 69–99 % con inicial + 3 y al 26–79 % con inicial + 2, porque el equipo llega tocado del Bosque Verde; solo con el inicial sale al 0 %. Falta que Ayme elija qué se ajusta (el informe propone palancas) y con qué cifras.
 20. ~~Llamada de aliado~~ **Hecha (#372)**, con los detalles decididos el 2026-11-22 (§10.8). Decidido además que el jefe pierde **todos** sus efectos al irse a la banca, también los propios.
 21. **Capacidad del PC.** Ilimitada por ahora; se revisará si hace falta un tope.
 22. **Pantallas de la app** (mapa de región, combate, equipo, descanso) y **tienda**: sin diseño. Se propone hacer varias propuestas visuales antes de implementar (como en el resto de la app).

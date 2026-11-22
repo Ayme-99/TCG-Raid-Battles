@@ -21,12 +21,12 @@
 //   nodos     cada inicial contra cada rival posible de cada combate del
 //             tramo (`regiones/kanto.json`), con los PS llenos y --partidas
 //             semillas por emparejamiento. Un entrenador sin Pokémon fijos
-//             se mide Pokémon a Pokémon de su clase; el jefe, sin la llamada
-//             de aliado (no está en el motor).
+//             se mide Pokémon a Pokémon de su clase; el jefe, con su llamada
+//             de aliado (salvo --aliado=no).
 //   tramo     el tramo entero de seguido, --partidas veces por inicial: el
 //             daño se arrastra, la energía vuelve a 10 en cada combate, los
 //             descansos curan, las bifurcaciones se eligen al azar y los
-//             desvíos opcionales se saltan. Se gana si se llega al final sin
+//             desvíos opcionales se saltan y el jefe llama a su aliado. Se gana si se llega al final sin
 //             perder ningún combate. Dos variantes: solo el inicial y
 //             capturando todos los salvajes vencidos (hasta 6, con los PS
 //             llenos). Son cotas para medir, no reglas del juego.
@@ -44,6 +44,8 @@
 //   --energia-maxima=N     máximo de la reserva (10)
 //   --energia-turno=N      energía que se recupera al terminar el turno (1)
 //   --energia-cargar=N     energía extra al cargar (1)
+//   --aliado=no            mide a los jefes sin su llamada de aliado (por
+//                          defecto la llevan, D-20 §4, Jefes)
 //   --capturas=N           capturas del equipo en el modo realista (2)
 //   --entrenador=N         Pokémon de un entrenador sin Pokémon fijos en el
 //                          modo tramo (1; sin decidir en D-20)
@@ -68,6 +70,7 @@ class Config {
   String? informe;
   int entrenador = 1;
   int capturas = 2;
+  bool aliado = true;
 
   ParametrosCombate get parametros => ParametrosCombate(
         energiaInicial: energiaInicial,
@@ -96,8 +99,10 @@ Resultado jugar(
   Bando empieza,
   ParametrosCombate parametros, [
   int semilla = 1,
+  LlamadaEnCombate? llamada,
 ]) =>
     jugarDesde(EstadoCombate.inicial(
+      llamadaRival: llamada,
       equipoJugador: jugador,
       equipoRival: rival,
       empieza: empieza,
@@ -311,6 +316,8 @@ void main(List<String> args) {
       c.energiaTurno = int.parse(a.substring(16));
     } else if (a.startsWith('--energia-cargar=')) {
       c.energiaCargar = int.parse(a.substring(17));
+    } else if (a.startsWith('--aliado=')) {
+      c.aliado = a.substring(9) != 'no';
     } else if (a.startsWith('--capturas=')) {
       c.capturas = int.parse(a.substring(11));
     } else if (a.startsWith('--entrenador=')) {
@@ -419,6 +426,15 @@ List<List<String>> rivalesPosibles(NodoRuta n, DatosTramo d) {
   }
 }
 
+/// La llamada de aliado del rival si es un jefe que la tiene y no se ha
+/// pedido medir sin ella (`--aliado=no`), o null.
+LlamadaEnCombate? llamadaDe(List<String> rival, Config c,
+    Map<String, PokemonCampana> catalogo, DatosTramo d) {
+  if (!c.aliado || rival.length != 1) return null;
+  final jefe = d.jefes[rival.first];
+  return jefe == null ? null : llamadaEnCombate(jefe, catalogo);
+}
+
 PokemonCampana especie(
         String id, Map<String, PokemonCampana> catalogo, DatosTramo d) =>
     catalogo[id] ?? d.jefes[id]!.pokemon;
@@ -439,12 +455,14 @@ void nodos(Config c, Map<String, PokemonCampana> catalogo) {
     stdout.writeln('${n.nombre}$opc');
     for (final rival in rivalesPosibles(n, d)) {
       final equipoRival = [for (final id in rival) especie(id, catalogo, d)];
+      final llamada = llamadaDe(rival, c, catalogo, d);
       final celdas = <String>[];
       for (final i in iniciales) {
         final acc = Acumulado();
         for (var s = 1; s <= semillas; s++) {
           final r = jugar(
-              [catalogo[i]!], equipoRival, Bando.jugador, c.parametros, s);
+              [catalogo[i]!], equipoRival, Bando.jugador, c.parametros, s,
+              llamada);
           acc.sumar(r, r.ganador == Bando.jugador);
         }
         if (!n.opcional) {
@@ -537,6 +555,7 @@ Recorrido recorrer(String inicial, bool capturar, Random rnd, Config c,
         equipoRival: equipoRival,
         parametros: c.parametros,
         semilla: semilla,
+        llamadaRival: llamadaDe(rival, c, catalogo, d),
       );
       final arranque = inicialRival.copiarCon(
           jugador: inicialRival.jugador.copiarCon(equipo: enPie));
@@ -575,7 +594,7 @@ void tramo(Config c, Map<String, PokemonCampana> catalogo) {
   stdout.writeln('Tramo entero de seguido (${c.partidas} recorridos por inicial,'
       ' semilla ${c.semilla}, entrenador sin fijos con ${c.entrenador} Pokémon)');
   stdout.writeln('Daño arrastrado, energía a 10 en cada combate, curar en los '
-      'descansos, sin opcionales, jefe sin llamada de aliado');
+      'descansos, sin opcionales, jefe ${c.aliado ? "con" : "sin"} llamada de aliado');
   for (final capturar in [false, true]) {
     final variante = capturar ? 'capturando' : 'solo-inicial';
     stdout.writeln('');
@@ -646,7 +665,7 @@ void realista(Config c, Map<String, PokemonCampana> catalogo) {
   stdout.writeln('${c.partidas} recorridos por inicial, semilla ${c.semilla}, '
       'Cazabichos con ${c.entrenador} Pokémon; la IA elige el activo de cada '
       'combate; daño arrastrado, curar en los descansos, sin opcionales, jefe '
-      'sin llamada de aliado');
+      '${c.aliado ? "con" : "sin"} llamada de aliado');
   for (final i in iniciales) {
     final rnd = Random(c.semilla);
     var completos = 0;
