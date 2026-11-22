@@ -27,30 +27,69 @@ CatalogoCampana kanto() => CatalogoCampana.desdeJson(
       region: leer(File('../catalog/campana/regiones/kanto.json')),
     );
 
-/// Juega un combate con la IA en los dos bandos.
+/// La acción del jugador en los tests: ataca con lo más fuerte que le llegue y,
+/// si no, carga. (Con la IA en los dos bandos hay duelos que no acaban nunca,
+/// por ejemplo un Pokémon que se pasa el combate usando Gruñido.)
+AccionCombate accionDelJugador(EstadoCombate e) {
+  final yo = e.jugador;
+  if (e.fase == FaseCombate.eligiendoActivo) {
+    return ElegirSiguiente(Bando.jugador, yo.relevos.first);
+  }
+  final ataques = yo.pokemonActivo.especie.ataques;
+  int? mejor;
+  for (var i = 0; i < ataques.length; i++) {
+    if (ataques[i].coste > yo.energia) continue;
+    if (mejor == null || ataques[i].dano > ataques[mejor].dano) mejor = i;
+  }
+  return mejor == null
+      ? const Cargar(Bando.jugador)
+      : Atacar(Bando.jugador, mejor);
+}
+
+/// Juega un combate: la máquina decide por el rival y [accionDelJugador] por
+/// el jugador.
 EstadoCombate jugarSolo(EstadoCombate e) {
   var s = e;
   var pasos = 0;
   while (s.fase != FaseCombate.terminado) {
-    s = aplicarCombate(s, decidirAccion(s, s.actua));
-    if (++pasos > 500) fail('El combate no termina.');
+    final bando = s.actua;
+    s = aplicarCombate(
+        s, bando == Bando.rival ? decidirAccion(s, bando) : accionDelJugador(s));
+    if (++pasos > 3000) fail('El combate no termina.');
   }
   return s;
 }
 
+/// El mismo estado con todo el equipo a 999 PS. El equilibrado de la campaña
+/// es cosa del simulador (`balance/informes/campana_calibrar_*.md`): estos
+/// tests solo comprueban que la ruta, las capturas y los combates encajan de
+/// punta a punta, así que el equipo aguanta lo que haga falta.
+PartidaCampana robusto(PartidaCampana p) => PartidaCampana(
+      progreso: p.progreso,
+      equipo: [for (final e in p.equipo) PokemonGuardado(e.id, 999, xp: e.xp)],
+      pc: p.pc,
+      puntos: p.puntos,
+      semilla: p.semilla,
+      capturaPendiente: p.capturaPendiente,
+      derrotas: p.derrotas,
+      dinero: p.dinero,
+      mochila: p.mochila,
+      ultimaCura: p.ultimaCura,
+    );
+
 /// Avanza hasta el combate de [nodo] por el camino principal.
 PartidaCampana hasta(CatalogoCampana c, PartidaCampana p, String nodo) {
-  var s = p;
+  var s = robusto(p);
   var combates = 0;
   while (s.progreso.nodoActual != nodo) {
     if (s.hayCombate(c)) {
-      s = s.terminarCombate(c, jugarSolo(s.empezarCombate(c)));
-      if (s.capturaPendiente != null) s = s.capturar(c);
-      if (++combates > 200) fail('No llega a $nodo.');
+      s = robusto(s.terminarCombate(c, jugarSolo(s.empezarCombate(c))));
+      if (s.capturaPendiente != null) s = robusto(s.capturar(c));
+      if (++combates > 300) fail('No llega a $nodo.');
       continue;
     }
     if (s.nodoActual(c).tipo == TipoNodo.descanso && !s.progreso.resuelto) {
-      s = s.descansar(c);
+      s = robusto(s.descansar(c));
       continue;
     }
     final op = s.opciones(c);
@@ -75,14 +114,14 @@ void main() {
         throwsA(isA<ReglaIncumplida>()));
   });
 
-  test('el rival salvaje sale de la zona y es el mismo con la misma semilla',
-      () {
+  test('el rival salvaje es el que fija el nodo', () {
     final p = PartidaCampana.nueva(c.region, semilla: 7)
         .elegirInicial(c, 'squirtle')
-        .avanzar(c, 'ruta-1');
+        .avanzar(c, 'ruta-1')
+        .avanzar(c, 'ruta-1-pidgey');
     final r = p.rival(c);
-    expect(['pidgey', 'rattata'], contains(r.equipo.single.id));
-    expect(r.captura, r.equipo.single.id);
+    expect(r.equipo.single.id, 'pidgey');
+    expect(r.captura, 'pidgey');
     expect(r.puntos, 100);
     expect(p.rival(c).equipo.single.id, r.equipo.single.id);
   });
@@ -91,7 +130,8 @@ void main() {
       () {
     var p = PartidaCampana.nueva(c.region, semilla: 3)
         .elegirInicial(c, 'bulbasaur')
-        .avanzar(c, 'ruta-1');
+        .avanzar(c, 'ruta-1')
+        .avanzar(c, 'ruta-1-pidgey');
     final fin = jugarSolo(p.empezarCombate(c));
     expect(fin.ganador, Bando.jugador);
     final semilla = p.semilla;
@@ -103,16 +143,17 @@ void main() {
     expect(p.semilla, isNot(semilla));
     expect(p.opciones(c), isEmpty, reason: 'antes hay que decidir la captura');
     expect(() => p.avanzar(c, 'ciudad-verde'), throwsA(isA<ReglaIncumplida>()));
-    final capturado = p.capturaPendiente;
+    expect(p.capturaPendiente, 'pidgey');
     p = p.capturar(c);
-    expect(p.equipo.map((e) => e.id), ['bulbasaur', capturado]);
+    expect(p.equipo.map((e) => e.id), ['bulbasaur', 'pidgey']);
     expect(p.opciones(c), ['ciudad-verde']);
   });
 
   test('perder cura al equipo y le devuelve al último sitio donde se curó', () {
     var p = PartidaCampana.nueva(c.region)
         .elegirInicial(c, 'bulbasaur')
-        .avanzar(c, 'ruta-1');
+        .avanzar(c, 'ruta-1')
+        .avanzar(c, 'ruta-1-pidgey');
     expect(p.ultimaCura, 'pueblo-paleta');
     final e = p.empezarCombate(c);
     // Se rinde: el rival le deja a 0.
@@ -139,7 +180,13 @@ void main() {
       ultimaCura: 'pueblo-paleta',
     ).descansar(c);
     expect(p.ultimaCura, 'centro-plateada');
-    p = p.avanzar(c, 'gimnasio-plateada');
+    p = p.avanzar(c, 'gimnasio-joven');
+    p = PartidaCampana(
+        progreso: const ProgresoRuta(
+            nodoActual: 'gimnasio-brock',
+            superados: {'pueblo-paleta', 'centro-plateada'}),
+        equipo: p.equipo,
+        ultimaCura: 'centro-plateada');
     final e = p.empezarCombate(c);
     p = p.terminarCombate(
         c,
@@ -150,12 +197,12 @@ void main() {
             ganador: Bando.rival));
     expect(p.progreso.nodoActual, 'centro-plateada');
     expect(p.progreso.medallas, isEmpty);
-    expect(p.opciones(c), ['gimnasio-plateada']);
+    expect(p.opciones(c), ['gimnasio-joven']);
   });
 
   test('ganar da XP a los que siguen en pie y dinero con un entrenador', () {
     var p = PartidaCampana(
-      progreso: const ProgresoRuta(nodoActual: 'cazabichos'),
+      progreso: const ProgresoRuta(nodoActual: 'cazabichos-1'),
       equipo: [
         const PokemonGuardado('charmander', 70),
         const PokemonGuardado('pidgey', 0),
@@ -200,7 +247,7 @@ void main() {
     expect(() => p.usarRepelente(c), throwsA(isA<ReglaIncumplida>()),
         reason: 'aquí no hay salvajes');
     final fuera = PartidaCampana(
-        progreso: const ProgresoRuta(nodoActual: 'ruta-2'),
+        progreso: const ProgresoRuta(nodoActual: 'ruta-2-weedle'),
         equipo: p.equipo,
         mochila: p.mochila);
     expect(() => fuera.comprar(c, ObjetoCampana.pocion),
@@ -210,7 +257,7 @@ void main() {
     expect(evitado.capturaPendiente, isNull);
     expect(evitado.cuantos(ObjetoCampana.repelente), 0);
     final gimnasio = PartidaCampana(
-        progreso: const ProgresoRuta(nodoActual: 'cazabichos'),
+        progreso: const ProgresoRuta(nodoActual: 'cazabichos-1'),
         equipo: p.equipo,
         mochila: p.mochila);
     expect(() => gimnasio.usarRepelente(c), throwsA(isA<ReglaIncumplida>()));
@@ -218,7 +265,7 @@ void main() {
 
   test('con el equipo lleno, el capturado o el sustituido van al PC', () {
     var p = PartidaCampana(
-      progreso: const ProgresoRuta(nodoActual: 'ruta-1', resuelto: true),
+      progreso: const ProgresoRuta(nodoActual: 'ruta-1-pidgey', resuelto: true),
       equipo: [
         for (final id in [
           'bulbasaur',
@@ -251,6 +298,9 @@ void main() {
     expect(r.equipo.single.id, 'pikachu-jefe');
     expect(r.captura, 'pikachu');
     expect(r.puntos, 1000);
+    expect(r.llamada, isNotNull);
+    expect(r.llamada!.porcentaje, 50);
+    expect(r.llamada!.alFrente, 40);
     final repetido = PartidaCampana(
       progreso: const ProgresoRuta(
           nodoActual: 'jefe-pikachu', jefesDerrotados: {'pikachu-jefe'}),
@@ -263,7 +313,7 @@ void main() {
   test('el entrenador saca 2 Pokémon distintos de su lista y no se capturan',
       () {
     final p = PartidaCampana(
-      progreso: const ProgresoRuta(nodoActual: 'cazabichos'),
+      progreso: const ProgresoRuta(nodoActual: 'cazabichos-1'),
       equipo: [PokemonGuardado.completo(c.especie('charmander'))],
       semilla: 11,
     );
@@ -276,7 +326,7 @@ void main() {
 
   test('el combate sale con el primer Pokémon en pie y sus PS', () {
     final p = PartidaCampana(
-      progreso: const ProgresoRuta(nodoActual: 'ruta-2'),
+      progreso: const ProgresoRuta(nodoActual: 'ruta-2-weedle'),
       equipo: [
         const PokemonGuardado('bulbasaur', 0),
         const PokemonGuardado('pidgey', 25),
@@ -312,14 +362,15 @@ void main() {
     p = p.moverPc(c, dePc: 0);
     expect(p.equipo.length, 2);
     final fuera = PartidaCampana(
-        progreso: const ProgresoRuta(nodoActual: 'ruta-1'), equipo: p.equipo);
+        progreso: const ProgresoRuta(nodoActual: 'ruta-1-pidgey'),
+        equipo: p.equipo);
     expect(() => fuera.moverPc(c, dePc: 0), throwsA(isA<ReglaIncumplida>()));
   });
 
   test('la partida se guarda y se recupera tal cual', () {
     final p = PartidaCampana(
       progreso: const ProgresoRuta(
-          nodoActual: 'ruta-2',
+          nodoActual: 'ruta-2-weedle',
           superados: {'pueblo-paleta'},
           inicial: 'squirtle'),
       equipo: [const PokemonGuardado('squirtle', 42, xp: 3)],
@@ -342,18 +393,18 @@ void main() {
 
   test('el tramo se puede jugar entero hasta la medalla de Brock', () {
     for (final inicial in ['bulbasaur', 'charmander', 'squirtle']) {
-      var p =
-          PartidaCampana.nueva(c.region, semilla: 42).elegirInicial(c, inicial);
+      var p = robusto(PartidaCampana.nueva(c.region, semilla: 42)
+          .elegirInicial(c, inicial));
       var combates = 0;
       while (!p.terminada(c)) {
         if (p.hayCombate(c)) {
-          p = p.terminarCombate(c, jugarSolo(p.empezarCombate(c)));
-          if (p.capturaPendiente != null) p = p.capturar(c);
-          if (++combates > 200) fail('$inicial no acaba el tramo.');
+          p = robusto(p.terminarCombate(c, jugarSolo(p.empezarCombate(c))));
+          if (p.capturaPendiente != null) p = robusto(p.capturar(c));
+          if (++combates > 300) fail('$inicial no acaba el tramo.');
           continue;
         }
         if (p.nodoActual(c).tipo == TipoNodo.descanso && !p.progreso.resuelto) {
-          p = p.descansar(c);
+          p = robusto(p.descansar(c));
           continue;
         }
         // Coge siempre los desvíos opcionales.
@@ -362,6 +413,33 @@ void main() {
       expect(p.progreso.medallas, {'roca'}, reason: inicial);
       expect(p.progreso.jefesDerrotados, {'pikachu-jefe'}, reason: inicial);
       expect(p.puntos, greaterThan(1500 + 1000), reason: inicial);
+      expect(p.derrotas, 0, reason: inicial);
+    }
+  });
+
+  test('contra el jefe, la llamada de aliado entra y el aliado no se captura',
+      () {
+    var p = PartidaCampana(
+      progreso: const ProgresoRuta(nodoActual: 'jefe-pikachu'),
+      equipo: [
+        PokemonGuardado.completo(c.especie('squirtle')),
+        PokemonGuardado.completo(c.especie('bulbasaur')),
+      ],
+    );
+    var e = p.empezarCombate(c);
+    expect(e.llamada, isNotNull);
+    var llamado = false;
+    var pasos = 0;
+    while (e.fase != FaseCombate.terminado && pasos++ < 500) {
+      e = aplicarCombate(e, decidirAccion(e, e.actua));
+      if (e.llamadaHecha) llamado = true;
+    }
+    expect(llamado, isTrue,
+        reason: 'Pikachu llama a su aliado al bajar de 50 %');
+    if (e.ganador == Bando.jugador) {
+      p = p.terminarCombate(c, e);
+      expect(p.capturaPendiente, 'pikachu', reason: 'el aliado no se captura');
+      expect(p.progreso.jefesDerrotados, {'pikachu-jefe'});
     }
   });
 
@@ -369,7 +447,7 @@ void main() {
     final p = hasta(
         c,
         PartidaCampana.nueva(c.region).elegirInicial(c, 'squirtle'),
-        'gimnasio-plateada');
+        'gimnasio-brock');
     expect(p.hayCombate(c), isTrue);
   });
 }

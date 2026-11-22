@@ -284,8 +284,8 @@ class _PanelNodo extends ConsumerWidget {
         Text(r.equipo.map((e) => e.nombre).join(', '),
             style: tema.textTheme.bodySmall),
         if (r.puntos > 0) Text('Recompensa: ${r.puntos} puntos'),
-        if (nodo.tipo == TipoNodo.jefe)
-          Text('Pendiente: el jefe todavía no llama a sus aliados.',
+        if (r.llamada != null)
+          Text('Al bajar de la mitad de PS, el jefe llama a un aliado.',
               style: tema.textTheme.bodySmall),
         if (r.dinero > 0) Text('Dinero: ${r.dinero} \$'),
         Text(

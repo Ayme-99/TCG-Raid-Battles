@@ -205,22 +205,26 @@ void main() {
   group('Kanto: de Pueblo Paleta a Ciudad Plateada', () {
     final pokemon = {for (final f in jsonDe('../catalog/campana/pokemon')) idDe(f)};
     final jefes = {for (final f in jsonDe('../catalog/campana/jefes')) idDe(f)};
-    final clases = {
-      for (final f in jsonDe('../catalog/campana/zonas'))
-        idDe(f): {
-          for (final e in (leer(f)['entrenadores'] as List<dynamic>? ?? const []))
-            (e as Map<String, dynamic>)['clase'] as String,
-        },
+    final zonas = [
+      for (final f in jsonDe('../catalog/campana/zonas')) zonaCampanaDesdeJson(leer(f)),
+    ];
+    final salvajes = {for (final z in zonas) z.id: z.salvajes.toSet()};
+    final entrenadores = {
+      for (final z in zonas)
+        z.id: {for (final e in z.entrenadores) e.clase: e.pokemon.toSet()},
     };
 
     test('la estructura es válida', () {
       expect(kanto.problemas(), isEmpty);
     });
 
-    test('todo lo que nombra existe en el catálogo', () {
+    test('todo lo que nombra existe en el catálogo y es de su zona', () {
       expect(
           kanto.problemasDeCatalogo(
-              pokemon: pokemon, jefes: jefes, clasesPorZona: clases),
+              pokemon: pokemon,
+              jefes: jefes,
+              salvajesPorZona: salvajes,
+              entrenadoresPorZona: entrenadores),
           isEmpty);
     });
 
@@ -232,6 +236,53 @@ void main() {
       expect(f.lider!.nombre, 'Brock');
       expect(f.lider!.pokemon, ['geodude', 'onix']);
       expect(f.medalla, 'roca');
+    });
+
+    test('la Ruta 1 es una bifurcación entre Pidgey y Rattata', () {
+      final r = kanto.nodo('ruta-1');
+      expect(r.tipo, TipoNodo.bifurcacion);
+      expect(r.salidas.map((id) => kanto.nodo(id).pokemon),
+          [['pidgey'], ['rattata']]);
+    });
+
+    test('Ciudad Verde tiene centro Pokémon y la Ruta 22 es un desvío opcional',
+        () {
+      expect(kanto.nodo('ciudad-verde').tipo, TipoNodo.descanso);
+      expect(kanto.nodo('ruta-22').opcional, isTrue);
+      expect(kanto.nodo('ciudad-verde-salida').salidas, ['ruta-22', 'ruta-2']);
+      expect(kanto.nodo('ruta-22').salidas, ['ruta-2']);
+    });
+
+    test('la Ruta 2 sur ofrece Weedle o Caterpie y luego van dos Cazabichos', () {
+      expect(kanto.nodo('ruta-2').salidas.map((id) => kanto.nodo(id).pokemon),
+          [['weedle'], ['caterpie']]);
+      final c1 = kanto.nodo('cazabichos-1');
+      final c2 = kanto.nodo('cazabichos-2');
+      expect([c1.rival, c2.rival], everyElement(RivalDeCombate.entrenador));
+      expect([c1.clase, c2.clase], everyElement('Cazabichos'));
+      expect(c2.salidas, ['jefe-pikachu']);
+    });
+
+    test('el jefe es Pikachu y después hay un salvaje opcional o seguir', () {
+      final jefe = kanto.nodos.values.singleWhere((n) => n.tipo == TipoNodo.jefe);
+      expect(jefe.jefe, 'pikachu-jefe');
+      final norte = kanto.nodo('ruta-2-norte');
+      expect(norte.tipo, TipoNodo.bifurcacion);
+      expect(norte.salidas, ['ruta-2-norte-salvaje', 'centro-plateada']);
+      expect(kanto.nodo('ruta-2-norte-salvaje').opcional, isTrue);
+    });
+
+    test('Ciudad Plateada: centro Pokémon, Entrenador Joven y Brock', () {
+      expect(kanto.nodo('centro-plateada').tipo, TipoNodo.descanso);
+      final joven = kanto.nodo('gimnasio-joven');
+      expect(joven.clase, 'Entrenador Joven');
+      expect(joven.pokemon, ['diglett', 'sandshrew']);
+      expect(joven.salidas, ['gimnasio-brock']);
+    });
+
+    test('los únicos nodos opcionales son la Ruta 22 y la Ruta 2 norte', () {
+      final opcionales = kanto.nodos.values.where((n) => n.opcional).toList();
+      expect(opcionales.map((n) => n.id), ['ruta-22', 'ruta-2-norte-salvaje']);
     });
 
     // Reglas de diseño (D-20 §4): entre una medalla y la siguiente hay un
@@ -254,12 +305,55 @@ void main() {
 
       recorre(kanto.inicio, 0, 0);
     });
+  });
 
-    test('el jefe es Pikachu y los combates opcionales son salvajes', () {
-      final jefe = kanto.nodos.values.singleWhere((n) => n.tipo == TipoNodo.jefe);
-      expect(jefe.jefe, 'pikachu-jefe');
-      final opcionales = kanto.nodos.values.where((n) => n.opcional).toList();
-      expect(opcionales.map((n) => n.id), ['ruta-22', 'cueva-diglett']);
+  group('Pokémon fijos de un nodo', () {
+    NodoRuta salvaje(List<String> pokemon) => NodoRuta(
+        id: 'b',
+        tipo: TipoNodo.combate,
+        nombre: 'b',
+        salidas: const ['g'],
+        zona: 'z',
+        rival: RivalDeCombate.salvaje,
+        pokemon: pokemon);
+
+    test('un salvaje lleva como mucho un Pokémon y solo un combate los lleva', () {
+      expect(region([ini(['b']), salvaje(['x']), gim('g')]).problemas(), isEmpty);
+      expect(region([ini(['b']), salvaje([]), gim('g')]).problemas(), isEmpty);
+      expect(
+          region([ini(['b']), salvaje(['x', 'y']), gim('g')]).problemas().join(),
+          contains('salvaje lleva un solo Pokémon'));
+      final descanso = region([
+        ini(['d']),
+        const NodoRuta(
+            id: 'd',
+            tipo: TipoNodo.descanso,
+            nombre: 'd',
+            salidas: ['g'],
+            pokemon: ['x']),
+        gim('g'),
+      ]);
+      expect(descanso.problemas().join(), contains('no lleva "pokemon"'));
+    });
+
+    test('un Pokémon que no es de la zona o de la clase se detecta', () {
+      final r = region([
+        ini(['b']),
+        salvaje(['ajeno']),
+        gim('g'),
+      ]);
+      final p = r.problemasDeCatalogo(
+          pokemon: {'x', 'ajeno'},
+          jefes: {},
+          salvajesPorZona: {'z': {'x'}},
+          entrenadoresPorZona: {});
+      expect(p.join(), contains('"ajeno" no es un salvaje de "z"'));
+      final falta = r.problemasDeCatalogo(
+          pokemon: {'x'},
+          jefes: {},
+          salvajesPorZona: {'z': {'x'}},
+          entrenadoresPorZona: {});
+      expect(falta.join(), contains('el Pokémon "ajeno" no existe'));
     });
   });
 
@@ -282,22 +376,27 @@ void main() {
       expect(() => p.resolver(kanto), throwsA(isA<ReglaIncumplida>()));
       expect(() => p.avanzar(kanto, 'ruta-2'), throwsA(isA<ReglaIncumplida>()));
       p = p.avanzar(kanto, 'ruta-1');
+      // la Ruta 1 es una bifurcación: ya está resuelta y hay que elegir
+      expect(p.resuelto, isTrue);
+      expect(p.opciones(kanto), ['ruta-1-pidgey', 'ruta-1-rattata']);
+      p = p.avanzar(kanto, 'ruta-1-pidgey');
       expect(p.resuelto, isFalse);
       expect(p.opciones(kanto), isEmpty);
     });
 
-    test('una bifurcación se da por resuelta al llegar y se elige camino', () {
+    test('el desvío opcional se puede hacer y vuelve al camino principal', () {
       var p = ProgresoRuta.inicial(kanto)
           .resolver(kanto, inicial: 'bulbasaur')
           .avanzar(kanto, 'ruta-1')
+          .avanzar(kanto, 'ruta-1-rattata')
           .resolver(kanto)
-          .avanzar(kanto, 'ciudad-verde');
-      expect(p.resuelto, isTrue);
-      expect(p.superados, contains('ciudad-verde'));
+          .avanzar(kanto, 'ciudad-verde')
+          .resolver(kanto)
+          .avanzar(kanto, 'ciudad-verde-salida');
       expect(p.opciones(kanto), ['ruta-22', 'ruta-2']);
-      // el camino opcional vuelve a la Ruta 2
       p = p.avanzar(kanto, 'ruta-22').resolver(kanto).avanzar(kanto, 'ruta-2');
-      expect(p.superados, containsAll(['ruta-22']));
+      expect(p.superados, contains('ruta-22'));
+      expect(p.opciones(kanto), ['ruta-2-weedle', 'ruta-2-caterpie']);
     });
 
     test('se puede recorrer el tramo entero por el camino corto', () {
@@ -305,14 +404,18 @@ void main() {
       p = p.resolver(kanto, inicial: 'squirtle');
       for (final destino in [
         'ruta-1',
+        'ruta-1-pidgey',
         'ciudad-verde',
+        'ciudad-verde-salida',
         'ruta-2',
-        'bosque-verde',
-        'cazabichos',
+        'ruta-2-weedle',
+        'cazabichos-1',
+        'cazabichos-2',
         'jefe-pikachu',
-        'salida-bosque',
+        'ruta-2-norte',
         'centro-plateada',
-        'gimnasio-plateada',
+        'gimnasio-joven',
+        'gimnasio-brock',
       ]) {
         p = p.avanzar(kanto, destino);
         if (!p.resuelto) p = p.resolver(kanto);
@@ -321,7 +424,8 @@ void main() {
       expect(p.medallas, {'roca'});
       expect(p.jefesDerrotados, {'pikachu-jefe'});
       expect(p.superados, isNot(contains('ruta-22')));
-      expect(p.superados, isNot(contains('cueva-diglett')));
+      expect(p.superados, isNot(contains('ruta-2-norte-salvaje')));
+      expect(p.superados, isNot(contains('ruta-1-rattata')));
     });
 
     test('un jefe solo se captura la primera vez', () {

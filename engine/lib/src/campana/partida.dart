@@ -130,9 +130,14 @@ class CatalogoCampana {
         ...region.problemasDeCatalogo(
           pokemon: pokemon.keys.toSet(),
           jefes: jefes.keys.toSet(),
-          clasesPorZona: {
+          salvajesPorZona: {
+            for (final z in zonas.values) z.id: z.salvajes.toSet(),
+          },
+          entrenadoresPorZona: {
             for (final z in zonas.values)
-              z.id: {for (final e in z.entrenadores) e.clase},
+              z.id: {
+                for (final e in z.entrenadores) e.clase: e.pokemon.toSet()
+              },
           },
         ),
         for (final z in zonas.values)
@@ -183,12 +188,16 @@ class RivalDelNodo {
   /// Dinero que da ganar (solo entrenadores y líderes).
   final int dinero;
 
+  /// La llamada de aliado del jefe (D-20 §4, Jefes), o null.
+  final LlamadaEnCombate? llamada;
+
   const RivalDelNodo({
     required this.equipo,
     required this.nombre,
     required this.captura,
     required this.puntos,
     this.dinero = 0,
+    this.llamada,
   });
 }
 
@@ -319,12 +328,14 @@ class PartidaCampana {
 
   /// El rival del nodo actual. Con la misma partida sale siempre el mismo.
   ///
-  /// - Salvaje: uno al azar de los salvajes de la zona; se puede capturar.
-  /// - Entrenador: [ParametrosCampana.pokemonPorEntrenador] de su lista, al
-  ///   azar y sin repetir; no se capturan.
+  /// - Salvaje: el que fija el nodo o, si no, uno al azar de los salvajes de la
+  ///   zona; se puede capturar.
+  /// - Entrenador: el equipo que fija el nodo o, si no,
+  ///   [ParametrosCampana.pokemonPorEntrenador] de su lista, al azar y sin
+  ///   repetir; no se capturan.
   /// - Gimnasio: los Pokémon del líder, en orden.
-  /// - Jefe: su carta NN/20, sin la llamada del aliado (tarea 7, pendiente). Al
-  ///   derrotarlo la primera vez se ofrece su carta normal.
+  /// - Jefe: su carta NN/20 con su llamada de aliado, si la tiene. Al derrotarlo
+  ///   la primera vez se ofrece su carta normal (los aliados no se capturan).
   RivalDelNodo rival(CatalogoCampana c,
       {ParametrosCampana parametros = const ParametrosCampana()}) {
     final nodo = nodoActual(c);
@@ -340,7 +351,9 @@ class PartidaCampana {
         }
 
         if (nodo.rival == RivalDeCombate.salvaje) {
-          final especie = c.especie(zona.salvajes[azar(zona.salvajes.length)]);
+          final especie = c.especie(nodo.pokemon.isNotEmpty
+              ? nodo.pokemon.first
+              : zona.salvajes[azar(zona.salvajes.length)]);
           return RivalDelNodo(
             equipo: [especie],
             nombre: '${especie.nombre} salvaje',
@@ -351,9 +364,11 @@ class PartidaCampana {
         final grupo = zona.entrenadores.firstWhere((e) => e.clase == nodo.clase,
             orElse: () => throw ReglaIncumplida(
                 'La zona "${zona.id}" no tiene "${nodo.clase}".'));
+        // El nodo puede fijar el equipo; si no, salen de la lista de su clase.
         final lista = [...grupo.pokemon];
-        final elegidos = <String>[];
-        while (elegidos.length < parametros.pokemonPorEntrenador &&
+        final elegidos = <String>[...nodo.pokemon];
+        while (nodo.pokemon.isEmpty &&
+            elegidos.length < parametros.pokemonPorEntrenador &&
             lista.isNotEmpty) {
           elegidos.add(lista.removeAt(azar(lista.length)));
         }
@@ -384,6 +399,7 @@ class PartidaCampana {
               '${jefe.numero.toString().padLeft(2, '0')}/$totalJefesCampana)',
           captura: primera ? cartaNormalDeJefe(c, nodo.jefe!) : null,
           puntos: primera ? parametros.puntosJefe : 0,
+          llamada: llamadaEnCombate(jefe, c.pokemon),
         );
       case TipoNodo.inicio:
       case TipoNodo.bifurcacion:
@@ -414,6 +430,7 @@ class PartidaCampana {
       ],
       equipoRival: [for (final p in r.equipo) PokemonEnCombate.completo(p)],
       semilla: _siguiente(_siguiente(semilla)),
+      llamadaRival: r.llamada,
     );
   }
 
@@ -447,7 +464,8 @@ class PartidaCampana {
     }
     final r = rival(c, parametros: parametros);
     final tras = fin.jugador.equipo;
-    final xp = parametros.xpPorPokemon * fin.rival.equipo.length;
+    final derrotados = fin.rival.equipo.where((p) => !p.enPie).length;
+    final xp = parametros.xpPorPokemon * derrotados;
     return _copiar(
       equipo: [
         for (var i = 0; i < equipo.length; i++)

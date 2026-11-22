@@ -1,3 +1,4 @@
+import 'combate.dart';
 import 'pokemon.dart';
 import 'ruta.dart';
 import 'tipos.dart';
@@ -143,13 +144,21 @@ HabilidadCampana? _habilidadDesdeJson(dynamic json) {
 const totalJefesCampana = 20;
 
 /// Cuándo y quién llama a un aliado durante el combate contra un jefe: al
-/// bajar de [alBajarDePorcentaje] % de sus PS, el jefe se retira a la banca y
-/// entra uno de los [aliados] (ids de Pokémon del catálogo).
+/// llegar a [alBajarDePorcentaje] % de sus PS o bajar de él (el nombre del
+/// campo es anterior; decidido el 2026-11-22: con 50 PS justos de 100 ya
+/// llama) invoca a uno de los [aliados] (ids de Pokémon del catálogo), que
+/// aparece en la banca, y al llegar a [alFrenteAlPorcentaje] % el aliado pasa
+/// al puesto activo y el jefe a la banca. Ver [LlamadaEnCombate].
 class LlamadaDeAliado {
   final int alBajarDePorcentaje;
+
+  /// Porcentaje al que el aliado pasa de la banca al puesto activo; null si
+  /// entra directamente al invocarlo (D-20 §4, Jefes).
+  final int? alFrenteAlPorcentaje;
   final List<String> aliados;
 
-  const LlamadaDeAliado(this.alBajarDePorcentaje, this.aliados);
+  const LlamadaDeAliado(this.alBajarDePorcentaje, this.aliados,
+      {this.alFrenteAlPorcentaje});
 }
 
 /// Un jefe de campaña: un Pokémon salvaje con su carta de la serie NN/20.
@@ -172,7 +181,8 @@ JefeCampana jefeCampanaDesdeJson(Map<String, dynamic> json) {
   final llamada = json['llamaAliado'];
   return JefeCampana(
     numero: _campo<int>(json, 'numero'),
-    pokemon: pokemonCampanaDesdeJson(_campo<Map<String, dynamic>>(json, 'pokemon')),
+    pokemon:
+        pokemonCampanaDesdeJson(_campo<Map<String, dynamic>>(json, 'pokemon')),
     llamaAliado: llamada == null
         ? null
         : LlamadaDeAliado(
@@ -181,8 +191,28 @@ JefeCampana jefeCampanaDesdeJson(Map<String, dynamic> json) {
               for (final a in _campo<List<dynamic>>(llamada, 'aliados'))
                 a as String,
             ],
+            alFrenteAlPorcentaje: llamada['alFrenteAlPorcentaje'] as int?,
           ),
   );
+}
+
+/// La llamada de aliado de [jefe] lista para [EstadoCombate.inicial]
+/// (`llamadaRival`), con los aliados sacados de [pokemon] (el catálogo de
+/// campaña por id), o null si el jefe no llama a nadie. El jefe va el primero
+/// del equipo rival.
+LlamadaEnCombate? llamadaEnCombate(
+    JefeCampana jefe, Map<String, PokemonCampana> pokemon) {
+  final l = jefe.llamaAliado;
+  if (l == null) return null;
+  return LlamadaEnCombate(
+      l.alBajarDePorcentaje,
+      [
+        for (final id in l.aliados)
+          pokemon[id] ??
+              (throw FormatException(
+                  'El aliado "$id" no está en el catálogo.')),
+      ],
+      alFrente: l.alFrenteAlPorcentaje);
 }
 
 /// Un grupo de entrenadores de una zona (por ejemplo, los PokéManiacos).
@@ -240,7 +270,10 @@ ZonaCampana zonaCampanaDesdeJson(Map<String, dynamic> json) {
             for (final e in entrenadores)
               EntrenadoresDeZona(
                 _campo<String>(e as Map<String, dynamic>, 'clase'),
-                [for (final p in _campo<List<dynamic>>(e, 'pokemon')) p as String],
+                [
+                  for (final p in _campo<List<dynamic>>(e, 'pokemon'))
+                    p as String
+                ],
               ),
           ]
         : const [],
@@ -265,7 +298,8 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
   final rival = json['rival'] as String?;
   return NodoRuta(
     id: _campo<String>(json, 'id'),
-    tipo: _enumDeTexto(TipoNodo.values, _campo<String>(json, 'tipo'), 'Tipo de nodo'),
+    tipo: _enumDeTexto(
+        TipoNodo.values, _campo<String>(json, 'tipo'), 'Tipo de nodo'),
     nombre: _campo<String>(json, 'nombre'),
     salidas: _textos(json, 'salidas'),
     opcional: (json['opcional'] as bool?) ?? false,
@@ -275,6 +309,7 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
         ? null
         : _enumDeTexto(RivalDeCombate.values, rival, 'Rival'),
     clase: json['clase'] as String?,
+    pokemon: _textos(json, 'pokemon'),
     lider: lider is Map<String, dynamic>
         ? LiderDeGimnasio(
             _campo<String>(lider, 'nombre'), _textos(lider, 'pokemon'))

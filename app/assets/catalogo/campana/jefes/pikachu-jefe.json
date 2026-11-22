@@ -28,6 +28,7 @@
   },
   "llamaAliado": {
     "alBajarDePorcentaje": 50,
+    "alFrenteAlPorcentaje": 40,
     "aliados": [
       "weedle",
       "caterpie",

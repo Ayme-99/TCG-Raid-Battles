@@ -71,7 +71,8 @@ Future<void> jugarCombate(WidgetTester tester) async {
     }
     if (activo(tester, 'ataque-1')) {
       await tocar(tester, 'ataque-1');
-    } else if (activo(tester, 'ataque-0')) {
+    } else if (!hay('ataque-1') && activo(tester, 'ataque-0')) {
+      // Con dos ataques, si el fuerte no llega se carga (el otro es Gruñido).
       await tocar(tester, 'ataque-0');
     } else {
       await tocar(tester, 'accion-cargar');
@@ -103,7 +104,7 @@ void main() {
   testWidgets('el catálogo de campaña se lee de los assets de la app',
       (tester) async {
     final c = await tester.runAsync(() => cargarCatalogoCampana(rootBundle));
-    expect(c!.region.nodos, contains('gimnasio-plateada'));
+    expect(c!.region.nodos, contains('gimnasio-brock'));
     expect(c.pokemon, contains('bulbasaur'));
     expect(c.jefes, contains('pikachu-jefe'));
   });
@@ -136,6 +137,7 @@ void main() {
       await tocar(tester, 'inicial-bulbasaur');
       expect(c.read(campanaProvider).partida!.equipo.single.id, 'bulbasaur');
       await tocar(tester, 'ir-ruta-1');
+      await tocar(tester, 'ir-ruta-1-pidgey');
       await tocar(tester, 'campana-combatir');
       expect(find.byKey(const Key('campana-combate')), findsOneWidget);
       await jugarCombate(tester);
@@ -152,44 +154,83 @@ void main() {
     });
   }
 
-  testWidgets('se juega el tramo entero hasta la Medalla Roca tocando botones',
+  testWidgets(
+      'se juega de Pueblo Paleta al centro de Ciudad Verde tocando botones',
       (tester) async {
     final almacen = AlmacenMemoria();
     final c = await abrirCampana(tester, almacen: almacen);
     await tocar(tester, 'campana-empezar');
     await tocar(tester, 'inicial-squirtle');
     final catalogo = catalogoCampanaDeDisco();
-    for (var paso = 0; paso < 300; paso++) {
+    for (var paso = 0; paso < 40; paso++) {
       final p = c.read(campanaProvider).partida!;
-      if (p.terminada(catalogo)) break;
+      if (p.progreso.nodoActual == 'ciudad-verde' && p.progreso.resuelto) break;
       if (p.capturaPendiente != null) {
-        await tocar(
-            tester,
-            hay('campana-capturar')
-                ? 'campana-capturar'
-                : 'campana-no-capturar');
+        await tocar(tester, 'campana-capturar');
       } else if (p.hayCombate(catalogo)) {
         await tocar(tester, 'campana-combatir');
         await jugarCombate(tester);
       } else if (p.nodoActual(catalogo).tipo == TipoNodo.descanso &&
           !p.progreso.resuelto) {
         await tocar(tester, 'campana-curar');
-        expect(
-            c
-                .read(campanaProvider)
-                .partida!
-                .equipo
-                .every((e) => e.ps == catalogo.especie(e.id).ps),
-            isTrue);
       } else {
-        // Coge los desvíos opcionales: más capturas.
         await tocar(tester, 'ir-${p.opciones(catalogo).first}');
       }
     }
     final p = c.read(campanaProvider).partida!;
+    expect(p.progreso.nodoActual, 'ciudad-verde');
+    expect(p.progreso.resuelto, isTrue);
+    expect(p.ultimaCura, 'ciudad-verde');
+    expect(p.equipo.every((e) => e.ps == catalogo.especie(e.id).ps), isTrue);
+    expect(p.equipo.length, greaterThanOrEqualTo(2));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('se gana la Medalla Roca al vencer a Brock', (tester) async {
+    final almacen = AlmacenMemoria();
+    // El equilibrado de la campaña es cosa del simulador: este test solo
+    // comprueba la pantalla del gimnasio y el final del tramo.
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+        nodoActual: 'gimnasio-brock',
+        superados: {'pueblo-paleta', 'centro-plateada'},
+        inicial: 'bulbasaur',
+      ),
+      equipo: [PokemonGuardado('bulbasaur', 999)],
+      ultimaCura: 'centro-plateada',
+    );
+    final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
+    expect(find.textContaining('Brock'), findsWidgets);
+    await tocar(tester, 'campana-combatir');
+    await jugarCombate(tester);
+    final catalogo = catalogoCampanaDeDisco();
+    final p = c.read(campanaProvider).partida!;
     expect(p.terminada(catalogo), isTrue);
     expect(p.progreso.medallas, {'roca'});
     expect(find.textContaining('Medalla Roca'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contra el jefe, el aliado entra en la banca y la partida sigue',
+      (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+        nodoActual: 'jefe-pikachu',
+        superados: {'pueblo-paleta', 'ciudad-verde'},
+        inicial: 'bulbasaur',
+      ),
+      equipo: [PokemonGuardado('bulbasaur', 999)],
+      ultimaCura: 'ciudad-verde',
+    );
+    final c = await abrirCampana(tester,
+        almacen: AlmacenMemoria(), guardada: guardada);
+    expect(find.textContaining('Pikachu'), findsWidgets);
+    await tocar(tester, 'campana-combatir');
+    await jugarCombate(tester);
+    final p = c.read(campanaProvider).partida!;
+    expect(p.progreso.jefesDerrotados, {'pikachu-jefe'});
+    expect(p.capturaPendiente, 'pikachu', reason: 'el aliado no se captura');
+    expect(find.byKey(const Key('campana-capturar')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -227,8 +268,8 @@ void main() {
     await tocar(tester, 'equipo-2');
     await tocar(tester, 'equipo-primero');
     expect(c.read(campanaProvider).partida!.equipo.first.id, 'rattata');
-    await tocar(tester, 'ir-gimnasio-plateada');
-    expect(find.textContaining('Brock'), findsWidgets);
+    await tocar(tester, 'ir-gimnasio-joven');
+    expect(find.textContaining('Entrenador Joven'), findsWidgets);
   });
 
   test('una campaña guardada dañada se descarta', () async {

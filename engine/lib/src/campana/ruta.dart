@@ -58,6 +58,11 @@ class NodoRuta {
   /// Clase de entrenador de la zona (solo combate contra un entrenador).
   final String? clase;
 
+  /// Los Pokémon fijos del rival (solo [TipoNodo.combate]): uno si es salvaje
+  /// (por ejemplo, el nodo que ofrece Pidgey en la Ruta 1) y su equipo si es un
+  /// entrenador. Vacía: el rival sale de la zona (o de la clase) al llegar.
+  final List<String> pokemon;
+
   /// El líder y el id de la medalla (solo [TipoNodo.gimnasio]).
   final LiderDeGimnasio? lider;
   final String? medalla;
@@ -75,6 +80,7 @@ class NodoRuta {
     this.zona,
     this.rival,
     this.clase,
+    this.pokemon = const [],
     this.lider,
     this.medalla,
     this.jefe,
@@ -111,8 +117,10 @@ class RegionCampana {
       ];
 
   /// Nodos en los que acaba la región: los que no tienen salidas.
-  List<NodoRuta> get finales =>
-      [for (final n in nodos.values) if (n.salidas.isEmpty) n];
+  List<NodoRuta> get finales => [
+        for (final n in nodos.values)
+          if (n.salidas.isEmpty) n
+      ];
 
   /// Lo que está mal en la estructura de la región (vacía si es válida):
   /// un solo inicio sin entradas, salidas que existen, el número de salidas de
@@ -168,7 +176,10 @@ class RegionCampana {
     final pendientes = {
       for (final n in nodos.values) n.id: entradas(n.id).length,
     };
-    final listos = [for (final e in pendientes.entries) if (e.value == 0) e.key];
+    final listos = [
+      for (final e in pendientes.entries)
+        if (e.value == 0) e.key
+    ];
     var ordenados = 0;
     while (listos.isNotEmpty) {
       final id = listos.removeLast();
@@ -230,15 +241,23 @@ class RegionCampana {
     exige(!esGimnasio || (n.lider?.pokemon.isNotEmpty ?? true),
         'necesita Pokémon en el líder');
     exige(n.tipo != TipoNodo.jefe || n.jefe != null, 'necesita "jefe"');
-    exige(n.clase == null || n.rival == RivalDeCombate.entrenador,
-        'solo lleva "clase" con un entrenador');
-    exige(!(esCombate && n.rival == RivalDeCombate.entrenador) ||
-        n.clase != null, 'necesita "clase" con un entrenador');
+    exige(
+        !(esCombate && n.rival == RivalDeCombate.entrenador) || n.clase != null,
+        'necesita "clase" con un entrenador');
     if (!esInicio) sin(n.iniciales.isEmpty, 'iniciales');
     if (!esCombate) {
       sin(n.zona == null, 'zona');
       sin(n.rival == null, 'rival');
+      sin(n.pokemon.isEmpty, 'pokemon');
+      sin(n.clase == null, 'clase');
     }
+    exige(
+        !(esCombate && n.rival == RivalDeCombate.salvaje) ||
+            n.pokemon.length <= 1,
+        'salvaje lleva un solo Pokémon');
+    exige(
+        !(esCombate && n.clase != null) || n.rival == RivalDeCombate.entrenador,
+        'solo lleva "clase" con un entrenador');
     if (!esGimnasio) {
       sin(n.lider == null, 'lider');
       sin(n.medalla == null, 'medalla');
@@ -248,28 +267,43 @@ class RegionCampana {
   }
 
   /// Lo que no existe en el catálogo: Pokémon, zonas, clases de entrenador y
-  /// jefes a los que apuntan los nodos. [clasesPorZona] da, de cada zona, las
-  /// clases de entrenador que tiene.
+  /// jefes a los que apuntan los nodos, y Pokémon fijos que no son de su zona.
+  /// [salvajesPorZona] da los Pokémon salvajes de cada zona y
+  /// [entrenadoresPorZona] los de cada clase de entrenador de cada zona.
   List<String> problemasDeCatalogo({
     required Set<String> pokemon,
     required Set<String> jefes,
-    required Map<String, Set<String>> clasesPorZona,
+    required Map<String, Set<String>> salvajesPorZona,
+    required Map<String, Map<String, Set<String>>> entrenadoresPorZona,
   }) {
     final p = <String>[];
     for (final n in nodos.values) {
-      for (final id in n.iniciales) {
-        if (!pokemon.contains(id)) p.add('${n.id}: el Pokémon "$id" no existe.');
-      }
-      for (final id in n.lider?.pokemon ?? const <String>[]) {
-        if (!pokemon.contains(id)) p.add('${n.id}: el Pokémon "$id" no existe.');
+      for (final id in [...n.iniciales, ...n.pokemon, ...?n.lider?.pokemon]) {
+        if (!pokemon.contains(id))
+          p.add('${n.id}: el Pokémon "$id" no existe.');
       }
       final zona = n.zona;
       if (zona != null) {
-        final clases = clasesPorZona[zona];
-        if (clases == null) {
+        if (!salvajesPorZona.containsKey(zona)) {
           p.add('${n.id}: la zona "$zona" no existe.');
-        } else if (n.clase != null && !clases.contains(n.clase)) {
-          p.add('${n.id}: la zona "$zona" no tiene entrenadores "${n.clase}".');
+        } else if (n.rival == RivalDeCombate.salvaje) {
+          for (final id in n.pokemon) {
+            if (!salvajesPorZona[zona]!.contains(id)) {
+              p.add('${n.id}: "$id" no es un salvaje de "$zona".');
+            }
+          }
+        } else if (n.clase != null) {
+          final equipo = entrenadoresPorZona[zona]?[n.clase];
+          if (equipo == null) {
+            p.add(
+                '${n.id}: la zona "$zona" no tiene entrenadores "${n.clase}".');
+          } else {
+            for (final id in n.pokemon) {
+              if (!equipo.contains(id)) {
+                p.add('${n.id}: "$id" no es de los "${n.clase}" de "$zona".');
+              }
+            }
+          }
         }
       }
       if (n.jefe != null && !jefes.contains(n.jefe)) {

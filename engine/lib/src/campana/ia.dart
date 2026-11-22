@@ -14,7 +14,8 @@ import 'pokemon.dart';
 /// 2. Si puede dejar fuera de combate al rival, ataca con lo más barato que
 ///    lo logre.
 /// 3. Si su activo es débil a un ataque del rival, o no llega a ningún ataque,
-///    cambia a un relevo que sí le sirva.
+///    cambia a un relevo que sí le sirva (nunca al jefe que espera a que caiga
+///    su aliado).
 /// 4. Si tiene un ataque que reduce el daño del rival (Gruñido) y compensa
 ///    (evita más daño en lo que le queda de vida que el que haría ahora
 ///    atacando), lo usa; nunca lo repite mientras siga activo el mismo rival.
@@ -76,6 +77,7 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
         exigirAtaque: true,
         exigirNoDebil: debil,
         extra: rival.extraRecibido,
+        candidatos: yo.cambiables,
       );
       if (relevo != null) return Cambiar(bando, relevo);
     }
@@ -321,7 +323,8 @@ int? _mejorAtaque(
       // Daño por energía: dano / coste, comparado sin dividir.
       final izquierda = dano * mejorCoste;
       final derecha = mejorDano * coste;
-      mejora = izquierda > derecha || (izquierda == derecha && dano > mejorDano);
+      mejora =
+          izquierda > derecha || (izquierda == derecha && dano > mejorDano);
     }
     if (mejora) {
       mejor = i;
@@ -346,10 +349,11 @@ int? _mejorRelevo(
   required bool exigirAtaque,
   bool exigirNoDebil = false,
   int extra = 0,
+  List<int>? candidatos,
 }) {
   int? mejor;
   var mejorPuntos = -1;
-  for (final i in yo.relevos) {
+  for (final i in candidatos ?? yo.relevos) {
     final r = yo.equipo[i];
     final debil = _esDebilContra(r.especie, objetivo.especie);
     if (exigirNoDebil && debil) continue;
@@ -391,8 +395,7 @@ PokemonCampana _conRacha(BandoCombate yo) {
             nombre: e.ataques[i].nombre,
             tipo: e.ataques[i].tipo,
             coste: e.ataques[i].coste,
-            dano: e.ataques[i].dano *
-                (yo.ultimoAtaque == i ? yo.racha + 1 : 1),
+            dano: e.ataques[i].dano * (yo.ultimoAtaque == i ? yo.racha + 1 : 1),
             efecto: e.ataques[i].efecto,
           )
         else
