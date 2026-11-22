@@ -196,7 +196,7 @@ Estructura de una región: `Inicio → rutas → jefe del tramo → descanso →
 
 ### Modelo de la ruta
 
-Decidido el 2026-11-22. Una región es un **grafo dirigido sin ciclos** que se recorre solo hacia delante (`RegionCampana`, `engine/lib/src/campana/ruta.dart`; datos en `catalog/campana/regiones/<id>.json`, esquema `region-campana.schema.json`). Cada nodo (`NodoRuta`) lleva `id`, `tipo`, `nombre`, `salidas` y los datos propios de su tipo:
+Decidido el 2026-11-22. Una región es un **grafo dirigido sin ciclos**. Se avanza por él y, desde el 2026-11-22, **también se puede retroceder** por nodos ya visitados (§10.7; antes era solo hacia delante) (`RegionCampana`, `engine/lib/src/campana/ruta.dart`; datos en `catalog/campana/regiones/<id>.json`, esquema `region-campana.schema.json`). Cada nodo (`NodoRuta`) lleva `id`, `tipo`, `nombre`, `salidas` y los datos propios de su tipo:
 
 | Tipo | Datos | Salidas |
 |---|---|---|
@@ -364,6 +364,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 10 | Puntos al servidor y tienda (después de la porción vertical) | Pendiente |
 | 11 | Reponer el resto de Pokémon y zonas (Túnel Roca, Ciudad Plateada en adelante) | Pendiente |
 | 12 | Tipos del TCG: `hielo`, `veneno`, `volador`, `bicho` y `fantasma` pasan a otros tipos y entra `metal` (§8, pregunta 10; §10.3) | Decidido el 2026-11-22; pendiente de implementar (#366) |
+| 13 | Pantalla del mapa como escenas interactivas (hierba alta, bordes y edificios pulsables) y retroceso entre escenas; arte vectorial propio (#365; §10.7) | Decidido el 2026-11-22; pendiente de implementar. Faltan wireframes de combate, equipo y centro |
 
 ## 10. Registro de decisiones
 
@@ -482,6 +483,9 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | **Liga: rivales.** Los de los juegos con los tipos pasados al TCG: Lorelei (agua), Bruno (lucha), Agatha (psíquico), Lance (dragón) y el Campeón, que es el rival del jugador (equipo variado). Los líderes y el Alto Mando no son jefes: usan cartas normales (§10.8). | §4; #367 |
 | 2026-11-22 | **Liga: recompensa.** Cada rival paga **dinero y puntos propios**, como un líder, y el Campeón más. Al vencerlo **termina la campaña** con una pantalla de final. Las cifras por rival se fijan al diseñar ese tramo. | §4, §5; #367 |
 | 2026-11-22 | **Liga: dificultad.** Objetivo: **completar la Liga a la primera en un 25 %** (unos 4 intentos de media), medido por Calidad con el simulador. Sustituye al 75 % por combate (§10.5) solo para la Liga, porque 15 combates seguidos darían un 1 % con aquel objetivo. | §10.5; #367 |
+| 2026-11-22 | **Pantalla del mapa: escenas interactivas** (propuesta D del lienzo de wireframes). Cada nodo es una **escena ilustrada** en la que se pulsa: la **hierba alta** lanza el combate salvaje, los **bordes** llevan al nodo siguiente o al anterior y los edificios o personajes abren el centro, el gimnasio o la conversación. Sustituye a la lista de nodos de la primera versión. Barra fija con dinero, Pokéballs y XP, y el equipo abajo. El arte es **vectorial y propio**, sin capturas de los juegos (propiedad intelectual); si más adelante se quiere más calidad, ilustraciones originales. Datos nuevos en el catálogo: imagen o escena por nodo y zonas pulsables con coordenadas. El motor no cambia. | §4, §9; #365 |
+| 2026-11-22 | **Retroceder:** se puede volver a **cualquier escena ya visitada** (el grafo sigue sin ciclos; el jugador puede moverse hacia atrás). Sustituye a «solo hacia delante» (§10.9). | §4; #365 |
+| 2026-11-22 | **Qué se puede repetir:** solo los **Pokémon salvajes**, para **capturarlos o ganar XP**. Los entrenadores, los gimnasios, los jefes y las conversaciones **no** se repiten (los que curan siguen sirviendo como punto de curación). Los salvajes **no dan dinero** (ya decidido), así que las Pokéballs siguen limitadas por el dinero. La **XP es ilimitada**, sin cambios de reglas; Calidad mide con el simulador el caso peor **sin entrenar** y cuántos combates de entrenamiento hacen falta para vencer a Brock, y si se abusa se reduce la XP tras la primera vez. Los **puntos** se dan una sola vez por combate (§4). | §4, §10.6; #365 |
 | 2026-11-22 | **Nodo «Conversación»** (nuevo tipo `conversacion`: hablar y, si lo dice, curar). En el Bosque Verde, **justo antes de Pikachu**, sale **siempre** un Cazabichos que avisa sin combatir de que Pikachu se come la comida de los demás y se ha hecho más fuerte, y cura al equipo. **Si pierdes contra Pikachu, vuelves a ese Cazabichos.** El texto lo propone Claude y Ayme lo aprueba. | §4; `kanto.json` (`aviso-pikachu`) |
 
 ### 10.8 Jefes
@@ -512,6 +516,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | Los tipos que no existen en el TCG se decidían «Pokémon a Pokémon» (§8, 10). | Tabla fija: `veneno` → oscuridad, `bicho` → planta, `volador` → normal, `fantasma` → psíquico, `hielo` → agua; y entra `metal` (§10.3). |
 | 2026-11-22 | La XP iba **por Pokémon** (10 por rival a cada Pokémon que siguiera en pie) y las victorias daban **puntos que en el centro se convertían en XP** (§10.6, 2026-11-21). | La evolución usa **solo XP de combate**, en una **reserva común** que el jugador reparte; se gasta entera para evolucionar (§10.6). |
 | 2026-11-22 | La evolución se hacía **en el centro Pokémon, un Pokémon por visita**, y la carta evolucionada **recuperaba todos los PS** (§10.6, 2026-11-21 y §2.1). | Se evoluciona **fuera de combate**, desde el menú del equipo, sin límite por visita, y el Pokémon **queda con 10 PS**, también si estaba debilitado (§10.6). |
+| 2026-11-22 | La región se recorría **solo hacia delante** y no había combates repetibles. | Se puede **retroceder** a escenas visitadas y repetir **solo los salvajes** (§10.7). |
 
 ### 10.10 Forma de trabajar
 
