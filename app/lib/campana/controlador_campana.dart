@@ -87,6 +87,14 @@ class ControladorCampana extends Notifier<EstadoCampana> {
 
   void noCapturar() => _guardar(_partida.noCapturar());
 
+  /// Lanza una Ball al Pokémon pendiente. Devuelve el motivo si no se puede, o
+  /// «se ha escapado» si sale cruz.
+  String? lanzarBall(CatalogoCampana c, ObjetoCampana ball) {
+    final motivo = _intentar(() => _partida.lanzarBall(c, ball));
+    if (motivo != null) return motivo;
+    return _partida.capturaLograda ? null : '¡Se ha escapado de la Ball!';
+  }
+
   void descansar(CatalogoCampana c) => _guardar(_partida.descansar(c));
 
   void conversar(CatalogoCampana c) => _guardar(_partida.conversar(c));

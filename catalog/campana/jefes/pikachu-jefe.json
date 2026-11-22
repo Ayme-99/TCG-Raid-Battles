@@ -1,6 +1,7 @@
 {
   "numero": 1,
   "xp": 30,
+  "capturaAsegurada": true,
   "pokemon": {
     "id": "pikachu-jefe",
     "numero": 25,
@@ -12,6 +13,7 @@
       "multiplicador": 2
     },
     "retirada": 0,
+    "categoriaCaptura": "comun",
     "ataques": [
       {
         "nombre": "Ataque Rápido",

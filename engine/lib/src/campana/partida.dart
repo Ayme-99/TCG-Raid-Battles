@@ -160,7 +160,8 @@ class CatalogoCampana {
           if (n.lider != null && n.lider!.dinero == null)
             '${n.id}: el líder no tiene "dinero".',
           if (n.clase != null &&
-              zonas[n.zona]?.entrenadores
+              zonas[n.zona]
+                      ?.entrenadores
                       .where((e) => e.clase == n.clase)
                       .firstOrNull
                       ?.dinero ==
@@ -277,6 +278,10 @@ class PartidaCampana {
   /// capturarlo o dejarlo no se avanza.
   final String? capturaPendiente;
 
+  /// Si ya ha salido cara con una Ball ([lanzarBall]) y solo falta decidir
+  /// dónde va el capturado ([capturar]).
+  final bool capturaLograda;
+
   /// Dinero, que se gana a entrenadores y se gasta en la tienda.
   final int dinero;
 
@@ -301,6 +306,7 @@ class PartidaCampana {
     this.puntos = 0,
     this.semilla = 1,
     this.capturaPendiente,
+    this.capturaLograda = false,
     this.derrotas = 0,
     this.dinero = 0,
     this.xp = 0,
@@ -327,6 +333,7 @@ class PartidaCampana {
     int? semilla,
     String? capturaPendiente,
     bool limpiarCaptura = false,
+    bool? capturaLograda,
     int? derrotas,
     int? dinero,
     int? xp,
@@ -341,6 +348,8 @@ class PartidaCampana {
         semilla: semilla ?? this.semilla,
         capturaPendiente:
             limpiarCaptura ? null : (capturaPendiente ?? this.capturaPendiente),
+        capturaLograda:
+            limpiarCaptura ? false : (capturaLograda ?? this.capturaLograda),
         derrotas: derrotas ?? this.derrotas,
         dinero: dinero ?? this.dinero,
         xp: xp ?? this.xp,
@@ -436,7 +445,7 @@ class PartidaCampana {
           return RivalDelNodo(
             equipo: [especie],
             nombre: '${especie.nombre} salvaje',
-            captura: especie.id,
+            captura: zona.permiteCaptura ? especie.id : null,
             // Repetir un salvaje no da puntos (se dan una vez por combate).
             puntos: progreso.repitiendo ? 0 : parametros.puntosSalvaje,
             xp: _xpDeEquipo([especie]),
@@ -672,7 +681,63 @@ class PartidaCampana {
           {ParametrosCampana parametros = const ParametrosCampana()}) =>
       equipo.length >= parametros.tamanoEquipo;
 
-  /// Captura el Pokémon pendiente, con todos sus PS. Si hay hueco se une al
+  /// Las Balls que hay en la mochila, de peor a mejor.
+  List<ObjetoCampana> ballsEnMochila() => [
+        for (final b in _balls)
+          if (cuantos(b) > 0) b,
+      ];
+
+  static const _balls = [
+    ObjetoCampana.pokeball,
+    ObjetoCampana.superBall,
+    ObjetoCampana.ultraBall,
+  ];
+
+  /// Categoría y si es segura la captura pendiente: la del jefe del nodo
+  /// (si el nodo es un jefe) o la de la carta del salvaje.
+  (CategoriaCaptura, bool) _capturaDelNodo(CatalogoCampana c) {
+    final nodo = nodoActual(c);
+    final jefe = nodo.tipo == TipoNodo.jefe ? c.jefes[nodo.jefe] : null;
+    if (jefe != null) return (jefe.categoriaCaptura, jefe.capturaAsegurada);
+    return (
+      c.especie(capturaPendiente!).categoriaCaptura ?? CategoriaCaptura.comun,
+      false
+    );
+  }
+
+  /// Probabilidad, en tanto por mil, de capturar al pendiente con [ball].
+  int probabilidadConBall(CatalogoCampana c, ObjetoCampana ball) {
+    if (capturaPendiente == null) return 0;
+    final (categoria, segura) = _capturaDelNodo(c);
+    if (segura) return 1000;
+    return probabilidadCaptura(categoria, _balls.indexOf(ball));
+  }
+
+  /// Lanza una [ball] al Pokémon pendiente (D-20 §10.6): gasta 1 Ball, salga
+  /// lo que salga, y la moneda se tira con la semilla de la partida, que
+  /// avanza. Con cara, [capturaLograda] y falta [capturar]; con cruz se puede
+  /// volver a lanzar mientras queden Balls, sin tope.
+  PartidaCampana lanzarBall(CatalogoCampana c, ObjetoCampana ball) {
+    if (capturaPendiente == null) {
+      throw const ReglaIncumplida('No hay nada que capturar.');
+    }
+    if (capturaLograda) throw const ReglaIncumplida('Ya está capturado.');
+    if (!_balls.contains(ball)) {
+      throw const ReglaIncumplida('Eso no es una Ball.');
+    }
+    if (cuantos(ball) < 1) {
+      throw const ReglaIncumplida('No te quedan de esas.');
+    }
+    final s = _siguiente(semilla);
+    final cara = s % 1000 < probabilidadConBall(c, ball);
+    return _copiar(
+      semilla: s,
+      mochila: {...mochila, ball: cuantos(ball) - 1},
+      capturaLograda: cara,
+    );
+  }
+
+  /// Coloca el Pokémon ya capturado ([capturaLograda]), con todos sus PS. Si hay hueco se une al
   /// equipo; si no, con [sustituir] (índice del equipo) ese va al PC y el
   /// capturado ocupa su sitio, y sin [sustituir] el capturado va al PC. Nunca
   /// se pierde un Pokémon (D-20 §2).
@@ -681,6 +746,9 @@ class PartidaCampana {
       ParametrosCampana parametros = const ParametrosCampana()}) {
     final id = capturaPendiente;
     if (id == null) throw const ReglaIncumplida('No hay nada que capturar.');
+    if (!capturaLograda) {
+      throw const ReglaIncumplida('Antes hay que lanzarle una Ball y acertar.');
+    }
     final nuevo = PokemonGuardado.completo(c.especie(id));
     if (!equipoLleno(parametros: parametros)) {
       return _copiar(equipo: [...equipo, nuevo], limpiarCaptura: true);
@@ -699,10 +767,14 @@ class PartidaCampana {
     );
   }
 
-  /// Deja escapar al Pokémon pendiente sin capturarlo.
+  /// Deja escapar al Pokémon pendiente sin capturarlo (también sin Balls).
+  /// Un jefe que se deja ir ya no se puede capturar (D-20 §10.6).
   PartidaCampana noCapturar() {
     if (capturaPendiente == null) {
       throw const ReglaIncumplida('No hay nada que capturar.');
+    }
+    if (capturaLograda) {
+      throw const ReglaIncumplida('Ya está capturado: elige dónde va.');
     }
     return _copiar(limpiarCaptura: true);
   }
@@ -833,9 +905,8 @@ class PartidaCampana {
     if (indice < 0 || indice >= equipo.length) {
       throw const ReglaIncumplida('Ese Pokémon no está en el equipo.');
     }
-    final evolucion = evolucionesPorXp(c, indice)
-        .where((e) => e.a == destino)
-        .firstOrNull;
+    final evolucion =
+        evolucionesPorXp(c, indice).where((e) => e.a == destino).firstOrNull;
     if (evolucion == null) {
       throw ReglaIncumplida(
           '${c.especie(equipo[indice].id).nombre} no evoluciona en "$destino" con XP.');
@@ -859,6 +930,7 @@ class PartidaCampana {
         'puntos': puntos,
         'semilla': semilla,
         if (capturaPendiente != null) 'capturaPendiente': capturaPendiente,
+        if (capturaLograda) 'capturaLograda': true,
         'derrotas': derrotas,
         'dinero': dinero,
         'xp': xp,
@@ -891,6 +963,7 @@ class PartidaCampana {
       puntos: json['puntos'] as int,
       semilla: _normalizar(json['semilla'] as int),
       capturaPendiente: json['capturaPendiente'] as String?,
+      capturaLograda: (json['capturaLograda'] as bool?) ?? false,
       derrotas: (json['derrotas'] as int?) ?? 0,
       dinero: (json['dinero'] as int?) ?? 0,
       xp: v == 1 ? xpAntigua : (json['xp'] as int?) ?? 0,
