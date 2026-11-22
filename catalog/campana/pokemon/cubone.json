@@ -5,20 +5,14 @@
   "tipo": "lucha",
   "ps": 60,
   "debilidad": {
-    "tipo": "agua",
+    "tipo": "planta",
     "multiplicador": 2
   },
   "retirada": 0,
   "categoriaCaptura": "comun",
   "ataques": [
     {
-      "nombre": "Garra",
-      "tipo": "normal",
-      "coste": 1,
-      "dano": 10
-    },
-    {
-      "nombre": "Golpe Hueso",
+      "nombre": "Hueso Palo",
       "tipo": "lucha",
       "coste": 2,
       "dano": 30
