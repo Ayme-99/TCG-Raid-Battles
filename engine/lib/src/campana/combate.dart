@@ -75,8 +75,9 @@ class BandoCombate {
   final int racha;
 
   /// Posición de un Pokémon del equipo que no puede salir con [Cambiar]
-  /// (-1 si no hay ninguno): el jefe que se ha retirado a la banca al llamar
-  /// a su aliado, que solo vuelve cuando el aliado cae (D-20 §4, Jefes).
+  /// (-1 si no hay ninguno), por la llamada de aliado (D-20 §4, Jefes): el
+  /// aliado que espera en la banca a que el jefe llegue al segundo umbral, o
+  /// el jefe que se ha retirado y solo vuelve cuando el aliado cae.
   final int enEspera;
 
   const BandoCombate({
@@ -153,20 +154,30 @@ class DanoRepetido {
   const DanoRepetido(this.atacante, this.ataque, this.reduccion);
 }
 
-/// La llamada de aliado de un jefe en combate (D-20 §4, Jefes): cuando el
-/// Pokémon de la posición [jefe] del rival **llega** al [porcentaje] de sus PS
-/// o baja de él (con 100 PS y el 50 %, al quedarse en 50 o menos) sin caer,
-/// se retira a la banca y entra uno de los [aliados], elegido con la semilla
-/// del combate. Llama una sola vez por combate. Cuando el aliado cae, vuelve
-/// el jefe con los PS que tenía; mientras tanto no puede volver con [Cambiar].
+/// La llamada de aliado de un jefe en combate (D-20 §4, Jefes), en dos
+/// pasos. Cuando el Pokémon de la posición [jefe] del rival **llega** al
+/// [porcentaje] de sus PS o baja de él sin caer, invoca a uno de los
+/// [aliados] (elegido con la semilla del combate), que aparece **en la
+/// banca**. Cuando llega a [alFrente] % o baja de él, el jefe se retira a la
+/// banca (pierde todos sus efectos, como al cambiar) y el aliado pasa al
+/// puesto activo. Un golpe que cruce los dos umbrales hace las dos cosas a la
+/// vez. Llama una sola vez por combate; el aliado no sale con [Cambiar]
+/// mientras espera, y el jefe no vuelve hasta que cae el aliado, con los PS
+/// que tenía. El combate se gana cuando cae el jefe.
 class LlamadaEnCombate {
   final int porcentaje;
+
+  /// Porcentaje de PS al que el aliado pasa al puesto activo (igual o menor
+  /// que [porcentaje]; si es igual, entra directamente).
+  final int alFrente;
   final List<PokemonCampana> aliados;
 
   /// Posición del jefe en el equipo del rival (el primero, de salida).
   final int jefe;
 
-  const LlamadaEnCombate(this.porcentaje, this.aliados, {this.jefe = 0});
+  const LlamadaEnCombate(this.porcentaje, this.aliados,
+      {int? alFrente, this.jefe = 0})
+      : alFrente = alFrente ?? porcentaje;
 }
 
 /// Estado inmutable de un combate 1 contra 1.
@@ -203,9 +214,12 @@ class EstadoCombate {
   /// La llamada de aliado del rival, si es un jefe que la tiene; null si no.
   final LlamadaEnCombate? llamada;
 
-  /// Posición en el equipo del rival del aliado que ha entrado, o null si el
-  /// jefe todavía no ha llamado. Los aliados no se capturan.
+  /// Posición en el equipo del rival del aliado invocado, o null si el jefe
+  /// todavía no ha llamado. Los aliados no se capturan.
   final int? aliado;
+
+  /// Si el aliado ya ha pasado al puesto activo (segundo umbral).
+  final bool aliadoAlFrente;
 
   const EstadoCombate({
     required this.jugador,
@@ -221,6 +235,7 @@ class EstadoCombate {
     this.repetirDano,
     this.llamada,
     this.aliado,
+    this.aliadoAlFrente = false,
   });
 
   /// Si el jefe ya ha llamado a su aliado en este combate.
@@ -240,6 +255,7 @@ class EstadoCombate {
     }
     if (llamadaRival != null &&
         (llamadaRival.aliados.isEmpty ||
+            llamadaRival.alFrente > llamadaRival.porcentaje ||
             llamadaRival.jefe < 0 ||
             llamadaRival.jefe >= equipoRival.length)) {
       throw const ReglaIncumplida('La llamada de aliado no es válida.');
@@ -292,6 +308,7 @@ class EstadoCombate {
     DanoRepetido? repetirDano,
     bool limpiarRepetirDano = false,
     int? aliado,
+    bool? aliadoAlFrente,
   }) =>
       EstadoCombate(
         jugador: jugador ?? this.jugador,
@@ -308,6 +325,7 @@ class EstadoCombate {
             limpiarRepetirDano ? null : (repetirDano ?? this.repetirDano),
         llamada: llamada,
         aliado: aliado ?? this.aliado,
+        aliadoAlFrente: aliadoAlFrente ?? this.aliadoAlFrente,
       );
 
   EstadoCombate conBando(Bando b, BandoCombate nuevo) => b == Bando.jugador
@@ -437,7 +455,7 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
   final golpeado = nuevo
       .conBando(a.bando, bando.copiarCon(equipo: equipo))
       .copiarCon(limpiarRepetirDano: true);
-  if (golpeado.bando(a.bando).derrotado) {
+  if (golpeado.bando(a.bando).derrotado || _jefeCaido(golpeado)) {
     return golpeado.copiarCon(
         fase: FaseCombate.terminado, ganador: rep.atacante);
   }
@@ -566,7 +584,7 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
           semilla: semilla,
           ultimaMoneda: moneda,
           ultimasMonedas: monedas.isEmpty ? null : monedas);
-  if (defensorNuevo.derrotado) {
+  if (defensorNuevo.derrotado || _jefeCaido(nuevo)) {
     return nuevo.copiarCon(fase: FaseCombate.terminado, ganador: a.bando);
   }
   if (efecto is RepiteDanoAlDerribar && !golpeado.enPie) {
@@ -581,8 +599,9 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
 EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
   final b = estado.bando(a.bando);
   if (a.indice == b.enEspera && b.relevos.contains(a.indice)) {
-    throw const ReglaIncumplida(
-        'El jefe no vuelve hasta que caiga su aliado.');
+    throw ReglaIncumplida(estado.aliadoAlFrente
+            ? 'El jefe no vuelve hasta que caiga su aliado.'
+            : 'El aliado espera en la banca hasta que el jefe lo saque.');
   }
   if (!b.cambiables.contains(a.indice)) {
     throw const ReglaIncumplida('Ese Pokémon no puede salir.');
@@ -630,6 +649,10 @@ EstadoCombate _terminarTurno(EstadoCombate estado) {
       );
   final chequeado = _chequeoPokemon(cambiado, termina);
   if (chequeado.fase == FaseCombate.terminado) return chequeado;
+  if (_jefeCaido(chequeado)) {
+    return chequeado.copiarCon(
+        fase: FaseCombate.terminado, ganador: Bando.jugador);
+  }
   final tras = _llamarAliado(chequeado);
   // Si cae algún activo (por un ataque o por el veneno), hay que elegir relevo.
   return tras.debenElegir.isEmpty
@@ -658,29 +681,47 @@ EstadoCombate _chequeoPokemon(EstadoCombate estado, Bando primero) {
   return s;
 }
 
+/// Con llamada de aliado, el combate se gana cuando cae el jefe, aunque su
+/// aliado siga en pie (D-20 §4, Jefes).
+bool _jefeCaido(EstadoCombate e) {
+  final l = e.llamada;
+  return l != null && !e.rival.equipo[l.jefe].enPie;
+}
+
 /// Llamada de aliado del jefe (D-20 §4, Jefes). Se comprueba al terminar cada
 /// turno, después del chequeo Pokémon, así que cuenta cualquier daño: el de
-/// un ataque y el del veneno. Si el jefe activo sigue en pie con el
-/// porcentaje de PS de la llamada o menos, se retira a la banca (pierde sus
-/// estados, como al cambiar) y entra un aliado elegido con la semilla.
+/// un ataque y el del veneno. Con el jefe activo y en pie: al llegar al
+/// primer umbral invoca a un aliado elegido con la semilla, que aparece en la
+/// banca; al llegar al segundo, el jefe se retira a la banca (pierde todos
+/// sus efectos, como al cambiar) y el aliado pasa al puesto activo. Un mismo
+/// golpe puede hacer las dos cosas.
 EstadoCombate _llamarAliado(EstadoCombate estado) {
   final llamada = estado.llamada;
-  if (llamada == null || estado.llamadaHecha) return estado;
-  final rival = estado.rival;
-  if (rival.activo != llamada.jefe) return estado;
+  if (llamada == null || estado.aliadoAlFrente) return estado;
+  var s = estado;
+  var rival = s.rival;
+  if (rival.activo != llamada.jefe) return s;
   final jefe = rival.pokemonActivo;
-  if (!jefe.enPie || jefe.ps * 100 > llamada.porcentaje * jefe.especie.ps) {
-    return estado;
+  if (!jefe.enPie) return s;
+  bool llega(int porcentaje) => jefe.ps * 100 <= porcentaje * jefe.especie.ps;
+  if (!s.llamadaHecha) {
+    if (!llega(llamada.porcentaje)) return s;
+    final semilla = _siguienteSemilla(s.semilla);
+    final elegido = llamada.aliados[(semilla >> 8) % llamada.aliados.length];
+    final posicion = rival.equipo.length;
+    rival = rival.copiarCon(
+        equipo: [...rival.equipo, PokemonEnCombate.completo(elegido)],
+        enEspera: posicion);
+    s = s
+        .conBando(Bando.rival, rival)
+        .copiarCon(semilla: semilla, aliado: posicion);
   }
-  final semilla = _siguienteSemilla(estado.semilla);
-  final elegido = llamada.aliados[(semilla >> 8) % llamada.aliados.length];
-  final posicion = rival.equipo.length;
-  return estado
+  if (!llega(llamada.alFrente)) return s;
+  return s
       .conBando(
           Bando.rival,
           rival.copiarCon(
-            equipo: [...rival.equipo, PokemonEnCombate.completo(elegido)],
-            activo: posicion,
+            activo: s.aliado,
             danoReducido: 0,
             danoExtra: 0,
             veneno: 0,
@@ -690,5 +731,5 @@ EstadoCombate _llamarAliado(EstadoCombate estado) {
             racha: 0,
             enEspera: llamada.jefe,
           ))
-      .copiarCon(semilla: semilla, aliado: posicion);
+      .copiarCon(aliadoAlFrente: true);
 }

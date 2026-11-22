@@ -29,13 +29,18 @@ PokemonCampana bicho(String id,
 final jefe = bicho('jefe', ps: 100, ataques: [golpe(10)]);
 final aliados = [bicho('aliado-a', ps: 30), bicho('aliado-b', ps: 30)];
 
+// Sin `alFrente` el aliado entra directamente al invocarlo (un solo umbral);
+// los dos pasos de Pikachu (50 % a la banca, 40 % al frente) van en su grupo.
 EstadoCombate combate(List<AtaqueCampana> ataquesJugador,
-        {int semilla = 1, int porcentaje = 50, List<PokemonCampana>? jugador}) =>
+        {int semilla = 1,
+        int porcentaje = 50,
+        int? alFrente,
+        List<PokemonCampana>? jugador}) =>
     EstadoCombate.inicial(
       equipoJugador: jugador ?? [bicho('heroe', ps: 300, ataques: ataquesJugador)],
       equipoRival: [jefe],
       semilla: semilla,
-      llamadaRival: LlamadaEnCombate(porcentaje, aliados),
+      llamadaRival: LlamadaEnCombate(porcentaje, aliados, alFrente: alFrente),
     );
 
 EstadoCombate jugar(EstadoCombate e, List<AccionCombate> acciones) {
@@ -217,6 +222,103 @@ void main() {
     });
   });
 
+  group('en dos pasos: 50 % a la banca, 40 % al frente', () {
+    EstadoCombate dosPasos(List<AtaqueCampana> ataques) =>
+        combate(ataques, alFrente: 40);
+
+    test('al 50 % invoca al aliado, que aparece en la banca', () {
+      final e = jugar(dosPasos([golpe(50)]), [const Atacar(Bando.jugador, 0)]);
+      expect(e.llamadaHecha, isTrue);
+      expect(e.aliadoAlFrente, isFalse);
+      expect(e.rival.activo, 0, reason: 'el jefe sigue delante');
+      expect(e.rival.equipo, hasLength(2));
+      expect(e.rival.enEspera, e.aliado);
+    });
+
+    test('el aliado no sale con Cambiar mientras espera en la banca', () {
+      final e = jugar(dosPasos([golpe(50)]), [const Atacar(Bando.jugador, 0)]);
+      expect(e.rival.cambiables, isEmpty);
+      expect(() => aplicarCombate(e, Cambiar(Bando.rival, e.aliado!)),
+          throwsA(isA<ReglaIncumplida>()));
+      expect(decidirAccion(e, Bando.rival), isNot(isA<Cambiar>()));
+    });
+
+    test('el jefe conserva sus efectos mientras el aliado está en la banca', () {
+      var e = dosPasos([golpe(0, efecto: const ReduceDanoRival(10)), golpe(50)]);
+      e = jugar(e, [
+        const Atacar(Bando.jugador, 0),
+        const Atacar(Bando.rival, 0),
+        const Atacar(Bando.jugador, 1),
+      ]);
+      expect(e.llamadaHecha, isTrue);
+      expect(e.rival.danoReducido, 10);
+    });
+
+    test('al 40 % el jefe se retira (sin efectos) y el aliado pasa al frente',
+        () {
+      var e = dosPasos([golpe(50), golpe(10, efecto: const ReduceDanoRival(10))]);
+      e = jugar(e, [
+        const Atacar(Bando.jugador, 0),
+        const Atacar(Bando.rival, 0),
+        const Atacar(Bando.jugador, 1),
+      ]);
+      expect(e.aliadoAlFrente, isTrue);
+      expect(e.rival.activo, e.aliado);
+      expect(e.rival.equipo[0].ps, 40);
+      expect(e.rival.enEspera, 0);
+      expect(e.rival.danoReducido, 0, reason: 'pierde todos los efectos');
+    });
+
+    test('un golpe que cruza los dos umbrales lo pone delante directamente',
+        () {
+      final e = jugar(dosPasos([golpe(60)]), [const Atacar(Bando.jugador, 0)]);
+      expect(e.llamadaHecha, isTrue);
+      expect(e.aliadoAlFrente, isTrue);
+      expect(e.rival.activo, e.aliado);
+      expect(e.rival.equipo[0].ps, 40);
+    });
+
+    test('si el jefe cae con el aliado en la banca, se gana', () {
+      final e = jugar(dosPasos([golpe(50)]), [
+        const Atacar(Bando.jugador, 0),
+        const Atacar(Bando.rival, 0),
+        const Atacar(Bando.jugador, 0),
+      ]);
+      expect(e.fase, FaseCombate.terminado);
+      expect(e.ganador, Bando.jugador);
+      expect(e.rival.equipo[e.aliado!].enPie, isTrue);
+    });
+
+    test('el jefe vuelve con sus PS y no vuelve a cambiarse', () {
+      var e = dosPasos([golpe(60), golpe(30), golpe(10)]);
+      e = jugar(e, [
+        const Atacar(Bando.jugador, 0),
+        const Atacar(Bando.rival, 0),
+        const Atacar(Bando.jugador, 1),
+      ]);
+      expect(e.debenElegir, [Bando.rival]);
+      e = aplicarCombate(e, decidirAccion(e, e.actua));
+      expect(e.rival.activo, 0);
+      expect(e.rival.pokemonActivo.ps, 40);
+      e = jugar(e, [
+        const Atacar(Bando.rival, 0),
+        const Atacar(Bando.jugador, 2),
+      ]);
+      expect(e.rival.activo, 0);
+      expect(e.rival.equipo, hasLength(2));
+    });
+
+    test('un segundo umbral mayor que el primero no vale', () {
+      expect(
+          () => EstadoCombate.inicial(
+                equipoJugador: [jefe],
+                equipoRival: [jefe],
+                llamadaRival: LlamadaEnCombate(40, aliados, alFrente: 50),
+              ),
+          throwsA(isA<ReglaIncumplida>()));
+    });
+  });
+
   group('Pikachu del catálogo', () {
     Map<String, dynamic> leer(String ruta) =>
         jsonDecode(File(ruta).readAsStringSync()) as Map<String, dynamic>;
@@ -234,6 +336,7 @@ void main() {
     test('su llamada sale del catálogo con sus cuatro aliados', () {
       final l = llamadaEnCombate(pikachu, pokemon)!;
       expect(l.porcentaje, 50);
+      expect(l.alFrente, 40);
       expect(l.aliados.map((a) => a.id),
           ['weedle', 'caterpie', 'metapod', 'kakuna']);
     });
