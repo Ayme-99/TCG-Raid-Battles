@@ -8,24 +8,25 @@
     "tipo": "agua",
     "multiplicador": 2
   },
-  "resistencia": {
-    "tipo": "normal",
-    "reduccion": 30
-  },
-  "retirada": 0,
+  "retirada": 1,
   "categoriaCaptura": "intermedio",
   "ataques": [
     {
-      "nombre": "Placaje",
+      "nombre": "Pulimento",
       "tipo": "normal",
       "coste": 1,
-      "dano": 10
+      "dano": 0,
+      "efecto": {
+        "tipo": "ganaEnergia",
+        "valor": 2,
+        "texto": "Tu bando recupera 2 de energía (hasta el máximo de 10)."
+      }
     },
     {
       "nombre": "Lanzarrocas",
       "tipo": "lucha",
-      "coste": 2,
-      "dano": 30
+      "coste": 3,
+      "dano": 50
     }
   ]
 }

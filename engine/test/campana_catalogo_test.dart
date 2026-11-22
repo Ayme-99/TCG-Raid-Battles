@@ -215,6 +215,28 @@ void main() {
       expect(c.ataques.last.dano, 20);
     });
 
+    test('Geodude: carta impresa con Pulimento (gana 2 de energía) y Lanzarrocas', () {
+      final g = pokemon['geodude']!;
+      expect(g.tipo, TipoCampana.lucha);
+      expect(g.ps, 80);
+      expect(g.debilidad!.tipo, TipoCampana.agua);
+      expect(g.debilidad!.multiplicador, 2);
+      expect(g.resistencia, isNull);
+      expect(g.retirada, 1);
+      final pulimento = g.ataques.first;
+      expect(pulimento.nombre, 'Pulimento');
+      expect(pulimento.tipo, TipoCampana.normal);
+      expect(pulimento.coste, 1);
+      expect(pulimento.dano, 0);
+      expect(pulimento.efecto, isA<GanaEnergia>()
+          .having((e) => e.valor, 'valor', 2));
+      final lanzarrocas = g.ataques.last;
+      expect(lanzarrocas.nombre, 'Lanzarrocas');
+      expect(lanzarrocas.tipo, TipoCampana.lucha);
+      expect(lanzarrocas.coste, 3);
+      expect(lanzarrocas.dano, 50);
+    });
+
     test('Squirtle: Látigo hace que el rival reciba 10 más y no hace daño', () {
       final s = pokemon['squirtle']!;
       expect(s.ps, 80);

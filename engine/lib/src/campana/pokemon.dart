@@ -1,6 +1,6 @@
 import 'tipos.dart';
 
-/// Efecto de un ataque (D-20 §3.6). Hoy hay diez; los demás (monedas,
+/// Efecto de un ataque (D-20 §3.6). Hoy hay once; los demás (monedas,
 /// estados…) llegan con las cartas que los necesiten.
 sealed class EfectoAtaque {
   const EfectoAtaque();
@@ -31,6 +31,16 @@ class QuitaEnergiaRival extends EfectoAtaque {
   final int valor;
 
   const QuitaEnergiaRival(this.valor);
+}
+
+/// El propio bando suma [valor] de energía a su reserva en el momento de usar
+/// el ataque, después de pagar su coste y con tope en
+/// la energía máxima del combate (10). Se aplica una vez y no deja estado
+/// (Pulimento). Es el efecto «propio» de [QuitaEnergiaRival].
+class GanaEnergia extends EfectoAtaque {
+  final int valor;
+
+  const GanaEnergia(this.valor);
 }
 
 /// Lanza una moneda al atacar: si sale cara, el ataque hace [valor] puntos de

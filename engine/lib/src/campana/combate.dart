@@ -618,6 +618,12 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
       energia: atacante.energia - ataque.coste,
       ultimoAtaque: a.indice,
       racha: racha);
+  if (efecto is GanaEnergia) {
+    // El coste ya está pagado; se suma después, con tope en el máximo.
+    final max = estado.parametros.energiaMaxima;
+    final total = atacanteNuevo.energia + efecto.valor;
+    atacanteNuevo = atacanteNuevo.copiarCon(energia: total > max ? max : total);
+  }
   if (efecto is ReduceDanoPropio && efecto.valor > atacante.proteccion) {
     atacanteNuevo = atacanteNuevo.copiarCon(proteccion: efecto.valor);
   }

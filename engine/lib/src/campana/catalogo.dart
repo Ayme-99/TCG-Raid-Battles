@@ -99,6 +99,8 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
       return MonedaDanoExtra(_campo<int>(json, 'valor'));
     case 'quitaEnergiaRival':
       return QuitaEnergiaRival(_campo<int>(json, 'valor'));
+    case 'ganaEnergia':
+      return GanaEnergia(_campo<int>(json, 'valor'));
   }
   throw FormatException('Efecto de ataque desconocido: "$tipo".');
 }
