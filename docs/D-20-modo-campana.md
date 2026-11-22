@@ -250,10 +250,10 @@ Hecho el 2026-11-22 (tareas 6, 8 y 9, primera versión). `PartidaCampana` (`engi
 
 - **Rival de cada nodo:** el salvaje sale al azar de la zona con la semilla de la partida; un entrenador sin equipo fijo en el nodo saca **2** Pokémon de su lista (suposición); el gimnasio, los del líder en orden; el jefe, su carta NN/20 con su **llamada de aliado** (#372): el aliado entra en el combate, no se captura y no cuenta como rival derrotado para la XP si sigue en pie. Si el nodo fija el Pokémon (`pokemon` en `kanto.json`), sale ese; si no, sale de la zona o de la clase de entrenador con la semilla.
 - **PS entre combates:** el daño se arrastra de un combate a otro y la energía vuelve a 10 al empezar cada combate (decidido por Ayme el 2026-11-22). Solo cura el centro Pokémon o una Poción.
-- **Captura:** al vencer a un salvaje, o a un jefe la primera vez (su carta normal, `pikachu-jefe` → `pikachu`), se ofrece capturarlo; **siempre funciona** mientras no exista la Pokéball. Hay hueco: entra al equipo; equipo lleno: se elige a quién mandar al PC, o va al PC el capturado.
+- **Captura:** al vencer a un salvaje, o a un jefe la primera vez (su carta normal, `pikachu-jefe` → `pikachu`), se ofrece capturarlo; **hoy siempre funciona**. Decidido el 2026-11-22 (§10.6): pasará a **Pokéball con moneda** y categoría de captura, pendiente de implementar (#368). Hay hueco: entra al equipo; equipo lleno: se elige a quién mandar al PC, o va al PC el capturado.
 - **Derrota** (decidido el 2026-11-22): se vuelve al **último sitio donde se curó** el equipo (el inicio, el último centro Pokémon usado o la última conversación que curó, como el aviso antes de Pikachu; una Poción no cuenta), con el equipo curado. Se conserva lo ganado: capturas, puntos, dinero, XP y medallas. Los nodos de después se vuelven a pasar; un jefe ya derrotado ya no da puntos ni captura.
-- **XP y dinero** (decidido el 2026-11-22): la XP se gana al derrotar Pokémon (10 por rival, para cada Pokémon del equipo que siga en pie al acabar: suposición) y el dinero, al vencer a entrenadores (200) y líderes (500). Se empieza con 300 (suposición). La evolución con XP aún no está.
-- **Tienda del centro Pokémon:** Poción (100, cura 20 PS a un Pokémon en pie, fuera de combate, sin revivir) y Repelente (150, evita un combate contra un salvaje, sin puntos, XP ni captura). La Pokéball queda pendiente porque falta decidir la probabilidad de captura.
+- **XP y dinero** (decidido el 2026-11-22): la XP se gana al derrotar Pokémon (10 por rival, para cada Pokémon del equipo que siga en pie al acabar: suposición) y el dinero, al vencer a entrenadores (200) y líderes (500). Se empieza con 300 (suposición). La evolución con XP aún no está. **Esas cifras de dinero están sustituidas** (decidido el 2026-11-22, §10.6): dinero de salida 1000 y pago por clase de entrenador y líder, pendiente de implementar (#362).
+- **Tienda del centro Pokémon:** Poción (100, cura 20 PS a un Pokémon en pie, fuera de combate, sin revivir) y Repelente (150, evita un combate contra un salvaje, sin puntos, XP ni captura). La Pokéball queda pendiente de implementar (#368). **Precios sustituidos** (decidido el 2026-11-22, §10.6): Poción 300 y Pokéball 200; en el primer tramo la tienda vende solo Pokéball y Poción, y el Repelente (350) llega después.
 - **Puntos** (provisionales): salvaje 100, entrenador 200, jefe 1000 (la primera vez), medalla 1500. Se guardan en el dispositivo; todavía no se envían al servidor (tarea 10).
 - **App:** «Nueva partida → Modo campaña» abre el mapa (`app/lib/campana/`). Pantallas: mapa con la ruta y el nodo actual, elección de inicial, combate (la máquina responde al momento y hay un registro de lo que pasa), captura, equipo (ordenar, Poción), centro Pokémon (curar, tienda, PC). La partida se guarda en el dispositivo tras cada cambio (`shared_preferences`, clave `campana_kanto`); un combate a medias no se guarda y, al volver, empieza de nuevo contra el mismo rival.
 
@@ -314,9 +314,9 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 
 **Reglas del juego**
 
-3. **Cómo se captura.** Qué pasa con la Pokéball (¿se compra?, ¿limita la captura?, ¿hay probabilidad?). Hoy solo está decidido que capturar es opcional.
-4. **Qué se vende en el descanso** (curas, objetos, Pokémon) y cuánto cuesta.
-5. **Dinero.** Los entrenadores dan dinero (decidido), pero no está dicho qué es, para qué sirve ni cómo se relaciona con los puntos.
+3. ~~Cómo se captura~~ **Decidido el 2026-11-22** (§10.6): Pokéball con moneda y categoría de captura.
+4. **Qué se vende en el descanso.** En el primer tramo, solo Pokéball y Poción (§10.6); falta decidir el resto (Repelente, Super y Ultra Ball, objetos, Pokémon) para los tramos siguientes.
+5. **Dinero.** Cerradas las cifras del primer tramo (§10.6); falta decidir para qué sirve el dinero frente a los puntos y las cifras de los tramos siguientes.
 6. **Cifras de progresión:** cuántos puntos cuesta cada XP, cuántas XP necesita cada Pokémon para evolucionar, y cuánto cuestan el intercambio y hacerse ex.
 7. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex). Todavía no hay ninguna carta evolucionada ni ex.
 8. **Liga.** Es fase 2 y no tiene tipo de nodo; falta decidir cómo se juega (varios combates seguidos, sin descanso…).
@@ -333,7 +333,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 14. **Jefes 02 a 16.** La lista de §4 es una propuesta mía; solo está cerrado el total (20), el 01 (Pikachu) y los cuatro legendarios.
 15. **Túnel Roca.** La zona sigue listando a Onix como jefe y no tiene sitio en el recorrido; hay que rehacerla (el jefe de la zona es un salvaje de la serie NN/20) y decidir en qué tramo entra.
 16. **Listas de Pokémon por zona.** Las de Ruta 1, Ruta 2, Bosque Verde, Ruta 22 y el gimnasio de Ciudad Plateada salen de los juegos Rojo y Azul **por contrastar con Serebii o Bulbapedia**.
-17. **Campo `rareza`.** Se propuso en el diseño y no existe en el esquema ni en el motor.
+17. ~~Campo `rareza`~~ **Sustituido el 2026-11-22** (§10.6) por el campo `categoriaCaptura` (Común, Intermedio, Fuerte o Jefe), que aún no existe en el esquema ni en el motor (#368).
 18. **Más Pokémon.** El tramo de Pueblo Paleta a Ciudad Plateada está completo (la lista de Ayme se acabó el 2026-11-22), pero los 151 y el resto de zonas no: la creación de cartas es manual y es el cuello de botella.
 
 **Equilibrado y producto**
@@ -450,6 +450,13 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-21 | Objetos de evolución (piedras): se compran fuera de los centros o se encuentran en las rutas. Evolución por **intercambio** (Haunter, Kadabra…): cuesta **puntos**. | §2.1 |
 | 2026-11-21 | La **última fase de cada Pokémon es una carta ex**; uno que no evoluciona puede hacerse ex **gastando puntos**. Cada ex es una entrada propia del catálogo. La carta evolucionada **sustituye** a la anterior y recupera todos los PS. | §2.1 |
 | 2026-11-21 | **Derrotar Pokémon da XP** y se elige a quién se la das. Cada combate da puntos **una sola vez**. Los entrenadores dan **dinero** (sin definir). | §4, §5 |
+| 2026-11-22 | **Captura con Pokéball.** Tras derrotar a un salvaje, o a un jefe la primera vez, se captura tirando una moneda con la semilla de la partida. Cada tirada gasta 1 Ball (también si sale cara) y se puede reintentar mientras queden. Sin Pokéballs el combate acaba sin captura; un jefe no capturado la primera vez ya no se puede capturar. **Sin tope** de Pokéballs en la mochila: el límite lo pone el dinero. Pendiente de implementar. | §4, Partida de campaña; #361, #368 |
+| 2026-11-22 | **Categoría de captura.** La probabilidad depende de la categoría del Pokémon y de la Ball (Pokéball / Super Ball / Ultra Ball): Común 75 / 100 / 100 %, Intermedio 50 / 75 / 100 %, Fuerte 25 / 50 / 75 %, Jefe 12,5 / 25 / 50 %. La categoría es un campo de cada carta y de cada jefe (`categoriaCaptura`). **Pikachu jefe** es Común con **captura asegurada** (la moneda sale siempre cara) por ser el tutorial. | #361, #368 |
+| 2026-11-22 | **Asignación inicial de categorías.** Común: Pidgey, Rattata, Spearow, Nidoran♀, Nidoran♂, Caterpie, Weedle, Diglett, Sandshrew, Zubat, Cubone, Machop, Slowpoke y Pikachu. Intermedio: Metapod, Kakuna, Mankey y Geodude. Fuerte: Onix. Los iniciales no aplican. | #361 |
+| 2026-11-22 | **La Ruta 1 no permite capturar** (solo se aprende a combatir). La primera tienda es el centro de Ciudad Verde y la mochila de salida lleva **0 Pokéballs**. | #361 |
+| 2026-11-22 | **Super Ball** se desbloquea con la 1ª medalla y **Ultra Ball** con 5 medallas. | #361 |
+| 2026-11-22 | **Precios** (los de los juegos Rojo, Azul, Amarillo y FireRed/LeafGreen): Pokéball 200, Super Ball 600, Ultra Ball 1200, Poción 300 y Repelente 350. En el primer tramo la tienda vende **solo Pokéball y Poción**. | #362 |
+| 2026-11-22 | **Dinero.** Cada clase de entrenador y cada líder paga una cifra propia guardada en el catálogo (campo `dinero`), para ajustarlo a cada tramo. Referencia: al conseguir la 1ª medalla el jugador ha ganado unos **2.060** (en FireRed/LeafGreen son 2.064 solo con entrenadores). Primer tramo: Cazabichos 200 (×2), Entrenador Joven 260 y Brock 1.400. Dinero de salida: **1.000**. Los salvajes no dan dinero. Pendiente de implementar. | §5; #362 |
 
 ### 10.7 Mapa y ruta
 
