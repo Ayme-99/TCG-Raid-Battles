@@ -45,6 +45,7 @@ jobs:
       - run: dart run bin/sim_campana.dart --modo=nodos --partidas=5 --informe=/tmp/campana_nodos.csv
       - run: dart run bin/sim_campana.dart --modo=tramo --partidas=50 --informe=/tmp/campana_tramo.csv
       - run: dart run bin/sim_campana.dart --modo=realista --partidas=50 --informe=/tmp/campana_realista.csv
+      - run: dart run bin/sim_campana.dart --modo=realista --partidas=50 --aliado=no --informe=/tmp/campana_realista_sin_aliado.csv
 
   contrato:
     name: Contrato JSON (esquema del backend)

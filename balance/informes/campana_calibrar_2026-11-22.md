@@ -11,7 +11,7 @@ Fecha: 2026-11-22. Objetivo de Ayme: **75 % de victorias**. Este informe **no ca
 
 Límites (son de la medida, no reglas del juego):
 - La IA juega también por el jugador. Una persona puede jugar algo mejor.
-- **Pikachu jefe va sin la llamada de aliado** (#372 no está hecho). Con aliado será más difícil.
+- **Pikachu jefe va sin la llamada de aliado en los resultados 1 a 3** (se midieron antes de #372). Con aliado, ver el resultado 4.
 - Cuántos Pokémon saca un Cazabichos no está decidido: se mide con 1 (y abajo con 2 como comparación).
 - La captura no está diseñada (#361). El tramo se mide de dos formas: **solo con el inicial** y **capturando todos los salvajes vencidos** (hasta 6, con los PS llenos). Son cotas inferior y superior.
 - **`--modo=realista`**: el resultado 3, con un equipo de inicial + 2 o 3 capturas y la IA eligiendo el activo.
@@ -95,6 +95,35 @@ Ni con el equipo curado se llega al 75 % sin quitarle un Pokémon a Brock, y por
 **Pikachu jefe contra inicial + 2 capturas con los PS llenos:** 99–100 % con 100, 90 u 80 PS. Su problema en el tramo es el daño que trae el equipo, no sus PS.
 
 **Solo el inicial** (resultado 1, como referencia): Pikachu con 100 PS no cae con ningún inicial; con 90 cae con Charmander, con 80 o menos con Bulbasaur y Charmander, y **Squirtle no gana ni con 50** (débil a eléctrico). Inicial + Pidgey + Weedle contra el Entrenador Joven: 76 % con Bulbasaur o Charmander y 25 % con Squirtle.
+
+## Resultado 4: Pikachu con su aliado (#393)
+
+Desde #372 el motor tiene la llamada de aliado: al 50 % Pikachu invoca a Weedle, Caterpie, Metapod o Kakuna, que espera en la banca, y al 40 % el aliado pasa al frente. Los resultados 1 a 3 se midieron **sin** ella. Ahora los tres modos la llevan por defecto; `--aliado=no` repite la medida anterior. Los CSV del repositorio se han regenerado con el aliado.
+
+**Pikachu con aliado y el equipo con los PS llenos** (2000 combates, la IA elige el activo):
+
+| Equipo | Bulbasaur | Charmander | Squirtle |
+|---|---|---|---|
+| Inicial + 1 | 23 % | 48 % | 16 % |
+| Inicial + 2 | 77 % | 99 % | 76 % |
+| Inicial + 3 | 98 % | 100 % | 98 % |
+
+Sin aliado, inicial + 2 ganaba el 99–100 %.
+
+**En el tramo, modo `realista`, victorias contra Pikachu entre los que llegan a él** (el equipo llega tocado del Bosque Verde):
+
+| Equipo | Cazabichos con | Bulbasaur | Charmander | Squirtle | Sin aliado (antes) |
+|---|---|---|---|---|---|
+| Inicial + 2 | 1 | 30 % | 79 % | 26 % | 52–99 % |
+| Inicial + 2 | 2 | 28 % | 28 % | 33 % | 37–59 % |
+| Inicial + 3 | 1 | 70 % | 99 % | 69 % | 97–100 % |
+| Inicial + 3 | 2 | 28 % | 61 % | 27 % | 33–86 % |
+
+**El tramo entero** no cambia en lo esencial: sigue en el 0–7 %, porque Brock frena a casi todos (0–18 % de los que llegan). Solo con el inicial, Pikachu sigue en el 0 %.
+
+**Lectura:** con aliado, Pikachu pasa de no ser problema con equipo a ser el **segundo muro**. Con inicial + 3 y el equipo curado se gana el 98–100 %, pero en el tramo baja al 69–70 % con Bulbasaur y Squirtle por el daño que traen del Bosque Verde. El muro principal sigue siendo Brock.
+
+Reproducir: `dart run bin/sim_campana.dart --modo=realista --partidas=5000 --capturas=3 [--entrenador=2] [--aliado=no]`.
 
 ## Cosas que no cuadran con D-20 §3.5 (para que Ayme decida, no se han tocado)
 
