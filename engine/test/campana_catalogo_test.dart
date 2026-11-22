@@ -250,13 +250,12 @@ void main() {
           isA<AumentaDanoRecibido>().having((e) => e.valor, 'valor', 10));
     });
 
-    test('Onix lleva debilidad, resistencia y retirada con coste', () {
+    test('Onix lleva debilidad y retirada con coste, sin resistencia', () {
       final onix = pokemon['onix']!;
       expect(onix.tipo, TipoCampana.lucha);
       expect(onix.debilidad!.tipo, TipoCampana.agua);
       expect(onix.debilidad!.multiplicador, 2);
-      expect(onix.resistencia!.tipo, TipoCampana.normal);
-      expect(onix.resistencia!.reduccion, 30);
+      expect(onix.resistencia, isNull);
       expect(onix.retirada, 1);
     });
 
