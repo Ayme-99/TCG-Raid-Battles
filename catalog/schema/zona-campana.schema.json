@@ -30,7 +30,7 @@
     "captura": {
       "type": "boolean",
       "default": true,
-      "description": "Si sus salvajes se pueden capturar. La Ruta 1 lleva false: solo se aprende a combatir (D-20 §10.6)."
+      "description": "Si sus salvajes se pueden capturar. Hoy todas las zonas lo permiten; en la Ruta 1 no hay Pokéballs hasta la primera tienda, pero se puede volver a capturar (D-20 §10.6)."
     },
     "entrenadores": {
       "type": "array",

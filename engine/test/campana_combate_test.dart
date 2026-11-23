@@ -648,6 +648,112 @@ void main() {
     });
   });
 
+  group('efecto: confusión (Supersónico)', () {
+    const supersonico = AtaqueCampana(
+      nombre: 'Supersónico',
+      tipo: TipoCampana.oscuridad,
+      coste: 1,
+      dano: 0,
+      efecto: ConfundeDefensor(),
+    );
+    const golpe = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.normal, coste: 1, dano: 40);
+    final murcielago = pokemon('z',
+        tipo: TipoCampana.oscuridad, ps: 100, ataques: const [supersonico]);
+    final rival = pokemon('r', ps: 200, ataques: const [golpe]);
+
+    EstadoCombate usado(int semilla) => aplicarCombate(
+          EstadoCombate.inicial(
+              equipoJugador: [murcielago, pokemon('z2')],
+              equipoRival: [rival, pokemon('r2')],
+              semilla: semilla),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    // Una semilla con cara y otra con cruz en la moneda de Supersónico.
+    final porMoneda = <bool, int>{};
+    for (var s = 1; s <= 40 && porMoneda.length < 2; s++) {
+      porMoneda.putIfAbsent(usado(s).ultimaMoneda!, () => s);
+    }
+
+    test('lanza una moneda y la deja a la vista; no hace daño', () {
+      for (final s in porMoneda.values) {
+        final e = usado(s);
+        expect(e.ultimasMonedas, hasLength(1));
+        expect(e.ultimasMonedas!.single, e.ultimaMoneda);
+        expect(e.rival.pokemonActivo.ps, 200);
+        expect(e.jugador.energia, 10, reason: '10 - 1 + 1 de fin de turno');
+        expect(e.semilla, isNot(EstadoCombate.inicial(
+                equipoJugador: [murcielago],
+                equipoRival: [rival],
+                semilla: s)
+            .semilla));
+      }
+    });
+
+    test('con cara el Defensor queda Confundido; con cruz, no', () {
+      expect(usado(porMoneda[true]!).rival.cegado, isTrue);
+      expect(usado(porMoneda[false]!).rival.cegado, isFalse);
+      expect(usado(porMoneda[true]!).jugador.cegado, isFalse);
+    });
+
+    test('Confundido: con cruz en su ataque no hace nada y gasta la energía',
+        () {
+      final resultados = <bool, EstadoCombate>{};
+      for (var s = 1; s <= 80; s++) {
+        final e0 = usado(s);
+        if (!e0.rival.cegado) continue;
+        final e = aplicarCombate(e0, const Atacar(Bando.rival, 0));
+        resultados[e.ultimaMoneda!] = e;
+      }
+      final cara = resultados[true]!;
+      final cruz = resultados[false]!;
+      expect(cara.jugador.pokemonActivo.ps, 60);
+      expect(cruz.jugador.pokemonActivo.ps, 100);
+      expect(cruz.rival.energia, cara.rival.energia);
+      expect(cara.rival.cegado, isFalse);
+      expect(cruz.rival.cegado, isFalse);
+    });
+
+    test('solo dura su próximo turno', () {
+      var e = usado(porMoneda[true]!);
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(e.rival.cegado, isFalse);
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 60, reason: 'sin moneda, hace daño');
+    });
+  });
+
+  group('efecto: confusión con 2 monedas (Hidropulso)', () {
+    const hidropulso = AtaqueCampana(
+      nombre: 'Hidropulso',
+      tipo: TipoCampana.agua,
+      coste: 3,
+      dano: 40,
+      efecto: ConfundeDefensor(2),
+    );
+    final lento = pokemon('s',
+        tipo: TipoCampana.agua, ps: 100, ataques: const [hidropulso]);
+    final rival = pokemon('r', ps: 200);
+
+    test('hace su daño, lanza 2 monedas y confunde solo con dos caras', () {
+      final vistos = <String>{};
+      for (var s = 1; s <= 80; s++) {
+        final e = aplicarCombate(
+            EstadoCombate.inicial(
+                equipoJugador: [lento], equipoRival: [rival], semilla: s),
+            const Atacar(Bando.jugador, 0));
+        expect(e.rival.pokemonActivo.ps, 160);
+        final m = e.ultimasMonedas!;
+        expect(m, hasLength(2));
+        expect(e.rival.cegado, m[0] && m[1]);
+        vistos.add(m.join(','));
+      }
+      expect(vistos, hasLength(4), reason: 'salen las cuatro combinaciones');
+    });
+  });
+
   group('efecto: protección propia (Fortaleza)', () {
     const fortaleza = AtaqueCampana(
       nombre: 'Fortaleza',

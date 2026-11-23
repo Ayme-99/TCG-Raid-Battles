@@ -14,14 +14,19 @@
     {
       "nombre": "Pistola Agua",
       "tipo": "agua",
-      "coste": 1,
+      "coste": 2,
       "dano": 20
     },
     {
-      "nombre": "Confusión",
-      "tipo": "psiquico",
-      "coste": 2,
-      "dano": 30
+      "nombre": "Hidropulso",
+      "tipo": "agua",
+      "coste": 3,
+      "dano": 40,
+      "efecto": {
+        "tipo": "confundeDefensor",
+        "monedas": 2,
+        "texto": "Lanza 2 monedas. Si en ambas sale Cara, el Pokémon Defensor pasa a estar Confundido."
+      }
     }
   ]
 }
