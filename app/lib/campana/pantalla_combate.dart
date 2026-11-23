@@ -5,19 +5,53 @@ import 'package:incursiones_engine/campana.dart';
 import 'controlador_campana.dart';
 import 'widgets_campana.dart';
 
-/// Combate 1 contra 1 de la campaña (D-20 §3). El jugador elige la acción; la
-/// máquina (`decidirAccion`) responde al momento y lo que pasa queda en el
-/// registro.
-class PantallaCombateCampana extends ConsumerWidget {
+// Colores del kit de interfaz (docs/diseno-ui/campana-arte-interfaz.md).
+const _tinta = Color(0xFF2A1D3A);
+const _crema = Color(0xFFFFF4D6);
+const _dorado = Color(0xFFFFC83D);
+const _tapete = Color(0xFF1F7A52);
+const _verde = Color(0xFF5BD16B);
+const _naranja = Color(0xFFFF7A45);
+const _rojo = Color(0xFFE5484D);
+
+/// La ficha de energía (sprite de EP, aislado en `sprites_ajenos/`).
+const _fichaEnergia =
+    'assets/campana/sprites_ajenos/energia/energia_arcoiris.png';
+
+/// Los combates del tutorial, en los que el primer toque va señalado
+/// (D-20 §10.7, propuesta I): los de la Ruta 1 y el de Pikachu.
+bool esCombateTutorial(NodoRuta nodo) =>
+    nodo.zona == 'ruta-1' || nodo.jefe == 'pikachu-jefe';
+
+/// Combate 1 contra 1 de la campaña (D-20 §3) con la mesa de la propuesta I
+/// (D-20 §10.7): un tapete con la banca rival, el activo rival, tu activo y
+/// tu banca. Se toca a tu activo para atacar o cargar y a uno de tu banca para
+/// cambiar. La máquina (`decidirAccion`) responde al momento.
+class PantallaCombateCampana extends ConsumerStatefulWidget {
   const PantallaCombateCampana({super.key, required this.catalogo});
 
   final CatalogoCampana catalogo;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PantallaCombateCampana> createState() =>
+      _PantallaCombateCampanaState();
+}
+
+class _PantallaCombateCampanaState
+    extends ConsumerState<PantallaCombateCampana> {
+  /// Si el jugador ya ha tocado algo en este combate (apaga el destello del
+  /// tutorial).
+  bool _tocado = false;
+
+  @override
+  Widget build(BuildContext context) {
     final estado = ref.watch(campanaProvider);
     final combate = estado.combate!;
     final control = ref.read(campanaProvider.notifier);
+    final partida = estado.partida;
+    final tutorial = !_tocado &&
+        partida != null &&
+        esCombateTutorial(partida.nodoActual(widget.catalogo));
 
     void actuar(AccionCombate a) {
       final motivo = control.actuar(a);
@@ -31,305 +65,575 @@ class PantallaCombateCampana extends ConsumerWidget {
     final eligiendo = !terminado &&
         combate.fase == FaseCombate.eligiendoActivo &&
         combate.actua == Bando.jugador;
-    final registro = _Registro(lineas: estado.registro);
-    final mesa = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _Bando(
+    final miTurno = !terminado && !eligiendo && combate.actua == Bando.jugador;
+    final yo = combate.jugador;
+    final max = combate.parametros.energiaMaxima;
+
+    void tocarActivo() {
+      setState(() => _tocado = true);
+      _hojaAcciones(context, combate, actuar);
+    }
+
+    void tocarBanca(int i) {
+      setState(() => _tocado = true);
+      if (eligiendo) {
+        actuar(ElegirSiguiente(Bando.jugador, i));
+      } else {
+        _confirmarCambio(context, combate, i, actuar);
+      }
+    }
+
+    final mesa = Container(
+      key: const Key('combate-tapete'),
+      decoration: BoxDecoration(
+        color: _tapete,
+        border: Border.all(color: _dorado, width: 4),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _Banca(
+            clave: 'banca-rival',
             bando: combate.rival,
-            titulo: 'Rival',
-            energiaMax: combate.parametros.energiaMaxima),
-        const SizedBox(height: 12),
-        _Bando(
-            bando: combate.jugador,
-            titulo: 'Tú',
-            energiaMax: combate.parametros.energiaMaxima,
-            propio: true),
-        const SizedBox(height: 12),
-        if (terminado)
-          _Final(
-            gano: combate.ganador == Bando.jugador,
-            onContinuar: () => control.cerrarCombate(catalogo),
-          )
-        else if (eligiendo)
-          _ElegirRelevo(
-            bando: combate.jugador,
-            titulo: 'Tu Pokémon ha caído. ¿Quién sale?',
-            onElegir: (i) => actuar(ElegirSiguiente(Bando.jugador, i)),
-          )
-        else
-          _Acciones(combate: combate, actuar: actuar),
-      ],
+          ),
+          const SizedBox(height: 10),
+          _Activo(
+            clave: 'activo-rival',
+            bando: combate.rival,
+            energiaMax: max,
+          ),
+          const SizedBox(height: 10),
+          _UltimaJugada(
+            texto: estado.registro.isEmpty ? '' : estado.registro.last,
+            alVerTodo: () => _hojaRegistro(context, estado.registro),
+          ),
+          const SizedBox(height: 10),
+          _Activo(
+            clave: 'activo-jugador',
+            bando: yo,
+            energiaMax: max,
+            propio: true,
+            destello: tutorial && miTurno,
+            alTocar: miTurno ? tocarActivo : null,
+          ),
+          const SizedBox(height: 10),
+          _Banca(
+            clave: 'banca-jugador',
+            bando: yo,
+            alTocar: (eligiendo ||
+                    (miTurno &&
+                        yo.energia >= yo.pokemonActivo.especie.retirada))
+                ? tocarBanca
+                : null,
+          ),
+        ],
+      ),
     );
 
     return Scaffold(
       key: const Key('campana-combate'),
+      backgroundColor: _crema,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text('Combate · turno ${combate.numeroTurno}'),
+        actions: [
+          IconButton(
+            key: const Key('combate-ver-registro'),
+            tooltip: 'Registro del combate',
+            icon: const Icon(Icons.receipt_long_rounded),
+            onPressed: () => _hojaRegistro(context, estado.registro),
+          ),
+        ],
       ),
-      body: LayoutBuilder(
-        builder: (context, caja) {
-          if (caja.maxWidth >= 900) {
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16), child: mesa),
-                ),
-                const VerticalDivider(width: 1),
-                SizedBox(width: 360, child: registro),
-              ],
-            );
-          }
-          return Column(
-            children: [
-              Expanded(
-                flex: 3,
-                child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(12), child: mesa),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(12),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  mesa,
+                  const SizedBox(height: 12),
+                  if (terminado)
+                    _Final(
+                      gano: combate.ganador == Bando.jugador,
+                      onContinuar: () => control.cerrarCombate(widget.catalogo),
+                    )
+                  else if (eligiendo)
+                    const _Aviso(
+                      clave: 'combate-elige-relevo',
+                      texto: 'Tu Pokémon ha caído. Toca a uno de tu banca '
+                          'para que salga.',
+                    )
+                  else if (tutorial && miTurno)
+                    const _Aviso(
+                      clave: 'combate-tutorial',
+                      texto: 'Toca a tu Pokémon para atacar o cargar energía.',
+                    ),
+                ],
               ),
-              const Divider(height: 1),
-              Expanded(flex: 1, child: registro),
-            ],
-          );
-        },
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
-class _Bando extends StatelessWidget {
-  const _Bando({
+/// Hoja de acciones del activo: sus ataques con su coste y Cargar.
+void _hojaAcciones(BuildContext context, EstadoCombate combate,
+    void Function(AccionCombate) actuar) {
+  final yo = combate.jugador;
+  final especie = yo.pokemonActivo.especie;
+  final p = combate.parametros;
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: _crema,
+    builder: (hoja) => SafeArea(
+      child: Padding(
+        key: const Key('hoja-acciones'),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('${especie.nombre} · energía ${yo.energia}',
+                style: const TextStyle(
+                    color: _tinta, fontSize: 18, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            for (var i = 0; i < especie.ataques.length; i++) ...[
+              _BotonAccion(
+                clave: 'ataque-$i',
+                color: colorTipo(especie.ataques[i].tipo),
+                texto: textoAtaque(especie.ataques[i]),
+                activo: yo.energia >= especie.ataques[i].coste,
+                alTocar: () {
+                  Navigator.of(hoja).pop();
+                  actuar(Atacar(Bando.jugador, i));
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+            _BotonAccion(
+              clave: 'accion-cargar',
+              color: _dorado,
+              texto: 'Cargar (+${p.energiaAlCargar + p.energiaPorTurno})',
+              activo: true,
+              alTocar: () {
+                Navigator.of(hoja).pop();
+                actuar(const Cargar(Bando.jugador));
+              },
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+/// Cambiar gasta el turno (y la retirada): se pide confirmación.
+Future<void> _confirmarCambio(BuildContext context, EstadoCombate combate,
+    int indice, void Function(AccionCombate) actuar) async {
+  final yo = combate.jugador;
+  final sale = yo.equipo[indice].especie;
+  final retirada = yo.pokemonActivo.especie.retirada;
+  final si = await showDialog<bool>(
+    context: context,
+    builder: (dialogo) => AlertDialog(
+      title: Text('¿Sacar a ${sale.nombre}?'),
+      content: Text(retirada > 0
+          ? 'Cambiar gasta el turno y $retirada de energía.'
+          : 'Cambiar gasta el turno.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogo).pop(false),
+          child: const Text('Volver'),
+        ),
+        FilledButton(
+          key: const Key('confirmar-cambio'),
+          onPressed: () => Navigator.of(dialogo).pop(true),
+          child: const Text('Cambiar'),
+        ),
+      ],
+    ),
+  );
+  if (si == true) actuar(Cambiar(Bando.jugador, indice));
+}
+
+void _hojaRegistro(BuildContext context, List<String> lineas) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: _crema,
+    builder: (_) => SafeArea(
+      child: ListView.builder(
+        key: const Key('combate-registro'),
+        reverse: true,
+        padding: const EdgeInsets.all(16),
+        itemCount: lineas.length,
+        itemBuilder: (_, i) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Text(lineas[lineas.length - 1 - i]),
+        ),
+      ),
+    ),
+  );
+}
+
+/// Los estados del bando que se ven en la mesa («pega −10», envenenado…).
+List<String> estadosDeBando(BandoCombate b) => [
+      if (b.veneno > 0) 'envenenado',
+      if (b.danoReducido > 0) 'pega −${b.danoReducido}',
+      if (b.danoExtra > 0) 'recibe +${b.danoExtra}',
+      if (b.proteccion > 0) 'recibe −${b.proteccion}',
+      if (b.cegado) 'puede fallar',
+      if (b.racha > 1) 'racha ×${b.racha}',
+    ];
+
+/// El activo de un bando: su carta, la vida, la energía como fichas y sus
+/// estados.
+class _Activo extends StatelessWidget {
+  const _Activo({
+    required this.clave,
     required this.bando,
-    required this.titulo,
     required this.energiaMax,
     this.propio = false,
+    this.destello = false,
+    this.alTocar,
   });
 
+  final String clave;
   final BandoCombate bando;
-  final String titulo;
   final int energiaMax;
   final bool propio;
+  final bool destello;
+  final VoidCallback? alTocar;
 
   @override
   Widget build(BuildContext context) {
     final activo = bando.pokemonActivo;
     final especie = activo.especie;
-    final tema = Theme.of(context);
-    final estados = [
-      if (bando.veneno > 0) 'envenenado',
-      if (bando.danoReducido > 0) 'pega −${bando.danoReducido}',
-      if (bando.danoExtra > 0) 'recibe +${bando.danoExtra}',
-      if (bando.proteccion > 0) 'recibe −${bando.proteccion}',
-      if (bando.cegado) 'puede fallar',
-      if (bando.racha > 1) 'racha ×${bando.racha}',
-    ];
-    return Card(
-      key: Key(propio ? 'bando-jugador' : 'bando-rival'),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ImagenCartaCampana(especie: especie, ancho: 90),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('$titulo · ${especie.nombre}',
-                      style: tema.textTheme.titleMedium),
-                  Text(resumenCarta(especie), style: tema.textTheme.bodySmall),
-                  const SizedBox(height: 6),
-                  FichaVida(ps: activo.ps, max: especie.ps),
-                  const SizedBox(height: 6),
-                  Text('Energía ${bando.energia} / $energiaMax',
-                      key: Key(propio ? 'energia-jugador' : 'energia-rival')),
-                  if (estados.isNotEmpty)
-                    Text(estados.join(' · '),
-                        style: TextStyle(color: tema.colorScheme.error)),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Equipo: ${[
-                      for (var i = 0; i < bando.equipo.length; i++)
-                        if (i != bando.activo)
-                          '${bando.equipo[i].especie.nombre} ${bando.equipo[i].ps}/${bando.equipo[i].especie.ps}',
-                    ].join(', ').ifEmpty('nadie más')}',
-                    style: tema.textTheme.bodySmall,
+    final estados = estadosDeBando(bando);
+    final carta = Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+            color: destello ? _dorado : Colors.transparent, width: 4),
+        boxShadow: destello
+            ? const [BoxShadow(color: _dorado, blurRadius: 18, spreadRadius: 2)]
+            : null,
+      ),
+      child: ImagenCartaCampana(especie: especie, ancho: 110),
+    );
+    final datos = Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(especie.nombre,
+              style: const TextStyle(
+                  color: _crema, fontSize: 18, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 6),
+          _Vida(ps: activo.ps, max: especie.ps, alto: 14),
+          const SizedBox(height: 2),
+          Text('${activo.ps} / ${especie.ps} PS',
+              key: Key('ps-$clave'), style: const TextStyle(color: _crema)),
+          const SizedBox(height: 6),
+          _Energia(
+            clave: propio ? 'energia-jugador' : 'energia-rival',
+            energia: bando.energia,
+            max: energiaMax,
+          ),
+          if (estados.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: [
+                for (final e in estados)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: _naranja,
+                      border: Border.all(color: _tinta, width: 1.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(e,
+                        style: const TextStyle(
+                            color: _tinta, fontWeight: FontWeight.w700)),
                   ),
-                ],
-              ),
+              ],
             ),
           ],
+        ],
+      ),
+    );
+    return Semantics(
+      button: alTocar != null,
+      label: propio ? 'Tu Pokémon activo' : 'Pokémon activo rival',
+      child: Material(
+        key: Key(clave),
+        color: Colors.black.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: alTocar,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: propio
+                  ? [carta, const SizedBox(width: 12), datos]
+                  : [datos, const SizedBox(width: 12), carta],
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-extension on String {
-  String ifEmpty(String otro) => isEmpty ? otro : this;
+/// La banca de un bando: hasta 5 miniaturas de la carta (60×84) con una barra
+/// de vida fina encima; los caídos en gris y sin poder elegirse.
+class _Banca extends StatelessWidget {
+  const _Banca({required this.clave, required this.bando, this.alTocar});
+
+  final String clave;
+  final BandoCombate bando;
+  final void Function(int indice)? alTocar;
+
+  @override
+  Widget build(BuildContext context) {
+    final indices = [
+      for (var i = 0; i < bando.equipo.length; i++)
+        if (i != bando.activo) i,
+    ];
+    return SizedBox(
+      key: Key(clave),
+      height: 100,
+      child: indices.isEmpty
+          ? const Center(
+              child: Text('Banca vacía', style: TextStyle(color: _crema)))
+          : ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                for (final i in indices)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: _Miniatura(
+                      clave: '$clave-$i',
+                      pokemon: bando.equipo[i],
+                      alTocar: alTocar != null && bando.equipo[i].enPie
+                          ? () => alTocar!(i)
+                          : null,
+                    ),
+                  ),
+              ],
+            ),
+    );
+  }
 }
 
-/// PS del activo: barra y número.
-class FichaVida extends StatelessWidget {
-  const FichaVida({super.key, required this.ps, required this.max});
+class _Miniatura extends StatelessWidget {
+  const _Miniatura({required this.clave, required this.pokemon, this.alTocar});
+
+  final String clave;
+  final PokemonEnCombate pokemon;
+  final VoidCallback? alTocar;
+
+  @override
+  Widget build(BuildContext context) {
+    final caido = !pokemon.enPie;
+    Widget carta = ImagenCartaCampana(especie: pokemon.especie, ancho: 60);
+    if (caido) {
+      carta = ColorFiltered(
+        colorFilter: const ColorFilter.mode(Colors.black54, BlendMode.srcATop),
+        child: carta,
+      );
+    }
+    return Semantics(
+      button: alTocar != null,
+      label: '${pokemon.especie.nombre}, ${pokemon.ps} PS',
+      child: InkWell(
+        key: Key(clave),
+        onTap: alTocar,
+        borderRadius: BorderRadius.circular(8),
+        child: SizedBox(
+          width: 60,
+          child: Column(
+            children: [
+              _Vida(ps: pokemon.ps, max: pokemon.especie.ps, alto: 6),
+              const SizedBox(height: 4),
+              carta,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Barra de vida con los colores del kit: verde, naranja por debajo de la
+/// mitad y rojo por debajo de un cuarto.
+class _Vida extends StatelessWidget {
+  const _Vida({required this.ps, required this.max, required this.alto});
 
   final int ps;
+  final int max;
+  final double alto;
+
+  @override
+  Widget build(BuildContext context) {
+    final f = (ps / max).clamp(0.0, 1.0);
+    return Container(
+      height: alto,
+      decoration: BoxDecoration(
+        color: _tinta,
+        borderRadius: BorderRadius.circular(alto),
+        border: Border.all(color: _tinta, width: 1.5),
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: FractionallySizedBox(
+          widthFactor: f,
+          child: Container(
+            decoration: BoxDecoration(
+              color: f > 0.5
+                  ? _verde
+                  : f > 0.25
+                      ? _naranja
+                      : _rojo,
+              borderRadius: BorderRadius.circular(alto),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// La energía como fichas de 0 a [max] (no barra): las vacías, en gris.
+class _Energia extends StatelessWidget {
+  const _Energia(
+      {required this.clave, required this.energia, required this.max});
+
+  final String clave;
+  final int energia;
   final int max;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: (ps / max).clamp(0.0, 1.0),
-              minHeight: 12,
-              color: ps / max > 0.5
-                  ? Colors.green
-                  : ps / max > 0.25
-                      ? Colors.amber
-                      : Colors.red,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text('$ps / $max PS'),
-      ],
-    );
-  }
-}
-
-class _Acciones extends StatelessWidget {
-  const _Acciones({required this.combate, required this.actuar});
-
-  final EstadoCombate combate;
-  final void Function(AccionCombate) actuar;
-
-  @override
-  Widget build(BuildContext context) {
-    final yo = combate.jugador;
-    final especie = yo.pokemonActivo.especie;
-    final miTurno = combate.actua == Bando.jugador;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(miTurno ? 'Tu turno: una acción' : 'Turno del rival…',
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            for (var i = 0; i < especie.ataques.length; i++) ...[
-              FilledButton(
-                key: Key('ataque-$i'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: colorTipo(especie.ataques[i].tipo),
-                  foregroundColor: Colors.black,
-                ),
-                onPressed: miTurno && yo.energia >= especie.ataques[i].coste
-                    ? () => actuar(Atacar(Bando.jugador, i))
-                    : null,
-                child: Text(textoAtaque(especie.ataques[i])),
-              ),
-              const SizedBox(height: 8),
-            ],
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    key: const Key('accion-cargar'),
-                    icon: const Icon(Icons.bolt_rounded),
-                    label: Text(
-                        'Cargar (+${combate.parametros.energiaAlCargar + combate.parametros.energiaPorTurno})'),
-                    onPressed: miTurno
-                        ? () => actuar(const Cargar(Bando.jugador))
-                        : null,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    key: const Key('accion-cambiar'),
-                    icon: const Icon(Icons.swap_horiz_rounded),
-                    label: Text(especie.retirada > 0
-                        ? 'Cambiar (−${especie.retirada})'
-                        : 'Cambiar'),
-                    onPressed: miTurno &&
-                            yo.relevos.isNotEmpty &&
-                            yo.energia >= especie.retirada
-                        ? () => _cambiar(context)
-                        : null,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _cambiar(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (hoja) => SafeArea(
-        child: _ElegirRelevo(
-          bando: combate.jugador,
-          titulo: '¿Quién sale? Cambiar gasta el turno.',
-          onElegir: (i) {
-            Navigator.of(hoja).pop();
-            actuar(Cambiar(Bando.jugador, i));
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _ElegirRelevo extends StatelessWidget {
-  const _ElegirRelevo({
-    required this.bando,
-    required this.titulo,
-    required this.onElegir,
-  });
-
-  final BandoCombate bando;
-  final String titulo;
-  final void Function(int) onElegir;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Semantics(
+      label: 'Energía $energia de $max',
+      child: Wrap(
+        key: Key(clave),
+        spacing: 2,
+        runSpacing: 2,
         children: [
-          Text(titulo, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final i in bando.relevos)
-                FichaPokemon(
-                  key: Key('relevo-$i'),
-                  especie: bando.equipo[i].especie,
-                  ps: bando.equipo[i].ps,
-                  onTap: () => onElegir(i),
-                ),
-            ],
-          ),
+          for (var i = 0; i < max; i++)
+            i < energia
+                ? Image.asset(_fichaEnergia, width: 20, height: 20)
+                : ColorFiltered(
+                    colorFilter: const ColorFilter.mode(
+                        Color(0xFF3A3A3A), BlendMode.srcATop),
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: Image.asset(_fichaEnergia, width: 20, height: 20),
+                    ),
+                  ),
         ],
       ),
     );
   }
+}
+
+/// La última jugada, siempre a la vista; tocarla abre el registro entero.
+class _UltimaJugada extends StatelessWidget {
+  const _UltimaJugada({required this.texto, required this.alVerTodo});
+
+  final String texto;
+  final VoidCallback alVerTodo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: _crema,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: _tinta, width: 2),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: alVerTodo,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(texto,
+              key: const Key('combate-ultima'),
+              textAlign: TextAlign.center,
+              style:
+                  const TextStyle(color: _tinta, fontWeight: FontWeight.w600)),
+        ),
+      ),
+    );
+  }
+}
+
+class _BotonAccion extends StatelessWidget {
+  const _BotonAccion({
+    required this.clave,
+    required this.color,
+    required this.texto,
+    required this.activo,
+    required this.alTocar,
+  });
+
+  final String clave;
+  final Color color;
+  final String texto;
+  final bool activo;
+  final VoidCallback alTocar;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton(
+      key: Key(clave),
+      style: FilledButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: _tinta,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: _tinta, width: 2),
+        ),
+      ),
+      onPressed: activo ? alTocar : null,
+      child: Text(texto, style: const TextStyle(fontWeight: FontWeight.w700)),
+    );
+  }
+}
+
+class _Aviso extends StatelessWidget {
+  const _Aviso({required this.clave, required this.texto});
+
+  final String clave;
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        key: Key(clave),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _dorado,
+          border: Border.all(color: _tinta, width: 2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(texto,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: _tinta, fontWeight: FontWeight.w700)),
+      );
 }
 
 class _Final extends StatelessWidget {
@@ -360,26 +664,6 @@ class _Final extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _Registro extends StatelessWidget {
-  const _Registro({required this.lineas});
-
-  final List<String> lineas;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      key: const Key('combate-registro'),
-      reverse: true,
-      padding: const EdgeInsets.all(12),
-      itemCount: lineas.length,
-      itemBuilder: (_, i) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Text(lineas[lineas.length - 1 - i]),
       ),
     );
   }
