@@ -57,9 +57,9 @@ Los sprites de Pokémon, medallas y personajes que lleguen después irán tambi�
 
 | Issue | Estado |
 |---|---|
-| #415 escenas | Datos hechos (#413, #425; coordenadas de marcador). Arte: guía vectorial y zonas de Pueblo Paleta y prompts de Flux de las 9 escenas más el interior del centro en `escenas/`. Faltan las imágenes finales. Formato por decidir: la app lee `app/assets/campana/escenas/<imagen>.webp` (D-20 §4) y la tarea pedía SVG. |
-| #378 fondos de zona | Cubierta por #415: el mapa pasó a escenas (D-20 §10.7). Propuesta: cerrar. |
-| #379 iconos de nodo | Obsoleta con el mapa de escenas. Propuesta: cerrar, salvo que se quiera marcar el tipo de nodo en la lista de la ruta. |
+| #415 escenas | Datos hechos (#413, #425; coordenadas de marcador). Arte: guía vectorial y zonas de Pueblo Paleta y prompts de Flux de las 9 escenas más el interior del centro en `escenas/`. Faltan las imágenes finales. Formato decidido el 2026-11-23: `.webp` en `app/assets/campana/escenas/<imagen>.webp`, 390×844 (D-20 §10). |
+| #378 fondos de zona | Cubierta por #415: el mapa pasó a escenas (D-20 §10.7). Cerrada el 2026-11-23. |
+| #379 iconos de nodo | Obsoleta con el mapa de escenas. Cerrada el 2026-11-23 (decisión de Ayme). |
 | #408 metal | Icono hecho (`sprites_ajenos/iconos_tipo/metal.png`). Color propuesto abajo. |
 | #376 cartas impresas | Completa: Zubat, Geodude, Machop, Onix, Cubone y Slowpoke tienen carta en `app/assets/campana/cartas/` y JSON. Solo queda la decisión del Túnel Roca (D-20 §8, 15), que no es de Arte. |
 | #405, #406, #407 | En espera hasta que Ayme confirme el plan B de Brock (#409). Esquema abajo. |
@@ -79,6 +79,14 @@ No se crean hasta confirmación. Datos de D-20 §3: heredan tipo, debilidad y re
 | Wartortle | Squirtle | 100 |
 
 Ataques, retirada y número NN/150 los fija Ayme al diseñar la carta.
+
+### Formato de las escenas
+
+- **Entrega:** `.webp` en `app/assets/campana/escenas/<imagen>.webp`, proporción 390×844, uno por id de imagen de `kanto.json` (pueblo-paleta, ruta-1, centro-pokemon, ciudad-verde, ruta-22, ruta-2, bosque-verde, ruta-2-norte, gimnasio-plateada).
+- **Zonas pulsables:** en `kanto.json`, coordenadas relativas 0–1 a esa imagen. Al ilustrar cada escena se ajustan las de marcador; la guía de cada una lleva su `.zonas.json` en `escenas/`.
+- **Origen:** guía vectorial propia (SVG) más imagen final generada con ella como composición; ver `escenas/prompts_flux_escenas.md`.
+- **Sin personajes ni Pokémon en el fondo:** los sprites de EP se pintan encima.
+- **Fuera de `app/assets/`:** SVG de guía, prompts y zonas.
 
 ## Aviso de derechos
 
