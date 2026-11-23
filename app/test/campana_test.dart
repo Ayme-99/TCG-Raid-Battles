@@ -56,22 +56,26 @@ Future<void> tocar(WidgetTester tester, String clave) async {
   await tester.pumpAndSettle();
 }
 
-/// Juega el combate que hay en pantalla tocando botones: el ataque más caro que
-/// llegue, si no cargar; al caer un Pokémon saca al primero que pueda.
+/// Juega el combate que hay en pantalla tocando la mesa (D-20 §10.7,
+/// propuesta I): toca a su activo y elige el ataque más caro que llegue, si no
+/// carga; al caer un Pokémon saca al primero de la banca que pueda.
 Future<void> jugarCombate(WidgetTester tester) async {
   for (var i = 0; i < 200; i++) {
     if (hay('combate-continuar')) {
       await tocar(tester, 'combate-continuar');
       return;
     }
-    final relevo = find.byWidgetPredicate((w) =>
-        w.key is ValueKey<String> &&
-        (w.key! as ValueKey<String>).value.startsWith('relevo-'));
-    if (relevo.evaluate().isNotEmpty) {
+    if (hay('combate-elige-relevo')) {
+      final relevo = find.byWidgetPredicate((w) =>
+          w is InkWell &&
+          w.onTap != null &&
+          w.key is ValueKey<String> &&
+          (w.key! as ValueKey<String>).value.startsWith('banca-jugador-'));
       await tester.tap(relevo.first);
       await tester.pumpAndSettle();
       continue;
     }
+    if (!hay('hoja-acciones')) await tocar(tester, 'activo-jugador');
     if (activo(tester, 'ataque-1')) {
       await tocar(tester, 'ataque-1');
     } else if (!hay('ataque-1') && activo(tester, 'ataque-0')) {
