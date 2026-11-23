@@ -404,14 +404,13 @@ void main() {
     );
     final almacen = AlmacenMemoria();
     final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
-    // Un nodo sin visitar no lleva a ningún sitio.
-    await tester.tap(find.byKey(const Key('nodo-ruta-22')));
+    // Un borde que lleva a un nodo sin visitar no lleva a ningún sitio.
+    await tester.tap(find.byKey(const Key('zona-ir-ruta-1-rattata')));
     await tester.pumpAndSettle();
     expect(
         c.read(campanaProvider).partida!.progreso.nodoActual, 'ciudad-verde');
-    await tester.ensureVisible(find.byKey(const Key('nodo-ruta-1-pidgey')));
-    await tester.tap(find.byKey(const Key('nodo-ruta-1-pidgey')));
-    await tester.pumpAndSettle();
+    // El borde de un nodo visitado vuelve atrás.
+    await tocar(tester, 'zona-ir-ruta-1-pidgey');
     expect(
         c.read(campanaProvider).partida!.progreso.nodoActual, 'ruta-1-pidgey');
     expect(hay('campana-combatir'), isFalse, reason: 'ya se ganó');

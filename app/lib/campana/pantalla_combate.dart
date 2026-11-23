@@ -3,20 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/campana.dart';
 
 import 'controlador_campana.dart';
+import 'escena_mapa.dart' show ColoresCampana, carpetaSpritesAjenos;
 import 'widgets_campana.dart';
 
 // Colores del kit de interfaz (docs/diseno-ui/campana-arte-interfaz.md).
-const _tinta = Color(0xFF2A1D3A);
-const _crema = Color(0xFFFFF4D6);
-const _dorado = Color(0xFFFFC83D);
-const _tapete = Color(0xFF1F7A52);
-const _verde = Color(0xFF5BD16B);
-const _naranja = Color(0xFFFF7A45);
-const _rojo = Color(0xFFE5484D);
+const _tinta = ColoresCampana.tinta;
+const _crema = ColoresCampana.crema;
+const _dorado = ColoresCampana.dorado;
+const _tapete = ColoresCampana.tapete;
+const _verde = ColoresCampana.verde;
+const _naranja = ColoresCampana.naranja;
+const _rojo = ColoresCampana.rojo;
 
 /// La ficha de energía (sprite de EP, aislado en `sprites_ajenos/`).
-const _fichaEnergia =
-    'assets/campana/sprites_ajenos/energia/energia_arcoiris.png';
+const _fichaEnergia = '${carpetaSpritesAjenos}energia/energia_arcoiris.png';
 
 /// Los combates del tutorial, en los que el primer toque va señalado
 /// (D-20 §10.7, propuesta I): los de la Ruta 1 y el de Pikachu.

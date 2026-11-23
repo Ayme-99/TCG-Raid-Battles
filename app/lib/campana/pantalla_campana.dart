@@ -4,6 +4,7 @@ import 'package:incursiones_engine/campana.dart';
 
 import 'catalogo_campana.dart';
 import 'controlador_campana.dart';
+import 'escena_mapa.dart';
 import 'pantalla_combate.dart';
 import 'widgets_campana.dart';
 
@@ -82,35 +83,130 @@ class _Mapa extends ConsumerWidget {
           : LayoutBuilder(
               builder: (context, caja) {
                 final ancho = caja.maxWidth >= 900;
-                final ruta = _Ruta(catalogo: catalogo, partida: p);
-                final panel = ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _PanelNodo(catalogo: catalogo, partida: p),
-                    const SizedBox(height: 16),
-                    _Equipo(catalogo: catalogo, partida: p),
-                  ],
-                );
-                if (ancho) {
-                  return Row(
+                // La escena del nodo, con su barra fija de recursos encima
+                // (propuesta D de los wireframes, D-20 §10.7).
+                final escena = Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      SizedBox(width: 340, child: ruta),
-                      const VerticalDivider(width: 1),
-                      Expanded(child: panel),
+                      BarraRecursos(partida: p),
+                      const SizedBox(height: 8),
+                      EscenaInteractiva(
+                        catalogo: catalogo,
+                        partida: p,
+                        alTocar: (z) => _tocarZona(context, ref, p, z),
+                      ),
+                    ],
+                  ),
+                );
+                final panel = [
+                  _PanelNodo(catalogo: catalogo, partida: p),
+                  const SizedBox(height: 16),
+                  _Equipo(catalogo: catalogo, partida: p),
+                ];
+                if (ancho) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: SingleChildScrollView(child: escena)),
+                      SizedBox(
+                        width: 420,
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: panel,
+                          ),
+                        ),
+                      ),
                     ],
                   );
                 }
-                return Column(
-                  children: [
-                    SizedBox(height: 150, child: ruta),
-                    const Divider(height: 1),
-                    Expanded(child: panel),
-                  ],
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      escena,
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: panel,
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
     );
+  }
+
+  /// Lo que hace tocar una zona de la escena (D-20 §4, Escenas). Solo se
+  /// llama con zonas activas ([estadoZona]).
+  void _tocarZona(
+      BuildContext context, WidgetRef ref, PartidaCampana p, ZonaPulsable z) {
+    final c = catalogo;
+    final control = ref.read(campanaProvider.notifier);
+    switch (z.accion) {
+      case AccionZona.ir:
+        if (p.opciones(c).contains(z.destino)) {
+          control.avanzar(c, z.destino!);
+        } else {
+          _avisar(context, control.retroceder(c, z.destino!));
+        }
+      case AccionZona.combate:
+        // Un salvaje ya vencido se vuelve a buscar en la hierba (#412).
+        if (!p.hayCombate(c)) control.repetirCombate(c);
+        control.combatir(c);
+      case AccionZona.inicial:
+        final nodo = p.nodoActual(c);
+        showModalBottomSheet<void>(
+          context: context,
+          builder: (hoja) => SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  for (final id in nodo.iniciales)
+                    _OpcionInicial(
+                      especie: c.especie(id),
+                      clave: 'hoja-inicial-$id',
+                      onTap: () {
+                        Navigator.of(hoja).pop();
+                        control.elegirInicial(c, id);
+                      },
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      case AccionZona.hablar:
+        control.conversar(c);
+      case AccionZona.curar:
+        control.descansar(c);
+      case AccionZona.tienda:
+      case AccionZona.pc:
+        showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => SafeArea(
+            child: Consumer(
+              builder: (context, ref, _) {
+                final actual = ref.watch(campanaProvider).partida!;
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: _Descanso(catalogo: c, partida: actual),
+                );
+              },
+            ),
+          ),
+        );
+    }
   }
 }
 
@@ -172,59 +268,6 @@ class _SinPartida extends ConsumerWidget {
   }
 }
 
-/// La ruta, nodo a nodo, en el orden del catálogo.
-/// La ruta. Se puede volver a cualquier nodo ya visitado tocándolo (D-20
-/// §10.7, retroceso).
-class _Ruta extends ConsumerWidget {
-  const _Ruta({required this.catalogo, required this.partida});
-
-  final CatalogoCampana catalogo;
-  final PartidaCampana partida;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final control = ref.read(campanaProvider.notifier);
-    final nodos = catalogo.region.nodos.values.toList();
-    final actual = partida.progreso.nodoActual;
-    final indiceActual = nodos.indexWhere((n) => n.id == actual);
-    return ListView.builder(
-      key: const Key('campana-ruta'),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: nodos.length,
-      // Que el nodo actual quede a la vista al abrir.
-      controller: ScrollController(
-          initialScrollOffset: ((indiceActual - 1) * 56.0).clamp(0, 1e6)),
-      itemBuilder: (context, i) {
-        final n = nodos[i];
-        final hecho = partida.progreso.superados.contains(n.id);
-        final aqui = n.id == actual;
-        final sePuedeVolver = !aqui &&
-            partida.capturaPendiente == null &&
-            partida.progreso.visitados.contains(n.id);
-        return ListTile(
-          key: Key('nodo-${n.id}'),
-          dense: true,
-          selected: aqui,
-          leading: Icon(
-            hecho && !aqui ? Icons.check_circle : _icono(n.tipo),
-            color: hecho && !aqui ? Colors.green : null,
-          ),
-          title: Text(n.nombre),
-          subtitle: Text([
-            _tipo(n),
-            if (n.opcional) 'opcional',
-            if (aqui) 'estás aquí',
-            if (sePuedeVolver) 'toca para volver',
-          ].join(' · ')),
-          onTap: sePuedeVolver
-              ? () => _avisar(context, control.retroceder(catalogo, n.id))
-              : null,
-        );
-      },
-    );
-  }
-}
-
 IconData _icono(TipoNodo t) => switch (t) {
       TipoNodo.inicio => Icons.home_rounded,
       TipoNodo.combate => Icons.grass_rounded,
@@ -233,17 +276,6 @@ IconData _icono(TipoNodo t) => switch (t) {
       TipoNodo.gimnasio => Icons.emoji_events_rounded,
       TipoNodo.jefe => Icons.whatshot_rounded,
       TipoNodo.conversacion => Icons.forum_rounded,
-    };
-
-String _tipo(NodoRuta n) => switch (n.tipo) {
-      TipoNodo.inicio => 'inicio',
-      TipoNodo.combate =>
-        n.rival == RivalDeCombate.entrenador ? 'entrenador' : 'Pokémon salvaje',
-      TipoNodo.bifurcacion => 'cruce',
-      TipoNodo.descanso => 'centro Pokémon',
-      TipoNodo.gimnasio => 'gimnasio',
-      TipoNodo.jefe => 'jefe',
-      TipoNodo.conversacion => n.cura ? 'conversación · cura' : 'conversación',
     };
 
 /// Lo que se hace en el nodo actual.
@@ -398,15 +430,19 @@ class _PanelNodo extends ConsumerWidget {
 }
 
 class _OpcionInicial extends StatelessWidget {
-  const _OpcionInicial({required this.especie, required this.onTap});
+  const _OpcionInicial(
+      {required this.especie, required this.onTap, this.clave});
 
   final PokemonCampana especie;
   final VoidCallback onTap;
 
+  /// Clave del botón; por defecto `inicial-<id>`.
+  final String? clave;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      key: Key('inicial-${especie.id}'),
+      key: Key(clave ?? 'inicial-${especie.id}'),
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: SizedBox(
