@@ -1,0 +1,20 @@
+Barrido de Pokéballs compradas en Ciudad Verde (800 recorridos por casilla; Ruta 1 con Balls: sí, Ruta 22: no).
+inicial     Balls  Pikachu 1.º  Joven 1.º  Brock 1.º  tramo sin perder  gana Brock
+bulbasaur       0            —          —          —             0.0 %       0.0 %
+bulbasaur       1            —          —          —             0.0 %       0.0 %
+bulbasaur       2       10.2 %     87.7 %      0.0 %             0.0 %       0.0 %
+bulbasaur       3       57.0 %     86.4 %     56.5 %            28.1 %      49.5 %
+bulbasaur       4       79.4 %     86.9 %     71.4 %            43.9 %      77.6 %
+bulbasaur       5       87.9 %     87.6 %     76.3 %            50.9 %      89.4 %
+charmander      0        0.0 %          —          —             0.0 %       0.0 %
+charmander      1        0.0 %          —          —             0.0 %       0.0 %
+charmander      2       28.4 %     74.5 %      0.0 %             0.0 %       0.0 %
+charmander      3       68.6 %     76.3 %     71.5 %            40.3 %      52.4 %
+charmander      4       88.4 %     76.2 %     91.6 %            62.3 %      82.6 %
+charmander      5       96.1 %     76.1 %     98.2 %            71.9 %      95.0 %
+squirtle        0            —          —          —             0.0 %       0.0 %
+squirtle        1            —          —          —             0.0 %       0.0 %
+squirtle        2        1.6 %     54.3 %      0.0 %             0.0 %       0.0 %
+squirtle        3       41.4 %     76.2 %     80.3 %            28.1 %      46.9 %
+squirtle        4       58.7 %     80.9 %     94.8 %            41.9 %      72.8 %
+squirtle        5       65.3 %     81.5 %     98.1 %            47.3 %      83.0 %
