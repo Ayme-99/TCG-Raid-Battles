@@ -1,6 +1,6 @@
 # D-21 · Modo campaña: tienda de puntos, Pokédex «Mis cartas» y comunicación
 
-Estado: **PROPUESTA para que Ayme confirme** (2026-11-23). Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
+Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23 con sus respuestas a la primera versión. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
 
 Cómo leerlo:
 
@@ -16,12 +16,13 @@ Cómo leerlo:
 | 2 | Los puntos se gastan (D-20) pero D-10 dice que no se gastan | Dos contadores: **puntos ganados** (total histórico, para desbloquear jefes) y **saldo** (lo gastable). | §1.2 |
 | 3 | Catálogo de la tienda al lanzar | Solo **monedas y dados** (cosmética). Sobres y cartas sueltas esperan a que existan cartas del formato digital. Las campañas y los jefes **no** se venden. | §2.2 |
 | 4 | Precios | Moneda de serie 800, temática 2.000; dados de serie 1.500, temáticos 3.000; sobre 1.000; carta suelta 200 / 400 / 800 / 2.000 según rareza. | §2.3 |
-| 5 | Qué cuesta dentro de la campaña pagar con puntos | Intercambio 500 y hacerse ex 1.500. | §2.5 |
-| 6 | Qué es «Mis cartas» | Dos colecciones: **Campaña** (capturas) y **Formato digital** (tienda). Los jefes de campaña van en «Enemigos». | §3.1 |
-| 7 | Qué se registra al capturar | La carta, la fecha, la zona y la Ball; cuenta aunque el Pokémon acabe en el PC y aunque luego evolucione. | §3.3 |
-| 8 | Relación con las cartas físicas | Misma imagen y misma numeración, sin escaneo ni canje. Un código de canje queda como idea futura, no se decide ahora. | §3.5 |
+| 5 | Los puntos no se usan dentro de la campaña (**decidido**). Entonces, ¿con qué se paga el intercambio y hacerse ex? | Con **dinero**: intercambio 2.000 y hacerse ex 4.000, o mejor, 1 y 2 tramos de dinero. | §2.5 |
+| 6 | Qué es «Mis cartas» | **Decidido:** las cartas de campaña solo valen en campaña; la tienda traerá cartas para las partidas rápidas digitales. Dos colecciones, y los jefes de campaña van en «Enemigos». | §3.1 |
+| 7 | Qué se registra al capturar | **Decidido:** por ahora solo la carta. Cuenta aunque el Pokémon acabe en el PC y aunque luego evolucione. | §3.3 |
+| 8 | Relación con las cartas físicas | Misma imagen y misma numeración, sin escaneo ni canje; reglas de reimpresión y de uso privado. El código de canje queda como idea futura. | §3.5 |
 | 9 | Bono de primera captura (opcional) | +50 puntos por carta nueva. Puedes decir que no. | §3.6 |
 | 10 | Cómo se presenta el modo campaña al grupo | Tres fases: Ayme solo, 2 o 3 probadores, grupo entero; con el mensaje de §4.3. | §4 |
+| 11 | Sesión en la campaña | **Decidido:** la sesión es obligatoria para jugar el modo campaña. Se propone guardar la partida también en la cuenta (§6). | §4.3, §6 |
 
 ## 1. Marco común
 
@@ -29,17 +30,21 @@ Cómo leerlo:
 
 El modo campaña maneja **cuatro cifras** que se parecen y que un jugador nuevo va a confundir. Esta tabla es la definición oficial y debe usarse tal cual en la app, en el tutorial y en los mensajes al grupo.
 
-| Cifra | Qué es | Se gana con | Se gasta en | Dónde vive |
+**Decidido por Ayme (2026-11-23)**, con sus palabras:
+
+| Cifra | Definición | Se gana con | Se gasta en | Dónde vive |
 |---|---|---|---|---|
-| **Energía** | Fichas del combate, de 0 a 10 | Se recupera sola (+1 por turno; Cargar da +1 más) | Atacar | Solo dentro de un combate |
-| **XP** | Reserva común para evolucionar | Derrotar Pokémon (10, 20 o 30 según categoría) | Evolucionar, fuera de combate | La partida de campaña |
-| **Dinero** | La «cartera» de la campaña | Vencer a entrenadores y líderes | Pokéballs, Pociones, Repelentes (centro Pokémon) | La partida de campaña |
-| **Puntos** | La moneda del juego, compartida con las incursiones | Combates, medallas y jefes de la campaña; partida libre digital | La tienda de la pantalla de inicio; intercambio y ex dentro de la campaña (§2.5) | La **cuenta** |
+| **Energía** | Limita la capacidad de atacar durante un combate | Se recupera sola (+1 por turno; Cargar da +1 más) | Atacar | Solo dentro de un combate |
+| **XP** | Cantidad necesaria para evolucionar un Pokémon | Derrotar Pokémon (10, 20 o 30 según categoría) | Evolucionar, fuera de combate | La partida de campaña |
+| **Dinero** | Recompensa monetaria al ganar combates contra entrenadores; sirve para comprar objetos | Vencer a entrenadores y líderes | Objetos del centro Pokémon (y, en propuesta, el intercambio y hacerse ex, §2.5) | La partida de campaña |
+| **Puntos** | **No tienen utilidad dentro de la campaña.** Pasan a la cuenta al conseguir medallas o avanzar en la historia, y sirven para comprar cosas en el menú de la app | Combates, medallas y jefes de la campaña; partida libre digital | La tienda de la pantalla de inicio | La **cuenta** |
+
+Una precisión de redacción: la XP **se mide en XP**, nunca en «puntos», aunque se hable de «lo necesario para evolucionar». Si en la app o en los mensajes la XP se llama «puntos», se confunde con los puntos de la cuenta, que es justo lo que este vocabulario quiere evitar.
 
 **PROPUESTA (decisión 1): separación total entre dinero y puntos.**
 
-- El **dinero** es local y se acaba con la campaña. Compra **consumibles** (los precios ya decididos: Pokéball 200, Super Ball 600, Ultra Ball 1.200, Poción 300, Repelente 350).
-- Los **puntos** pertenecen a la cuenta y duran. Compran **colección y cosmética**.
+- El **dinero** es local y se acaba con la campaña. Compra **objetos** (los precios ya decididos: Pokéball 200, Super Ball 600, Ultra Ball 1.200, Poción 300, Repelente 350) y, en propuesta, los servicios del centro (§2.5).
+- Los **puntos** pertenecen a la cuenta y duran. Compran **colección y cosmética**, y **solo fuera de la campaña**.
 - **Nada se vende por las dos vías.** Si los puntos pudieran comprar Pokéballs, el dinero perdería sentido y la campaña se resolvería «pagando». Si el dinero pudiera comprar cosmética, la tienda dejaría de ser un incentivo para jugar las incursiones.
 - Esto responde a la pregunta abierta de D-20 §8 (5), «para qué sirve el dinero frente a los puntos».
 
@@ -147,13 +152,32 @@ Todas las cifras son **ajustables sin tocar la tienda**: viven en un catálogo d
 - Las rarezas son las del proyecto (Común, Poco común, Rara, Ultra rara). Los jefes se quedan fuera de los sobres.
 - **Duplicados:** decisión abierta, sin propuesta firme. La opción más simple es que se queden en la colección (no hacen falta copias en el juego). Si Ayme quiere un incentivo, se pueden devolver como puntos (por ejemplo, un 25 % del precio de la carta suelta), pero eso crea un bucle de puntos que habría que simular.
 
-### 2.5 Pagar con puntos dentro de la campaña
+### 2.5 Qué se paga dentro de la campaña (y por qué no son los puntos)
 
-D-20 §10.6 deja **solo dos usos** de los puntos dentro de la campaña: la evolución por **intercambio** (Kadabra, Haunter, Machoke, Graveler) y **hacerse ex** un Pokémon que no evoluciona (Onix). La XP no los usa.
+**Decidido por Ayme (2026-11-23):** los puntos **no tienen utilidad dentro de la campaña**. Lo que gana la campaña pasa a la cuenta y se gasta solo en el menú de la app.
 
-**PROPUESTA (decisión 5):** intercambio **500** puntos, hacerse ex **1.500** puntos.
+Esto **sustituye** a lo que D-20 §2.1, §5 y §10.6 decían (que el intercambio y hacerse ex «cuestan puntos») y a mi primera versión de este documento. Consecuencias:
 
-Aviso importante: Ayme escribió que «cuántos puntos da cada cosa es irrelevante salvo que haya compras con puntos dentro de la campaña». **Estas dos compras hacen que sí importe**, así que las cifras de abono (100, 200, 1.000, 1.500) dejan de ser provisionales a la ligera. Antes de cerrarlas, Calidad debería simular cuántos puntos tiene un jugador cuando llega a su primer intercambio o a su primer ex. Mientras no haya cartas evolucionadas ni ex en el catálogo, nada de esto es urgente.
+- Sin sumideros de puntos dentro de la campaña, las cifras de abono (100, 200, 1.000, 1.500) **solo pesan en la economía de la tienda**, no en el equilibrio de la campaña. Vuelven a ser lo que Ayme dijo el 2026-11-21: irrelevantes para jugar, y solo relevantes para el ritmo de la tienda (§2.1 y §2.3).
+- Siguen sin resolverse el **intercambio** (Kadabra, Haunter, Machoke, Graveler) y **hacerse ex** un Pokémon que no evoluciona (Onix): alguien tiene que decir con qué se pagan.
+
+**PROPUESTA (decisión 5):** se pagan con **dinero**, en el centro Pokémon, en una «máquina de intercambio» y un servicio de «potenciación ex».
+
+| Servicio | Precio propuesto | Cuándo aparece |
+|---|---|---|
+| Evolución por intercambio | **2.000** de dinero | Cuando el Pokémon ya cumple las medallas mínimas y la XP (D-20 §10.11) |
+| Hacerse ex (Pokémon sin evolución) | **4.000** de dinero | Igual |
+
+Por qué dinero y por qué estas cifras:
+
+- **Encaja con la definición.** Dinero = recompensa por vencer entrenadores que sirve para comprar cosas. Y deja los puntos limpios.
+- **Hace que el dinero siga importando.** Hoy compite solo con las Pokéballs y las Pociones. Con estos dos usos, el jugador tiene que decidir entre equiparse y evolucionar, que es lo que da vida a una economía.
+- **Escala sola.** Hoy un tramo da unos **2.000 de dinero** (el primero: 2.060 entre Cazabichos, Entrenador Joven y Brock, más los 1.000 de salida). La regla es: **intercambio = lo que paga un tramo, hacerse ex = dos tramos**. Si Diseño sube el dinero de los tramos siguientes (cada clase y cada líder lleva su cifra en el catálogo), estos precios suben con él.
+- **Tiene sentido de progresión.** Los Pokémon que necesitan intercambio llegan después de varias medallas, cuando ya se ha ganado dinero de sobra para pagarlo; hacerse ex es una decisión de fondo del equipo, por eso cuesta el doble.
+
+Lo que falta antes de cerrar: **Calidad simula** cuánto dinero lleva un jugador al llegar a su primer intercambio y a su primer ex (hoy no hay ninguna carta evolucionada por intercambio ni ex en el catálogo, así que no es urgente) y **Diseño** confirma si el servicio vive en el centro Pokémon.
+
+**Qué implica para el trabajo de otros** (sin tocarlo aquí): en D-20 §2.1 y en el esquema de evolución, las vías `intercambio` y `puntos` llevan un campo `puntos`; si Ayme confirma, ese coste pasa a ser **dinero** (la nota para Diseño del §5 lo recoge).
 
 ## 3. #388 · Pokédex «Mis cartas»
 
@@ -165,43 +189,38 @@ La Pokédex tiene dos categorías (`flujo-app.md` §6): **Enemigos** (existe) y 
 - D-20 §1: las cartas de campaña **no se usan** en la partida libre.
 - El texto de la issue #388: «las cartas conseguidas en la campaña».
 
-**PROPUESTA (decisión 6):** «Mis cartas» tiene **dos colecciones**, con un selector arriba.
+**Decidido por Ayme (2026-11-23):** las cartas conseguidas en la campaña se usan **solo en la campaña**, y en el futuro habrá cartas en la tienda del menú para las partidas rápidas en formato digital. Eso da razón a las tres lecturas a la vez, y deja «Mis cartas» así (la estructura concreta es **PROPUESTA**, decisión 6): **dos colecciones**, con un selector arriba.
 
 | Colección | Qué contiene | Cómo se consigue | Se usa en |
 |---|---|---|---|
 | **Campaña** | Los Pokémon de la serie 001/150 (Mew, 151/150) | Capturando y evolucionando en la campaña | Solo la campaña |
 | **Formato digital** | Las cartas que se usarán en la partida libre digital | Tienda (sobres y cartas sueltas) | Partida libre digital |
 
-Así ni se mezclan las cartas que no valen en la partida libre con las que sí, ni se pierde la intención de la issue. La colección **Formato digital** queda vacía y oculta hasta que existan esas cartas.
+Así ni se mezclan las cartas que no valen en la partida libre con las que sí, ni se pierde la intención de la issue. La colección **Formato digital** queda oculta hasta que existan esas cartas: hoy solo se ve **Campaña**.
 
 **Los jefes de campaña (serie NN/20) van en «Enemigos»**, no en «Mis cartas»: son rivales. Se les aplica la regla que ya tiene Enemigos (**gris** = enfrentado, **color** = derrotado, **silueta** = nunca visto). Al capturar a un jefe se obtiene la **carta normal** del Pokémon (Pikachu 025/150), que sí va a «Mis cartas».
 
 ### 3.2 Estados de una carta
 
-Misma idea que Enemigos, para que el jugador no aprenda dos lenguajes.
+Como el registro es **solo la carta** (§3.3), hay dos estados, y no tres como en Enemigos.
 
 | Estado | Cuándo | Cómo se ve |
 |---|---|---|
-| **Silueta** | Nunca la ha visto | Silueta con su número |
-| **Vista** | Ha empezado un combate contra ese Pokémon, o lo ha visto en una evolución, pero no la tiene | Carta en gris |
+| **Silueta** | Aún no la tiene | Silueta con su número |
 | **Conseguida** | La ha capturado, ha evolucionado hasta ella o la ha elegido como inicial | Carta a todo color |
+
+El estado «vista» (gris), que sí existe en Enemigos, **no entra**: exigiría registrar los combates, y Ayme ha pedido registrar solo la carta. Se puede añadir más adelante sin migrar nada, porque lo que ya se guarda no cambia.
 
 - La carta es **siempre la imagen exportada de PokeCardMaker** (decisión de arte de Ayme, `campana-arte-interfaz.md`): la app no dibuja marcos.
 - Solo aparecen huecos de las cartas que **ya existen en el catálogo** (hoy 22). Enseñar 150 siluetas de cartas que no existen sería ruido. Un contador dice «Conseguidas 14 de 22» y, aparte, «nuevas cartas con cada actualización».
-- Se ordena por **número de la Pokédex**, no por el número impreso (D-20 §11).
-- **Detalle al pulsar:** la carta grande, fecha y sitio de la primera captura, cuántas veces la ha capturado, su línea de evolución con el estado de cada paso y en qué zonas aparece (la zona solo se enseña cuando la carta ya está **vista**, para no fastidiar el descubrimiento).
+- Se ordena por **número de la Pokédex**, que coincide con el impreso (§3.5).
+- **Detalle al pulsar:** la carta grande y su línea de evolución con el estado de cada paso, que sale del catálogo y de las cartas conseguidas, sin guardar nada más.
 
 ### 3.3 Qué se registra al capturar
 
-**PROPUESTA (decisión 7).** Por cada carta, se guarda:
+**Decidido por Ayme (2026-11-23): por el momento, solo la carta.** El resto de reglas de esta sección las ha dado por buenas.
 
-| Dato | Para qué |
-|---|---|
-| `idCarta` | Identifica la carta |
-| `estado` (vista / conseguida) | Pintar la rejilla |
-| `primeraVez` (fecha UTC) | El detalle de la carta |
-| `zona` y `ball` de la primera captura | El detalle de la carta |
-| `capturas` (número) | El detalle de la carta |
+Dato guardado: **el `idCarta`** de cada carta conseguida. Nada más (ni fecha, ni zona, ni Ball, ni número de capturas).
 
 Reglas de cuándo se registra:
 
@@ -210,26 +229,39 @@ Reglas de cuándo se registra:
 3. **El inicial cuenta** como conseguido al elegirlo.
 4. **Un jefe capturado** registra la **carta normal**, no la del jefe (D-20 §4, Jefes).
 5. **Una carta ex** es una entrada propia (D-20 §2.1): Raichu ex no es Raichu. Ojo: la Pokédex de **Enemigos** usa `idCarta`, que unifica «Kingdra ex» y «Kingdra»; en «Mis cartas» **no** debe hacerse, o una carta ex quedaría conseguida sin tenerla.
-6. **Repetir un salvaje** y capturarlo otra vez suma a `capturas`, sin cambiar el resto.
+6. **Capturar otra vez** una carta que ya se tiene no cambia nada.
 
-**La colección es de la cuenta, no de la partida.** Una campaña nueva empieza con el equipo vacío, pero «Mis cartas» conserva todo. Se guarda en el dispositivo y se sincroniza al iniciar sesión, igual que la Pokédex de Enemigos (`flujo-app.md` §6).
+**La colección es de la cuenta, no de la partida.** Una campaña nueva empieza con el equipo vacío, pero «Mis cartas» conserva todo. Se guarda en el dispositivo y se sincroniza al iniciar sesión, igual que la Pokédex de Enemigos (`flujo-app.md` §6). Como la sesión es obligatoria en la campaña (§4.3), la sincronización siempre puede ocurrir.
 
 ### 3.4 Qué no hace
 
 - **No se registran cartas físicas oficiales** de Pokémon TCG (las que se usan en la partida libre física): no hay escaneo ni reconocimiento.
-- **No se vende nada que no se haya capturado** en la colección **Campaña**: esa colección solo se llena jugando.
+- **La colección Campaña no se compra**: solo se llena jugando.
 - **No hay colecciones ajenas:** no se ven las cartas de otros jugadores hasta que existan amigos (`flujo-app.md` §7).
 
 ### 3.5 Relación con las cartas físicas
 
-Ayme ha creado e impreso las cartas de campaña (las 22 actuales, 001/150 y la serie NN/20). La relación queda así:
+Ayme crea las cartas en PokeCardMaker y las imprime: las 22 actuales (serie 001/150) y la serie de jefes NN/20 ya están impresas. La carta física y la digital son **la misma carta**, y esto es lo que eso significa en la práctica.
 
-**PROPUESTA (decisión 8):**
+**PROPUESTA (decisión 8), en cinco reglas:**
 
-- **Misma carta, mismo arte, misma numeración.** La carta digital de «Mis cartas» es la imagen de la carta física. Un jugador con la carta impresa en la mano reconoce la que ve en la app.
-- **No hay vínculo técnico:** tener la carta impresa no desbloquea la digital, ni al revés. Cada jugador consigue la suya jugando.
-- **Idea futura, sin decidir:** un **código de canje** impreso en la carta física que desbloquee su copia digital (útil para regalar una carta a un amigo). No encaja todavía: exige servidor, control de usos y un criterio contra el reparto de cartas sin jugar. Se anota para cuando el formato digital esté consolidado.
-- **Dependencia para Arte y Diseño:** la numeración impresa de Nidoran♂ es 029/150 y la de la Pokédex es 032 (D-20 §8, 13). Hay que resolverlo **antes** de enseñar el número en «Mis cartas».
+**1. La imagen manda y es la misma.** La carta de «Mis cartas» es la imagen exportada de PokeCardMaker (`app/assets/campana/cartas/<id>.webp`, 480×670), exactamente la que se imprime. Los datos del juego (`catalog/campana/pokemon/<id>.json`) salen de esa imagen (D-20 §11). Si la imagen y el JSON no coinciden, **se corrige el JSON**, no la carta, como ya se hizo con Cubone, Zubat y Slowpoke.
+
+**2. Una reimpresión actualiza la digital en la misma entrega.** Pasó con Mankey (texto de la habilidad) y con Machop. Regla: cuando una carta se reimprime, la imagen del repositorio se cambia **en el mismo PR** que su JSON, y la impresa antigua queda **obsoleta**: ya no es la carta del juego. Así nunca hay dos versiones vivas a la vez. Para el grupo, basta con que Ayme avise «la carta de X se ha reimpreso» y se tire la vieja.
+
+**3. La numeración es la de la Pokédex.** El número impreso (NNN/150) coincide con el número de la Pokédex de cada Pokémon (Nidoran♀ 029/150 y Nidoran♂ 032/150, ya corregido), y los jefes llevan su propia serie NN/20. En «Mis cartas» se enseña el número impreso y se ordena por él; no hay dos números. Mew será 151/150.
+
+**4. Tener la carta física no da nada en la app, ni al revés.** No hay vínculo técnico, ni escaneo, ni reconocimiento. Cada jugador consigue su carta digital **jugando la campaña**. Regalar o cambiar una carta impresa entre amigos es cosa de la mesa y no mueve nada en la colección digital.
+
+**5. Uso privado (#389).** Las impresiones son para el grupo. No se venden, ni se envían fuera de él, ni se publican las imágenes. Es una recomendación coherente con la decisión de Ayme, no una regla nueva.
+
+**Idea futura, sin decidir: código de canje.** Un código impreso en la carta física que desbloquee su copia digital (por ejemplo, para regalar una carta). **No se hace ahora** porque:
+
+- Exige servidor, control de usos (un código solo vale una vez) y un modelo de cuenta que hoy no existe.
+- Choca con la regla de que la colección **Campaña** solo se llena jugando: el código sería un atajo.
+- La colección **Formato digital**, que sí se compra, todavía no existe.
+
+Condiciones para retomarla: que esté el formato digital y la tienda, y que Ayme quiera una forma de regalar cartas entre amigos. Una versión más ligera, sin riesgo, sería un **QR informativo** que lleve al detalle de la carta (sin desbloquear nada).
 
 ### 3.6 Bono de primera captura (opcional)
 
@@ -258,12 +290,12 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 2. **Es una versión de prueba.** Hoy llega de Pueblo Paleta a Brock. El resto de Kanto llega con actualizaciones.
 3. **Lo que ganas sirve fuera.** Los puntos van a tu cuenta y se gastan en la tienda (cuando abra) y suman para desbloquear jefes de las incursiones.
 
-**Lo que no se promete**: la tienda (aún no existe), la Liga, las cartas del formato digital, el tiempo que dura el primer tramo (sin medir hasta el primer playtest), ni que se pueda jugar sin cuenta si algún día los puntos lo exigen.
+**Lo que no se promete**: la tienda (aún no existe), la Liga, las cartas del formato digital, el tiempo que dura el primer tramo (sin medir hasta el primer playtest), ni que se pueda jugar sin cuenta (la campaña exige sesión).
 
 **Riesgos que hay que decir de entrada** (mejor sin sorpresas):
 
 - **La partida se guarda en el dispositivo**, no en la cuenta. Si el amigo juega en la **web** y borra los datos del navegador, **pierde el progreso**. Hasta que haya sincronización, hay que avisarlo.
-- **Hace falta cuenta de Deck Tracker** para entrar (en la app solo se inicia sesión; el registro se hace en Deck Tracker). Es la mayor fricción de la primera sesión.
+- **La sesión es obligatoria** para jugar la campaña (**decidido por Ayme el 2026-11-23**). En la app solo se inicia sesión y el registro se hace en Deck Tracker, así que el amigo **debe tener ya su cuenta antes de empezar**. Es la mayor fricción de la primera sesión: conviene que se la cree antes de que le llegue el enlace.
 - **No es un proyecto público.** Los sprites son de Nintendo y The Pokémon Company, tomados de Escarlata y Púrpura (#389): el enlace es para el grupo y no se reenvía ni se publica.
 
 **Borrador del mensaje al grupo** (tono de grupo de WhatsApp, para que Ayme lo adapte):
@@ -271,7 +303,7 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 > Ya se puede probar el **modo campaña** de Incursiones 🎮
 > Es como un Pokémon de cartas para jugar **solo**: eliges inicial en Pueblo Paleta, recorres Kanto, capturas y llegas hasta la medalla de Brock. De momento solo ese tramo; el resto irá llegando.
 > Lo que ganas se guarda como **puntos** en tu cuenta: servirán para la tienda y para desbloquear jefes de las incursiones.
-> Ojo: es versión de prueba. Necesitas tu cuenta de Deck Tracker, y la partida se guarda **en tu dispositivo** (si juegas en la web y borras datos del navegador, la pierdes).
+> Ojo: es versión de prueba. Para jugar necesitas tu cuenta de Deck Tracker (créala antes), y la partida se guarda **en tu dispositivo** (si juegas en la web y borras datos del navegador, la pierdes).
 > Enlace: [enlace]. Es solo para nosotros, no lo paséis fuera 🙏
 > Decidme dónde os atascáis o qué no se entiende. Eso es lo más útil.
 
@@ -335,6 +367,9 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 | Documento | Cambio |
 |---|---|
 | D-20 §5 y §8 (4, 5) | Cerrar «qué se vende» y «dinero frente a puntos» con §1.1 y §2 |
+| D-20 §2.1, §5 y §10.6 | Los puntos **no** se usan en la campaña: sustituye «el intercambio y hacerse ex cuestan puntos». Si se aprueba, pasan a costar dinero (§2.5) |
+| D-20 §8 (13) | Nidoran♂ ya es 032/150: la pregunta se da por resuelta |
+| D-20 §6 y `flujo-app.md` §2 | La sesión es obligatoria en el modo campaña (la regla general «nunca obligatoria» deja de valer ahí) |
 | D-20 §10 | Nuevas filas del registro con las decisiones 1 a 9 |
 | D-10 §5 | Añadir el contador de **saldo** junto al de puntos ganados |
 | `flujo-app.md` §6 | Definir las dos colecciones de «Mis cartas» y su relación con Enemigos |
@@ -355,10 +390,12 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 
 ## 6. Preguntas abiertas
 
-1. **¿Se puede jugar la campaña sin sesión?** `flujo-app.md` dice que la sesión nunca es obligatoria, pero los puntos van a la cuenta y hoy se guardan en el dispositivo sin enviarse. Hay que decidir si se juega sin cuenta con los puntos **en espera** (la app ya tiene una cola de envío) o si se pide cuenta. Cambia lo que dice el mensaje de §4.3.
-2. **¿Qué pasa con los puntos de un invitado en la campaña?** D-10 dice que se pierden; en un modo de un solo jugador, la regla quizá deba ser otra.
-3. **Tamaño del sobre y composición** (§2.4): son números míos.
-4. **Rarezas de las cartas del formato digital:** se han usado las del proyecto (Común a Ultra rara) y pueden no ser las definitivas.
+Resueltas el 2026-11-23: la sesión es obligatoria en la campaña, las cartas de campaña valen solo en campaña, solo se registra la carta, los puntos no se usan dentro de la campaña, y la carta de Nidoran♂ ya es la 032/150.
+
+1. **¿Se guarda la partida de campaña también en la cuenta?** Como ya hay sesión obligatoria, sería natural y quitaría el riesgo de perder el progreso al borrar los datos del navegador (§4.3). Hoy se guarda solo en el dispositivo. Es una decisión de Diseño y Programación; yo propongo hacerlo.
+2. **Tamaño del sobre y composición** (§2.4): son números míos.
+3. **Rarezas de las cartas del formato digital:** se han usado las del proyecto (Común a Ultra rara) y pueden no ser las definitivas.
+4. **Duplicados de sobre** (§2.4).
 
 ## 7. Fuentes
 
