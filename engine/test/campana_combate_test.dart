@@ -725,6 +725,35 @@ void main() {
     });
   });
 
+  group('efecto: confusión con 2 monedas (Hidropulso)', () {
+    const hidropulso = AtaqueCampana(
+      nombre: 'Hidropulso',
+      tipo: TipoCampana.agua,
+      coste: 3,
+      dano: 40,
+      efecto: ConfundeDefensor(2),
+    );
+    final lento = pokemon('s',
+        tipo: TipoCampana.agua, ps: 100, ataques: const [hidropulso]);
+    final rival = pokemon('r', ps: 200);
+
+    test('hace su daño, lanza 2 monedas y confunde solo con dos caras', () {
+      final vistos = <String>{};
+      for (var s = 1; s <= 80; s++) {
+        final e = aplicarCombate(
+            EstadoCombate.inicial(
+                equipoJugador: [lento], equipoRival: [rival], semilla: s),
+            const Atacar(Bando.jugador, 0));
+        expect(e.rival.pokemonActivo.ps, 160);
+        final m = e.ultimasMonedas!;
+        expect(m, hasLength(2));
+        expect(e.rival.cegado, m[0] && m[1]);
+        vistos.add(m.join(','));
+      }
+      expect(vistos, hasLength(4), reason: 'salen las cuatro combinaciones');
+    });
+  });
+
   group('efecto: protección propia (Fortaleza)', () {
     const fortaleza = AtaqueCampana(
       nombre: 'Fortaleza',

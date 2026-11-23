@@ -18,6 +18,7 @@
       "dano": 0,
       "efecto": {
         "tipo": "confundeDefensor",
+        "monedas": 1,
         "texto": "Lanza una moneda. Si sale Cara, el Pokémon Defensor pasa a estar Confundido."
       }
     },

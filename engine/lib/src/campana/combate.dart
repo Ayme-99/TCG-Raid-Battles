@@ -611,11 +611,16 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
     defensorNuevo = defensorNuevo.copiarCon(cegado: true);
   }
   if (efecto is ConfundeDefensor) {
-    // Supersónico: con cara, el mismo estado que Bofetón Lodo.
-    semilla = _siguienteSemilla(semilla);
-    moneda = (semilla >> 8) & 1 == 1;
-    monedas.add(moneda);
-    if (moneda) defensorNuevo = defensorNuevo.copiarCon(cegado: true);
+    // Supersónico e Hidropulso: si todas salen cara, el mismo estado que
+    // Bofetón Lodo.
+    var todasCara = true;
+    for (var i = 0; i < efecto.monedas; i++) {
+      semilla = _siguienteSemilla(semilla);
+      moneda = (semilla >> 8) & 1 == 1;
+      monedas.add(moneda);
+      if (!moneda) todasCara = false;
+    }
+    if (todasCara) defensorNuevo = defensorNuevo.copiarCon(cegado: true);
   }
   if (efecto is QuitaEnergiaRival) {
     final resto = defensorNuevo.energia - efecto.valor;

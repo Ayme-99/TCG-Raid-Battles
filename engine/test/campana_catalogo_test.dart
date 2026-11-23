@@ -283,6 +283,52 @@ void main() {
       expect(enumEsquema, TipoCampana.values.map((t) => t.name).toList());
     });
 
+    test('Slowpoke sigue a su carta impresa (079/150)', () {
+      final s = pokemon['slowpoke']!;
+      expect(s.tipo, TipoCampana.agua);
+      expect(s.ps, 80);
+      expect(s.debilidad?.tipo, TipoCampana.electrico);
+      expect(s.debilidad?.multiplicador, 2);
+      expect(s.resistencia, isNull);
+      expect(s.retirada, 1);
+      expect(s.ataques.map((a) => a.nombre), ['Pistola Agua', 'Hidropulso']);
+      final pistola = s.ataques.first;
+      expect(pistola.tipo, TipoCampana.agua);
+      expect(pistola.coste, 2);
+      expect(pistola.dano, 20);
+      final hidro = s.ataques.last;
+      expect(hidro.tipo, TipoCampana.agua);
+      expect(hidro.coste, 3);
+      expect(hidro.dano, 40);
+      expect((hidro.efecto as ConfundeDefensor).monedas, 2);
+    });
+
+    test('confundeDefensor: monedas es 1 por defecto y no puede ser 0', () {
+      Map<String, dynamic> carta(Map<String, dynamic> efecto) => {
+            'id': 'prueba',
+            'nombre': 'Prueba',
+            'tipo': 'normal',
+            'ps': 60,
+            'retirada': 0,
+            'ataques': [
+              {
+                'nombre': 'A',
+                'tipo': 'normal',
+                'coste': 1,
+                'dano': 0,
+                'efecto': efecto
+              },
+              {'nombre': 'B', 'tipo': 'normal', 'coste': 2, 'dano': 30},
+            ],
+          };
+      final p = pokemonCampanaDesdeJson(carta({'tipo': 'confundeDefensor'}));
+      expect((p.ataques.first.efecto as ConfundeDefensor).monedas, 1);
+      expect(
+          () => pokemonCampanaDesdeJson(
+              carta({'tipo': 'confundeDefensor', 'monedas': 0})),
+          throwsFormatException);
+    });
+
     test('Zubat sigue a su carta impresa (041/150)', () {
       final zubat = pokemon['zubat']!;
       expect(zubat.tipo, TipoCampana.oscuridad);
@@ -296,7 +342,7 @@ void main() {
       expect(sonico.tipo, TipoCampana.oscuridad);
       expect(sonico.coste, 1);
       expect(sonico.dano, 0);
-      expect(sonico.efecto, isA<ConfundeDefensor>());
+      expect((sonico.efecto as ConfundeDefensor).monedas, 1);
       final mordisco = zubat.ataques.last;
       expect(mordisco.tipo, TipoCampana.oscuridad);
       expect(mordisco.coste, 2);
