@@ -12,14 +12,19 @@
   "categoriaCaptura": "comun",
   "ataques": [
     {
-      "nombre": "Mordisco",
-      "tipo": "normal",
+      "nombre": "Supersónico",
+      "tipo": "oscuridad",
       "coste": 1,
-      "dano": 10
+      "dano": 0,
+      "efecto": {
+        "tipo": "confundeDefensor",
+        "monedas": 1,
+        "texto": "Lanza una moneda. Si sale Cara, el Pokémon Defensor pasa a estar Confundido."
+      }
     },
     {
-      "nombre": "Ataque Ala",
-      "tipo": "normal",
+      "nombre": "Mordisco",
+      "tipo": "oscuridad",
       "coste": 2,
       "dano": 30
     }

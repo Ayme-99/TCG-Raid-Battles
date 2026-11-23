@@ -80,6 +80,18 @@ class MonedaFalloRival extends EfectoAtaque {
   const MonedaFalloRival();
 }
 
+/// Lanza [monedas] monedas al usar el ataque: si **todas** salen cara, el
+/// Pokémon Defensor queda Confundido, que en campaña es el mismo estado que
+/// [MonedaFalloRival] (`BandoCombate.cegado`): en su próximo turno, si ataca,
+/// lanza una moneda y con cruz ese ataque no hace nada. Si alguna sale cruz no
+/// pasa nada. No se acumula (Supersónico con 1 moneda, Hidropulso con 2;
+/// D-20 §3.6).
+class ConfundeDefensor extends EfectoAtaque {
+  final int monedas;
+
+  const ConfundeDefensor([this.monedas = 1]);
+}
+
 /// El daño del ataque se multiplica por las veces **seguidas** que este
 /// Pokémon lo ha usado, contando la actual: [AtaqueCampana.dano] la primera
 /// vez, el doble la segunda, el triple la tercera… Se reinicia si el Pokémon usa
