@@ -8,24 +8,19 @@
     "tipo": "agua",
     "multiplicador": 2
   },
-  "resistencia": {
-    "tipo": "normal",
-    "reduccion": 30
-  },
   "retirada": 1,
   "categoriaCaptura": "fuerte",
   "ataques": [
     {
-      "nombre": "Atadura",
-      "tipo": "normal",
-      "coste": 2,
-      "dano": 30
-    },
-    {
-      "nombre": "Lanzarrocas",
+      "nombre": "Tumba Rocas",
       "tipo": "lucha",
       "coste": 3,
-      "dano": 60
+      "dano": 50,
+      "efecto": {
+        "tipo": "quitaEnergiaRival",
+        "valor": 1,
+        "texto": "El rival pierde 1 energía (si le queda alguna)."
+      }
     }
   ]
 }
