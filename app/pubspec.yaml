@@ -16,6 +16,7 @@ dependencies:
   wakelock_plus: ^1.2.8
   incursiones_engine:
     path: ../engine
+  flutter_svg: ^2.5.0
 
 dev_dependencies:
   flutter_test:
