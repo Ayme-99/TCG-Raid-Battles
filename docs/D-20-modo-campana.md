@@ -2,6 +2,15 @@
 
 Estado: **en desarrollo** (revisado el 2026-11-23). Issue #334 (diseño) y una issue por cada pieza (#336 a #356). Ayme va cerrando el diseño decisión a decisión; cada una queda en el [registro de §10](#10-registro-de-decisiones) con su fecha. **El código y los datos mandan**: este documento describe lo que hay y lo que falta.
 
+> **Nota de Negocio y comunidad para Diseño (2026-11-23).** Este documento es de Diseño y **no se ha modificado su contenido**; esto es un aviso de lo que Ayme decidió el 2026-11-23 al revisar [D-21](./D-21-campana-negocio-y-comunidad.md) y que Diseño debe trasladar a §2.1, §5, §6, §8 y al registro de §10:
+>
+> 1. **Los puntos no tienen utilidad dentro de la campaña** (Ayme). Se ganan en la campaña, pasan a la cuenta al conseguir medallas o avanzar en la historia y se gastan solo en el menú de la app. Esto **sustituye** a «el intercambio y hacerse ex cuestan puntos» (§2.1, §5, §10.6). D-21 §2.5 propone pagarlos con **dinero** (intercambio 2.000, hacerse ex 4.000, es decir, 1 y 2 tramos de dinero); **sigue siendo una propuesta**. Si se aprueba, las vías `intercambio` y `puntos` del esquema de evolución (campo `puntos`) pasarían a costar dinero.
+> 2. **La sesión es obligatoria para jugar el modo campaña** (Ayme). Afecta a §6 y a `flujo-app.md` §2, que dice que la sesión nunca es obligatoria.
+> 3. **«Mis cartas»** (Ayme): las cartas conseguidas en la campaña se usan **solo en la campaña**; en el futuro habrá cartas en la tienda del menú para las partidas rápidas en formato digital. Se registra **solo la carta** conseguida (D-21 §3).
+> 4. **Nidoran♂ ya es 032/150** (comprobado: la imagen del repositorio y la carta de Ayme coinciden). La pregunta de §8 (13) queda resuelta.
+> 5. **Vocabulario único** (Ayme): energía, XP, dinero y puntos, definidos en D-21 §1.1. La XP se mide en XP, no en «puntos».
+> 6. **Tienda de puntos** (D-21 §2): todo lo de precios y catálogo es **propuesta** pendiente de confirmar; cierra, si se aprueba, §8 (4) y (5).
+
 | Pieza | Estado |
 |---|---|
 | Combate 1 contra 1: energía, acciones, debilidad y resistencia, doce efectos y una habilidad, azar con semilla, veneno (§3) | **Hecho** (#336, #350, #352) |
