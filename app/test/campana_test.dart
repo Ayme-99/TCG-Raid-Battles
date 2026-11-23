@@ -144,7 +144,12 @@ void main() {
       await tocar(tester, 'campana-combatir');
       expect(find.byKey(const Key('campana-combate')), findsOneWidget);
       await jugarCombate(tester);
-      // La Ruta 1 no deja capturar (D-20 §10.6).
+      // La Ruta 1 deja capturar, pero aún no hay Pokéballs (hasta la
+      // primera tienda): se ofrece y solo queda seguir.
+      expect(c.read(campanaProvider).partida!.capturaPendiente, 'pidgey');
+      expect(find.text('No te quedan Balls: este combate acaba sin captura.'),
+          findsOneWidget);
+      await tocar(tester, 'campana-no-capturar');
       expect(c.read(campanaProvider).partida!.capturaPendiente, isNull);
       expect(tester.takeException(), isNull);
       // Se ha guardado en el dispositivo y se recupera igual.
@@ -182,7 +187,7 @@ void main() {
     expect(p.progreso.resuelto, isTrue);
     expect(p.ultimaCura, 'ciudad-verde');
     expect(p.equipo.every((e) => e.ps == catalogo.especie(e.id).ps), isTrue);
-    expect(p.equipo.length, 1, reason: 'en la Ruta 1 no se captura');
+    expect(p.equipo.length, 1, reason: 'sin Pokéballs no se captura en la Ruta 1');
     expect(tester.takeException(), isNull);
   });
 
