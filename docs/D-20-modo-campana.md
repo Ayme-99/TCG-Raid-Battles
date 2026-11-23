@@ -275,14 +275,63 @@ Lista propuesta (solo el total y Pikachu están cerrados; el resto puede cambiar
 
 **Combate:** es un 1 contra 1 con el mismo motor y la misma IA. **Capturable** (decidido el 2026-11-21): al derrotarlo se ofrece la carta **normal** del Pokémon (la 025/150 en el caso de Pikachu, con 60 PS), no la del jefe, con las mismas reglas de equipo y PC que cualquier captura (§2). **Solo se captura la primera vez**: si se repite el jefe, ya no se puede volver a capturar. **Los aliados que llama el jefe no se capturan.** Los puntos del jefe se dan solo la primera vez. Si lleva `llamaAliado`, la llamada va **en dos pasos** (decidido el 2026-11-22, §10.8). Al **llegar a `alBajarDePorcentaje`** de sus PS o bajar de él (Pikachu: 50 %; con 50 PS justos ya llama), el jefe **invoca** a un **aliado elegido al azar** con la semilla del combate (Pikachu: Weedle, Caterpie, Metapod o Kakuna), que aparece **en la banca**. Al **llegar a `alFrenteAlPorcentaje`** (Pikachu: 40 %), el jefe se retira a la banca y el aliado pasa al **puesto activo**. Así, unos ataques solo lo invocan y otros, los que cruzan los dos umbrales de un golpe, lo ponen delante directamente. Cuando el aliado cae, **vuelve el jefe con los PS que tenía**. Más detalles: cuenta **cualquier daño**, también el del veneno (se comprueba al acabar cada turno, tras el chequeo Pokémon); si el golpe lo deja a 0, no llama, porque ya está derrotado; llama **una sola vez por combate**; al retirarse **pierde todos sus efectos**, también los propios como Fortaleza (mientras el aliado solo espera en la banca, el jefe los conserva); el aliado juega con la misma energía del bando; ni el aliado que espera ni el jefe retirado pueden salir con «Cambiar»; y **se gana cuando cae el jefe**: aunque caiga el aliado no se gana, y si el jefe cae con el aliado en la banca, se gana igual. En el motor: `LlamadaEnCombate` (`EstadoCombate.inicial(llamadaRival: …)`, que se construye desde el catálogo con `llamadaEnCombate(jefe, pokemon)`), `EstadoCombate.aliado` (posición del aliado en el equipo rival, para que la captura lo excluya), `EstadoCombate.aliadoAlFrente` y `BandoCombate.enEspera`. El campo `alBajarDePorcentaje` conserva su nombre aunque basta con llegar; sin `alFrenteAlPorcentaje`, el aliado entra directamente al invocarlo. Los PS de los jefes pueden salirse de la tabla de §3.5, pero su daño es el de su fase. Los datos están en `catalog/campana/jefes/*.json`.
 
+### Propuesta de jefes 02 a 16 (#364, 2026-11-23, por confirmar)
+
+**Es una propuesta: nada de esto está decidido.** Mantiene los 15 Pokémon de la lista de arriba y añade el tramo (entre qué medallas aparece, en el orden de los juegos), la zona y los aliados que llama. La ubicación sale de los juegos y está **por contrastar con Serebii o Bulbapedia**, como las demás zonas (§8, 16); varios de estos Pokémon no son salvajes en los juegos (Lapras, Aerodactyl, Dragonite), así que su zona es de historia.
+
+**Regla de los aliados** (para el que quiera cambiarla): como en Pikachu, el jefe llama a **uno al azar** de una lista de 3 o 4 **Pokémon débiles de su zona**, que no se capturan y salen en la banca (§10.8). Hay dos opciones por coste: **A) solo cartas que ya existen** (cero cartas nuevas para los aliados; la que recomiendo para la primera entrega) y **B) aliados temáticos** (cartas nuevas, marcadas con \*). La tabla da la A; los ejemplos de B van en la última columna.
+
+| Nº | Jefe | Entre medallas | Zona (juegos) | Aliados con cartas que ya existen (A) | Aliados temáticos (B, \* = carta nueva) |
+|---|---|---|---|---|---|
+| 02 | Clefairy | 1.ª y 2.ª | Monte Moon | Zubat, Geodude, Sandshrew | Paras\*, Zubat, Geodude |
+| 03 | Dugtrio | 2.ª y 3.ª | Cueva Diglett | Diglett, Sandshrew, Geodude | los mismos |
+| 04 | Marowak | 3.ª y 4.ª | Torre Pokémon (Ciudad Lavanda) | Cubone, Zubat, Geodude | Cubone, Gastly\*, Zubat |
+| 05 | Kangaskhan | 4.ª y 5.ª | Zona Safari | Nidoran♀, Nidoran♂, Rattata | Nidorina, Rhyhorn\*, Exeggcute\* |
+| 06 | Lapras | 5.ª y 6.ª | Edificio Silph (Ciudad Azafrán; regalo en los juegos) | Slowpoke, Squirtle, Zubat | Slowpoke, Shellder\*, Tentacool\* |
+| 07 | Muk | 6.ª y 7.ª | Mansión Pokémon (Isla Canela) | Weedle, Rattata, Zubat | Grimer\*, Koffing\*, Ponyta\* |
+| 08 | Gyarados | 7.ª y 8.ª | Ruta 21 (mar) | Slowpoke, Squirtle, Geodude | Magikarp\*, Tentacool\*, Krabby\* |
+| 09 | Snorlax | 3.ª y 4.ª | Ruta 12 | Pidgey, Rattata, Slowpoke | Pidgey, Oddish\*, Bellsprout\* |
+| 10 | Electrode | 2.ª y 3.ª | Central Eléctrica | Pikachu, Mankey, Machop | Voltorb\*, Magnemite\*, Pikachu |
+| 11 | Dodrio | 4.ª y 5.ª | Ruta 16 (Camino de Bicis) | Spearow, Pidgey, Rattata | Doduo\*, Spearow, Fearow\* |
+| 12 | Golem | 7.ª y 8.ª | Calle Victoria | Geodude, Onix, Machop | Graveler\*, Geodude, Onix |
+| 13 | Alakazam | 7.ª y 8.ª | Cueva Celeste (entrada) | Slowpoke, Zubat, Machop | Abra\*, Kadabra\*, Slowpoke |
+| 14 | Aerodactyl | 5.ª y 6.ª | Fósiles (zona por decidir) | Zubat, Geodude, Onix | los mismos |
+| 15 | Scyther | 5.ª y 6.ª | Zona Safari (otro rincón) | Caterpie, Metapod, Weedle | Pinsir\*, Paras\*, Venonat\* |
+| 16 | Dragonite | 7.ª y 8.ª | Calle Victoria (fondo) | Squirtle, Slowpoke, Geodude | Dratini\*, Dragonair\*, Magikarp\* |
+
+**Qué hay que decidir (por orden de coste para Ayme):**
+1. **Los 15 Pokémon y el tramo de cada uno** (sin coste: solo cambia esta tabla).
+2. **Aliados A o B.** Con A, los aliados ya tienen carta; con B hay que crear unas 24 cartas más (Paras, Gastly, Rhyhorn, Exeggcute, Shellder, Tentacool, Grimer, Koffing, Ponyta, Magikarp, Krabby, Oddish, Bellsprout, Voltorb, Magnemite, Doduo, Fearow, Graveler, Abra, Kadabra, Pinsir, Venonat, Dratini y Dragonair), y todas esperan a su zona. Recomiendo A.
+3. **Dos zonas repetidas** (Safari y Calle Victoria tienen dos jefes cada una) y las ubicaciones «de historia» (Lapras, Aerodactyl, Dragonite): se pueden separar en nodos distintos de la misma zona o moverlas.
+4. **Cuántos jefes entran en la primera entrega.** Hoy solo existe Pikachu y los siguientes tramos no tienen zonas (tarea 11): lo razonable es crear la carta de un jefe por tramo según se haga cada tramo.
+
+Con cada jefe hay que crear su carta NN/20 y, si lleva `llamaAliado`, su JSON (`catalog/campana/jefes/<id>.json`, igual que `pikachu-jefe`).
+
+### Líderes de gimnasio (ficha por rellenar, 2026-11-23)
+
+Ayme mandará los líderes (§8, 28); **no se inventa ninguno**. Esta es la ficha vacía, con lo que ya es dato: la ciudad y la medalla (nombres de los juegos; el arte de las medallas es el de LGPE, §10.1) y lo decidido de Brock.
+
+| Nº | Medalla | Ciudad | Líder | Tipo | Pokémon (id de carta) | Dinero | Puntos de la medalla |
+|---|---|---|---|---|---|---|---|
+| 1 | Roca | Ciudad Plateada | | | Geodude y Onix (cartas normales, §4 Jefes) | 1.400 | 1.500 (provisional) |
+| 2 | Cascada | Ciudad Celeste | | | | | |
+| 3 | Trueno | Ciudad Carmín | | | | | |
+| 4 | Arcoíris | Ciudad Azulona | | | | | |
+| 5 | Alma | Ciudad Fucsia | | | | | |
+| 6 | Pantano | Ciudad Azafrán | | | | | |
+| 7 | Volcán | Isla Canela | | | | | |
+| 8 | Tierra | Ciudad Verde | | | | | |
+
+Reglas que ya se aplican a cada ficha: los líderes usan **cartas normales**, no de jefe (arriba); el gimnasio da una medalla y puntos; el dinero se da una sola vez; y el orden de medallas es el de los juegos. Las medallas mínimas de cada evolución dependen de este orden (§10.11).
+
 **Pikachu (01/20):** 100 PS, eléctrico, debilidad lucha ×2, sin resistencia, retirada 0. Ataque Rápido (1, 10) e Impactrueno (2, 30). Estimación de dificultad: unos 20 de daño por turno, de modo que el inicial aguanta 4–5 turnos; se calibrará con el simulador. La llamada de aliado está en el motor desde #372.
 
 ## 5. Puntos y tienda
 
 - La campaña da puntos por **victoria en combate**, por **medalla** y por **jefe**, más una cantidad menor por ruta superada (las cifras son provisionales y se ajustan al final; solo importan si hay compras dentro de la campaña).
 - Los puntos van a la **cuenta** (hace falta sesión) y se gastan en la **tienda** de la pantalla de inicio: monedas, dados, sobres y cartas sueltas del formato digital.
-- Aparte de los puntos, los entrenadores dan **dinero** (decidido el 2026-11-21, sin más detalle): qué es, para qué sirve y cómo se relaciona con los puntos está por definir (§8).
-- Compras dentro de la campaña (el descanso), la **XP de evolución** y la evolución por intercambio o a ex se pagan con los mismos puntos, y lo que sobra al terminar se conserva. Gastar puntos en evolucionar es renunciar a gastarlos en la tienda.
+- Aparte de los puntos, los entrenadores y los líderes dan **dinero** (§10.6): es local de la partida y se gasta en la tienda del centro Pokémon (Pokéballs, Pociones, Repelente y, más adelante, Cuerda Huida). No es la moneda de la cuenta. Para qué sirve frente a los puntos queda por decidir (§8, 5; propuesta de Negocio en D-21, #444).
+- Los **puntos** solo se gastan dentro de la campaña en la **evolución por intercambio** y en **hacerse ex** (§10.6). La **XP de evolución** sale de los combates, no de los puntos, y las compras del centro Pokémon se pagan con dinero. Lo que sobra de puntos al terminar se conserva. Gastarlos en intercambio o ex es renunciar a gastarlos en la tienda de la pantalla de inicio.
 
 ## 6. Cómo encaja en el proyecto
 
@@ -336,7 +385,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 
 12. **Spearow.** Con 0 caras hace 50 (así lo dice la carta: la tirada peor es la que más daño hace). Se señaló como inusual y se dejó como está impreso.
 13. **Nidoran♂.** Su carta lleva impreso 029/150, que es el número de la hembra; el catálogo guarda 32 (número de la Pokédex). Falta saber si se reimprime.
-14. **Jefes 02 a 16.** La lista de §4 es una propuesta mía; solo está cerrado el total (20), el 01 (Pikachu) y los cuatro legendarios.
+14. **Jefes 02 a 16.** La lista de §4 es una propuesta mía; solo está cerrado el total (20), el 01 (Pikachu) y los cuatro legendarios. **Propuesta completa el 2026-11-23** (§4, «Propuesta de jefes 02 a 16»), por confirmar (#364).
 15. **Túnel Roca.** La zona sigue listando a Onix como jefe y no tiene sitio en el recorrido; hay que rehacerla (el jefe de la zona es un salvaje de la serie NN/20) y decidir en qué tramo entra.
 16. **Listas de Pokémon por zona.** Las de Ruta 1, Ruta 2, Bosque Verde, Ruta 22 y el gimnasio de Ciudad Plateada salen de los juegos Rojo y Azul **por contrastar con Serebii o Bulbapedia**.
 17. ~~Campo `rareza`~~ **Sustituido el 2026-11-22** (§10.6) por el campo `categoriaCaptura` (Común, Intermedio, Fuerte o Jefe), que aún no existe en el esquema ni en el motor (#368).
@@ -344,12 +393,13 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 
 **Equilibrado y producto**
 
-19. **Calibrar con el simulador.** (El plan B si Brock sale por debajo del objetivo es evolucionar un inicial antes de Brock, opcional, §10.6.) Objetivo fijado (75 %, §10.5) y medido en `balance/informes/campana_calibrar_2026-11-22.md` (#383): con un equipo realista (inicial + 3 capturas) las rutas, los Cazabichos, Pikachu y el Entrenador Joven pasan del 90 %, pero **Brock** se queda en el 0–7 % y el tramo entero en el 0–7 %; con la llamada de aliado (#393), Pikachu baja al 69–99 % con inicial + 3 y al 26–79 % con inicial + 2, porque el equipo llega tocado del Bosque Verde; solo con el inicial sale al 0 %. Falta que Ayme elija qué se ajusta (el informe propone palancas) y con qué cifras.
+19. **Calibrar con el simulador.** (El plan B si Brock sale por debajo del objetivo es evolucionar un inicial antes de Brock, opcional, §10.6.) Objetivo fijado (75 %, §10.5) y medido en `balance/informes/campana_calibrar_2026-11-22.md` (#383): con un equipo realista (inicial + 3 capturas) las rutas, los Cazabichos, Pikachu y el Entrenador Joven pasan del 90 %, pero **Brock** se queda en el 0–7 % y el tramo entero en el 0–7 %; con la llamada de aliado (#393), Pikachu baja al 69–99 % con inicial + 3 y al 26–79 % con inicial + 2, porque el equipo llega tocado del Bosque Verde; solo con el inicial sale al 0 %. Falta que Ayme elija qué se ajusta (el informe propone palancas) y con qué cifras. **2026-11-23:** a la espera del informe de #409 (Calidad); no se propone palanca para Brock hasta que llegue.
 20. ~~Llamada de aliado~~ **Hecha (#372)**, con los detalles decididos el 2026-11-22 (§10.8). Decidido además que el jefe pierde **todos** sus efectos al irse a la banca, también los propios.
 21. **Capacidad del PC.** Ilimitada por ahora; se revisará si hace falta un tope.
 22. **Pantallas de la app** (mapa de región, combate, equipo, descanso) y **tienda**: sin diseño. Se propone hacer varias propuestas visuales antes de implementar (como en el resto de la app).
 23. **Kanban.** Las tarjetas del GitHub Project (`users/Ayme-99/projects/10`) no se pueden comprobar ni mover desde las sesiones de trabajo (la API del proyecto está bloqueada), y las issues #334 a #354 siguen abiertas aunque su PR ya está fusionado.
 24. **Medallas y líderes de gimnasio** (#416). Las medallas y los líderes de Kanto no existen en estilo Escarlata y Púrpura. **Decidido el 2026-11-22 por Ayme: las medallas serán las de Pokémon: Let's Go, Pikachu! y Let's Go, Eevee! (LGPE)**, de WikiDex: https://www.wikidex.net/wiki/Categor%C3%ADa:Sprites_de_medallas_de_Kanto (enlace para dárselo al artista). **Pendiente:** los líderes de gimnasio; **Ayme los mandará más adelante** (2026-11-22).
+28. **Líderes de gimnasio: ficha por rellenar.** Ayme los mandará (2026-11-22); la ficha vacía está en §4, «Líderes de gimnasio».
 25. **Dormido.** No existe en campaña todavía (decisión de Ayme del 2026-11-23: dejarlo programado o programarlo cuando aparezca un Pokémon que lo cause). Hay que decidir cuál de las dos cosas (#436).
 26. ~~Cuerda Huida: ¿gasta el turno?~~ **Decidido el 2026-11-23 por Ayme: sí gasta el turno** (como cambiar, §3.2) **y ahorra la energía de la retirada**. Se revisa con el simulador si resulta poco útil (#437). Falta decidir en qué tramo se vende.
 27. **Pociones en combate.** Hoy solo se usan desde la pantalla de equipo; hay que decidir si también en combate (#435).
@@ -538,6 +588,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | Fecha | Antes | Ahora |
 |---|---|---|
 | 2026-11-23 | #368 leyó «la Ruta 1 no permite capturar» como una regla de la zona (`captura: false`). | No es una regla de la zona: en la Ruta 1 no se captura **la primera vez** porque no hay Pokéballs hasta la primera tienda (Ciudad Verde); después se puede volver a capturar (Ayme, 2026-11-23). La zona deja de llevar `captura: false`. |
+| 2026-11-23 | §5 decía que las **compras del descanso**, la **XP de evolución** y la evolución se pagaban **con puntos**, y que el dinero estaba «por definir». | Desde el 2026-11-22 (§10.6) las compras del centro Pokémon se pagan con **dinero**, la evolución cuesta **XP** de combate, y los puntos solo pagan el **intercambio** y el **hacerse ex**. Texto de §5 corregido el 2026-11-23. |
 | 2026-11-22 | La tabla de §10.11 (#417) puso los iniciales a **1 medalla**, por un error al fijarla. | Los iniciales evolucionan con **0 medallas**, así que pueden hacerlo antes de Brock; el plan B de §10.6 sigue vigente. Corregido el 2026-11-22 (#416). |
 | 2026-11-22 | `fantasma` pasaba a **psíquico** (§10.3) y Agatha era de tipo psíquico. | `fantasma` pasa a **oscuridad**, igual que `veneno`, y Agatha es de tipo **oscuridad** (§10.3, §10.7; #416). |
 | 2026-11-21 | La tercera acción era «Pasar». | «Cargar» (§10.2). |
@@ -597,6 +648,19 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | Slowpoke → Slowbro | 37 | 5 |
 | Pikachu → Raichu | Piedra Trueno | Por decidir: depende de cuándo se pueda comprar la piedra |
 | Onix → Steelix | Intercambio con Revestimiento Metálico | Por decidir (no es de la primera generación, §10.3) |
+
+**Propuesta (2026-11-23, por confirmar): los dos casos abiertos.** Todo esto es propuesta mía; Ayme no ha decidido nada.
+
+*Pikachu → Raichu (Piedra Trueno).* Raichu es la **última fase**, así que sería una **carta ex** (§2.1). Propongo:
+- **Medallas mínimas: 3** (la de Trueno, la del líder eléctrico) y la **Piedra Trueno a la venta en la tienda de Ciudad Azulona** (en los juegos se vende en los grandes almacenes de Azulona; por contrastar), que se alcanza tras la 3.ª medalla. Así el plazo y la tienda coinciden y no hay que decidir cuándo se compra por separado.
+- **Precio de la piedra:** el de los juegos (por contrastar con Serebii o Bulbapedia; unos 2.100). Como las piedras se compran con **dinero** (§10.6), esto casa con la regla ya decidida («los objetos de evolución se compran fuera de los centros o se encuentran en las rutas», §2.1).
+- **Sin XP**: la piedra sustituye a la XP, como pide la regla de §2.1. Queda por decidir si una evolución que acaba en ex cuesta además **puntos** (hoy solo el intercambio y el hacerse ex los cuestan).
+- **Alternativa más barata** (sin tienda nueva): la Piedra Trueno se encuentra en la **Central Eléctrica** (ruta clave del jefe 10) en lugar de comprarse. Cuesta menos en datos y deja a Pikachu sin evolución hasta entonces.
+
+*Onix → Steelix (Revestimiento Metálico).* D-20 se contradice: §2.1 dice que Onix «puede hacerse ex gastando puntos» y esta fila dice que evoluciona a Steelix con un objeto y un intercambio. Propongo **resolverlo así**, de menor a mayor coste:
+1. **Onix se hace ex gastando puntos y no hay Steelix en la primera entrega** (recomendado): se cumple §2.1 y D-21, no hace falta ningún objeto ni intercambio, y Steelix, que no es de la primera generación (§10.3), queda fuera del alcance. **Medallas mínimas: 4** (Onix ex tendría 240 PS, §3.5, y las terceras fases de los iniciales, que serían 4 y 5 medallas (arriba), son la referencia). Coste en puntos: el de D-21 (1.500, por decidir en §8, 6).
+2. **Steelix ex por hacerse ex** (mismo proceso, otra carta): necesita la carta Steelix ex, el color y el icono de `metal` (§8, 10; #408) y no es Kanto de la primera generación.
+3. **Steelix por Revestimiento Metálico más intercambio** (lo que dice la fila actual): objeto nuevo en la tienda, intercambio y dos pagos (dinero y puntos). Es lo más caro y no lo recomiendo.
 
 Las terceras fases de los iniciales (nivel 32 y 36 en los juegos) serían 4 y 5 medallas si se hacen; no hay cartas todavía.
 
