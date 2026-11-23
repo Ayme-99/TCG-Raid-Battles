@@ -151,7 +151,7 @@ void main() {
         .avanzar(c, 'ruta-1-pidgey');
     final r = p.rival(c);
     expect(r.equipo.single.id, 'pidgey');
-    expect(r.captura, isNull, reason: 'la Ruta 1 no deja capturar');
+    expect(r.captura, 'pidgey');
     expect(r.puntos, 100);
     expect(p.rival(c).equipo.single.id, r.equipo.single.id);
   });
@@ -170,7 +170,10 @@ void main() {
     expect(p.puntos, 100);
     expect(p.equipo.single.ps, fin.jugador.equipo.single.ps);
     expect(p.semilla, isNot(semilla));
-    expect(p.capturaPendiente, isNull, reason: 'la Ruta 1 no deja capturar');
+    expect(p.capturaPendiente, 'pidgey');
+    expect(p.ballsEnMochila(), isEmpty,
+        reason: 'sin Pokéballs hasta la primera tienda');
+    p = p.noCapturar();
     expect(p.opciones(c), ['ciudad-verde']);
   });
 
@@ -1044,13 +1047,15 @@ void main() {
       expect(PartidaCampana.nueva(c.region).ballsEnMochila(), isEmpty);
     });
 
-    test('la Ruta 1 no deja capturar; la Ruta 2 sí', () {
-      expect(c.zonas['ruta-1']!.permiteCaptura, isFalse);
+    test('la Ruta 1 y la Ruta 2 dejan capturar', () {
+      // En la Ruta 1 no hay Pokéballs hasta la primera tienda (Ciudad Verde),
+      // pero se puede volver atrás a capturar (Ayme, 2026-11-23).
+      expect(c.zonas['ruta-1']!.permiteCaptura, isTrue);
       expect(c.zonas['ruta-2']!.permiteCaptura, isTrue);
       const r1 = PartidaCampana(
           progreso: ProgresoRuta(nodoActual: 'ruta-1-rattata'),
           equipo: [PokemonGuardado('squirtle', 80)]);
-      expect(r1.rival(c).captura, isNull);
+      expect(r1.rival(c).captura, 'rattata');
       const r2 = PartidaCampana(
           progreso: ProgresoRuta(nodoActual: 'ruta-2-caterpie'),
           equipo: [PokemonGuardado('squirtle', 80)]);
@@ -1121,8 +1126,8 @@ void main() {
     PartidaCampana enVerde() {
       var p = PartidaCampana.nueva(c.region).elegirInicial(c, 'squirtle');
       p = p.avanzar(c, 'ruta-1').avanzar(c, 'ruta-1-pidgey');
-      // La Ruta 1 no permite captura (#368): no queda nada que capturar.
-      p = p.terminarCombate(c, ganar(p.empezarCombate(c)));
+      // Sin Pokéballs todavía: se deja ir.
+      p = p.terminarCombate(c, ganar(p.empezarCombate(c))).noCapturar();
       return p.avanzar(c, 'ciudad-verde');
     }
 
@@ -1171,7 +1176,8 @@ void main() {
       expect(() => p.repetirCombate(c), throwsA(isA<ReglaIncumplida>()));
     });
 
-    test('repetir un salvaje da XP y no da dinero ni puntos', () {
+    test('repetir un salvaje da XP, se puede capturar y no da dinero ni puntos',
+        () {
       var p = enVerde().retroceder(c, 'ruta-1-pidgey');
       final antes = p;
       expect(p.puedeRepetir(c), isTrue);
@@ -1183,11 +1189,10 @@ void main() {
       expect(p.xp, antes.xp + 10, reason: 'Pidgey es Común');
       expect(p.dinero, antes.dinero);
       expect(p.puntos, antes.puntos);
-      expect(p.capturaPendiente, isNull,
-          reason: 'la Ruta 1 no permite captura');
+      expect(p.capturaPendiente, 'pidgey');
       expect(p.progreso.repitiendo, isFalse);
       // Y se puede repetir otra vez, sin tope de XP.
-      p = p.repetirCombate(c);
+      p = p.noCapturar().repetirCombate(c);
       p = p.terminarCombate(c, ganar(p.empezarCombate(c)));
       expect(p.xp, antes.xp + 20);
     });
