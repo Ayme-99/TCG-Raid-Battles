@@ -69,6 +69,20 @@ class BandoCombate {
   /// no hace nada (Bofetón Lodo del rival). Dura solo su próximo turno.
   final bool cegado;
 
+  /// Si es true, cada ataque de este bando lanza una moneda y con cruz no hace
+  /// nada, **mientras siga activo el mismo Pokémon** (Pantalla de Humo del
+  /// rival, [MonedaFalloRival.mientrasActivo]). Se quita al cambiar de activo.
+  final bool cegadoMientrasActivo;
+
+  /// Si el veneno de [veneno] es de Drenadoras ([DrenaDefensor]): cada chequeo
+  /// que quita PS cura además al activo del otro bando. Se quita al cambiar.
+  final bool drenado;
+
+  /// Paralizado (Dragoaliento del rival, [ParalizaDefensor]): en su próximo
+  /// turno este bando no puede atacar ni cambiar de Pokémon, solo cargar. Se
+  /// quita al acabar ese turno, o si su activo cae o deja de estar activo.
+  final bool paralizado;
+
   /// Índice del ataque que usó el activo en su turno anterior (-1 si no atacó,
   /// o si cargó o cambió) y cuántas veces seguidas lo lleva usando (Rodar).
   final int ultimoAtaque;
@@ -89,6 +103,9 @@ class BandoCombate {
     this.veneno = 0,
     this.proteccion = 0,
     this.cegado = false,
+    this.cegadoMientrasActivo = false,
+    this.drenado = false,
+    this.paralizado = false,
     this.ultimoAtaque = -1,
     this.racha = 0,
     this.enEspera = -1,
@@ -125,6 +142,9 @@ class BandoCombate {
     int? veneno,
     int? proteccion,
     bool? cegado,
+    bool? cegadoMientrasActivo,
+    bool? drenado,
+    bool? paralizado,
     int? ultimoAtaque,
     int? racha,
     int? enEspera,
@@ -138,6 +158,9 @@ class BandoCombate {
         veneno: veneno ?? this.veneno,
         proteccion: proteccion ?? this.proteccion,
         cegado: cegado ?? this.cegado,
+        cegadoMientrasActivo: cegadoMientrasActivo ?? this.cegadoMientrasActivo,
+        drenado: drenado ?? this.drenado,
+        paralizado: paralizado ?? this.paralizado,
         ultimoAtaque: ultimoAtaque ?? this.ultimoAtaque,
         racha: racha ?? this.racha,
         enEspera: enEspera ?? this.enEspera,
@@ -479,6 +502,9 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
           veneno: 0,
           proteccion: 0,
           cegado: false,
+          cegadoMientrasActivo: false,
+          drenado: false,
+          paralizado: false,
           ultimoAtaque: -1,
           racha: 0,
           enEspera: -1));
@@ -516,6 +542,9 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
     throw const ReglaIncumplida('Ese ataque no existe.');
   }
   final ataque = ataques[a.indice];
+  if (atacante.paralizado) {
+    throw const ReglaIncumplida('Está paralizado: este turno no puede atacar.');
+  }
   if (atacante.energia < ataque.coste) {
     throw const ReglaIncumplida('No hay energía suficiente para ese ataque.');
   }
@@ -525,8 +554,9 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   var semilla = estado.semilla;
   bool? moneda;
   final monedas = <bool>[];
-  if (atacante.cegado) {
-    // Bofetón Lodo del rival: con cruz este ataque no hace nada.
+  if (atacante.cegado || atacante.cegadoMientrasActivo) {
+    // Bofetón Lodo o Pantalla de Humo del rival: con cruz este ataque no hace
+    // nada. Pantalla de Humo sigue mientras el Pokémon siga activo.
     semilla = _siguienteSemilla(semilla);
     moneda = (semilla >> 8) & 1 == 1;
     monedas.add(moneda);
@@ -605,10 +635,35 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
     defensorNuevo = defensorNuevo.copiarCon(danoExtra: efecto.valor);
   }
   if (efecto is EnvenenaDefensor && efecto.valor > defensor.veneno) {
-    defensorNuevo = defensorNuevo.copiarCon(veneno: efecto.valor);
+    defensorNuevo =
+        defensorNuevo.copiarCon(veneno: efecto.valor, drenado: false);
+  }
+  if (efecto is DrenaDefensor && !defensor.drenado) {
+    // Drenadoras: el veneno de 10 sin acumular (si ya había uno mayor, se
+    // queda el mayor) y, desde ahora, cada chequeo cura al otro bando.
+    defensorNuevo = defensorNuevo.copiarCon(
+        veneno: defensor.veneno > DrenaDefensor.dano
+            ? defensor.veneno
+            : DrenaDefensor.dano,
+        drenado: true);
   }
   if (efecto is MonedaFalloRival) {
-    defensorNuevo = defensorNuevo.copiarCon(cegado: true);
+    defensorNuevo = efecto.mientrasActivo
+        ? defensorNuevo.copiarCon(cegadoMientrasActivo: true)
+        : defensorNuevo.copiarCon(cegado: true);
+  }
+  if (efecto is ParalizaDefensor) {
+    // Dragoaliento: tras el daño, con suficientes caras queda Paralizado.
+    var caras = 0;
+    for (var i = 0; i < efecto.monedas; i++) {
+      semilla = _siguienteSemilla(semilla);
+      moneda = (semilla >> 8) & 1 == 1;
+      monedas.add(moneda);
+      if (moneda) caras++;
+    }
+    if (caras >= efecto.minimoCaras && golpeado.enPie) {
+      defensorNuevo = defensorNuevo.copiarCon(paralizado: true);
+    }
   }
   if (efecto is ConfundeDefensor) {
     // Supersónico e Hidropulso: si todas salen cara, el mismo estado que
@@ -660,6 +715,10 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
 /// sale (0 de salida, así que normalmente solo cuesta el turno).
 EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
   final b = estado.bando(a.bando);
+  if (b.paralizado) {
+    throw const ReglaIncumplida(
+        'Está paralizado: este turno no puede cambiar.');
+  }
   if (a.indice == b.enEspera && b.relevos.contains(a.indice)) {
     throw ReglaIncumplida(estado.aliadoAlFrente
         ? 'El jefe no vuelve hasta que caiga su aliado.'
@@ -681,6 +740,8 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
         danoExtra: 0,
         veneno: 0,
         proteccion: 0,
+        cegadoMientrasActivo: false,
+        drenado: false,
         ultimoAtaque: -1,
         racha: 0),
   ));
@@ -702,9 +763,10 @@ EstadoCombate _terminarTurno(EstadoCombate estado) {
   final total = actual.energia + p.energiaPorTurno;
   final energia = total > p.energiaMaxima ? p.energiaMaxima : total;
   final termina = estado.turno;
-  // El efecto de Bofetón Lodo solo dura el turno que acaba de jugarse.
+  // Bofetón Lodo y la parálisis solo duran el turno que acaba de jugarse.
   final cambiado = estado
-      .conBando(termina, actual.copiarCon(energia: energia, cegado: false))
+      .conBando(termina,
+          actual.copiarCon(energia: energia, cegado: false, paralizado: false))
       .copiarCon(
         turno: termina.otro,
         numeroTurno: estado.numeroTurno + 1,
@@ -736,6 +798,20 @@ EstadoCombate _chequeoPokemon(EstadoCombate estado, Bando primero) {
         activo.conPs(activo.ps - bando.veneno);
     final nuevo = bando.copiarCon(equipo: equipo);
     s = s.conBando(b, nuevo);
+    if (bando.drenado) {
+      // Drenadoras: el chequeo ha quitado PS, así que cura al activo del otro
+      // bando (el que esté ahora), hasta su máximo y si sigue en pie.
+      final otro = s.bando(b.otro);
+      final suyo = otro.pokemonActivo;
+      if (suyo.enPie && suyo.ps < suyo.especie.ps) {
+        final ps = suyo.ps + DrenaDefensor.cura;
+        s = s.conBando(
+            b.otro,
+            otro.copiarCon(
+                equipo: [...otro.equipo]..[otro.activo] =
+                    suyo.conPs(ps > suyo.especie.ps ? suyo.especie.ps : ps)));
+      }
+    }
     if (nuevo.derrotado) {
       return s.copiarCon(fase: FaseCombate.terminado, ganador: b.otro);
     }
@@ -789,6 +865,9 @@ EstadoCombate _llamarAliado(EstadoCombate estado) {
             veneno: 0,
             proteccion: 0,
             cegado: false,
+            cegadoMientrasActivo: false,
+            drenado: false,
+            paralizado: false,
             ultimoAtaque: -1,
             racha: 0,
             enEspera: llamada.jefe,

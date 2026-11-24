@@ -90,7 +90,18 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
     case 'danoPorRacha':
       return const DanoPorRacha();
     case 'monedaFalloRival':
-      return const MonedaFalloRival();
+      return MonedaFalloRival(
+          mientrasActivo: (json['mientrasActivo'] as bool?) ?? false);
+    case 'drenaDefensor':
+      return const DrenaDefensor();
+    case 'paralizaDefensor':
+      final monedas = _campo<int>(json, 'monedas');
+      final minimo = _campo<int>(json, 'minimoCaras');
+      if (monedas < 1 || minimo < 1 || minimo > monedas) {
+        throw const FormatException(
+            '"minimoCaras" tiene que estar entre 1 y "monedas".');
+      }
+      return ParalizaDefensor(monedas, minimo);
     case 'confundeDefensor':
       final monedas = (json['monedas'] as int?) ?? 1;
       if (monedas < 1) {

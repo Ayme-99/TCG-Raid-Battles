@@ -350,6 +350,111 @@ void main() {
     });
   });
 
+  group('evoluciones de los iniciales (tarea 16, #439)', () {
+    test('Ivysaur (002/150) sigue a su carta impresa', () {
+      final p = pokemon['ivysaur']!;
+      expect(p.tipo, TipoCampana.planta);
+      expect(p.ps, 110);
+      expect(p.debilidad!.tipo, TipoCampana.fuego);
+      expect(p.resistencia, isNull);
+      expect(p.retirada, 1);
+      expect(p.categoriaCaptura, isNull, reason: 'como su inicial');
+      expect(p.ataques.map((a) => (a.nombre, a.coste, a.dano)),
+          [('Drenadoras', 2, 0), ('Hoja Afilada', 3, 50)]);
+      expect(p.ataques.first.efecto, isA<DrenaDefensor>());
+    });
+
+    test('Charmeleon (005/150) sigue a su carta impresa', () {
+      final p = pokemon['charmeleon']!;
+      expect(p.tipo, TipoCampana.fuego);
+      expect(p.ps, 100);
+      expect(p.debilidad!.tipo, TipoCampana.agua);
+      expect(p.resistencia, isNull);
+      expect(p.retirada, 1);
+      expect(p.ataques.map((a) => (a.nombre, a.coste, a.dano)),
+          [('Pantalla de Humo', 2, 0), ('Dragoaliento', 3, 50)]);
+      expect((p.ataques.first.efecto as MonedaFalloRival).mientrasActivo,
+          isTrue);
+      final para = p.ataques.last.efecto as ParalizaDefensor;
+      expect((para.monedas, para.minimoCaras), (3, 2));
+    });
+
+    test('Wartortle (008/150) sigue a su carta impresa', () {
+      final p = pokemon['wartortle']!;
+      expect(p.tipo, TipoCampana.agua);
+      expect(p.ps, 100);
+      expect(p.debilidad!.tipo, TipoCampana.electrico);
+      expect(p.resistencia, isNull);
+      expect(p.retirada, 1);
+      expect(p.ataques.map((a) => (a.nombre, a.coste, a.dano)),
+          [('Refugio', 1, 0), ('Hidropulso', 3, 40)]);
+      expect((p.ataques.first.efecto as ReduceDanoPropio).valor, 10);
+      expect((p.ataques.last.efecto as ConfundeDefensor).monedas, 2);
+    });
+
+    test('los iniciales evolucionan por XP: 70 y 0 medallas', () {
+      for (final (de, a) in [
+        ('bulbasaur', 'ivysaur'),
+        ('charmander', 'charmeleon'),
+        ('squirtle', 'wartortle'),
+      ]) {
+        final e = pokemon[de]!.evoluciones.single;
+        expect((e.a, e.via, e.xpEvolucion, e.medallasMinimas),
+            (a, ViaEvolucion.xp, 70, 0),
+            reason: de);
+      }
+    });
+
+    test('Bofetón Lodo sigue durando un turno (mientrasActivo es false)', () {
+      final e = pokemon['diglett']!
+          .ataques
+          .map((a) => a.efecto)
+          .whereType<MonedaFalloRival>()
+          .single;
+      expect(e.mientrasActivo, isFalse);
+    });
+
+    test('paralizaDefensor necesita monedas y minimoCaras coherentes', () {
+      Map<String, dynamic> con(Map<String, dynamic> efecto) => {
+            'id': 'x',
+            'nombre': 'X',
+            'tipo': 'fuego',
+            'ps': 60,
+            'ataques': [
+              {
+                'nombre': 'A',
+                'tipo': 'fuego',
+                'coste': 1,
+                'dano': 20,
+                'efecto': efecto
+              },
+            ],
+          };
+      expect(
+          () => pokemonCampanaDesdeJson(con({'tipo': 'paralizaDefensor'})),
+          throwsFormatException);
+      expect(
+          () => pokemonCampanaDesdeJson(con(
+              {'tipo': 'paralizaDefensor', 'monedas': 2, 'minimoCaras': 3})),
+          throwsFormatException);
+      expect(
+          pokemonCampanaDesdeJson(con({'tipo': 'drenaDefensor'}))
+              .ataques
+              .single
+              .efecto,
+          isA<DrenaDefensor>());
+    });
+
+    test('el esquema lista los efectos nuevos', () {
+      final esquema = File('../catalog/schema/pokemon-campana.schema.json')
+          .readAsStringSync();
+      for (final t in ['drenaDefensor', 'paralizaDefensor', 'mientrasActivo',
+          'minimoCaras']) {
+        expect(esquema, contains('"$t"'), reason: t);
+      }
+    });
+  });
+
   group('evolución y cartas ex', () {
     Map<String, dynamic> base(List<Map<String, dynamic>> evoluciones,
             {bool ex = false}) =>
