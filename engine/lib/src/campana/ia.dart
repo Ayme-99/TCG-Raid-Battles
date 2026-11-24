@@ -11,6 +11,7 @@ import 'pokemon.dart';
 /// Orden de decisión:
 /// 1. Si cae su Pokémon activo, saca el relevo con mejor combinación de no ser
 ///    débil, daño que puede hacer y salud.
+///    Si está Paralizado (Dragoaliento), carga: no puede hacer otra cosa.
 /// 2. Si puede dejar fuera de combate al rival, ataca con lo más barato que
 ///    lo logre.
 /// 3. Si su activo es débil a un ataque del rival, o no llega a ningún ataque,
@@ -59,6 +60,9 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
         exigirAtaque: false, extra: rival.extraRecibido);
     return ElegirSiguiente(bando, i ?? yo.relevos.first);
   }
+
+  // Paralizado (Dragoaliento): este turno no puede atacar ni cambiar.
+  if (yo.paralizado) return Cargar(bando);
 
   final activo = _conRacha(yo);
   final ataque = _mejorAtaque(

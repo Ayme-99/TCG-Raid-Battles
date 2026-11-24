@@ -754,6 +754,231 @@ void main() {
     });
   });
 
+  group('efecto: moneda de fallo mientras siga activo (Pantalla de Humo)', () {
+    const humo = AtaqueCampana(
+      nombre: 'Pantalla de Humo',
+      tipo: TipoCampana.fuego,
+      coste: 2,
+      dano: 0,
+      efecto: MonedaFalloRival(mientrasActivo: true),
+    );
+    const golpe = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.normal, coste: 1, dano: 10);
+    final lagarto =
+        pokemon('c', tipo: TipoCampana.fuego, ps: 100, ataques: const [humo]);
+    final rival = pokemon('r', ps: 200, ataques: const [golpe]);
+
+    EstadoCombate marcado(int semilla) => aplicarCombate(
+          EstadoCombate.inicial(
+              equipoJugador: [lagarto, pokemon('c2')],
+              equipoRival: [rival, pokemon('r2')],
+              semilla: semilla),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    test('no hace daño y deja al rival marcado mientras siga activo', () {
+      final e = marcado(1);
+      expect(e.rival.pokemonActivo.ps, 200);
+      expect(e.rival.cegadoMientrasActivo, isTrue);
+      expect(e.rival.cegado, isFalse);
+    });
+
+    test('dura más de un turno: cada ataque lanza su moneda', () {
+      var e = marcado(7);
+      final monedas = <bool>[];
+      for (var i = 0; i < 6; i++) {
+        final antes = e.jugador.pokemonActivo.ps;
+        e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+        expect(e.ultimasMonedas, hasLength(1));
+        final m = e.ultimaMoneda!;
+        monedas.add(m);
+        expect(e.jugador.pokemonActivo.ps, m ? antes - 10 : antes,
+            reason: 'con cruz el ataque no se lleva a cabo');
+        expect(e.rival.cegadoMientrasActivo, isTrue);
+        e = aplicarCombate(e, const Cargar(Bando.jugador));
+      }
+      expect(monedas.toSet(), {true, false},
+          reason: 'en seis ataques salen cara y cruz');
+    });
+
+    test('cargar no lo quita; cambiar de Pokémon, sí', () {
+      var e = marcado(1);
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(e.rival.cegadoMientrasActivo, isTrue);
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      e = aplicarCombate(e, const Cambiar(Bando.rival, 1));
+      expect(e.rival.cegadoMientrasActivo, isFalse);
+    });
+
+    test('cuando cae, el que sale ya no está marcado', () {
+      var e = marcado(1);
+      e = e.copiarCon(
+          rival: e.rival.copiarCon(
+              equipo: [e.rival.equipo[0].conPs(0), e.rival.equipo[1]]),
+          fase: FaseCombate.eligiendoActivo,
+          turno: Bando.rival);
+      e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+      expect(e.rival.cegadoMientrasActivo, isFalse);
+    });
+  });
+
+  group('efecto: parálisis (Dragoaliento)', () {
+    const dragoaliento = AtaqueCampana(
+      nombre: 'Dragoaliento',
+      tipo: TipoCampana.fuego,
+      coste: 3,
+      dano: 50,
+      efecto: ParalizaDefensor(3, 2),
+    );
+    const golpe = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.normal, coste: 1, dano: 10);
+    final lagarto = pokemon('c',
+        tipo: TipoCampana.fuego, ps: 100, ataques: const [dragoaliento]);
+    final rival = pokemon('r', ps: 300, ataques: const [golpe]);
+
+    EstadoCombate usado(int semilla) => aplicarCombate(
+          EstadoCombate.inicial(
+              equipoJugador: [lagarto, pokemon('c2')],
+              equipoRival: [rival, pokemon('r2')],
+              semilla: semilla),
+          const Atacar(Bando.jugador, 0),
+        );
+
+    final paraliza = <bool, int>{};
+    for (var s = 1; s <= 80 && paraliza.length < 2; s++) {
+      paraliza.putIfAbsent(usado(s).rival.paralizado, () => s);
+    }
+
+    test('hace su daño, lanza 3 monedas y paraliza con 2 caras o más', () {
+      final vistos = <int>{};
+      for (var s = 1; s <= 80; s++) {
+        final e = usado(s);
+        expect(e.rival.pokemonActivo.ps, 250);
+        final m = e.ultimasMonedas!;
+        expect(m, hasLength(3));
+        final caras = m.where((c) => c).length;
+        vistos.add(caras);
+        expect(e.rival.paralizado, caras >= 2);
+        expect(e.jugador.paralizado, isFalse);
+      }
+      expect(vistos, containsAll([0, 1, 2, 3]));
+    });
+
+    test('el paralizado no puede atacar ni cambiar; sí cargar', () {
+      final e = usado(paraliza[true]!);
+      expect(() => aplicarCombate(e, const Atacar(Bando.rival, 0)),
+          throwsA(isA<ReglaIncumplida>()));
+      expect(() => aplicarCombate(e, const Cambiar(Bando.rival, 1)),
+          throwsA(isA<ReglaIncumplida>()));
+      final cargado = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(cargado.rival.paralizado, isFalse,
+          reason: 'se quita al acabar su turno');
+    });
+
+    test('solo dura su próximo turno y no se acumula', () {
+      var e = usado(paraliza[true]!);
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      e = aplicarCombate(e, const Atacar(Bando.rival, 0));
+      expect(e.jugador.pokemonActivo.ps, 90, reason: 'ya puede atacar');
+    });
+
+    test('la IA, paralizada, carga', () {
+      final e = usado(paraliza[true]!);
+      expect(decidirAccion(e, Bando.rival), isA<Cargar>());
+    });
+
+    test('si el golpe lo derriba no queda paralizado el que sale', () {
+      final debil = pokemon('d', ps: 50, ataques: const [golpe]);
+      for (var s = 1; s <= 40; s++) {
+        var e = aplicarCombate(
+            EstadoCombate.inicial(
+                equipoJugador: [lagarto],
+                equipoRival: [debil, pokemon('r2')],
+                semilla: s),
+            const Atacar(Bando.jugador, 0));
+        expect(e.fase, FaseCombate.eligiendoActivo);
+        e = aplicarCombate(e, const ElegirSiguiente(Bando.rival, 1));
+        expect(e.rival.paralizado, isFalse);
+      }
+    });
+  });
+
+  group('efecto: Drenadoras (drenaDefensor)', () {
+    const drenadoras = AtaqueCampana(
+      nombre: 'Drenadoras',
+      tipo: TipoCampana.planta,
+      coste: 2,
+      dano: 0,
+      efecto: DrenaDefensor(),
+    );
+    const golpe = AtaqueCampana(
+        nombre: 'Golpe', tipo: TipoCampana.normal, coste: 1, dano: 30);
+    final planta = pokemon('i',
+        tipo: TipoCampana.planta, ps: 110, ataques: const [drenadoras]);
+    final rival = pokemon('r', ps: 100, ataques: const [golpe]);
+
+    EstadoCombate conPs(int psPlanta) => EstadoCombate.conEquipos(
+          equipoJugador: [
+            PokemonEnCombate(planta, psPlanta),
+            PokemonEnCombate.completo(pokemon('i2', ps: 60)),
+          ],
+          equipoRival: [
+            PokemonEnCombate.completo(rival),
+            PokemonEnCombate.completo(pokemon('r2')),
+          ],
+        );
+
+    test('quita 10 por chequeo y cura 10 al activo de quien lo usó', () {
+      var e = aplicarCombate(conPs(50), const Atacar(Bando.jugador, 0));
+      expect(e.rival.veneno, 10);
+      expect(e.rival.drenado, isTrue);
+      expect(e.rival.pokemonActivo.ps, 90);
+      expect(e.jugador.pokemonActivo.ps, 60);
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      expect(e.rival.pokemonActivo.ps, 80);
+      expect(e.jugador.pokemonActivo.ps, 70);
+    });
+
+    test('la cura no pasa del máximo', () {
+      final e = aplicarCombate(conPs(110), const Atacar(Bando.jugador, 0));
+      expect(e.jugador.pokemonActivo.ps, 110);
+      expect(e.rival.pokemonActivo.ps, 90, reason: 'el daño sí se hace');
+    });
+
+    test('cura al activo de ese momento, aunque no sea quien lo usó', () {
+      var e = EstadoCombate.conEquipos(
+        equipoJugador: [
+          PokemonEnCombate(planta, 110),
+          PokemonEnCombate(pokemon('i2', ps: 60), 30),
+        ],
+        equipoRival: [
+          PokemonEnCombate.completo(rival),
+          PokemonEnCombate.completo(pokemon('r2')),
+        ],
+      );
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Cambiar(Bando.jugador, 1));
+      expect(e.jugador.pokemonActivo.especie.id, 'i2');
+      expect(e.jugador.pokemonActivo.ps, 40);
+      expect(e.rival.pokemonActivo.ps, 70);
+    });
+
+    test('no se acumula y cambiar de Pokémon lo quita', () {
+      var e = aplicarCombate(conPs(50), const Atacar(Bando.jugador, 0));
+      e = aplicarCombate(e, const Cargar(Bando.rival));
+      e = aplicarCombate(e, const Atacar(Bando.jugador, 0));
+      expect(e.rival.veneno, 10);
+      e = aplicarCombate(e, const Cambiar(Bando.rival, 1));
+      expect(e.rival.veneno, 0);
+      expect(e.rival.drenado, isFalse);
+      final ps = e.jugador.pokemonActivo.ps;
+      e = aplicarCombate(e, const Cargar(Bando.jugador));
+      expect(e.jugador.pokemonActivo.ps, ps, reason: 'ya no cura');
+    });
+  });
+
   group('efecto: protección propia (Fortaleza)', () {
     const fortaleza = AtaqueCampana(
       nombre: 'Fortaleza',
