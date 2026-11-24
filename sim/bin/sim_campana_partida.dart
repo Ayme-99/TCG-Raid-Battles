@@ -52,16 +52,8 @@
 //                     (10, 10, 1, 1)
 //   --partidas=N      recorridos (tramo, 3000) o semillas (techo, 4000)
 //   --semilla=N       semilla del generador (1)
-//   --fase1=si|no     cartas de fase 1 de los iniciales. El catálogo de master
-//                     aún NO las tiene (los JSON esperan a los efectos nuevos,
-//                     PR #438, tarea 16): con «si» se añaden EN MEMORIA con los
-//                     datos de las cartas impresas (Ivysaur 110 PS, Charmeleon
-//                     100, Wartortle 100; Hoja Afilada 50, Dragoaliento 50,
-//                     Hidropulso 40) y los efectos que el motor aún no tiene
-//                     (drenaDefensor, paralizaDefensor, Pantalla de Humo
-//                     permanente) se sustituyen por el más parecido que sí
-//                     existe, que es más flojo: es una COTA INFERIOR de la
-//                     evolución. No se escribe nada.
+//   --fase1=si|no     (solo modo techo) compara también el equipo con la fase 1 del
+//                     inicial; las cartas son las reales del catálogo de master (#455).
 //   --informe=RUTA    CSV de salida
 import 'dart:convert';
 import 'dart:io';
@@ -139,24 +131,12 @@ List<File> _jsons(String dir) => Directory(dir)
     .toList()
   ..sort((a, b) => a.path.compareTo(b.path));
 
-/// Carga el catálogo. Con [fase1] añade EN MEMORIA las cartas de fase 1 de los
-/// iniciales (supuestas) y la evolución a 70 XP con 0 medallas (D-20 §10.11).
+/// Carga el catálogo de master tal cual: los iniciales ya traen la evolución a
+/// 70 XP y las cartas reales de Ivysaur, Charmeleon y Wartortle (#455).
 CatalogoCampana cargarCatalogo(Config c) {
-  final pokemon = <Map<String, dynamic>>[];
-  for (final f in _jsons('${c.catalogo}/pokemon')) {
-    pokemon.add(_leer(f));
-  }
-  if (c.fase1) {
-    for (final p in List.of(pokemon)) {
-      final id = p['id'] as String;
-      final destino = fase1De[id];
-      if (destino == null) continue;
-      p['evoluciones'] = [
-        {'a': destino, 'via': 'xp', 'xpEvolucion': 70, 'medallasMinimas': 0}
-      ];
-      pokemon.add(fase1Aproximada(destino, p));
-    }
-  }
+  final pokemon = <Map<String, dynamic>>[
+    for (final f in _jsons('${c.catalogo}/pokemon')) _leer(f),
+  ];
   final zonas = [for (final f in _jsons('${c.catalogo}/zonas')) _leer(f)];
   final jefes = {
     for (final f in _jsons('${c.catalogo}/jefes'))
@@ -165,77 +145,6 @@ CatalogoCampana cargarCatalogo(Config c) {
   final region = _leer(File('${c.catalogo}/regiones/kanto.json'));
   return CatalogoCampana.desdeJson(
       pokemon: pokemon, zonas: zonas, jefes: jefes, region: region);
-}
-
-/// Carta de fase 1 de [destino] a partir de los datos impresos (PR #438,
-/// D-20 §12). Los efectos nuevos que el motor todavía no tiene se sustituyen
-/// por el más parecido que sí existe:
-///  - Ivysaur, Drenadoras (`drenaDefensor`: veneno de 10 por chequeo y cura 10
-///    al activo) → solo `envenenaDefensor` (sin la cura).
-///  - Charmeleon, Pantalla de Humo (`monedaFalloRival` mientras siga activo)
-///    → `monedaFalloRival` de un solo turno; Dragoaliento (50 y parálisis) →
-///    50 sin parálisis.
-///  - Wartortle: Refugio (`reduceDanoPropio` 10) e Hidropulso (`confundeDefensor`
-///    con 2 monedas) ya existen tal cual.
-Map<String, dynamic> fase1Aproximada(String destino, Map<String, dynamic> base) {
-  Map<String, dynamic> ataque(String nombre, String tipo, int coste, int dano,
-          [Map<String, dynamic>? efecto]) =>
-      {
-        'nombre': nombre,
-        'tipo': tipo,
-        'coste': coste,
-        'dano': dano,
-        if (efecto != null) 'efecto': efecto,
-      };
-  final tipo = base['tipo'] as String;
-  late final int ps;
-  late final List<Map<String, dynamic>> ataques;
-  switch (destino) {
-    case 'ivysaur':
-      ps = 110;
-      ataques = [
-        ataque('Drenadoras', tipo, 2, 0, {
-          'tipo': 'envenenaDefensor',
-          'valor': 10,
-          'texto': 'Aproximación sin cura del efecto drenaDefensor.'
-        }),
-        ataque('Hoja Afilada', tipo, 3, 50),
-      ];
-    case 'charmeleon':
-      ps = 100;
-      ataques = [
-        ataque('Pantalla de Humo', tipo, 2, 0, {
-          'tipo': 'monedaFalloRival',
-          'texto': 'Aproximación de un solo turno del efecto permanente.'
-        }),
-        ataque('Dragoaliento', tipo, 3, 50),
-      ];
-    default:
-      ps = 100;
-      ataques = [
-        ataque('Refugio', tipo, 1, 0, {
-          'tipo': 'reduceDanoPropio',
-          'valor': 10,
-          'texto': 'Mientras este Pokémon siga activo, recibe 10 puntos menos.'
-        }),
-        ataque('Hidropulso', tipo, 3, 40, {
-          'tipo': 'confundeDefensor',
-          'monedas': 2,
-          'texto': 'Lanza 2 monedas. Si ambas son Cara, Confundido.'
-        }),
-      ];
-  }
-  return {
-    'id': destino,
-    'numero': (base['numero'] as int) + 1,
-    'nombre': '${destino[0].toUpperCase()}${destino.substring(1)} (aprox.)',
-    'tipo': tipo,
-    'ps': ps,
-    'debilidad': base['debilidad'],
-    'retirada': 1,
-    'categoriaCaptura': 'fuerte',
-    'ataques': ataques,
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -783,7 +692,7 @@ void tramo(Config cfg, CatalogoCampana c) {
   stdout.writeln('Tramo con las reglas reales de partida (#409): $partidas '
       'recorridos por inicial, semilla ${cfg.semilla}.');
   stdout.writeln('Evolución del inicial: ${cfg.evolucionInicial ? "sí (70 XP)" : "no"}'
-      '${cfg.fase1 ? "  [fase 1 aproximada con las cartas impresas del PR #438]" : ""}'
+      ''
       ' · curar volviendo al centro: ${cfg.retroceder ? "sí" : "no"}'
       ' · Ruta 1 con Balls: ${cfg.ruta1 ? "sí" : "no"}'
       ' · Ruta 22: ${cfg.ruta22 ? "sí" : "no"}'

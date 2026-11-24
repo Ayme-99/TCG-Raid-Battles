@@ -8,7 +8,7 @@ Diseño: ~100 por tramo (700–900 en total)      total 800 · por tramo 100/100
 Como el tramo 1: 180 por tramo                 total 1440 · por tramo 180/180/180/180/180/180/180/180
 Creciente: 180 a 360 (rivales más fuertes)     total 2160 · por tramo 180/206/231/257/283/309/334/360
 
-== 2. Ex al llegar a la Liga (tras la 8.ª medalla), opción A 4/4/5, inicial Bulbasaur ==
+== 2. Ex al llegar a la Liga (tras la 8.ª medalla), opción D 2/3/4 (Básico ex 2, Fase 1 ex 3, Fase 2 ex 4; Onix ex a 2), inicial Bulbasaur ==
 XP de la ruta                                  xpEvo  política   ex (Fase 2)  XP gastada  compradas
 Diseño: ~100 por tramo (700–900 en total)         80    barato   10      (3)         740          2
 Diseño: ~100 por tramo (700–900 en total)         80     orden    7      (4)         730          0
@@ -50,16 +50,21 @@ opción B 3/4/5:  ex por medalla 0 0 2 3 7 8 9 10 · Fase 2 0 0 0 0 2 2 2 3
 opción C 3/3/4:  ex por medalla 0 0 2 5 7 8 9 10 · Fase 2 0 0 0 2 2 2 2 3
 opción D 2/3/4:  ex por medalla 0 1 2 5 7 8 9 10 · Fase 2 0 0 0 2 2 2 2 3
 
-== 5. Dinero: piedras compradas junto a Pokéballs y Pociones (XP como el tramo 1, xpEvo 80, opción A, barato) ==
+== 5. Dinero: piedras compradas junto a Pokéballs y Pociones (XP como el tramo 1, xpEvo 80, opción D, barato) ==
 Pociones por tramo      ex Liga  compradas  dinero final
 0 (0 Pociones)               16          8           609
 600 (2 Pociones)             13          5          1809
 1200 (4 Pociones)            11          3          1009
 1800 (6 Pociones)             9          1           209
+Con la ruta de ~100 XP por tramo (piedras compradas: dinero, no XP):
+0 (0 Pociones)               10          2         12609
+600 (2 Pociones)             10          2          7809
+1200 (4 Pociones)            10          2          3009
+1800 (6 Pociones)             9          1           209
 Coste esperado de capturar las 16 especies con Pokéball: 5071 (25.4 Pokéballs).
 Dinero total de 8 tramos: 20680 + 1000 de salida.
 
-== 6. Por inicial (XP como el tramo 1 y ~100, xpEvo 80, opción A, barato) ==
+== 6. Por inicial (XP como el tramo 1 y ~100, xpEvo 80, opción D, barato) ==
 bulbasaur    100 XP/tramo → 10 ex
 bulbasaur    180 XP/tramo → 16 ex
 charmander   100 XP/tramo → 10 ex
@@ -74,13 +79,13 @@ squirtle     180 XP/tramo → 16 ex
    110    barato                       120          480
    110     orden                       175          700
 
-== 7. Qué ex salen (≈100 XP/tramo, xpEvo 80, opción A, barato) ==
+== 7. Qué ex salen (≈100 XP/tramo, xpEvo 80, opción D, barato) ==
 bulbasaur   sin ex (le faltan 150 XP)
-caterpie    ex en el tramo 5
-weedle      ex en el tramo 5
+caterpie    ex en el tramo 4
+weedle      ex en el tramo 4
 pidgey      sin ex (le faltan 160 XP)
 rattata     ex en el tramo 4
-pikachu     ex en el tramo 4
+pikachu     ex en el tramo 2
 spearow     ex en el tramo 5
 zubat       ex en el tramo 5
 sandshrew   ex en el tramo 6
@@ -88,8 +93,8 @@ mankey      ex en el tramo 7
 geodude     ex en el tramo 8
 diglett     sin ex (le faltan 80 XP)
 machop      sin ex (le faltan 80 XP)
-onix        ex en el tramo 4
+onix        ex en el tramo 3
 cubone      sin ex (le faltan 80 XP)
 slowpoke    sin ex (le faltan 80 XP)
 
-CSV: /tmp/ex.csv
+CSV: /tmp/ex2.csv

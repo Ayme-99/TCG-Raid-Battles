@@ -18,7 +18,7 @@
 //     `xpEvo`: 80 u 110) y pide medallas mínimas (§10.11). Intercambio gratis.
 //   · La carta ex es un paso más tras la última fase normal, sin XP, con una
 //     piedra ex: una de premio por medalla o comprada a 2.000 de dinero.
-//   · Medallas mínimas del ex: opción A 4/4/5, B 3/4/5, C 3/3/4 (Básico /
+//   · Medallas mínimas del ex: opción D 2/3/4 (decidida, D-20 §10.11, #454/#460) y A 4/4/5, B 3/4/5, C 3/3/4 (antiguas, solo comparación) (Básico /
 //     Fase 1 / Fase 2) y nunca menos que la de su última fase normal.
 import 'dart:io';
 
@@ -108,7 +108,7 @@ class Escenario {
     required this.nombre,
     required this.xpTramo,
     this.xpEvo = 80,
-    this.opcion = 'A',
+    this.opcion = 'D',
     this.inicial = 'bulbasaur',
     this.politica = 'barato',
     this.extraXpTramo = 0,
@@ -328,7 +328,7 @@ void main(List<String> args) {
 
   // 2) Ex al llegar a la Liga.
   stdout.writeln('');
-  stdout.writeln('== 2. Ex al llegar a la Liga (tras la 8.ª medalla), opción A 4/4/5, inicial Bulbasaur ==');
+  stdout.writeln('== 2. Ex al llegar a la Liga (tras la 8.ª medalla), opción D 2/3/4 (Básico ex 2, Fase 1 ex 3, Fase 2 ex 4; Onix ex a 2), inicial Bulbasaur ==');
   stdout.writeln('${"XP de la ruta".padRight(46)}${"xpEvo".padLeft(6)}${"política".padLeft(10)}${"ex".padLeft(5)}${"(Fase 2)".padLeft(9)}${"XP gastada".padLeft(12)}${"compradas".padLeft(11)}');
   for (final k in esc.keys) {
     for (final xe in [80, 110]) {
@@ -339,7 +339,7 @@ void main(List<String> args) {
             '${pad(r.fin.ex, 5)}${pad("(${r.fin.ex2})", 9)}'
             '${pad(r.fin.xpGastada, 12)}${pad(r.fin.piedrasCompradas, 11)}');
         for (final f in r.fotos) {
-          lineasCsv.add('liga,$k,$pol,$xe,A,bulbasaur,${f.tramo},${f.ex},${f.ex2},'
+          lineasCsv.add('liga,$k,$pol,$xe,D,bulbasaur,${f.tramo},${f.ex},${f.ex2},'
               '${f.xpIngresada},${f.xpGastada},${f.piedrasPremio},${f.piedrasCompradas},${f.dinero}');
         }
       }
@@ -393,12 +393,18 @@ void main(List<String> args) {
 
   // 5) Dinero.
   stdout.writeln('');
-  stdout.writeln('== 5. Dinero: piedras compradas junto a Pokéballs y Pociones (XP como el tramo 1, xpEvo 80, opción A, barato) ==');
+  stdout.writeln('== 5. Dinero: piedras compradas junto a Pokéballs y Pociones (XP como el tramo 1, xpEvo 80, opción D, barato) ==');
   stdout.writeln('${"Pociones por tramo".padRight(22)}${"ex Liga".padLeft(9)}${"compradas".padLeft(11)}${"dinero final".padLeft(14)}');
   final r0 = correr(Escenario(nombre: 'x', xpTramo: plano(xpTramo1)));
   for (final gp in [0, 600, 1200, 1800]) {
     final r = correr(Escenario(
         nombre: 'x', xpTramo: plano(xpTramo1), pocionesTramo: gp));
+    stdout.writeln('${"$gp (${gp ~/ 300} Pociones)".padRight(22)}'
+        '${pad(r.fin.ex, 9)}${pad(r.fin.piedrasCompradas, 11)}${pad(r.fin.dinero, 14)}');
+  }
+  stdout.writeln('Con la ruta de ~100 XP por tramo (piedras compradas: dinero, no XP):');
+  for (final gp in [0, 600, 1200, 1800]) {
+    final r = correr(Escenario(nombre: 'x', xpTramo: plano(100), pocionesTramo: gp));
     stdout.writeln('${"$gp (${gp ~/ 300} Pociones)".padRight(22)}'
         '${pad(r.fin.ex, 9)}${pad(r.fin.piedrasCompradas, 11)}${pad(r.fin.dinero, 14)}');
   }
@@ -408,7 +414,7 @@ void main(List<String> args) {
 
   // 6) Por inicial.
   stdout.writeln('');
-  stdout.writeln('== 6. Por inicial (XP como el tramo 1 y ~100, xpEvo 80, opción A, barato) ==');
+  stdout.writeln('== 6. Por inicial (XP como el tramo 1 y ~100, xpEvo 80, opción D, barato) ==');
   for (final ini in ['bulbasaur', 'charmander', 'squirtle']) {
     for (final v in [100, xpTramo1]) {
       final r = correr(Escenario(
@@ -438,7 +444,7 @@ void main(List<String> args) {
 
   // 7) Detalle de la ruta de ~100 con xpEvo 80, qué ex salen.
   stdout.writeln('');
-  stdout.writeln('== 7. Qué ex salen (≈100 XP/tramo, xpEvo 80, opción A, barato) ==');
+  stdout.writeln('== 7. Qué ex salen (≈100 XP/tramo, xpEvo 80, opción D, barato) ==');
   final rd = correr(Escenario(nombre: 'x', xpTramo: plano(100)));
   for (final l in rd.lineas) {
     stdout.writeln('${l.especie.id.padRight(11)} ${l.ex ? "ex en el tramo ${l.tramoEx}" : "sin ex (le faltan ${l.costeXp(80)} XP)"}');
