@@ -96,6 +96,29 @@ Estado el 2026-11-23. El código está en `app/lib/campana/`. Las claves (`Key`)
 - Pantalla del PC (sin wireframe todavía).
 - Mayor resolución de los iconos de tipo y de la energía si se quieren más grandes de 28 px.
 
+## Estado de las tareas de Arte (2026-11-23)
+
+| Issue | Estado |
+|---|---|
+| #415 escenas | Datos hechos (#413, #425; coordenadas de marcador). Arte: guía vectorial y zonas de Pueblo Paleta y prompts de Flux de las 9 escenas más el interior del centro en `escenas/`. Faltan las imágenes finales. Formato decidido el 2026-11-23: `.webp` en `app/assets/campana/escenas/<imagen>.webp`, 390×844 (decisión de Ayme; Diseño la registra en D-20 §10, ver #415). |
+| #378 fondos de zona | Cubierta por #415: el mapa pasó a escenas (D-20 §10.7). Cerrada el 2026-11-23. |
+| #379 iconos de nodo | Obsoleta con el mapa de escenas. Cerrada el 2026-11-23 (decisión de Ayme). |
+| #408 metal | Icono hecho (`sprites_ajenos/iconos_tipo/metal.png`). Color propuesto abajo. |
+| #376 cartas impresas | Completa: Zubat, Geodude, Machop, Onix, Cubone y Slowpoke tienen carta en `app/assets/campana/cartas/` y JSON. Solo queda la decisión del Túnel Roca (D-20 §8, 15), que no es de Arte. |
+| #405, #406, #407 | Hechas por Ayme y Diseño el 2026-11-23: `ivysaur.webp`, `charmeleon.webp` y `wartortle.webp` ya están en `app/assets/campana/cartas/` y los datos en D-20 §10 y §12. Sin trabajo de Arte pendiente. |
+
+### Color del tipo metal (#408)
+
+Propuesta: `0xFF7E9AAE` (acero azulado). El gris provisional actual, `0xFF78909C`, se confunde con normal (`0xFF9E9E9E`) y oscuridad (`0xFF455A64`). El icono de EP es gris cálido, así que el acero azulado lo separa de normal en las fichas y en los botones de ataque. Cambio en `colorTipo` de `app/lib/campana/widgets_campana.dart`, que queda para Programación porque Arte no toca código.
+
+### Formato de las escenas
+
+- **Entrega:** `.webp` en `app/assets/campana/escenas/<imagen>.webp`, proporción 390×844, uno por id de imagen de `kanto.json` (pueblo-paleta, ruta-1, centro-pokemon, ciudad-verde, ruta-22, ruta-2, bosque-verde, ruta-2-norte, gimnasio-plateada).
+- **Zonas pulsables:** en `kanto.json`, coordenadas relativas 0–1 a esa imagen. Al ilustrar cada escena se ajustan las de marcador; la guía de cada una lleva su `.zonas.json` en `escenas/`.
+- **Origen:** guía vectorial propia (SVG) más imagen final generada con ella como composición; ver `escenas/prompts_flux_escenas.md`.
+- **Sin personajes ni Pokémon en el fondo:** los sprites de EP se pintan encima.
+- **Fuera de `app/assets/`:** SVG de guía, prompts y zonas.
+
 ## Aviso de derechos
 
 Los iconos de tipo, la energía, las bolas, las pociones, los repelentes y los sprites de Pokémon y personajes son material de Nintendo / Game Freak / The Pokémon Company, tomado de Pokémon Escarlata y Púrpura a través de WikiDex.
