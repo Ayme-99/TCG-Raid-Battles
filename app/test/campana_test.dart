@@ -56,22 +56,26 @@ Future<void> tocar(WidgetTester tester, String clave) async {
   await tester.pumpAndSettle();
 }
 
-/// Juega el combate que hay en pantalla tocando botones: el ataque más caro que
-/// llegue, si no cargar; al caer un Pokémon saca al primero que pueda.
+/// Juega el combate que hay en pantalla tocando la mesa (D-20 §10.7,
+/// propuesta I): toca a su activo y elige el ataque más caro que llegue, si no
+/// carga; al caer un Pokémon saca al primero de la banca que pueda.
 Future<void> jugarCombate(WidgetTester tester) async {
   for (var i = 0; i < 200; i++) {
     if (hay('combate-continuar')) {
       await tocar(tester, 'combate-continuar');
       return;
     }
-    final relevo = find.byWidgetPredicate((w) =>
-        w.key is ValueKey<String> &&
-        (w.key! as ValueKey<String>).value.startsWith('relevo-'));
-    if (relevo.evaluate().isNotEmpty) {
+    if (hay('combate-elige-relevo')) {
+      final relevo = find.byWidgetPredicate((w) =>
+          w is InkWell &&
+          w.onTap != null &&
+          w.key is ValueKey<String> &&
+          (w.key! as ValueKey<String>).value.startsWith('banca-jugador-'));
       await tester.tap(relevo.first);
       await tester.pumpAndSettle();
       continue;
     }
+    if (!hay('hoja-acciones')) await tocar(tester, 'activo-jugador');
     if (activo(tester, 'ataque-1')) {
       await tocar(tester, 'ataque-1');
     } else if (!hay('ataque-1') && activo(tester, 'ataque-0')) {
@@ -187,7 +191,8 @@ void main() {
     expect(p.progreso.resuelto, isTrue);
     expect(p.ultimaCura, 'ciudad-verde');
     expect(p.equipo.every((e) => e.ps == catalogo.especie(e.id).ps), isTrue);
-    expect(p.equipo.length, 1, reason: 'sin Pokéballs no se captura en la Ruta 1');
+    expect(p.equipo.length, 1,
+        reason: 'sin Pokéballs no se captura en la Ruta 1');
     expect(tester.takeException(), isNull);
   });
 
@@ -332,8 +337,8 @@ void main() {
     // Weedle ya no llega: la opción sale pero desactivada.
     await tocar(tester, 'equipo-2');
     expect(find.text('Faltan 40 XP.'), findsOneWidget);
-    final tile = tester.widget<ListTile>(
-        find.byKey(const Key('equipo-evolucionar-kakuna')));
+    final tile = tester
+        .widget<ListTile>(find.byKey(const Key('equipo-evolucionar-kakuna')));
     expect(tile.enabled, isFalse);
     // Se guarda en el dispositivo.
     final json = jsonDecode(almacen.datos[claveCampana]!) as Map;
@@ -345,10 +350,11 @@ void main() {
       (tester) async {
     // Pidgey → Rattata de mentira con 2 medallas (Pidgeotto no tiene carta).
     final almacen = AlmacenMemoria();
-    final real = (await tester.runAsync(() => cargarCatalogoCampana(rootBundle)))!;
+    final real =
+        (await tester.runAsync(() => cargarCatalogoCampana(rootBundle)))!;
     final pidgey = jsonDecode(
-            File('assets/catalogo/campana/pokemon/pidgey.json').readAsStringSync())
-        as Map<String, dynamic>;
+        File('assets/catalogo/campana/pokemon/pidgey.json')
+            .readAsStringSync()) as Map<String, dynamic>;
     pidgey['evoluciones'] = [
       {'a': 'rattata', 'via': 'xp', 'xpEvolucion': 50, 'medallasMinimas': 2},
     ];
@@ -368,8 +374,8 @@ void main() {
         almacen: almacen, guardada: guardada, catalogo: catalogo);
     await tocar(tester, 'equipo-0');
     expect(find.text('Requiere 2 medallas.'), findsOneWidget);
-    final tile = tester.widget<ListTile>(
-        find.byKey(const Key('equipo-evolucionar-rattata')));
+    final tile = tester
+        .widget<ListTile>(find.byKey(const Key('equipo-evolucionar-rattata')));
     expect(tile.enabled, isFalse);
     expect(c.read(campanaProvider).partida!.equipo.single.id, 'pidgey');
   });
@@ -380,23 +386,33 @@ void main() {
       progreso: ProgresoRuta(
           nodoActual: 'ciudad-verde',
           resuelto: true,
-          superados: {'pueblo-paleta', 'ruta-1', 'ruta-1-pidgey', 'ciudad-verde'},
-          visitados: {'pueblo-paleta', 'ruta-1', 'ruta-1-pidgey', 'ciudad-verde'},
+          superados: {
+            'pueblo-paleta',
+            'ruta-1',
+            'ruta-1-pidgey',
+            'ciudad-verde'
+          },
+          visitados: {
+            'pueblo-paleta',
+            'ruta-1',
+            'ruta-1-pidgey',
+            'ciudad-verde'
+          },
           inicial: 'squirtle'),
       equipo: [PokemonGuardado('squirtle', 80)],
       dinero: 1000,
     );
     final almacen = AlmacenMemoria();
     final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
-    // Un nodo sin visitar no lleva a ningún sitio.
-    await tester.tap(find.byKey(const Key('nodo-ruta-22')));
+    // Un borde que lleva a un nodo sin visitar no lleva a ningún sitio.
+    await tester.tap(find.byKey(const Key('zona-ir-ruta-1-rattata')));
     await tester.pumpAndSettle();
-    expect(c.read(campanaProvider).partida!.progreso.nodoActual, 'ciudad-verde');
-    await tester.ensureVisible(find.byKey(const Key('nodo-ruta-1-pidgey')));
-    await tester.tap(find.byKey(const Key('nodo-ruta-1-pidgey')));
-    await tester.pumpAndSettle();
-    expect(c.read(campanaProvider).partida!.progreso.nodoActual,
-        'ruta-1-pidgey');
+    expect(
+        c.read(campanaProvider).partida!.progreso.nodoActual, 'ciudad-verde');
+    // El borde de un nodo visitado vuelve atrás.
+    await tocar(tester, 'zona-ir-ruta-1-pidgey');
+    expect(
+        c.read(campanaProvider).partida!.progreso.nodoActual, 'ruta-1-pidgey');
     expect(hay('campana-combatir'), isFalse, reason: 'ya se ganó');
     await tocar(tester, 'campana-repetir');
     final p = c.read(campanaProvider).partida!;
@@ -435,8 +451,7 @@ void main() {
     expect(c.read(campanaProvider).partida!.dinero, 200);
     await tocar(tester, 'comprar-pokeball');
     expect(c.read(campanaProvider).partida!.dinero, 0);
-    expect(
-        c.read(campanaProvider).partida!.cuantos(ObjetoCampana.pokeball), 1);
+    expect(c.read(campanaProvider).partida!.cuantos(ObjetoCampana.pokeball), 1);
     await tocar(tester, 'equipo-0');
     await tocar(tester, 'equipo-pocion');
     expect(c.read(campanaProvider).partida!.equipo.first.ps, 30);
