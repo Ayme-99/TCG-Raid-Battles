@@ -206,7 +206,7 @@ Suman **24.880** más 1.000 de salida. El tramo 1 es el que ya está en el catá
 
 - Cuánto dinero lleva un jugador al llegar a cada piedra, con la curva propuesta. Todo parte de la suposición de ~2.060 por tramo y de mi estimación de gasto, **sin medir**.
 - Con 6 ex de más de 200 PS como punto de partida, la **Liga** (objetivo del 25 %, D-20 §10.7) se calibra con ese poder, no con el de un equipo normal.
-- Si con 10 ex posibles el equipo sale **demasiado fuerte**, el palanca es el dinero por tramo y el número de piedras de premio, no el precio.
+- Si con 10 ex posibles el equipo sale **demasiado fuerte**, la palanca es el dinero por tramo y el número de piedras de premio, no el precio.
 
 **Qué implica para el trabajo de otros** (sin tocarlo aquí): el campo `puntos` del catálogo y del motor deja de tener sentido (el intercambio es gratis y hacerse ex es un objeto); lo recoge la tarea 17 (#447) de D-20. El objeto necesita su precio (2.000) y su medalla mínima.
 
