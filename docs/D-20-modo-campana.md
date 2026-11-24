@@ -393,7 +393,7 @@ Reglas que ya se aplican a cada ficha: los líderes usan **cartas normales**, no
 
 - La campaña da puntos por **victoria en combate**, por **medalla** y por **jefe**, más una cantidad menor por ruta superada (las cifras son provisionales y se ajustan al final; desde el 2026-11-24 no hay compras con puntos dentro de la campaña, así que solo importan para la tienda de la cuenta).
 - Los puntos van a la **cuenta** (hace falta sesión) y se gastan en la **tienda** de la pantalla de inicio: monedas, dados, sobres y cartas sueltas del formato digital.
-- Aparte de los puntos, los entrenadores y los líderes dan **dinero** (§10.6): es local de la partida y se gasta en la tienda del centro Pokémon (Pokéballs, Pociones, Repelente y, más adelante, Cuerda Huida). No es la moneda de la cuenta. Decidido el 2026-11-24 (§10.9): el dinero paga **todo lo que se gasta dentro de la campaña**, incluida la **piedra ex** (precio por fijar por Negocio, D-21). El **intercambio es gratis**.
+- Aparte de los puntos, los entrenadores y los líderes dan **dinero** (§10.6): es local de la partida y se gasta en la tienda del centro Pokémon (Pokéballs, Pociones, Repelente y, más adelante, Cuerda Huida). No es la moneda de la cuenta. Decidido el 2026-11-24 (§10.9): el dinero paga **todo lo que se gasta dentro de la campaña**, incluida la **piedra ex** (**2.000** de dinero, §10.6; se vende desde la 2.ª medalla). El **intercambio es gratis**.
 - Los **puntos no tienen ningún uso dentro de la campaña** (decidido el 2026-11-24, §10.9): solo van a la cuenta y se gastan en la tienda de la pantalla de inicio. La **XP de evolución** sale de los combates, y las compras del centro Pokémon y la piedra ex se pagan con **dinero**, y el intercambio es gratis.
 
 ## 6. Cómo encaja en el proyecto
