@@ -5,6 +5,7 @@ import 'package:incursiones_engine/campana.dart';
 import 'catalogo_campana.dart';
 import 'controlador_campana.dart';
 import 'escena_mapa.dart';
+import 'pantalla_centro.dart';
 import 'pantalla_combate.dart';
 import 'pantalla_equipo.dart';
 import 'widgets_campana.dart';
@@ -190,23 +191,12 @@ class _Mapa extends ConsumerWidget {
         control.conversar(c);
       case AccionZona.curar:
         control.descansar(c);
+      // Centro Pokémon (propuesta M): la estantería abre la tienda y el PC,
+      // su pantalla aparte.
       case AccionZona.tienda:
+        abrirTienda(context, c);
       case AccionZona.pc:
-        showModalBottomSheet<void>(
-          context: context,
-          isScrollControlled: true,
-          builder: (_) => SafeArea(
-            child: Consumer(
-              builder: (context, ref, _) {
-                final actual = ref.watch(campanaProvider).partida!;
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: _Descanso(catalogo: c, partida: actual),
-                );
-              },
-            ),
-          ),
-        );
+        abrirPc(context, c);
     }
   }
 }
@@ -574,84 +564,20 @@ class _Captura extends ConsumerWidget {
 String _porcentaje(int porMil) =>
     porMil % 10 == 0 ? '${porMil ~/ 10} %' : '${porMil ~/ 10},${porMil % 10} %';
 
-/// El centro Pokémon: curar y el PC.
-class _Descanso extends ConsumerWidget {
+/// El centro Pokémon en el panel del nodo: curar, tienda y PC
+/// ([PanelCentro], propuesta M).
+class _Descanso extends StatelessWidget {
   const _Descanso({required this.catalogo, required this.partida});
 
   final CatalogoCampana catalogo;
   final PartidaCampana partida;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final c = catalogo;
-    final p = partida;
-    final control = ref.read(campanaProvider.notifier);
-    final lleno = p.equipoLleno(parametros: parametrosCampana);
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(p.progreso.resuelto
-            ? 'Tu equipo está como nuevo. Puedes ordenar el equipo y usar el PC.'
-            : 'Aquí se cura todo el equipo.'),
-        const SizedBox(height: 8),
-        FilledButton.icon(
-          key: const Key('campana-curar'),
-          icon: const Icon(Icons.healing_rounded),
-          label: const Text('Curar al equipo'),
-          onPressed: () => control.descansar(c),
-        ),
-        const SizedBox(height: 16),
-        Text('Tienda · tienes ${p.dinero} \$',
-            style: Theme.of(context).textTheme.titleMedium),
-        // Lo que vende este centro (D-20 §10.6): en el primer tramo, Pokéball
-        // y Poción; las Balls mejores piden medallas.
-        for (final o in p.tienda(c, parametros: parametrosCampana))
-          ListTile(
-            key: Key('tienda-${o.name}'),
-            contentPadding: EdgeInsets.zero,
-            title: Text(nombreObjeto(o)),
-            subtitle: Text('${descripcionObjeto(o)} · '
-                'en la mochila: ${p.cuantos(o)}'),
-            trailing: FilledButton.tonal(
-              key: Key('comprar-${o.name}'),
-              onPressed: p.dinero >= parametrosCampana.precios[o]!
-                  ? () => _avisar(context, control.comprar(c, o))
-                  : null,
-              child: Text('${parametrosCampana.precios[o]} \$'),
-            ),
-          ),
-        const SizedBox(height: 16),
-        Text('PC (${p.pc.length})',
-            style: Theme.of(context).textTheme.titleMedium),
-        if (p.pc.isEmpty) const Text('No tienes Pokémon en el PC.'),
-        for (var i = 0; i < p.pc.length; i++)
-          ListTile(
-            key: Key('pc-$i'),
-            contentPadding: EdgeInsets.zero,
-            title: Text(c.especie(p.pc[i].id).nombre),
-            subtitle: Text('${p.pc[i].ps} / ${c.especie(p.pc[i].id).ps} PS'),
-            trailing: lleno
-                ? PopupMenuButton<int>(
-                    key: Key('pc-cambiar-$i'),
-                    tooltip: 'Cambiar por uno del equipo',
-                    icon: const Icon(Icons.swap_horiz_rounded),
-                    onSelected: (e) => control.moverPc(c, deEquipo: e, dePc: i),
-                    itemBuilder: (_) => [
-                      for (var e = 0; e < p.equipo.length; e++)
-                        PopupMenuItem(
-                          value: e,
-                          child:
-                              Text('Por ${c.especie(p.equipo[e].id).nombre}'),
-                        ),
-                    ],
-                  )
-                : IconButton(
-                    key: Key('pc-sacar-$i'),
-                    tooltip: 'Al equipo',
-                    icon: const Icon(Icons.group_add_rounded),
-                    onPressed: () => control.moverPc(c, dePc: i),
-                  ),
-          ),
+        PanelCentro(catalogo: catalogo, partida: partida),
       ],
     );
   }
