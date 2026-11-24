@@ -52,16 +52,8 @@
 //                     (10, 10, 1, 1)
 //   --partidas=N      recorridos (tramo, 3000) o semillas (techo, 4000)
 //   --semilla=N       semilla del generador (1)
-//   --fase1=si|no     cartas de fase 1 de los iniciales. El catálogo de master
-//                     aún NO las tiene (los JSON esperan a los efectos nuevos,
-//                     PR #438, tarea 16): con «si» se añaden EN MEMORIA con los
-//                     datos de las cartas impresas (Ivysaur 110 PS, Charmeleon
-//                     100, Wartortle 100; Hoja Afilada 50, Dragoaliento 50,
-//                     Hidropulso 40) y los efectos que el motor aún no tiene
-//                     (drenaDefensor, paralizaDefensor, Pantalla de Humo
-//                     permanente) se sustituyen por el más parecido que sí
-//                     existe, que es más flojo: es una COTA INFERIOR de la
-//                     evolución. No se escribe nada.
+//   --fase1=si|no     (solo modo techo) compara también el equipo con la fase 1 del
+//                     inicial; las cartas son las reales del catálogo de master (#455).
 //   --informe=RUTA    CSV de salida
 import 'dart:convert';
 import 'dart:io';
@@ -94,6 +86,12 @@ class Config {
   List<String> rival = [];
   bool aliado = true;
   bool traza = false;
+  bool pocionesCombate = false; // Pociones en combate (#435): sin gastar turno
+  int umbralPocion = 50; // la IA cura al activo mientras tenga ≤ N PS
+  String pocionesEn = 'todos'; // todos | brock
+  int psPocion = 20; // PS que cura una Poción
+  int precioPocion = 300;
+  int limitePocionCombate = 0; // 0 = sin límite por combate
   int topeTurnos = 0; // 0 = sin tope (solo corta a las 2000 acciones)
   String alTope = 'derrota'; // derrota | mas-ps
 }
@@ -133,24 +131,12 @@ List<File> _jsons(String dir) => Directory(dir)
     .toList()
   ..sort((a, b) => a.path.compareTo(b.path));
 
-/// Carga el catálogo. Con [fase1] añade EN MEMORIA las cartas de fase 1 de los
-/// iniciales (supuestas) y la evolución a 70 XP con 0 medallas (D-20 §10.11).
+/// Carga el catálogo de master tal cual: los iniciales ya traen la evolución a
+/// 70 XP y las cartas reales de Ivysaur, Charmeleon y Wartortle (#455).
 CatalogoCampana cargarCatalogo(Config c) {
-  final pokemon = <Map<String, dynamic>>[];
-  for (final f in _jsons('${c.catalogo}/pokemon')) {
-    pokemon.add(_leer(f));
-  }
-  if (c.fase1) {
-    for (final p in List.of(pokemon)) {
-      final id = p['id'] as String;
-      final destino = fase1De[id];
-      if (destino == null) continue;
-      p['evoluciones'] = [
-        {'a': destino, 'via': 'xp', 'xpEvolucion': 70, 'medallasMinimas': 0}
-      ];
-      pokemon.add(fase1Aproximada(destino, p));
-    }
-  }
+  final pokemon = <Map<String, dynamic>>[
+    for (final f in _jsons('${c.catalogo}/pokemon')) _leer(f),
+  ];
   final zonas = [for (final f in _jsons('${c.catalogo}/zonas')) _leer(f)];
   final jefes = {
     for (final f in _jsons('${c.catalogo}/jefes'))
@@ -159,77 +145,6 @@ CatalogoCampana cargarCatalogo(Config c) {
   final region = _leer(File('${c.catalogo}/regiones/kanto.json'));
   return CatalogoCampana.desdeJson(
       pokemon: pokemon, zonas: zonas, jefes: jefes, region: region);
-}
-
-/// Carta de fase 1 de [destino] a partir de los datos impresos (PR #438,
-/// D-20 §12). Los efectos nuevos que el motor todavía no tiene se sustituyen
-/// por el más parecido que sí existe:
-///  - Ivysaur, Drenadoras (`drenaDefensor`: veneno de 10 por chequeo y cura 10
-///    al activo) → solo `envenenaDefensor` (sin la cura).
-///  - Charmeleon, Pantalla de Humo (`monedaFalloRival` mientras siga activo)
-///    → `monedaFalloRival` de un solo turno; Dragoaliento (50 y parálisis) →
-///    50 sin parálisis.
-///  - Wartortle: Refugio (`reduceDanoPropio` 10) e Hidropulso (`confundeDefensor`
-///    con 2 monedas) ya existen tal cual.
-Map<String, dynamic> fase1Aproximada(String destino, Map<String, dynamic> base) {
-  Map<String, dynamic> ataque(String nombre, String tipo, int coste, int dano,
-          [Map<String, dynamic>? efecto]) =>
-      {
-        'nombre': nombre,
-        'tipo': tipo,
-        'coste': coste,
-        'dano': dano,
-        if (efecto != null) 'efecto': efecto,
-      };
-  final tipo = base['tipo'] as String;
-  late final int ps;
-  late final List<Map<String, dynamic>> ataques;
-  switch (destino) {
-    case 'ivysaur':
-      ps = 110;
-      ataques = [
-        ataque('Drenadoras', tipo, 2, 0, {
-          'tipo': 'envenenaDefensor',
-          'valor': 10,
-          'texto': 'Aproximación sin cura del efecto drenaDefensor.'
-        }),
-        ataque('Hoja Afilada', tipo, 3, 50),
-      ];
-    case 'charmeleon':
-      ps = 100;
-      ataques = [
-        ataque('Pantalla de Humo', tipo, 2, 0, {
-          'tipo': 'monedaFalloRival',
-          'texto': 'Aproximación de un solo turno del efecto permanente.'
-        }),
-        ataque('Dragoaliento', tipo, 3, 50),
-      ];
-    default:
-      ps = 100;
-      ataques = [
-        ataque('Refugio', tipo, 1, 0, {
-          'tipo': 'reduceDanoPropio',
-          'valor': 10,
-          'texto': 'Mientras este Pokémon siga activo, recibe 10 puntos menos.'
-        }),
-        ataque('Hidropulso', tipo, 3, 40, {
-          'tipo': 'confundeDefensor',
-          'monedas': 2,
-          'texto': 'Lanza 2 monedas. Si ambas son Cara, Confundido.'
-        }),
-      ];
-  }
-  return {
-    'id': destino,
-    'numero': (base['numero'] as int) + 1,
-    'nombre': '${destino[0].toUpperCase()}${destino.substring(1)} (aprox.)',
-    'tipo': tipo,
-    'ps': ps,
-    'debilidad': base['debilidad'],
-    'retirada': 1,
-    'categoriaCaptura': 'fuerte',
-    'ataques': ataques,
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -241,6 +156,32 @@ EstadoCombate hastaElFinal(EstadoCombate e, [int topeTurnos = 0]) {
     e = aplicarCombate(e, decidirAccion(e, e.actua));
   }
   return e;
+}
+
+/// Como [hastaElFinal], pero el jugador puede usar Pociones en combate (#435):
+/// no gastan turno y no hay límite por combate, solo el inventario
+/// ([disponibles]). La IA cura 20 PS al activo mientras le queden ≤ [umbral]
+/// PS (el golpe fuerte de Brock es de 50), antes de cada acción propia.
+(EstadoCombate, int) hastaElFinalConPociones(EstadoCombate e, int disponibles,
+    int umbral, int psPocion, int limite, [int topeTurnos = 0]) {
+  var usadas = 0;
+  for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+    if (topeTurnos > 0 && e.numeroTurno > topeTurnos) break;
+    if (e.fase == FaseCombate.enCurso && e.actua == Bando.jugador) {
+      while (usadas < disponibles &&
+          (limite == 0 || usadas < limite)) {
+        final b = e.jugador;
+        final a = b.equipo[b.activo];
+        if (!a.enPie || a.ps > umbral || a.ps >= a.especie.ps) break;
+        final equipo = [...b.equipo];
+        equipo[b.activo] = a.conPs(min(a.ps + psPocion, a.especie.ps));
+        e = e.conBando(Bando.jugador, b.copiarCon(equipo: equipo));
+        usadas++;
+      }
+    }
+    e = aplicarCombate(e, decidirAccion(e, e.actua));
+  }
+  return (e, usadas);
 }
 
 /// Pone de activo al Pokémon que la IA sacaría contra [rival]: el mismo
@@ -309,17 +250,28 @@ class Corrida {
   bool abortada = false;
   String? rendidoEn;
   int estancados = 0;
+  int pocionesUsadas = 0;
+  int pocionesEnBrock = 0;
 }
 
 class Jugador {
   Jugador(this.c, this.cfg, this.rnd, this.stats, this.balls);
+  int usadasCombate = 0;
   final CatalogoCampana c;
   final Config cfg;
   final Random rnd;
   final Map<String, Nodo> stats;
   final int balls;
-  late final ParametrosCampana params =
-      ParametrosCampana(pokemonPorEntrenador: cfg.entrenador);
+  late final ParametrosCampana params = ParametrosCampana(
+      pokemonPorEntrenador: cfg.entrenador,
+      psPocion: cfg.psPocion,
+      precios: {
+        ObjetoCampana.pokeball: 200,
+        ObjetoCampana.superBall: 600,
+        ObjetoCampana.ultraBall: 1200,
+        ObjetoCampana.pocion: cfg.precioPocion,
+        ObjetoCampana.repelente: 350,
+      });
   final visto = <String>{};
   final corrida = Corrida();
   String inicial = '';
@@ -428,12 +380,25 @@ class Jugador {
     final n = p.nodoActual(c);
     if (p.progreso.resuelto) return p;
     if (n.tipo == TipoNodo.descanso) {
-      return p.descansar(c);
+      final d = p.descansar(c);
+      return cfg.pocionesCombate && n.id == 'centro-plateada'
+          ? comprarPocionesFaltan(d)
+          : d;
     }
     if (n.tipo == TipoNodo.conversacion) {
       return p.conversar(c);
     }
     return p;
+  }
+
+  /// Compra en la tienda del centro las Pociones que faltan hasta
+  /// `--pociones`, con el dinero que haya (300 cada una).
+  PartidaCampana comprarPocionesFaltan(PartidaCampana q) {
+    final falta = cfg.pociones - q.cuantos(ObjetoCampana.pocion);
+    final n = min(falta, q.dinero ~/ cfg.precioPocion);
+    return n > 0
+        ? q.comprar(c, ObjetoCampana.pocion, cantidad: n, parametros: params)
+        : q;
   }
 
   /// Último centro Pokémon visitado.
@@ -452,6 +417,9 @@ class Jugador {
     var q = p.progreso.nodoActual == centro ? p : p.retroceder(c, centro);
     q = evolucionar(q);
     q = q.descansar(c);
+    if (cfg.pocionesCombate && centro == 'centro-plateada') {
+      q = comprarPocionesFaltan(q);
+    }
     if (q.progreso.nodoActual != destino) q = q.retroceder(c, destino);
     return q;
   }
@@ -462,7 +430,7 @@ class Jugador {
   (PartidaCampana, bool) intento(PartidaCampana p, String nodo, int variante) {
     var q = p;
     if (cfg.retroceder && hayHeridos(q)) q = curarAndando(q, nodo);
-    if (cfg.pociones > 0) q = usarPociones(q);
+    if (cfg.pociones > 0 && !cfg.pocionesCombate) q = usarPociones(q);
     final rival = q.rival(c, parametros: params).equipo;
     q = conActivo(q, c, params, rival,
         variante: cfg.rotar ? variante : 0);
@@ -478,7 +446,20 @@ class Jugador {
       semilla: _siguiente(_siguiente(q.semilla)),
       llamadaRival: cfg.aliado ? rv.llamada : null,
     );
-    var fin = hastaElFinal(inicio, cfg.topeTurnos);
+    var fin;
+    if (cfg.pocionesCombate &&
+        (cfg.pocionesEn == 'todos' || nodo == 'gimnasio-brock')) {
+      final disp = q.cuantos(ObjetoCampana.pocion) - usadasCombate;
+      final (f, usadas) = hastaElFinalConPociones(
+          inicio, disp < 0 ? 0 : disp, cfg.umbralPocion, params.psPocion,
+          cfg.limitePocionCombate, cfg.topeTurnos);
+      fin = f;
+      usadasCombate += usadas;
+      corrida.pocionesUsadas += usadas;
+      if (nodo == 'gimnasio-brock') corrida.pocionesEnBrock += usadas;
+    } else {
+      fin = hastaElFinal(inicio, cfg.topeTurnos);
+    }
     combatesTotales++;
     if (fin.fase == FaseCombate.terminado) duraciones.add(fin.numeroTurno);
     if (fin.fase != FaseCombate.terminado && cfg.alTope == 'mas-ps') {
@@ -591,8 +572,7 @@ class Jugador {
     p = p.descansar(c);
     final nBalls = min(balls, p.dinero ~/ 200);
     if (nBalls > 0) p = p.comprar(c, ObjetoCampana.pokeball, cantidad: nBalls, parametros: params);
-    final nPoc = min(cfg.pociones, p.dinero ~/ 300);
-    if (nPoc > 0) p = p.comprar(c, ObjetoCampana.pocion, cantidad: nPoc, parametros: params);
+    p = comprarPocionesFaltan(p);
 
     // Volver a la Ruta 1 a capturar (misma especie que ya se venció).
     if (cfg.ruta1 && p.cuantos(ObjetoCampana.pokeball) > 1) {
@@ -654,6 +634,8 @@ class ResumenTramo {
   int xpBrock = 0;
   int capturas = 0;
   int evolucionInicial = 0;
+  int pocionesUsadas = 0;
+  int pocionesEnBrock = 0;
   final composicion = <String, int>{};
 }
 
@@ -675,6 +657,8 @@ ResumenTramo correr(Config cfg, CatalogoCampana c, String ini, int balls,
     r.intentosBrock += co.intentosBrock;
     r.xpBrock += co.xpAlLlegarABrock;
     r.capturas += co.capturas;
+    r.pocionesUsadas += co.pocionesUsadas;
+    r.pocionesEnBrock += co.pocionesEnBrock;
     if (co.evolucionoInicial) r.evolucionInicial++;
     final firma = (List.of(co.equipoEnBrock)..sort()).join('+');
     r.composicion[firma] = (r.composicion[firma] ?? 0) + 1;
@@ -708,7 +692,7 @@ void tramo(Config cfg, CatalogoCampana c) {
   stdout.writeln('Tramo con las reglas reales de partida (#409): $partidas '
       'recorridos por inicial, semilla ${cfg.semilla}.');
   stdout.writeln('Evolución del inicial: ${cfg.evolucionInicial ? "sí (70 XP)" : "no"}'
-      '${cfg.fase1 ? "  [fase 1 aproximada con las cartas impresas del PR #438]" : ""}'
+      ''
       ' · curar volviendo al centro: ${cfg.retroceder ? "sí" : "no"}'
       ' · Ruta 1 con Balls: ${cfg.ruta1 ? "sí" : "no"}'
       ' · Ruta 22: ${cfg.ruta22 ? "sí" : "no"}'
@@ -816,6 +800,48 @@ void barridoBolas(Config cfg, CatalogoCampana c) {
 
 /// Park-Miller, la misma sucesión que usa `PartidaCampana` para sus semillas.
 int _siguiente(int s) => (s * 16807) % 2147483647;
+
+/// Brock con Pociones en combate (#435), repartiendo el dinero entre Pokéballs
+/// y Pociones. Dinero antes de Brock: 1.000 en Ciudad Verde y 400 + 260 de los
+/// Cazabichos y el Entrenador Joven (las Pociones que no caben en Ciudad Verde
+/// se compran en el centro de Ciudad Plateada, antes de Brock).
+void barridoPociones(Config cfg, CatalogoCampana c) {
+  final partidas = cfg.partidas > 0 ? cfg.partidas : 600;
+  cfg.pocionesCombate = true;
+  final maxPocionesFijo = cfg.pociones;
+  stdout.writeln('Brock con Pociones en combate: Poción ${cfg.umbralPocion == 50 ? "" : "(umbral ${cfg.umbralPocion}) "}'
+      'cura ${const ParametrosCampana().psPocion} PS, sin gastar turno, '
+      'en ${cfg.pocionesEn == "todos" ? "todos los combates" : "solo Brock"}. '
+      '$partidas recorridos por casilla.');
+  stdout.writeln('${"inicial".padRight(11)}${"Balls".padLeft(6)}${"Poc.".padLeft(5)}'
+      '${"Pikachu 1.º".padLeft(13)}${"Joven 1.º".padLeft(11)}${"Brock 1.º".padLeft(11)}'
+      '${"llegan".padLeft(8)}${"gana Brock".padLeft(12)}${"sin perder".padLeft(12)}${"Poc./partida".padLeft(14)}'
+      '${"en Brock".padLeft(10)}');
+  for (final ini in iniciales) {
+    if (cfg.solo != null && cfg.solo != ini) continue;
+    for (final b in cfg.balls == 'auto' ? [5, 4, 3, 2] : [int.parse(cfg.balls)]) {
+      final maxP = maxPocionesFijo > 0
+          ? maxPocionesFijo
+          : (1660 - 200 * b) ~/ cfg.precioPocion;
+      for (var pc = 0; pc <= maxP; pc++) {
+        cfg.pociones = pc;
+        final r = correr(cfg, c, ini, b, partidas, cfg.semilla);
+        String f(String id) {
+          final n = r.nodos[id];
+          return n == null || n.llegan == 0 ? '—' : pct(n.ganan / n.llegan);
+        }
+        stdout.writeln('${ini.padRight(11)}${"$b".padLeft(6)}${"$pc".padLeft(5)}'
+            '${f("jefe-pikachu").padLeft(13)}${f("gimnasio-joven").padLeft(11)}'
+            '${f("gimnasio-brock").padLeft(11)}'
+            '${pct((r.nodos["gimnasio-brock"]?.llegan ?? 0) / r.recorridos).padLeft(8)}'
+            '${pct(r.ganaBrock / r.recorridos).padLeft(12)}'
+            '${pct(r.sinDerrotas / r.recorridos).padLeft(12)}'
+            '${(r.pocionesUsadas / r.recorridos).toStringAsFixed(2).padLeft(14)}'
+            '${(r.pocionesEnBrock / r.recorridos).toStringAsFixed(2).padLeft(10)}');
+      }
+    }
+  }
+}
 
 void _escribir(String ruta, List<String> lineas) {
   final f = File(ruta);
@@ -1130,6 +1156,18 @@ void main(List<String> args) {
         cfg.equipo = v.split(',');
       case '--rival':
         cfg.rival = v.split(',');
+      case '--pociones-combate':
+        cfg.pocionesCombate = v == 'si';
+      case '--umbral-pocion':
+        cfg.umbralPocion = int.parse(v);
+      case '--pociones-en':
+        cfg.pocionesEn = v;
+      case '--ps-pocion':
+        cfg.psPocion = int.parse(v);
+      case '--precio-pocion':
+        cfg.precioPocion = int.parse(v);
+      case '--limite-pocion':
+        cfg.limitePocionCombate = int.parse(v);
       case '--aliado':
         cfg.aliado = v != 'no';
       case '--tope-turnos':
@@ -1169,6 +1207,8 @@ void main(List<String> args) {
       equipoContra(cfg, c);
     case 'bolas':
       barridoBolas(cfg, c);
+    case 'pociones':
+      barridoPociones(cfg, c);
     default:
       stderr.writeln('--modo: usa «tramo», «techo» o «equipo»');
       exit(2);

@@ -1,0 +1,14 @@
+Brock con Pociones en combate: Poción cura 20 PS, sin gastar turno, en todos los combates. 1000 recorridos por casilla.
+inicial     Balls Poc.  Pikachu 1.º  Joven 1.º  Brock 1.º  llegan  gana Brock  sin perder  Poc./partida  en Brock
+bulbasaur       5    0       93.5 %     99.5 %     98.7 %  99.8 %      99.8 %      70.6 %          0.00      0.00
+bulbasaur       5    1       93.5 %     99.5 %     98.7 %  99.8 %      99.8 %      70.6 %          1.00      1.00
+bulbasaur       5    2       93.5 %     99.5 %    100.0 %  99.8 %      99.8 %      70.6 %          2.00      2.00
+bulbasaur       5    3       93.5 %     99.5 %    100.0 %  99.8 %      99.8 %      70.6 %          2.00      2.00
+charmander      5    0      100.0 %     99.5 %     96.9 % 100.0 %      99.9 %      96.4 %          0.00      0.00
+charmander      5    1      100.0 %     99.5 %     98.6 % 100.0 %      99.9 %      98.1 %          1.00      1.00
+charmander      5    2      100.0 %     99.5 %     99.9 % 100.0 %     100.0 %      99.3 %          2.00      2.00
+charmander      5    3      100.0 %     99.5 %     99.9 % 100.0 %     100.0 %      99.3 %          2.00      2.00
+squirtle        5    0       67.8 %     93.6 %    100.0 %  90.9 %      90.9 %      51.9 %          0.00      0.00
+squirtle        5    1       67.8 %     93.6 %    100.0 %  90.9 %      90.9 %      51.9 %          0.91      0.91
+squirtle        5    2       67.8 %     93.6 %    100.0 %  90.9 %      90.9 %      51.9 %          1.70      1.70
+squirtle        5    3       67.8 %     93.6 %    100.0 %  90.9 %      90.9 %      51.9 %          1.70      1.70

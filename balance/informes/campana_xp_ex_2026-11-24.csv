@@ -1,0 +1,129 @@
+tabla,xp_tramo,politica,xpEvo,opcion,inicial,medalla,ex,ex_fase2,xp_ingresada,xp_gastada,piedras_premio,piedras_compradas,dinero
+liga,Diseño: ~100 por tramo (700–900 en total),barato,80,D,bulbasaur,1,0,0,100,100,1,0,1458
+liga,Diseño: ~100 por tramo (700–900 en total),barato,80,D,bulbasaur,2,1,0,200,180,2,0,2067
+liga,Diseño: ~100 por tramo (700–900 en total),barato,80,D,bulbasaur,3,2,0,300,260,3,0,3093
+liga,Diseño: ~100 por tramo (700–900 en total),barato,80,D,bulbasaur,4,5,2,400,340,4,1,3336
+liga,Diseño: ~100 por tramo (700–900 en total),barato,80,D,bulbasaur,5,7,2,500,500,5,2,3729
+liga,Diseño: ~100 por tramo (700–900 en total),barato,80,D,bulbasaur,6,8,2,600,580,6,2,6539
+liga,Diseño: ~100 por tramo (700–900 en total),barato,80,D,bulbasaur,7,9,2,700,660,7,2,9499
+liga,Diseño: ~100 por tramo (700–900 en total),barato,80,D,bulbasaur,8,10,3,800,740,8,2,12609
+liga,Diseño: ~100 por tramo (700–900 en total),orden,80,D,bulbasaur,1,0,0,100,70,1,0,1458
+liga,Diseño: ~100 por tramo (700–900 en total),orden,80,D,bulbasaur,2,0,0,200,70,2,0,2067
+liga,Diseño: ~100 por tramo (700–900 en total),orden,80,D,bulbasaur,3,0,0,300,70,3,0,3093
+liga,Diseño: ~100 por tramo (700–900 en total),orden,80,D,bulbasaur,4,2,2,400,330,4,0,5336
+liga,Diseño: ~100 por tramo (700–900 en total),orden,80,D,bulbasaur,5,3,3,500,490,5,0,7729
+liga,Diseño: ~100 por tramo (700–900 en total),orden,80,D,bulbasaur,6,4,4,600,570,6,0,10539
+liga,Diseño: ~100 por tramo (700–900 en total),orden,80,D,bulbasaur,7,6,4,700,650,7,0,13499
+liga,Diseño: ~100 por tramo (700–900 en total),orden,80,D,bulbasaur,8,7,4,800,730,8,0,16609
+liga,Diseño: ~100 por tramo (700–900 en total),barato,110,D,bulbasaur,1,0,0,100,100,1,0,1458
+liga,Diseño: ~100 por tramo (700–900 en total),barato,110,D,bulbasaur,2,1,0,200,170,2,0,2067
+liga,Diseño: ~100 por tramo (700–900 en total),barato,110,D,bulbasaur,3,2,0,300,280,3,0,3093
+liga,Diseño: ~100 por tramo (700–900 en total),barato,110,D,bulbasaur,4,4,2,400,390,4,0,5336
+liga,Diseño: ~100 por tramo (700–900 en total),barato,110,D,bulbasaur,5,5,3,500,500,5,0,7729
+liga,Diseño: ~100 por tramo (700–900 en total),barato,110,D,bulbasaur,6,5,3,600,500,6,0,10539
+liga,Diseño: ~100 por tramo (700–900 en total),barato,110,D,bulbasaur,7,6,3,700,610,7,0,13499
+liga,Diseño: ~100 por tramo (700–900 en total),barato,110,D,bulbasaur,8,7,3,800,720,8,0,16609
+liga,Diseño: ~100 por tramo (700–900 en total),orden,110,D,bulbasaur,1,0,0,100,70,1,0,1458
+liga,Diseño: ~100 por tramo (700–900 en total),orden,110,D,bulbasaur,2,0,0,200,70,2,0,2067
+liga,Diseño: ~100 por tramo (700–900 en total),orden,110,D,bulbasaur,3,0,0,300,70,3,0,3093
+liga,Diseño: ~100 por tramo (700–900 en total),orden,110,D,bulbasaur,4,2,2,400,390,4,0,5336
+liga,Diseño: ~100 por tramo (700–900 en total),orden,110,D,bulbasaur,5,3,3,500,500,5,0,7729
+liga,Diseño: ~100 por tramo (700–900 en total),orden,110,D,bulbasaur,6,3,3,600,500,6,0,10539
+liga,Diseño: ~100 por tramo (700–900 en total),orden,110,D,bulbasaur,7,3,3,700,610,7,0,13499
+liga,Diseño: ~100 por tramo (700–900 en total),orden,110,D,bulbasaur,8,4,4,800,720,8,0,16609
+liga,Como el tramo 1: 180 por tramo,barato,80,D,bulbasaur,1,0,0,180,180,1,0,1458
+liga,Como el tramo 1: 180 por tramo,barato,80,D,bulbasaur,2,1,0,360,340,2,0,2067
+liga,Como el tramo 1: 180 por tramo,barato,80,D,bulbasaur,3,4,0,540,500,3,1,1093
+liga,Como el tramo 1: 180 por tramo,barato,80,D,bulbasaur,4,6,2,720,660,4,2,1336
+liga,Como el tramo 1: 180 por tramo,barato,80,D,bulbasaur,5,8,2,900,900,5,3,1729
+liga,Como el tramo 1: 180 por tramo,barato,80,D,bulbasaur,6,11,3,1080,1060,6,5,539
+liga,Como el tramo 1: 180 por tramo,barato,80,D,bulbasaur,7,13,4,1260,1210,7,6,1499
+liga,Como el tramo 1: 180 por tramo,barato,80,D,bulbasaur,8,16,6,1440,1370,8,8,609
+liga,Como el tramo 1: 180 por tramo,orden,80,D,bulbasaur,1,0,0,180,70,1,0,1458
+liga,Como el tramo 1: 180 por tramo,orden,80,D,bulbasaur,2,0,0,360,70,2,0,2067
+liga,Como el tramo 1: 180 por tramo,orden,80,D,bulbasaur,3,0,0,540,70,3,0,3093
+liga,Como el tramo 1: 180 por tramo,orden,80,D,bulbasaur,4,3,3,720,490,4,0,5336
+liga,Como el tramo 1: 180 por tramo,orden,80,D,bulbasaur,5,8,4,900,890,5,3,1729
+liga,Como el tramo 1: 180 por tramo,orden,80,D,bulbasaur,6,11,5,1080,1050,6,5,539
+liga,Como el tramo 1: 180 por tramo,orden,80,D,bulbasaur,7,13,6,1260,1210,7,6,1499
+liga,Como el tramo 1: 180 por tramo,orden,80,D,bulbasaur,8,16,6,1440,1370,8,8,609
+liga,Como el tramo 1: 180 por tramo,barato,110,D,bulbasaur,1,0,0,180,160,1,0,1458
+liga,Como el tramo 1: 180 por tramo,barato,110,D,bulbasaur,2,1,0,360,320,2,0,2067
+liga,Como el tramo 1: 180 por tramo,barato,110,D,bulbasaur,3,4,0,540,540,3,1,1093
+liga,Como el tramo 1: 180 por tramo,barato,110,D,bulbasaur,4,6,2,720,720,4,2,1336
+liga,Como el tramo 1: 180 por tramo,barato,110,D,bulbasaur,5,8,3,900,830,5,3,1729
+liga,Como el tramo 1: 180 por tramo,barato,110,D,bulbasaur,6,10,3,1080,1050,6,4,2539
+liga,Como el tramo 1: 180 por tramo,barato,110,D,bulbasaur,7,11,4,1260,1160,7,4,5499
+liga,Como el tramo 1: 180 por tramo,barato,110,D,bulbasaur,8,13,5,1440,1380,8,5,6609
+liga,Como el tramo 1: 180 por tramo,orden,110,D,bulbasaur,1,0,0,180,70,1,0,1458
+liga,Como el tramo 1: 180 por tramo,orden,110,D,bulbasaur,2,0,0,360,70,2,0,2067
+liga,Como el tramo 1: 180 por tramo,orden,110,D,bulbasaur,3,0,0,540,70,3,0,3093
+liga,Como el tramo 1: 180 por tramo,orden,110,D,bulbasaur,4,3,3,720,610,4,0,5336
+liga,Como el tramo 1: 180 por tramo,orden,110,D,bulbasaur,5,6,4,900,830,5,1,5729
+liga,Como el tramo 1: 180 por tramo,orden,110,D,bulbasaur,6,8,4,1080,1050,6,2,6539
+liga,Como el tramo 1: 180 por tramo,orden,110,D,bulbasaur,7,9,4,1260,1160,7,2,9499
+liga,Como el tramo 1: 180 por tramo,orden,110,D,bulbasaur,8,11,5,1440,1380,8,3,10609
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,80,D,bulbasaur,1,0,0,180,180,1,0,1458
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,80,D,bulbasaur,2,1,0,386,340,2,0,2067
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,80,D,bulbasaur,3,4,0,617,580,3,1,1093
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,80,D,bulbasaur,4,6,2,874,820,4,2,1336
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,80,D,bulbasaur,5,8,2,1157,1130,5,3,1729
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,80,D,bulbasaur,6,11,3,1466,1370,6,5,539
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,80,D,bulbasaur,7,13,5,1800,1370,7,6,1499
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,80,D,bulbasaur,8,16,6,2160,1370,8,8,609
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,80,D,bulbasaur,1,0,0,180,70,1,0,1458
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,80,D,bulbasaur,2,0,0,386,70,2,0,2067
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,80,D,bulbasaur,3,0,0,617,70,3,0,3093
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,80,D,bulbasaur,4,3,3,874,490,4,0,5336
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,80,D,bulbasaur,5,8,4,1157,890,5,3,1729
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,80,D,bulbasaur,6,11,5,1466,1130,6,5,539
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,80,D,bulbasaur,7,13,6,1800,1210,7,6,1499
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,80,D,bulbasaur,8,16,6,2160,1370,8,8,609
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,110,D,bulbasaur,1,0,0,180,160,1,0,1458
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,110,D,bulbasaur,2,1,0,386,380,2,0,2067
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,110,D,bulbasaur,3,4,0,617,600,3,1,1093
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,110,D,bulbasaur,4,6,1,874,870,4,2,1336
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,110,D,bulbasaur,5,8,1,1157,1090,5,3,1729
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,110,D,bulbasaur,6,11,3,1466,1420,6,5,539
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,110,D,bulbasaur,7,13,4,1800,1710,7,6,1499
+liga,Creciente: 180 a 360 (rivales más fuertes),barato,110,D,bulbasaur,8,16,6,2160,1820,8,8,609
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,110,D,bulbasaur,1,0,0,180,70,1,0,1458
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,110,D,bulbasaur,2,0,0,386,70,2,0,2067
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,110,D,bulbasaur,3,0,0,617,70,3,0,3093
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,110,D,bulbasaur,4,3,3,874,610,4,0,5336
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,110,D,bulbasaur,5,8,4,1157,1050,5,3,1729
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,110,D,bulbasaur,6,11,5,1466,1380,6,5,539
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,110,D,bulbasaur,7,13,6,1800,1600,7,6,1499
+liga,Creciente: 180 a 360 (rivales más fuertes),orden,110,D,bulbasaur,8,16,6,2160,1820,8,8,609
+medallas,180,barato,80,A,bulbasaur,1,0,0,180,180,1,0,1458
+medallas,180,barato,80,A,bulbasaur,2,0,0,360,340,2,0,2067
+medallas,180,barato,80,A,bulbasaur,3,0,0,540,500,3,0,3093
+medallas,180,barato,80,A,bulbasaur,4,6,0,720,660,4,2,1336
+medallas,180,barato,80,A,bulbasaur,5,8,2,900,900,5,3,1729
+medallas,180,barato,80,A,bulbasaur,6,11,3,1080,1060,6,5,539
+medallas,180,barato,80,A,bulbasaur,7,13,4,1260,1210,7,6,1499
+medallas,180,barato,80,A,bulbasaur,8,16,6,1440,1370,8,8,609
+medallas,180,barato,80,B,bulbasaur,1,0,0,180,180,1,0,1458
+medallas,180,barato,80,B,bulbasaur,2,0,0,360,340,2,0,2067
+medallas,180,barato,80,B,bulbasaur,3,2,0,540,500,3,0,3093
+medallas,180,barato,80,B,bulbasaur,4,6,0,720,660,4,2,1336
+medallas,180,barato,80,B,bulbasaur,5,8,2,900,900,5,3,1729
+medallas,180,barato,80,B,bulbasaur,6,11,3,1080,1060,6,5,539
+medallas,180,barato,80,B,bulbasaur,7,13,4,1260,1210,7,6,1499
+medallas,180,barato,80,B,bulbasaur,8,16,6,1440,1370,8,8,609
+medallas,180,barato,80,C,bulbasaur,1,0,0,180,180,1,0,1458
+medallas,180,barato,80,C,bulbasaur,2,0,0,360,340,2,0,2067
+medallas,180,barato,80,C,bulbasaur,3,4,0,540,500,3,1,1093
+medallas,180,barato,80,C,bulbasaur,4,6,2,720,660,4,2,1336
+medallas,180,barato,80,C,bulbasaur,5,8,2,900,900,5,3,1729
+medallas,180,barato,80,C,bulbasaur,6,11,3,1080,1060,6,5,539
+medallas,180,barato,80,C,bulbasaur,7,13,4,1260,1210,7,6,1499
+medallas,180,barato,80,C,bulbasaur,8,16,6,1440,1370,8,8,609
+medallas,180,barato,80,D,bulbasaur,1,0,0,180,180,1,0,1458
+medallas,180,barato,80,D,bulbasaur,2,1,0,360,340,2,0,2067
+medallas,180,barato,80,D,bulbasaur,3,4,0,540,500,3,1,1093
+medallas,180,barato,80,D,bulbasaur,4,6,2,720,660,4,2,1336
+medallas,180,barato,80,D,bulbasaur,5,8,2,900,900,5,3,1729
+medallas,180,barato,80,D,bulbasaur,6,11,3,1080,1060,6,5,539
+medallas,180,barato,80,D,bulbasaur,7,13,4,1260,1210,7,6,1499
+medallas,180,barato,80,D,bulbasaur,8,16,6,1440,1370,8,8,609
