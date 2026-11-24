@@ -1367,4 +1367,104 @@ void main() {
       expect(grunido.efecto, isA<ReduceDanoRival>());
     });
   });
+
+  group('Poción en combate (D-20 §3.2, #458)', () {
+    EstadoCombate herido({
+      int pociones = 2,
+      ParametrosCombate parametros = const ParametrosCombate(),
+    }) =>
+        EstadoCombate.conEquipos(
+          equipoJugador: [
+            PokemonEnCombate(pokemon('a1'), 50),
+            PokemonEnCombate(pokemon('a2'), 90),
+            PokemonEnCombate(pokemon('a3'), 0),
+          ],
+          equipoRival: [PokemonEnCombate.completo(pokemon('b1'))],
+          parametros: parametros,
+          pocionesJugador: pociones,
+        );
+
+    test('cura 20 PS y no gasta el turno', () {
+      final e = herido();
+      final d = aplicarCombate(e, const UsarPocion(Bando.jugador, 0));
+      expect(d.jugador.equipo[0].ps, 70);
+      expect(d.jugador.pociones, 1);
+      expect(d.jugador.pocionesUsadas, 1);
+      expect(d.turno, Bando.jugador);
+      expect(d.numeroTurno, e.numeroTurno);
+      expect(d.jugador.energia, e.jugador.energia);
+      // Después puede atacar en el mismo turno.
+      final t = aplicarCombate(d, const Atacar(Bando.jugador, 0));
+      expect(t.turno, Bando.rival);
+    });
+
+    test('sin límite por combate: solo el inventario', () {
+      var e = herido(pociones: 3);
+      e = aplicarCombate(e, const UsarPocion(Bando.jugador, 0));
+      e = aplicarCombate(e, const UsarPocion(Bando.jugador, 0));
+      expect(e.jugador.equipo[0].ps, 90);
+      e = aplicarCombate(e, const UsarPocion(Bando.jugador, 0));
+      expect(e.jugador.equipo[0].ps, 100, reason: 'no pasa de los PS máximos');
+      expect(e.jugador.pociones, 0);
+      expect(e.jugador.pocionesUsadas, 3);
+      expect(() => aplicarCombate(e, const UsarPocion(Bando.jugador, 1)),
+          throwsA(isA<ReglaIncumplida>()));
+    });
+
+    test('cura a la banca (propuesta), no revive ni cura al que está lleno',
+        () {
+      final e = herido();
+      final d = aplicarCombate(e, const UsarPocion(Bando.jugador, 1));
+      expect(d.jugador.equipo[1].ps, 100);
+      expect(d.jugador.activo, 0);
+      expect(() => aplicarCombate(e, const UsarPocion(Bando.jugador, 2)),
+          throwsA(isA<ReglaIncumplida>()), reason: 'caído');
+      expect(() => aplicarCombate(d, const UsarPocion(Bando.jugador, 1)),
+          throwsA(isA<ReglaIncumplida>()), reason: 'lleno');
+      expect(objetivosDePocion(e, Bando.jugador), [0, 1]);
+    });
+
+    test('con pocionCuraBanca = false solo cura al activo', () {
+      final e = herido(
+          parametros: const ParametrosCombate(pocionCuraBanca: false));
+      expect(objetivosDePocion(e, Bando.jugador), [0]);
+      expect(() => aplicarCombate(e, const UsarPocion(Bando.jugador, 1)),
+          throwsA(isA<ReglaIncumplida>()));
+      expect(aplicarCombate(e, const UsarPocion(Bando.jugador, 0))
+          .jugador
+          .equipo[0]
+          .ps, 70);
+    });
+
+    test('sin Pociones, o fuera de su turno, no se puede', () {
+      final sin = herido(pociones: 0);
+      expect(objetivosDePocion(sin, Bando.jugador), isEmpty);
+      expect(() => aplicarCombate(sin, const UsarPocion(Bando.jugador, 0)),
+          throwsA(isA<ReglaIncumplida>()));
+      final suyo = aplicarCombate(herido(), const Cargar(Bando.jugador));
+      expect(objetivosDePocion(suyo, Bando.jugador), isEmpty);
+      expect(() => aplicarCombate(suyo, const UsarPocion(Bando.jugador, 0)),
+          throwsA(isA<ReglaIncumplida>()));
+    });
+
+    test('el rival no usa objetos (propuesta), salvo con rivalUsaObjetos',
+        () {
+      EstadoCombate rivalHerido(ParametrosCombate p) => EstadoCombate.conEquipos(
+            equipoJugador: [PokemonEnCombate.completo(pokemon('a1'))],
+            equipoRival: [PokemonEnCombate(pokemon('b1'), 40)],
+            empieza: Bando.rival,
+            parametros: p,
+            pocionesRival: 1,
+          );
+      final no = rivalHerido(const ParametrosCombate());
+      expect(objetivosDePocion(no, Bando.rival), isEmpty);
+      expect(() => aplicarCombate(no, const UsarPocion(Bando.rival, 0)),
+          throwsA(isA<ReglaIncumplida>()));
+      final si = rivalHerido(const ParametrosCombate(rivalUsaObjetos: true));
+      expect(aplicarCombate(si, const UsarPocion(Bando.rival, 0))
+          .rival
+          .equipo[0]
+          .ps, 60);
+    });
+  });
 }
