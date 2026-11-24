@@ -1,31 +1,114 @@
 {
- "escena": "pueblo-paleta",
- "tamano": [
-  390,
-  844
- ],
- "zonas": [
-  {
-   "id": "laboratorio",
-   "tipo": "edificio",
-   "accion": "elegir-inicial",
-   "rect": [
-    30,
-    150,
-    182,
-    200
-   ]
-  },
-  {
-   "id": "ruta-1",
-   "tipo": "borde-superior",
-   "accion": "avanzar",
-   "rect": [
-    212,
-    36,
-    116,
-    100
-   ]
-  }
- ]
+  "escena": "pueblo-paleta",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "La salida a la Ruta 1 es el borde superior (el camino llega al borde); la barra de recursos tapa el 7 % de arriba.",
+  "zonas": [
+    {
+      "id": "laboratorio",
+      "tipo": "edificio",
+      "accion": "inicial",
+      "rect": [
+        360,
+        40,
+        590,
+        610
+      ],
+      "rel": [
+        0.1875,
+        0.0368,
+        0.3073,
+        0.5607
+      ]
+    },
+    {
+      "id": "puerta-laboratorio",
+      "tipo": "punto-de-entrada",
+      "accion": "inicial",
+      "rect": [
+        735,
+        465,
+        85,
+        135
+      ],
+      "rel": [
+        0.3828,
+        0.4274,
+        0.0443,
+        0.1241
+      ]
+    },
+    {
+      "id": "ruta-1",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "rect": [
+        1110,
+        0,
+        210,
+        190
+      ],
+      "rel": [
+        0.5781,
+        0.0,
+        0.1094,
+        0.1746
+      ],
+      "destino": "ruta-1"
+    },
+    {
+      "id": "casa-jugador",
+      "tipo": "decorativo",
+      "accion": null,
+      "rect": [
+        95,
+        600,
+        420,
+        345
+      ],
+      "rel": [
+        0.0495,
+        0.5515,
+        0.2188,
+        0.3171
+      ]
+    },
+    {
+      "id": "casa-vecino-1",
+      "tipo": "decorativo",
+      "accion": null,
+      "rect": [
+        1490,
+        300,
+        290,
+        285
+      ],
+      "rel": [
+        0.776,
+        0.2757,
+        0.151,
+        0.2619
+      ]
+    },
+    {
+      "id": "casa-vecino-2",
+      "tipo": "decorativo",
+      "accion": null,
+      "rect": [
+        1260,
+        585,
+        300,
+        310
+      ],
+      "rel": [
+        0.6562,
+        0.5377,
+        0.1562,
+        0.2849
+      ]
+    }
+  ]
 }

@@ -124,7 +124,7 @@ Estado el 2026-11-23. El código está en `app/lib/campana/`. Las claves (`Key`)
 
 | Issue | Estado |
 |---|---|
-| #415 escenas | Datos hechos (#413, #425; coordenadas de marcador). Arte: guía vectorial y zonas de Pueblo Paleta y prompts de Flux de las 9 escenas más el interior del centro en `escenas/`. Faltan las imágenes finales. Formato decidido el 2026-11-23: `.webp` en `app/assets/campana/escenas/<imagen>.webp`, 390×844 (decisión de Ayme; Diseño la registra en D-20 §10, ver #415). |
+| #415 escenas | **Pueblo Paleta entregada** (2026-11-24): `app/assets/campana/escenas/pueblo-paleta.webp` (1920×1088) y sus zonas en `docs/diseno-ui/escenas/pueblo-paleta.zonas.json`; faltan las otras 8. Datos hechos (#413, #425; coordenadas de marcador). Arte: guía vectorial y zonas de Pueblo Paleta y prompts de Flux de las 9 escenas más el interior del centro en `escenas/`. Faltan las imágenes finales. Formato: `.webp` en `app/assets/campana/escenas/<imagen>.webp` (decisión de Ayme del 2026-11-23). **Proporción:** PC es la plataforma principal (Ayme, 2026-11-24), así que las escenas pasan de 390×844 a **16:9 (1920×1088)**; Diseño debe registrarlo en D-20 §10 y replantear los wireframes (ver #415). |
 | #378 fondos de zona | Cubierta por #415: el mapa pasó a escenas (D-20 §10.7). Cerrada el 2026-11-23. |
 | #379 iconos de nodo | Obsoleta con el mapa de escenas. Cerrada el 2026-11-23 (decisión de Ayme). |
 | #408 metal | Icono hecho (`sprites_ajenos/iconos_tipo/metal.png`). Color propuesto abajo. |
@@ -137,7 +137,7 @@ Propuesta: `0xFF7E9AAE` (acero azulado). El gris provisional actual, `0xFF78909C
 
 ### Formato de las escenas
 
-- **Entrega:** `.webp` en `app/assets/campana/escenas/<imagen>.webp`, proporción 390×844, uno por id de imagen de `kanto.json` (pueblo-paleta, ruta-1, centro-pokemon, ciudad-verde, ruta-22, ruta-2, bosque-verde, ruta-2-norte, gimnasio-plateada).
+- **Entrega:** `.webp` en `app/assets/campana/escenas/<imagen>.webp`, proporción 16:9 (1920×1088, PC principal; antes 390×844), uno por id de imagen de `kanto.json` (pueblo-paleta, ruta-1, centro-pokemon, ciudad-verde, ruta-22, ruta-2, bosque-verde, ruta-2-norte, gimnasio-plateada).
 - **Zonas pulsables:** en `kanto.json`, coordenadas relativas 0–1 a esa imagen. Al ilustrar cada escena se ajustan las de marcador; la guía de cada una lleva su `.zonas.json` en `escenas/`.
 - **Origen:** guía vectorial propia (SVG) más imagen final generada con ella como composición; ver `escenas/prompts_flux_escenas.md`.
 - **Sin personajes ni Pokémon en el fondo:** los sprites de EP se pintan encima.
