@@ -382,7 +382,7 @@ void main() {
     test('Wartortle (008/150) sigue a su carta impresa', () {
       final p = pokemon['wartortle']!;
       expect(p.tipo, TipoCampana.agua);
-      expect(p.ps, 100);
+      expect(p.ps, 110);
       expect(p.debilidad!.tipo, TipoCampana.electrico);
       expect(p.resistencia, isNull);
       expect(p.retirada, 1);
