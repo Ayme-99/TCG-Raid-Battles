@@ -215,7 +215,8 @@
       },
       "tienda": [
         "pokeball",
-        "pocion"
+        "pocion",
+        "piedraEx"
       ]
     },
     {
@@ -726,7 +727,8 @@
       },
       "tienda": [
         "pokeball",
-        "pocion"
+        "pocion",
+        "piedraEx"
       ]
     },
     {

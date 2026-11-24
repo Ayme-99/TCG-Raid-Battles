@@ -331,7 +331,12 @@ void main() {
     );
     final almacen = AlmacenMemoria();
     final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
+    await tocar(tester, 'campana-ver-equipo');
+    expect(hay('pantalla-equipo'), isTrue);
     expect(find.text('Reserva de XP: 60'), findsOneWidget);
+    // Rejilla de 2×3: tres cartas y tres huecos libres (propuesta J).
+    expect(hay('equipo-hueco-3') && hay('equipo-hueco-5'), isTrue);
+    expect(hay('equipo-hueco-2'), isFalse);
     // Caterpie está debilitado: evolucionar lo revive a 10 PS.
     await tocar(tester, 'equipo-1');
     expect(find.text('Evolucionar en Metapod (50 XP)'), findsOneWidget);
@@ -379,6 +384,7 @@ void main() {
     );
     final c = await abrirCampana(tester,
         almacen: almacen, guardada: guardada, catalogo: catalogo);
+    await tocar(tester, 'campana-ver-equipo');
     await tocar(tester, 'equipo-0');
     expect(find.text('Requiere 2 medallas.'), findsOneWidget);
     final tile = tester
@@ -463,9 +469,12 @@ void main() {
     expect(c.read(campanaProvider).partida!.dinero, 0);
     expect(c.read(campanaProvider).partida!.cuantos(ObjetoCampana.pokeball), 1);
     await cerrarHoja(tester);
+    await tocar(tester, 'campana-ver-equipo');
     await tocar(tester, 'equipo-0');
     await tocar(tester, 'equipo-pocion');
     expect(c.read(campanaProvider).partida!.equipo.first.ps, 30);
+    await cerrarHoja(tester);
+    await tocar(tester, 'equipo-volver');
     await tocar(tester, 'campana-curar');
     expect(c.read(campanaProvider).partida!.equipo.map((e) => e.ps), [70, 60]);
     // PC, en su pantalla aparte: Rattata entra al equipo (hay hueco).
@@ -477,9 +486,11 @@ void main() {
     expect(hay('pc-vacio'), isTrue);
     await tocar(tester, 'pc-volver');
     // Poner primero a Rattata.
+    await tocar(tester, 'campana-ver-equipo');
     await tocar(tester, 'equipo-2');
     await tocar(tester, 'equipo-primero');
     expect(c.read(campanaProvider).partida!.equipo.first.id, 'rattata');
+    await tocar(tester, 'equipo-volver');
     await tocar(tester, 'ir-gimnasio-joven');
     expect(find.textContaining('Entrenador Joven'), findsWidgets);
   });
@@ -554,6 +565,54 @@ void main() {
     // La estantería abre la tienda; el mostrador cura.
     await tocar(tester, 'zona-tienda');
     expect(hay('hoja-tienda'), isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'pantalla de equipo: caídos en gris, aviso y orden solo en el '
+      'centro (propuesta J)', (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ruta-2-norte',
+          superados: {'pueblo-paleta'},
+          inicial: 'squirtle'),
+      equipo: [
+        PokemonGuardado('squirtle', 30),
+        PokemonGuardado('pidgey', 0),
+      ],
+      mochila: {ObjetoCampana.pocion: 2, ObjetoCampana.piedraEx: 1},
+    );
+    // A tamaño de móvil: la rejilla es de 2 columnas.
+    final c = await abrirCampana(tester,
+        almacen: AlmacenMemoria(),
+        guardada: guardada,
+        tamano: const Size(390, 844));
+    await tocar(tester, 'campana-ver-equipo');
+    expect(find.text('Pociones: 2'), findsOneWidget);
+    expect(find.text('Piedras ex: 1'), findsOneWidget);
+    expect(find.text('Debilitado'), findsOneWidget);
+    expect(find.byType(ColorFiltered), findsOneWidget,
+        reason: 'el caído va en gris');
+    // Un debilitado: aviso del centro y la Poción apagada.
+    await tocar(tester, 'equipo-1');
+    expect(hay('equipo-aviso-debilitado'), isTrue);
+    expect(
+        tester.widget<ListTile>(find.byKey(const Key('equipo-pocion'))).enabled,
+        isFalse);
+    // Fuera de un centro no se ordena ni se deja en el PC.
+    expect(hay('equipo-primero'), isFalse);
+    expect(hay('equipo-al-pc'), isFalse);
+    expect(hay('equipo-solo-centro'), isTrue);
+    await cerrarHoja(tester);
+    // La Poción cura 20 y quedan las que haya.
+    await tocar(tester, 'equipo-0');
+    await tocar(tester, 'equipo-pocion');
+    expect(c.read(campanaProvider).partida!.equipo.first.ps, 50);
+    expect(find.text('Te quedan 1.'), findsOneWidget);
+    await cerrarHoja(tester);
+    expect(find.text('Pociones: 1'), findsOneWidget);
+    await tocar(tester, 'equipo-volver');
+    expect(hay('pantalla-equipo'), isFalse);
     expect(tester.takeException(), isNull);
   });
 }

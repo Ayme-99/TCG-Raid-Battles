@@ -7,6 +7,7 @@ import 'controlador_campana.dart';
 import 'escena_mapa.dart';
 import 'pantalla_centro.dart';
 import 'pantalla_combate.dart';
+import 'pantalla_equipo.dart';
 import 'widgets_campana.dart';
 
 /// Modo campaña (D-20): el mapa del primer tramo de Kanto, con el nodo actual,
@@ -322,6 +323,9 @@ class _PanelNodo extends ConsumerWidget {
           Text('Al llegar a la mitad de sus PS, el jefe llama a un aliado.',
               style: tema.textTheme.bodySmall),
         if (r.dinero > 0) Text('Dinero: ${r.dinero} \$'),
+        if (r.piedrasEx > 0)
+          Text('Con la medalla: ${r.piedrasEx} '
+              '${r.piedrasEx == 1 ? 'Piedra ex' : 'Piedras ex'}'),
         Text(
             'Si pierdes, vuelves a ${c.region.nodo(p.ultimaCura ?? c.region.inicio).nombre}.',
             style: tema.textTheme.bodySmall),
@@ -579,37 +583,38 @@ class _Descanso extends StatelessWidget {
   }
 }
 
-/// El equipo: el primero sale a combatir. Tocar uno lo pone primero y, en un
-/// centro Pokémon, también se puede dejar en el PC.
-class _Equipo extends ConsumerWidget {
+/// Resumen del equipo en el mapa: sus fichas y el botón que abre la pantalla
+/// de equipo (propuesta J, D-20 §10.7), donde se usan Pociones, se evoluciona
+/// y, en un centro Pokémon, se ordena y se deja en el PC.
+class _Equipo extends StatelessWidget {
   const _Equipo({required this.catalogo, required this.partida});
 
   final CatalogoCampana catalogo;
   final PartidaCampana partida;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final c = catalogo;
     final p = partida;
     if (p.equipo.isEmpty) return const SizedBox.shrink();
-    final control = ref.read(campanaProvider.notifier);
-    final enCentro = p.nodoActual(c).tipo == TipoNodo.descanso;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Tu equipo (${p.equipo.length}/${parametrosCampana.tamanoEquipo})',
-            style: Theme.of(context).textTheme.titleMedium),
-        Text('Reserva de XP: ${p.xp}',
-            key: const Key('campana-xp'),
-            style: Theme.of(context).textTheme.bodyMedium),
-        Text(
-            'El primero sale a combatir. Toca uno para ponerlo primero, '
-            'darle una Poción o evolucionarlo con la XP de la reserva. '
-            'Mochila: '
-            '${p.cuantos(ObjetoCampana.pokeball)} Pokéballs, '
-            '${p.cuantos(ObjetoCampana.pocion)} Pociones, '
-            '${p.cuantos(ObjetoCampana.repelente)} Repelentes.',
-            style: Theme.of(context).textTheme.bodySmall),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                  'Tu equipo (${p.equipo.length}/${parametrosCampana.tamanoEquipo})',
+                  style: Theme.of(context).textTheme.titleMedium),
+            ),
+            FilledButton.tonalIcon(
+              key: const Key('campana-ver-equipo'),
+              icon: const Icon(Icons.style_rounded),
+              label: const Text('Ver equipo'),
+              onPressed: () => abrirEquipo(context, c),
+            ),
+          ],
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -617,87 +622,16 @@ class _Equipo extends ConsumerWidget {
           children: [
             for (var i = 0; i < p.equipo.length; i++)
               FichaPokemon(
-                key: Key('equipo-$i'),
+                key: Key('mapa-equipo-$i'),
                 especie: c.especie(p.equipo[i].id),
                 ps: p.equipo[i].ps,
                 destacada: i == 0,
                 detalle: i == 0 ? 'sale primero' : null,
-                onTap: () => _opciones(context, control, i, enCentro),
+                onTap: () => abrirEquipo(context, c),
               ),
           ],
         ),
       ],
-    );
-  }
-
-  void _opciones(
-      BuildContext context, ControladorCampana control, int i, bool enCentro) {
-    final especie = catalogo.especie(partida.equipo[i].id);
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(especie.nombre,
-                  style: Theme.of(context).textTheme.titleLarge),
-              Text(resumenCarta(especie)),
-              for (final a in especie.ataques) Text(textoAtaque(a)),
-              const SizedBox(height: 12),
-              if (i != 0)
-                ListTile(
-                  key: const Key('equipo-primero'),
-                  leading: const Icon(Icons.vertical_align_top_rounded),
-                  title: const Text('Poner primero'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    control.ponerPrimero(i);
-                  },
-                ),
-              if (partida.cuantos(ObjetoCampana.pocion) > 0)
-                ListTile(
-                  key: const Key('equipo-pocion'),
-                  leading: const Icon(Icons.local_drink_rounded),
-                  title:
-                      Text('Usar Poción (+${parametrosCampana.psPocion} PS)'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _avisar(context, control.usarPocion(catalogo, i));
-                  },
-                ),
-              // Evolucionar (D-20 §10.6): gasta XP de la reserva y deja al
-              // Pokémon con 10 PS, también si estaba debilitado.
-              for (final e in partida.evolucionesPorXp(catalogo, i))
-                ListTile(
-                  key: Key('equipo-evolucionar-${e.a}'),
-                  leading: const Icon(Icons.auto_awesome_rounded),
-                  title: Text('Evolucionar en '
-                      '${catalogo.especie(e.a).nombre} (${e.xpEvolucion} XP)'),
-                  subtitle: Text(partida.motivoSinEvolucion(e) ??
-                      'Queda con ${PartidaCampana.psAlEvolucionar} PS.'),
-                  enabled: partida.puedeEvolucionar(e),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _avisar(context, control.evolucionar(catalogo, i, e.a));
-                  },
-                ),
-              if (enCentro && partida.equipo.length > 1)
-                ListTile(
-                  key: const Key('equipo-al-pc'),
-                  leading: const Icon(Icons.computer_rounded),
-                  title: const Text('Dejar en el PC'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    control.moverPc(catalogo, deEquipo: i);
-                  },
-                ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -715,6 +649,7 @@ String nombreObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.ultraBall => 'Ultra Ball',
       ObjetoCampana.pocion => 'Poción',
       ObjetoCampana.repelente => 'Repelente',
+      ObjetoCampana.piedraEx => 'Piedra ex',
     };
 
 String descripcionObjeto(ObjetoCampana o) => switch (o) {
@@ -725,4 +660,6 @@ String descripcionObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.pocion =>
         'Cura ${parametrosCampana.psPocion} PS fuera de combate',
       ObjetoCampana.repelente => 'Evita un combate contra un Pokémon salvaje',
+      ObjetoCampana.piedraEx =>
+        'Hace ex a un Pokémon que ya no evoluciona; una por ex',
     };

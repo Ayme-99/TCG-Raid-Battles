@@ -83,6 +83,19 @@ Estado el 2026-11-23. El código está en `app/lib/campana/`. Las claves (`Key`)
 - **Registro:** el entero se abre desde la última jugada o desde el botón de la barra (`combate-ver-registro`).
 - **Tutorial** (combates de la Ruta 1 y Pikachu, `esCombateTutorial`): tu activo lleva un brillo dorado fijo y el aviso «Toca a tu Pokémon…» (`combate-tutorial`) hasta el primer toque. No es animado, para no frenar los tests.
 
+### Equipo (propuesta J, PR 3 de #373)
+
+`pantalla_equipo.dart`: `PantallaEquipo`, que se abre desde el mapa con «Ver equipo» (`campana-ver-equipo`) o tocando una ficha del equipo. Es una pantalla aparte, con fondo crema.
+
+- **Arriba:** la reserva de XP (`campana-xp`) y las Pociones (`equipo-pociones`) y las piedras ex (`campana-piedras-ex`), en una caja blanca con contorno tinta.
+- **Rejilla:** 2 columnas en móvil y 3 desde 600 px de ancho (6 huecos, `equipo-rejilla`). Cada carta (`equipo-<i>`) lleva la imagen, el nombre, la barra de vida (verde, naranja y roja, como la mesa) y los PS. La que sale primero tiene el borde dorado. Un debilitado va en gris y pone «Debilitado». Los huecos libres son cajas claras con «Hueco libre» (`equipo-hueco-<i>`).
+- **Hoja de la carta** (`hoja-equipo`): la carta pequeña con sus datos.
+  - **Usar Poción** (`equipo-pocion`): dice cuántas quedan, y se apaga sin Pociones, con el Pokémon debilitado o con todos sus PS. La hoja sigue abierta tras usarla.
+  - **Evolucionar** (`equipo-evolucionar-<id>`): con su coste en XP y el motivo si no se puede.
+  - En un debilitado, un aviso (`equipo-aviso-debilitado`) de que solo lo cura el centro.
+  - **Solo en un centro Pokémon:** Poner primero (`equipo-primero`) y Dejar en el PC (`equipo-al-pc`). Fuera de un centro, la hoja lo explica (`equipo-solo-centro`).
+- Volver al mapa: `equipo-volver`.
+
 ### Centro Pokémon (propuesta M, PR 4 de #373)
 
 `pantalla_centro.dart`. La escena del centro es la del mapa: arriba, la barra de recursos (dinero y Pokéballs); en la escena, el mostrador (`zona-curar`), la estantería (`zona-tienda`), el PC (`zona-pc`) y las salidas, que hacen de puerta; y abajo, el equipo con su vida.
@@ -96,7 +109,7 @@ Estado el 2026-11-23. El código está en `app/lib/campana/`. Las claves (`Key`)
 
 ### Pendiente
 
-- Pantalla de **equipo** (propuesta J): PR 3 de #373.
+- Las cuatro pantallas de #373 están hechas.
 - Fuente **Fredoka** y los botones SVG del kit (`boton_*`, `hoja_fondo`, `vida_*`, `tapete_combate`). Hoy la mesa reproduce sus colores con widgets; el arte del kit se puede cambiar sin tocar la lógica.
 
 ## Pendiente
@@ -104,7 +117,7 @@ Estado el 2026-11-23. El código está en `app/lib/campana/`. Las claves (`Key`)
 - Escenas: Pueblo Paleta, Ruta 1, Ciudad Verde (con su centro), Ruta 22, Ruta 2, Bosque Verde, Ruta 2 norte, Ciudad Plateada (con su centro) y gimnasio de Brock; interior del Centro Pokémon.
 - Sprites de Pokémon (se subirán cuando esté el mapa), enfermera y entrenadores.
 - Líderes de gimnasio: no existen en estilo EP; falta decidir si salen de LGPE o se representan de otra forma (D-20 §8, pregunta 24).
-- Pantalla del PC (sin wireframe todavía).
+- Wireframe propio de la pantalla del PC (hoy está hecha sin él).
 - Mayor resolución de los iconos de tipo y de la energía si se quieren más grandes de 28 px.
 
 ## Estado de las tareas de Arte (2026-11-23)
