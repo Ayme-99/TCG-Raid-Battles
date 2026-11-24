@@ -20,7 +20,7 @@ Compra en Ciudad Plateada (misma página): Poké Ball 200 y **Poción 300**, igu
 
 ## Diferencias y dudas
 
-1. **Mankey en la Ruta 22.** El catálogo lo pone con las demás especies y el modelo de ex de #451 lo cuenta en el tramo 1 («Mankey» es una de las 16 especies del cómputo). En Rojo y Azul la Ruta 22 no lo tiene y Mankey se consigue más adelante (Rutas 5 a 8 y Ruta 9 en estos juegos; no lo he contrastado hoy). Es una decisión de Diseño: o se acepta como licencia del modo campaña o se mueve a otro tramo. Si se mueve, el cómputo de ex de #451 cambia poco (una especie a otro tramo).
+1. **Mankey en la Ruta 22.** El catálogo lo pone con las demás especies y el modelo de ex de #451 lo cuenta en el tramo 1 («Mankey» es una de las 16 especies del cómputo). En Rojo y Azul la Ruta 22 no lo tiene; dónde se consigue en esos juegos no lo he contrastado hoy. Es una decisión de Diseño: o se acepta como licencia del modo campaña o se mueve a otro tramo. Si se mueve, el cómputo de ex de #451 cambia poco (una especie a otro tramo).
 2. **Cazabichos del Bosque Verde.** El catálogo tiene un solo entrenador con Weedle, Caterpie, Kakuna y Metapod y 200 de dinero; en el juego hay varios Cazabichos con 1 a 3 Pokémon cada uno y, en Amarillo, una Lass. No es un error (el modo campaña ya agrupa equipos de 2), pero sí que el «Cazabichos» del catálogo son varios entrenadores del juego.
 3. **Nidoran♀ y Nidoran♂ salen en la Ruta 22** (y en Amarillo también en la Ruta 2): ya quedan fuera del cómputo de ex porque sus evoluciones piden Piedra Lunar, que no existe en el modo.
 4. **Pociones y precios.** El precio de la Poción en la tienda de Plateada coincide con el de D-20 (300).
