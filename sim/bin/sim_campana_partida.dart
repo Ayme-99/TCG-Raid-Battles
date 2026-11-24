@@ -39,6 +39,9 @@
 //   --prioridad=inicial|bichos  en qué gasta primero la XP
 //   --rotar=si|no               tras perder, sale con otra especie (si); no:
 //                               repite siempre el mismo orden (no)
+//   --tope-turnos=N             corta el combate al pasar de N turnos (0 = no)
+//   --al-tope=derrota|mas-ps    qué pasa al llegar al tope: cuenta como derrota
+//                               o gana quien tenga más PS en pie
 //   --aliado=no                 Pikachu jefe sin su llamada de aliado
 //   --entrenador=N              Pokémon que saca cada Cazabichos (2, el del
 //                               motor; D-20 §4 lo da como suposición)
@@ -91,7 +94,17 @@ class Config {
   List<String> rival = [];
   bool aliado = true;
   bool traza = false;
+  int topeTurnos = 0; // 0 = sin tope (solo corta a las 2000 acciones)
+  String alTope = 'derrota'; // derrota | mas-ps
 }
+
+/// Turnos de cada combate terminado (para medir su duración) y combates
+/// cortados por el tope, por casilla.
+final duraciones = <int>[];
+final alTopePorNodo = <String, int>{};
+int combatesTotales = 0;
+int combatesAlTope = 0;
+int alTopeGanaJugador = 0;
 
 const iniciales = ['bulbasaur', 'charmander', 'squirtle'];
 const fase1De = {
@@ -222,8 +235,9 @@ Map<String, dynamic> fase1Aproximada(String destino, Map<String, dynamic> base) 
 // ---------------------------------------------------------------------------
 // Combate con la IA en los dos bandos
 
-EstadoCombate hastaElFinal(EstadoCombate e) {
+EstadoCombate hastaElFinal(EstadoCombate e, [int topeTurnos = 0]) {
   for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
+    if (topeTurnos > 0 && e.numeroTurno > topeTurnos) break;
     e = aplicarCombate(e, decidirAccion(e, e.actua));
   }
   return e;
@@ -464,8 +478,24 @@ class Jugador {
       semilla: _siguiente(_siguiente(q.semilla)),
       llamadaRival: cfg.aliado ? rv.llamada : null,
     );
-    var fin = hastaElFinal(inicio);
-    if (fin.fase != FaseCombate.terminado) {
+    var fin = hastaElFinal(inicio, cfg.topeTurnos);
+    combatesTotales++;
+    if (fin.fase == FaseCombate.terminado) duraciones.add(fin.numeroTurno);
+    if (fin.fase != FaseCombate.terminado && cfg.alTope == 'mas-ps') {
+      // Regla propuesta: al llegar al tope gana quien tenga más PS en pie
+      // (el rival gana los empates).
+      int ps(BandoCombate b) => b.equipo.fold(0, (a, x) => a + x.ps);
+      combatesAlTope++;
+      alTopePorNodo.update(nodo, (v) => v + 1, ifAbsent: () => 1);
+      final gj = ps(fin.jugador) > ps(fin.rival);
+      if (gj) alTopeGanaJugador++;
+      stats.putIfAbsent(nodo, Nodo.new).estancados++;
+      fin = fin.copiarCon(
+          fase: FaseCombate.terminado,
+          ganador: gj ? Bando.jugador : Bando.rival);
+    } else if (fin.fase != FaseCombate.terminado) {
+      combatesAlTope++;
+      alTopePorNodo.update(nodo, (v) => v + 1, ifAbsent: () => 1);
       // Tablas: ninguno puede hacer daño al otro (p. ej. Gruñido contra
       // Fortaleza). El motor no tiene tope de turnos; aquí cuenta como derrota
       // y se anota.
@@ -740,6 +770,20 @@ void tramo(Config cfg, CatalogoCampana c) {
       for (final e in orden.take(6)) {
         stdout.writeln('              ${pct(e.value / r.recorridos).padLeft(8)}  ${e.key}');
       }
+    }
+  }
+  if (duraciones.isNotEmpty) {
+    final d = [...duraciones]..sort();
+    int q(double f) => d[((d.length - 1) * f).round()];
+    stdout.writeln('');
+    stdout.writeln('Duración de los combates terminados (turnos): mediana '
+        '${q(0.5)} · p95 ${q(0.95)} · p99 ${q(0.99)} · máximo ${d.last}.');
+    stdout.writeln('Combates jugados: $combatesTotales · cortados por el tope '
+        '(${cfg.topeTurnos == 0 ? "sin tope: no acaban" : "${cfg.topeTurnos} turnos"}'
+        '): $combatesAlTope (${pct(combatesAlTope / combatesTotales)})'
+        '${cfg.alTope == "mas-ps" && combatesAlTope > 0 ? " · de ellos gana el jugador por PS: ${pct(alTopeGanaJugador / combatesAlTope)}" : ""}.');
+    if (alTopePorNodo.isNotEmpty) {
+      stdout.writeln('Por casilla: ${alTopePorNodo.entries.map((e) => "${e.key} ${e.value}").join(", ")}.');
     }
   }
   _escribir(cfg.informe ?? '../balance/informes/campana_partida_tramo.csv', lineas);
@@ -1088,6 +1132,10 @@ void main(List<String> args) {
         cfg.rival = v.split(',');
       case '--aliado':
         cfg.aliado = v != 'no';
+      case '--tope-turnos':
+        cfg.topeTurnos = int.parse(v);
+      case '--al-tope':
+        cfg.alTope = v;
       case '--traza':
         cfg.traza = true;
       case '--rotar':
