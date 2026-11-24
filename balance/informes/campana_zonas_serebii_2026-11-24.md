@@ -18,6 +18,10 @@ Las cinco zonas coinciden con Rojo/Azul salvo **una diferencia real**: la **Ruta
 
 Compra en Ciudad Plateada (misma página): Poké Ball 200 y **Poción 300**, igual que los precios del motor (`precios` de `ParametrosCampana`).
 
+## Decisión de Ayme (2026-11-24)
+
+**Mankey se queda en la Ruta 22** como licencia del modo campaña. El catálogo y el cómputo de ex de #451 no cambian.
+
 ## Diferencias y dudas
 
 1. **Mankey en la Ruta 22.** El catálogo lo pone con las demás especies y el modelo de ex de #451 lo cuenta en el tramo 1 («Mankey» es una de las 16 especies del cómputo). En Rojo y Azul la Ruta 22 no lo tiene; dónde se consigue en esos juegos no lo he contrastado hoy. Es una decisión de Diseño: o se acepta como licencia del modo campaña o se mueve a otro tramo. Si se mueve, el cómputo de ex de #451 cambia poco (una especie a otro tramo).
