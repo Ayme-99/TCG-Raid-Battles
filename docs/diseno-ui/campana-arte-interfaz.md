@@ -83,9 +83,20 @@ Estado el 2026-11-23. El código está en `app/lib/campana/`. Las claves (`Key`)
 - **Registro:** el entero se abre desde la última jugada o desde el botón de la barra (`combate-ver-registro`).
 - **Tutorial** (combates de la Ruta 1 y Pikachu, `esCombateTutorial`): tu activo lleva un brillo dorado fijo y el aviso «Toca a tu Pokémon…» (`combate-tutorial`) hasta el primer toque. No es animado, para no frenar los tests.
 
+### Centro Pokémon (propuesta M, PR 4 de #373)
+
+`pantalla_centro.dart`. La escena del centro es la del mapa: arriba, la barra de recursos (dinero y Pokéballs); en la escena, el mostrador (`zona-curar`), la estantería (`zona-tienda`), el PC (`zona-pc`) y las salidas, que hacen de puerta; y abajo, el equipo con su vida.
+
+- **Panel del centro** (`PanelCentro`): repite las tres acciones con botones, `campana-curar`, `centro-tienda` y `centro-pc` (con cuántos hay en el PC).
+- **Tienda** (`hoja-tienda`): una hoja con el dinero y, por objeto, su descripción, cuántos hay en la mochila y el botón de compra (`tienda-<objeto>`, `comprar-<objeto>`). Sin dinero, el botón se apaga.
+- **PC** (`pantalla-pc`), una pantalla aparte, sin wireframe propio:
+  - Arriba, el equipo (`pc-equipo-<i>`): tocar uno lo deja en el PC si queda al menos otro.
+  - Debajo, los del PC (`pc-<i>`, o `pc-vacio`): tocar uno lo saca al equipo si hay hueco. Con el equipo lleno, una hoja (`hoja-pc-cambiar`) pregunta por cuál cambiarlo (`pc-cambiar-<pc>-<equipo>`).
+  - Volver: `pc-volver`.
+
 ### Pendiente
 
-- Pantalla de **equipo** (propuesta J) y **centro Pokémon** (propuesta M) con el PC aparte: PR 3 y 4 de #373.
+- Pantalla de **equipo** (propuesta J): PR 3 de #373.
 - Fuente **Fredoka** y los botones SVG del kit (`boton_*`, `hoja_fondo`, `vida_*`, `tapete_combate`). Hoy la mesa reproduce sus colores con widgets; el arte del kit se puede cambiar sin tocar la lógica.
 
 ## Pendiente

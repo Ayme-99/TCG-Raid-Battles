@@ -56,6 +56,13 @@ Future<void> tocar(WidgetTester tester, String clave) async {
   await tester.pumpAndSettle();
 }
 
+/// Cierra la hoja de abajo que esté abierta.
+Future<void> cerrarHoja(WidgetTester tester) async {
+  final hoja = find.byType(BottomSheet);
+  Navigator.of(tester.element(hoja.last)).pop();
+  await tester.pumpAndSettle();
+}
+
 /// Juega el combate que hay en pantalla tocando la mesa (D-20 §10.7,
 /// propuesta I): toca a su activo y elige el ataque más caro que llegue, si no
 /// carga; al caer un Pokémon saca al primero de la banca que pueda.
@@ -441,7 +448,10 @@ void main() {
     final almacen = AlmacenMemoria();
     final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
     expect(find.text('1200 puntos · 500 \$ · 0 medallas'), findsOneWidget);
-    // Tienda del primer tramo: solo Pokéball y Poción (D-20 §10.6).
+    // Tienda del primer tramo: solo Pokéball y Poción (D-20 §10.6). Se abre
+    // desde la estantería o con el botón del panel (propuesta M).
+    await tocar(tester, 'centro-tienda');
+    expect(hay('hoja-tienda'), isTrue);
     expect(hay('tienda-pokeball'), isTrue);
     expect(hay('tienda-pocion'), isTrue);
     expect(hay('tienda-repelente'), isFalse);
@@ -452,15 +462,20 @@ void main() {
     await tocar(tester, 'comprar-pokeball');
     expect(c.read(campanaProvider).partida!.dinero, 0);
     expect(c.read(campanaProvider).partida!.cuantos(ObjetoCampana.pokeball), 1);
+    await cerrarHoja(tester);
     await tocar(tester, 'equipo-0');
     await tocar(tester, 'equipo-pocion');
     expect(c.read(campanaProvider).partida!.equipo.first.ps, 30);
     await tocar(tester, 'campana-curar');
     expect(c.read(campanaProvider).partida!.equipo.map((e) => e.ps), [70, 60]);
-    // PC: Rattata entra al equipo (hay hueco).
-    await tocar(tester, 'pc-sacar-0');
+    // PC, en su pantalla aparte: Rattata entra al equipo (hay hueco).
+    await tocar(tester, 'centro-pc');
+    expect(hay('pantalla-pc'), isTrue);
+    await tocar(tester, 'pc-0');
     expect(c.read(campanaProvider).partida!.equipo.length, 3);
     expect(c.read(campanaProvider).partida!.pc, isEmpty);
+    expect(hay('pc-vacio'), isTrue);
+    await tocar(tester, 'pc-volver');
     // Poner primero a Rattata.
     await tocar(tester, 'equipo-2');
     await tocar(tester, 'equipo-primero');
@@ -495,5 +510,50 @@ void main() {
     final almacen = AlmacenMemoria()..datos[claveCampana] = '{"version": 99}';
     expect(await leerCampana(almacen), isNull);
     expect(almacen.datos, isNot(contains(claveCampana)));
+  });
+
+  testWidgets(
+      'centro Pokémon: el PC es una pantalla aparte y, con el equipo '
+      'lleno, se cambia uno por otro (propuesta M)', (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ciudad-verde',
+          superados: {'pueblo-paleta'},
+          inicial: 'squirtle'),
+      equipo: [
+        PokemonGuardado('squirtle', 80),
+        PokemonGuardado('pidgey', 60),
+        PokemonGuardado('rattata', 60),
+        PokemonGuardado('caterpie', 50),
+        PokemonGuardado('weedle', 50),
+        PokemonGuardado('spearow', 60),
+      ],
+      pc: [PokemonGuardado('nidoran-f', 70)],
+    );
+    final c = await abrirCampana(tester,
+        almacen: AlmacenMemoria(),
+        guardada: guardada,
+        tamano: const Size(390, 844));
+    // La zona del PC de la escena abre la pantalla del PC.
+    await tocar(tester, 'zona-pc');
+    expect(hay('pantalla-pc'), isTrue);
+    expect(find.text('Equipo (6/6)'), findsOneWidget);
+    await tocar(tester, 'pc-0');
+    expect(hay('hoja-pc-cambiar'), isTrue);
+    await tocar(tester, 'pc-cambiar-0-3');
+    var p = c.read(campanaProvider).partida!;
+    expect(p.equipo[3].id, 'nidoran-f');
+    expect(p.pc.single.id, 'caterpie');
+    // Dejar uno del equipo en el PC.
+    await tocar(tester, 'pc-equipo-5');
+    p = c.read(campanaProvider).partida!;
+    expect(p.equipo.length, 5);
+    expect(p.pc.map((e) => e.id), ['caterpie', 'spearow']);
+    await tocar(tester, 'pc-volver');
+    expect(hay('pantalla-pc'), isFalse);
+    // La estantería abre la tienda; el mostrador cura.
+    await tocar(tester, 'zona-tienda');
+    expect(hay('hoja-tienda'), isTrue);
+    expect(tester.takeException(), isNull);
   });
 }
