@@ -1,6 +1,6 @@
 # Modo campaña: sonido (primer tramo)
 
-Estado: **propuesta del Departamento de Sonido, pendiente de que Ayme la apruebe** (2026-11-23). Cubre las issues #381 (música) y #382 (efectos) y fija qué hace falta antes del playtest #385. Es solo documentación: **no hay audio ni código en este cambio**.
+Estado: **propuesta del Departamento de Sonido, pendiente de que Ayme la apruebe** (2026-11-23; revisada el 2026-11-24 contra `master`, con el guion de playtest de #385 y las cartas nuevas de D-20). Cubre las issues #381 (música) y #382 (efectos) y fija qué hace falta antes del playtest #385. Es solo documentación: **no hay audio ni código en este cambio**.
 
 Alcance: el primer tramo, de Pueblo Paleta a Brock (D-20 §4). Los combates, la captura, el centro Pokémon, la tienda y el equipo son los de D-20; si algo no coincide con el código o el catálogo, mandan ellos.
 
@@ -32,16 +32,16 @@ Estilo visual ya fijado: colorido de videojuego y la mesa como tapete (`campana-
 
 ## 3. Música (#381)
 
-Los combates duran poco (el golpe principal quita del 40 al 50 % de los PS, D-20 §3.5), así que la música de combate **tiene que decir quién es en los primeros segundos**: intro de 2 a 4 s sin bucle y después un bucle de 45 a 75 s. Los bucles de exploración, que se oyen más rato, van de 60 a 90 s. Un bucle debe poder repetirse sin que se note el salto: el final enlaza con el principio.
+El simulador estima unos **18 combates de unos 12 turnos por recorrido** del tramo (guion de playtest, `GUION_CAMPANA_TRAMO1.md`), así que **la música de combate es la que más se oye**. Si un turno lleva de 5 a 10 s (estimación mía), un combate pasa del minuto y un bucle de 45 s se repetiría varias veces. Por eso los bucles de combate van de 60 a 90 s, con una intro de 2 a 4 s sin bucle que diga qué pieza es desde el principio, y se prefiere un segundo tema de combate salvaje antes que alargar uno solo (M-04b, P2). Los bucles de exploración van de 60 a 90 s. Un bucle debe poder repetirse sin que se note el salto: el final enlaza con el principio.
 
 | ID | Pieza y dónde suena | Duración y bucle | Ambiente | Referencias (solo para escuchar) | Origen | Prio |
 |---|---|---|---|---|---|---|
 | M-01 | **Pueblo.** Pueblo Paleta, Ciudad Verde y el gimnasio de Ciudad Plateada (mientras no hay combate) | 60–90 s, bucle | Calma de mañana, hogar, un poco de nostalgia. 80–95 BPM, tono mayor, marimba y ukelele | Tema de Pueblo Paleta (Rojo/Azul) por la calma; Animal Crossing y Stardew Valley por el tono de pueblo | O → L | P1 |
 | M-02 | **Ruta.** Ruta 1, Ruta 2, Ruta 22 y Ruta 2 norte | 60–90 s, bucle | Ir de paseo con ganas de aventura. 105–120 BPM, ritmo marcado de madera, melodía silbable | Tema de la Ruta 1 (Rojo/Azul) por la sensación de salir de casa | O → L | P1 |
 | M-03 | **Bosque Verde.** Escena del bosque y del aviso de Pikachu (conversación) | 60–75 s, bucle | Lo mismo que M-02 pero más oscuro y lento: menos melodía, más cuerda a pizzicato. 85–100 BPM | Tema del Bosque Verde (Rojo/Azul) por la tensión suave | O (variante de M-02) → reutilizar M-02 | P2 |
-| M-04 | **Combate salvaje.** Rutas y bosque; también el combate de la Ruta 1 (tutorial) | Intro 2–3 s + bucle 45–60 s | Energía alegre, sin amenaza. 140–150 BPM, ritmo sincopado, melodía corta que se queda | Tema de combate salvaje (Rojo/Azul) por la urgencia; Pokémon TCG Pocket por el tono ligero | O → L | **P0** (provisional) |
-| M-05 | **Combate de entrenador.** Cazabichos y Entrenador Joven | Intro 2–3 s + bucle 45–60 s | Más serio que M-04: hay un rival que te ha visto. 145–155 BPM, bajo más presente, metales sintéticos | Tema de combate de entrenador (Rojo/Azul) | O → L | P1 |
-| M-06 | **Jefe (Pikachu 01/20).** El resto de jefes NN/20 pueden reutilizarlo | Intro 3–4 s + bucle 60–75 s | Más grande y más peligroso, pero con humor: el jefe es un Pikachu que se come la comida de los demás. 150–160 BPM | Temas de combate contra jefes en juegos de plataformas; el tono del aviso del Cazabichos | O → L | P1 |
+| M-04 | **Combate salvaje.** Rutas y bosque; también el combate de la Ruta 1 (tutorial) | Intro 2–3 s + bucle 60–90 s | Energía alegre, sin amenaza. 140–150 BPM, ritmo sincopado, melodía corta que se queda | Tema de combate salvaje (Rojo/Azul) por la urgencia; Pokémon TCG Pocket por el tono ligero | O → L | **P0** (provisional) |
+| M-05 | **Combate de entrenador.** Cazabichos y Entrenador Joven | Intro 2–3 s + bucle 60–90 s | Más serio que M-04: hay un rival que te ha visto. 145–155 BPM, bajo más presente, metales sintéticos | Tema de combate de entrenador (Rojo/Azul) | O → L | P1 |
+| M-06 | **Jefe (Pikachu 01/20).** El resto de jefes NN/20 pueden reutilizarlo | Intro 3–4 s + bucle 60–90 s | Más grande y más peligroso, pero con humor: el jefe es un Pikachu que se come la comida de los demás. 150–160 BPM | Temas de combate contra jefes en juegos de plataformas; el tono del aviso del Cazabichos | O → L | P1 |
 | M-07 | **Líder de gimnasio (Brock).** *Propuesta mía, no estaba en la lista* | Intro 3–4 s + bucle 60–75 s | Cima del primer tramo: rotundo, con peso (los Pokémon de Brock son de tipo lucha). 135–150 BPM, percusión grave | Tema de combate de líder (Rojo/Azul) | O → **reutilizar M-05** | P2 |
 | M-08 | **Centro Pokémon**, con tienda y PC | 45–60 s, bucle | Refugio: amable, tranquilo, casi de nana. 70–85 BPM, glockenspiel y pads suaves | Tema del Centro Pokémon (Rojo/Azul); menús de tienda de juegos de granja | O → L | P1 |
 | M-09 | **Victoria de combate.** Al ganar a un salvaje o un entrenador | 4–6 s, **sin bucle** | Fanfarria corta y alegre, que corte limpia | Fanfarria de victoria de los juegos de Pokémon por la duración | O → L | **P0** |
@@ -51,7 +51,7 @@ Los combates duran poco (el golpe principal quita del 40 al 50 % de los PS, D-20
 
 **Notas por pieza**
 
-- **Combates:** una sola pieza provisional sirve para todos hasta que haya M-05 a M-07: es lo que cubre el P0.
+- **Combates:** una sola pieza provisional sirve para todos hasta que haya M-05 a M-07: es lo que cubre el P0. **M-04b** (un segundo tema salvaje, P2) es la primera ampliación si el playtest dice que cansa.
 - **Jefe con aliado (Pikachu):** el aliado entra en dos pasos, al 50 % y al 40 % (D-20 §4, Jefes). Esos momentos los marca un efecto (E-15), no un cambio de música; si luego se quiere, M-06 puede tener una segunda capa que entre con el aliado (P2).
 - **Victoria y derrota** no llevan bucle: la pantalla de resultado espera al jugador.
 - **Final del tramo:** al ganar a Brock, la app dice que el recorrido acaba por ahora (D-20 §4); M-10 y E-18 son el cierre.
@@ -72,15 +72,15 @@ La campaña usa mucho el azar (monedas de ataques y habilidades, hasta 3 monedas
 | E-08 | **Atacar.** Al usar un ataque; variantes por tipo | 0,4–0,7 s | Un silbido genérico y 7 variantes de tipo (ver abajo) | Efectos de golpe de juegos de lucha de estilo sencillo | O (sintetizado) → L | **P0** (solo el genérico), tipos P1 |
 | E-09 | **Daño recibido** | 0,3 s, 3 intensidades | Golpe normal; **débil** (×2): golpe más fuerte con un «ding» de acierto; **resistido** o **0 de daño**: golpe apagado | Impactos de juegos de combate por turnos | O (sintetizado) → L | **P0** (solo el normal), el resto P1 |
 | E-10 | **Pokémon debilitado** | 0,8–1,2 s | Descenso suave, como desinflarse | Globo que se deshincha, versión corta | O (sintetizado) → L | **P0** |
-| E-11 | **Cambiar de Pokémon** | 0,4–0,6 s | Cambio de carta: «fshh» de papel y un toque | Barajar o deslizar una carta | O (grabado) → L | P1 |
+| E-11 | **Cambiar de Pokémon**, y usar la **Cuerda Huida** (cambia sin pagar la retirada; gasta el turno, D-20 §10) | 0,4–0,6 s | Cambio de carta: «fshh» de papel y un toque | Barajar o deslizar una carta | O (grabado) → L | P1 |
 | E-12 | **Cargar** (energía +2) | 0,6–0,8 s | Subida chispeante que carga una ficha | Carga de energía de juegos arcade | O (sintetizado) → L | P1 |
-| E-13 | **Estados y efectos de ataque.** Veneno (aplicar y chequeo), bajar el daño del rival, subir el daño que recibe, quitar o ganar energía, confusión | 0,3–0,5 s cada uno | Un motivo corto por familia: veneno (gorgoteo), bajada (descendente), subida (ascendente), energía (tic de ficha), confusión (zumbido) | Pitidos de estado de juegos de rol | O (sintetizado) → L | P2 |
+| E-13 | **Estados y efectos de ataque.** Veneno (aplicar y chequeo), parálisis (Dragoaliento), drenaje (Drenadoras), bajar el daño del rival, subir el daño que recibe, quitar o ganar energía, confusión y fallo por moneda (Pantalla de Humo, Bofetón Lodo) | 0,3–0,5 s cada uno | Un motivo corto por familia: veneno (gorgoteo), parálisis (chisporroteo que se corta), drenaje (sorbo ascendente), bajada (descendente), subida (ascendente), energía (tic de ficha), confusión y fallo (zumbido) | Pitidos de estado de juegos de rol | O (sintetizado) → L | P2 |
 | E-14 | **Ficha de energía** que se gasta o se recupera | 0,1 s | Clic seco | Ficha de plástico sobre madera | O (grabado) → L | P2 |
 | E-15 | **Llamada de aliado del jefe** (50 %) y **aliado al frente** (40 %) | 1–1,5 s, 2 variantes | Pequeña fanfarria de «llega ayuda»; la del 40 %, más fuerte | Llegada de un personaje en una pelea de juego de mesa | O → L | P1 |
-| E-16 | **Evolución.** Hoy: Caterpie → Metapod y Weedle → Kakuna (D-20 §2.1) | 3–5 s | Brillo que crece, estallido y melodía corta de remate | Escenas de transformación de dibujos; no la melodía de ningún juego | O → L | P1 |
+| E-16 | **Evolución.** Caterpie → Metapod, Weedle → Kakuna y los iniciales a 0 medallas (70 XP); el guion de #385 pide probarlas. Hacerse ex y el intercambio (D-20 §2.1) podrían llevar un remate propio más adelante | 3–5 s | Brillo que crece, estallido y melodía corta de remate | Escenas de transformación de dibujos; no la melodía de ningún juego | O → L | P1 |
 | E-17 | **Curar.** Poción (fuera de combate) y mostrador del centro (todo el equipo) | Poción 0,8 s; centro 2–3 s | Destellos suaves; el del centro, con una melodía cortita y cálida. *Añadido por mí, no estaba en la lista* | Máquina de curación de un centro Pokémon (por la idea, no por la melodía) | O → L | P1 |
 | E-18 | **Subir medalla.** Al ganar a Brock: la medalla se suma a las del jugador | 2–3 s (sobre M-10) | Brillo de metal y golpe de tapete; remata la fanfarria | Medalla que cae en una mesa | O (grabado + sintetizado) → L | P1 |
-| E-19 | **Comprar.** Pagar en la tienda del centro; también **ganar dinero** al vencer a un entrenador | 0,4 s; ganar dinero 0,6 s | Campanita de caja y un tic de monedas. **Debe sonar distinto de E-01 a E-04**: aquí es «tintineo de caja», allí «metal sobre fieltro», para que no se confundan | Caja registradora suave | O → L | P1 |
+| E-19 | **Comprar.** Pagar en la tienda del centro, y más adelante el intercambio (2.000) y hacerse ex (4.000); también **ganar dinero** al vencer a un entrenador | 0,4 s; ganar dinero 0,6 s | Campanita de caja y un tic de monedas. **Debe sonar distinto de E-01 a E-04**: aquí es «tintineo de caja», allí «metal sobre fieltro», para que no se confundan | Caja registradora suave | O → L | P1 |
 | E-20 | **Error o acción no permitida.** No hay energía, no quedan Balls, falta una medalla, no hay dinero (hoy la app los muestra como aviso) | 0,25 s | Bajo suave y corto: no regaña | Pitido de «no» de menús de móvil | O (sintetizado) → L | **P0** |
 | E-21 | **Pulsar y navegar.** Tocar botones, abrir hojas, moverse entre escenas | 0,1–0,2 s | Clic de madera suave; un «paso» o un roce de hierba al ir a la hierba alta | Menús de juegos de mesa digitales | O (sintetizado) → L | P2 |
 
@@ -101,7 +101,7 @@ Los niveles:
 - **Música:** un único tema de combate provisional (M-04, sirve para todos los combates), la victoria (M-09) y la derrota (M-11).
 - **Efectos:** moneda (E-01, E-02, E-03, E-04), captura (E-05, E-06, E-07), un ataque genérico (E-08), el daño normal (E-09), debilitado (E-10) y error (E-20).
 
-Con eso el playtest ve y oye los puntos donde pasa algo que decide la partida: el azar de las monedas, el ciclo de captura con Balls que se agotan y el fin de cada combate. **Sin nada de esto el playtest también vale** para lo que persigue (fallos y balance, #385); el sonido no lo bloquea. Si no llega a tiempo, se juega en silencio y se anota.
+Con eso el playtest ve y oye los puntos donde pasa algo que decide la partida: el azar de las monedas, el ciclo de captura con Balls que se agotan y el fin de cada combate. El guion de #385 pide anotar si el juego deja claro que no hay Balls en la Ruta 1: E-20 (error) ayuda a que se note. **Sin nada de esto el playtest también vale** para lo que persigue (fallos y balance, #385), tanto la fase 0 con Ayme solo como las siguientes; el sonido no lo bloquea. Si no llega a tiempo, se juega en silencio y se anota.
 
 **Preguntas de audio para anotar en el playtest**, por si se hace con sonido:
 
@@ -118,7 +118,8 @@ Con eso el playtest ve y oye los puntos donde pasa algo que decide la partida: e
 | 1 | ¿De dónde sale la música: la compones tú, la encargas o usamos librerías libres? | Para el P0, sintetizados rápidos y grabaciones propias (la moneda real sobre un tapete es la mejor pieza posible para este juego). Para el P1, composición propia o librerías libres, lo que te resulte más cómodo. |
 | 2 | ¿Qué material propio tienes ya? ¿Se puede redistribuir? | Si no se puede, se usa en tu equipo pero no se sube (el repositorio es público). Eso necesita que Programación decida cómo cargarlo (§6). |
 | 3 | ¿Brock merece un tema propio (M-07)? | No antes de que el resto esté: se reutiliza M-05. |
-| 4 | ¿Gritos de Pokémon? | Fuera de alcance. No hay fuente propia y la regla 1 de §1 lo impide con los reales. Se puede volver a hablar si se quieren sonidos originales «tipo grito». |
+| 4 | ¿Se admite música o efectos generados con IA? | Sí, para bocetos y para piezas que se suban, con herramientas cuyos términos permitan redistribuir (Treblo, Stable Audio Open) y registrando herramienta, plan y fecha. No subir al repositorio lo hecho con el plan gratuito de Suno: la propiedad sigue siendo de Suno. Si se aprueba, se añade un código «IA» a los de origen. |
+| 5 | ¿Gritos de Pokémon? | Fuera de alcance. No hay fuente propia y la regla 1 de §1 lo impide con los reales. Se puede volver a hablar si se quieren sonidos originales «tipo grito». |
 
 ## 6. Entrega de los archivos
 
