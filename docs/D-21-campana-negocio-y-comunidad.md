@@ -182,16 +182,16 @@ Por qué importa el precio: un ex es un salto enorme de poder (Onix pasa de 110 
 
 #### Cifras que propongo, con su argumento
 
-| Precio | Equivale a | Piedras en Kanto (con ~17.500 y sin gastar en otra cosa) | Argumento a favor | Argumento en contra |
+| Precio | Equivale a | Piedras en Kanto completo (sin gastar en otra cosa → con gasto normal en Balls y Pociones) | Argumento a favor | Argumento en contra |
 |---|---|---|---|---|
-| **2.000** | Un tramo; casi el precio de una piedra de los juegos (~2.100) | Hasta unas 8 | Es coherente con las demás piedras y no castiga. Se puede comprar nada más cumplir la medalla (a la 3.ª sobran 2.700 a 4.200). | Un ex cuesta lo mismo que una evolución normal, pese a ser un salto mucho mayor. Casi cualquier equipo acaba entero en ex y el reto de la Liga (objetivo del 25 %) se vuelve fácil. |
-| **3.000** | Dos Ultra Balls y media | Unas 5 | Alcanzable a la 3.ª medalla gastando con normalidad, así que el requisito de medallas y el de dinero llegan a la vez. Obliga a elegir, pero sin sufrir. | Sigue permitiendo 4 o 5 ex por campaña; hay que vigilar el equilibrio. |
-| **4.000** (mi propuesta, la tabla anterior) | Dos tramos; unas 3,3 Ultra Balls | Unas 4 (en la práctica, 2 o 3, porque también se gasta en otras cosas) | Convierte hacer ex en una **decisión de equipo**: «a cuál le pongo la piedra». A la 3.ª medalla solo la compra quien ahorre; a la 4.ª es alcanzable. Compite de verdad con las Ultra Balls (1.200). | Si Ayme mantiene las 3 medallas para Onix, queda justo y el jugador espera una medalla más. |
-| **6.000** | Tres tramos; cinco Ultra Balls | Unas 2 o 3 | El ex es un premio raro; el equipo conserva su identidad. | Con 3 medallas hay que renunciar a casi todas las Pokéballs y Pociones, así que el requisito de medallas deja de importar: manda el dinero. La campaña se vuelve más lenta sin ganar nada. |
+| **2.000** | Un tramo; casi el precio de una piedra de los juegos (~2.100) | 8 → **3 o 4** | Es coherente con las demás piedras y no castiga. Se puede comprar nada más cumplir la medalla (a la 3.ª sobran 2.700 a 4.200). | Un ex cuesta lo mismo que una evolución normal, pese a ser un salto mucho mayor. Casi cualquier equipo acaba entero en ex y el reto de la Liga (objetivo del 25 %) se vuelve fácil. |
+| **3.000** | Dos Ultra Balls y media | 5 → **2 o 3** | Alcanzable a la 3.ª medalla gastando con normalidad, así que el requisito de medallas y el de dinero llegan a la vez. Obliga a elegir, pero sin sufrir. | Sigue permitiendo 4 o 5 ex por campaña; hay que vigilar el equilibrio. |
+| **4.000** (mi propuesta, la tabla anterior) | Dos tramos; unas 3,3 Ultra Balls | 4 → **1 o 2** (2 o 3 si los tramos finales pagan más que los primeros) | Convierte hacer ex en una **decisión de equipo**: «a cuál le pongo la piedra». A la 3.ª medalla solo la compra quien ahorre; a la 4.ª es alcanzable. Compite de verdad con las Ultra Balls (1.200). | Si Ayme mantiene las 3 medallas para Onix, queda justo y el jugador espera una medalla más. |
+| **6.000** | Tres tramos; cinco Ultra Balls | 2 → **1** | El ex es un premio raro; el equipo conserva su identidad. | Con 3 medallas hay que renunciar a casi todas las Pokéballs y Pociones, así que el requisito de medallas deja de importar: manda el dinero. La campaña se vuelve más lenta sin ganar nada. |
 
 **Mi recomendación, para que Ayme confirme: 4.000.**
 
-- Hace que **un equipo tenga uno o dos ex antes de la Liga**, que es lo que se busca para que sea una decisión.
+- Hace que **un equipo tenga uno o dos ex al acabar Kanto**, que es lo que se busca para que sea una decisión.
 - **Si Ayme da por buena la regla de 3 medallas para Onix y quiere que se pueda comprar entonces, 3.000** es la cifra correcta. Con 4 medallas, 4.000 sale solo.
 - **Descarto 2.000 y 6.000**: el primero rompe el reto, y el segundo hace irrelevante la regla de las medallas.
 
