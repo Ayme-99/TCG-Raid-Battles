@@ -42,11 +42,13 @@ Creciente: 180 a 360 (rivales más fuertes)       110     orden            0    
 opción A 4/4/5:  ex por medalla 0 0 0 6 8 11 13 16 · Fase 2 0 0 0 0 2 3 4 6
 opción B 3/4/5:  ex por medalla 0 0 2 6 8 11 13 16 · Fase 2 0 0 0 0 2 3 4 6
 opción C 3/3/4:  ex por medalla 0 0 4 6 8 11 13 16 · Fase 2 0 0 0 2 2 3 4 6
+opción D 2/3/4:  ex por medalla 0 1 4 6 8 11 13 16 · Fase 2 0 0 0 2 2 3 4 6
 
 Con la ruta de ~100 XP por tramo:
 opción A 4/4/5:  ex por medalla 0 0 0 3 7 8 9 10 · Fase 2 0 0 0 0 2 2 2 3
 opción B 3/4/5:  ex por medalla 0 0 2 3 7 8 9 10 · Fase 2 0 0 0 0 2 2 2 3
 opción C 3/3/4:  ex por medalla 0 0 2 5 7 8 9 10 · Fase 2 0 0 0 2 2 2 2 3
+opción D 2/3/4:  ex por medalla 0 1 2 5 7 8 9 10 · Fase 2 0 0 0 2 2 2 2 3
 
 == 5. Dinero: piedras compradas junto a Pokéballs y Pociones (XP como el tramo 1, xpEvo 80, opción A, barato) ==
 Pociones por tramo      ex Liga  compradas  dinero final
@@ -90,4 +92,4 @@ onix        ex en el tramo 4
 cubone      sin ex (le faltan 80 XP)
 slowpoke    sin ex (le faltan 80 XP)
 
-CSV: ../balance/informes/campana_xp_ex_2026-11-24.csv
+CSV: /tmp/ex.csv

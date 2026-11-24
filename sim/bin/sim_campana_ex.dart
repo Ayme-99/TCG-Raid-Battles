@@ -65,6 +65,7 @@ const opcionesMedallas = {
   'A': [4, 4, 5],
   'B': [3, 4, 5],
   'C': [3, 3, 4],
+  'D': [2, 3, 4], // pedido por Ayme 2026-11-24: Onix y Pikachu ex a 2 medallas
 };
 
 List<Especie> catalogo(String inicial) => [
@@ -369,7 +370,7 @@ void main(List<String> args) {
   // 4) Medallas mínimas del ex.
   stdout.writeln('');
   stdout.writeln('== 4. Ex disponibles tras cada medalla, según la opción de medallas (XP como el tramo 1, xpEvo 80, política barata) ==');
-  for (final op in ['A', 'B', 'C']) {
+  for (final op in ['A', 'B', 'C', 'D']) {
     final r = correr(Escenario(
         nombre: 'x', xpTramo: plano(xpTramo1), opcion: op, politica: 'barato'));
     stdout.writeln('opción $op ${opcionesMedallas[op]!.join("/")}:'
@@ -382,7 +383,7 @@ void main(List<String> args) {
   }
   stdout.writeln('');
   stdout.writeln('Con la ruta de ~100 XP por tramo:');
-  for (final op in ['A', 'B', 'C']) {
+  for (final op in ['A', 'B', 'C', 'D']) {
     final r = correr(Escenario(
         nombre: 'x', xpTramo: plano(100), opcion: op, politica: 'barato'));
     stdout.writeln('opción $op ${opcionesMedallas[op]!.join("/")}:'

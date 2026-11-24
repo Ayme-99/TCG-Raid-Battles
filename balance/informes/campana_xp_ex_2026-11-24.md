@@ -140,3 +140,54 @@ No hace falta ninguna si los tramos 2 a 8 se parecen al 1. Si salen unos 100 XP 
 cd sim
 dart run bin/sim_campana_ex.dart --csv=../balance/informes/campana_xp_ex_2026-11-24.csv
 ```
+
+---
+
+## Anexo (2026-11-24, petición de Ayme en #453): medallas D 2/3/4 y Pociones en combate (#435)
+
+Simulador: `sim/bin/sim_campana_partida.dart --modo=pociones` (Pociones en combate: sin gastar turno, sin límite por combate, solo inventario; se usa cuando los PS del activo bajan del 50 %). Datos crudos en `balance/informes/campana_pociones_2026-11-24/`. 800 recorridos por casilla, política B, Ruta 1 con capturas, retroceder al último centro.
+
+### A. Opción de medallas D (Onix y Pikachu ex a 2 medallas; resto 3 y 4)
+
+| Opción | ex disponibles tras cada medalla (1 a 8), ruta 180 XP/tramo | Ídem, ruta ~100 XP/tramo |
+|---|---|---|
+| A 4/4/5 | 0 0 0 6 8 11 13 16 | 0 0 0 3 7 8 9 10 |
+| B 3/4/5 | 0 0 2 6 8 11 13 16 | 0 0 2 3 7 8 9 10 |
+| C 3/3/4 | 0 0 4 6 8 11 13 16 | 0 0 2 5 7 8 9 10 |
+| **D 2/3/4** | **0 1 4 6 8 11 13 16** | 0 1 2 5 7 8 9 10 |
+
+D adelanta el primer ex a la 2.ª medalla (1 ex) y no cambia el total al llegar a la Liga (16 con 180 XP/tramo; 10 con ~100). El límite sigue siendo la XP, no la opción de medallas.
+
+### B. Brock con Pociones (Poción 20 PS, 300 de dinero)
+
+Primer intento en Brock (5 Balls, 3 Pociones máximo, 800 recorridos):
+
+| Inicial | Sin Poción | 1 Poción | 2 Pociones |
+|---|---|---|---|
+| Bulbasaur | 76,3 % | **94,7 %** | 94,7 % |
+| Charmander | 98,2 % | 98,2 % | 98,6 % |
+| Squirtle | 98,1 % | 98,1 % | 100 % |
+
+- Con 5 Balls, Brock ya estaba en 76/98/98 % sin Pociones. **Una sola Poción** sube a Bulbasaur a ~95 %: el reto de Brock deja de estar «cerca del 75 %».
+- La 2.ª Poción no aporta (Bulbasaur 94,7 → 94,7 %). Hacen falta **0 Pociones** para quedarse en el 75 % de Bulbasaur y **1** ya lo supera de sobra.
+- Las Balls pesan más que las Pociones: con 4 Balls + 2 Pociones Brock da 89/93/95 %, pero la tasa de llegar baja a ~90 % y el reto global cae (Bulbasaur gana Brock ~80 %); con 3 Balls + 3 Pociones, 72/72/—; con 2 Balls, 0 % (no se llega a Brock).
+- Con 1.000 iniciales y todo en Pociones (3), no quedan Balls y el recorrido no pasa de Pikachu: **no es trivial, es inviable**. El límite real no es la Poción a 300, es el presupuesto: antes de Brock hay ~1.660, y 5 Balls (1.000) dejan solo para 2 Pociones.
+- Las Pociones se compran en Plateada, después de Pikachu y del Entrenador Joven, así que **no ayudan en esos dos combates**, que son los muros reales (Pikachu con Squirtle 65 %).
+
+### C. Palancas (5 Balls, hasta 3 Pociones)
+
+| Palanca | Efecto en Brock (Bulbasaur, 1 Poción) |
+|---|---|
+| Cura 10 PS | 76,3 % (sin efecto; la Poción no basta) |
+| Cura 20 PS (actual) | 94,7 % |
+| Cura 30 PS | 94,7 % (Squirtle 98,1 → 100 %) |
+| Precio 300 / 400 / 500 | 1–3 Pociones: igual (la compra cabe, ~1 Poción/partida) |
+| Precio 700 | 0 Pociones compradas: la palanca se apaga |
+| Límite 1 por combate | igual que sin límite (se usa ~1 por partida) |
+
+### D. Recomendación
+
+La Poción a 300 y 20 PS **no hace trivial el reto** de Brock por dinero (el presupuesto manda), pero una sola Poción ya lo deja en ~95 % para Bulbasaur. Si Dirección quiere mantener a Brock cerca del 75 %:
+1. **Precio 500** (mantiene 1 Poción/partida alcanzable, no se puede apilar 3 con 5 Balls), o
+2. **Límite de compra: 1 Poción antes de Brock** (el límite por combate no sirve; el efecto está en cuántas se tienen).
+Quedan sin medir (no están en el motor): Pociones en la IA real y efectos de evolución (#439).
