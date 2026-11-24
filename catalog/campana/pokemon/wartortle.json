@@ -3,7 +3,7 @@
   "numero": 8,
   "nombre": "Wartortle",
   "tipo": "agua",
-  "ps": 100,
+  "ps": 110,
   "debilidad": {
     "tipo": "electrico",
     "multiplicador": 2
