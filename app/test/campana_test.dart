@@ -527,7 +527,7 @@ void main() {
         PokemonGuardado('squirtle', 30),
         PokemonGuardado('pidgey', 0),
       ],
-      mochila: {ObjetoCampana.pocion: 2},
+      mochila: {ObjetoCampana.pocion: 2, ObjetoCampana.piedraEx: 1},
     );
     // A tamaño de móvil: la rejilla es de 2 columnas.
     final c = await abrirCampana(tester,
@@ -536,6 +536,7 @@ void main() {
         tamano: const Size(390, 844));
     await tocar(tester, 'campana-ver-equipo');
     expect(find.text('Pociones: 2'), findsOneWidget);
+    expect(find.text('Piedras ex: 1'), findsOneWidget);
     expect(find.text('Debilitado'), findsOneWidget);
     expect(find.byType(ColorFiltered), findsOneWidget,
         reason: 'el caído va en gris');

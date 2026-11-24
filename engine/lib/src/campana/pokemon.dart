@@ -77,7 +77,38 @@ class ReduceDanoPropio extends EfectoAtaque {
 /// con cruz ese ataque no hace nada (la energía se gasta igual). Solo afecta a
 /// ese turno, pase lo que pase en él (Bofetón Lodo).
 class MonedaFalloRival extends EfectoAtaque {
-  const MonedaFalloRival();
+  /// Si es true, no dura un turno sino **mientras el Defensor siga activo**:
+  /// cada vez que ataque lanza la moneda; se quita al cambiarlo o cuando cae
+  /// (Pantalla de Humo de Charmeleon, D-20 §3.6, decidido el 2026-11-23).
+  final bool mientrasActivo;
+
+  const MonedaFalloRival({this.mientrasActivo = false});
+}
+
+/// Drenadoras (Ivysaur, D-20 §3.6): el Defensor queda envenenado con 10 PS por
+/// chequeo mientras siga activo, sin acumular, como [EnvenenaDefensor]; y cada
+/// chequeo en que pierde PS por ello cura [cura] PS al Pokémon activo del
+/// bando que lo usó en ese momento (no tiene por qué ser el mismo), hasta su
+/// máximo.
+class DrenaDefensor extends EfectoAtaque {
+  /// PS que quita en cada chequeo.
+  static const dano = 10;
+
+  /// PS que cura al activo del que lo usó.
+  static const cura = 10;
+
+  const DrenaDefensor();
+}
+
+/// Dragoaliento (Charmeleon, D-20 §3.6, decidido el 2026-11-23): tras el daño
+/// lanza [monedas] monedas y, con al menos [minimoCaras] caras, el Defensor
+/// queda **Paralizado**: en su próximo turno no puede atacar ni cambiar de
+/// Pokémon (solo cargar). Se quita al acabar ese turno y no se acumula.
+class ParalizaDefensor extends EfectoAtaque {
+  final int monedas;
+  final int minimoCaras;
+
+  const ParalizaDefensor(this.monedas, this.minimoCaras);
 }
 
 /// Lanza [monedas] monedas al usar el ataque: si **todas** salen cara, el
@@ -160,15 +191,25 @@ enum ViaEvolucion {
   /// Gastando XP de la reserva común de la partida (D-20 §10.6).
   xp,
 
-  /// Con un objeto de evolución (una piedra…).
+  /// Con un objeto de evolución (una piedra…). Hacerse ex es un objeto más,
+  /// la piedra ex ([idPiedraEx], D-20 §2.1 y §10.11).
   objeto,
 
-  /// Por intercambio: cuesta puntos por usar la máquina de intercambio.
+  /// Por intercambio: es gratis (decidido el 2026-11-24, D-20 §10.9).
   intercambio,
-
-  /// Gastando puntos, para hacerse ex un Pokémon que no evoluciona.
-  puntos,
 }
+
+/// Id del objeto de evolución «piedra ex» (D-20 §2.1, decidido el
+/// 2026-11-24): `"via": "objeto", "objeto": "piedra-ex"`. Convierte la última
+/// fase normal en su carta ex; una piedra, un ex, sin XP.
+const idPiedraEx = 'piedra-ex';
+
+/// Medallas mínimas de cada carta ex según la fase del Pokémon que se hace
+/// ex (Básico, Fase 1, Fase 2): **2 / 3 / 4**, fijadas por Ayme el 2026-11-24
+/// (#447; Onix ex, a 2). Una evolución con piedra ex que no lleve
+/// `medallasMinimas` en el JSON toma la de esta tabla; si la lleva, vale la
+/// mayor de las dos. Para cambiarlas basta con tocar esta lista.
+const medallasMinimasEx = [2, 3, 4];
 
 /// Una evolución posible de un Pokémon. La carta evolucionada sustituye a la
 /// anterior.
@@ -181,12 +222,9 @@ class EvolucionCampana {
   /// `xpEvolucion`.
   final int? xpEvolucion;
 
-  /// Id del objeto (con [ViaEvolucion.objeto]).
+  /// Id del objeto (con [ViaEvolucion.objeto]); [idPiedraEx] para hacerse
+  /// ex.
   final String? objeto;
-
-  /// Puntos que cuesta (con [ViaEvolucion.intercambio] o
-  /// [ViaEvolucion.puntos]).
-  final int? puntos;
 
   /// Medallas que hacen falta para que se ofrezca (D-20 §10.6 y §10.11): sin
   /// ellas no se evoluciona aunque haya XP. Null si está por decidir (no
@@ -198,9 +236,18 @@ class EvolucionCampana {
     required this.via,
     this.xpEvolucion,
     this.objeto,
-    this.puntos,
     this.medallasMinimas,
   });
+
+  /// Si es hacerse ex con la piedra ex.
+  bool get esPiedraEx => via == ViaEvolucion.objeto && objeto == idPiedraEx;
+
+  EvolucionCampana conMedallasMinimas(int? medallas) => EvolucionCampana(
+      a: a,
+      via: via,
+      xpEvolucion: xpEvolucion,
+      objeto: objeto,
+      medallasMinimas: medallas);
 }
 
 /// Categoría de captura de un Pokémon (D-20 §10.6). Fija la probabilidad de

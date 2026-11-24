@@ -113,6 +113,12 @@ class _ContenidoEquipo extends ConsumerWidget {
                   style: const TextStyle(
                       color: ColoresCampana.tinta,
                       fontWeight: FontWeight.w700)),
+              // Contador de la mochila (D-20 §10.6, #447).
+              Text('Piedras ex: ${p.cuantos(ObjetoCampana.piedraEx)}',
+                  key: const Key('campana-piedras-ex'),
+                  style: const TextStyle(
+                      color: ColoresCampana.tinta,
+                      fontWeight: FontWeight.w700)),
             ],
           ),
         ),
@@ -413,14 +419,19 @@ class _HojaPokemon extends ConsumerWidget {
               enabled: pociones > 0 && !caido && !lleno,
               onTap: () => hacer(() => control.usarPocion(c, i)),
             ),
-            // Evolucionar (D-20 §10.6): gasta XP de la reserva y deja al
-            // Pokémon con 10 PS, también si estaba debilitado.
-            for (final e in p.evolucionesPorXp(c, i))
+            // Evolucionar (D-20 §10.6): gasta XP de la reserva (o una piedra
+            // ex para hacerse ex, §2.1, #447) y deja al Pokémon con 10 PS,
+            // también si estaba debilitado.
+            for (final e in p.evolucionesDe(c, i))
               ListTile(
                 key: Key('equipo-evolucionar-${e.a}'),
                 leading: const Icon(Icons.auto_awesome_rounded),
-                title: Text('Evolucionar en '
-                    '${c.especie(e.a).nombre} (${e.xpEvolucion} XP)'),
+                title: Text(e.esPiedraEx
+                    ? 'Hacerse ex (1 piedra): ${c.especie(e.a).nombre}'
+                    : e.via == ViaEvolucion.xp
+                        ? 'Evolucionar en '
+                            '${c.especie(e.a).nombre} (${e.xpEvolucion} XP)'
+                        : 'Evolucionar en ${c.especie(e.a).nombre}'),
                 subtitle: Text(p.motivoSinEvolucion(e) ??
                     'Queda con ${PartidaCampana.psAlEvolucionar} PS.'),
                 enabled: p.puedeEvolucionar(e),

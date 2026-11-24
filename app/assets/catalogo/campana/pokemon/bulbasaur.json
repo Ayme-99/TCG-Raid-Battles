@@ -27,5 +27,13 @@
       "coste": 2,
       "dano": 20
     }
+  ],
+  "evoluciones": [
+    {
+      "a": "ivysaur",
+      "via": "xp",
+      "xpEvolucion": 70,
+      "medallasMinimas": 0
+    }
   ]
 }

@@ -333,6 +333,9 @@ class _PanelNodo extends ConsumerWidget {
           Text('Al llegar a la mitad de sus PS, el jefe llama a un aliado.',
               style: tema.textTheme.bodySmall),
         if (r.dinero > 0) Text('Dinero: ${r.dinero} \$'),
+        if (r.piedrasEx > 0)
+          Text('Con la medalla: ${r.piedrasEx} '
+              '${r.piedrasEx == 1 ? 'Piedra ex' : 'Piedras ex'}'),
         Text(
             'Si pierdes, vuelves a ${c.region.nodo(p.ultimaCura ?? c.region.inicio).nombre}.',
             style: tema.textTheme.bodySmall),
@@ -720,6 +723,7 @@ String nombreObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.ultraBall => 'Ultra Ball',
       ObjetoCampana.pocion => 'Poción',
       ObjetoCampana.repelente => 'Repelente',
+      ObjetoCampana.piedraEx => 'Piedra ex',
     };
 
 String descripcionObjeto(ObjetoCampana o) => switch (o) {
@@ -730,4 +734,6 @@ String descripcionObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.pocion =>
         'Cura ${parametrosCampana.psPocion} PS fuera de combate',
       ObjetoCampana.repelente => 'Evita un combate contra un Pokémon salvaje',
+      ObjetoCampana.piedraEx =>
+        'Hace ex a un Pokémon que ya no evoluciona; una por ex',
     };

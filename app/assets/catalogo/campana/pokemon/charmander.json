@@ -27,5 +27,13 @@
       "coste": 2,
       "dano": 30
     }
+  ],
+  "evoluciones": [
+    {
+      "a": "charmeleon",
+      "via": "xp",
+      "xpEvolucion": 70,
+      "medallasMinimas": 0
+    }
   ]
 }

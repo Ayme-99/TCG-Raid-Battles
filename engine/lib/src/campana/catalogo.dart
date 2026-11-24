@@ -55,12 +55,12 @@ EvolucionCampana _evolucionDesdeJson(Map<String, dynamic> json) {
           objeto: _campo<String>(json, 'objeto'),
           medallasMinimas: medallas);
     case ViaEvolucion.intercambio:
-    case ViaEvolucion.puntos:
-      return EvolucionCampana(
-          a: a,
-          via: via,
-          puntos: _campo<int>(json, 'puntos'),
-          medallasMinimas: medallas);
+      // Gratis desde el 2026-11-24 (D-20 §10.9): ya no lleva `puntos`.
+      if (json.containsKey('puntos')) {
+        throw const FormatException(
+            'El intercambio es gratis: quita "puntos" (D-20 §10.9).');
+      }
+      return EvolucionCampana(a: a, via: via, medallasMinimas: medallas);
   }
 }
 
@@ -90,7 +90,18 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
     case 'danoPorRacha':
       return const DanoPorRacha();
     case 'monedaFalloRival':
-      return const MonedaFalloRival();
+      return MonedaFalloRival(
+          mientrasActivo: (json['mientrasActivo'] as bool?) ?? false);
+    case 'drenaDefensor':
+      return const DrenaDefensor();
+    case 'paralizaDefensor':
+      final monedas = _campo<int>(json, 'monedas');
+      final minimo = _campo<int>(json, 'minimoCaras');
+      if (monedas < 1 || minimo < 1 || minimo > monedas) {
+        throw const FormatException(
+            '"minimoCaras" tiene que estar entre 1 y "monedas".');
+      }
+      return ParalizaDefensor(monedas, minimo);
     case 'confundeDefensor':
       final monedas = (json['monedas'] as int?) ?? 1;
       if (monedas < 1) {
@@ -117,6 +128,13 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
   final debilidad = json['debilidad'];
   final resistencia = json['resistencia'];
   final ataques = _campo<List<dynamic>>(json, 'ataques');
+  final ex = (json['ex'] as bool?) ?? false;
+  final evoluciones = (json['evoluciones'] as List<dynamic>?) ?? const [];
+  // La piedra ex es el último paso de la línea (D-20 §10.11, punto 4).
+  if (ex && evoluciones.isNotEmpty) {
+    throw FormatException(
+        '${json['id']}: una carta ex no lleva "evoluciones" (D-20 §10.11).');
+  }
   return PokemonCampana(
     id: _campo<String>(json, 'id'),
     nombre: _campo<String>(json, 'nombre'),
@@ -136,12 +154,12 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
         : null,
     retirada: (json['retirada'] as int?) ?? 0,
     habilidad: _habilidadDesdeJson(json['habilidad']),
-    ex: (json['ex'] as bool?) ?? false,
+    ex: ex,
     categoriaCaptura: json['categoriaCaptura'] == null
         ? null
         : categoriaCapturaDeTexto(_campo<String>(json, 'categoriaCaptura')),
     evoluciones: [
-      for (final e in (json['evoluciones'] as List<dynamic>?) ?? const [])
+      for (final e in evoluciones)
         _evolucionDesdeJson(e as Map<String, dynamic>),
     ],
     ataques: [

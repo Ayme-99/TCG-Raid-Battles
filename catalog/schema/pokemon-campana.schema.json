@@ -11,6 +11,23 @@
     "ps",
     "ataques"
   ],
+  "if": {
+    "required": [
+      "ex"
+    ],
+    "properties": {
+      "ex": {
+        "const": true
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "evoluciones": {
+        "maxItems": 0
+      }
+    }
+  },
   "properties": {
     "id": {
       "type": "string",
@@ -126,15 +143,27 @@
                   "confundeDefensor",
                   "danoPorRacha",
                   "monedasDano",
-                  "repiteDanoAlDerribar"
+                  "repiteDanoAlDerribar",
+                  "drenaDefensor",
+                  "paralizaDefensor"
                 ],
-                "description": "reduceDanoRival: mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (Gruñido). aumentaDanoRecibido: mientras siga activo, recibe `valor` más de daño de los ataques (Látigo). Ambos, antes de debilidad y resistencia, sin acumular. quitaEnergiaRival: el rival pierde `valor` de energía (si le queda) al usar el ataque, una sola vez. ganaEnergia: el propio bando suma `valor` de energía a su reserva al usar el ataque (después de pagar el coste, con tope en el máximo de 10), una sola vez y sin dejar estado (Pulimento). monedaDanoExtra: lanza una moneda; si sale cara el ataque hace `valor` más de daño (el `dano` de la carta es el de cruz). envenenaDefensor: el activo rival pierde `valor` PS en cada chequeo Pokémon (cada cambio de turno) mientras siga activo, sin acumular. reduceDanoPropio: mientras el propio Pokémon siga activo, recibe `valor` menos de daño de los ataques, antes de debilidad y resistencia, sin acumular. monedaFalloRival (sin `valor`): en su próximo turno, si el rival ataca lanza una moneda y con cruz ese ataque no hace nada, con la energía gastada. confundeDefensor (sin `valor`, con `monedas`, 1 por defecto): lanza `monedas` monedas al usar el ataque; si todas salen Cara el activo rival queda Confundido, que es el mismo estado que monedaFalloRival (en su próximo turno, si ataca, lanza una moneda y con cruz ese ataque no hace nada); si alguna sale cruz no pasa nada; no se acumula (Supersónico con 1, Hidropulso con 2). danoPorRacha (sin `valor`): el `dano` se multiplica por las veces seguidas que este Pokémon ha usado el ataque, contando la actual. monedasDano: lanza `monedas` monedas y hace `danoPorCaras[n]` con n caras; el `dano` del ataque es el daño esperado, solo para la IA. repiteDanoAlDerribar (sin `valor`): si el ataque derriba al activo rival, el nuevo activo recibe de nuevo ese ataque al salir, una sola vez (D-20 §3.6)."
+                "description": "reduceDanoRival: mientras el activo rival siga activo, sus ataques hacen `valor` menos de daño (Gruñido). aumentaDanoRecibido: mientras siga activo, recibe `valor` más de daño de los ataques (Látigo). Ambos, antes de debilidad y resistencia, sin acumular. quitaEnergiaRival: el rival pierde `valor` de energía (si le queda) al usar el ataque, una sola vez. ganaEnergia: el propio bando suma `valor` de energía a su reserva al usar el ataque (después de pagar el coste, con tope en el máximo de 10), una sola vez y sin dejar estado (Pulimento). monedaDanoExtra: lanza una moneda; si sale cara el ataque hace `valor` más de daño (el `dano` de la carta es el de cruz). envenenaDefensor: el activo rival pierde `valor` PS en cada chequeo Pokémon (cada cambio de turno) mientras siga activo, sin acumular. reduceDanoPropio: mientras el propio Pokémon siga activo, recibe `valor` menos de daño de los ataques, antes de debilidad y resistencia, sin acumular. monedaFalloRival (sin `valor`): en su próximo turno, si el rival ataca lanza una moneda y con cruz ese ataque no hace nada, con la energía gastada. confundeDefensor (sin `valor`, con `monedas`, 1 por defecto): lanza `monedas` monedas al usar el ataque; si todas salen Cara el activo rival queda Confundido, que es el mismo estado que monedaFalloRival (en su próximo turno, si ataca, lanza una moneda y con cruz ese ataque no hace nada); si alguna sale cruz no pasa nada; no se acumula (Supersónico con 1, Hidropulso con 2). danoPorRacha (sin `valor`): el `dano` se multiplica por las veces seguidas que este Pokémon ha usado el ataque, contando la actual. monedasDano: lanza `monedas` monedas y hace `danoPorCaras[n]` con n caras; el `dano` del ataque es el daño esperado, solo para la IA. repiteDanoAlDerribar (sin `valor`): si el ataque derriba al activo rival, el nuevo activo recibe de nuevo ese ataque al salir, una sola vez. monedaFalloRival con `mientrasActivo: true` (Pantalla de Humo): el estado no dura un turno sino mientras el activo rival siga activo (se quita al cambiarlo o cuando cae). drenaDefensor (sin `valor`, Drenadoras): como envenenaDefensor de 10 (sin acumular) y, cada chequeo en que quita PS, cura 10 PS al Pokémon activo de quien lo usó, hasta su máximo. paralizaDefensor (con `monedas` y `minimoCaras`, Dragoaliento): lanza `monedas` monedas tras el daño; con al menos `minimoCaras` caras el activo rival queda Paralizado: en su próximo turno no puede atacar ni cambiar de Pokémon (solo cargar); se quita al acabar ese turno y no se acumula (D-20 §3.6)."
               },
               "monedas": {
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 6,
-                "description": "monedasDano: cuántas monedas se lanzan. confundeDefensor: cuántas monedas se lanzan (1 por defecto); confunde si todas salen Cara."
+                "description": "monedasDano: cuántas monedas se lanzan. confundeDefensor: cuántas monedas se lanzan (1 por defecto); confunde si todas salen Cara. paralizaDefensor: cuántas monedas se lanzan."
+              },
+              "minimoCaras": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "paralizaDefensor: caras que hacen falta para paralizar (2 de 3 en Dragoaliento)."
+              },
+              "mientrasActivo": {
+                "type": "boolean",
+                "default": false,
+                "description": "monedaFalloRival: si es true dura mientras el activo rival siga activo, no solo su próximo turno (Pantalla de Humo)."
               },
               "danoPorCaras": {
                 "type": "array",
@@ -233,7 +262,7 @@
     "ex": {
       "type": "boolean",
       "default": false,
-      "description": "Carta ex: la última fase de cada Pokémon (D-20 §2.1)."
+      "description": "Carta ex (D-20 §2.1): se llega con la piedra ex desde la última fase normal. Una carta ex no lleva evoluciones (§10.11)."
     },
     "evoluciones": {
       "type": "array",
@@ -255,9 +284,9 @@
             "enum": [
               "xp",
               "objeto",
-              "intercambio",
-              "puntos"
-            ]
+              "intercambio"
+            ],
+            "description": "xp: gasta XP de la reserva. objeto: gasta un objeto (piedra-ex para hacerse ex). intercambio: gratis (D-20 §10.9)."
           },
           "xpEvolucion": {
             "type": "integer",
@@ -266,17 +295,13 @@
             "description": "XP que gasta de la reserva común de la partida al evolucionar (D-20 §10.6): 50 para Caterpie y Weedle, 70 para un inicial."
           },
           "objeto": {
-            "type": "string"
+            "type": "string",
+            "description": "Id del objeto de evolución: piedra-ex para hacerse ex (D-20 §2.1), piedra-trueno…"
           },
           "medallasMinimas": {
             "type": "integer",
             "minimum": 0,
             "description": "Medallas que hacen falta para que se ofrezca la evolución (D-20 §10.6; tabla en §10.11). Sin ellas no se evoluciona aunque haya XP. Sin este campo, por decidir: no limita."
-          },
-          "puntos": {
-            "type": "integer",
-            "minimum": 10,
-            "multipleOf": 10
           }
         },
         "allOf": [
@@ -305,23 +330,6 @@
             "then": {
               "required": [
                 "objeto"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "via": {
-                  "enum": [
-                    "intercambio",
-                    "puntos"
-                  ]
-                }
-              }
-            },
-            "then": {
-              "required": [
-                "puntos"
               ]
             }
           }
