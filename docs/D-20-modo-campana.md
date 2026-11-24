@@ -495,8 +495,8 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 17 | **Intercambio gratis y piedra ex** (#447): quitar `puntos` del intercambio; `via: "objeto"`, `objeto: "piedra-ex"` para hacerse ex (2.000 en la tienda desde la 2.ª medalla, premio de una por medalla en cada gimnasio, contador en la mochila); la carta ex se declara en `evoluciones` de la última fase normal (de la base en Pikachu y Eevee) y **una carta ex no lleva `evoluciones`** (test); al hacerse ex el Pokémon queda con 10 PS (§10.6). Detalle en §10.11 | Pendiente |
 | 18 | **Medir la XP y el número de ex** (Calidad): cuántos ex se alcanzan al llegar a la Liga por la ruta principal, con y sin repetir salvajes (§10.6, 2026-11-24). Repetirla con **Pociones en combate** y con las medallas de los ex 2/3/4 (§10.11) | Pendiente |
 | 19 | **Repetir Brock (#409)** con Pociones en combate (Calidad): cuántas hacen falta para seguir cerca del 75 %; si el reto queda trivial, proponer un límite o un precio | Pendiente |
-| 20 | **Usar Poción en combate sin gastar turno** (Programación): motor, IA y pantalla de combate. Empieza cuando Calidad haya medido (tarea 19) | Pendiente |
-| 21 | **Quitar `metal`** del enum de tipos, del esquema y de la app, y borrar el icono `sprites_ajenos/iconos_tipo/metal.png` (§10.9, #408) | Pendiente |
+| 20 | **Usar Poción en combate sin gastar turno** (Programación, #458): motor, IA y pantalla de combate. Empieza cuando Calidad haya medido (tarea 19) | Pendiente |
+| 21 | **Quitar `metal`** del enum de tipos, del esquema y de la app, y borrar el icono `sprites_ajenos/iconos_tipo/metal.png` (§10.9, #408; #459) | Pendiente |
 
 ## 10. Registro de decisiones
 
