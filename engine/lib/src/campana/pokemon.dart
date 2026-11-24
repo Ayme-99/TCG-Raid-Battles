@@ -174,11 +174,11 @@ enum ViaEvolucion {
 const idPiedraEx = 'piedra-ex';
 
 /// Medallas mínimas de cada carta ex según la fase del Pokémon que se hace
-/// ex (Básico, Fase 1, Fase 2): propuesta A de D-20 §10.11 (4 / 4 / 5), **por
-/// confirmar por Ayme**. Una evolución con piedra ex que no lleve
+/// ex (Básico, Fase 1, Fase 2): **2 / 3 / 4**, fijadas por Ayme el 2026-11-24
+/// (#447; Onix ex, a 2). Una evolución con piedra ex que no lleve
 /// `medallasMinimas` en el JSON toma la de esta tabla; si la lleva, vale la
 /// mayor de las dos. Para cambiarlas basta con tocar esta lista.
-const medallasMinimasEx = [4, 4, 5];
+const medallasMinimasEx = [2, 3, 4];
 
 /// Una evolución posible de un Pokémon. La carta evolucionada sustituye a la
 /// anterior.

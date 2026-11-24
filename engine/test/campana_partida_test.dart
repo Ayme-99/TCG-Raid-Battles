@@ -1314,13 +1314,13 @@ void main() {
           mochila: {if (piedras > 0) ObjetoCampana.piedraEx: piedras},
         );
 
-    test('la piedra ex cuesta 2.000 y se vende desde la 4.ª medalla', () {
+    test('la piedra ex cuesta 2.000 y se vende desde la 2.ª medalla', () {
       const par = ParametrosCampana();
       expect(par.precios[ObjetoCampana.piedraEx], 2000);
-      expect(par.medallasParaComprar[ObjetoCampana.piedraEx], 4);
-      expect(con(const [], medallas: 3).tienda(c),
+      expect(par.medallasParaComprar[ObjetoCampana.piedraEx], 2);
+      expect(con(const [], medallas: 1).tienda(c),
           isNot(contains(ObjetoCampana.piedraEx)));
-      final p = con(const [], medallas: 4, dinero: 4500);
+      final p = con(const [], medallas: 2, dinero: 4500);
       expect(p.tienda(c), contains(ObjetoCampana.piedraEx));
       final q = p.comprar(c, ObjetoCampana.piedraEx, cantidad: 2);
       expect(q.cuantos(ObjetoCampana.piedraEx), 2, reason: 'se apila');
@@ -1337,9 +1337,9 @@ void main() {
       }
     });
 
-    test('las medallas de cada ex salen de la tabla 4 / 4 / 5 por fase', () {
+    test('las medallas de cada ex salen de la tabla 2 / 3 / 4 por fase', () {
       final c2 = conEx();
-      expect(medallasMinimasEx, [4, 4, 5]);
+      expect(medallasMinimasEx, [2, 3, 4]);
       expect(c2.fase('onix'), 0);
       expect(c2.fase('caterpie'), 0);
       expect(c2.fase('metapod'), 1);
@@ -1347,8 +1347,17 @@ void main() {
         PokemonGuardado('onix', 90),
         PokemonGuardado('metapod', 70),
       ]);
-      expect(p.evolucionesDe(c2, 0).single.medallasMinimas, 4);
-      expect(p.evolucionesDe(c2, 1).single.medallasMinimas, 4);
+      expect(p.evolucionesDe(c2, 0).single.medallasMinimas, 2,
+          reason: 'Onix ex (Básico ex), 2');
+      expect(p.evolucionesDe(c2, 1).single.medallasMinimas, 3,
+          reason: 'Fase 1 ex, 3');
+      expect(
+          c2.medallasParaEx(
+              'ivysaur-de-mentira',
+              const EvolucionCampana(
+                  a: 'x', via: ViaEvolucion.objeto, objeto: idPiedraEx)),
+          2,
+          reason: 'sin línea en el catálogo cuenta como Básico');
       // La ficha puede pedir más, pero no menos que la tabla.
       expect(
           con(const [PokemonGuardado('onix', 90)])
@@ -1361,13 +1370,13 @@ void main() {
               .evolucionesDe(conEx(medallasOnix: 1), 0)
               .single
               .medallasMinimas,
-          4);
+          2);
     });
 
     test('hacerse ex gasta una piedra, nada de XP, y deja 10 PS', () {
       final c2 = conEx();
       final p = con(const [PokemonGuardado('onix', 90)],
-              medallas: 4, piedras: 2, xp: 30)
+              medallas: 2, piedras: 2, xp: 30)
           .evolucionar(c2, 0, 'onix-ex');
       expect(p.equipo.single.id, 'onix-ex');
       expect(p.equipo.single.ps, PartidaCampana.psAlEvolucionar);
@@ -1378,15 +1387,15 @@ void main() {
 
     test('sin piedra o sin medallas no se hace ex, con su motivo', () {
       final c2 = conEx();
-      final sinPiedra = con(const [PokemonGuardado('onix', 90)], medallas: 4);
+      final sinPiedra = con(const [PokemonGuardado('onix', 90)], medallas: 2);
       final e = sinPiedra.evolucionesDe(c2, 0).single;
       expect(sinPiedra.motivoSinEvolucion(e), 'No tienes ninguna piedra ex.');
       expect(() => sinPiedra.evolucionar(c2, 0, 'onix-ex'),
           throwsA(isA<ReglaIncumplida>()));
       final pocas =
-          con(const [PokemonGuardado('onix', 90)], medallas: 3, piedras: 1);
+          con(const [PokemonGuardado('onix', 90)], medallas: 1, piedras: 1);
       expect(pocas.motivoSinEvolucion(pocas.evolucionesDe(c2, 0).single),
-          'Requiere 4 medallas.');
+          'Requiere 2 medallas.');
       expect(sinPiedra.evolucionesPorXp(c2, 0), isEmpty,
           reason: 'la piedra ex no es una evolución por XP');
     });

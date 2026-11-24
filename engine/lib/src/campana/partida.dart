@@ -68,8 +68,8 @@ class ParametrosCampana {
     this.medallasParaComprar = const {
       ObjetoCampana.superBall: 1,
       ObjetoCampana.ultraBall: 5,
-      // Propuesta (D-20 §10.11, tabla A): la medalla del ex más barato.
-      ObjetoCampana.piedraEx: 4,
+      // Desde la medalla del ex más barato (Básico ex, 2; Ayme, 2026-11-24).
+      ObjetoCampana.piedraEx: 2,
     },
     this.psPocion = 20,
     this.piedrasExPorMedalla = 1,
