@@ -119,7 +119,7 @@ Con la ruta de ~100 XP por tramo, XP extra por tramo (solo en los tramos 5 a 8) 
 
 ## Palancas, de menos a más coste para Ayme
 
-Solo hace falta ninguna si los tramos 2 a 8 se parecen al 1. Si salen unos 100 XP por tramo:
+No hace falta ninguna si los tramos 2 a 8 se parecen al 1. Si salen unos 100 XP por tramo:
 
 1. **Repetir salvajes.** Sin coste de datos: con `xpEvo` 80 bastan de 8 a 36 combates en toda la campaña.
 2. **`xpEvolucion` de las fases siguientes en 80 en lugar de 110.** Solo datos, al crear cada carta. Es la palanca que más pesa (de 7 a 10 ex con 100 XP por tramo). Con 110 y 100 XP por tramo, repetir salvajes pasa a ser de 24 a 72 combates y no basta con confiar en ello.
