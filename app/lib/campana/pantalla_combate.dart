@@ -78,6 +78,10 @@ class _PantallaCombateCampanaState
       setState(() => _tocado = true);
       if (eligiendo) {
         actuar(ElegirSiguiente(Bando.jugador, i));
+      } else if (combate.jugador.paralizado) {
+        // Dragoaliento: este turno no se puede cambiar (D-20 §3.6).
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(
+            content: Text('Está paralizado: este turno no puede cambiar.')));
       } else {
         _confirmarCambio(context, combate, i, actuar);
       }
@@ -204,13 +208,21 @@ void _hojaAcciones(BuildContext context, EstadoCombate combate,
             Text('${especie.nombre} · energía ${yo.energia}',
                 style: const TextStyle(
                     color: _tinta, fontSize: 18, fontWeight: FontWeight.w700)),
+            if (yo.paralizado)
+              const Padding(
+                key: Key('aviso-paralizado'),
+                padding: EdgeInsets.only(top: 4),
+                child: Text('Paralizado: este turno solo puede cargar.',
+                    style: TextStyle(color: _tinta)),
+              ),
             const SizedBox(height: 12),
             for (var i = 0; i < especie.ataques.length; i++) ...[
               _BotonAccion(
                 clave: 'ataque-$i',
                 color: colorTipo(especie.ataques[i].tipo),
                 texto: textoAtaque(especie.ataques[i]),
-                activo: yo.energia >= especie.ataques[i].coste,
+                activo:
+                    !yo.paralizado && yo.energia >= especie.ataques[i].coste,
                 alTocar: () {
                   Navigator.of(hoja).pop();
                   actuar(Atacar(Bando.jugador, i));
@@ -285,11 +297,12 @@ void _hojaRegistro(BuildContext context, List<String> lineas) {
 
 /// Los estados del bando que se ven en la mesa («pega −10», envenenado…).
 List<String> estadosDeBando(BandoCombate b) => [
-      if (b.veneno > 0) 'envenenado',
+      if (b.veneno > 0) b.drenado ? 'drenado' : 'envenenado',
+      if (b.paralizado) 'paralizado',
       if (b.danoReducido > 0) 'pega −${b.danoReducido}',
       if (b.danoExtra > 0) 'recibe +${b.danoExtra}',
       if (b.proteccion > 0) 'recibe −${b.proteccion}',
-      if (b.cegado) 'puede fallar',
+      if (b.cegado || b.cegadoMientrasActivo) 'puede fallar',
       if (b.racha > 1) 'racha ×${b.racha}',
     ];
 

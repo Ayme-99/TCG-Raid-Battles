@@ -1,0 +1,30 @@
+{
+  "id": "ivysaur",
+  "numero": 2,
+  "nombre": "Ivysaur",
+  "tipo": "planta",
+  "ps": 110,
+  "debilidad": {
+    "tipo": "fuego",
+    "multiplicador": 2
+  },
+  "retirada": 1,
+  "ataques": [
+    {
+      "nombre": "Drenadoras",
+      "tipo": "planta",
+      "coste": 2,
+      "dano": 0,
+      "efecto": {
+        "tipo": "drenaDefensor",
+        "texto": "Mientras el Pokémon Defensor siga en el Puesto Activo. Durante el Chequeo Pokémon pon 1 contador de daño sobre él. Si lo haces, tu Pokémon Activo se cura 10 puntos de vida."
+      }
+    },
+    {
+      "nombre": "Hoja Afilada",
+      "tipo": "planta",
+      "coste": 3,
+      "dano": 50
+    }
+  ]
+}

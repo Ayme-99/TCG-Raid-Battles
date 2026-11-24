@@ -77,7 +77,38 @@ class ReduceDanoPropio extends EfectoAtaque {
 /// con cruz ese ataque no hace nada (la energía se gasta igual). Solo afecta a
 /// ese turno, pase lo que pase en él (Bofetón Lodo).
 class MonedaFalloRival extends EfectoAtaque {
-  const MonedaFalloRival();
+  /// Si es true, no dura un turno sino **mientras el Defensor siga activo**:
+  /// cada vez que ataque lanza la moneda; se quita al cambiarlo o cuando cae
+  /// (Pantalla de Humo de Charmeleon, D-20 §3.6, decidido el 2026-11-23).
+  final bool mientrasActivo;
+
+  const MonedaFalloRival({this.mientrasActivo = false});
+}
+
+/// Drenadoras (Ivysaur, D-20 §3.6): el Defensor queda envenenado con 10 PS por
+/// chequeo mientras siga activo, sin acumular, como [EnvenenaDefensor]; y cada
+/// chequeo en que pierde PS por ello cura [cura] PS al Pokémon activo del
+/// bando que lo usó en ese momento (no tiene por qué ser el mismo), hasta su
+/// máximo.
+class DrenaDefensor extends EfectoAtaque {
+  /// PS que quita en cada chequeo.
+  static const dano = 10;
+
+  /// PS que cura al activo del que lo usó.
+  static const cura = 10;
+
+  const DrenaDefensor();
+}
+
+/// Dragoaliento (Charmeleon, D-20 §3.6, decidido el 2026-11-23): tras el daño
+/// lanza [monedas] monedas y, con al menos [minimoCaras] caras, el Defensor
+/// queda **Paralizado**: en su próximo turno no puede atacar ni cambiar de
+/// Pokémon (solo cargar). Se quita al acabar ese turno y no se acumula.
+class ParalizaDefensor extends EfectoAtaque {
+  final int monedas;
+  final int minimoCaras;
+
+  const ParalizaDefensor(this.monedas, this.minimoCaras);
 }
 
 /// Lanza [monedas] monedas al usar el ataque: si **todas** salen cara, el

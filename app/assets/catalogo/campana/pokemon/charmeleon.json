@@ -1,0 +1,37 @@
+{
+  "id": "charmeleon",
+  "numero": 5,
+  "nombre": "Charmeleon",
+  "tipo": "fuego",
+  "ps": 100,
+  "debilidad": {
+    "tipo": "agua",
+    "multiplicador": 2
+  },
+  "retirada": 1,
+  "ataques": [
+    {
+      "nombre": "Pantalla de Humo",
+      "tipo": "fuego",
+      "coste": 2,
+      "dano": 0,
+      "efecto": {
+        "tipo": "monedaFalloRival",
+        "mientrasActivo": true,
+        "texto": "Mientras el Pokémon Defensor siga en el Puesto Activo. Cada vez que use un Ataque, lanza una moneda. Si sale Cruz el Ataque no se lleva a cabo."
+      }
+    },
+    {
+      "nombre": "Dragoaliento",
+      "tipo": "fuego",
+      "coste": 3,
+      "dano": 50,
+      "efecto": {
+        "tipo": "paralizaDefensor",
+        "monedas": 3,
+        "minimoCaras": 2,
+        "texto": "Lanza 3 monedas. Si sale Cara en al menos 2 de ellas, el Pokémon Defensor pasa a estar Paralizado."
+      }
+    }
+  ]
+}

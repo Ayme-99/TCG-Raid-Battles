@@ -1,0 +1,36 @@
+{
+  "id": "wartortle",
+  "numero": 8,
+  "nombre": "Wartortle",
+  "tipo": "agua",
+  "ps": 100,
+  "debilidad": {
+    "tipo": "electrico",
+    "multiplicador": 2
+  },
+  "retirada": 1,
+  "ataques": [
+    {
+      "nombre": "Refugio",
+      "tipo": "agua",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "reduceDanoPropio",
+        "valor": 10,
+        "texto": "Mientras este Pokémon siga activo, recibe 10 puntos menos de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula."
+      }
+    },
+    {
+      "nombre": "Hidropulso",
+      "tipo": "agua",
+      "coste": 3,
+      "dano": 40,
+      "efecto": {
+        "tipo": "confundeDefensor",
+        "monedas": 2,
+        "texto": "Lanza 2 monedas. Si en ambas sale Cara, el Pokémon Defensor pasa a estar Confundido."
+      }
+    }
+  ]
+}
