@@ -6,6 +6,7 @@ import 'catalogo_campana.dart';
 import 'controlador_campana.dart';
 import 'escena_mapa.dart';
 import 'pantalla_combate.dart';
+import 'pantalla_equipo.dart';
 import 'widgets_campana.dart';
 
 /// Modo campaña (D-20): el mapa del primer tramo de Kanto, con el nodo actual,
@@ -656,41 +657,38 @@ class _Descanso extends ConsumerWidget {
   }
 }
 
-/// El equipo: el primero sale a combatir. Tocar uno lo pone primero y, en un
-/// centro Pokémon, también se puede dejar en el PC.
-class _Equipo extends ConsumerWidget {
+/// Resumen del equipo en el mapa: sus fichas y el botón que abre la pantalla
+/// de equipo (propuesta J, D-20 §10.7), donde se usan Pociones, se evoluciona
+/// y, en un centro Pokémon, se ordena y se deja en el PC.
+class _Equipo extends StatelessWidget {
   const _Equipo({required this.catalogo, required this.partida});
 
   final CatalogoCampana catalogo;
   final PartidaCampana partida;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final c = catalogo;
     final p = partida;
     if (p.equipo.isEmpty) return const SizedBox.shrink();
-    final control = ref.read(campanaProvider.notifier);
-    final enCentro = p.nodoActual(c).tipo == TipoNodo.descanso;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Tu equipo (${p.equipo.length}/${parametrosCampana.tamanoEquipo})',
-            style: Theme.of(context).textTheme.titleMedium),
-        Text('Reserva de XP: ${p.xp}',
-            key: const Key('campana-xp'),
-            style: Theme.of(context).textTheme.bodyMedium),
-        Text(
-            'El primero sale a combatir. Toca uno para ponerlo primero, '
-            'darle una Poción o evolucionarlo con la XP de la reserva. '
-            'Mochila: '
-            '${p.cuantos(ObjetoCampana.pokeball)} Pokéballs, '
-            '${p.cuantos(ObjetoCampana.pocion)} Pociones, '
-            '${p.cuantos(ObjetoCampana.repelente)} Repelentes.',
-            style: Theme.of(context).textTheme.bodySmall),
-        // Contador de la mochila (D-20 §10.6, propuesta del 2026-11-24).
-        Text('Piedras ex: ${p.cuantos(ObjetoCampana.piedraEx)}',
-            key: const Key('campana-piedras-ex'),
-            style: Theme.of(context).textTheme.bodySmall),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                  'Tu equipo (${p.equipo.length}/${parametrosCampana.tamanoEquipo})',
+                  style: Theme.of(context).textTheme.titleMedium),
+            ),
+            FilledButton.tonalIcon(
+              key: const Key('campana-ver-equipo'),
+              icon: const Icon(Icons.style_rounded),
+              label: const Text('Ver equipo'),
+              onPressed: () => abrirEquipo(context, c),
+            ),
+          ],
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -698,92 +696,16 @@ class _Equipo extends ConsumerWidget {
           children: [
             for (var i = 0; i < p.equipo.length; i++)
               FichaPokemon(
-                key: Key('equipo-$i'),
+                key: Key('mapa-equipo-$i'),
                 especie: c.especie(p.equipo[i].id),
                 ps: p.equipo[i].ps,
                 destacada: i == 0,
                 detalle: i == 0 ? 'sale primero' : null,
-                onTap: () => _opciones(context, control, i, enCentro),
+                onTap: () => abrirEquipo(context, c),
               ),
           ],
         ),
       ],
-    );
-  }
-
-  void _opciones(
-      BuildContext context, ControladorCampana control, int i, bool enCentro) {
-    final especie = catalogo.especie(partida.equipo[i].id);
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(especie.nombre,
-                  style: Theme.of(context).textTheme.titleLarge),
-              Text(resumenCarta(especie)),
-              for (final a in especie.ataques) Text(textoAtaque(a)),
-              const SizedBox(height: 12),
-              if (i != 0)
-                ListTile(
-                  key: const Key('equipo-primero'),
-                  leading: const Icon(Icons.vertical_align_top_rounded),
-                  title: const Text('Poner primero'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    control.ponerPrimero(i);
-                  },
-                ),
-              if (partida.cuantos(ObjetoCampana.pocion) > 0)
-                ListTile(
-                  key: const Key('equipo-pocion'),
-                  leading: const Icon(Icons.local_drink_rounded),
-                  title:
-                      Text('Usar Poción (+${parametrosCampana.psPocion} PS)'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _avisar(context, control.usarPocion(catalogo, i));
-                  },
-                ),
-              // Evolucionar (D-20 §10.6): gasta XP de la reserva (o una piedra
-              // ex para hacerse ex, §2.1) y deja al Pokémon con 10 PS, también
-              // si estaba debilitado.
-              for (final e in partida.evolucionesDe(catalogo, i))
-                ListTile(
-                  key: Key('equipo-evolucionar-${e.a}'),
-                  leading: const Icon(Icons.auto_awesome_rounded),
-                  title: Text(e.esPiedraEx
-                      ? 'Hacerse ex (1 piedra): ${catalogo.especie(e.a).nombre}'
-                      : e.via == ViaEvolucion.xp
-                          ? 'Evolucionar en '
-                              '${catalogo.especie(e.a).nombre} (${e.xpEvolucion} XP)'
-                          : 'Evolucionar en ${catalogo.especie(e.a).nombre}'),
-                  subtitle: Text(partida.motivoSinEvolucion(e) ??
-                      'Queda con ${PartidaCampana.psAlEvolucionar} PS.'),
-                  enabled: partida.puedeEvolucionar(e),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _avisar(context, control.evolucionar(catalogo, i, e.a));
-                  },
-                ),
-              if (enCentro && partida.equipo.length > 1)
-                ListTile(
-                  key: const Key('equipo-al-pc'),
-                  leading: const Icon(Icons.computer_rounded),
-                  title: const Text('Dejar en el PC'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    control.moverPc(catalogo, deEquipo: i);
-                  },
-                ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

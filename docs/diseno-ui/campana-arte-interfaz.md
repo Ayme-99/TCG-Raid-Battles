@@ -83,9 +83,22 @@ Estado el 2026-11-23. El código está en `app/lib/campana/`. Las claves (`Key`)
 - **Registro:** el entero se abre desde la última jugada o desde el botón de la barra (`combate-ver-registro`).
 - **Tutorial** (combates de la Ruta 1 y Pikachu, `esCombateTutorial`): tu activo lleva un brillo dorado fijo y el aviso «Toca a tu Pokémon…» (`combate-tutorial`) hasta el primer toque. No es animado, para no frenar los tests.
 
+### Equipo (propuesta J, PR 3 de #373)
+
+`pantalla_equipo.dart`: `PantallaEquipo`, que se abre desde el mapa con «Ver equipo» (`campana-ver-equipo`) o tocando una ficha del equipo. Es una pantalla aparte, con fondo crema.
+
+- **Arriba:** la reserva de XP (`campana-xp`) y las Pociones (`equipo-pociones`), en una caja blanca con contorno tinta.
+- **Rejilla:** 2 columnas en móvil y 3 desde 600 px de ancho (6 huecos, `equipo-rejilla`). Cada carta (`equipo-<i>`) lleva la imagen, el nombre, la barra de vida (verde, naranja y roja, como la mesa) y los PS. La que sale primero tiene el borde dorado. Un debilitado va en gris y pone «Debilitado». Los huecos libres son cajas claras con «Hueco libre» (`equipo-hueco-<i>`).
+- **Hoja de la carta** (`hoja-equipo`): la carta pequeña con sus datos.
+  - **Usar Poción** (`equipo-pocion`): dice cuántas quedan, y se apaga sin Pociones, con el Pokémon debilitado o con todos sus PS. La hoja sigue abierta tras usarla.
+  - **Evolucionar** (`equipo-evolucionar-<id>`): con su coste en XP y el motivo si no se puede.
+  - En un debilitado, un aviso (`equipo-aviso-debilitado`) de que solo lo cura el centro.
+  - **Solo en un centro Pokémon:** Poner primero (`equipo-primero`) y Dejar en el PC (`equipo-al-pc`). Fuera de un centro, la hoja lo explica (`equipo-solo-centro`).
+- Volver al mapa: `equipo-volver`.
+
 ### Pendiente
 
-- Pantalla de **equipo** (propuesta J) y **centro Pokémon** (propuesta M) con el PC aparte: PR 3 y 4 de #373.
+- Pantalla de **centro Pokémon** (propuesta M) con el PC aparte: PR 4 de #373.
 - Fuente **Fredoka** y los botones SVG del kit (`boton_*`, `hoja_fondo`, `vida_*`, `tapete_combate`). Hoy la mesa reproduce sus colores con widgets; el arte del kit se puede cambiar sin tocar la lógica.
 
 ## Pendiente
