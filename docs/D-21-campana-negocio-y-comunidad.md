@@ -16,7 +16,7 @@ Cómo leerlo:
 | 2 | Los puntos se gastan (D-20) pero D-10 dice que no se gastan | Dos contadores: **puntos ganados** (total histórico, para desbloquear jefes) y **saldo** (lo gastable). | §1.2 |
 | 3 | Catálogo de la tienda al lanzar | Solo **monedas y dados** (cosmética). Sobres y cartas sueltas esperan a que existan cartas del formato digital. Las campañas y los jefes **no** se venden. | §2.2 |
 | 4 | Precios | Moneda de serie 800, temática 2.000; dados de serie 1.500, temáticos 3.000; sobre 1.000; carta suelta 200 / 400 / 800 / 2.000 según rareza. | §2.3 |
-| 5 | **Decidido el 2026-11-24:** los puntos no se usan en la campaña, el intercambio es **gratis** y hacerse ex es un objeto, la **piedra ex**. ¿Cuánto cuesta la piedra? | **4.000 de dinero** (propuesta, con tres alternativas razonadas: 2.000, 3.000 y 6.000). | §2.5 |
+| 5 | **Decidido el 2026-11-24:** los puntos no se usan en la campaña, el intercambio es **gratis**, hacerse ex es la **piedra ex** a **2.000 de dinero**, el dinero por tramo sube (+300 por tramo) y hay 3 piedras de premio. El objetivo es un equipo de 6 ex y más en el PC. | Pendiente: cuántos ex en el PC, qué medallas dan piedra y la lista de excepciones (Pikachu, Eevee). | §2.5 |
 | 6 | Qué es «Mis cartas» | **Decidido:** las cartas de campaña solo valen en campaña; la tienda traerá cartas para las partidas rápidas digitales. Dos colecciones, y los jefes de campaña van en «Enemigos». | §3.1 |
 | 7 | Qué se registra al capturar | **Decidido:** por ahora solo la carta. Cuenta aunque el Pokémon acabe en el PC y aunque luego evolucione. | §3.3 |
 | 8 | Relación con las cartas físicas | Misma imagen y misma numeración, sin escaneo ni canje; reglas de reimpresión y de uso privado. El código de canje queda como idea futura. | §3.5 |
@@ -157,49 +157,58 @@ Todas las cifras son **ajustables sin tocar la tienda**: viven en un catálogo d
 **Decidido por Ayme:**
 
 - **Los puntos no tienen utilidad dentro de la campaña** (2026-11-23). La tienda de puntos vive solo en el menú de la app.
-- **El intercambio es gratis** (2026-11-24). Kadabra, Haunter, Machoke y Graveler evolucionan sin pagar nada.
-- **Hacerse ex es un objeto, la «piedra ex»** (2026-11-24). Ejemplo de Ayme: Venusaur + piedra ex = Venusaur ex. El **precio lo fijo yo**, y Ayme lo confirma.
+- **El intercambio es gratis** (2026-11-24).
+- **Hacerse ex es un objeto, la «piedra ex»** (2026-11-24). Ejemplo: Venusaur + piedra ex = Venusaur ex. La carta ex aplica **cuando el Pokémon ya no puede evolucionar más**. Excepciones por fandom: **Pikachu y Eevee** también pueden ser ex. Las cartas las crea Ayme a mano, así que no es un cuello de botella.
+- **Objetivo de diseño: terminar la campaña con un equipo de 6 ex** y, además, más ex en el PC para tener un equipo polivalente. Al final los rivales serán cada vez más fuertes, así que las cartas de **más de 200 PS** son el objetivo.
+- **Precio de la piedra ex: 2.000 de dinero** (propuesta de Negocio aceptada por Ayme el 2026-11-24).
+- Ayme acepta también las dos medidas siguientes: el dinero por tramo sube hacia el final, y algunas piedras se dan de premio.
 
-Esto sustituye a mi primera propuesta (intercambio 2.000 y hacerse ex 4.000 en dinero): el intercambio **ya no tiene precio** y hacerse ex pasa a ser un objeto con precio.
+Esto sustituye a mi primera propuesta (intercambio 2.000 y hacerse ex 4.000) y a la recomendación de 4.000, que servía para un equipo con 1 o 2 ex y no para este objetivo.
 
-Queda abierto, y es de Diseño, si la piedra vale solo para un Pokémon sin evolución (Onix) o también para pasar de la última fase normal a su ex (Venusaur). El precio de abajo vale para los dos casos: **una piedra, un ex**.
+**Qué falta, y es de Diseño:** la lista exacta de excepciones como Pikachu y Eevee (y cómo conviven con Raichu, que sería una carta ex por evolución) y si Pokémon de 3 fases como Venusaur necesitan la piedra para pasar a ex (lo que dice el ejemplo de Ayme). El cálculo de abajo supone que **sí**.
 
-#### Referencias para poner el precio
+#### Por qué 2.000 con este objetivo
 
-| Dato | Valor | Origen |
-|---|---|---|
-| Dinero ganado hasta la 1.ª medalla | unos **2.060** (más 1.000 de salida) | D-20 §10.6 |
-| Lo que paga un tramo, extrapolado | ~**2.060** por medalla (**suposición mía**: el dinero de los tramos siguientes no está fijado) | — |
-| Ultra Ball | **1.200** (se vende con 5 medallas) | D-20 §10.6 |
-| Super Ball / Poción / Repelente | 600 / 300 / 350 | D-20 §10.6 |
-| Piedra de evolución en los juegos | unos 2.100 (por contrastar) | D-20 §10.11 |
-| Onix ex: medallas mínimas | **3** según Ayme; el PR #448 de Diseño dice 4 (conviene aclararlo) | D-20 §10.11 |
-| Onix ex: PS | 240 (frente a 110 de Onix) | D-20 §3.5 |
+Un equipo de 6 ex más unos 4 ex en el PC (el 4 es una **suposición mía**, falta que Ayme diga cuántos) son **unas 10 piedras**. A 2.000, son 20.000 de dinero en piedras, más el gasto en Pokéballs y Pociones (supongo 1.000 a 1.500 por tramo, 8.000 a 12.000 en total, sin medir). Hace falta una campaña de **28.000 a 32.000** de dinero. Con ~2.060 por tramo (D-20 §10.6) salen solo unos 17.500, y de ahí solo unas 3 o 4 piedras.
 
-**Cuánto dinero hay cuando se puede comprar.** Con la suposición de ~2.060 por tramo, el dinero **acumulado** (con los 1.000 de salida) es de unos **3.060 a la 1.ª medalla, 5.120 a la 2.ª, 7.180 a la 3.ª y 9.240 a la 4.ª**. De eso hay que restar lo que se gasta en Pokéballs y Pociones: supongo 1.000 a 1.500 por tramo (sin medir). Entonces, sobran unos **2.700 a 4.200 a la 3.ª medalla** y unos **3.200 a 5.200 a la 4.ª**. Y en **Kanto completo** (8 tramos) el dinero total ronda los **17.500** (suposición lineal; en los juegos los tramos finales pagan más).
+Referencias: Ultra Ball 1.200 (con 5 medallas), piedra de evolución de los juegos ~2.100, Onix ex 240 PS frente a 110. A 3.000 o 4.000 el objetivo exigiría ×2,3 a ×3 el dinero actual por tramo, así que **2.000** es el precio que permite el objetivo.
 
-Por qué importa el precio: un ex es un salto enorme de poder (Onix pasa de 110 a 240 PS) y la piedra es **un objeto por Pokémon**. Si es barata, todo el equipo acaba siendo ex y desaparece el reto; si es cara, nadie la compra y el objeto sobra.
+#### Cómo se llega: dinero creciente y piedras de premio
 
-#### Cifras que propongo, con su argumento
+Las dos medidas actúan a la vez.
 
-| Precio | Equivale a | Piedras en Kanto completo (sin gastar en otra cosa → con gasto normal en Balls y Pociones) | Argumento a favor | Argumento en contra |
-|---|---|---|---|---|
-| **2.000** | Un tramo; casi el precio de una piedra de los juegos (~2.100) | 8 → **3 o 4** | Es coherente con las demás piedras y no castiga. Se puede comprar nada más cumplir la medalla (a la 3.ª sobran 2.700 a 4.200). | Un ex cuesta lo mismo que una evolución normal, pese a ser un salto mucho mayor. Casi cualquier equipo acaba entero en ex y el reto de la Liga (objetivo del 25 %) se vuelve fácil. |
-| **3.000** | Dos Ultra Balls y media | 5 → **2 o 3** | Alcanzable a la 3.ª medalla gastando con normalidad, así que el requisito de medallas y el de dinero llegan a la vez. Obliga a elegir, pero sin sufrir. | Sigue permitiendo 4 o 5 ex por campaña; hay que vigilar el equilibrio. |
-| **4.000** (mi propuesta, la tabla anterior) | Dos tramos; unas 3,3 Ultra Balls | 4 → **1 o 2** (2 o 3 si los tramos finales pagan más que los primeros) | Convierte hacer ex en una **decisión de equipo**: «a cuál le pongo la piedra». A la 3.ª medalla solo la compra quien ahorre; a la 4.ª es alcanzable. Compite de verdad con las Ultra Balls (1.200). | Si Ayme mantiene las 3 medallas para Onix, queda justo y el jugador espera una medalla más. |
-| **6.000** | Tres tramos; cinco Ultra Balls | 2 → **1** | El ex es un premio raro; el equipo conserva su identidad. | Con 3 medallas hay que renunciar a casi todas las Pokéballs y Pociones, así que el requisito de medallas deja de importar: manda el dinero. La campaña se vuelve más lenta sin ganar nada. |
+**1. El dinero por tramo sube hacia el final** (Diseño fija la cifra de cada clase y de cada líder en el catálogo). Propongo **+300 por tramo**:
 
-**Mi recomendación, para que Ayme confirme: 4.000.**
+| Tramo | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|---|
+| Dinero ganado | 2.060 | 2.360 | 2.660 | 2.960 | 3.260 | 3.560 | 3.860 | 4.160 |
 
-- Hace que **un equipo tenga uno o dos ex al acabar Kanto**, que es lo que se busca para que sea una decisión.
-- **Si Ayme da por buena la regla de 3 medallas para Onix y quiere que se pueda comprar entonces, 3.000** es la cifra correcta. Con 4 medallas, 4.000 sale solo.
-- **Descarto 2.000 y 6.000**: el primero rompe el reto, y el segundo hace irrelevante la regla de las medallas.
+Suman **24.880** más 1.000 de salida. El tramo 1 es el que ya está en el catálogo. Es una guía, no una decisión: los tramos intermedios dependen de los entrenadores que Diseño ponga en cada uno.
 
-**Dónde se vende** (propuesta): en la tienda del centro Pokémon, como la Super Ball y la Ultra Ball: aparece cuando se tienen las **medallas mínimas** del primer Pokémon que puede usarla. Así no se ve un objeto que no se puede usar.
+**2. Tres piedras de premio** (gratis), por ejemplo con las medallas **4, 6 y 8**: una a mitad de campaña y otra al final, para que el equipo completo se note como un hito. Cada una ahorra 2.000.
 
-**Antes de cerrar:** Calidad mide con el simulador cuánto dinero lleva un jugador al llegar a su primera piedra y a su segunda (hoy no hay cartas ex en el catálogo, así que no es urgente), y Diseño decide el alcance de la piedra (arriba). Todo el cálculo de arriba depende de la suposición de ~2.060 por tramo y de mi estimación de gasto, **sin medir**.
+**La cuenta cuadra:**
 
-**Qué implica para el trabajo de otros** (sin tocarlo aquí): el campo `puntos` del catálogo y del motor deja de tener sentido (el intercambio es gratis y hacerse ex es un objeto); lo recoge la tarea 17 (#447) de D-20.
+| Concepto | Valor |
+|---|---|
+| Piedras de premio | 3 |
+| Piedras compradas | 7 (14.000) |
+| Total de ex posibles | **10 (6 en el equipo y 4 en el PC)** |
+| Gasto en Balls y Pociones | 8.000 a 12.000 |
+| Dinero necesario | 22.000 a 26.000 |
+| Dinero con la curva | 25.880 |
+
+**El ritmo no se rompe.** A la 3.ª medalla, que es la mínima de Onix ex según Ayme, el dinero acumulado es de ~8.080. Restando 3.000 a 4.500 de consumibles, quedan de 3.600 a 5.100, es decir, **1 o 2 piedras**. Los ex siguen llegando poco a poco, y las medallas mínimas de cada Pokémon marcan el ritmo.
+
+**Dónde se vende:** en la tienda del centro Pokémon, como la Super Ball y la Ultra Ball: aparece cuando se tienen las medallas mínimas del primer Pokémon que puede usarla. **Una piedra, un ex.**
+
+#### Qué se espera medir (Calidad)
+
+- Cuánto dinero lleva un jugador al llegar a cada piedra, con la curva propuesta. Todo parte de la suposición de ~2.060 por tramo y de mi estimación de gasto, **sin medir**.
+- Con 6 ex de más de 200 PS como punto de partida, la **Liga** (objetivo del 25 %, D-20 §10.7) se calibra con ese poder, no con el de un equipo normal.
+- Si con 10 ex posibles el equipo sale **demasiado fuerte**, el palanca es el dinero por tramo y el número de piedras de premio, no el precio.
+
+**Qué implica para el trabajo de otros** (sin tocarlo aquí): el campo `puntos` del catálogo y del motor deja de tener sentido (el intercambio es gratis y hacerse ex es un objeto); lo recoge la tarea 17 (#447) de D-20. El objeto necesita su precio (2.000) y su medalla mínima.
 
 ## 3. #388 · Pokédex «Mis cartas»
 
@@ -389,7 +398,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 | Documento | Cambio |
 |---|---|
 | D-20 §5 y §8 (4, 5) | Cerrar «qué se vende» y «dinero frente a puntos» con §1.1 y §2 |
-| D-20 §2.1, §5 y §10.6 | Los puntos **no** se usan en la campaña (decidido). Intercambio **gratis** y hacerse ex con la **piedra ex** (decidido el 2026-11-24, ya recogido en el PR #448 de Diseño). Falta el precio de la piedra (§2.5, propuesta) |
+| D-20 §2.1, §5 y §10.6 | Los puntos **no** se usan en la campaña (decidido). Intercambio **gratis** y hacerse ex con la **piedra ex** (decidido el 2026-11-24, ya recogido en el PR #448 de Diseño). Precio de la piedra: 2.000 (aceptado). Dinero por tramo creciente y 3 piedras de premio (§2.5) |
 | D-20 §8 (13) | Nidoran♂ ya es 032/150: la pregunta se da por resuelta |
 | D-20 §6 y `flujo-app.md` §2 | La sesión es obligatoria en el modo campaña (la regla general «nunca obligatoria» deja de valer ahí) |
 | D-20 §10 | Nuevas filas del registro con las decisiones 1 a 9 |
@@ -404,7 +413,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 - «Mis cartas» necesita un registro por carta (§3.3), con clave en el dispositivo y sincronización al iniciar sesión.
 - El servidor acepta lo que reporta el cliente con tope por hito (D-20 §6); los topes son los valores de §2.1.
 
-**Para Diseño y Calidad:** simulación de cuánto dinero lleva un jugador al llegar a su primera piedra ex y a su segunda (§2.5); decidir los duplicados de sobre (§2.4); el momento exacto de cada texto de §4.5.
+**Para Diseño y Calidad:** la curva de dinero por tramo, las medallas que dan piedra de premio y el alcance de la piedra (Pikachu, Eevee, Venusaur), y la simulación del dinero al llegar a cada piedra (§2.5); decidir los duplicados de sobre (§2.4); el momento exacto de cada texto de §4.5.
 
 **Para Arte:** diseños de moneda y de dados (la clásica y la estándar ya existen); el estado «gris» de «Mis cartas» (el criterio visual de Enemigos ya existe); la pantalla de la tienda.
 
