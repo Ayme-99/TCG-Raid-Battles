@@ -11,6 +11,23 @@
     "ps",
     "ataques"
   ],
+  "if": {
+    "required": [
+      "ex"
+    ],
+    "properties": {
+      "ex": {
+        "const": true
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "evoluciones": {
+        "maxItems": 0
+      }
+    }
+  },
   "properties": {
     "id": {
       "type": "string",
@@ -233,7 +250,7 @@
     "ex": {
       "type": "boolean",
       "default": false,
-      "description": "Carta ex: la última fase de cada Pokémon (D-20 §2.1)."
+      "description": "Carta ex (D-20 §2.1): se llega con la piedra ex desde la última fase normal. Una carta ex no lleva evoluciones (§10.11)."
     },
     "evoluciones": {
       "type": "array",
@@ -255,9 +272,9 @@
             "enum": [
               "xp",
               "objeto",
-              "intercambio",
-              "puntos"
-            ]
+              "intercambio"
+            ],
+            "description": "xp: gasta XP de la reserva. objeto: gasta un objeto (piedra-ex para hacerse ex). intercambio: gratis (D-20 §10.9)."
           },
           "xpEvolucion": {
             "type": "integer",
@@ -266,17 +283,13 @@
             "description": "XP que gasta de la reserva común de la partida al evolucionar (D-20 §10.6): 50 para Caterpie y Weedle, 70 para un inicial."
           },
           "objeto": {
-            "type": "string"
+            "type": "string",
+            "description": "Id del objeto de evolución: piedra-ex para hacerse ex (D-20 §2.1), piedra-trueno…"
           },
           "medallasMinimas": {
             "type": "integer",
             "minimum": 0,
             "description": "Medallas que hacen falta para que se ofrezca la evolución (D-20 §10.6; tabla en §10.11). Sin ellas no se evoluciona aunque haya XP. Sin este campo, por decidir: no limita."
-          },
-          "puntos": {
-            "type": "integer",
-            "minimum": 10,
-            "multipleOf": 10
           }
         },
         "allOf": [
@@ -305,23 +318,6 @@
             "then": {
               "required": [
                 "objeto"
-              ]
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "via": {
-                  "enum": [
-                    "intercambio",
-                    "puntos"
-                  ]
-                }
-              }
-            },
-            "then": {
-              "required": [
-                "puntos"
               ]
             }
           }

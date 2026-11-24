@@ -392,6 +392,7 @@ void main() {
         ObjetoCampana.ultraBall: 1200,
         ObjetoCampana.pocion: 300,
         ObjetoCampana.repelente: 350,
+        ObjetoCampana.piedraEx: 2000,
       });
     });
 
@@ -1259,5 +1260,181 @@ void main() {
         PartidaCampana.nueva(c.region).elegirInicial(c, 'squirtle'),
         'gimnasio-brock');
     expect(p.hayCombate(c), isTrue);
+  });
+
+  group('piedra ex e intercambio gratis (D-20 §2.1 y §10.11, #447)', () {
+    // Aún no hay cartas ex impresas: se prueban con cartas de mentira.
+    // Onix (Básico) → onix-ex y Metapod (Fase 1) → metapod-ex.
+    Map<String, dynamic> cartaEx(String id) => {
+          ...leer(File(
+              '../catalog/campana/pokemon/${id.replaceAll('-ex', '')}.json')),
+          'id': id,
+          'nombre': '${id.replaceAll('-ex', '')} ex',
+          'ps': 200,
+          'ex': true,
+        }..remove('evoluciones');
+
+    CatalogoCampana conEx({int? medallasOnix}) {
+      final onix = leer(File('../catalog/campana/pokemon/onix.json'));
+      onix['evoluciones'] = [
+        {
+          'a': 'onix-ex',
+          'via': 'objeto',
+          'objeto': 'piedra-ex',
+          if (medallasOnix != null) 'medallasMinimas': medallasOnix,
+        },
+      ];
+      final metapod = leer(File('../catalog/campana/pokemon/metapod.json'));
+      metapod['evoluciones'] = [
+        {'a': 'metapod-ex', 'via': 'objeto', 'objeto': 'piedra-ex'},
+      ];
+      return CatalogoCampana(
+        pokemon: {
+          ...c.pokemon,
+          'onix': pokemonCampanaDesdeJson(onix),
+          'metapod': pokemonCampanaDesdeJson(metapod),
+          'onix-ex': pokemonCampanaDesdeJson(cartaEx('onix-ex')),
+          'metapod-ex': pokemonCampanaDesdeJson(cartaEx('metapod-ex')),
+        },
+        zonas: c.zonas,
+        jefes: c.jefes,
+        region: c.region,
+      );
+    }
+
+    PartidaCampana con(List<PokemonGuardado> equipo,
+            {int medallas = 0, int piedras = 0, int xp = 0, int dinero = 0}) =>
+        PartidaCampana(
+          progreso: ProgresoRuta(
+              nodoActual: 'centro-plateada',
+              medallas: {for (var i = 0; i < medallas; i++) 'm$i'}),
+          equipo: equipo,
+          xp: xp,
+          dinero: dinero,
+          mochila: {if (piedras > 0) ObjetoCampana.piedraEx: piedras},
+        );
+
+    test('la piedra ex cuesta 2.000 y se vende desde la 4.ª medalla', () {
+      const par = ParametrosCampana();
+      expect(par.precios[ObjetoCampana.piedraEx], 2000);
+      expect(par.medallasParaComprar[ObjetoCampana.piedraEx], 4);
+      expect(con(const [], medallas: 3).tienda(c),
+          isNot(contains(ObjetoCampana.piedraEx)));
+      final p = con(const [], medallas: 4, dinero: 4500);
+      expect(p.tienda(c), contains(ObjetoCampana.piedraEx));
+      final q = p.comprar(c, ObjetoCampana.piedraEx, cantidad: 2);
+      expect(q.cuantos(ObjetoCampana.piedraEx), 2, reason: 'se apila');
+      expect(q.dinero, 500);
+    });
+
+    test('los centros de Kanto venden la piedra ex y ninguna Piedra Trueno',
+        () {
+      for (final n in c.region.nodos.values) {
+        if (n.tienda.isEmpty) continue;
+        expect(n.tienda, contains('piedraEx'), reason: n.id);
+        expect(
+            n.tienda.where((t) => t.toLowerCase().contains('trueno')), isEmpty);
+      }
+    });
+
+    test('las medallas de cada ex salen de la tabla 4 / 4 / 5 por fase', () {
+      final c2 = conEx();
+      expect(medallasMinimasEx, [4, 4, 5]);
+      expect(c2.fase('onix'), 0);
+      expect(c2.fase('caterpie'), 0);
+      expect(c2.fase('metapod'), 1);
+      final p = con(const [
+        PokemonGuardado('onix', 90),
+        PokemonGuardado('metapod', 70),
+      ]);
+      expect(p.evolucionesDe(c2, 0).single.medallasMinimas, 4);
+      expect(p.evolucionesDe(c2, 1).single.medallasMinimas, 4);
+      // La ficha puede pedir más, pero no menos que la tabla.
+      expect(
+          con(const [PokemonGuardado('onix', 90)])
+              .evolucionesDe(conEx(medallasOnix: 6), 0)
+              .single
+              .medallasMinimas,
+          6);
+      expect(
+          con(const [PokemonGuardado('onix', 90)])
+              .evolucionesDe(conEx(medallasOnix: 1), 0)
+              .single
+              .medallasMinimas,
+          4);
+    });
+
+    test('hacerse ex gasta una piedra, nada de XP, y deja 10 PS', () {
+      final c2 = conEx();
+      final p = con(const [PokemonGuardado('onix', 90)],
+              medallas: 4, piedras: 2, xp: 30)
+          .evolucionar(c2, 0, 'onix-ex');
+      expect(p.equipo.single.id, 'onix-ex');
+      expect(p.equipo.single.ps, PartidaCampana.psAlEvolucionar);
+      expect(p.cuantos(ObjetoCampana.piedraEx), 1);
+      expect(p.xp, 30);
+      expect(p.evolucionesDe(c2, 0), isEmpty, reason: 'el ex cierra la línea');
+    });
+
+    test('sin piedra o sin medallas no se hace ex, con su motivo', () {
+      final c2 = conEx();
+      final sinPiedra = con(const [PokemonGuardado('onix', 90)], medallas: 4);
+      final e = sinPiedra.evolucionesDe(c2, 0).single;
+      expect(sinPiedra.motivoSinEvolucion(e), 'No tienes ninguna piedra ex.');
+      expect(() => sinPiedra.evolucionar(c2, 0, 'onix-ex'),
+          throwsA(isA<ReglaIncumplida>()));
+      final pocas =
+          con(const [PokemonGuardado('onix', 90)], medallas: 3, piedras: 1);
+      expect(pocas.motivoSinEvolucion(pocas.evolucionesDe(c2, 0).single),
+          'Requiere 4 medallas.');
+      expect(sinPiedra.evolucionesPorXp(c2, 0), isEmpty,
+          reason: 'la piedra ex no es una evolución por XP');
+    });
+
+    test('un objeto que aún no se puede conseguir no deja evolucionar', () {
+      final pika = leer(File('../catalog/campana/pokemon/pikachu.json'));
+      pika['evoluciones'] = [
+        {'a': 'rattata', 'via': 'objeto', 'objeto': 'piedra-trueno'},
+      ];
+      final c2 = CatalogoCampana(
+        pokemon: {...c.pokemon, 'pikachu': pokemonCampanaDesdeJson(pika)},
+        zonas: c.zonas,
+        jefes: c.jefes,
+        region: c.region,
+      );
+      final p = con(const [PokemonGuardado('pikachu', 60)], medallas: 8);
+      expect(objetoDeEvolucion('piedra-trueno'), isNull);
+      expect(p.motivoSinEvolucion(p.evolucionesDe(c2, 0).single),
+          'Aún no se puede conseguir ese objeto.');
+    });
+
+    test('cada medalla nueva da una piedra ex; Brock da la primera', () {
+      var p = PartidaCampana(
+          progreso: const ProgresoRuta(nodoActual: 'gimnasio-brock'),
+          equipo: const [PokemonGuardado('squirtle', 80)]);
+      expect(p.rival(c).piedrasEx, 1);
+      final e = p.empezarCombate(c);
+      p = p.terminarCombate(
+          c,
+          e.copiarCon(
+            rival: e.rival.copiarCon(
+                equipo: [for (final r in e.rival.equipo) r.conPs(0)]),
+            fase: FaseCombate.terminado,
+            ganador: Bando.jugador,
+          ));
+      expect(p.progreso.medallas, {'roca'});
+      expect(p.cuantos(ObjetoCampana.piedraEx), 1);
+      expect(
+          PartidaCampana.desdeJson(p.aJson()).cuantos(ObjetoCampana.piedraEx),
+          1,
+          reason: 'se guarda en la mochila');
+    });
+
+    test('un entrenador o un salvaje no dan piedra ex', () {
+      final p = PartidaCampana(
+          progreso: const ProgresoRuta(nodoActual: 'gimnasio-joven'),
+          equipo: const [PokemonGuardado('squirtle', 80)]);
+      expect(p.rival(c).piedrasEx, 0);
+    });
   });
 }

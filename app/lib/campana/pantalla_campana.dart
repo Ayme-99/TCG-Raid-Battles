@@ -332,6 +332,9 @@ class _PanelNodo extends ConsumerWidget {
           Text('Al llegar a la mitad de sus PS, el jefe llama a un aliado.',
               style: tema.textTheme.bodySmall),
         if (r.dinero > 0) Text('Dinero: ${r.dinero} \$'),
+        if (r.piedrasEx > 0)
+          Text('Con la medalla: ${r.piedrasEx} '
+              '${r.piedrasEx == 1 ? 'Piedra ex' : 'Piedras ex'}'),
         Text(
             'Si pierdes, vuelves a ${c.region.nodo(p.ultimaCura ?? c.region.inicio).nombre}.',
             style: tema.textTheme.bodySmall),
@@ -684,6 +687,10 @@ class _Equipo extends ConsumerWidget {
             '${p.cuantos(ObjetoCampana.pocion)} Pociones, '
             '${p.cuantos(ObjetoCampana.repelente)} Repelentes.',
             style: Theme.of(context).textTheme.bodySmall),
+        // Contador de la mochila (D-20 §10.6, propuesta del 2026-11-24).
+        Text('Piedras ex: ${p.cuantos(ObjetoCampana.piedraEx)}',
+            key: const Key('campana-piedras-ex'),
+            style: Theme.of(context).textTheme.bodySmall),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -742,14 +749,19 @@ class _Equipo extends ConsumerWidget {
                     _avisar(context, control.usarPocion(catalogo, i));
                   },
                 ),
-              // Evolucionar (D-20 §10.6): gasta XP de la reserva y deja al
-              // Pokémon con 10 PS, también si estaba debilitado.
-              for (final e in partida.evolucionesPorXp(catalogo, i))
+              // Evolucionar (D-20 §10.6): gasta XP de la reserva (o una piedra
+              // ex para hacerse ex, §2.1) y deja al Pokémon con 10 PS, también
+              // si estaba debilitado.
+              for (final e in partida.evolucionesDe(catalogo, i))
                 ListTile(
                   key: Key('equipo-evolucionar-${e.a}'),
                   leading: const Icon(Icons.auto_awesome_rounded),
-                  title: Text('Evolucionar en '
-                      '${catalogo.especie(e.a).nombre} (${e.xpEvolucion} XP)'),
+                  title: Text(e.esPiedraEx
+                      ? 'Hacerse ex (1 piedra): ${catalogo.especie(e.a).nombre}'
+                      : e.via == ViaEvolucion.xp
+                          ? 'Evolucionar en '
+                              '${catalogo.especie(e.a).nombre} (${e.xpEvolucion} XP)'
+                          : 'Evolucionar en ${catalogo.especie(e.a).nombre}'),
                   subtitle: Text(partida.motivoSinEvolucion(e) ??
                       'Queda con ${PartidaCampana.psAlEvolucionar} PS.'),
                   enabled: partida.puedeEvolucionar(e),
@@ -789,6 +801,7 @@ String nombreObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.ultraBall => 'Ultra Ball',
       ObjetoCampana.pocion => 'Poción',
       ObjetoCampana.repelente => 'Repelente',
+      ObjetoCampana.piedraEx => 'Piedra ex',
     };
 
 String descripcionObjeto(ObjetoCampana o) => switch (o) {
@@ -799,4 +812,6 @@ String descripcionObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.pocion =>
         'Cura ${parametrosCampana.psPocion} PS fuera de combate',
       ObjetoCampana.repelente => 'Evita un combate contra un Pokémon salvaje',
+      ObjetoCampana.piedraEx =>
+        'Hace ex a un Pokémon que ya no evoluciona; una por ex',
     };

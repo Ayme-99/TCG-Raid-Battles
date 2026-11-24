@@ -39,6 +39,10 @@ class ParametrosCampana {
   /// PS que cura una Poción.
   final int psPocion;
 
+  /// Piedras ex que da cada medalla nueva (D-20 §2.1, decidido el 2026-11-24:
+  /// una por medalla, se entrega con ella y no caduca).
+  final int piedrasExPorMedalla;
+
   /// Pokémon del equipo: 1 activo y 5 en la banca (D-20 §2).
   final int tamanoEquipo;
 
@@ -58,12 +62,17 @@ class ParametrosCampana {
       ObjetoCampana.ultraBall: 1200,
       ObjetoCampana.pocion: 300,
       ObjetoCampana.repelente: 350,
+      // Decidido por Ayme el 2026-11-24 (D-21 §2.5).
+      ObjetoCampana.piedraEx: 2000,
     },
     this.medallasParaComprar = const {
       ObjetoCampana.superBall: 1,
       ObjetoCampana.ultraBall: 5,
+      // Propuesta (D-20 §10.11, tabla A): la medalla del ex más barato.
+      ObjetoCampana.piedraEx: 4,
     },
     this.psPocion = 20,
+    this.piedrasExPorMedalla = 1,
     this.tamanoEquipo = 6,
     this.pokemonPorEntrenador = 2,
   });
@@ -86,7 +95,18 @@ enum ObjetoCampana {
   /// Evita un combate contra un Pokémon salvaje: el nodo se da por pasado sin
   /// puntos, XP ni captura.
   repelente,
+
+  /// Piedra ex (D-20 §2.1, decidido el 2026-11-24): hace ex a un Pokémon en su
+  /// última fase normal. Se apila y se gasta una por ex. En el catálogo, el
+  /// objeto de evolución [idPiedraEx].
+  piedraEx,
 }
+
+/// El objeto de la mochila que corresponde a un objeto de evolución del
+/// catálogo (`"objeto"` de una evolución), o null si no se puede tener (la
+/// Piedra Trueno aún no se obtiene, D-20 §10.11).
+ObjetoCampana? objetoDeEvolucion(String id) =>
+    id == idPiedraEx ? ObjetoCampana.piedraEx : null;
 
 /// Todo lo que una partida de campaña necesita del catálogo: los Pokémon, las
 /// zonas, los jefes y la región.
@@ -131,6 +151,28 @@ class CatalogoCampana {
     final p = pokemon[id];
     if (p == null) throw ReglaIncumplida('El Pokémon "$id" no existe.');
     return p;
+  }
+
+  /// Fase de [id] en su línea: 0 si es Básico, 1 si es Fase 1, 2 si es
+  /// Fase 2. Se cuenta cuántos Pokémon del catálogo evolucionan en él por XP
+  /// u objeto normal, sin contar la piedra ex.
+  int fase(String id) {
+    for (final p in pokemon.values) {
+      for (final e in p.evoluciones) {
+        if (e.a == id && !e.esPiedraEx && p.id != id) return fase(p.id) + 1;
+      }
+    }
+    return 0;
+  }
+
+  /// Medallas mínimas para que [desde] se haga ex con [evolucion] (D-20
+  /// §10.11): la mayor entre la de su ficha y la de [medallasMinimasEx] para
+  /// su fase (propuesta A, por confirmar).
+  int medallasParaEx(String desde, EvolucionCampana evolucion) {
+    final f = fase(desde);
+    final tabla = medallasMinimasEx[f.clamp(0, medallasMinimasEx.length - 1)];
+    final ficha = evolucion.medallasMinimas ?? 0;
+    return ficha > tabla ? ficha : tabla;
   }
 
   /// Lo que falta en el catálogo para jugar la región (vacía si está bien).
@@ -222,6 +264,10 @@ class RivalDelNodo {
   /// Dinero que da ganar (solo entrenadores y líderes).
   final int dinero;
 
+  /// Piedras ex que da ganar: las de la medalla de un gimnasio que aún no se
+  /// tiene ([ParametrosCampana.piedrasExPorMedalla]).
+  final int piedrasEx;
+
   /// XP que suma a la reserva ganar: la de cada Pokémon del [equipo] según su
   /// categoría de captura, o la del jefe. Un aliado del jefe que cae suma
   /// además la de su categoría ([terminarCombate]).
@@ -236,6 +282,7 @@ class RivalDelNodo {
     required this.captura,
     required this.puntos,
     this.dinero = 0,
+    this.piedrasEx = 0,
     this.xp = 0,
     this.llamada,
   });
@@ -480,6 +527,9 @@ class PartidaCampana {
           captura: null,
           puntos: parametros.puntosMedalla,
           dinero: lider.dinero ?? 0,
+          piedrasEx: progreso.medallas.contains(nodo.medalla)
+              ? 0
+              : parametros.piedrasExPorMedalla,
           xp: _xpDeEquipo(equipoLider),
         );
       case TipoNodo.jefe:
@@ -577,6 +627,13 @@ class PartidaCampana {
       puntos: puntos + r.puntos,
       dinero: dinero + r.dinero,
       xp: xp + r.xp + _xpDeEquipo(aliadosCaidos),
+      mochila: r.piedrasEx == 0
+          ? null
+          : {
+              ...mochila,
+              ObjetoCampana.piedraEx:
+                  cuantos(ObjetoCampana.piedraEx) + r.piedrasEx,
+            },
       semilla: siguiente,
       capturaPendiente: r.captura,
     );
@@ -870,53 +927,92 @@ class PartidaCampana {
 
   /// Las evoluciones por XP del Pokémon [indice] del equipo, con su coste.
   /// Puede haberlas aunque no llegue la reserva: [puedeEvolucionar] lo dice.
-  List<EvolucionCampana> evolucionesPorXp(CatalogoCampana c, int indice) {
+  List<EvolucionCampana> evolucionesPorXp(CatalogoCampana c, int indice) => [
+        for (final e in evolucionesDe(c, indice))
+          if (e.via == ViaEvolucion.xp) e,
+      ];
+
+  /// Todo lo que se ofrece en el menú del equipo para el Pokémon [indice]:
+  /// evoluciones por XP y por objeto (la piedra ex incluida), cuyo Pokémon
+  /// destino está en el catálogo. La de piedra ex lleva ya sus medallas
+  /// mínimas: las de su ficha o, si son menos, las de [medallasMinimasEx]
+  /// según la fase (D-20 §10.11, propuesta A). El intercambio no se ofrece
+  /// aquí: va en la máquina de intercambio, que aún no existe.
+  List<EvolucionCampana> evolucionesDe(CatalogoCampana c, int indice) {
     if (indice < 0 || indice >= equipo.length) return const [];
+    final id = equipo[indice].id;
     return [
-      for (final e in c.especie(equipo[indice].id).evoluciones)
-        if (e.via == ViaEvolucion.xp && c.pokemon.containsKey(e.a)) e,
+      for (final e in c.especie(id).evoluciones)
+        if ((e.via == ViaEvolucion.xp || e.via == ViaEvolucion.objeto) &&
+            c.pokemon.containsKey(e.a))
+          e.esPiedraEx ? e.conMedallasMinimas(c.medallasParaEx(id, e)) : e,
     ];
   }
 
   /// Por qué no se puede hacer [evolucion] ahora, o null si se puede: faltan
-  /// medallas (D-20 §10.11, #414) o la reserva no llega (§10.6).
+  /// medallas (D-20 §10.11, #414), la reserva no llega (§10.6) o falta el
+  /// objeto en la mochila (la piedra ex, §2.1).
   String? motivoSinEvolucion(EvolucionCampana evolucion) {
-    if (evolucion.via != ViaEvolucion.xp) return 'No evoluciona con XP.';
+    if (evolucion.via == ViaEvolucion.intercambio) {
+      return 'Se evoluciona por intercambio.';
+    }
     final medallas = evolucion.medallasMinimas ?? 0;
     if (progreso.medallas.length < medallas) {
       return 'Requiere $medallas ${medallas == 1 ? 'medalla' : 'medallas'}.';
+    }
+    if (evolucion.via == ViaEvolucion.objeto) {
+      final objeto = objetoDeEvolucion(evolucion.objeto!);
+      if (objeto == null) return 'Aún no se puede conseguir ese objeto.';
+      if (cuantos(objeto) < 1) {
+        return objeto == ObjetoCampana.piedraEx
+            ? 'No tienes ninguna piedra ex.'
+            : 'No tienes el objeto.';
+      }
+      return null;
     }
     final coste = evolucion.xpEvolucion ?? 0;
     if (xp < coste) return 'Faltan ${coste - xp} XP.';
     return null;
   }
 
-  /// Si [evolucion] se puede hacer ahora: hay medallas y XP suficientes.
+  /// Si [evolucion] se puede hacer ahora: hay medallas y XP (u objeto)
+  /// suficientes.
   bool puedeEvolucionar(EvolucionCampana evolucion) =>
       motivoSinEvolucion(evolucion) == null;
 
-  /// Evoluciona al Pokémon [indice] del equipo en [destino] gastando de la
-  /// reserva la XP de esa evolución (D-20 §10.6, decidido el 2026-11-22), si
-  /// se tienen las medallas que pide (`medallasMinimas`, §10.11). Se
-  /// hace fuera de combate, desde el menú del equipo, sin límite por visita. La
-  /// carta evolucionada sustituye a la anterior y queda con **10 PS**, aunque
-  /// tuviera más o estuviera debilitado (evolucionar revive a 10 PS).
+  /// Evoluciona al Pokémon [indice] del equipo en [destino], si se tienen las
+  /// medallas que pide (`medallasMinimas`, D-20 §10.11):
+  ///
+  /// - Por XP: gasta de la reserva la XP de esa evolución (§10.6).
+  /// - Por objeto: gasta uno de la mochila. Hacerse ex gasta **una piedra ex**
+  ///   y nada de XP (§2.1, decidido el 2026-11-24).
+  ///
+  /// Se hace fuera de combate, desde el menú del equipo, sin límite por
+  /// visita. La carta evolucionada sustituye a la anterior y queda con
+  /// **10 PS**, aunque tuviera más o estuviera debilitado (evolucionar revive
+  /// a 10 PS).
   PartidaCampana evolucionar(CatalogoCampana c, int indice, String destino) {
     if (indice < 0 || indice >= equipo.length) {
       throw const ReglaIncumplida('Ese Pokémon no está en el equipo.');
     }
     final evolucion =
-        evolucionesPorXp(c, indice).where((e) => e.a == destino).firstOrNull;
+        evolucionesDe(c, indice).where((e) => e.a == destino).firstOrNull;
     if (evolucion == null) {
       throw ReglaIncumplida(
-          '${c.especie(equipo[indice].id).nombre} no evoluciona en "$destino" con XP.');
+          '${c.especie(equipo[indice].id).nombre} no evoluciona en "$destino".');
     }
     final motivo = motivoSinEvolucion(evolucion);
     if (motivo != null) throw ReglaIncumplida(motivo);
-    return _copiar(
-      equipo: [...equipo]..[indice] = PokemonGuardado(destino, psAlEvolucionar),
-      xp: xp - evolucion.xpEvolucion!,
-    );
+    final nuevo = [...equipo]..[indice] =
+        PokemonGuardado(destino, psAlEvolucionar);
+    if (evolucion.via == ViaEvolucion.objeto) {
+      final objeto = objetoDeEvolucion(evolucion.objeto!)!;
+      return _copiar(
+        equipo: nuevo,
+        mochila: {...mochila, objeto: cuantos(objeto) - 1},
+      );
+    }
+    return _copiar(equipo: nuevo, xp: xp - evolucion.xpEvolucion!);
   }
 
   /// PS con los que queda un Pokémon al evolucionar (D-20 §10.6).
