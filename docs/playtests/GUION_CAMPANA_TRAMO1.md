@@ -30,3 +30,20 @@ Inicial, equipo al entrar a Brock, Pokéballs y Pociones comprados, derrotas por
 - Ganas a Brock a la primera con cualquier equipo (demasiado fácil).
 - Más de 3 derrotas ante Pikachu jefe con Squirtle (esperado ≈ 35 % de fallo a la primera).
 - No entender que hay que volver a la tienda.
+
+## Fase 0 (D-21 §4.4): Ayme solo, medir la duración
+
+Juega el tramo entero seguido, sin pausas largas, y apunta:
+
+| Dato | Anota |
+|---|---|
+| Hora de inicio y de fin | |
+| Minutos totales (sin pausas) | |
+| Minutos hasta el primer combate acabado | |
+| Minutos hasta llegar a Ciudad Verde | |
+| Minutos hasta Brock | |
+| Combates jugados (incluidos los repetidos) | |
+| Derrotas | |
+| Bloqueos (sitio donde no pudiste seguir) | |
+
+Referencia del simulador: ≈18 combates de ≈12 turnos por recorrido. La fase 0 se da por buena cuando el tramo se completa sin bloqueos y se conoce la duración. Pasa a la fase 1 (2 o 3 amigos, uno cada vez, tú mirando sin ayudar y apuntando en `PLANTILLA.md`).

@@ -109,3 +109,31 @@ dart run bin/sim_campana_partida.dart --modo=tramo --partidas=1500 --ruta1=si --
 dart run bin/sim_campana_partida.dart --modo=bolas --partidas=800 --ruta1=si
 dart run bin/sim_campana_partida.dart --modo=techo --fase1=si --partidas=1500
 ```
+
+## Actualización 2026-11-24: tope de turnos (propuesta para Diseño) y duración del tramo
+
+Pedido por Dirección: el tope va **solo en el simulador** (`--tope-turnos=N --al-tope=derrota|mas-ps`); el motor no se toca hasta que Diseño fije la regla del juego.
+
+**Cuántos combates acaban así (1.000 recorridos por inicial, política B, retroceder = sí):**
+
+| Dato | Valor |
+|---|---|
+| Combates jugados | 52.828 |
+| Duración de los que terminan (turnos del motor) | mediana 12 · p95 19 · p99 26 · máximo 34 |
+| Combates que no terminan (empate técnico) | **240 (0,5 %)** |
+| En qué casillas | solo Bosque Verde: Cazabichos 1 (127) y Cazabichos 2 (113) |
+| Política A (sin Balls en Ruta 1) | 612 de 227.034 (0,3 %), también solo en Cazabichos |
+
+Son empates reales, no combates largos: con un tope de 60 turnos salen exactamente los mismos 240. Es el caso de Metapod/Kakuna (Fortaleza) contra un Pokémon sin daño suficiente. El combate natural más largo dura 34 turnos, así que un tope de **40 turnos** no cortaría ninguno que hoy termine.
+
+**Qué debería pasar al llegar al tope (propuesta para Diseño, tres opciones):**
+
+| Opción | Efecto medido |
+|---|---|
+| Cuenta como derrota (lo que hace hoy el simulador) | Es arbitrario: castiga al jugador por un empate que el rival también provoca |
+| **Gana quien tenga más PS en pie** (el rival gana los empates) | De los 208 combates cortados, gana el jugador el 88 % (95 % en política A). El «tramo sin perder ningún combate» de Bulbasaur sube de 50,9 % a 56,3 %; el resto no cambia y Brock tampoco |
+| Tablas: se repite el combate sin perder nada | No medido; no cambia el resultado del tramo, solo evita el bloqueo. Es la más fácil de explicar al jugador |
+
+Recomendación de Calidad: **40 turnos y «gana quien tenga más PS en pie»**, o tablas si Diseño prefiere no decidir por PS. No hace falta tocar el motor para medirlo.
+
+**Duración del primer tramo (D-21 §4.4, fase 0):** en el simulador, un recorrido completo juega unos **18 combates** (incluidos los repetidos tras perder) de unos 12 turnos cada uno. Es una referencia, no un tiempo real: la duración en minutos solo se mide jugando. En `docs/playtests/GUION_CAMPANA_TRAMO1.md` hay ahora una hoja para que Ayme apunte la suya (fase 0).
