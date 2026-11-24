@@ -1,6 +1,6 @@
 # D-21 · Modo campaña: tienda de puntos, Pokédex «Mis cartas» y comunicación
 
-Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23 con sus respuestas a la primera versión. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
+Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23 y el 2026-11-24 con sus decisiones. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
 
 Cómo leerlo:
 
@@ -16,7 +16,7 @@ Cómo leerlo:
 | 2 | Los puntos se gastan (D-20) pero D-10 dice que no se gastan | Dos contadores: **puntos ganados** (total histórico, para desbloquear jefes) y **saldo** (lo gastable). | §1.2 |
 | 3 | Catálogo de la tienda al lanzar | Solo **monedas y dados** (cosmética). Sobres y cartas sueltas esperan a que existan cartas del formato digital. Las campañas y los jefes **no** se venden. | §2.2 |
 | 4 | Precios | Moneda de serie 800, temática 2.000; dados de serie 1.500, temáticos 3.000; sobre 1.000; carta suelta 200 / 400 / 800 / 2.000 según rareza. | §2.3 |
-| 5 | Los puntos no se usan dentro de la campaña (**decidido**). Entonces, ¿con qué se paga el intercambio y hacerse ex? | Con **dinero**: intercambio 2.000 y hacerse ex 4.000, o mejor, 1 y 2 tramos de dinero. | §2.5 |
+| 5 | **Decidido el 2026-11-24:** los puntos no se usan en la campaña, el intercambio es **gratis** y hacerse ex es un objeto, la **piedra ex**. ¿Cuánto cuesta la piedra? | **4.000 de dinero** (propuesta, con tres alternativas razonadas: 2.000, 3.000 y 6.000). | §2.5 |
 | 6 | Qué es «Mis cartas» | **Decidido:** las cartas de campaña solo valen en campaña; la tienda traerá cartas para las partidas rápidas digitales. Dos colecciones, y los jefes de campaña van en «Enemigos». | §3.1 |
 | 7 | Qué se registra al capturar | **Decidido:** por ahora solo la carta. Cuenta aunque el Pokémon acabe en el PC y aunque luego evolucione. | §3.3 |
 | 8 | Relación con las cartas físicas | Misma imagen y misma numeración, sin escaneo ni canje; reglas de reimpresión y de uso privado. El código de canje queda como idea futura. | §3.5 |
@@ -36,14 +36,14 @@ El modo campaña maneja **cuatro cifras** que se parecen y que un jugador nuevo 
 |---|---|---|---|---|
 | **Energía** | Limita la capacidad de atacar durante un combate | Se recupera sola (+1 por turno; Cargar da +1 más) | Atacar | Solo dentro de un combate |
 | **XP** | Cantidad necesaria para evolucionar un Pokémon | Derrotar Pokémon (10, 20 o 30 según categoría) | Evolucionar, fuera de combate | La partida de campaña |
-| **Dinero** | Recompensa monetaria al ganar combates contra entrenadores; sirve para comprar objetos | Vencer a entrenadores y líderes | Objetos del centro Pokémon (y, en propuesta, el intercambio y hacerse ex, §2.5) | La partida de campaña |
+| **Dinero** | Recompensa monetaria al ganar combates contra entrenadores; sirve para comprar objetos | Vencer a entrenadores y líderes | Objetos del centro Pokémon, incluida la piedra ex (§2.5) | La partida de campaña |
 | **Puntos** | **No tienen utilidad dentro de la campaña.** Pasan a la cuenta al conseguir medallas o avanzar en la historia, y sirven para comprar cosas en el menú de la app | Combates, medallas y jefes de la campaña; partida libre digital | La tienda de la pantalla de inicio | La **cuenta** |
 
 Una precisión de redacción: la XP **se mide en XP**, nunca en «puntos», aunque se hable de «lo necesario para evolucionar». Si en la app o en los mensajes la XP se llama «puntos», se confunde con los puntos de la cuenta, que es justo lo que este vocabulario quiere evitar.
 
 **PROPUESTA (decisión 1): separación total entre dinero y puntos.**
 
-- El **dinero** es local y se acaba con la campaña. Compra **objetos** (los precios ya decididos: Pokéball 200, Super Ball 600, Ultra Ball 1.200, Poción 300, Repelente 350) y, en propuesta, los servicios del centro (§2.5).
+- El **dinero** es local y se acaba con la campaña. Compra **objetos** (los precios ya decididos: Pokéball 200, Super Ball 600, Ultra Ball 1.200, Poción 300, Repelente 350) y la piedra ex (§2.5). El intercambio es gratis.
 - Los **puntos** pertenecen a la cuenta y duran. Compran **colección y cosmética**, y **solo fuera de la campaña**.
 - **Nada se vende por las dos vías.** Si los puntos pudieran comprar Pokéballs, el dinero perdería sentido y la campaña se resolvería «pagando». Si el dinero pudiera comprar cosmética, la tienda dejaría de ser un incentivo para jugar las incursiones.
 - Esto responde a la pregunta abierta de D-20 §8 (5), «para qué sirve el dinero frente a los puntos».
@@ -152,32 +152,54 @@ Todas las cifras son **ajustables sin tocar la tienda**: viven en un catálogo d
 - Las rarezas son las del proyecto (Común, Poco común, Rara, Ultra rara). Los jefes se quedan fuera de los sobres.
 - **Duplicados:** decisión abierta, sin propuesta firme. La opción más simple es que se queden en la colección (no hacen falta copias en el juego). Si Ayme quiere un incentivo, se pueden devolver como puntos (por ejemplo, un 25 % del precio de la carta suelta), pero eso crea un bucle de puntos que habría que simular.
 
-### 2.5 Qué se paga dentro de la campaña (y por qué no son los puntos)
+### 2.5 Qué se paga dentro de la campaña: la piedra ex
 
-**Decidido por Ayme (2026-11-23):** los puntos **no tienen utilidad dentro de la campaña**. Lo que gana la campaña pasa a la cuenta y se gasta solo en el menú de la app.
+**Decidido por Ayme:**
 
-Esto **sustituye** a lo que D-20 §2.1, §5 y §10.6 decían (que el intercambio y hacerse ex «cuestan puntos») y a mi primera versión de este documento. Consecuencias:
+- **Los puntos no tienen utilidad dentro de la campaña** (2026-11-23). La tienda de puntos vive solo en el menú de la app.
+- **El intercambio es gratis** (2026-11-24). Kadabra, Haunter, Machoke y Graveler evolucionan sin pagar nada.
+- **Hacerse ex es un objeto, la «piedra ex»** (2026-11-24). Ejemplo de Ayme: Venusaur + piedra ex = Venusaur ex. El **precio lo fijo yo**, y Ayme lo confirma.
 
-- Sin sumideros de puntos dentro de la campaña, las cifras de abono (100, 200, 1.000, 1.500) **solo pesan en la economía de la tienda**, no en el equilibrio de la campaña. Vuelven a ser lo que Ayme dijo el 2026-11-21: irrelevantes para jugar, y solo relevantes para el ritmo de la tienda (§2.1 y §2.3).
-- Siguen sin resolverse el **intercambio** (Kadabra, Haunter, Machoke, Graveler) y **hacerse ex** un Pokémon que no evoluciona (Onix): alguien tiene que decir con qué se pagan.
+Esto sustituye a mi primera propuesta (intercambio 2.000 y hacerse ex 4.000 en dinero): el intercambio **ya no tiene precio** y hacerse ex pasa a ser un objeto con precio.
 
-**PROPUESTA (decisión 5):** se pagan con **dinero**, en el centro Pokémon, en una «máquina de intercambio» y un servicio de «potenciación ex».
+Queda abierto, y es de Diseño, si la piedra vale solo para un Pokémon sin evolución (Onix) o también para pasar de la última fase normal a su ex (Venusaur). El precio de abajo vale para los dos casos: **una piedra, un ex**.
 
-| Servicio | Precio propuesto | Cuándo aparece |
+#### Referencias para poner el precio
+
+| Dato | Valor | Origen |
 |---|---|---|
-| Evolución por intercambio | **2.000** de dinero | Cuando el Pokémon ya cumple las medallas mínimas y la XP (D-20 §10.11) |
-| Hacerse ex (Pokémon sin evolución) | **4.000** de dinero | Igual |
+| Dinero ganado hasta la 1.ª medalla | unos **2.060** (más 1.000 de salida) | D-20 §10.6 |
+| Lo que paga un tramo, extrapolado | ~**2.060** por medalla (**suposición mía**: el dinero de los tramos siguientes no está fijado) | — |
+| Ultra Ball | **1.200** (se vende con 5 medallas) | D-20 §10.6 |
+| Super Ball / Poción / Repelente | 600 / 300 / 350 | D-20 §10.6 |
+| Piedra de evolución en los juegos | unos 2.100 (por contrastar) | D-20 §10.11 |
+| Onix ex: medallas mínimas | **3** según Ayme; el PR #448 de Diseño dice 4 (conviene aclararlo) | D-20 §10.11 |
+| Onix ex: PS | 240 (frente a 110 de Onix) | D-20 §3.5 |
 
-Por qué dinero y por qué estas cifras:
+**Cuánto dinero hay cuando se puede comprar.** Con la suposición de ~2.060 por tramo, el dinero **acumulado** (con los 1.000 de salida) es de unos **3.060 a la 1.ª medalla, 5.120 a la 2.ª, 7.180 a la 3.ª y 9.240 a la 4.ª**. De eso hay que restar lo que se gasta en Pokéballs y Pociones: supongo 1.000 a 1.500 por tramo (sin medir). Entonces, sobran unos **2.700 a 4.200 a la 3.ª medalla** y unos **3.200 a 5.200 a la 4.ª**. Y en **Kanto completo** (8 tramos) el dinero total ronda los **17.500** (suposición lineal; en los juegos los tramos finales pagan más).
 
-- **Encaja con la definición.** Dinero = recompensa por vencer entrenadores que sirve para comprar cosas. Y deja los puntos limpios.
-- **Hace que el dinero siga importando.** Hoy compite solo con las Pokéballs y las Pociones. Con estos dos usos, el jugador tiene que decidir entre equiparse y evolucionar, que es lo que da vida a una economía.
-- **Escala sola.** Hoy un tramo da unos **2.000 de dinero** (el primero: 2.060 entre Cazabichos, Entrenador Joven y Brock, más los 1.000 de salida). La regla es: **intercambio = lo que paga un tramo, hacerse ex = dos tramos**. Si Diseño sube el dinero de los tramos siguientes (cada clase y cada líder lleva su cifra en el catálogo), estos precios suben con él.
-- **Tiene sentido de progresión.** Los Pokémon que necesitan intercambio llegan después de varias medallas, cuando ya se ha ganado dinero de sobra para pagarlo; hacerse ex es una decisión de fondo del equipo, por eso cuesta el doble.
+Por qué importa el precio: un ex es un salto enorme de poder (Onix pasa de 110 a 240 PS) y la piedra es **un objeto por Pokémon**. Si es barata, todo el equipo acaba siendo ex y desaparece el reto; si es cara, nadie la compra y el objeto sobra.
 
-Lo que falta antes de cerrar: **Calidad simula** cuánto dinero lleva un jugador al llegar a su primer intercambio y a su primer ex (hoy no hay ninguna carta evolucionada por intercambio ni ex en el catálogo, así que no es urgente) y **Diseño** confirma si el servicio vive en el centro Pokémon.
+#### Cifras que propongo, con su argumento
 
-**Qué implica para el trabajo de otros** (sin tocarlo aquí): en D-20 §2.1 y en el esquema de evolución, las vías `intercambio` y `puntos` llevan un campo `puntos`; si Ayme confirma, ese coste pasa a ser **dinero** (la nota para Diseño del §5 lo recoge).
+| Precio | Equivale a | Piedras en Kanto (con ~17.500 y sin gastar en otra cosa) | Argumento a favor | Argumento en contra |
+|---|---|---|---|---|
+| **2.000** | Un tramo; casi el precio de una piedra de los juegos (~2.100) | Hasta unas 8 | Es coherente con las demás piedras y no castiga. Se puede comprar nada más cumplir la medalla (a la 3.ª sobran 2.700 a 4.200). | Un ex cuesta lo mismo que una evolución normal, pese a ser un salto mucho mayor. Casi cualquier equipo acaba entero en ex y el reto de la Liga (objetivo del 25 %) se vuelve fácil. |
+| **3.000** | Dos Ultra Balls y media | Unas 5 | Alcanzable a la 3.ª medalla gastando con normalidad, así que el requisito de medallas y el de dinero llegan a la vez. Obliga a elegir, pero sin sufrir. | Sigue permitiendo 4 o 5 ex por campaña; hay que vigilar el equilibrio. |
+| **4.000** (mi propuesta, la tabla anterior) | Dos tramos; unas 3,3 Ultra Balls | Unas 4 (en la práctica, 2 o 3, porque también se gasta en otras cosas) | Convierte hacer ex en una **decisión de equipo**: «a cuál le pongo la piedra». A la 3.ª medalla solo la compra quien ahorre; a la 4.ª es alcanzable. Compite de verdad con las Ultra Balls (1.200). | Si Ayme mantiene las 3 medallas para Onix, queda justo y el jugador espera una medalla más. |
+| **6.000** | Tres tramos; cinco Ultra Balls | Unas 2 o 3 | El ex es un premio raro; el equipo conserva su identidad. | Con 3 medallas hay que renunciar a casi todas las Pokéballs y Pociones, así que el requisito de medallas deja de importar: manda el dinero. La campaña se vuelve más lenta sin ganar nada. |
+
+**Mi recomendación, para que Ayme confirme: 4.000.**
+
+- Hace que **un equipo tenga uno o dos ex antes de la Liga**, que es lo que se busca para que sea una decisión.
+- **Si Ayme da por buena la regla de 3 medallas para Onix y quiere que se pueda comprar entonces, 3.000** es la cifra correcta. Con 4 medallas, 4.000 sale solo.
+- **Descarto 2.000 y 6.000**: el primero rompe el reto, y el segundo hace irrelevante la regla de las medallas.
+
+**Dónde se vende** (propuesta): en la tienda del centro Pokémon, como la Super Ball y la Ultra Ball: aparece cuando se tienen las **medallas mínimas** del primer Pokémon que puede usarla. Así no se ve un objeto que no se puede usar.
+
+**Antes de cerrar:** Calidad mide con el simulador cuánto dinero lleva un jugador al llegar a su primera piedra y a su segunda (hoy no hay cartas ex en el catálogo, así que no es urgente), y Diseño decide el alcance de la piedra (arriba). Todo el cálculo de arriba depende de la suposición de ~2.060 por tramo y de mi estimación de gasto, **sin medir**.
+
+**Qué implica para el trabajo de otros** (sin tocarlo aquí): el campo `puntos` del catálogo y del motor deja de tener sentido (el intercambio es gratis y hacerse ex es un objeto); lo recoge la tarea 17 (#447) de D-20.
 
 ## 3. #388 · Pokédex «Mis cartas»
 
@@ -367,7 +389,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 | Documento | Cambio |
 |---|---|
 | D-20 §5 y §8 (4, 5) | Cerrar «qué se vende» y «dinero frente a puntos» con §1.1 y §2 |
-| D-20 §2.1, §5 y §10.6 | Los puntos **no** se usan en la campaña: sustituye «el intercambio y hacerse ex cuestan puntos». Si se aprueba, pasan a costar dinero (§2.5) |
+| D-20 §2.1, §5 y §10.6 | Los puntos **no** se usan en la campaña (decidido). Intercambio **gratis** y hacerse ex con la **piedra ex** (decidido el 2026-11-24, ya recogido en el PR #448 de Diseño). Falta el precio de la piedra (§2.5, propuesta) |
 | D-20 §8 (13) | Nidoran♂ ya es 032/150: la pregunta se da por resuelta |
 | D-20 §6 y `flujo-app.md` §2 | La sesión es obligatoria en el modo campaña (la regla general «nunca obligatoria» deja de valer ahí) |
 | D-20 §10 | Nuevas filas del registro con las decisiones 1 a 9 |
@@ -382,7 +404,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 - «Mis cartas» necesita un registro por carta (§3.3), con clave en el dispositivo y sincronización al iniciar sesión.
 - El servidor acepta lo que reporta el cliente con tope por hito (D-20 §6); los topes son los valores de §2.1.
 
-**Para Diseño:** simulación de cuántos puntos hay al llegar al primer intercambio y al primer ex (§2.5); decidir los duplicados de sobre (§2.4); el momento exacto de cada texto de §4.5.
+**Para Diseño y Calidad:** simulación de cuánto dinero lleva un jugador al llegar a su primera piedra ex y a su segunda (§2.5); decidir los duplicados de sobre (§2.4); el momento exacto de cada texto de §4.5.
 
 **Para Arte:** diseños de moneda y de dados (la clásica y la estándar ya existen); el estado «gris» de «Mis cartas» (el criterio visual de Enemigos ya existe); la pantalla de la tienda.
 
