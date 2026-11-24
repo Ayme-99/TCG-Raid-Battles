@@ -1,0 +1,31 @@
+{
+ "escena": "pueblo-paleta",
+ "tamano": [
+  390,
+  844
+ ],
+ "zonas": [
+  {
+   "id": "laboratorio",
+   "tipo": "edificio",
+   "accion": "elegir-inicial",
+   "rect": [
+    30,
+    150,
+    182,
+    200
+   ]
+  },
+  {
+   "id": "ruta-1",
+   "tipo": "borde-superior",
+   "accion": "avanzar",
+   "rect": [
+    212,
+    36,
+    116,
+    100
+   ]
+  }
+ ]
+}
