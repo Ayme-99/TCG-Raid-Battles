@@ -71,7 +71,14 @@ Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos
 - Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xpEvolucion: N` en la carta; el campo se llamaba `xp` hasta #403), con `medallasMinimas` para la medalla que la desbloquea (§10.11, #414). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4). **Sustituido el 2026-11-22** (§10.6): la XP es una reserva común y se evoluciona fuera de combate, desde el menú del equipo, sin límite por visita.
 - **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`).
 - **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): es **gratis** (decidido el 2026-11-24, §10.9): la máquina de intercambio no cobra (`via: "intercambio"`, sin campo de precio; hoy lleva `puntos: N`, que se quita en el Motor).
-- **Cartas ex.** La **última fase de cada Pokémon es una carta ex**. Un Pokémon que no evoluciona (Onix…) puede hacerse ex con una **piedra ex**, un objeto (decidido el 2026-11-24, §10.9; el precio lo decide Negocio, D-21; hoy `via: "puntos"`, `puntos: N`, que el Motor cambia por un objeto), con el mismo proceso. En el caso de Onix, hacerse ex es **subirlo de nivel a ex**, no evolucionarlo a otro Pokémon. Cada carta ex es una **entrada propia del catálogo** (`"ex": true`).
+- **Cartas ex y piedra ex** (decidido por Ayme el 2026-11-24, D-21 §2.5; sustituye a «la última fase de cada Pokémon es una carta ex», §10.9):
+  - **La carta ex es un paso más** tras la última fase normal: Básico → Fase 1 → Fase 2 → **Fase 2 ex**; Básico → Fase 1 → **Fase 1 ex**; Básico → **Básico ex**. Solo se ofrece cuando el Pokémon **ya no puede evolucionar más**.
+  - Se pasa a ex con un objeto, la **piedra ex** (`via: "objeto"`, `objeto: "piedra-ex"`): **2.000 de dinero**, en la tienda del centro Pokémon. **Una piedra, un ex**, sin XP. Ejemplo de Ayme: Venusaur + piedra ex = Venusaur ex.
+  - **Una piedra ex de premio por medalla** (8), que se entrega con la medalla y no caduca. El resto se compra.
+  - **Objetivo:** llegar a la Liga con **12 ex o más** entre el equipo (6) y el PC. Las cartas ex tienen **más de 200 PS** (§3.5). Ayme crea las cartas a mano.
+  - **Excepciones por fandom:** **Pikachu y Eevee** pueden ser ex aunque puedan evolucionar.
+  - Cada carta ex es una **entrada propia del catálogo** (`"ex": true`). Onix «evoluciona» subiendo a Onix ex, sin Steelix.
+  - **Propuestas de Diseño pendientes de Ayme** (§10.11): el ex no evoluciona más, las medallas mínimas de cada ex, cómo conviven Pikachu y Raichu, cómo se resuelve Eevee y qué otras excepciones hay.
 - **La carta evolucionada sustituye a la anterior** y recupera todos sus PS (**sustituido el 2026-11-22**, §10.6: queda con **10 PS**, también si estaba debilitado). Una forma evolucionada también puede aparecer salvaje en una zona si el catálogo la incluye, y entonces se captura aparte.
 - Un Pokémon puede tener **varias** evoluciones (Eevee con sus piedras), por eso `evoluciones` es una lista.
 
@@ -144,8 +151,9 @@ Decidido el 2026-11-21. Los números salen de las **cartas reales del Standard 2
 |---|---|---|---|---|---|
 | Básico | 50–90 | 10–20 | 30–40 | 50–60 | — |
 | Fase 1 | 90–130 | 20–30 | 50–60 | 80–100 | 110–130 |
-| ex (línea de 2 fases o sin evolución) | 200–260 | 30–60 | 80–110 | 130–160 | 180–200 |
-| ex (línea de 3 fases) | 270–340 | 40–60 | 90–120 | 150–190 | 220–300 |
+| Fase 2 sin ex (**propuesta del 2026-11-24**) | 120–150 | 30–40 | 60–80 | 100–120 | — |
+| Básico ex y Fase 1 ex (antes «ex de línea de 2 fases o sin evolución») | 200–260 | 30–60 | 80–110 | 130–160 | 180–200 |
+| Fase 2 ex (antes «ex de línea de 3 fases») | 270–340 | 40–60 | 90–120 | 150–190 | 220–300 |
 
 **Reglas de calibración**
 - El ataque de **coste 2** es el golpe principal: quita del 40 al 50 % de los PS de un rival de su misma fase, así que un duelo igualado dura unos 3 golpes. Con debilidad ×2 baja a 1–2.
@@ -323,13 +331,13 @@ Ayme mandará los líderes (§8, 28); **no se inventa ninguno**. Esta es la fich
 | Nº | Medalla | Ciudad | Líder | Tipo | Pokémon (id de carta) | Dinero |
 |---|---|---|---|---|---|---|
 | 1 | Roca | Ciudad Plateada | | | Geodude y Onix (cartas normales, §4 Jefes) | 1.400 |
-| 2 | Cascada | Ciudad Celeste | | | | |
-| 3 | Trueno | Ciudad Carmín | | | | |
-| 4 | Arcoíris | Ciudad Azulona | | | | |
-| 5 | Alma | Ciudad Fucsia | | | | |
-| 6 | Pantano | Ciudad Azafrán | | | | |
-| 7 | Volcán | Isla Canela | | | | |
-| 8 | Tierra | Ciudad Verde | | | | |
+| 2 | Cascada | Ciudad Celeste | | | | 1.500 (propuesta, §10.6) |
+| 3 | Trueno | Ciudad Carmín | | | | 1.600 (propuesta, §10.6) |
+| 4 | Arcoíris | Ciudad Azulona | | | | 1.700 (propuesta, §10.6) |
+| 5 | Alma | Ciudad Fucsia | | | | 1.800 (propuesta, §10.6) |
+| 6 | Pantano | Ciudad Azafrán | | | | 1.900 (propuesta, §10.6) |
+| 7 | Volcán | Isla Canela | | | | 2.000 (propuesta, §10.6) |
+| 8 | Tierra | Ciudad Verde | | | | 2.100 (propuesta, §10.6) |
 
 Reglas que ya se aplican a cada ficha: los líderes usan **cartas normales**, no de jefe (arriba); el gimnasio da una medalla y puntos (la cifra de puntos es global, §5, no va por líder y no sirve dentro de la campaña); el dinero se da una sola vez; y el orden de medallas es el de los juegos. Las medallas mínimas de cada evolución dependen de este orden (§10.11).
 
@@ -381,7 +389,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 3. ~~Cómo se captura~~ **Decidido el 2026-11-22** (§10.6): Pokéball con moneda y categoría de captura.
 4. **Qué se vende en el descanso.** En el primer tramo, solo Pokéball y Poción (§10.6); falta decidir el resto (Repelente, Super y Ultra Ball, objetos, Pokémon) para los tramos siguientes.
 5. **Dinero.** Cerradas las cifras del primer tramo (§10.6). **Decidido el 2026-11-24:** el dinero paga todo lo de dentro de la campaña, incluida la piedra ex, y los puntos no se usan en ella (§10.9). Faltan las cifras de los tramos siguientes.
-6. **Cifras de progresión.** La XP de cada rival y el coste de evolucionar a fase 1 están **decididos** (§10.6) y hechos en #403 (los puntos ya no se convierten en XP). Falta el `xpEvolucion` de las demás fases cuando tengan carta. El intercambio es **gratis** y hacerse ex se hace con una **piedra ex** cuyo **precio fija Negocio** (decidido el 2026-11-24).
+6. **Cifras de progresión.** La XP de cada rival y el coste de evolucionar a fase 1 están **decididos** (§10.6) y hechos en #403 (los puntos ya no se convierten en XP). Falta el `xpEvolucion` de las demás fases cuando tengan carta (propuesta en §10.6, 2026-11-24). El intercambio es **gratis** y hacerse ex cuesta una **piedra ex** de **2.000** (decidido el 2026-11-24, D-21 §2.5).
 7. **Qué dan y qué cuestan las cartas ex** (más PS y ataques más fuertes, con otro coste de energía) y cuántas fases tiene cada cadena (por ejemplo, Machop → Machoke → Machamp ex). Todavía no hay ninguna carta evolucionada ni ex.
 8. ~~Liga~~ **Decidida el 2026-11-22** (§10.7): cinco rivales seguidos, tres Pokémon cada uno, un centro solo a la entrada. Es fase 2; faltan las cartas de sus rivales y las cifras de dinero y puntos por rival.
 9. **Combates 2 contra 2 y 3 contra 3.** Futuro, sin diseño.
@@ -408,7 +416,8 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 22. **Pantallas de la app** (mapa de región, combate, equipo, descanso) y **tienda**: sin diseño. Se propone hacer varias propuestas visuales antes de implementar (como en el resto de la app).
 23. **Kanban.** Las tarjetas del GitHub Project (`users/Ayme-99/projects/10`) no se pueden comprobar ni mover desde las sesiones de trabajo (la API del proyecto está bloqueada), y las issues #334 a #354 siguen abiertas aunque su PR ya está fusionado.
 24. **Medallas y líderes de gimnasio** (#416). Las medallas y los líderes de Kanto no existen en estilo Escarlata y Púrpura. **Decidido el 2026-11-22 por Ayme: las medallas serán las de Pokémon: Let's Go, Pikachu! y Let's Go, Eevee! (LGPE)**, de WikiDex: https://www.wikidex.net/wiki/Categor%C3%ADa:Sprites_de_medallas_de_Kanto (enlace para dárselo al artista). **Pendiente:** los líderes de gimnasio; **Ayme los mandará más adelante** (2026-11-22).
-28. **Líderes de gimnasio: ficha por rellenar.** Ayme los mandará (2026-11-22); la ficha vacía está en §4, «Líderes de gimnasio».
+28. **Líderes de gimnasio: ficha por rellenar.** Ayme los mandará (2026-11-22); la ficha vacía está en §4, «Líderes de gimnasio». Su columna de dinero lleva ya la propuesta del presupuesto por tramo (§10.6).
+29. **Cartas ex: lo que falta por decidir (propuesta de Diseño del 2026-11-24, §10.11).** (a) Excepciones además de Pikachu y Eevee; (b) Pikachu ex frente a Raichu; (c) Eevee en la primera entrega; (d) que el ex no evolucione; (e) medallas mínimas (4/4/5 o 3/4/5; Onix 3 o 4); (f) la piedra de premio y su aviso; (g) cómo cubrir la XP para 12 ex; (h) el presupuesto de dinero por tramo. Todo **por confirmar por Ayme**.
 25. **Dormido.** No existe en campaña todavía (decisión de Ayme del 2026-11-23: dejarlo programado o programarlo cuando aparezca un Pokémon que lo cause). **Decidido el 2026-11-24: no se hace nada ahora**; se programa cuando exista la primera carta que lo cause (#436).
 26. ~~Cuerda Huida: ¿gasta el turno?~~ **Decidido el 2026-11-23 por Ayme: sí gasta el turno** (como cambiar, §3.2) **y ahorra la energía de la retirada**. Se revisa con el simulador si resulta poco útil (#437). **Se vende desde el tramo 2**, junto a la Super Ball (decidido el 2026-11-24).
 27. **Pociones en combate.** Hoy solo se usan desde la pantalla de equipo; **decidido el 2026-11-24: no se hace nada ahora** (sin Pociones en combate, Brock sale bien); se retoma si el simulador lo pide (#435).
@@ -437,7 +446,8 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 14 | **Pulimento de Geodude:** efecto `ganaEnergia` (esquema, motor, IA), actualizar `geodude.json` a la carta impresa (§10.5) y volver a medir a Brock con el simulador | Motor, IA, esquema y `geodude.json` **hechos**; la nueva medida de Brock queda para Calidad |
 | 15 | **Supersónico de Zubat e Hidropulso de Slowpoke:** efecto `confundeDefensor` con campo `monedas` (esquema, motor, IA), actualizar `zubat.json` y `slowpoke.json` a sus cartas impresas (§10.5; el test «Zubat es de oscuridad y Ataque Ala es normal» cambia) y volver a medir con el simulador | **Hecho**: esquema, motor, `zubat.json` y `slowpoke.json`; la IA no lo usa (no se rompe). Duelos: Zubat 38,6 % (igual), Slowpoke 87,5 % (antes 77,3 %) |
 | 16 | **Evoluciones de los iniciales:** efectos `drenaDefensor`, `paralizaDefensor` y la opción `mientrasActivo` de `monedaFalloRival` (esquema, motor, IA); `ivysaur.json`, `charmeleon.json` y `wartortle.json` a las cartas impresas (§10.5); `evoluciones` en Bulbasaur, Charmander y Squirtle (`via: xp`, `xpEvolucion` 70, `medallasMinimas` 0); y volver a medir con el simulador | Pendiente (#439) |
-| 17 | **Intercambio gratis y piedra ex:** quitar el precio en puntos del intercambio y cambiar `via: "puntos"` (hacerse ex) por un objeto «piedra ex» (§10.9); el precio de la piedra lo fija Negocio (D-21) (#447) | Pendiente |
+| 17 | **Intercambio gratis y piedra ex** (#447): quitar `puntos` del intercambio; `via: "objeto"`, `objeto: "piedra-ex"` para hacerse ex (2.000 en la tienda desde la 3.ª o 4.ª medalla, premio de una por medalla en cada gimnasio, contador en la mochila); la carta ex se declara en `evoluciones` de la última fase normal (de la base en Pikachu y Eevee) y **una carta ex no lleva `evoluciones`** (test); al hacerse ex el Pokémon queda con 10 PS (§10.6). Detalle en §10.11 | Pendiente |
+| 18 | **Medir la XP y el número de ex** (Calidad): cuántos ex se alcanzan al llegar a la Liga por la ruta principal, con y sin repetir salvajes (§10.6, 2026-11-24) | Pendiente |
 
 ## 10. Registro de decisiones
 
@@ -549,7 +559,10 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | **Precios** (los de los juegos Rojo, Azul, Amarillo y FireRed/LeafGreen): Pokéball 200, Super Ball 600, Ultra Ball 1200, Poción 300 y Repelente 350. En el primer tramo la tienda vende **solo Pokéball y Poción**. **Hecho (#402)**: campo `tienda` en cada centro. | #362 |
 | 2026-11-23 | **Cuerda Huida** (objeto de combate): **precio 550** (el de los juegos) y **usable en combate**; su efecto es cambiar el Pokémon activo por uno de la banca **sin pagar la retirada**, aunque esté Paralizado (y Dormido, cuando exista). **Gasta el turno y ahorra la energía de la retirada** (decidido por Ayme el 2026-11-23; #437). **Se vende desde el tramo 2**, junto a la Super Ball (decidido el 2026-11-24). Hoy no hay objetos en combate: la Cuerda Huida sería el primero, y de ahí sale la pregunta de si las **Pociones** también (#435). | §8, 26 y 27; #435, #437 |
 | 2026-11-22 | **Dinero.** Cada clase de entrenador y cada líder paga una cifra propia guardada en el catálogo (campo `dinero`), para ajustarlo a cada tramo. Referencia: al conseguir la 1ª medalla el jugador ha ganado unos **2.060** (en FireRed/LeafGreen son 2.064 solo con entrenadores). Primer tramo: Cazabichos 200 (×2), Entrenador Joven 260 y Brock 1.400. Dinero de salida: **1.000**. Los salvajes no dan dinero. **Hecho (#402).** | §5; #362 |
-| 2026-11-24 | **Intercambio gratis; hacerse ex con una «piedra ex»** (decidido por Ayme; el precio lo decide Negocio). Los puntos no tienen ningún uso dentro de la campaña. Ejemplo de Ayme: Venusaur + piedra ex = Venusaur ex. Falta renombrar o quitar el campo `puntos` del catálogo y el motor y definir el objeto (#447). **Abierto:** si la piedra ex vale solo para Pokémon sin evolución (Onix) o también para pasar de la última fase normal a su ex (§2.1 dice que la última fase ya es ex). | §2.1, §5, §10.9; #444, #447 |
+| 2026-11-24 | **Cartas ex y piedra ex** (decidido por Ayme, D-21 §2.5): intercambio **gratis**; hacerse ex con la **piedra ex**, **2.000** de dinero, una piedra por ex y sin XP; las líneas acaban en su carta ex como un paso más (Básico → Básico ex; Básico → Fase 1 → Fase 1 ex; Básico → Fase 1 → Fase 2 → Fase 2 ex), que solo se ofrece cuando ya no se puede evolucionar más; excepciones por fandom: Pikachu y Eevee; **una piedra ex de premio por medalla** (8) y el resto se compra en el centro; objetivo de **12 ex o más** entre equipo y PC, con cartas de más de 200 PS; los puntos no tienen uso en la campaña. Falta el objeto y el campo en catálogo y motor (#447). | §2.1, §5, §10.9, §10.11; D-21 §2.5; #447 |
+| 2026-11-24 | **Cuello de botella de XP para 12 ex (propuesta de Diseño, por confirmar).** La piedra ex **no cuesta XP**: la XP solo paga llegar a la última fase normal. Un Básico ex cuesta 0, un Fase 1 ex una evolución y un Fase 2 ex dos. Con un equipo de ejemplo de 12 (inicial, Caterpie, Weedle, Pidgey, Rattata, Spearow, Sandshrew, Cubone, Geodude, Machop, Pikachu y Onix) salen **unos 1.100 a 1.300 XP** (D-21 estimaba 1.500 porque contaba XP también para el ex), frente a los **700 a 900 XP** de la ruta principal: faltan **300 a 500**, medido a ojo y **sin simulador**. Opciones por coste: (1) no cambiar nada y confiar en repetir salvajes (unos 25 a 40 combates; sin coste de datos, riesgo de aburrir); (2) **`xpEvolucion` de las fases siguientes en 80 en lugar de los 110 de los juegos** (solo datos, al crear cada carta; deja el hueco en unos 100 a 200 XP) **(recomendada junto con la 1)**; (3) subir la XP de los rivales de los tramos 5 a 8 (`xp` propio en sus JSON), solo si Calidad mide menos de 12 ex. Calidad debe medirlo (tarea 18). | §2.1, §8, 29; D-21 §2.5 |
+| 2026-11-24 | **Presupuesto de dinero por tramo (propuesta de Diseño, por confirmar), con la curva de +150 por tramo de Negocio (D-21 §2.5).** Total por tramo 2.060, 2.210, 2.360, 2.510, 2.660, 2.810, 2.960 y 3.110 (suman 20.680; con los 1.000 de salida, 21.680, como en D-21). Reparto: **el líder paga unas dos terceras partes** (1.400, 1.500, 1.600, 1.700, 1.800, 1.900, 2.000 y 2.100: +100 por tramo) y **los entrenadores el resto** (660, 710, 760, 810, 860, 910, 960 y 1.010: +50 por tramo). El tramo 1 no cambia (Cazabichos 200 ×2, Entrenador Joven 260 y Brock 1.400). **Cifras por clase de entrenador de los tramos 2 a 8: no se pueden fijar aún**, porque las rutas, sus entrenadores y sus líderes no existen (tarea 11); cuando se diseñe cada tramo, los entrenadores de la ruta se reparten el presupuesto de entrenadores a partes iguales, redondeado a 10. | §4, §8, 5; D-21 §2.5 |
+| 2026-11-24 | **Primera piedra ex de premio y aviso en pantalla (propuesta de Diseño, por confirmar).** La da **Brock con la medalla Roca** (1 de 8); el campo de recompensas de cada gimnasio lleva una piedra ex. Aviso al ganarla: «¡Has ganado la Medalla Roca y una Piedra ex! Servirá cuando tengas 4 medallas.» (con el número de la tabla de §10.11). La mochila muestra «Piedras ex: N» y la hoja del Pokémon, «Hacerse ex (1 piedra)», activa o apagada con el motivo «Requiere N medallas», como en las evoluciones (§10.6). El texto y la pantalla los define Arte. | §10.11; #447 |
 | 2026-11-22 | **Evoluciones del primer tramo.** Por ahora solo las que ya tienen carta en el catálogo: **Caterpie → Metapod** y **Weedle → Kakuna**, que se capturan en la Ruta 2 sur. Lo que da Brock (puntos) se guarda para evolucionar a uno más después. **Si Brock resulta muy difícil con ese equipo, se puede evolucionar también un inicial antes de Brock** (Bulbasaur, Charmander o Squirtle), lo que exige crear sus cartas de fase 1. Es **opcional, no obligatorio**, y se medirá con el simulador contra el objetivo del 75 % (§10.5). Las cifras de XP y de coste de evolución quedan por cerrar con cálculos (§8, 6). | #363 |
 | 2026-11-22 | **Solo XP de combate para evolucionar, en una reserva común.** Cada combate suma XP a una **reserva** que se guarda; el jugador decide a qué Pokémon se la gasta y cuándo (en el centro Pokémon). La XP se gasta **entera para evolucionar**: no se puede dejar a medias ni repartir en parte. Los puntos no intervienen en la evolución (solo en la tienda de la cuenta y en el intercambio y hacerse ex, §10.6). | §2.1, §5; #363 |
 | 2026-11-22 | **Cifras de XP.** Cada rival derrotado suma XP a la reserva (una sola vez, no por Pokémon): **10, 20 o 30 según su categoría de captura** (Común 10, Intermedio 20, Fuerte y Jefe 30; un jefe puede llevar `xp` propio en su JSON, y Pikachu jefe da 30). Coste de evolucionar a fase 1: **50 XP** para Caterpie → Metapod y Weedle → Kakuna (≈ 5 KO, la proporción de los juegos: nivel 7, unos 220–316 XP frente a unos 58 por KO), y **70 XP** para un inicial (**abaratado a propósito**: en los juegos serían ≈ 410, nivel 16, y no cabría antes de Brock). Con 10 XP por rival, la reserva era de 70–90 XP en Plateada y de 110–130 tras Brock; con la regla de 10, 20 o 30 es de unos **110 XP en Plateada (90–130) y unos 180 tras Brock (160–200)**, y **los costes se quedan en 50 y 70** (decidido el 2026-11-22): con ellos, casi siempre se puede evolucionar un inicial y un insecto antes de Brock, y Calidad medirá con el simulador si eso es demasiado fácil. Dato nuevo del catálogo: `xpEvolucion` en cada Pokémon que evoluciona. Las demás fases se fijan cuando tengan carta (referencia de los juegos: Metapod y Kakuna ≈ 110). Si el simulador dice que es demasiado fácil o difícil, se ajustan estas cifras. **Hecho (#403)**, salvo el `xpEvolucion` de los iniciales, que espera a sus cartas de fase 1. | §2.1; #363 |
@@ -600,7 +613,8 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 |---|---|---|
 | 2026-11-23 | #368 leyó «la Ruta 1 no permite capturar» como una regla de la zona (`captura: false`). | No es una regla de la zona: en la Ruta 1 no se captura **la primera vez** porque no hay Pokéballs hasta la primera tienda (Ciudad Verde); después se puede volver a capturar (Ayme, 2026-11-23). La zona deja de llevar `captura: false`. |
 | 2026-11-23 | §5 decía que las **compras del descanso**, la **XP de evolución** y la evolución se pagaban **con puntos**, y que el dinero estaba «por definir». | Desde el 2026-11-22 (§10.6) las compras del centro Pokémon se pagan con **dinero**, la evolución cuesta **XP** de combate, y los puntos solo pagan el **intercambio** y el **hacerse ex**. Texto de §5 corregido el 2026-11-23. **Parte sustituida el 2026-11-24:** los puntos tampoco pagan el intercambio ni hacerse ex (ver la fila siguiente). |
-| 2026-11-24 | El intercambio y hacerse ex costaban **puntos** (§2.1, §10.6, §10.9 del 2026-11-23). | Los **puntos no tienen ningún uso dentro de la campaña**. El **intercambio es gratis** y hacerse ex se hace con una **piedra ex**, de precio fijado por Negocio (decisión de Ayme del 2026-11-24, corrigiendo mi versión de #445, que ponía 2.000 y 4.000 de dinero a partir de la propuesta de D-21). |
+| 2026-11-24 | El intercambio y hacerse ex costaban **puntos** (§2.1, §10.6, §10.9 del 2026-11-23). | Los **puntos no tienen ningún uso dentro de la campaña**. El **intercambio es gratis** y hacerse ex es la **piedra ex** a **2.000** de dinero (Ayme, 2026-11-24; D-21 §2.5). Corrige mi versión de #445 (4.000) y la de #448 (precio sin fijar). |
+| 2026-11-24 | «La **última fase de cada Pokémon es una carta ex**» (§2.1, 2026-11-21). | La carta ex es **un paso más después de la última fase normal**: hace falta la carta normal **y** la ex (Venusaur y Venusaur ex). Cada línea necesita, por tanto, una carta más que antes (unas 16 cartas no ex más y las de Pikachu ex y Eevee ex, estimación mía). Una Fase 2 sin ex necesita fila en el baremo (§3.5, propuesta). |
 | 2026-11-22 | La tabla de §10.11 (#417) puso los iniciales a **1 medalla**, por un error al fijarla. | Los iniciales evolucionan con **0 medallas**, así que pueden hacerlo antes de Brock; el plan B de §10.6 sigue vigente. Corregido el 2026-11-22 (#416). |
 | 2026-11-22 | `fantasma` pasaba a **psíquico** (§10.3) y Agatha era de tipo psíquico. | `fantasma` pasa a **oscuridad**, igual que `veneno`, y Agatha es de tipo **oscuridad** (§10.3, §10.7; #416). |
 | 2026-11-21 | La tercera acción era «Pasar». | «Cargar» (§10.2). |
@@ -658,23 +672,40 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | Diglett → Dugtrio | 26 | 3 |
 | Machop → Machoke, Mankey → Primeape, Cubone → Marowak | 28 | 3 |
 | Slowpoke → Slowbro | 37 | 5 |
-| Pikachu → Raichu | Piedra Trueno | **Decidido el 2026-11-24:** evoluciona con la Piedra Trueno, que **aún no se puede obtener**; dónde y cuándo se consigue sigue abierto (propuesta de Diseño debajo) |
-| Onix → Steelix | Intercambio con Revestimiento Metálico | **Decidido el 2026-11-24:** sin Steelix en la primera entrega; «evolucionar» a Onix es subirlo a **Onix ex** con la piedra ex, a las 4 medallas |
+| Pikachu → Raichu | Piedra Trueno | **Decidido el 2026-11-24:** evoluciona con la Piedra Trueno, que **aún no se puede obtener**; dónde y cuándo se consigue sigue abierto (ver «Pikachu y Raichu», abajo) |
+| Onix → Steelix | Intercambio con Revestimiento Metálico | **Decidido el 2026-11-24:** sin Steelix en la primera entrega; «evolucionar» a Onix es subirlo a **Onix ex** con la piedra ex (medallas: tabla de las cartas ex, abajo) |
 
-**Los dos casos abiertos, con lo decidido por Ayme el 2026-11-24.** Raichu: evoluciona con la **Piedra Trueno**, que **todavía no se puede obtener** (dónde y cuándo se consigue queda abierto). Onix: por ahora «evolucionar» es solo hacerlo **más fuerte**, una subida de nivel a **Onix ex**; no hay Steelix. Lo demás de este bloque es propuesta anterior de Diseño.
+#### Cartas ex: reglas y medallas mínimas (propuesta de Diseño, 2026-11-24)
 
-*Pikachu → Raichu (Piedra Trueno).* Raichu es la **última fase**, así que sería una **carta ex** (§2.1). Propongo:
-- **Propuesta (no decidida), medallas mínimas: 3** (la de Trueno, la del líder eléctrico) y la **Piedra Trueno a la venta en la tienda de Ciudad Azulona** (en los juegos se vende en los grandes almacenes de Azulona; por contrastar), que se alcanza tras la 3.ª medalla. Así el plazo y la tienda coinciden y no hay que decidir cuándo se compra por separado.
-- **Precio de la piedra:** el de los juegos (por contrastar con Serebii o Bulbapedia; unos 2.100). Como las piedras se compran con **dinero** (§10.6), esto casa con la regla ya decidida («los objetos de evolución se compran fuera de los centros o se encuentran en las rutas», §2.1).
-- **Sin XP**: la piedra sustituye a la XP, como pide la regla de §2.1. Queda por decidir si una evolución que acaba en ex cuesta además **dinero** (hoy solo el intercambio y hacerse ex lo cuestan).
-- **Alternativa más barata** (sin tienda nueva): la Piedra Trueno se encuentra en la **Central Eléctrica** (ruta clave del jefe 10) en lugar de comprarse. Cuesta menos en datos y deja a Pikachu sin evolución hasta entonces.
+**Lo decidido por Ayme (§2.1) va sin marca; todo lo demás es propuesta mía, por confirmar.** Raichu evoluciona con la **Piedra Trueno**, que **todavía no se puede obtener**. Onix «evoluciona» subiendo a **Onix ex**, sin Steelix.
 
-*Onix → Steelix (Revestimiento Metálico).* D-20 se contradecía: §2.1 decía que Onix «puede hacerse ex gastando puntos» (ahora dinero) y esta fila decía que evoluciona a Steelix con un objeto y un intercambio. Opciones, de menor a mayor coste (**elegida la 1**):
-1. **Onix se hace ex con la piedra ex y no hay Steelix en la primera entrega** (elegida): se cumple §2.1 y D-21, no hace falta ningún objeto ni intercambio, y Steelix, que no es de la primera generación (§10.3), queda fuera del alcance. **Medallas mínimas: 4** (Onix ex tendría 240 PS, §3.5, y las terceras fases de los iniciales, que serían 4 y 5 medallas (arriba), son la referencia). Coste: el de la **piedra ex**, que fija Negocio.
-2. **Steelix ex por hacerse ex** (mismo proceso, otra carta): necesita la carta Steelix ex, el color y el icono de `metal` (§8, 10; #408) y no es Kanto de la primera generación.
-3. **Steelix por Revestimiento Metálico más intercambio** (lo que dice la fila actual): objeto nuevo en la tienda, intercambio y dos pagos (el objeto y el intercambio). Es lo más caro y no lo recomiendo.
+**Ejemplos de línea** (decidido): Bulbasaur → Ivysaur (XP) → Venusaur (XP) → Venusaur ex (piedra ex); Rattata → Raticate (XP) → Raticate ex (piedra ex); Onix → Onix ex (piedra ex). Llegar a la última fase normal cuesta XP y medallas; la piedra ex no cuesta XP.
 
-Las terceras fases de los iniciales (nivel 32 y 36 en los juegos) serían 4 y 5 medallas si se hacen; no hay cartas todavía.
+**1. Excepciones por fandom.** Criterios propuestos: (a) **mascota** de la franquicia (Pikachu); (b) **línea ramificada** en la que el jugador elige (Eevee); (c) un personaje que el jugador espera ver como ex aunque evolucione. Cada excepción es un ex **sin XP ni medallas de evolución**: adelanta un ex barato. Opciones por coste:
+- **A. Solo Pikachu y Eevee** (decidido; **recomendada** para la primera entrega).
+- **B. Añadir Jigglypuff y Meowth** (mascotas de rutas y del Team Rocket): 2 ex más y unas 4 cartas.
+- **C. Además, Magikarp y Psyduck** (populares): 4 ex más. Solo si el simulador (tarea 18) dice que faltan ex.
+
+**2. Pikachu y Raichu.** Son **dos cartas ex distintas**: **Pikachu ex** (Básico ex) y **Raichu ex** (Fase 1 ex), y además hace falta la carta Raichu normal. La **Piedra Trueno sigue siendo necesaria** para Raichu y hoy no se puede obtener, así que por ahora **solo existe el camino de Pikachu ex**. Elegir ex **cierra la línea**: Pikachu ex ya no llega a Raichu, y Raichu ex cuesta Piedra Trueno más piedra ex. Opciones por coste: **(1) Pikachu ex cierra la línea** (recomendada; no hacen falta Raichu ni Raichu ex hasta que haya Piedra Trueno); (2) Pikachu ex puede seguir a Raichu ex con las dos piedras (rompe el punto 4); (3) quitar a Pikachu de las excepciones.
+
+**3. Eevee.** Es un Básico con tres ramas por piedra (Vaporeon, Jolteon, Flareon). Opciones por coste: **(A) primera entrega solo con Eevee ex** (Eevee + piedra ex; las tres ramas y sus piedras quedan para después; **recomendada**, cero cartas más); (B) Eevee → una de las tres (piedra elemental) → Fase 1 ex: 6 cartas (3 normales y 3 ex) y tres piedras en el mapa (la de Trueno se comparte con Raichu); (C) que Eevee ex pueda evolucionar después (rompe el punto 4). Con A o B, la piedra ex **cierra** la línea: un Eevee ex no se ramifica, y uno ramificado ya no es Eevee ex.
+
+**4. ¿Un ex puede seguir evolucionando?** **No** (suposición de Dirección, de acuerdo): la piedra ex es el último paso, sin excepciones; una carta ex no lleva `evoluciones`, y un test del catálogo lo comprueba.
+
+**5. Medallas mínimas de cada ex.** Aclaración sobre Onix: la única confirmación **escrita** de Ayme (2026-11-24, 11:25, «Confirmo») es **4 medallas para Onix ex**; el «3» que cita Dirección no consta por escrito. **Vale 4 hasta que Ayme diga otra cosa.** Regla propuesta: **la medalla de un ex es la mayor entre la de su última fase normal y el mínimo de su tipo.** Opciones por coste (todas son datos):
+
+| Tipo de ex | A: 4 / 4 / 5 (**recomendada**) | B: 3 / 4 / 5 (si Ayme quiso decir 3 para Onix) | C: 3 / 3 / 4 (más permisiva) | Ejemplos |
+|---|---|---|---|---|
+| Básico ex (200–260 PS) | 4 | 3 | 3 | Onix ex, Pikachu ex, Eevee ex |
+| Fase 1 ex (210–260 PS) | 4 | 4 | 3 | Raticate ex, Fearow ex, Primeape ex |
+| Fase 2 ex (270–340 PS) | 5 | 5 | 4 | Venusaur ex, Charizard ex, Butterfree ex |
+
+La opción A casa con las terceras fases de los iniciales (nivel 32 y 36 en los juegos, es decir, 4 y 5 medallas) y con la cuenta de piedras de D-21 (6 a 7 piedras tras la 4.ª medalla). C pondría ex de 330 PS ya en la 4.ª medalla y es la que más riesgo tiene para el reto; Calidad la mide con la tarea 18.
+
+**6. Primera piedra de premio.** La da **Brock con la medalla Roca** y el aviso va en §10.6 (2026-11-24). La primera piedra no se puede usar hasta cumplir la medalla de la tabla: el aviso lo dice.
+
+**7. Piedra Trueno.** Hoy no se puede obtener. Cuando se pueda, la propuesta anterior sigue en pie: venderla en Ciudad Azulona (unos 2.100, por contrastar con Serebii o Bulbapedia) o encontrarla en la Central Eléctrica (ruta clave del jefe 10).
+
 
 ## 11. Cómo se crea una carta
 
