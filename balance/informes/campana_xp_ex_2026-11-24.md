@@ -170,7 +170,7 @@ Primer intento en Brock (5 Balls, 3 Pociones máximo, 800 recorridos):
 
 - Con 5 Balls, Brock ya estaba en 76/98/98 % sin Pociones. **Una sola Poción** sube a Bulbasaur a ~95 %: el reto de Brock deja de estar «cerca del 75 %».
 - La 2.ª Poción no aporta (Bulbasaur 94,7 → 94,7 %). Hacen falta **0 Pociones** para quedarse en el 75 % de Bulbasaur y **1** ya lo supera de sobra.
-- Las Balls pesan más que las Pociones: con 4 Balls + 2 Pociones Brock da 89/93/95 %, pero la tasa de llegar baja a ~90 % y el reto global cae (Bulbasaur gana Brock ~80 %); con 3 Balls + 3 Pociones, 72/72/—; con 2 Balls, 0 % (no se llega a Brock).
+- Las Balls pesan más que las Pociones: con 4 Balls + 2 Pociones Brock da 89/93/95 %, pero la tasa de llegar baja a ~90 % y el reto global cae (Bulbasaur gana Brock ~80 %); con 3 Balls + 3 Pociones, Brock 72/72 % (Bulbasaur/Charmander) pero solo llega ~73 %; con 2 Balls, 0 % (no se llega a Brock).
 - Con 1.000 iniciales y todo en Pociones (3), no quedan Balls y el recorrido no pasa de Pikachu: **no es trivial, es inviable**. El límite real no es la Poción a 300, es el presupuesto: antes de Brock hay ~1.660, y 5 Balls (1.000) dejan solo para 2 Pociones.
 - Las Pociones se compran en Plateada, después de Pikachu y del Entrenador Joven, así que **no ayudan en esos dos combates**, que son los muros reales (Pikachu con Squirtle 65 %).
 
