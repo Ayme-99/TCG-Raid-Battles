@@ -476,33 +476,89 @@ void main() {
       expect(p.ex, isFalse);
     });
 
-    test('se leen las cuatro vías de evolución', () {
+    test('se leen las tres vías de evolución; el intercambio es gratis', () {
       final p = pokemonCampanaDesdeJson(base([
         {'a': 'a', 'via': 'xp', 'xpEvolucion': 30},
         {'a': 'b', 'via': 'objeto', 'objeto': 'piedra-trueno'},
-        {'a': 'c', 'via': 'intercambio', 'puntos': 200},
-        {'a': 'd', 'via': 'puntos', 'puntos': 300},
-      ], ex: true));
-      expect(p.ex, isTrue);
+        {'a': 'c', 'via': 'intercambio'},
+      ]));
       expect(p.evoluciones.map((e) => e.via), ViaEvolucion.values);
       expect(p.evoluciones[0].xpEvolucion, 30);
       expect(p.evoluciones[1].objeto, 'piedra-trueno');
-      expect(p.evoluciones[2].puntos, 200);
-      expect(p.evoluciones[3].puntos, 300);
+      expect(p.evoluciones[1].esPiedraEx, isFalse);
+      expect(p.evoluciones[2].via, ViaEvolucion.intercambio);
+    });
+
+    test('hacerse ex es un objeto: la piedra ex (D-20 §2.1)', () {
+      final p = pokemonCampanaDesdeJson(base([
+        {'a': 'prueba-ex', 'via': 'objeto', 'objeto': 'piedra-ex'},
+      ]));
+      expect(p.evoluciones.single.objeto, idPiedraEx);
+      expect(p.evoluciones.single.esPiedraEx, isTrue);
+    });
+
+    test('ya no hay vía «puntos» ni precio en el intercambio (D-20 §10.9)', () {
+      expect(
+          () => pokemonCampanaDesdeJson(base([
+                {'a': 'a', 'via': 'puntos', 'puntos': 300}
+              ])),
+          throwsFormatException);
+      expect(
+          () => pokemonCampanaDesdeJson(base([
+                {'a': 'a', 'via': 'intercambio', 'puntos': 200}
+              ])),
+          throwsFormatException);
+    });
+
+    test('una carta ex no lleva evoluciones (D-20 §10.11)', () {
+      expect(pokemonCampanaDesdeJson(base([], ex: true)).ex, isTrue);
+      expect(
+          () => pokemonCampanaDesdeJson(base([
+                {'a': 'a', 'via': 'xp', 'xpEvolucion': 30}
+              ], ex: true)),
+          throwsFormatException);
     });
 
     test('una evolución a medias o con una vía desconocida se rechaza', () {
-      expect(() => pokemonCampanaDesdeJson(base([{'a': 'a', 'via': 'xp'}])),
+      expect(
+          () => pokemonCampanaDesdeJson(base([
+                {'a': 'a', 'via': 'xp'}
+              ])),
           throwsFormatException);
       expect(
-          () => pokemonCampanaDesdeJson(base([{'a': 'a', 'via': 'objeto'}])),
+          () => pokemonCampanaDesdeJson(base([
+                {'a': 'a', 'via': 'objeto'}
+              ])),
           throwsFormatException);
       expect(
-          () => pokemonCampanaDesdeJson(
-              base([{'a': 'a', 'via': 'intercambio'}])),
+          () => pokemonCampanaDesdeJson(base([
+                {'a': 'a', 'via': 'magia'}
+              ])),
           throwsFormatException);
-      expect(() => pokemonCampanaDesdeJson(base([{'a': 'a', 'via': 'magia'}])),
-          throwsFormatException);
+    });
+
+    test(
+        'en el catálogo, ninguna carta ex evoluciona y la piedra ex lleva a '
+        'una carta ex desde una fase que ya no evoluciona por XP', () {
+      for (final p in pokemon.values) {
+        if (p.ex) expect(p.evoluciones, isEmpty, reason: p.id);
+        for (final e in p.evoluciones) {
+          if (!e.esPiedraEx) continue;
+          expect(pokemon[e.a]?.ex, isTrue, reason: '${p.id} → ${e.a}');
+          expect(p.evoluciones.where((o) => o.via == ViaEvolucion.xp), isEmpty,
+              reason: '${p.id}: solo se hace ex en su última fase normal');
+        }
+      }
+    });
+
+    test(
+        'el esquema ya no tiene la vía «puntos» y prohíbe evoluciones en un ex',
+        () {
+      final esquema = File('../catalog/schema/pokemon-campana.schema.json')
+          .readAsStringSync();
+      expect(esquema, isNot(contains('"puntos"')));
+      final json = jsonDecode(esquema) as Map<String, dynamic>;
+      expect((json['then'] as Map)['properties']['evoluciones']['maxItems'], 0);
     });
 
     test('toda evolución del catálogo apunta a un Pokémon que existe', () {
