@@ -16,7 +16,7 @@ Cómo leerlo:
 | 2 | Los puntos se gastan (D-20) pero D-10 dice que no se gastan | Dos contadores: **puntos ganados** (total histórico, para desbloquear jefes) y **saldo** (lo gastable). | §1.2 |
 | 3 | Catálogo de la tienda al lanzar | Solo **monedas y dados** (cosmética). Sobres y cartas sueltas esperan a que existan cartas del formato digital. Las campañas y los jefes **no** se venden. | §2.2 |
 | 4 | Precios | Moneda de serie 800, temática 2.000; dados de serie 1.500, temáticos 3.000; sobre 1.000; carta suelta 200 / 400 / 800 / 2.000 según rareza. | §2.3 |
-| 5 | **Decidido el 2026-11-24:** los puntos no se usan en la campaña, el intercambio es **gratis**, hacerse ex es la **piedra ex** a **2.000 de dinero**, el dinero por tramo sube (+300 por tramo) y hay 3 piedras de premio. El objetivo es un equipo de 6 ex y más en el PC. | Pendiente: cuántos ex en el PC, qué medallas dan piedra y la lista de excepciones (Pikachu, Eevee). | §2.5 |
+| 5 | **Decidido el 2026-11-24:** los puntos no se usan en la campaña, el intercambio es **gratis**, hacerse ex es la **piedra ex** a **2.000 de dinero**, hay **una piedra de premio por medalla** y el objetivo es llegar a la Liga con **12 ex o más** entre equipo y PC. | Dinero por tramo con una subida suave (+150) para tener margen; la lista de excepciones (Pikachu, Eevee) la define Diseño; medir la XP necesaria. | §2.5 |
 | 6 | Qué es «Mis cartas» | **Decidido:** las cartas de campaña solo valen en campaña; la tienda traerá cartas para las partidas rápidas digitales. Dos colecciones, y los jefes de campaña van en «Enemigos». | §3.1 |
 | 7 | Qué se registra al capturar | **Decidido:** por ahora solo la carta. Cuenta aunque el Pokémon acabe en el PC y aunque luego evolucione. | §3.3 |
 | 8 | Relación con las cartas físicas | Misma imagen y misma numeración, sin escaneo ni canje; reglas de reimpresión y de uso privado. El código de canje queda como idea futura. | §3.5 |
@@ -158,57 +158,59 @@ Todas las cifras son **ajustables sin tocar la tienda**: viven en un catálogo d
 
 - **Los puntos no tienen utilidad dentro de la campaña** (2026-11-23). La tienda de puntos vive solo en el menú de la app.
 - **El intercambio es gratis** (2026-11-24).
-- **Hacerse ex es un objeto, la «piedra ex»** (2026-11-24). Ejemplo: Venusaur + piedra ex = Venusaur ex. La carta ex aplica **cuando el Pokémon ya no puede evolucionar más**. Excepciones por fandom: **Pikachu y Eevee** también pueden ser ex. Las cartas las crea Ayme a mano, así que no es un cuello de botella.
-- **Objetivo de diseño: terminar la campaña con un equipo de 6 ex** y, además, más ex en el PC para tener un equipo polivalente. Al final los rivales serán cada vez más fuertes, así que las cartas de **más de 200 PS** son el objetivo.
-- **Precio de la piedra ex: 2.000 de dinero** (propuesta de Negocio aceptada por Ayme el 2026-11-24).
-- Ayme acepta también las dos medidas siguientes: el dinero por tramo sube hacia el final, y algunas piedras se dan de premio.
+- **Hacerse ex es un objeto, la «piedra ex»**, a **2.000 de dinero** (precio propuesto por Negocio y aceptado el 2026-11-24). Una piedra, un ex. Ejemplo de Ayme: Venusaur + piedra ex = Venusaur ex.
+- **Las líneas evolutivas** (Ayme, 2026-11-24), donde la carta ex es siempre el último paso:
+  - Básico → Fase 1 → Fase 2 → **Fase 2 ex**
+  - Básico → Fase 1 → **Fase 1 ex**
+  - Básico → **Básico ex**
+- **Excepciones por fandom:** Pikachu y Eevee, que pueden evolucionar y también ser ex. La lista exacta y cómo se resuelven la define **Diseño** (Ayme le pasa un prompt).
+- **Piedra de premio: una por medalla** (8 en total). Como el juego no tiene MT, es un premio que encaja. Se entrega con la medalla y no caduca.
+- **Objetivo: llegar a la Liga con al menos 12 ex entre el equipo y el PC**, con cartas de más de 200 PS, porque los rivales serán cada vez más fuertes. El equipo final es de 6 ex y el resto, en el PC para tener un equipo polivalente. Las cartas las crea Ayme a mano, así que no es un cuello de botella.
 
-Esto sustituye a mi primera propuesta (intercambio 2.000 y hacerse ex 4.000) y a la recomendación de 4.000, que servía para un equipo con 1 o 2 ex y no para este objetivo.
+Esto sustituye a mis propuestas anteriores (intercambio 2.000 y hacerse ex 4.000; tres piedras de premio en las medallas 4, 6 y 8; unos 10 ex posibles).
 
-**Qué falta, y es de Diseño:** la lista exacta de excepciones como Pikachu y Eevee (y cómo conviven con Raichu, que sería una carta ex por evolución) y si Pokémon de 3 fases como Venusaur necesitan la piedra para pasar a ex (lo que dice el ejemplo de Ayme). El cálculo de abajo supone que **sí**.
+#### La cuenta de piedras
 
-#### Por qué 2.000 con este objetivo
+Para 12 ex hacen falta 12 piedras: **8 de premio y al menos 4 compradas** (8.000 de dinero). Con unos 8.000 a 12.000 en total para Pokéballs y Pociones (suposición mía de 1.000 a 1.500 por tramo, sin medir), la campaña necesita de **16.000 a 20.000** de dinero.
 
-Un equipo de 6 ex más unos 4 ex en el PC (el 4 es una **suposición mía**, falta que Ayme diga cuántos) son **unas 10 piedras**. A 2.000, son 20.000 de dinero en piedras, más el gasto en Pokéballs y Pociones (supongo 1.000 a 1.500 por tramo, 8.000 a 12.000 en total, sin medir). Hace falta una campaña de **28.000 a 32.000** de dinero. Con ~2.060 por tramo (D-20 §10.6) salen solo unos 17.500, y de ahí solo unas 3 o 4 piedras.
-
-Referencias: Ultra Ball 1.200 (con 5 medallas), piedra de evolución de los juegos ~2.100, Onix ex 240 PS frente a 110. A 3.000 o 4.000 el objetivo exigiría ×2,3 a ×3 el dinero actual por tramo, así que **2.000** es el precio que permite el objetivo.
-
-#### Cómo se llega: dinero creciente y piedras de premio
-
-Las dos medidas actúan a la vez.
-
-**1. El dinero por tramo sube hacia el final** (Diseño fija la cifra de cada clase y de cada líder en el catálogo). Propongo **+300 por tramo**:
+Con el dinero de hoy (~2.060 por tramo, unos 17.500 en 8 tramos) ya se llega al objetivo por poco. Para tener margen propongo una subida suave de **+150 por tramo** (guía para Diseño, que fija la cifra de cada clase y cada líder en el catálogo):
 
 | Tramo | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|
-| Dinero ganado | 2.060 | 2.360 | 2.660 | 2.960 | 3.260 | 3.560 | 3.860 | 4.160 |
+| Dinero ganado | 2.060 | 2.210 | 2.360 | 2.510 | 2.660 | 2.810 | 2.960 | 3.110 |
 
-Suman **24.880** más 1.000 de salida. El tramo 1 es el que ya está en el catálogo. Es una guía, no una decisión: los tramos intermedios dependen de los entrenadores que Diseño ponga en cada uno.
+Suman unos **20.680** más 1.000 de salida (**21.680**). Salen de **4 a 6 piedras compradas**, es decir, **12 a 14 ex posibles**.
 
-**2. Tres piedras de premio** (gratis), por ejemplo con las medallas **4, 6 y 8**: una a mitad de campaña y otra al final, para que el equipo completo se note como un hito. Cada una ahorra 2.000.
+**Piedras acumuladas según la medalla** (premio más compradas posibles, con esa curva y el gasto supuesto):
 
-**La cuenta cuadra:**
+| Tras la medalla | De premio | Compradas posibles | Piedras en total |
+|---|---|---|---|
+| 1 | 1 | 0 a 1 | 1 a 2 |
+| 2 | 2 | 1 | 3 |
+| 3 | 3 | 1 a 2 | 4 a 5 |
+| 4 | 4 | 2 a 3 | 6 a 7 |
+| 5 | 5 | 2 a 3 | 7 a 8 |
+| 6 | 6 | 3 a 4 | 9 a 10 |
+| 7 | 7 | 4 a 5 | 11 a 12 |
+| 8 | 8 | 4 a 6 | 12 a 14 |
 
-| Concepto | Valor |
-|---|---|
-| Piedras de premio | 3 |
-| Piedras compradas | 7 (14.000) |
-| Total de ex posibles | **10 (6 en el equipo y 4 en el PC)** |
-| Gasto en Balls y Pociones | 8.000 a 12.000 |
-| Dinero necesario | 22.000 a 26.000 |
-| Dinero con la curva | 25.880 |
+**Por qué 2.000 con este objetivo.** Antes me parecía barato. Con las piedras de premio, la escasez ya no la pone el precio sino las medallas mínimas y el ritmo de las evoluciones. Un precio mayor (3.000 o 4.000) obligaría a subir el dinero de los tramos ×1,5 o más, o a dejar de comprar Balls y Pociones.
 
-**El ritmo no se rompe.** A la 3.ª medalla, que es la mínima de Onix ex según Ayme, el dinero acumulado es de ~8.080. Restando 3.000 a 4.500 de consumibles, quedan de 3.600 a 5.100, es decir, **1 o 2 piedras**. Los ex siguen llegando poco a poco, y las medallas mínimas de cada Pokémon marcan el ritmo.
+**Dónde se vende:** en la tienda del centro Pokémon, como la Super Ball y la Ultra Ball.
 
-**Dónde se vende:** en la tienda del centro Pokémon, como la Super Ball y la Ultra Ball: aparece cuando se tienen las medallas mínimas del primer Pokémon que puede usarla. **Una piedra, un ex.**
+#### El verdadero cuello de botella: capturas y XP, no las piedras
+
+12 ex exigen **12 Pokémon distintos capturados y llevados hasta su última fase**, y cada evolución cuesta XP (50 para Caterpie y Weedle, 70 para un inicial, unos 110 para las fases siguientes según la referencia de los juegos, D-20 §10.6). Una estimación **muy gruesa**: de 130 a 160 XP de media por Pokémon, o sea, **del orden de 1.500 XP** para 12 ex. D-20 estima unos 110 XP en Ciudad Plateada y unos 180 tras Brock, es decir, del orden de **700 a 900 XP por la ruta principal en 8 tramos**. Falta casi la mitad, y se tendría que sacar de repetir salvajes (que sí dan XP) o de subir la XP de los rivales de los últimos tramos.
+
+Esto no es decisión mía, pero **Diseño y Calidad deben medirlo antes de dar por buenos los 12 ex**. Las piedras sobrarán si los Pokémon no llegan a su última fase.
 
 #### Qué se espera medir (Calidad)
 
-- Cuánto dinero lleva un jugador al llegar a cada piedra, con la curva propuesta. Todo parte de la suposición de ~2.060 por tramo y de mi estimación de gasto, **sin medir**.
+- Cuántos ex puede tener un jugador al llegar a la Liga, con la XP y el dinero de la ruta principal y sin repetir salvajes. Todo parte de la suposición de ~2.060 por tramo y de mi estimación de gasto, **sin medir**.
 - Con 6 ex de más de 200 PS como punto de partida, la **Liga** (objetivo del 25 %, D-20 §10.7) se calibra con ese poder, no con el de un equipo normal.
-- Si con 10 ex posibles el equipo sale **demasiado fuerte**, la palanca es el dinero por tramo y el número de piedras de premio, no el precio.
+- Si con tantos ex el equipo sale **demasiado fuerte**, las palancas son el dinero por tramo y las piedras de premio, no el precio.
 
-**Qué implica para el trabajo de otros** (sin tocarlo aquí): el campo `puntos` del catálogo y del motor deja de tener sentido (el intercambio es gratis y hacerse ex es un objeto); lo recoge la tarea 17 (#447) de D-20. El objeto necesita su precio (2.000) y su medalla mínima.
+**Qué implica para el trabajo de otros** (sin tocarlo aquí): el campo `puntos` del catálogo y del motor deja de tener sentido (el intercambio es gratis y hacerse ex es un objeto); lo recoge la tarea 17 (#447) de D-20. El objeto necesita su precio (2.000), su medalla mínima, su entrega con cada medalla y las tres estructuras de línea de arriba.
 
 ## 3. #388 · Pokédex «Mis cartas»
 
@@ -398,7 +400,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 | Documento | Cambio |
 |---|---|
 | D-20 §5 y §8 (4, 5) | Cerrar «qué se vende» y «dinero frente a puntos» con §1.1 y §2 |
-| D-20 §2.1, §5 y §10.6 | Los puntos **no** se usan en la campaña (decidido). Intercambio **gratis** y hacerse ex con la **piedra ex** (decidido el 2026-11-24, ya recogido en el PR #448 de Diseño). Precio de la piedra: 2.000 (aceptado). Dinero por tramo creciente y 3 piedras de premio (§2.5) |
+| D-20 §2.1, §5 y §10.6 | Los puntos **no** se usan en la campaña (decidido). Intercambio **gratis** y hacerse ex con la **piedra ex** (decidido el 2026-11-24, ya recogido en el PR #448 de Diseño). Precio de la piedra: 2.000, una piedra de premio por medalla y objetivo de 12 ex en la Liga (decidido, §2.5) |
 | D-20 §8 (13) | Nidoran♂ ya es 032/150: la pregunta se da por resuelta |
 | D-20 §6 y `flujo-app.md` §2 | La sesión es obligatoria en el modo campaña (la regla general «nunca obligatoria» deja de valer ahí) |
 | D-20 §10 | Nuevas filas del registro con las decisiones 1 a 9 |
@@ -413,7 +415,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 - «Mis cartas» necesita un registro por carta (§3.3), con clave en el dispositivo y sincronización al iniciar sesión.
 - El servidor acepta lo que reporta el cliente con tope por hito (D-20 §6); los topes son los valores de §2.1.
 
-**Para Diseño y Calidad:** la curva de dinero por tramo, las medallas que dan piedra de premio y el alcance de la piedra (Pikachu, Eevee, Venusaur), y la simulación del dinero al llegar a cada piedra (§2.5); decidir los duplicados de sobre (§2.4); el momento exacto de cada texto de §4.5.
+**Para Diseño y Calidad:** la lista de excepciones (Pikachu, Eevee), la XP necesaria para 12 ex, la curva de dinero y la simulación del número de ex en la Liga (§2.5); decidir los duplicados de sobre (§2.4); el momento exacto de cada texto de §4.5.
 
 **Para Arte:** diseños de moneda y de dados (la clásica y la estándar ya existen); el estado «gris» de «Mis cartas» (el criterio visual de Enemigos ya existe); la pantalla de la tienda.
 
