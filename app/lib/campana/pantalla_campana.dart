@@ -83,68 +83,73 @@ class _Mapa extends ConsumerWidget {
           ],
         ],
       ),
-      body: p == null || !validos
-          ? _SinPartida(catalogo: catalogo, danada: !validos)
-          : LayoutBuilder(
-              builder: (context, caja) {
-                final ancho = caja.maxWidth >= 900;
-                // La escena del nodo, con su barra fija de recursos encima
-                // (propuesta D de los wireframes, D-20 §10.7).
-                final escena = Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      BarraRecursos(partida: p),
-                      const SizedBox(height: 8),
-                      EscenaInteractiva(
-                        catalogo: catalogo,
-                        partida: p,
-                        alTocar: (z) => _tocarZona(context, ref, p, z),
-                      ),
-                    ],
-                  ),
-                );
-                final panel = [
-                  _PanelNodo(catalogo: catalogo, partida: p),
-                  const SizedBox(height: 16),
-                  _Equipo(catalogo: catalogo, partida: p),
-                ];
-                if (ancho) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: SingleChildScrollView(child: escena)),
-                      SizedBox(
-                        width: 420,
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: panel,
+      body: ref.watch(conflictoCampanaProvider) != null
+          ? _ElegirPartida(
+              catalogo: catalogo,
+              conflicto: ref.watch(conflictoCampanaProvider)!,
+            )
+          : p == null || !validos
+              ? _SinPartida(catalogo: catalogo, danada: !validos)
+              : LayoutBuilder(
+                  builder: (context, caja) {
+                    final ancho = caja.maxWidth >= 900;
+                    // La escena del nodo, con su barra fija de recursos encima
+                    // (propuesta D de los wireframes, D-20 §10.7).
+                    final escena = Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          BarraRecursos(partida: p),
+                          const SizedBox(height: 8),
+                          EscenaInteractiva(
+                            catalogo: catalogo,
+                            partida: p,
+                            alTocar: (z) => _tocarZona(context, ref, p, z),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  );
-                }
-                return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      escena,
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: panel,
-                        ),
+                    );
+                    final panel = [
+                      _PanelNodo(catalogo: catalogo, partida: p),
+                      const SizedBox(height: 16),
+                      _Equipo(catalogo: catalogo, partida: p),
+                    ];
+                    if (ancho) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: SingleChildScrollView(child: escena)),
+                          SizedBox(
+                            width: 420,
+                            child: SingleChildScrollView(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: panel,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    return SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          escena,
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: panel,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
     );
   }
 
@@ -669,3 +674,61 @@ String descripcionObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.piedraEx =>
         'Hace ex a un Pokémon que ya no evoluciona; una por ex',
     };
+
+/// La partida de este dispositivo y la de la cuenta han cambiado las dos
+/// (#478): el jugador elige con cuál seguir. Se enseña de cada una dónde
+/// está, sus medallas y sus puntos.
+class _ElegirPartida extends ConsumerWidget {
+  const _ElegirPartida({required this.catalogo, required this.conflicto});
+
+  final CatalogoCampana catalogo;
+  final ConflictoCampana conflicto;
+
+  String _resumen(PartidaCampana p) {
+    final id = p.progreso.nodoActual;
+    final donde = catalogo.region.nodos[id]?.nombre ?? id;
+    final medallas = p.progreso.medallas.length;
+    return 'En $donde · $medallas '
+        '${medallas == 1 ? 'medalla' : 'medallas'} · ${p.puntos} puntos';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controlador = ref.read(campanaProvider.notifier);
+    Widget opcion(String clave, String titulo, PartidaCampana p,
+            Future<void> Function() elegir) =>
+        Card(
+          child: ListTile(
+            title: Text(titulo),
+            subtitle: Text(_resumen(p), key: Key('$clave-resumen')),
+            trailing: FilledButton(
+              key: Key(clave),
+              onPressed: elegir,
+              child: const Text('Seguir con esta'),
+            ),
+          ),
+        );
+    return Center(
+      key: const Key('campana-elegir-partida'),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(16),
+          children: [
+            Text(
+              'Tu partida ha cambiado en este dispositivo y también en tu '
+              'cuenta. ¿Con cuál sigues? La otra se perderá.',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+            opcion('partida-dispositivo', 'La de este dispositivo',
+                conflicto.local, controlador.usarPartidaDeEsteDispositivo),
+            opcion('partida-cuenta', 'La de tu cuenta', conflicto.cuenta,
+                controlador.usarPartidaDeLaCuenta),
+          ],
+        ),
+      ),
+    );
+  }
+}

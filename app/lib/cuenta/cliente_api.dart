@@ -131,6 +131,44 @@ class ProductoTienda {
   final bool disponible;
 }
 
+/// La partida de campaña guardada en la cuenta (#478) y su revisión.
+class GuardadoCuenta {
+  const GuardadoCuenta({required this.revision, required this.partida});
+
+  final int revision;
+
+  /// `PartidaCampana.aJson()` tal cual lo guardó la app.
+  final Map<String, dynamic> partida;
+}
+
+/// Qué ha pasado al subir la partida de campaña a la cuenta.
+class ResultadoSubida {
+  const ResultadoSubida.guardada(int this.revision)
+      : conflicto = false,
+        actual = null;
+  const ResultadoSubida.conflicto(this.actual)
+      : conflicto = true,
+        revision = null;
+
+  /// La revisión nueva, si se ha guardado.
+  final int? revision;
+
+  /// Si la de la cuenta había cambiado desde que se leyó (409).
+  final bool conflicto;
+
+  /// La copia de la cuenta en un conflicto (null si ya no hay ninguna).
+  final GuardadoCuenta? actual;
+}
+
+GuardadoCuenta? _guardadoDe(Object? json) {
+  if (json is! Map) return null;
+  final revision = json['revision'];
+  final partida = json['partida'];
+  if (revision is! int || partida is! Map) return null;
+  return GuardadoCuenta(
+      revision: revision, partida: Map<String, dynamic>.from(partida));
+}
+
 /// Cliente HTTP del servidor de Deck Tracker (cuentas e Incursiones).
 class ClienteApi {
   ClienteApi({
@@ -276,6 +314,64 @@ class ClienteApi {
     return RespuestaHitos(
       ResultadoEnvio.rechazada,
       mensaje: mensaje == null ? 'El servidor respondió $estado.' : '$mensaje',
+    );
+  }
+
+  /// La partida de campaña de la cuenta, o null si no tiene (404). Lanza
+  /// [ErrorApi] sin `estado` si no hay conexión.
+  Future<GuardadoCuenta?> leerGuardadoCampana(
+      String token, String campana) async {
+    final http.Response r;
+    try {
+      r = await _http.get(
+        Uri.parse('$base/incursiones/campana/partidas/$campana'),
+        headers: {'authorization': 'Bearer $token'},
+      ).timeout(espera);
+    } catch (_) {
+      throw const ErrorApi('No se pudo conectar con el servidor.');
+    }
+    if (r.statusCode == 404) return null;
+    final g = r.statusCode == 200 ? _guardadoDe(_cuerpo(r)) : null;
+    if (g != null) return g;
+    throw ErrorApi('El servidor respondió ${r.statusCode}.',
+        estado: r.statusCode);
+  }
+
+  /// Sube la partida de campaña con la [revision] que se leyó (0 si no había).
+  /// Lanza [ErrorApi] sin `estado` si no hay conexión.
+  Future<ResultadoSubida> subirGuardadoCampana(
+    String token,
+    String campana, {
+    required int revision,
+    required Map<String, dynamic> partida,
+  }) async {
+    final http.Response r;
+    try {
+      r = await _http
+          .put(
+            Uri.parse('$base/incursiones/campana/partidas/$campana'),
+            headers: {
+              'content-type': 'application/json',
+              'authorization': 'Bearer $token',
+            },
+            body: jsonEncode(
+                {'version': 1, 'revision': revision, 'partida': partida}),
+          )
+          .timeout(espera);
+    } catch (_) {
+      throw const ErrorApi('No se pudo conectar con el servidor.');
+    }
+    final cuerpo = _cuerpo(r);
+    if (r.statusCode == 200) {
+      final nueva = cuerpo['revision'];
+      if (nueva is int) return ResultadoSubida.guardada(nueva);
+    }
+    if (r.statusCode == 409) {
+      return ResultadoSubida.conflicto(_guardadoDe(cuerpo['actual']));
+    }
+    throw ErrorApi(
+      '${cuerpo['mensaje'] ?? cuerpo['error'] ?? 'El servidor respondió ${r.statusCode}.'}',
+      estado: r.statusCode,
     );
   }
 
