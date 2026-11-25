@@ -9,7 +9,7 @@ Estado: **en desarrollo** (revisado el 2026-11-23). Issue #334 (diseño) y una i
 > 3. **«Mis cartas»** (Ayme): las cartas conseguidas en la campaña se usan **solo en la campaña**; en el futuro habrá cartas en la tienda del menú para las partidas rápidas en formato digital. Se registra **solo la carta** conseguida (D-21 §3).
 > 4. **Nidoran♂ ya es 032/150** (comprobado: la imagen del repositorio y la carta de Ayme coinciden). La pregunta de §8 (13) queda resuelta.
 > 5. **Vocabulario único** (Ayme): energía, XP, dinero y puntos, definidos en D-21 §1.1. La XP se mide en XP, no en «puntos».
-> 6. **Tienda de puntos** (D-21 §2): todo lo de precios y catálogo es **propuesta** pendiente de confirmar; cierra, si se aprueba, §8 (4) y (5).
+> 6. **Tienda de puntos** (D-21 §2): los **precios en puntos** son **Decididos (iniciales)** desde el 2026-11-25 (§5, §10.1); el catálogo (D-21 §2.2) y el modelo de dos contadores (D-21 §1.2) siguen **por confirmar**. Los precios no cierran §8 (4) ni (5): son preguntas del dinero de dentro de la campaña.
 
 | Pieza | Estado |
 |---|---|
@@ -418,6 +418,22 @@ Reglas que ya se aplican a cada ficha: los líderes usan **cartas normales**, no
 - Aparte de los puntos, los entrenadores y los líderes dan **dinero** (§10.6): es local de la partida y se gasta en la tienda del centro Pokémon (Pokéballs, Pociones, Repelente y, más adelante, Cuerda Huida). No es la moneda de la cuenta. Decidido el 2026-11-24 (§10.9): el dinero paga **todo lo que se gasta dentro de la campaña**, incluida la **piedra ex** (**2.000** de dinero, §10.6; se vende desde la 2.ª medalla). El **intercambio es gratis**.
 - Los **puntos no tienen ningún uso dentro de la campaña** (decidido el 2026-11-24, §10.9): solo van a la cuenta y se gastan en la tienda de la pantalla de inicio. La **XP de evolución** sale de los combates, y las compras del centro Pokémon y la piedra ex se pagan con **dinero**, y el intercambio es gratis.
 
+### Precios en puntos de la tienda de la cuenta (Decididos, iniciales)
+
+**Decididos por Ayme el 2026-11-25 (#387) como valores iniciales**; se pueden cambiar después sin mucho trabajo. Vienen de D-21 §2.3. La tienda de puntos es la del menú de la app, **no** la del centro Pokémon (§4), y vale también para las partidas rápidas en formato digital; en la campaña no se gasta nada con puntos (§10.9).
+
+| Producto | Precio (puntos) |
+|---|---|
+| Moneda clásica y dados estándar | 0 (siempre disponibles) |
+| Moneda de serie (color o metal) | **800** |
+| Moneda temática (Onix, Manectric, Kingdra, Arceus o un mapa) | **2.000** |
+| Juego de dados de serie | **1.500** |
+| Juego de dados temático | **3.000** |
+| Sobre del formato digital | **1.000** |
+| Carta suelta: Común / Poco común / Rara / Ultra rara | **200 / 400 / 800 / 2.000** |
+
+El catálogo de la tienda debe ser **datos, no constantes** (Ayme, 2026-11-25): así se ajustan sin tocar el código (#374).
+
 ## 6. Cómo encaja en el proyecto
 
 | Pieza | Propuesta |
@@ -540,6 +556,7 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 | 2026-11-22 | **Arte y derechos (decisión de Ayme, #389).** Los **sprites de Pokémon, objetos y personajes son de Pokémon Escarlata y Púrpura (EP)**, tomados de WikiDex. Es un **proyecto personal, de uso privado para él y sus amigos, sin fines comerciales**. El repositorio sigue siendo **público** y los sprites van incluidos; **si GitHub o los titulares de los derechos piden retirarlos, Ayme los quita en cuanto se le avise.** El **arte propio** se limita a la **interfaz y los fondos de escena**. Las medallas son las de LGPE y los líderes están pendientes (§8, 24). Si hay que retirar los sprites, **hay un prompt en el chat del Director del juego que se encarga de borrarlos**. Esto no es una licencia: los derechos siguen siendo de sus titulares. | §4, §8; #389, #416 |
 | 2026-11-24 | **La sesión es obligatoria para jugar el modo campaña** (Ayme, #390; D-21 §4). Sustituye a «la sesión nunca es obligatoria» de `flujo-app.md` §2, que **sigue valiendo para la partida libre**; el cambio en `flujo-app.md` es de Diseño de interfaz. | §6; #390 |
 | 2026-11-24 | **La partida de campaña se guarda también en la cuenta** (Ayme, #390): además del dispositivo, para no perder el progreso al borrar los datos del navegador. Sustituye a «en el dispositivo, sincronizado al iniciar sesión» (§6). **Tarea secundaria, sin prisa**; hace falta una tarea de Programación (tarea 22, §9). | §6; #390 |
+| 2026-11-25 | **Precios en puntos de la tienda de la cuenta: Decididos (iniciales)** (Ayme, #387): moneda de serie 800, temática 2.000; dados de serie 1.500, temáticos 3.000; sobre 1.000; carta suelta 200 / 400 / 800 / 2.000 según rareza; clásicas y estándar, gratis. Valores iniciales, cambiables después; el catálogo de la tienda es de datos (#374). El resto de D-21 §2 (catálogo, dos contadores) sigue por confirmar. | §5; D-21 §2.3; #387 |
 
 ### 10.2 Combate y energía
 
