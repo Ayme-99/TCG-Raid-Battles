@@ -5,7 +5,7 @@ Estado: **en desarrollo** (revisado el 2026-11-23). Issue #334 (diseño) y una i
 > **Nota de Negocio y comunidad para Diseño (2026-11-23).** Este documento es de Diseño y **no se ha modificado su contenido**; esto es un aviso de lo que Ayme decidió el 2026-11-23 al revisar [D-21](./D-21-campana-negocio-y-comunidad.md) y que Diseño debe trasladar a §2.1, §5, §6, §8 y al registro de §10:
 >
 > 1. **Los puntos no tienen utilidad dentro de la campaña** (Ayme). Se ganan en la campaña, pasan a la cuenta al conseguir medallas o avanzar en la historia y se gastan solo en el menú de la app. Esto **sustituye** a «el intercambio y hacerse ex cuestan puntos» (§2.1, §5, §10.6). **Decidido el 2026-11-24 por Ayme (§10.9):** el **intercambio es gratis** y **hacerse ex** se hace con un objeto, la **piedra ex**, cuyo precio fija Negocio (D-21). Las cifras de D-21 §2.5 (2.000 y 4.000) quedan como propuesta de Negocio, ya sin efecto para el intercambio.
-> 2. **La sesión es obligatoria para jugar el modo campaña** (Ayme). Afecta a §6 y a `flujo-app.md` §2, que dice que la sesión nunca es obligatoria.
+> 2. **La sesión es obligatoria para jugar el modo campaña** (Ayme). **Registrado el 2026-11-24 en §10.1 y §6**; afecta a `flujo-app.md` §2, que dice que la sesión nunca es obligatoria (vale solo para la partida libre).
 > 3. **«Mis cartas»** (Ayme): las cartas conseguidas en la campaña se usan **solo en la campaña**; en el futuro habrá cartas en la tienda del menú para las partidas rápidas en formato digital. Se registra **solo la carta** conseguida (D-21 §3).
 > 4. **Nidoran♂ ya es 032/150** (comprobado: la imagen del repositorio y la carta de Ayme coinciden). La pregunta de §8 (13) queda resuelta.
 > 5. **Vocabulario único** (Ayme): energía, XP, dinero y puntos, definidos en D-21 §1.1. La XP se mide en XP, no en «puntos».
@@ -21,7 +21,7 @@ Estado: **en desarrollo** (revisado el 2026-11-23). Issue #334 (diseño) y una i
 | Jefe que llama a un aliado a mitad de combate (§4, Jefes) | **Hecho** (#372) |
 | Captura, equipo de 6 y PC, centro Pokémon (§2, §4) | **Primera versión hecha** (§4, Partida de campaña); falta la Pokéball |
 | XP, evolución y cartas ex: modelo de datos (§2.1) | Hecho (#346); **reserva común de XP y evolución desde el equipo** hechas (#403): Caterpie → Metapod y Weedle → Kakuna; sin cartas ex ni fase 1 de los iniciales todavía |
-| Guardado local del progreso (§6) | **Hecho** en el dispositivo (`PartidaCampana`, clave `campana_kanto`); sin sincronizar con la cuenta |
+| Guardado del progreso (§6) | **Hecho** en el dispositivo (`PartidaCampana`, clave `campana_kanto`). **Decidido el 2026-11-24:** también en la cuenta y con sesión obligatoria; **pendiente** (tarea 22) |
 | Pantallas de la app (mapa, combate, equipo, centro Pokémon) | **Primera versión hecha**; el **mapa ya es de escenas** (#373); combate, equipo y centro, pendientes del diseño de §10.7 |
 | Puntos al servidor y tienda con puntos | Pendiente (la tienda del centro usa dinero, §4 Partida de campaña) |
 
@@ -403,7 +403,7 @@ Reglas que ya se aplican a cada ficha: los líderes usan **cartas normales**, no
 | Motor | Librería `engine/lib/campana.dart` (código en `engine/lib/src/campana/`), con el mismo patrón que la partida: estado inmutable y reductor puro, `aplicarCombate(estado, acción)`. No toca el motor de las incursiones. **Hecho:** combate 1 contra 1 con energía, atacar, cambiar, cargar, elegir siguiente, debilidad y resistencia (#336); IA rival (#338); efectos, habilidades y azar con semilla (#350, #352); modelo de ruta y progreso (#354). Llamada de aliado del jefe (#372). **Pendiente:** captura y equipo, descanso. |
 | Catálogo | `catalog/campana/`: `pokemon/*.json` (uno por Pokémon, con su número de la Pokédex), `zonas/*.json` (qué aparece en cada zona), `regiones/*.json` (el grafo de nodos de la ruta) y sus esquemas en `catalog/schema/`. El JSON manda, como con los jefes. |
 | Simulador | `sim/` simula combates y rutas de campaña para equilibrar PS, costes de energía y la IA rival. |
-| Guardado | Progreso de campaña (región, nodo, equipo, **PC**, jefes ya capturados, medallas, reserva de XP, puntos pendientes) **en el dispositivo**, sincronizado con la cuenta al iniciar sesión. Es un esquema **aparte** del contrato de partida. `ProgresoRuta` ya guarda lo de la ruta (nodo, superados, medallas, jefes derrotados, inicial) con `aJson`/`desdeJson`; `PartidaCampana` guarda además el equipo, el PC y la reserva de XP. |
+| Guardado | Progreso de campaña (región, nodo, equipo, **PC**, jefes ya capturados, medallas, reserva de XP, puntos pendientes) **en el dispositivo y también en la cuenta** (decidido el 2026-11-24, §10.1: la sesión es obligatoria para jugar la campaña). Es un esquema **aparte** del contrato de partida. `ProgresoRuta` ya guarda lo de la ruta (nodo, superados, medallas, jefes derrotados, inicial) con `aJson`/`desdeJson`; `PartidaCampana` guarda además el equipo, el PC y la reserva de XP. **Falta** guardarlo en la cuenta (tarea 22). |
 | Servidor | Recibe los puntos ganados al terminar un jefe o una medalla. Al ser un solo jugador y coste 0, se acepta lo que reporta el cliente con un tope por hito (no hay competición). |
 | App | Pantallas nuevas: mapa de región, combate, equipo, descanso y tienda. Reutiliza los fondos de mesa por mapa y los avisos. |
 
@@ -483,7 +483,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 5 | Modelo de región y de nodos, y avance por el mapa (#354) | Hecho |
 | 6 | Captura, equipo, PC y descanso | **Primera versión hecha** (§4, Partida de campaña); falta la Pokéball |
 | 7 | Jefe con aliados (llamada a mitad de combate, #372) y medalla | Llamada hecha |
-| 8 | Guardado de progreso de campaña en el dispositivo | Hecho (sin sincronizar con la cuenta) |
+| 8 | Guardado de progreso de campaña en el dispositivo | Hecho (sin guardar en la cuenta; decidido el 2026-11-24, tarea 22) |
 | 9 | Pantallas de la app: mapa, combate, equipo, descanso | **Primera versión hecha**, funcional y sin diseño visual definitivo |
 | 10 | Puntos al servidor y tienda (después de la porción vertical) | Pendiente |
 | 11 | Reponer el resto de Pokémon y zonas (Túnel Roca, Ciudad Plateada en adelante) | Pendiente |
@@ -497,6 +497,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 19 | **Repetir Brock (#409)** con Pociones en combate (Calidad): cuántas hacen falta para seguir cerca del 75 %; si el reto queda trivial, proponer un límite o un precio | Pendiente |
 | 20 | **Usar Poción en combate sin gastar turno** (Programación, #458): motor, IA y pantalla de combate. Empieza cuando Calidad haya medido (tarea 19) | Pendiente |
 | 21 | **Quitar `metal`** del enum de tipos, del esquema y de la app, y borrar el icono `sprites_ajenos/iconos_tipo/metal.png` (§10.9, #408; #459) | Pendiente |
+| 22 | **Guardar la partida de campaña en la cuenta** y exigir sesión para jugarla (§6, §10.1; #390). Tarea secundaria, sin prisa; Programación abre la issue | Pendiente |
 
 ## 10. Registro de decisiones
 
@@ -515,6 +516,8 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 | 2026-11-21 | Los puntos de la campaña compran en la tienda monedas, dados, sobres y cartas sueltas del formato digital, y quizá campañas (lo normal es que estén abiertas de primeras). Cuántos puntos da cada cosa es irrelevante salvo que haya compras dentro de la campaña (no las hay desde el 2026-11-24, §10.9); lo que sobre al terminarla se conserva. | §5 |
 | 2026-11-21 | Rechazó **robar energía** como mecánica (obligaría a los rivales a usar la misma para igualar los combates) y vio demasiado simple un «perfil de daño» como carta digital. | §3 |
 | 2026-11-22 | **Arte y derechos (decisión de Ayme, #389).** Los **sprites de Pokémon, objetos y personajes son de Pokémon Escarlata y Púrpura (EP)**, tomados de WikiDex. Es un **proyecto personal, de uso privado para él y sus amigos, sin fines comerciales**. El repositorio sigue siendo **público** y los sprites van incluidos; **si GitHub o los titulares de los derechos piden retirarlos, Ayme los quita en cuanto se le avise.** El **arte propio** se limita a la **interfaz y los fondos de escena**. Las medallas son las de LGPE y los líderes están pendientes (§8, 24). Si hay que retirar los sprites, **hay un prompt en el chat del Director del juego que se encarga de borrarlos**. Esto no es una licencia: los derechos siguen siendo de sus titulares. | §4, §8; #389, #416 |
+| 2026-11-24 | **La sesión es obligatoria para jugar el modo campaña** (Ayme, #390; D-21 §4). Sustituye a «la sesión nunca es obligatoria» de `flujo-app.md` §2, que **sigue valiendo para la partida libre**; el cambio en `flujo-app.md` es de Diseño de interfaz. | §6; #390 |
+| 2026-11-24 | **La partida de campaña se guarda también en la cuenta** (Ayme, #390): además del dispositivo, para no perder el progreso al borrar los datos del navegador. Sustituye a «en el dispositivo, sincronizado al iniciar sesión» (§6). **Tarea secundaria, sin prisa**; hace falta una tarea de Programación (tarea 22, §9). | §6; #390 |
 
 ### 10.2 Combate y energía
 
