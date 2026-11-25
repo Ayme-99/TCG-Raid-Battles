@@ -142,7 +142,7 @@ void main() {
 
   for (final (nombre, tamano) in [
     ('tablet', const Size(1280, 800)),
-    ('móvil', const Size(390, 844)),
+    ('móvil', const Size(844, 390)),
   ]) {
     testWidgets('primer combate y captura en $nombre', (tester) async {
       final almacen = AlmacenMemoria();
@@ -544,7 +544,7 @@ void main() {
     final c = await abrirCampana(tester,
         almacen: AlmacenMemoria(),
         guardada: guardada,
-        tamano: const Size(390, 844));
+        tamano: const Size(844, 390));
     // La zona del PC de la escena abre la pantalla del PC.
     await tocar(tester, 'zona-pc');
     expect(hay('pantalla-pc'), isTrue);
@@ -582,11 +582,11 @@ void main() {
       ],
       mochila: {ObjetoCampana.pocion: 2, ObjetoCampana.piedraEx: 1},
     );
-    // A tamaño de móvil: la rejilla es de 2 columnas.
+    // A tamaño de móvil apaisado (la campaña solo va en horizontal, §10.7).
     final c = await abrirCampana(tester,
         almacen: AlmacenMemoria(),
         guardada: guardada,
-        tamano: const Size(390, 844));
+        tamano: const Size(844, 390));
     await tocar(tester, 'campana-ver-equipo');
     expect(find.text('Pociones: 2'), findsOneWidget);
     expect(find.text('Piedras ex: 1'), findsOneWidget);

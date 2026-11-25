@@ -4,6 +4,7 @@ import 'package:incursiones_engine/campana.dart';
 
 import 'controlador_campana.dart';
 import 'escena_mapa.dart' show ColoresCampana, carpetaSpritesAjenos;
+import 'solo_horizontal.dart';
 import 'widgets_campana.dart';
 
 // Colores del kit de interfaz (docs/diseno-ui/campana-arte-interfaz.md).
@@ -202,11 +203,13 @@ void _hojaAcciones(BuildContext context, EstadoCombate combate,
   final p = combate.parametros;
   final curables = objetivosDePocion(combate, Bando.jugador);
   final relevos = objetivosDeCuerda(combate, Bando.jugador);
-  showModalBottomSheet<void>(
+  mostrarHojaCampana<void>(
     context: context,
     backgroundColor: _crema,
+    // Con scroll: en un móvil apaisado la hoja es baja (§10.7).
     builder: (hoja) => SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
+          child: Padding(
         key: const Key('hoja-acciones'),
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -284,7 +287,7 @@ void _hojaAcciones(BuildContext context, EstadoCombate combate,
             ],
           ],
         ),
-      ),
+      )),
     ),
   );
 }
@@ -294,7 +297,7 @@ void _hojaAcciones(BuildContext context, EstadoCombate combate,
 void _elegirParaPocion(BuildContext context, EstadoCombate combate,
     List<int> curables, void Function(AccionCombate) actuar) {
   final yo = combate.jugador;
-  showModalBottomSheet<void>(
+  mostrarHojaCampana<void>(
     context: context,
     backgroundColor: _crema,
     builder: (hoja) => SafeArea(
@@ -335,7 +338,7 @@ void _elegirParaPocion(BuildContext context, EstadoCombate combate,
 void _elegirParaCuerda(BuildContext context, EstadoCombate combate,
     List<int> relevos, void Function(AccionCombate) actuar) {
   final yo = combate.jugador;
-  showModalBottomSheet<void>(
+  mostrarHojaCampana<void>(
     context: context,
     backgroundColor: _crema,
     builder: (hoja) => SafeArea(
@@ -382,7 +385,7 @@ Future<void> _confirmarCambio(BuildContext context, EstadoCombate combate,
   final puedeCambiar = !yo.paralizado && yo.energia >= retirada;
   final puedeCuerda =
       objetivosDeCuerda(combate, Bando.jugador).contains(indice);
-  final eleccion = await showDialog<AccionCombate>(
+  final eleccion = await mostrarDialogoCampana<AccionCombate>(
     context: context,
     builder: (dialogo) => AlertDialog(
       title: Text('¿Sacar a ${sale.nombre}?'),
@@ -421,7 +424,7 @@ Future<void> _confirmarCambio(BuildContext context, EstadoCombate combate,
 }
 
 void _hojaRegistro(BuildContext context, List<String> lineas) {
-  showModalBottomSheet<void>(
+  mostrarHojaCampana<void>(
     context: context,
     backgroundColor: _crema,
     builder: (_) => SafeArea(

@@ -4,6 +4,7 @@ import 'package:incursiones_engine/campana.dart';
 
 import 'controlador_campana.dart';
 import 'escena_mapa.dart' show ColoresCampana;
+import 'solo_horizontal.dart';
 import 'widgets_campana.dart';
 
 /// Pantalla de equipo (propuesta J de los wireframes, D-20 §10.7).
@@ -26,7 +27,8 @@ class PantallaEquipo extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final p = ref.watch(campanaProvider).partida;
-    return Scaffold(
+    return SoloHorizontal(
+        child: Scaffold(
       key: const Key('pantalla-equipo'),
       backgroundColor: ColoresCampana.crema,
       appBar: AppBar(
@@ -59,7 +61,7 @@ class PantallaEquipo extends ConsumerWidget {
                 ),
               ),
             ),
-    );
+    ));
   }
 }
 
@@ -163,7 +165,7 @@ class _ContenidoEquipo extends ConsumerWidget {
   /// La hoja de una carta del equipo: Poción, evoluciones y, en un centro,
   /// ordenar y dejar en el PC.
   void _hoja(BuildContext context, WidgetRef ref, int i, bool enCentro) {
-    showModalBottomSheet<void>(
+    mostrarHojaCampana<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: ColoresCampana.crema,
