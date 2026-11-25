@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ayme-99/TCG-Raid-Battles/contrato/campana/compra.v1.schema.json",
+  "title": "Compra en la tienda de puntos (versión 1)",
+  "description": "Cuerpo de POST /tienda/compras (#374, D-21 §1.2 y §2). Comprar baja el total de puntos de la cuenta, y los jefes que ya estaban desbloqueados siguen desbloqueados (opción C, decidida por Ayme el 2026-11-25). La app genera el id de la compra, así que repetir el envío no cobra dos veces.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "compra", "producto"],
+  "properties": {
+    "version": { "const": 1 },
+    "compra": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,64}$",
+      "description": "Id de la compra, generado por la app. Si se repite con el mismo producto, no se vuelve a cobrar."
+    },
+    "producto": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "description": "Id de un producto de catalog/tienda/tienda.json."
+    }
+  }
+}

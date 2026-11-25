@@ -13,12 +13,21 @@ const COLECCION_JUGADORES = 'incursiones_partida_jugadores';
 const COLECCION_GUARDADOS_CAMPANA = 'incursiones_campana_partidas';
 // Hitos de campaña abonados (#374): uno por cuenta, campaña, partida e id.
 const COLECCION_HITOS_CAMPANA = 'incursiones_campana_hitos';
+// Tienda de puntos (#374, D-21 §1.2): una por cuenta, `_id` = cuentaId, con lo
+// gastado, los productos, las compras y los niveles de jefe desbloqueados
+// para siempre.
+const COLECCION_TIENDA = 'incursiones_tienda_cuentas';
 
 function crearRepoMongo(db) {
   const partidas = db.collection(COLECCION_PARTIDAS);
   const jugadores = db.collection(COLECCION_JUGADORES);
   const hitos = db.collection(COLECCION_HITOS_CAMPANA);
   const guardados = db.collection(COLECCION_GUARDADOS_CAMPANA);
+  const tiendas = db.collection(COLECCION_TIENDA);
+  const tiendaVacia = () => ({ gastado: 0, productos: [], niveles: [], compras: [] });
+  const deTienda = (doc) => (doc
+    ? { gastado: doc.gastado, productos: doc.productos, niveles: doc.niveles, compras: doc.compras }
+    : tiendaVacia());
   const sinId = (doc) => {
     if (!doc) return null;
     const { _id, ...resto } = doc;
@@ -174,10 +183,53 @@ function crearRepoMongo(db) {
         .toArray();
       return { puntos: r ? r.puntos : 0, hitos: r ? r.hitos : 0 };
     },
+
+    async tiendaDe(cuentaId) {
+      return deTienda(await tiendas.findOne({ _id: cuentaId }));
+    },
+
+    // Atómico: el saldo, el id de la compra y si ya tiene el producto van en el
+    // filtro, así dos compras a la vez no gastan más de lo que hay.
+    async comprarEnTienda({ cuentaId, compra, producto, precio, unico, ganados, niveles, compradaEn }) {
+      try {
+        await tiendas.updateOne(
+          { _id: cuentaId },
+          { $setOnInsert: { cuentaId, ...tiendaVacia() } },
+          { upsert: true },
+        );
+      } catch (e) {
+        if (!(e && e.code === 11000)) throw e; // otra compra la creó a la vez
+      }
+      const nueva = { id: compra, producto, precio, compradaEn };
+      const hecho = await tiendas.findOneAndUpdate(
+        {
+          _id: cuentaId,
+          'compras.id': { $ne: compra },
+          gastado: { $lte: ganados - precio },
+          ...(unico ? { productos: { $ne: producto } } : {}),
+        },
+        {
+          $inc: { gastado: precio },
+          $addToSet: { productos: producto, niveles: { $each: niveles } },
+          $push: { compras: nueva },
+        },
+        { returnDocument: 'after' },
+      );
+      if (hecho) return { ok: true, repetida: false, compra: nueva };
+      const t = deTienda(await tiendas.findOne({ _id: cuentaId }));
+      const ya = t.compras.find((c) => c.id === compra);
+      if (ya) {
+        return ya.producto === producto
+          ? { ok: true, repetida: true, compra: ya }
+          : { ok: false, motivo: 'compra_distinta', compra: ya };
+      }
+      if (unico && t.productos.includes(producto)) return { ok: false, motivo: 'ya_comprado' };
+      return { ok: false, motivo: 'puntos_insuficientes' };
+    },
   };
 }
 
 module.exports = {
   crearRepoMongo, COLECCION_PARTIDAS, COLECCION_JUGADORES, COLECCION_GUARDADOS_CAMPANA,
-  COLECCION_HITOS_CAMPANA,
+  COLECCION_HITOS_CAMPANA, COLECCION_TIENDA,
 };

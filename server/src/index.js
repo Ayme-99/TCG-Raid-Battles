@@ -7,8 +7,9 @@ const { crearSalas } = require('./salas');
 const { montarSalas } = require('./ws');
 const { crearValidadorGuardado } = require('./guardadoCampana');
 const { crearValidadorHitos, cargarTopes, cargarTienda } = require('./hitosCampana');
+const { crearValidadorCompra } = require('./tienda');
 
 module.exports = {
   crearRouter, crearRepoMemoria, crearRepoMongo, crearValidador, crearSalas, montarSalas,
-  crearValidadorGuardado, crearValidadorHitos, cargarTopes, cargarTienda,
+  crearValidadorGuardado, crearValidadorHitos, cargarTopes, cargarTienda, crearValidadorCompra,
 };
