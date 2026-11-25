@@ -1,0 +1,82 @@
+{
+  "escena": "ruta-1",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Entrada por abajo (el camino de Pueblo Paleta), salida por el borde superior hacia Ciudad Verde. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "hierba-izquierda",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        40,
+        110,
+        690,
+        820
+      ],
+      "rel": [
+        0.0208,
+        0.1011,
+        0.3594,
+        0.7537
+      ],
+      "pokemon": "Pidgey"
+    },
+    {
+      "id": "hierba-derecha",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        1180,
+        110,
+        700,
+        820
+      ],
+      "rel": [
+        0.6146,
+        0.1011,
+        0.3646,
+        0.7537
+      ],
+      "pokemon": "Rattata"
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-ciudad-verde",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "rect": [
+        870,
+        0,
+        180,
+        110
+      ],
+      "rel": [
+        0.4531,
+        0.0,
+        0.0938,
+        0.1011
+      ],
+      "destino": "ciudad-verde"
+    }
+  ]
+}
