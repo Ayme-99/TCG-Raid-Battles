@@ -1467,4 +1467,95 @@ void main() {
           .ps, 60);
     });
   });
+
+  group('Cuerda Huida en combate (D-20 §10.6, #468)', () {
+    EstadoCombate conCuerdas({
+      int cuerdas = 1,
+      int retirada = 2,
+      bool paralizado = false,
+      int energia = 10,
+    }) {
+      final e = EstadoCombate.conEquipos(
+        equipoJugador: [
+          PokemonEnCombate.completo(pokemon('a1', retirada: retirada)),
+          PokemonEnCombate.completo(pokemon('a2')),
+          PokemonEnCombate(pokemon('a3'), 0),
+        ],
+        equipoRival: [PokemonEnCombate.completo(pokemon('b1'))],
+        cuerdasJugador: cuerdas,
+      );
+      return e.copiarCon(
+          jugador: e.jugador.copiarCon(
+              paralizado: paralizado, energia: energia, veneno: 10));
+    }
+
+    test('cambia sin pagar la retirada y gasta el turno', () {
+      final e = conCuerdas(energia: 5);
+      final d = aplicarCombate(e, const UsarCuerdaHuida(Bando.jugador, 1));
+      expect(d.jugador.activo, 1);
+      expect(d.jugador.cuerdas, 0);
+      expect(d.jugador.cuerdasUsadas, 1);
+      expect(d.turno, Bando.rival, reason: 'gasta el turno');
+      // 5 de energía, sin retirada, más la del fin de turno.
+      expect(d.jugador.energia, 6);
+      expect(d.jugador.veneno, 0, reason: 'el veneno se va con el activo');
+    });
+
+    test('vale aunque el activo esté Paralizado', () {
+      final e = conCuerdas(paralizado: true);
+      expect(() => aplicarCombate(e, const Cambiar(Bando.jugador, 1)),
+          throwsA(isA<ReglaIncumplida>()));
+      final d = aplicarCombate(e, const UsarCuerdaHuida(Bando.jugador, 1));
+      expect(d.jugador.activo, 1);
+      expect(d.jugador.paralizado, isFalse);
+    });
+
+    test('vale aunque no llegue la energía de la retirada', () {
+      final e = conCuerdas(retirada: 3, energia: 1);
+      expect(() => aplicarCombate(e, const Cambiar(Bando.jugador, 1)),
+          throwsA(isA<ReglaIncumplida>()));
+      expect(aplicarCombate(e, const UsarCuerdaHuida(Bando.jugador, 1))
+          .jugador
+          .activo, 1);
+    });
+
+    test('sin Cuerdas, a un caído o al propio activo no se puede', () {
+      final sin = conCuerdas(cuerdas: 0);
+      expect(objetivosDeCuerda(sin, Bando.jugador), isEmpty);
+      expect(() => aplicarCombate(sin, const UsarCuerdaHuida(Bando.jugador, 1)),
+          throwsA(isA<ReglaIncumplida>()));
+      final e = conCuerdas();
+      expect(objetivosDeCuerda(e, Bando.jugador), [1]);
+      expect(() => aplicarCombate(e, const UsarCuerdaHuida(Bando.jugador, 2)),
+          throwsA(isA<ReglaIncumplida>()), reason: 'caído');
+      expect(() => aplicarCombate(e, const UsarCuerdaHuida(Bando.jugador, 0)),
+          throwsA(isA<ReglaIncumplida>()), reason: 'ya es el activo');
+    });
+
+    test('fuera de su turno no se puede', () {
+      final suyo = aplicarCombate(conCuerdas(), const Cargar(Bando.jugador));
+      expect(objetivosDeCuerda(suyo, Bando.jugador), isEmpty);
+    });
+
+    test('el rival no usa objetos, salvo con rivalUsaObjetos', () {
+      EstadoCombate rival(ParametrosCombate p) => EstadoCombate.conEquipos(
+            equipoJugador: [PokemonEnCombate.completo(pokemon('a1'))],
+            equipoRival: [
+              PokemonEnCombate.completo(pokemon('b1')),
+              PokemonEnCombate.completo(pokemon('b2')),
+            ],
+            empieza: Bando.rival,
+            parametros: p,
+            cuerdasRival: 1,
+          );
+      final no = rival(const ParametrosCombate());
+      expect(objetivosDeCuerda(no, Bando.rival), isEmpty);
+      expect(() => aplicarCombate(no, const UsarCuerdaHuida(Bando.rival, 1)),
+          throwsA(isA<ReglaIncumplida>()));
+      final si = rival(const ParametrosCombate(rivalUsaObjetos: true));
+      expect(aplicarCombate(si, const UsarCuerdaHuida(Bando.rival, 1))
+          .rival
+          .activo, 1);
+    });
+  });
 }

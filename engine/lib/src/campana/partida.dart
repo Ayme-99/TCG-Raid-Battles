@@ -33,7 +33,8 @@ class ParametrosCampana {
   final Map<ObjetoCampana, int> precios;
 
   /// Medallas que hacen falta para que la tienda venda un objeto: Super Ball
-  /// con la 1.ª y Ultra Ball con 5 (D-20 §10.6). Los que no están, ninguna.
+  /// con la 1.ª, Cuerda Huida con la 1.ª (tramo 2) y Ultra Ball con 5 (D-20
+  /// §10.6). Los que no están, ninguna.
   final Map<ObjetoCampana, int> medallasParaComprar;
 
   /// PS que cura una Poción.
@@ -62,12 +63,16 @@ class ParametrosCampana {
       ObjetoCampana.ultraBall: 1200,
       ObjetoCampana.pocion: 300,
       ObjetoCampana.repelente: 350,
+      // Decidido por Ayme el 2026-11-23 (D-20 §10.6, #437).
+      ObjetoCampana.cuerdaHuida: 550,
       // Decidido por Ayme el 2026-11-24 (D-21 §2.5).
       ObjetoCampana.piedraEx: 2000,
     },
     this.medallasParaComprar = const {
       ObjetoCampana.superBall: 1,
       ObjetoCampana.ultraBall: 5,
+      // Desde el tramo 2, junto a la Super Ball (Ayme, 2026-11-24).
+      ObjetoCampana.cuerdaHuida: 1,
       // Desde la medalla del ex más barato (Básico ex, 2; Ayme, 2026-11-24).
       ObjetoCampana.piedraEx: 2,
     },
@@ -96,6 +101,11 @@ enum ObjetoCampana {
   /// Evita un combate contra un Pokémon salvaje: el nodo se da por pasado sin
   /// puntos, XP ni captura.
   repelente,
+
+  /// Cuerda Huida (D-20 §10.6, #437 y #468): solo en combate
+  /// ([UsarCuerdaHuida]). Cambia el activo sin pagar la retirada, aunque esté
+  /// Paralizado, y gasta el turno.
+  cuerdaHuida,
 
   /// Piedra ex (D-20 §2.1, decidido el 2026-11-24): hace ex a un Pokémon en su
   /// última fase normal. Se apila y se gasta una por ex. En el catálogo, el
@@ -581,6 +591,7 @@ class PartidaCampana {
       llamadaRival: r.llamada,
       parametros: ParametrosCombate(psPocion: parametros.psPocion),
       pocionesJugador: cuantos(ObjetoCampana.pocion),
+      cuerdasJugador: cuantos(ObjetoCampana.cuerdaHuida),
     );
   }
 
@@ -597,7 +608,8 @@ class PartidaCampana {
   ///   el combate perdido no da XP.
   ///
   /// En los dos casos avanza la semilla y se restan de la mochila las Pociones
-  /// usadas en el combate ([BandoCombate.pocionesUsadas]).
+  /// y las Cuerdas Huida usadas en el combate ([BandoCombate.pocionesUsadas],
+  /// [BandoCombate.cuerdasUsadas]).
   PartidaCampana terminarCombate(CatalogoCampana c, EstadoCombate fin,
       {ParametrosCampana parametros = const ParametrosCampana()}) {
     if (fin.fase != FaseCombate.terminado) {
@@ -607,11 +619,16 @@ class PartidaCampana {
       throw const ReglaIncumplida('Aquí no hay ningún combate pendiente.');
     }
     final siguiente = _siguiente(semilla);
-    final usadas = fin.jugador.pocionesUsadas;
-    final quedan = cuantos(ObjetoCampana.pocion) - usadas;
-    final mochilaTras = usadas == 0
-        ? mochila
-        : {...mochila, ObjetoCampana.pocion: quedan < 0 ? 0 : quedan};
+    final gastado = {
+      ObjetoCampana.pocion: fin.jugador.pocionesUsadas,
+      ObjetoCampana.cuerdaHuida: fin.jugador.cuerdasUsadas,
+    }..removeWhere((_, n) => n == 0);
+    final usadas = gastado.length;
+    final mochilaTras = {
+      ...mochila,
+      for (final e in gastado.entries)
+        e.key: cuantos(e.key) - e.value < 0 ? 0 : cuantos(e.key) - e.value,
+    };
     if (fin.ganador != Bando.jugador) {
       return _copiar(
         progreso: progreso.volverA(c.region, ultimaCura ?? c.region.inicio),

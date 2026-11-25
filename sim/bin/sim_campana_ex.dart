@@ -278,12 +278,12 @@ int extraParaObjetivo(Escenario base, int objetivo) {
 // ---------------------------------------------------------------------------
 // Escenarios de XP de la ruta principal (sin repetir)
 
-/// Tramo 1 medido sobre el catálogo (D-20 §4): Ruta 1 (10), Ruta 2 (10), dos
-/// Cazabichos de 2 Pokémon (media 15 cada Pokémon: 60), Pikachu (30), Entrenador
-/// Joven (Diglett 10 + Sandshrew 10) y Brock (Geodude 20 + Onix 30):
-/// 10 + 10 + 60 + 30 + 20 + 50 = 180. Sin los desvíos opcionales (Ruta 22 y
-/// Ruta 2 norte). Coincide con «unos 180 tras Brock» de D-20 §10.6.
-const xpTramo1 = 180;
+/// XP del tramo 1 (hasta ganar a Brock) en la ruta principal, medida con el
+/// motor real (`sim_campana_partida --modo=tramo --evolucion-inicial=si`,
+/// 2026-11-25): 150 al llegar a Brock y 200 con su recompensa (183 a 202 según
+/// el inicial; Squirtle pierde más combates). Con los desvíos de la Ruta 22 y
+/// la Ruta 2 norte son 203 a 213. Sustituye al 180 contado a mano.
+const xpTramo1 = 200;
 
 List<int> plano(int v) => List.filled(8, v);
 List<int> creciente() => [
@@ -306,8 +306,8 @@ void main(List<String> args) {
 
   final esc = {
     'Diseño: ~100 por tramo (700–900 en total)': plano(100),
-    'Como el tramo 1: 180 por tramo': plano(xpTramo1),
-    'Creciente: 180 a 360 (rivales más fuertes)': creciente(),
+    'Como el tramo 1: 200 por tramo': plano(xpTramo1),
+    'Creciente: 200 a 400 (rivales más fuertes)': creciente(),
   };
 
   stdout.writeln('MODELO DE CUENTAS DE XP Y CARTAS EX (#451). No simula combates.');

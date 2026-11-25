@@ -219,6 +219,8 @@ List<String> describirAccion(
       Cargar _ => '$propio $activo carga energía.',
       UsarPocion a => '$propio ${quien.equipo[a.indice].especie.nombre} '
           'recupera ${_curado(antes, despues, a)} PS con una Poción.',
+      UsarCuerdaHuida a => '$propio $activo huye con una Cuerda Huida; '
+          'sale ${quien.equipo[a.indice].especie.nombre}.',
       ElegirSiguiente a =>
         '$propio sale ${quien.equipo[a.indice].especie.nombre}.',
     },

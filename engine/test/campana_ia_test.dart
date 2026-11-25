@@ -785,4 +785,69 @@ void main() {
       expect(decidirAccion(e, Bando.rival), isNot(isA<UsarPocion>()));
     });
   });
+
+  group('Cuerda Huida en combate (D-20 §10.6, #468)', () {
+    // El activo es débil al fuego del rival; el relevo, no.
+    EstadoCombate debil({
+      int cuerdas = 1,
+      int retirada = 3,
+      int energia = 10,
+      bool paralizado = false,
+    }) {
+      final planta = pokemon('planta',
+          retirada: retirada, debilidad: const Debilidad(TipoCampana.fuego));
+      final agua = pokemon('agua', tipo: TipoCampana.agua);
+      final fuego = pokemon('fuego',
+          ps: 300, ataques: [ataque(1, 30, TipoCampana.fuego)]);
+      final e = EstadoCombate.conEquipos(
+        equipoJugador: [
+          PokemonEnCombate.completo(planta),
+          PokemonEnCombate.completo(agua),
+        ],
+        equipoRival: [PokemonEnCombate.completo(fuego)],
+        cuerdasJugador: cuerdas,
+      );
+      return e.copiarCon(
+          jugador:
+              e.jugador.copiarCon(energia: energia, paralizado: paralizado));
+    }
+
+    test('si puede pagar la retirada, cambia normal y guarda la Cuerda', () {
+      expect(decidirAccion(debil(), Bando.jugador), isA<Cambiar>());
+    });
+
+    test('si no llega a la retirada, usa la Cuerda', () {
+      final a = decidirAccion(debil(energia: 2), Bando.jugador);
+      expect(a, isA<UsarCuerdaHuida>());
+      expect((a as UsarCuerdaHuida).indice, 1);
+      expect(decidirAccion(debil(energia: 2, cuerdas: 0), Bando.jugador),
+          isNot(isA<UsarCuerdaHuida>()));
+    });
+
+    test('Paralizado y débil, sale con la Cuerda en vez de cargar', () {
+      expect(decidirAccion(debil(paralizado: true), Bando.jugador),
+          isA<UsarCuerdaHuida>());
+      expect(decidirAccion(debil(paralizado: true, cuerdas: 0), Bando.jugador),
+          isA<Cargar>());
+    });
+
+    test('el rival no usa la Cuerda (rivalUsaObjetos = false)', () {
+      final planta = pokemon('planta',
+          retirada: 3, debilidad: const Debilidad(TipoCampana.fuego));
+      final e = EstadoCombate.conEquipos(
+        equipoJugador: [
+          PokemonEnCombate.completo(pokemon('fuego',
+              ps: 300, ataques: [ataque(1, 30, TipoCampana.fuego)]))
+        ],
+        equipoRival: [
+          PokemonEnCombate.completo(planta),
+          PokemonEnCombate.completo(pokemon('agua', tipo: TipoCampana.agua)),
+        ],
+        empieza: Bando.rival,
+        cuerdasRival: 3,
+      );
+      final r = e.copiarCon(rival: e.rival.copiarCon(energia: 2));
+      expect(decidirAccion(r, Bando.rival), isNot(isA<UsarCuerdaHuida>()));
+    });
+  });
 }

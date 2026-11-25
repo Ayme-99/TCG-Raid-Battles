@@ -9,6 +9,7 @@ function listaDeVersiones(versiones) {
 }
 const { comprobarCoherencia, abonos } = require('./coherencia');
 const { COSTE_DESBLOQUEO } = require('./puntos');
+const { rutasGuardadoCampana } = require('./guardadoCampana');
 const { rutasHitosCampana } = require('./hitosCampana');
 
 const LIMITE_POR_DEFECTO = 20;
@@ -232,6 +233,8 @@ function crearRouter({
     });
   }));
 
+  // Partida de campaña guardada en la cuenta (#478).
+  router.use(rutasGuardadoCampana({ repo, ahora, error }));
   // Puntos de la campaña por hitos y catálogo de la tienda (#374).
   router.use(rutasHitosCampana({ repo, ahora, error }));
 

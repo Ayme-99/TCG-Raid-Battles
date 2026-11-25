@@ -217,6 +217,39 @@ void main() {
     expect(p.terminarCombate(c, perdido).cuantos(ObjetoCampana.pocion), 2);
   });
 
+  test('las Cuerdas Huida de la mochila van al combate y se gastan (#468)',
+      () {
+    final base = PartidaCampana.nueva(c.region, semilla: 3)
+        .elegirInicial(c, 'bulbasaur')
+        .avanzar(c, 'ruta-1')
+        .avanzar(c, 'ruta-1-pidgey');
+    final p = PartidaCampana(
+      progreso: base.progreso,
+      equipo: base.equipo,
+      semilla: base.semilla,
+      dinero: base.dinero,
+      mochila: const {ObjetoCampana.cuerdaHuida: 2, ObjetoCampana.pocion: 1},
+      ultimaCura: base.ultimaCura,
+    );
+    final e = p.empezarCombate(c);
+    expect(e.jugador.cuerdas, 2);
+    expect(e.rival.cuerdas, 0);
+    final gastada = e.copiarCon(
+      jugador: e.jugador.copiarCon(cuerdas: 1, cuerdasUsadas: 1),
+      fase: FaseCombate.terminado,
+      ganador: Bando.rival,
+    );
+    final tras = p.terminarCombate(c, gastada);
+    expect(tras.cuantos(ObjetoCampana.cuerdaHuida), 1);
+    expect(tras.cuantos(ObjetoCampana.pocion), 1, reason: 'no se usó');
+  });
+
+  test('la Cuerda Huida cuesta 550 y se vende desde la 1.ª medalla', () {
+    const p = ParametrosCampana();
+    expect(p.precios[ObjetoCampana.cuerdaHuida], 550);
+    expect(p.medallasParaComprar[ObjetoCampana.cuerdaHuida], 1);
+  });
+
   test('perder cura al equipo y le devuelve al último sitio donde se curó', () {
     var p = PartidaCampana.nueva(c.region)
         .elegirInicial(c, 'bulbasaur')
@@ -432,6 +465,7 @@ void main() {
         ObjetoCampana.ultraBall: 1200,
         ObjetoCampana.pocion: 300,
         ObjetoCampana.repelente: 350,
+        ObjetoCampana.cuerdaHuida: 550,
         ObjetoCampana.piedraEx: 2000,
       });
     });

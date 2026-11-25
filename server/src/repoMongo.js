@@ -8,6 +8,9 @@
 // por eso un reintento no puede sumar dos veces.
 const COLECCION_PARTIDAS = 'incursiones_partidas';
 const COLECCION_JUGADORES = 'incursiones_partida_jugadores';
+// Partida de campaña guardada en la cuenta (#478): una por cuenta y campaña,
+// `_id` = `${cuentaId}:${campana}`.
+const COLECCION_GUARDADOS_CAMPANA = 'incursiones_campana_partidas';
 // Hitos de campaña abonados (#374): uno por cuenta, campaña e id de hito.
 const COLECCION_HITOS_CAMPANA = 'incursiones_campana_hitos';
 
@@ -15,6 +18,12 @@ function crearRepoMongo(db) {
   const partidas = db.collection(COLECCION_PARTIDAS);
   const jugadores = db.collection(COLECCION_JUGADORES);
   const hitos = db.collection(COLECCION_HITOS_CAMPANA);
+  const guardados = db.collection(COLECCION_GUARDADOS_CAMPANA);
+  const sinId = (doc) => {
+    if (!doc) return null;
+    const { _id, ...resto } = doc;
+    return resto;
+  };
 
   return {
     // Llamar una vez al arrancar.
@@ -90,6 +99,32 @@ function crearRepoMongo(db) {
       return { puntos: r ? r.puntos : 0, partidas: r ? r.partidas : 0 };
     },
 
+    async obtenerGuardadoCampana(cuentaId, campana) {
+      return sinId(await guardados.findOne({ _id: `${cuentaId}:${campana}` }));
+    },
+
+    // Atómico: la revisión va en el filtro, así dos dispositivos no se pisan.
+    async guardarGuardadoCampana({ cuentaId, campana, revisionBase, partida, actualizadaEn }) {
+      const _id = `${cuentaId}:${campana}`;
+      const nuevo = { cuentaId, campana, revision: revisionBase + 1, actualizadaEn, partida };
+      if (revisionBase === 0) {
+        try {
+          await guardados.insertOne({ _id, ...nuevo });
+          return { ok: true, guardado: nuevo };
+        } catch (e) {
+          if (!(e && e.code === 11000)) throw e;
+          return { ok: false, actual: sinId(await guardados.findOne({ _id })) };
+        }
+      }
+      const hecho = await guardados.findOneAndUpdate(
+        { _id, revision: revisionBase },
+        { $set: nuevo },
+        { returnDocument: 'after' },
+      );
+      if (hecho) return { ok: true, guardado: sinId(hecho) };
+      return { ok: false, actual: sinId(await guardados.findOne({ _id })) };
+    },
+
     // `_id` = `${cuentaId}:${campana}:${id}`: el mismo hito no se abona dos
     // veces aunque lleguen dos envíos a la vez ($setOnInsert con upsert).
     async abonarHitosCampana({ cuentaId, campana, hitos: lista, abonadoEn }) {
@@ -141,5 +176,6 @@ function crearRepoMongo(db) {
 }
 
 module.exports = {
-  crearRepoMongo, COLECCION_PARTIDAS, COLECCION_JUGADORES, COLECCION_HITOS_CAMPANA,
+  crearRepoMongo, COLECCION_PARTIDAS, COLECCION_JUGADORES, COLECCION_GUARDADOS_CAMPANA,
+  COLECCION_HITOS_CAMPANA,
 };

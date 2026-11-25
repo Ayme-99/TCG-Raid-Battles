@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "revision": 0,
+  "partida": {
+    "version": 2,
+    "equipo": [
+      {
+        "id": "bulbasaur",
+        "ps": 90
+      },
+      {
+        "id": "pidgey",
+        "ps": 30
+      }
+    ],
+    "pc": [
+      {
+        "id": "rattata",
+        "ps": 60
+      }
+    ],
+    "puntos": 300,
+    "semilla": 7,
+    "derrotas": 1,
+    "dinero": 1250,
+    "xp": 40,
+    "mochila": {
+      "pocion": 2,
+      "pokeball": 3
+    },
+    "ultimaCura": "pueblo-paleta"
+  }
+}

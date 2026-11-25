@@ -72,6 +72,31 @@ function pruebasDeRepo(nombre, crear, opciones = {}) {
     assert.deepStrictEqual(ids(await repo.listar('b', { limite: 10, antes: null })), []);
   });
 
+  test(`${nombre}: la partida de campaña se guarda por revisión (#478)`, opciones, async (t) => {
+    const repo = await crear(t);
+    const base = { cuentaId: 'a', campana: 'kanto', actualizadaEn: 't1' };
+    assert.strictEqual(await repo.obtenerGuardadoCampana('a', 'kanto'), null);
+    const una = await repo.guardarGuardadoCampana({ ...base, revisionBase: 0, partida: { dinero: 1 } });
+    assert.strictEqual(una.ok, true);
+    assert.strictEqual(una.guardado.revision, 1);
+    const otra = await repo.guardarGuardadoCampana({ ...base, revisionBase: 0, partida: { dinero: 2 } });
+    assert.strictEqual(otra.ok, false);
+    assert.deepStrictEqual(otra.actual.partida, { dinero: 1 });
+    const dos = await repo.guardarGuardadoCampana({ ...base, revisionBase: 1, partida: { dinero: 3 }, actualizadaEn: 't2' });
+    assert.strictEqual(dos.ok, true);
+    assert.strictEqual(dos.guardado.revision, 2);
+    const vieja = await repo.guardarGuardadoCampana({ ...base, revisionBase: 1, partida: { dinero: 4 } });
+    assert.strictEqual(vieja.ok, false);
+    assert.strictEqual(vieja.actual.revision, 2);
+    const leida = await repo.obtenerGuardadoCampana('a', 'kanto');
+    assert.deepStrictEqual(leida, {
+      cuentaId: 'a', campana: 'kanto', revision: 2, actualizadaEn: 't2', partida: { dinero: 3 },
+    });
+    assert.strictEqual(await repo.obtenerGuardadoCampana('b', 'kanto'), null);
+    const sinNada = await repo.guardarGuardadoCampana({ ...base, cuentaId: 'b', revisionBase: 4, partida: {} });
+    assert.deepStrictEqual(sinNada, { ok: false, actual: null });
+  });
+
   test(`${nombre}: los hitos de campaña se abonan una vez por id (#374)`, opciones, async (t) => {
     const repo = await crear(t);
     const base = { cuentaId: 'a', campana: 'kanto', abonadoEn: 't1' };
