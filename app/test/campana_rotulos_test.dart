@@ -19,8 +19,8 @@ void main() {
   /// El tamaño de letra con que se ve en pantalla el rótulo [texto] de la zona
   /// [clave]: el de su estilo por lo que lo encoja el `FittedBox`.
   double letraEnPantalla(WidgetTester tester, String clave, String texto) {
-    final f = find.descendant(
-        of: find.byKey(Key(clave)), matching: find.text(texto));
+    final f =
+        find.descendant(of: find.byKey(Key(clave)), matching: find.text(texto));
     expect(f, findsOneWidget, reason: clave);
     final parrafo = tester.renderObject<RenderParagraph>(f);
     final escala = tester.getSize(f).width / parrafo.size.width;
@@ -28,7 +28,8 @@ void main() {
     return estilo.fontSize! * escala;
   }
 
-  testWidgets('en el móvil apaisado, la puerta «Salida de Ciudad Verde» '
+  testWidgets(
+      'en el móvil apaisado, la puerta «Salida de Ciudad Verde» '
       'se lee sin encoger', (tester) async {
     const guardada = PartidaCampana(
       progreso: ProgresoRuta(
@@ -69,6 +70,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     final c = catalogoCampanaDeDisco();
+    var vistos = 0;
     for (final n in c.region.nodos.values) {
       final p = PartidaCampana(
           progreso: ProgresoRuta(nodoActual: n.id),
@@ -91,11 +93,21 @@ void main() {
       await tester.pumpAndSettle();
       for (final z in n.escena!.zonas) {
         final rotulo = estadoZona(c, p, z).rotulo;
+        // Las escenas con el fondo de Arte ya no llevan rótulo.
+        if (find
+            .descendant(
+                of: find.byKey(Key(claveZona(z))), matching: find.text(rotulo))
+            .evaluate()
+            .isEmpty) {
+          continue;
+        }
+        vistos++;
         expect(letraEnPantalla(tester, claveZona(z), rotulo),
             greaterThanOrEqualTo(minimo),
             reason: '${n.id}: $rotulo');
       }
       expect(tester.takeException(), isNull, reason: n.id);
     }
+    expect(vistos, greaterThan(20), reason: 'casi todas usan el marcador');
   });
 }

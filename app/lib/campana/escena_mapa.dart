@@ -239,9 +239,7 @@ class _Zona extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: estado.activa ? alTocar : null,
-          child: conRotulo
-              ? _Rotulo(estado: estado)
-              : const SizedBox.expand(),
+          child: conRotulo ? _Rotulo(estado: estado) : const SizedBox.expand(),
         ),
       ),
     );
