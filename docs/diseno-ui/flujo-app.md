@@ -41,7 +41,7 @@ Abrir app
 
 - Botón principal: **Nueva partida**, o **Continuar** si hay una a medias (hoy la app la retoma sola al abrirse; pasa a ser una elección).
 - Accesos a **Pokédex** y a **Cuenta** (iniciar sesión o, con sesión, perfil, historial y amigos).
-- La sesión nunca es obligatoria: sin ella se juega igual y los demás jugadores cuentan como invitados.
+- **Cuándo hace falta sesión** (decidido el 2026-11-25, D-20 §10.1; #390): solo la **partida libre en formato físico** va **sin cuenta**: sin sesión se juega igual y los demás jugadores cuentan como invitados. **El modo campaña, el formato digital y la tienda exigen sesión**, y la **partida de campaña se guarda también en la cuenta**. Sin sesión, esos accesos llevan a **iniciar sesión y vuelven al acceso elegido** (confirmado por Ayme el 2026-11-25).
 
 ## 3. Preparación de una partida libre en formato físico (offline)
 
@@ -77,8 +77,8 @@ Tiene **dos categorías**: **Mis cartas** y **Enemigos**. Por ahora solo existe 
 
 - **Enemigos:** jefes y aliados enfrentados, agrupados por expansión (de salida solo hay una).
 - **Mis cartas:** las cartas del formato digital conseguidas en la tienda (sobres y cartas sueltas). **TODO.**
-- Se guarda **en el dispositivo** y funciona sin sesión.
-- Al **iniciar sesión se sincroniza** con la cuenta y se actualiza.
+- Lo de la **partida libre en formato físico** se guarda **en el dispositivo** y funciona sin sesión; al **iniciar sesión se sincroniza** con la cuenta y se actualiza.
+- Lo que viene de la **campaña**, del **formato digital** y de la **tienda** (los jefes de campaña de «Enemigos» y «Mis cartas») **exige sesión** y se guarda en la cuenta (D-20 §10.1, D-21 §3.1).
 
 ## 7. Cuenta
 
