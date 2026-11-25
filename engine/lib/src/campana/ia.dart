@@ -11,8 +11,9 @@ import 'pokemon.dart';
 /// Orden de decisión:
 /// 1. Si cae su Pokémon activo, saca el relevo con mejor combinación de no ser
 ///    débil, daño que puede hacer y salud.
-///    Si está Paralizado (Dragoaliento), carga: no puede hacer otra cosa
-///    (salvo curarse con una Poción, como en el paso 2 bis).
+///    Si está Paralizado (Dragoaliento), carga: no puede atacar ni cambiar
+///    (salvo curarse con una Poción, como en el paso 2 bis, o salir con una
+///    Cuerda Huida si el paso 3 querría cambiar).
 /// 2. Si puede dejar fuera de combate al rival, ataca con lo más barato que
 ///    lo logre.
 /// 2 bis. Pociones (D-20 §3.2, #458; no gastan turno): si el rival puede
@@ -25,6 +26,10 @@ import 'pokemon.dart';
 /// 3. Si su activo es débil a un ataque del rival, o no llega a ningún ataque,
 ///    cambia a un relevo que sí le sirva (nunca al jefe que espera a que caiga
 ///    su aliado).
+///    Cuerda Huida (D-20 §10.6, #468; gasta el turno, no paga la retirada):
+///    solo si cambiando no hay relevo que le sirva (no le llega la energía de
+///    la retirada o le deja sin ataque) y con toda su energía sí lo hay. Así
+///    no gasta un objeto de 550 en lo que un cambio normal ya resuelve.
 /// 4. Si tiene un ataque que reduce el daño del rival (Gruñido) y compensa
 ///    (evita más daño en lo que le queda de vida que el que haría ahora
 ///    atacando), lo usa; nunca lo repite mientras siga activo el mismo rival.
@@ -71,9 +76,6 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
 
   final pocion = _pocionQueSalva(estado, bando);
 
-  // Paralizado (Dragoaliento): este turno no puede atacar ni cambiar.
-  if (yo.paralizado) return pocion ?? Cargar(bando);
-
   final activo = _conRacha(yo);
   final ataque = _mejorAtaque(
       activo, yo.energia, objetivo, p, yo.danoReducido, rival.extraRecibido);
@@ -81,12 +83,31 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
       ? 0
       : danoDeAtaque(activo.ataques[ataque], objetivo.especie,
           reduccion: yo.danoReducido, extra: rival.extraRecibido);
+  final debil = _esDebilContra(activo, objetivo.especie);
+
+  // Relevo para salir con una Cuerda Huida (paso 3), o null.
+  UsarCuerdaHuida? cuerda() {
+    final candidatos = objetivosDeCuerda(estado, bando);
+    if (candidatos.isEmpty) return null;
+    final relevo = _mejorRelevo(yo, objetivo, yo.energia, p,
+        exigirAtaque: true,
+        exigirNoDebil: debil,
+        extra: rival.extraRecibido,
+        candidatos: candidatos);
+    return relevo == null ? null : UsarCuerdaHuida(bando, relevo);
+  }
+
+  // Paralizado (Dragoaliento): este turno no puede atacar ni cambiar.
+  if (yo.paralizado) {
+    if (pocion != null) return pocion;
+    return (debil || ataque == null ? cuerda() : null) ?? Cargar(bando);
+  }
+
   if (ataque != null && danoMio >= objetivo.ps) {
     return Atacar(bando, ataque);
   }
   if (pocion != null) return pocion;
 
-  final debil = _esDebilContra(activo, objetivo.especie);
   if (debil || ataque == null) {
     if (activo.retirada <= yo.energia) {
       final relevo = _mejorRelevo(
@@ -101,6 +122,8 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
       );
       if (relevo != null) return Cambiar(bando, relevo);
     }
+    final c = cuerda();
+    if (c != null) return c;
   }
 
   final veneno = _ataqueDeVeneno(yo, rival);

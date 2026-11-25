@@ -32,8 +32,9 @@ class ParametrosCombate {
   /// solo al activo.
   final bool pocionCuraBanca;
 
-  /// Propuesta de Diseño por confirmar (D-20 §3.2): el rival no usa objetos.
-  /// Con true, el motor acepta [UsarPocion] del rival y la IA las usa.
+  /// Decidido (D-20 §10.6, #458): el rival no usa objetos por ahora. Con
+  /// true, el motor acepta [UsarPocion] y [UsarCuerdaHuida] del rival y la IA
+  /// los usa.
   final bool rivalUsaObjetos;
 
   const ParametrosCombate({
@@ -118,6 +119,14 @@ class BandoCombate {
   /// al terminarlo.
   final int pocionesUsadas;
 
+  /// Cuerdas Huida que le quedan a este bando en el combate (D-20 §10.6,
+  /// #468): las del inventario al empezar.
+  final int cuerdas;
+
+  /// Cuerdas Huida gastadas en este combate; la partida las resta de la
+  /// mochila al terminarlo.
+  final int cuerdasUsadas;
+
   const BandoCombate({
     required this.equipo,
     required this.activo,
@@ -135,6 +144,8 @@ class BandoCombate {
     this.enEspera = -1,
     this.pociones = 0,
     this.pocionesUsadas = 0,
+    this.cuerdas = 0,
+    this.cuerdasUsadas = 0,
   });
 
   PokemonEnCombate get pokemonActivo => equipo[activo];
@@ -176,6 +187,8 @@ class BandoCombate {
     int? enEspera,
     int? pociones,
     int? pocionesUsadas,
+    int? cuerdas,
+    int? cuerdasUsadas,
   }) =>
       BandoCombate(
         equipo: equipo ?? this.equipo,
@@ -194,6 +207,8 @@ class BandoCombate {
         enEspera: enEspera ?? this.enEspera,
         pociones: pociones ?? this.pociones,
         pocionesUsadas: pocionesUsadas ?? this.pocionesUsadas,
+        cuerdas: cuerdas ?? this.cuerdas,
+        cuerdasUsadas: cuerdasUsadas ?? this.cuerdasUsadas,
       );
 }
 
@@ -304,6 +319,8 @@ class EstadoCombate {
     LlamadaEnCombate? llamadaRival,
     int pocionesJugador = 0,
     int pocionesRival = 0,
+    int cuerdasJugador = 0,
+    int cuerdasRival = 0,
   }) {
     if (equipoJugador.isEmpty || equipoRival.isEmpty) {
       throw const ReglaIncumplida('Cada bando necesita al menos un Pokémon.');
@@ -315,16 +332,18 @@ class EstadoCombate {
             llamadaRival.jefe >= equipoRival.length)) {
       throw const ReglaIncumplida('La llamada de aliado no es válida.');
     }
-    BandoCombate bando(List<PokemonCampana> equipo, int pociones) =>
+    BandoCombate bando(List<PokemonCampana> equipo, int pociones,
+            int cuerdas) =>
         BandoCombate(
           equipo: [for (final p in equipo) PokemonEnCombate.completo(p)],
           activo: 0,
           energia: parametros.energiaInicial,
           pociones: pociones,
+          cuerdas: cuerdas,
         );
     return EstadoCombate(
-      jugador: bando(equipoJugador, pocionesJugador),
-      rival: bando(equipoRival, pocionesRival),
+      jugador: bando(equipoJugador, pocionesJugador, cuerdasJugador),
+      rival: bando(equipoRival, pocionesRival, cuerdasRival),
       turno: empieza,
       fase: FaseCombate.enCurso,
       ganador: null,
@@ -346,6 +365,8 @@ class EstadoCombate {
     LlamadaEnCombate? llamadaRival,
     int pocionesJugador = 0,
     int pocionesRival = 0,
+    int cuerdasJugador = 0,
+    int cuerdasRival = 0,
   }) {
     if (llamadaRival != null &&
         (llamadaRival.aliados.isEmpty ||
@@ -354,7 +375,8 @@ class EstadoCombate {
             llamadaRival.jefe >= equipoRival.length)) {
       throw const ReglaIncumplida('La llamada de aliado no es válida.');
     }
-    BandoCombate bando(List<PokemonEnCombate> equipo, int pociones) {
+    BandoCombate bando(
+        List<PokemonEnCombate> equipo, int pociones, int cuerdas) {
       final activo = equipo.indexWhere((p) => p.enPie);
       if (activo < 0) {
         throw const ReglaIncumplida(
@@ -365,12 +387,13 @@ class EstadoCombate {
         activo: activo,
         energia: parametros.energiaInicial,
         pociones: pociones,
+        cuerdas: cuerdas,
       );
     }
 
     return EstadoCombate(
-      jugador: bando(equipoJugador, pocionesJugador),
-      rival: bando(equipoRival, pocionesRival),
+      jugador: bando(equipoJugador, pocionesJugador, cuerdasJugador),
+      rival: bando(equipoRival, pocionesRival, cuerdasRival),
       turno: empieza,
       fase: FaseCombate.enCurso,
       ganador: null,
@@ -474,6 +497,17 @@ class UsarPocion extends AccionCombate {
   const UsarPocion(super.bando, this.indice);
 }
 
+/// Usa una Cuerda Huida (D-20 §10.6, #437 y #468): cambia el activo por el
+/// del equipo en la posición [indice] **sin pagar la retirada** y aunque esté
+/// Paralizado. **Gasta el turno**, como [Cambiar]. Solo hay las
+/// [BandoCombate.cuerdas] del inventario. El rival solo puede si
+/// [ParametrosCombate.rivalUsaObjetos].
+class UsarCuerdaHuida extends AccionCombate {
+  final int indice;
+
+  const UsarCuerdaHuida(super.bando, this.indice);
+}
+
 /// Elige el Pokémon que sustituye al que ha caído. No gasta turno.
 class ElegirSiguiente extends AccionCombate {
   final int indice;
@@ -521,6 +555,7 @@ EstadoCombate aplicarCombate(EstadoCombate estado, AccionCombate accion) {
     Cambiar a => _cambiar(estado, a),
     Cargar a => _cargar(estado, a),
     UsarPocion a => _usarPocion(estado, a),
+    UsarCuerdaHuida a => _usarCuerdaHuida(estado, a),
     ElegirSiguiente _ =>
       throw const ReglaIncumplida('No hay que elegir Pokémon ahora.'),
   };
@@ -781,11 +816,16 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
   if (b.energia < retirada) {
     throw const ReglaIncumplida('No hay energía para retirar al Pokémon.');
   }
-  return _terminarTurno(estado.conBando(
-    a.bando,
+  return _terminarTurno(
+      estado.conBando(a.bando, _conNuevoActivo(b, a.indice, b.energia - retirada)));
+}
+
+/// [b] con [indice] de activo y [energia]: se quitan los efectos que solo
+/// duran mientras sigue el mismo activo.
+BandoCombate _conNuevoActivo(BandoCombate b, int indice, int energia) =>
     b.copiarCon(
-        activo: a.indice,
-        energia: b.energia - retirada,
+        activo: indice,
+        energia: energia,
         danoReducido: 0,
         danoExtra: 0,
         veneno: 0,
@@ -793,8 +833,44 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
         cegadoMientrasActivo: false,
         drenado: false,
         ultimoAtaque: -1,
-        racha: 0),
-  ));
+        racha: 0);
+
+/// Si [a] es válida, el estado con la Cuerda Huida usada y el turno
+/// terminado; si no, lanza [ReglaIncumplida]. No paga la retirada y vale
+/// aunque el activo esté Paralizado.
+EstadoCombate _usarCuerdaHuida(EstadoCombate estado, UsarCuerdaHuida a) {
+  final b = estado.bando(a.bando);
+  if (a.bando == Bando.rival && !estado.parametros.rivalUsaObjetos) {
+    throw const ReglaIncumplida('El rival no usa objetos.');
+  }
+  if (b.cuerdas < 1) {
+    throw const ReglaIncumplida('No te quedan Cuerdas Huida.');
+  }
+  if (a.indice == b.enEspera && b.relevos.contains(a.indice)) {
+    throw ReglaIncumplida(estado.aliadoAlFrente
+        ? 'El jefe no vuelve hasta que caiga su aliado.'
+        : 'El aliado espera en la banca hasta que el jefe lo saque.');
+  }
+  if (!b.cambiables.contains(a.indice)) {
+    throw const ReglaIncumplida('Ese Pokémon no puede salir.');
+  }
+  final nuevo = _conNuevoActivo(b, a.indice, b.energia)
+      .copiarCon(cuerdas: b.cuerdas - 1, cuerdasUsadas: b.cuerdasUsadas + 1);
+  return _terminarTurno(estado.conBando(a.bando, nuevo));
+}
+
+/// A quién puede sacar ahora [bando] con una Cuerda Huida (índices del
+/// equipo), o vacío si no puede usarla: no es su turno, no le quedan, es el
+/// rival sin [ParametrosCombate.rivalUsaObjetos] o no tiene relevos.
+List<int> objetivosDeCuerda(EstadoCombate estado, Bando bando) {
+  final b = estado.bando(bando);
+  if (estado.fase != FaseCombate.enCurso ||
+      estado.turno != bando ||
+      b.cuerdas < 1 ||
+      (bando == Bando.rival && !estado.parametros.rivalUsaObjetos)) {
+    return const [];
+  }
+  return b.cambiables;
 }
 
 /// Si [a] es válida, el estado con la Poción usada; si no, lanza

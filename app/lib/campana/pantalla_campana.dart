@@ -649,6 +649,7 @@ String nombreObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.ultraBall => 'Ultra Ball',
       ObjetoCampana.pocion => 'Poción',
       ObjetoCampana.repelente => 'Repelente',
+      ObjetoCampana.cuerdaHuida => 'Cuerda Huida',
       ObjetoCampana.piedraEx => 'Piedra ex',
     };
 
@@ -660,6 +661,8 @@ String descripcionObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.pocion =>
         'Cura ${parametrosCampana.psPocion} PS fuera de combate',
       ObjetoCampana.repelente => 'Evita un combate contra un Pokémon salvaje',
+      ObjetoCampana.cuerdaHuida =>
+        'En combate, cambia de Pokémon sin pagar la retirada (gasta el turno)',
       ObjetoCampana.piedraEx =>
         'Hace ex a un Pokémon que ya no evoluciona; una por ex',
     };

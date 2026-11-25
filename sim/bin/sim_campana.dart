@@ -122,6 +122,7 @@ Resultado jugarDesde(EstadoCombate e) {
       case Atacar _:
         atacar++;
       case Cambiar _:
+      case UsarCuerdaHuida _:
         cambiar++;
       case Cargar _:
         cargar++;

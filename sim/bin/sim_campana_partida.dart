@@ -1126,6 +1126,8 @@ void equipoContra(Config cfg, CatalogoCampana c) {
           Cambiar x => 'cambia a ${b.equipo[x.indice].especie.nombre}',
           Cargar _ => 'carga',
           UsarPocion x => 'usa una Poción con ${b.equipo[x.indice].especie.nombre}',
+          UsarCuerdaHuida x =>
+            'usa una Cuerda Huida y sale ${b.equipo[x.indice].especie.nombre}',
           ElegirSiguiente x => 'saca a ${b.equipo[x.indice].especie.nombre}',
         };
         stdout.writeln('  t${e.numeroTurno} ${e.actua.name} $nombre '
