@@ -115,24 +115,27 @@ Con eso el playtest ve y oye los puntos donde pasa algo que decide la partida: e
 
 | # | Pregunta | Mi recomendación |
 |---|---|---|
-| 1 | ¿De dónde sale la música: la compones tú, la encargas o usamos librerías libres? | Para el P0, sintetizados rápidos y grabaciones propias (la moneda real sobre un tapete es la mejor pieza posible para este juego). Para el P1, composición propia o librerías libres, lo que te resulte más cómodo. Dirección anota que probablemente usarás **Suno** (no definitivo): ver «Origen probable: Suno», más abajo. |
+| 1 | ¿De dónde sale la música: la compones tú, la encargas o usamos librerías libres? | Para el P0, sintetizados rápidos y grabaciones propias (la moneda real sobre un tapete es la mejor pieza posible para este juego). Para el P1, composición propia o librerías libres, lo que te resulte más cómodo. Suno es la única herramienta que conoces y has probado (2026-11-25): ver «Suno: solo bocetos y pruebas», más abajo. |
 | 2 | ¿Qué material propio tienes ya? ¿Se puede redistribuir? | Si no se puede, se usa en tu equipo pero no se sube (el repositorio es público). Eso necesita que Programación decida cómo cargarlo (§6). |
 | 3 | ¿Brock merece un tema propio (M-07)? | No antes de que el resto esté: se reutiliza M-05. |
-| 4 | ¿Se admite música o efectos generados con IA? | Sí, para bocetos y para piezas que se suban, con herramientas cuyos términos permitan redistribuir (Treblo, Stable Audio Open) y registrando herramienta, plan y fecha. No subir al repositorio lo hecho con el plan gratuito de Suno (ver «Origen probable: Suno»). Si se aprueba, se añade un código «IA» a los de origen. |
+| 4 | ¿Se admite música o efectos generados con IA? | Sí, para bocetos y para piezas que se suban, con herramientas cuyos términos permitan redistribuir (Treblo, Stable Audio Open) y registrando herramienta, plan y fecha. No subir al repositorio lo hecho con el plan gratuito de Suno (ver «Suno: solo bocetos y pruebas»). Si se aprueba, se añade un código «IA» a los de origen. |
 | 5 | ¿Gritos de Pokémon? | Fuera de alcance. No hay fuente propia y la regla 1 de §1 lo impide con los reales. Se puede volver a hablar si se quieren sonidos originales «tipo grito». |
 
-### Origen probable: Suno (anotado el 2026-11-25, no definitivo)
+### Suno: solo bocetos y pruebas (decidido el 2026-11-25)
 
-Dirección indica que Ayme **probablemente** usará Suno para la música. No está confirmado, y **no se produce ninguna pieza** hasta que Ayme confirme el origen y diga si tiene material propio que se pueda redistribuir (preguntas 1 y 2). La issue #381 sigue con «Decisión de Ayme».
+Ayme dice que **Suno es la única herramienta de música que conoce y ha probado**. Hasta nuevo aviso **no se produce ninguna pieza**, y la issue #381 sigue con «Decisión de Ayme» hasta que confirme si tiene material propio redistribuible (pregunta 2).
 
-**Condición, si al final es Suno: lo hecho con el plan gratuito de Suno NO se sube al repositorio.** El repositorio es público y subir un archivo es redistribuirlo. Según el centro de ayuda de Suno, en el plan gratuito Suno conserva la propiedad de las canciones y solo se permite un uso personal que no genere ingresos; la licencia comercial llega solo con un plan de pago y **no es retroactiva** para lo generado antes de suscribirse. Por eso:
+**Reglas, mientras Suno sea la herramienta:**
 
-1. **Plan gratuito:** vale para bocetos y para escuchar en el equipo de Ayme. Nada de eso entra en `app/assets/campana/audio/`, ni como «provisional».
-2. **Plan de pago:** solo lo generado **mientras** el plan de pago está activo es candidato a subirse, y habría que comprobar los términos vigentes en ese momento (han cambiado más de una vez, y puede que cuente solo lo descargado desde Suno dentro de la cuota mensual).
-3. **Registro de créditos:** si se usa Suno, cada fila de `CREDITOS-AUDIO.md` anota además el **plan que había al generar la pieza** (Gratis, Pro o Premier) y la fecha, porque de eso depende quién es el dueño.
-4. **Prompts:** sin nombres de juegos, personajes ni artistas (regla 2 de §1). Se describe el ambiente, los instrumentos y los BPM de las tablas de §3.
+1. **Suno sirve solo para bocetos y pruebas en el equipo de Ayme.**
+2. **Lo hecho con el plan gratuito no se sube al repositorio público ni se enseña a amigos.** Ni como «provisional». El repositorio es público y subir un archivo es redistribuirlo. Según el centro de ayuda de Suno, en el plan gratuito la propiedad de la canción es de Suno y solo se permite un uso personal que no genere ingresos; la licencia comercial llega con un plan de pago y **no es retroactiva** para lo generado antes de suscribirse.
+3. **Lo que se suba solo puede salir de un plan de pago activo,** generado **mientras** ese plan está activo y **tras revisar los términos vigentes de Suno** en ese momento (han cambiado más de una vez, y puede que cuente solo lo descargado desde Suno dentro de la cuota del plan).
+4. **Registro de créditos:** cada fila de `CREDITOS-AUDIO.md` anota el **plan que había al generar la pieza** (Gratis, Pro o Premier), la fecha y la revisión de términos, porque de eso depende quién es el dueño.
+5. **Prompts:** sin nombres de juegos, personajes ni artistas (regla 2 de §1). Se describe el ambiente, los instrumentos y los BPM de las tablas de §3.
 
-**Duda que dejo escrita para Ayme:** si la app con música de plan gratuito se enseña a los amigos (D-21), queda en zona gris, porque el permiso de Suno habla de uso personal. Mi recomendación es no hacerlo y, si se quiere esa música en las pruebas, generarla con el plan de pago.
+**Qué cambia para las pruebas con amigos (#385):** con música de plan gratuito no se enseña la app. Si hace falta música en esas pruebas, o se juega en silencio (el sonido no bloquea el playtest, §5) o se genera con un plan de pago activo.
+
+**Pendiente de Ayme:** ¿tiene material propio que se pueda redistribuir? (pregunta 2). Si lo tiene, puede cubrir el P0 sin pasar por Suno.
 
 ## 6. Entrega de los archivos
 
