@@ -384,7 +384,7 @@ Es el dato que le faltaba a Calidad para la XP y los ex (#451). **Solo cuenta la
 | 6 | 2 Intermedio (40) | 3 (90) | 06 Lapras (30) | 1 + líder | 8 | **230** | 230 |
 | 7 | 2 Intermedio (40) | 3 (90) | 07 Muk (30) | 1 + líder | 8 | **230** | 240 |
 | 8 | 2 Intermedio (40) | 3 (90) | 08 Gyarados (30) | 1 + líder | 8 | **230** | 250 |
-| **Total** | | | | | **58** | **1.620** | |
+| **Total** | | | | | **59** | **1.620** | |
 
 - **Media: unos 200 XP por tramo** (1.620 en total). Es el escenario de «180 por tramo» de Calidad con algo más; no el de ~100. Con `xpEvolucion` 80 salen los **16 ex** posibles; con 110, entre 11 y 16 según cómo juegue el jugador. Por eso se mantiene la palanca recomendada: `xpEvolucion` 80 en las fases siguientes.
 - **El dinero cuadra con §10.6:** los entrenadores de cada tramo reparten su presupuesto (710 a 1.010) entre 3 (tramos 2 a 5) o 4 (tramos 6 a 8) entrenadores contando el del gimnasio; redondeado a 10. Las cifras exactas se fijan al diseñar cada tramo (tarea 11).
