@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "hitos": [
+    {
+      "id": "x",
+      "tipo": "salvaje",
+      "puntos": 10
+    }
+  ]
+}

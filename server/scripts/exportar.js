@@ -12,6 +12,7 @@ const path = require('node:path');
 const RAIZ = path.join(__dirname, '..', '..');
 const ORIGEN_SRC = path.join(RAIZ, 'server', 'src');
 const ORIGEN_CONTRATO = path.join(RAIZ, 'contrato');
+const ORIGEN_CATALOGO = path.join(RAIZ, 'catalog');
 
 function exportar(destino) {
   fs.mkdirSync(path.join(destino, 'contrato'), { recursive: true });
@@ -31,11 +32,21 @@ function exportar(destino) {
     path.join(destino, 'contrato', 'sala', 'sala.v1.schema.json'),
   );
   copiados.push('contrato/sala/sala.v1.schema.json');
-  // Esquemas de la campaña con la cuenta (#478), que carga src/guardadoCampana.js.
+  // Esquemas de la campaña con la cuenta (guardado #478 e hitos #374), que
+  // cargan src/guardadoCampana.js y src/hitosCampana.js.
   fs.mkdirSync(path.join(destino, 'contrato', 'campana'), { recursive: true });
   for (const nombre of fs.readdirSync(path.join(ORIGEN_CONTRATO, 'campana')).filter((f) => f.endsWith('.schema.json')).sort()) {
     fs.copyFileSync(path.join(ORIGEN_CONTRATO, 'campana', nombre), path.join(destino, 'contrato', 'campana', nombre));
     copiados.push(`contrato/campana/${nombre}`);
+  }
+  // Datos de los hitos y la tienda (#374), que carga src/hitosCampana.js.
+  fs.mkdirSync(path.join(destino, 'catalogo'), { recursive: true });
+  for (const [origen, nombre] of [
+    [path.join(ORIGEN_CATALOGO, 'campana', 'topes-puntos.json'), 'topes-puntos.json'],
+    [path.join(ORIGEN_CATALOGO, 'tienda', 'tienda.json'), 'tienda.json'],
+  ]) {
+    fs.copyFileSync(origen, path.join(destino, 'catalogo', nombre));
+    copiados.push(`catalogo/${nombre}`);
   }
   fs.writeFileSync(
     path.join(destino, 'ORIGEN.md'),

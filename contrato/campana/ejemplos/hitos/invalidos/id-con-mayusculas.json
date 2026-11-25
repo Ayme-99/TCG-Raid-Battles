@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "campana": "kanto",
+  "hitos": [
+    {
+      "id": "Ruta 1",
+      "tipo": "salvaje",
+      "puntos": 10
+    }
+  ]
+}

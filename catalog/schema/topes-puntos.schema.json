@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ayme-99/TCG-Raid-Battles/catalog/schema/topes-puntos.schema.json",
+  "title": "Tope de puntos por hito de la campaña (#374, D-20 §6)",
+  "description": "Lo máximo que el servidor abona a la cuenta por un hito de cada tipo. El motor no puede dar más (engine/test/campana_topes_test.dart).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "topes"],
+  "properties": {
+    "version": { "const": 1 },
+    "fuente": { "type": "string" },
+    "topes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["salvaje", "entrenador", "jefe", "medalla"],
+      "properties": {
+        "salvaje": { "type": "integer", "minimum": 0 },
+        "entrenador": { "type": "integer", "minimum": 0 },
+        "jefe": { "type": "integer", "minimum": 0 },
+        "medalla": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

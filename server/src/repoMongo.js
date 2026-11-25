@@ -11,10 +11,13 @@ const COLECCION_JUGADORES = 'incursiones_partida_jugadores';
 // Partida de campaña guardada en la cuenta (#478): una por cuenta y campaña,
 // `_id` = `${cuentaId}:${campana}`.
 const COLECCION_GUARDADOS_CAMPANA = 'incursiones_campana_partidas';
+// Hitos de campaña abonados (#374): uno por cuenta, campaña e id de hito.
+const COLECCION_HITOS_CAMPANA = 'incursiones_campana_hitos';
 
 function crearRepoMongo(db) {
   const partidas = db.collection(COLECCION_PARTIDAS);
   const jugadores = db.collection(COLECCION_JUGADORES);
+  const hitos = db.collection(COLECCION_HITOS_CAMPANA);
   const guardados = db.collection(COLECCION_GUARDADOS_CAMPANA);
   const sinId = (doc) => {
     if (!doc) return null;
@@ -27,6 +30,7 @@ function crearRepoMongo(db) {
     async asegurarIndices() {
       await jugadores.createIndex({ partidaId: 1, asiento: 1 }, { unique: true });
       await jugadores.createIndex({ cuentaId: 1, guardadaEn: -1, partidaId: -1 });
+      await hitos.createIndex({ cuentaId: 1 });
     },
 
     async guardarPartida({ partida, jugadores: filas }) {
@@ -120,9 +124,58 @@ function crearRepoMongo(db) {
       if (hecho) return { ok: true, guardado: sinId(hecho) };
       return { ok: false, actual: sinId(await guardados.findOne({ _id })) };
     },
+
+    // `_id` = `${cuentaId}:${campana}:${id}`: el mismo hito no se abona dos
+    // veces aunque lleguen dos envíos a la vez ($setOnInsert con upsert).
+    async abonarHitosCampana({ cuentaId, campana, hitos: lista, abonadoEn }) {
+      const idDe = (h) => `${cuentaId}:${campana}:${h.id}`;
+      const ya = new Map(
+        (await hitos.find({ _id: { $in: lista.map(idDe) } }).toArray()).map((d) => [d._id, d]),
+      );
+      const distintos = [];
+      const repetidos = [];
+      const nuevos = [];
+      for (const h of lista) {
+        const d = ya.get(idDe(h));
+        if (!d) nuevos.push(h.id);
+        else if (d.tipo === h.tipo && d.puntos === h.puntos) repetidos.push(h.id);
+        else distintos.push({ id: h.id, tipo: d.tipo, puntos: d.puntos });
+      }
+      if (distintos.length > 0) return { nuevos: [], repetidos: [], distintos };
+      if (nuevos.length > 0) {
+        const r = await hitos.bulkWrite(
+          lista.filter((h) => nuevos.includes(h.id)).map((h) => ({
+            updateOne: {
+              filter: { _id: idDe(h) },
+              update: {
+                $setOnInsert: { cuentaId, campana, hitoId: h.id, tipo: h.tipo, puntos: h.puntos, abonadoEn },
+              },
+              upsert: true,
+            },
+          })),
+          { ordered: false },
+        );
+        // Si otro envío se adelantó con alguno, ese pasa a repetido.
+        const insertados = new Set(Object.values(r.upsertedIds || {}).map(String));
+        const tarde = nuevos.filter((id) => !insertados.has(idDe({ id })));
+        return { nuevos: nuevos.filter((id) => !tarde.includes(id)), repetidos: [...repetidos, ...tarde], distintos };
+      }
+      return { nuevos, repetidos, distintos };
+    },
+
+    async puntosCampanaDe(cuentaId) {
+      const [r] = await hitos
+        .aggregate([
+          { $match: { cuentaId } },
+          { $group: { _id: null, puntos: { $sum: '$puntos' }, hitos: { $sum: 1 } } },
+        ])
+        .toArray();
+      return { puntos: r ? r.puntos : 0, hitos: r ? r.hitos : 0 };
+    },
   };
 }
 
 module.exports = {
   crearRepoMongo, COLECCION_PARTIDAS, COLECCION_JUGADORES, COLECCION_GUARDADOS_CAMPANA,
+  COLECCION_HITOS_CAMPANA,
 };

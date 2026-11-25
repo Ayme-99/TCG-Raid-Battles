@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ayme-99/TCG-Raid-Battles/contrato/campana/hitos.v1.schema.json",
+  "title": "Hitos de campaña que abonan puntos a la cuenta (versión 1)",
+  "description": "Cuerpo de POST /campana/hitos (#374, D-20 §6). La app manda los hitos pendientes al terminar un jefe o una medalla (y al iniciar sesión). Cada hito tiene un id único por cuenta y campaña: el mismo id no suma dos veces. El servidor rechaza un hito que pase del tope de su tipo (catalog/campana/topes-puntos.json).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "campana", "hitos"],
+  "properties": {
+    "version": { "const": 1 },
+    "campana": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,31}$" },
+    "hitos": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "tipo", "puntos"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9:-]{0,95}$",
+            "description": "Único por cuenta y campaña. Propuesta: el id del nodo para un combate (`ruta-1-pidgey`, `jefe-pikachu`) y `medalla:<id>` para una medalla."
+          },
+          "tipo": { "enum": ["salvaje", "entrenador", "jefe", "medalla"] },
+          "puntos": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}
