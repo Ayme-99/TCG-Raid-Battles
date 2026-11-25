@@ -77,7 +77,7 @@ El abono sigue las reglas de D-10 (solo cobra quien tiene cuenta; la parte de un
 1. **Nunca dinero real.** Los puntos no se compran, ni la tienda se cobra con euros. Es un proyecto personal de uso privado (#389); cobrar, aunque fuera un euro, lo convertiría en otra cosa.
 2. **Propiedad intelectual (#389, cerrada).** Uso privado para Ayme y sus amigos, repositorio público con los sprites de Escarlata y Púrpura incluidos; si GitHub o los titulares piden retirarlos, Ayme los quita. Esto condiciona la tienda: **no se venden sprites ni arte de terceros por separado**, solo arte propio (diseños de moneda y de dados).
 3. **Sin transferencias** de puntos entre cuentas ni regalos, para que ningún atajo rompa los costes de desbloqueo.
-4. **Compras definitivas**, sin reembolso, con el precio siempre visible antes de pagar.
+4. **Compras definitivas**, sin reembolso, con el precio siempre visible antes de pagar. Una moneda o unos dados se compran **una sola vez por cuenta** (§2.3).
 5. **Probabilidades visibles** en los sobres, aunque sea entre amigos: abrir un sobre no debe parecer una ruleta.
 
 ## 2. #387 · La tienda
@@ -151,6 +151,8 @@ Lo que **no** entra en la tienda, y por qué:
 - Al terminar el primer tramo (3.300) el jugador puede comprarse **tres sobres**, o **una moneda de serie y un juego de dados**. Tras el jefe Pikachu (1.600 acumulados) ya le llega para algo, de modo que la tienda se ve útil **antes de Brock**.
 - Con la campaña completa (30.000 a 40.000) se llena una tienda sin vaciarla: nadie compra todo de golpe.
 - Las cartas sueltas valen en total **más** que los sobres: ver §2.4.
+
+**Regla de compra, decidida por Ayme el 2026-11-25: una moneda o unos dados se compran una vez por cuenta** (ya aplicada en el PR #491 de Programación). Una vez comprados son tuyos y la tienda los muestra como «Comprado», sin volver a cobrarlos. La **moneda clásica** y los **dados estándar** son **gratis** y siempre están disponibles. La regla es solo para monedas y dados; los sobres y las cartas sueltas, cuando existan, sí se pueden comprar más de una vez (§2.4).
 
 Todas las cifras son **ajustables sin tocar la tienda**: viven en un catálogo de datos (§5). «Decididos (iniciales)» significa que valen para lanzar y se revisarán con datos reales de uso.
 
