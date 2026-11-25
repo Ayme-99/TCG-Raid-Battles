@@ -370,6 +370,28 @@ Con cada jefe hay que crear su carta NN/20 y, si lleva `llamaAliado`, su JSON (`
 - **Tres jefes con Calle Victoria** (Golem, Dragonite y Moltres): se pueden repartir en nodos distintos.
 - **Primera entrega:** se aconseja implementar cada jefe cuando se haga su tramo y haya cartas (tarea 11).
 
+### Rivales por tramo, 2 a 8 (propuesta de Diseño, 2026-11-25, por confirmar; #451)
+
+Es el dato que le faltaba a Calidad para la XP y los ex (#451). **Solo cuenta la ruta principal** (lo obligatorio, sin repetir salvajes ni desvíos). La forma es la del tramo 1, que se mide en el catálogo: 2 salvajes obligatorios (las dos bifurcaciones), entrenadores de ruta, 1 jefe (02 a 08 de la lista A, §4), 1 entrenador de gimnasio y el líder. «Categoría» es la de captura (Común 10 XP, Intermedio 20, Fuerte y jefe 30, §10.6). Pesos medidos en el tramo 1: entrenador de ruta 30 (Cazabichos), entrenador de gimnasio 20 (Joven), líder 50 (Brock: Geodude 20 y Onix 30), jefe 30.
+
+| Tramo | Salvajes obligatorios | Entrenadores de ruta | Jefe (lista A) | Gimnasio | Rivales | XP de la ruta | Dinero por entrenador (≈) |
+|---|---|---|---|---|---|---|---|
+| 1 (real) | 2 Común (20) | 2 (60) | 01 Pikachu (30) | Joven (20) + Brock (50) | 7 | **180** | 220 |
+| 2 | 2 Común (20) | 2 (60) | 02 Clefairy (30) | 1 entrenador (20) + líder (50) | 7 | **180** | 240 |
+| 3 | 2 Común (20) | 2 (60) | 03 Dugtrio (30) | 1 + líder | 7 | **180** | 250 |
+| 4 | Común + Intermedio (30) | 2 (60) | 04 Marowak (30) | 1 + líder | 7 | **190** | 270 |
+| 5 | 2 Intermedio (40) | 2 (60) | 05 Snorlax (30) | 1 + líder | 7 | **200** | 290 |
+| 6 | 2 Intermedio (40) | 3 (90) | 06 Lapras (30) | 1 + líder | 8 | **230** | 230 |
+| 7 | 2 Intermedio (40) | 3 (90) | 07 Muk (30) | 1 + líder | 8 | **230** | 240 |
+| 8 | 2 Intermedio (40) | 3 (90) | 08 Gyarados (30) | 1 + líder | 8 | **230** | 250 |
+| **Total** | | | | | **59** | **1.620** | |
+
+- **Media: unos 200 XP por tramo** (1.620 en total). Es el escenario de «180 por tramo» de Calidad con algo más; no el de ~100. Con `xpEvolucion` 80 salen los **16 ex** posibles; con 110, entre 11 y 16 según cómo juegue el jugador. Por eso se mantiene la palanca recomendada: `xpEvolucion` 80 en las fases siguientes.
+- **El dinero cuadra con §10.6:** los entrenadores de cada tramo reparten su presupuesto (710 a 1.010) entre 3 (tramos 2 a 5) o 4 (tramos 6 a 8) entrenadores contando el del gimnasio; redondeado a 10. Las cifras exactas se fijan al diseñar cada tramo (tarea 11).
+- **Jefes 09 a 16 (rutas clave): propuesta de que sean opcionales**, en desvíos como la Ruta 22, para no cargar la ruta principal. Daría **30 XP cada uno, fuera de los 1.620**: tramo 5 (Dodrio, Kangaskhan, Scyther), tramo 6 (Electrode, Hitmonlee), tramo 7 (Aerodactyl) y antes de la Liga (Golem y Dragonite). Sin la decisión de la lista de jefes (#364), esto queda abierto.
+- **Un desvío opcional por tramo** (un salvaje, como la Ruta 22) da de 10 a 20 XP más. No cuenta en la ruta principal.
+- **No se mide** si esos rivales son más difíciles (eso es el simulador, tarea 11) ni la Liga (§10.7).
+
 ### Líderes de gimnasio (ficha por rellenar, 2026-11-23)
 
 Ayme mandará los líderes (§8, 28); **no se inventa ninguno**. Esta es la ficha vacía, con lo que ya es dato: la ciudad y la medalla (nombres de los juegos; el arte de las medallas es el de LGPE, §10.1) y lo decidido de Brock.
