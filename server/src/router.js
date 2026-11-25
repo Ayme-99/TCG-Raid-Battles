@@ -9,6 +9,7 @@ function listaDeVersiones(versiones) {
 }
 const { comprobarCoherencia, abonos } = require('./coherencia');
 const { COSTE_DESBLOQUEO } = require('./puntos');
+const { rutasGuardadoCampana } = require('./guardadoCampana');
 
 const LIMITE_POR_DEFECTO = 20;
 const LIMITE_MAXIMO = 50;
@@ -226,6 +227,9 @@ function crearRouter({
       })),
     });
   }));
+
+  // Partida de campaña guardada en la cuenta (#478).
+  router.use(rutasGuardadoCampana({ repo, ahora, error }));
 
   // Errores del propio router (JSON mal formado, cuerpo demasiado grande).
   // eslint-disable-next-line no-unused-vars

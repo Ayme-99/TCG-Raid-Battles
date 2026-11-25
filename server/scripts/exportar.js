@@ -31,6 +31,12 @@ function exportar(destino) {
     path.join(destino, 'contrato', 'sala', 'sala.v1.schema.json'),
   );
   copiados.push('contrato/sala/sala.v1.schema.json');
+  // Esquemas de la campaña con la cuenta (#478), que carga src/guardadoCampana.js.
+  fs.mkdirSync(path.join(destino, 'contrato', 'campana'), { recursive: true });
+  for (const nombre of fs.readdirSync(path.join(ORIGEN_CONTRATO, 'campana')).filter((f) => f.endsWith('.schema.json')).sort()) {
+    fs.copyFileSync(path.join(ORIGEN_CONTRATO, 'campana', nombre), path.join(destino, 'contrato', 'campana', nombre));
+    copiados.push(`contrato/campana/${nombre}`);
+  }
   fs.writeFileSync(
     path.join(destino, 'ORIGEN.md'),
     [

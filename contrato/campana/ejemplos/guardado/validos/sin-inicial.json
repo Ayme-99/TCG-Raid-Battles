@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "revision": 3,
+  "partida": {
+    "version": 2,
+    "progreso": {
+      "nodoActual": "pueblo-paleta",
+      "resuelto": false,
+      "superados": [],
+      "medallas": [],
+      "jefesDerrotados": [],
+      "visitados": [
+        "pueblo-paleta"
+      ]
+    },
+    "equipo": [],
+    "pc": [],
+    "puntos": 0,
+    "semilla": 1,
+    "derrotas": 0,
+    "dinero": 1000,
+    "xp": 0,
+    "mochila": {}
+  }
+}

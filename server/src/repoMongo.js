@@ -8,10 +8,19 @@
 // por eso un reintento no puede sumar dos veces.
 const COLECCION_PARTIDAS = 'incursiones_partidas';
 const COLECCION_JUGADORES = 'incursiones_partida_jugadores';
+// Partida de campaña guardada en la cuenta (#478): una por cuenta y campaña,
+// `_id` = `${cuentaId}:${campana}`.
+const COLECCION_GUARDADOS_CAMPANA = 'incursiones_campana_partidas';
 
 function crearRepoMongo(db) {
   const partidas = db.collection(COLECCION_PARTIDAS);
   const jugadores = db.collection(COLECCION_JUGADORES);
+  const guardados = db.collection(COLECCION_GUARDADOS_CAMPANA);
+  const sinId = (doc) => {
+    if (!doc) return null;
+    const { _id, ...resto } = doc;
+    return resto;
+  };
 
   return {
     // Llamar una vez al arrancar.
@@ -85,7 +94,35 @@ function crearRepoMongo(db) {
         .toArray();
       return { puntos: r ? r.puntos : 0, partidas: r ? r.partidas : 0 };
     },
+
+    async obtenerGuardadoCampana(cuentaId, campana) {
+      return sinId(await guardados.findOne({ _id: `${cuentaId}:${campana}` }));
+    },
+
+    // Atómico: la revisión va en el filtro, así dos dispositivos no se pisan.
+    async guardarGuardadoCampana({ cuentaId, campana, revisionBase, partida, actualizadaEn }) {
+      const _id = `${cuentaId}:${campana}`;
+      const nuevo = { cuentaId, campana, revision: revisionBase + 1, actualizadaEn, partida };
+      if (revisionBase === 0) {
+        try {
+          await guardados.insertOne({ _id, ...nuevo });
+          return { ok: true, guardado: nuevo };
+        } catch (e) {
+          if (!(e && e.code === 11000)) throw e;
+          return { ok: false, actual: sinId(await guardados.findOne({ _id })) };
+        }
+      }
+      const hecho = await guardados.findOneAndUpdate(
+        { _id, revision: revisionBase },
+        { $set: nuevo },
+        { returnDocument: 'after' },
+      );
+      if (hecho) return { ok: true, guardado: sinId(hecho) };
+      return { ok: false, actual: sinId(await guardados.findOne({ _id })) };
+    },
   };
 }
 
-module.exports = { crearRepoMongo, COLECCION_PARTIDAS, COLECCION_JUGADORES };
+module.exports = {
+  crearRepoMongo, COLECCION_PARTIDAS, COLECCION_JUGADORES, COLECCION_GUARDADOS_CAMPANA,
+};

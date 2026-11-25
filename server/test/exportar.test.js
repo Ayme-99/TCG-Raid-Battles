@@ -14,6 +14,8 @@ test('el módulo exportado funciona fuera del monorepo', () => {
     assert.ok(copiados.includes('contrato/partida.v2.schema.json'));
     assert.ok(copiados.includes('contrato/sala/sala.v1.schema.json'));
     assert.ok(copiados.includes('ws.js') && copiados.includes('salas.js'));
+    assert.ok(copiados.includes('contrato/campana/guardado.v1.schema.json'));
+    assert.ok(copiados.includes('guardadoCampana.js'));
     // Se carga desde la copia y encuentra los esquemas de ./contrato.
     const { crearValidador } = require(path.join(destino, 'esquema.js'));
     const validar = crearValidador();
@@ -22,6 +24,9 @@ test('el módulo exportado funciona fuera del monorepo', () => {
     const { crearValidadorSala } = require(path.join(destino, 'protocoloSala.js'));
     assert.deepStrictEqual(crearValidadorSala()({ tipo: 'ping' }).errores, []);
     assert.ok(errores.length > 0, 'un registro vacío no cumple el esquema');
+    // El del guardado de campaña también (#478).
+    const { crearValidadorGuardado } = require(path.join(destino, 'guardadoCampana.js'));
+    assert.ok(crearValidadorGuardado()({}).length > 0);
   } finally {
     fs.rmSync(destino, { recursive: true, force: true });
   }

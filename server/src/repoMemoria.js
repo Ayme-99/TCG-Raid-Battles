@@ -5,6 +5,7 @@
 function crearRepoMemoria() {
   const partidas = new Map();
   const filas = new Map(); // `${partidaId}:${asiento}` → fila
+  const guardados = new Map(); // `${cuentaId}:${campana}` → partida de campaña
 
   return {
     async guardarPartida({ partida, jugadores }) {
@@ -50,6 +51,25 @@ function crearRepoMemoria() {
         if (f.abonado) puntos += f.puntos + (f.bonoEstados ?? 0);
       }
       return { puntos, partidas: partidasJugadas };
+    },
+
+    // Partida de campaña de la cuenta (#478), o null.
+    async obtenerGuardadoCampana(cuentaId, campana) {
+      const g = guardados.get(`${cuentaId}:${campana}`);
+      return g ? structuredClone(g) : null;
+    },
+
+    // Guarda si la revisión guardada es `revisionBase` (0 si no había) y la
+    // sube en 1. Si no, { ok: false, actual }.
+    async guardarGuardadoCampana({ cuentaId, campana, revisionBase, partida, actualizadaEn }) {
+      const clave = `${cuentaId}:${campana}`;
+      const actual = guardados.get(clave) ?? null;
+      if ((actual ? actual.revision : 0) !== revisionBase) {
+        return { ok: false, actual: actual ? structuredClone(actual) : null };
+      }
+      const nuevo = { cuentaId, campana, revision: revisionBase + 1, actualizadaEn, partida: structuredClone(partida) };
+      guardados.set(clave, nuevo);
+      return { ok: true, guardado: structuredClone(nuevo) };
     },
   };
 }

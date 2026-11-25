@@ -23,6 +23,8 @@ Todos requieren sesión. Los errores tienen la forma `{ "error": "codigo", "mens
 | `GET /partidas?limite=20&despues=<cursor>` | Historial de la cuenta, de la más reciente a la más antigua. `limite` de 1 a 50. Devuelve `partidas` (resumen de cada una con `miPuesto` y `misPuntos`) y `siguiente` (cursor, `null` en la última página). |
 | `GET /partidas/:id` | El registro completo de una partida. `404` si no existe o si la cuenta no jugó en ella. |
 | `GET /me/puntos` | `puntos` acumulados (solo lo abonado; no se gastan), `partidas` jugadas y, por nivel, `coste`, `alcanzado` y `faltan` para desbloquear jefe nuevo. |
+| `GET /campana/partidas/:campana` | La partida de campaña guardada de la cuenta (`kanto`): `campana`, `revision`, `actualizadaEn` y `partida` (`PartidaCampana.aJson()`). `404 sin_partida` si no hay (#478). |
+| `PUT /campana/partidas/:campana` | Guarda la partida de campaña: `{ version: 1, revision, partida }` ([`../contrato/campana/`](../contrato/campana/README.md)). `revision` es la que se leyó (0 si no había); si coincide, guarda con `revision + 1`; si no, `409 revision_distinta` con la copia del servidor en `actual`. **No abona puntos.** |
 
 Los invitados ocupan puesto en el reparto pero no cobran ni el reparto ni el bono (D-10, D-11, D-12). A una cuenta se le abona `puntos + bonoEstados` de cada partida; el bono queda fuera de `puntosTotal`.
 
@@ -32,6 +34,7 @@ Dos colecciones, el modelo de D-10 §5 (`src/repoMongo.js`):
 
 - `incursiones_partidas`: una por partida (`_id` = `partidaId`), con el registro completo y los datos del resumen.
 - `incursiones_partida_jugadores`: una por asiento, con lo que se abona. Índice único `(partidaId, asiento)`.
+- `incursiones_campana_partidas`: la partida de campaña de cada cuenta (#478), `_id` = `cuentaId:campana`, con su `revision`. El guardado con revisión es atómico (la revisión va en el filtro).
 
 Los totales de una cuenta **se calculan sumando sus filas**, nunca se guardan, así que un reintento no puede sumar dos veces. Si un intento se corta entre las dos colecciones, el reintento completa las filas que faltan.
 
