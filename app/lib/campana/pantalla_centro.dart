@@ -5,6 +5,7 @@ import 'package:incursiones_engine/campana.dart';
 import 'controlador_campana.dart';
 import 'escena_mapa.dart' show ColoresCampana;
 import 'pantalla_campana.dart' show nombreObjeto, descripcionObjeto;
+import 'solo_horizontal.dart';
 import 'widgets_campana.dart';
 
 /// Centro Pokémon (propuesta M de los wireframes, D-20 §10.7). La escena del
@@ -65,7 +66,7 @@ class PanelCentro extends ConsumerWidget {
 
 /// La estantería: la tienda del centro en una hoja.
 void abrirTienda(BuildContext context, CatalogoCampana catalogo) {
-  showModalBottomSheet<void>(
+  mostrarHojaCampana<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: ColoresCampana.crema,
@@ -149,7 +150,8 @@ class PantallaPc extends ConsumerWidget {
     final p = ref.watch(campanaProvider).partida;
     final c = catalogo;
     final control = ref.read(campanaProvider.notifier);
-    return Scaffold(
+    return SoloHorizontal(
+        child: Scaffold(
       key: const Key('pantalla-pc'),
       backgroundColor: ColoresCampana.crema,
       appBar: AppBar(
@@ -226,7 +228,7 @@ class PantallaPc extends ConsumerWidget {
                 ),
               ),
             ),
-    );
+    ));
   }
 
   /// Saca al Pokémon [i] del PC: al equipo si hay hueco y, si está lleno, se
@@ -238,7 +240,7 @@ class PantallaPc extends ConsumerWidget {
       control.moverPc(c, dePc: i);
       return;
     }
-    showModalBottomSheet<void>(
+    mostrarHojaCampana<void>(
       context: context,
       backgroundColor: ColoresCampana.crema,
       builder: (hoja) => SafeArea(

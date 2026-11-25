@@ -8,6 +8,7 @@ import 'escena_mapa.dart';
 import 'pantalla_centro.dart';
 import 'pantalla_combate.dart';
 import 'pantalla_equipo.dart';
+import 'solo_horizontal.dart';
 import 'widgets_campana.dart';
 
 /// Modo campaña (D-20): el mapa del primer tramo de Kanto, con el nodo actual,
@@ -19,7 +20,9 @@ class PantallaCampana extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final catalogo = ref.watch(catalogoCampanaProvider);
-    return catalogo.when(
+    // Toda la campaña va dentro: en vertical sale «Gira el móvil» (§10.7).
+    return SoloHorizontal(
+        child: catalogo.when(
       loading: () => const Scaffold(
         key: Key('campana-cargando'),
         body: Center(child: CircularProgressIndicator()),
@@ -33,7 +36,7 @@ class PantallaCampana extends ConsumerWidget {
         if (estado.combate != null) return PantallaCombateCampana(catalogo: c);
         return _Mapa(catalogo: c, partida: estado.partida);
       },
-    );
+    ));
   }
 }
 
@@ -164,7 +167,7 @@ class _Mapa extends ConsumerWidget {
         control.combatir(c);
       case AccionZona.inicial:
         final nodo = p.nodoActual(c);
-        showModalBottomSheet<void>(
+        mostrarHojaCampana<void>(
           context: context,
           builder: (hoja) => SafeArea(
             child: SingleChildScrollView(
@@ -202,7 +205,7 @@ class _Mapa extends ConsumerWidget {
 }
 
 Future<bool> _confirmarNueva(BuildContext context) async =>
-    await showDialog<bool>(
+    await mostrarDialogoCampana<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('¿Empezar la campaña de nuevo?'),

@@ -229,7 +229,7 @@ void main() {
   });
 
   testWidgets('cabe en un móvil', (tester) async {
-    await empezar(tester, enRuta1, tamano: const Size(390, 844));
+    await empezar(tester, enRuta1, tamano: const Size(844, 390));
     await tocar(tester, 'activo-jugador');
     expect(hay('ataque-0'), isTrue);
     expect(tester.takeException(), isNull);
