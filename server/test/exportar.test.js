@@ -34,6 +34,9 @@ test('el módulo exportado funciona fuera del monorepo', () => {
     assert.ok(hitos.crearValidadorHitos()({}).length > 0);
     assert.strictEqual(hitos.cargarTopes().jefe > 0, true);
     assert.ok(hitos.cargarTienda().productos.length > 0);
+    // Y las compras de la tienda (#374), su esquema.
+    const tienda = require(path.join(destino, 'tienda.js'));
+    assert.ok(tienda.crearValidadorCompra()({}).length > 0);
   } finally {
     fs.rmSync(destino, { recursive: true, force: true });
   }

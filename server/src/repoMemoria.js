@@ -7,6 +7,8 @@ function crearRepoMemoria() {
   const filas = new Map(); // `${partidaId}:${asiento}` → fila
   const guardados = new Map(); // `${cuentaId}:${campana}` → partida de campaña
   const hitos = new Map(); // `${cuentaId}:${campana}:${partida}:${id}` → hito de campaña
+  const tiendas = new Map(); // cuentaId → { gastado, productos, niveles, compras }
+  const tiendaVacia = () => ({ gastado: 0, productos: [], niveles: [], compras: [] });
 
   return {
     async guardarPartida({ partida, jugadores }) {
@@ -107,6 +109,34 @@ function crearRepoMemoria() {
         cuantos += 1;
       }
       return { puntos, hitos: cuantos };
+    },
+
+    // Lo comprado en la tienda por la cuenta (#374, D-21 §1.2).
+    async tiendaDe(cuentaId) {
+      return structuredClone(tiendas.get(cuentaId) ?? tiendaVacia());
+    },
+
+    // Una compra: baja el total (`gastado` sube) y deja para siempre los
+    // niveles de jefe ya alcanzados (opción C de Ayme, 2026-11-25). Idempotente
+    // por `compra`. `ganados` es lo ganado por la cuenta (incursiones + campaña).
+    async comprarEnTienda({ cuentaId, compra, producto, precio, unico, ganados, niveles, compradaEn }) {
+      const t = tiendas.get(cuentaId) ?? tiendaVacia();
+      const ya = t.compras.find((c) => c.id === compra);
+      if (ya) {
+        return ya.producto === producto
+          ? { ok: true, repetida: true, compra: structuredClone(ya) }
+          : { ok: false, motivo: 'compra_distinta', compra: structuredClone(ya) };
+      }
+      if (unico && t.productos.includes(producto)) return { ok: false, motivo: 'ya_comprado' };
+      if (ganados - t.gastado < precio) return { ok: false, motivo: 'puntos_insuficientes' };
+      const nueva = { id: compra, producto, precio, compradaEn };
+      t.gastado += precio;
+      if (!t.productos.includes(producto)) t.productos.push(producto);
+      for (const n of niveles) if (!t.niveles.includes(n)) t.niveles.push(n);
+      t.niveles.sort((a, b) => a - b);
+      t.compras.push(nueva);
+      tiendas.set(cuentaId, t);
+      return { ok: true, repetida: false, compra: structuredClone(nueva) };
     },
   };
 }

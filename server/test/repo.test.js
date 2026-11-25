@@ -123,6 +123,39 @@ function pruebasDeRepo(nombre, crear, opciones = {}) {
       { nuevos: ['ruta-1-pidgey', 'pikachu'], repetidos: [], distintos: [] });
     assert.deepStrictEqual(await repo.puntosCampanaDe('a'), { puntos: 2300, hitos: 5 });
   });
+
+  test(`${nombre}: la tienda cobra una vez por compra y no pasa del total (#374)`, opciones, async (t) => {
+    const repo = await crear(t);
+    const base = { cuentaId: 'a', ganados: 2000, niveles: [], compradaEn: 't1' };
+    assert.deepStrictEqual(await repo.tiendaDe('a'), { gastado: 0, productos: [], niveles: [], compras: [] });
+    const una = await repo.comprarEnTienda({ ...base, compra: 'c1', producto: 'moneda-serie', precio: 800, unico: true });
+    assert.deepStrictEqual(una, {
+      ok: true, repetida: false, compra: { id: 'c1', producto: 'moneda-serie', precio: 800, compradaEn: 't1' },
+    });
+    assert.strictEqual((await repo.comprarEnTienda({ ...base, compra: 'c1', producto: 'moneda-serie', precio: 800, unico: true })).repetida, true);
+    assert.strictEqual((await repo.comprarEnTienda({ ...base, compra: 'c1', producto: 'sobre', precio: 800, unico: false })).motivo, 'compra_distinta');
+    assert.strictEqual((await repo.comprarEnTienda({ ...base, compra: 'c2', producto: 'moneda-serie', precio: 800, unico: true })).motivo, 'ya_comprado');
+    assert.strictEqual((await repo.comprarEnTienda({ ...base, compra: 'c3', producto: 'dados-serie', precio: 1500, unico: true })).motivo, 'puntos_insuficientes');
+    const sobre = await repo.comprarEnTienda({ ...base, compra: 'c4', producto: 'sobre', precio: 1000, unico: false, niveles: [1] });
+    assert.strictEqual(sobre.ok, true);
+    const t2 = await repo.tiendaDe('a');
+    assert.strictEqual(t2.gastado, 1800);
+    assert.deepStrictEqual(t2.productos, ['moneda-serie', 'sobre']);
+    assert.deepStrictEqual(t2.niveles, [1]);
+    assert.deepStrictEqual(t2.compras.map((c) => c.id), ['c1', 'c4']);
+    assert.strictEqual((await repo.tiendaDe('b')).gastado, 0);
+  });
+
+  test(`${nombre}: dos compras a la vez no gastan más de lo que hay (#374)`, opciones, async (t) => {
+    const repo = await crear(t);
+    const base = { cuentaId: 'a', ganados: 1000, niveles: [], compradaEn: 't1', producto: 'sobre', precio: 800, unico: false };
+    const r = await Promise.all([
+      repo.comprarEnTienda({ ...base, compra: 'c1' }),
+      repo.comprarEnTienda({ ...base, compra: 'c2' }),
+    ]);
+    assert.strictEqual(r.filter((x) => x.ok).length, 1);
+    assert.strictEqual((await repo.tiendaDe('a')).gastado, 800);
+  });
 }
 
 pruebasDeRepo('memoria', async () => crearRepoMemoria());
