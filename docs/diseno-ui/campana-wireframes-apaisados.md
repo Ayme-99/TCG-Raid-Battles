@@ -1,6 +1,6 @@
 # Modo campaña: wireframes apaisados (PC y móvil horizontal)
 
-Propuesta de Diseño (2026-11-25, #415), **por confirmar**. Sustituye a la disposición vertical (390×844) de los wireframes D, I, J y M de D-20 §10.7. La estructura de cada pantalla **no cambia**; solo se reparte en horizontal. Decisión de plataforma en D-20 §10.7 (2026-11-25).
+**Decidido por Ayme el 2026-11-25 (#415): la campaña se juega solo en horizontal** (móvil y PC, un solo diseño). Sustituye a la disposición vertical (390×844) de los wireframes D, I, J y M de D-20 §10.7. La estructura de cada pantalla **no cambia**; solo se reparte en horizontal. Decisión de plataforma en D-20 §10.7 (2026-11-25).
 
 ## Reglas comunes
 
@@ -65,12 +65,24 @@ Rejilla de **3 × 2** (en vertical era 2 × 3) y la hoja de acciones **a la dere
 
 Escena interactiva como el mapa: mostrador (curar), estantería (tienda), PC (pantalla aparte) y puerta (volver). El **PC** usa una lista a la izquierda (todas las cartas) y el detalle de la carta elegida a la derecha, con **Pasar al equipo** y **Hacerse ex**.
 
-## Móvil: ¿obligar a girar o adaptar?
+## Móvil: solo en horizontal (decidido el 2026-11-25)
 
-| Opción | Qué es | Coste | Riesgo |
-|---|---|---|---|
-| **A. Obligar a girar** (recomendada) | La campaña **solo** se juega en horizontal. En vertical sale «Gira el móvil» y se bloquea la orientación al entrar. El resto de la app sigue en vertical. | Bajo: un solo diseño y un solo juego de escenas (16:9). | Unos pocos usuarios con el giro bloqueado en el sistema. |
-| B. Adaptar | Un segundo diseño vertical y **escenas verticales (390×844)** además de las 16:9. | Alto: hay que rehacer las 9 escenas y las zonas, y mantener dos diseños. | Doble arte y doble prueba. |
-| C. Mixto | En vertical se muestra la escena 16:9 reducida arriba y los paneles abajo. | Medio: sin arte nuevo, pero la escena es pequeña y las zonas pulsables también. | Zonas pulsables pequeñas. |
+La campaña se juega **solo en horizontal**. No hay diseño vertical ni escenas verticales: un solo diseño y un solo juego de escenas 16:9.
 
-**Recomiendo A.** Es la que no duplica el arte. Se pide a Programación una pantalla de aviso y fijar la orientación horizontal al entrar en la campaña. Si Ayme prefiere B o C, cambian el coste y el calendario de Arte.
+- **Al entrar en la campaña** el móvil fija la orientación horizontal.
+- **Si el móvil está en vertical** (o el giro está bloqueado en el sistema), sale una pantalla de aviso a todo lo ancho, **«Gira el móvil»**, con un icono de móvil girando y el botón **Volver** a la pantalla de inicio. La campaña no se carga hasta que el móvil está en horizontal.
+- **El resto de la app** (inicio, partida libre, tienda, cuenta) **sigue en vertical**.
+- **PC:** la ventana es apaisada y no ve el aviso.
+
+```
++--------------------------------------------------------------+
+|                                                              |
+|                  [icono: móvil girando]                      |
+|                      Gira el móvil                           |
+|        La campaña solo se juega en horizontal.               |
+|                                                              |
+|                       [ Volver ]                             |
++--------------------------------------------------------------+
+```
+
+Programación hace el aviso y el bloqueo de orientación (Dirección crea la tarea); Arte no cambia.
