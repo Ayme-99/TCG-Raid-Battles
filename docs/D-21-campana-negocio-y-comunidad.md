@@ -1,6 +1,6 @@
 # D-21 · Modo campaña: tienda de puntos, Pokédex «Mis cartas» y comunicación
 
-Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23 y el 2026-11-24 con sus decisiones. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
+Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23, el 2026-11-24 y el 2026-11-25 con sus decisiones. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
 
 Cómo leerlo:
 
@@ -15,14 +15,14 @@ Cómo leerlo:
 | 1 | ¿Qué es cada moneda? Puntos (cuenta) frente a dinero (campaña) | Se separan del todo: el dinero compra consumibles dentro de una campaña; los puntos compran colección y cosmética fuera. Ningún objeto se vende por las dos vías. | §1.1 |
 | 2 | Los puntos se gastan (D-20) pero D-10 dice que no se gastan | Dos contadores: **puntos ganados** (total histórico, para desbloquear jefes) y **saldo** (lo gastable). | §1.2 |
 | 3 | Catálogo de la tienda al lanzar | Solo **monedas y dados** (cosmética). Sobres y cartas sueltas esperan a que existan cartas del formato digital. Las campañas y los jefes **no** se venden. | §2.2 |
-| 4 | Precios | Moneda de serie 800, temática 2.000; dados de serie 1.500, temáticos 3.000; sobre 1.000; carta suelta 200 / 400 / 800 / 2.000 según rareza. | §2.3 |
+| 4 | Precios | **Decididos (iniciales) el 2026-11-25:** moneda de serie 800, temática 2.000; dados de serie 1.500, temáticos 3.000; sobre 1.000; carta suelta 200 / 400 / 800 / 2.000 según rareza. Ajustables. | §2.3 |
 | 5 | **Decidido el 2026-11-24:** los puntos no se usan en la campaña, el intercambio es **gratis**, hacerse ex es la **piedra ex** a **2.000 de dinero**, hay **una piedra de premio por medalla** y el objetivo es llegar a la Liga con **12 ex o más** entre equipo y PC. | Dinero por tramo con una subida suave (+150) para tener margen; la lista de excepciones (Pikachu, Eevee) la define Diseño; medir la XP necesaria. | §2.5 |
 | 6 | Qué es «Mis cartas» | **Decidido:** las cartas de campaña solo valen en campaña; la tienda traerá cartas para las partidas rápidas digitales. Dos colecciones, y los jefes de campaña van en «Enemigos». | §3.1 |
 | 7 | Qué se registra al capturar | **Decidido:** por ahora solo la carta. Cuenta aunque el Pokémon acabe en el PC y aunque luego evolucione. | §3.3 |
 | 8 | Relación con las cartas físicas | Misma imagen y misma numeración, sin escaneo ni canje; reglas de reimpresión y de uso privado. El código de canje queda como idea futura. | §3.5 |
-| 9 | Bono de primera captura (opcional) | +50 puntos por carta nueva. Puedes decir que no. | §3.6 |
+| 9 | Bono de primera captura | **Decidido el 2026-11-25:** por ahora **no hay** bono (+50 puntos por carta nueva). Se puede revisar con datos de uso. | §3.6 |
 | 10 | Cómo se presenta el modo campaña al grupo | Tres fases: Ayme solo, 2 o 3 probadores, grupo entero; con el mensaje de §4.3. | §4 |
-| 11 | Sesión en la campaña | **Decidido:** la sesión es obligatoria para jugar el modo campaña. Se propone guardar la partida también en la cuenta (§6). | §4.3, §6 |
+| 11 | Sesión en la campaña | **Decidido:** la sesión es obligatoria para jugar el modo campaña. **Decidido el 2026-11-25:** la partida de campaña se guarda también en la cuenta. | §4.3, §6 |
 
 ## 1. Marco común
 
@@ -117,7 +117,7 @@ Lo que **no** entra en la tienda, y por qué:
 
 ### 2.3 Precios
 
-**PROPUESTA (decisión 4).**
+**Decididos (iniciales) el 2026-11-25 (decisión 4):** Ayme acepta estos precios como punto de partida; son ajustables (ver el final de la sección).
 
 | Producto | Precio (puntos) | Lo que equivale a |
 |---|---|---|
@@ -141,7 +141,7 @@ Lo que **no** entra en la tienda, y por qué:
 - Con la campaña completa (30.000 a 40.000) se llena una tienda sin vaciarla: nadie compra todo de golpe.
 - Las cartas sueltas valen en total **más** que los sobres: ver §2.4.
 
-Todas las cifras son **ajustables sin tocar la tienda**: viven en un catálogo de datos (§5).
+Todas las cifras son **ajustables sin tocar la tienda**: viven en un catálogo de datos (§5). «Decididos (iniciales)» significa que valen para lanzar y se revisarán con datos reales de uso.
 
 ### 2.4 Sobres
 
@@ -296,9 +296,9 @@ Ayme crea las cartas en PokeCardMaker y las imprime: las 22 actuales (serie 001/
 
 Condiciones para retomarla: que esté el formato digital y la tienda, y que Ayme quiera una forma de regalar cartas entre amigos. Una versión más ligera, sin riesgo, sería un **QR informativo** que lleve al detalle de la carta (sin desbloquear nada).
 
-### 3.6 Bono de primera captura (opcional)
+### 3.6 Bono de primera captura
 
-**PROPUESTA opcional (decisión 9):** +**50 puntos** la primera vez que se consigue una carta nueva. Con las 22 cartas actuales son 1.100 puntos de una sola vez. Motivo: capturar es opcional y cuesta Pokéballs, es decir, dinero; un pequeño premio alinea el incentivo con completar la colección. Riesgo: más puntos entran sin jugar combates, y las cifras de §2.5 pesan más. Mi recomendación es **no incluirlo al lanzar** y revisarlo con datos reales de uso.
+**Decidido el 2026-11-25 (decisión 9): por ahora NO hay bono de primera captura.** Capturar una carta nueva no da puntos. Queda abierto revisarlo más adelante con datos reales de uso. Lo que sigue es el razonamiento de la propuesta que se descartó: +**50 puntos** la primera vez que se consigue una carta nueva. Con las 22 cartas actuales son 1.100 puntos de una sola vez. Motivo: capturar es opcional y cuesta Pokéballs, es decir, dinero; un pequeño premio alinea el incentivo con completar la colección. Riesgo: más puntos entran sin jugar combates, y las cifras de §2.5 pesan más. Mi recomendación era **no incluirlo al lanzar**, y Ayme ha decidido lo mismo.
 
 ## 4. #390 · Tutorial y comunicación
 
@@ -327,7 +327,7 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 
 **Riesgos que hay que decir de entrada** (mejor sin sorpresas):
 
-- **La partida se guarda en el dispositivo**, no en la cuenta. Si el amigo juega en la **web** y borra los datos del navegador, **pierde el progreso**. Hasta que haya sincronización, hay que avisarlo.
+- **La partida se guardará también en la cuenta** (**decidido por Ayme el 2026-11-25**). Hasta que Programación lo implemente, la partida solo está en el dispositivo: si el amigo juega en la **web** y borra los datos del navegador, **pierde el progreso**, y hay que avisarlo. Cuando la sincronización esté hecha, el aviso se quita del mensaje.
 - **La sesión es obligatoria** para jugar la campaña (**decidido por Ayme el 2026-11-23**). En la app solo se inicia sesión y el registro se hace en Deck Tracker, así que el amigo **debe tener ya su cuenta antes de empezar**. Es la mayor fricción de la primera sesión: conviene que se la cree antes de que le llegue el enlace.
 - **No es un proyecto público.** Los sprites son de Nintendo y The Pokémon Company, tomados de Escarlata y Púrpura (#389): el enlace es para el grupo y no se reenvía ni se publica.
 
@@ -336,7 +336,7 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 > Ya se puede probar el **modo campaña** de Incursiones 🎮
 > Es como un Pokémon de cartas para jugar **solo**: eliges inicial en Pueblo Paleta, recorres Kanto, capturas y llegas hasta la medalla de Brock. De momento solo ese tramo; el resto irá llegando.
 > Lo que ganas se guarda como **puntos** en tu cuenta: servirán para la tienda y para desbloquear jefes de las incursiones.
-> Ojo: es versión de prueba. Para jugar necesitas tu cuenta de Deck Tracker (créala antes), y la partida se guarda **en tu dispositivo** (si juegas en la web y borras datos del navegador, la pierdes).
+> Ojo: es versión de prueba. Para jugar necesitas tu cuenta de Deck Tracker (créala antes), y la partida se guarda **en tu dispositivo** (si juegas en la web y borras datos del navegador, la pierdes; cuando se guarde también en tu cuenta, te lo diremos).
 > Enlace: [enlace]. Es solo para nosotros, no lo paséis fuera 🙏
 > Decidme dónde os atascáis o qué no se entiende. Eso es lo más útil.
 
@@ -391,7 +391,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 
 - Nada sobre la **Liga** ni sobre campañas nuevas: no están diseñadas.
 - Nada sobre **sobres** hasta que existan cartas digitales.
-- Nada de **precios** de la tienda hasta que Ayme confirme §2.3.
+- Nada de **precios** de la tienda hasta que exista la tienda: los precios de §2.3 están decididos, pero la tienda aún no está construida.
 
 ## 5. Qué cambia en otros documentos y qué necesita cada sector
 
@@ -413,6 +413,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 - El servidor guarda **puntos ganados** y **saldo** por cuenta, y un registro de compras (`compras`: cuenta, producto, precio, fecha) con clave generada por el cliente para que los reintentos no cobren dos veces, como en D-10.
 - El catálogo de la tienda debe ser **datos** (`id`, familia, nombre, precio, requisitos), no constantes, para ajustar precios sin publicar app.
 - «Mis cartas» necesita un registro por carta (§3.3), con clave en el dispositivo y sincronización al iniciar sesión.
+- La **partida de campaña** también se guarda en la cuenta (decidido el 2026-11-25). El formato y el momento de sincronización los define Diseño con Programación; aquí no se propone ninguno.
 - El servidor acepta lo que reporta el cliente con tope por hito (D-20 §6); los topes son los valores de §2.1.
 
 **Para Diseño y Calidad:** la lista de excepciones (Pikachu, Eevee), la XP necesaria para 12 ex, la curva de dinero y la simulación del número de ex en la Liga (§2.5); decidir los duplicados de sobre (§2.4); el momento exacto de cada texto de §4.5.
@@ -423,9 +424,11 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 
 ## 6. Preguntas abiertas
 
+Resueltas el 2026-11-25: los precios de §2.3 quedan decididos (iniciales, ajustables), no hay bono de primera captura y la partida de campaña se guarda también en la cuenta.
+
 Resueltas el 2026-11-23: la sesión es obligatoria en la campaña, las cartas de campaña valen solo en campaña, solo se registra la carta, los puntos no se usan dentro de la campaña, y la carta de Nidoran♂ ya es la 032/150.
 
-1. **¿Se guarda la partida de campaña también en la cuenta?** Como ya hay sesión obligatoria, sería natural y quitaría el riesgo de perder el progreso al borrar los datos del navegador (§4.3). Hoy se guarda solo en el dispositivo. Es una decisión de Diseño y Programación; yo propongo hacerlo.
+1. ~~¿Se guarda la partida de campaña también en la cuenta?~~ **Resuelta el 2026-11-25: sí.** Queda para Diseño y Programación definir cómo (§5).
 2. **Tamaño del sobre y composición** (§2.4): son números míos.
 3. **Rarezas de las cartas del formato digital:** se han usado las del proyecto (Común a Ultra rara) y pueden no ser las definitivas.
 4. **Duplicados de sobre** (§2.4).
