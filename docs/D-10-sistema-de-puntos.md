@@ -76,11 +76,12 @@ Se guarda el **registro de partidas** y los totales se **calculan** a partir de 
 
 - El `puntos` de cada fila se calcula al cerrar la partida con las tablas vigentes y se guarda, para que cambios futuros de las tablas no reescriban el historial.
 - Los invitados no tienen `jugador_id`: sus filas se guardan sin cuenta (`jugador_id` vacío, nombre de mesa, `puntos` calculados pero no abonados) para poder auditar el reparto (decidido en D-11).
-- Total de una cuenta = suma de sus `partida_jugadores.puntos` abonados.
-- Los 7 jefes de lanzamiento están disponibles desde el principio. Un jefe nuevo se desbloquea al llegar a su coste. **El total de puntos no se gasta nunca**; lo que baja con las compras de la tienda es el **saldo** (más abajo).
+- Total de una cuenta = suma de sus `partida_jugadores.puntos` abonados, más los puntos de campaña, **menos lo gastado en la tienda** (un solo total por cuenta, abajo).
+- Los 7 jefes de lanzamiento están disponibles desde el principio. Un jefe nuevo se desbloquea al llegar a su coste, medido sobre el **total de la cuenta**.
+- **Un solo total por cuenta** (decidido por Ayme el 2026-11-25, opción C de D-21 §1.2; #387): **sube con los abonos y baja con las compras** de la tienda. **Ya no hay «puntos ganados» ni «saldo»**: era la propuesta anterior y queda sustituida.
+- **Desbloquear un jefe es permanente.** Al desbloquearlo se guarda en la cuenta un **registro de jefes desbloqueados** (la colección `desbloqueos`, arriba), y gastar puntos después **no lo cierra**. Lo único que cambia al comprar es el ritmo hacia el siguiente jefe.
 - **Puntos de campaña** (decididos por Ayme el 2026-11-25 en #374, ya en el código, #480 y #481; D-20 §10.1): el modo campaña da puntos por **hitos** con topes **salvaje 100, entrenador 200, jefe 1.000 y medalla 1.500**, que son datos y se pueden editar (`catalog/campana/topes-puntos.json`). Un hito es único por **cuenta, campaña y partida**: repetir la campaña (partida nueva) da los puntos otra vez, pero reenviar el mismo hito dentro de la misma partida no suma dos veces.
 - **Los puntos de campaña cuentan para desbloquear los jefes de las incursiones**: se suman al total de la cuenta (`GET /me/puntos` devuelve `puntos`, con `puntosIncursiones` y `puntosCampana` por separado).
-- **Saldo** (D-21 §1.2): sube con cada abono de puntos y **baja con las compras** de la tienda; el total que desbloquea jefes no baja. El saldo se hace con el PR de la tienda.
 - Esto **no contradice** «los puntos no se usan dentro de la campaña» (D-20 §10.9): la campaña los da, pero dentro de ella no se gastan ni dan ventajas; solo sirven fuera, para los jefes de las incursiones y la tienda.
 - Una partida se guarda una sola vez (clave `_id` del cliente) para que los reintentos de red no sumen dos veces.
 - `jugador_id` es el id de usuario de Deck Tracker (decidido en D-11, `docs/D-11-identidad-jugadores.md`).
