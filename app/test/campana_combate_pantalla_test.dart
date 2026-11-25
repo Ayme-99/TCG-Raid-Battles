@@ -165,6 +165,69 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  group('Cuerda Huida (#468)', () {
+    const conCuerda = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ruta-1-pidgey',
+          superados: {'pueblo-paleta', 'ruta-1'},
+          inicial: 'squirtle'),
+      equipo: [
+        PokemonGuardado('squirtle', 80),
+        PokemonGuardado('charmander', 70),
+      ],
+      dinero: 1000,
+      mochila: {ObjetoCampana.cuerdaHuida: 1},
+    );
+
+    bool charmanderAlFrente() => find
+        .descendant(
+            of: find.byKey(const Key('activo-jugador')),
+            matching: find.text('Charmander'))
+        .evaluate()
+        .isNotEmpty;
+
+    testWidgets('desde la hoja de acciones: elige quién sale y gasta el turno',
+        (tester) async {
+      await empezar(tester, conCuerda);
+      await tocar(tester, 'activo-jugador');
+      expect(activo(tester, 'accion-cuerda'), isTrue);
+      expect(find.textContaining('quedan 1'), findsOneWidget);
+      await tocar(tester, 'accion-cuerda');
+      expect(hay('hoja-cuerda'), isTrue);
+      await tocar(tester, 'cuerda-1');
+      expect(charmanderAlFrente(), isTrue);
+      expect(find.text('Combate · turno 1'), findsNothing,
+          reason: 'gasta el turno');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('al tocar la banca, el diálogo la ofrece junto a Cambiar',
+        (tester) async {
+      await empezar(tester, conCuerda);
+      await tocar(tester, 'banca-jugador-1');
+      expect(hay('confirmar-cambio'), isTrue);
+      expect(hay('confirmar-cuerda'), isTrue);
+      await tocar(tester, 'confirmar-cuerda');
+      expect(charmanderAlFrente(), isTrue);
+      // Ya no le quedan: la hoja no enseña el botón.
+      await tocar(tester, 'activo-jugador');
+      expect(hay('accion-cuerda'), isFalse);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('sin Cuerdas no aparece', (tester) async {
+      await empezar(tester, enRuta1);
+      await tocar(tester, 'activo-jugador');
+      expect(hay('accion-cuerda'), isFalse);
+      Navigator.of(tester.element(find.byKey(const Key('hoja-acciones'))))
+          .pop();
+      await tester.pumpAndSettle();
+      await tocar(tester, 'banca-jugador-1');
+      expect(hay('confirmar-cuerda'), isFalse);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   testWidgets('cabe en un móvil', (tester) async {
     await empezar(tester, enRuta1, tamano: const Size(390, 844));
     await tocar(tester, 'activo-jugador');

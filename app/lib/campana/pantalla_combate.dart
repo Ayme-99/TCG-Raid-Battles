@@ -78,8 +78,10 @@ class _PantallaCombateCampanaState
       setState(() => _tocado = true);
       if (eligiendo) {
         actuar(ElegirSiguiente(Bando.jugador, i));
-      } else if (combate.jugador.paralizado) {
-        // Dragoaliento: este turno no se puede cambiar (D-20 §3.6).
+      } else if (combate.jugador.paralizado &&
+          !objetivosDeCuerda(combate, Bando.jugador).contains(i)) {
+        // Dragoaliento: este turno no se puede cambiar (D-20 §3.6), salvo con
+        // una Cuerda Huida (§10.6).
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(
             content: Text('Está paralizado: este turno no puede cambiar.')));
       } else {
@@ -128,7 +130,9 @@ class _PantallaCombateCampanaState
             bando: yo,
             alTocar: (eligiendo ||
                     (miTurno &&
-                        yo.energia >= yo.pokemonActivo.especie.retirada))
+                        (yo.energia >= yo.pokemonActivo.especie.retirada ||
+                            objetivosDeCuerda(combate, Bando.jugador)
+                                .isNotEmpty)))
                 ? tocarBanca
                 : null,
           ),
@@ -188,14 +192,16 @@ class _PantallaCombateCampanaState
   }
 }
 
-/// Hoja de acciones del activo: sus ataques con su coste, Cargar y Usar
-/// Poción (no gasta turno, D-20 §3.2; #458).
+/// Hoja de acciones del activo: sus ataques con su coste, Cargar, Usar
+/// Poción (no gasta turno, D-20 §3.2; #458) y, si lleva alguna, Usar Cuerda
+/// Huida (gasta el turno y no paga la retirada, §10.6; #468).
 void _hojaAcciones(BuildContext context, EstadoCombate combate,
     void Function(AccionCombate) actuar) {
   final yo = combate.jugador;
   final especie = yo.pokemonActivo.especie;
   final p = combate.parametros;
   final curables = objetivosDePocion(combate, Bando.jugador);
+  final relevos = objetivosDeCuerda(combate, Bando.jugador);
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: _crema,
@@ -214,7 +220,9 @@ void _hojaAcciones(BuildContext context, EstadoCombate combate,
               const Padding(
                 key: Key('aviso-paralizado'),
                 padding: EdgeInsets.only(top: 4),
-                child: Text('Paralizado: este turno solo puede cargar (o usar una Poción).',
+                child: Text(
+                    'Paralizado: este turno solo puede cargar (o usar una '
+                    'Poción o una Cuerda Huida).',
                     style: TextStyle(color: _tinta)),
               ),
             const SizedBox(height: 12),
@@ -260,6 +268,20 @@ void _hojaAcciones(BuildContext context, EstadoCombate combate,
                 }
               },
             ),
+            if (yo.cuerdas > 0) ...[
+              const SizedBox(height: 8),
+              _BotonAccion(
+                clave: 'accion-cuerda',
+                color: _naranja,
+                texto: 'Usar Cuerda Huida (sin retirada, gasta el turno) · '
+                    'quedan ${yo.cuerdas}',
+                activo: relevos.isNotEmpty,
+                alTocar: () {
+                  Navigator.of(hoja).pop();
+                  _elegirParaCuerda(context, combate, relevos, actuar);
+                },
+              ),
+            ],
           ],
         ),
       ),
@@ -309,33 +331,93 @@ void _elegirParaPocion(BuildContext context, EstadoCombate combate,
   );
 }
 
-/// Cambiar gasta el turno (y la retirada): se pide confirmación.
+/// A quién sacar con la Cuerda Huida (cualquier relevo que pueda salir).
+void _elegirParaCuerda(BuildContext context, EstadoCombate combate,
+    List<int> relevos, void Function(AccionCombate) actuar) {
+  final yo = combate.jugador;
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: _crema,
+    builder: (hoja) => SafeArea(
+      child: Padding(
+        key: const Key('hoja-cuerda'),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('¿Quién sale?',
+                style: TextStyle(
+                    color: _tinta, fontSize: 18, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            for (final i in relevos) ...[
+              _BotonAccion(
+                clave: 'cuerda-$i',
+                color: _naranja,
+                texto: '${yo.equipo[i].especie.nombre} · '
+                    '${yo.equipo[i].ps}/${yo.equipo[i].especie.ps} PS',
+                activo: true,
+                alTocar: () {
+                  Navigator.of(hoja).pop();
+                  actuar(UsarCuerdaHuida(Bando.jugador, i));
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+/// Cambiar gasta el turno (y la retirada): se pide confirmación. Si lleva una
+/// Cuerda Huida, el diálogo la ofrece también (sin retirada y aunque esté
+/// Paralizado; gasta el turno igual, D-20 §10.6).
 Future<void> _confirmarCambio(BuildContext context, EstadoCombate combate,
     int indice, void Function(AccionCombate) actuar) async {
   final yo = combate.jugador;
   final sale = yo.equipo[indice].especie;
   final retirada = yo.pokemonActivo.especie.retirada;
-  final si = await showDialog<bool>(
+  final puedeCambiar = !yo.paralizado && yo.energia >= retirada;
+  final puedeCuerda =
+      objetivosDeCuerda(combate, Bando.jugador).contains(indice);
+  final eleccion = await showDialog<AccionCombate>(
     context: context,
     builder: (dialogo) => AlertDialog(
       title: Text('¿Sacar a ${sale.nombre}?'),
-      content: Text(retirada > 0
-          ? 'Cambiar gasta el turno y $retirada de energía.'
-          : 'Cambiar gasta el turno.'),
+      content: Text([
+        if (puedeCambiar)
+          retirada > 0
+              ? 'Cambiar gasta el turno y $retirada de energía.'
+              : 'Cambiar gasta el turno.',
+        if (puedeCuerda)
+          'La Cuerda Huida no paga la retirada, pero gasta el turno '
+              '(te quedan ${yo.cuerdas}).',
+      ].join('\n')),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(dialogo).pop(false),
+          onPressed: () => Navigator.of(dialogo).pop(),
           child: const Text('Volver'),
         ),
-        FilledButton(
-          key: const Key('confirmar-cambio'),
-          onPressed: () => Navigator.of(dialogo).pop(true),
-          child: const Text('Cambiar'),
-        ),
+        if (puedeCuerda)
+          FilledButton(
+            key: const Key('confirmar-cuerda'),
+            onPressed: () => Navigator.of(dialogo)
+                .pop(UsarCuerdaHuida(Bando.jugador, indice)),
+            child: const Text('Cuerda Huida'),
+          ),
+        if (puedeCambiar)
+          FilledButton(
+            key: const Key('confirmar-cambio'),
+            onPressed: () =>
+                Navigator.of(dialogo).pop(Cambiar(Bando.jugador, indice)),
+            child: const Text('Cambiar'),
+          ),
       ],
     ),
   );
-  if (si == true) actuar(Cambiar(Bando.jugador, indice));
+  if (eleccion != null) actuar(eleccion);
 }
 
 void _hojaRegistro(BuildContext context, List<String> lineas) {

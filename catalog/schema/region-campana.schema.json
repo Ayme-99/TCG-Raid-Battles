@@ -84,7 +84,7 @@
         "texto": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "conversacion: lo que dice, línea a línea." },
         "cura": { "type": "boolean", "default": false, "description": "conversacion: si cura al equipo. Un nodo que cura es un punto de curación: al perder se vuelve a él." },
         "escena": { "$ref": "#/$defs/escena" },
-        "tienda": { "type": "array", "items": { "enum": ["pokeball", "superBall", "ultraBall", "pocion", "repelente", "piedraEx"] }, "description": "descanso: lo que vende la tienda del centro (D-20 §10.6). En el primer tramo, pokeball y pocion. Super Ball pide además 1 medalla y Ultra Ball 5. piedraEx: la piedra ex (2.000, D-21 §2.5), que se vende desde la 2.ª medalla (Ayme, 2026-11-24, #447). Sin él, el centro no tiene tienda." }
+        "tienda": { "type": "array", "items": { "enum": ["pokeball", "superBall", "ultraBall", "pocion", "repelente", "cuerdaHuida", "piedraEx"] }, "description": "descanso: lo que vende la tienda del centro (D-20 §10.6). En el primer tramo, pokeball y pocion. Super Ball y Cuerda Huida (550, desde el tramo 2) piden además 1 medalla y Ultra Ball 5. piedraEx: la piedra ex (2.000, D-21 §2.5), que se vende desde la 2.ª medalla (Ayme, 2026-11-24, #447). Sin él, el centro no tiene tienda." }
       }
     }
   }
