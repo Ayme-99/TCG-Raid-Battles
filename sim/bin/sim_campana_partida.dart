@@ -89,6 +89,9 @@ class Config {
   bool pocionesCombate = false; // Pociones en combate (#435): sin gastar turno
   int umbralPocion = 50; // la IA cura al activo mientras tenga ≤ N PS
   String pocionesEn = 'todos'; // todos | brock
+  // motor = la IA real (UsarPocion, #458/#465); simulador = la política antigua
+  // del simulador (curar bajo --umbral-pocion PS), solo para comparar.
+  String pocionPolitica = 'motor';
   int psPocion = 20; // PS que cura una Poción
   int precioPocion = 300;
   int limitePocionCombate = 0; // 0 = sin límite por combate
@@ -243,6 +246,9 @@ class Corrida {
   int derrotas = 0;
   int intentosBrock = 0;
   int xpAlLlegarABrock = 0;
+  int xpGastada = 0;
+  int xpGanadaHastaBrock = 0;
+  int xpTramoCompleto = 0;
   int ballsGastadas = 0;
   int capturas = 0;
   List<String> equipoEnBrock = [];
@@ -328,7 +334,9 @@ class Jugador {
       }
       if (idx == null) return q;
       if (iniciales.contains(q.equipo[idx].id)) corrida.evolucionoInicial = true;
+      final xpAntes = q.xp;
       q = q.evolucionar(c, idx, destino!);
+      corrida.xpGastada += xpAntes - q.xp;
     }
     return q;
   }
@@ -447,8 +455,22 @@ class Jugador {
       llamadaRival: cfg.aliado ? rv.llamada : null,
     );
     var fin;
-    if (cfg.pocionesCombate &&
-        (cfg.pocionesEn == 'todos' || nodo == 'gimnasio-brock')) {
+    final conPociones = cfg.pocionesCombate &&
+        (cfg.pocionesEn == 'todos' || nodo == 'gimnasio-brock');
+    if (conPociones && cfg.pocionPolitica == 'motor') {
+      // Motor real: la IA decide UsarPocion y el combate cuenta las gastadas.
+      var disp = q.cuantos(ObjetoCampana.pocion) - usadasCombate;
+      if (disp < 0) disp = 0;
+      if (cfg.limitePocionCombate > 0 && disp > cfg.limitePocionCombate) {
+        disp = cfg.limitePocionCombate;
+      }
+      fin = hastaElFinal(inicio.conBando(Bando.jugador,
+          inicio.jugador.copiarCon(pociones: disp)), cfg.topeTurnos);
+      final usadas = fin.jugador.pocionesUsadas as int;
+      usadasCombate += usadas;
+      corrida.pocionesUsadas += usadas;
+      if (nodo == 'gimnasio-brock') corrida.pocionesEnBrock += usadas;
+    } else if (conPociones) {
       final disp = q.cuantos(ObjetoCampana.pocion) - usadasCombate;
       final (f, usadas) = hastaElFinalConPociones(
           inicio, disp < 0 ? 0 : disp, cfg.umbralPocion, params.psPocion,
@@ -611,9 +633,11 @@ class Jugador {
     p = avanzarHasta(p, 'gimnasio-brock');
     if (cfg.retroceder) p = curarAndando(p, 'gimnasio-brock');
     corrida.xpAlLlegarABrock = p.xp;
+    corrida.xpGanadaHastaBrock = p.xp + corrida.xpGastada;
     corrida.equipoEnBrock = [for (final m in p.equipo) m.id];
     p = afrontar(p, 'gimnasio-brock');
     corrida.ganaBrock = p.progreso.medallas.contains('roca');
+    corrida.xpTramoCompleto = p.xp + corrida.xpGastada;
     if (corrida.ganaBrock) corrida.intentosBrock++;
     return corrida;
   }
@@ -632,6 +656,8 @@ class ResumenTramo {
   int derrotasTotal = 0;
   int intentosBrock = 0;
   int xpBrock = 0;
+  int xpGanada = 0;
+  int xpTramo = 0;
   int capturas = 0;
   int evolucionInicial = 0;
   int pocionesUsadas = 0;
@@ -656,6 +682,8 @@ ResumenTramo correr(Config cfg, CatalogoCampana c, String ini, int balls,
     r.derrotasTotal += co.derrotas;
     r.intentosBrock += co.intentosBrock;
     r.xpBrock += co.xpAlLlegarABrock;
+    r.xpGanada += co.xpGanadaHastaBrock;
+    r.xpTramo += co.xpTramoCompleto;
     r.capturas += co.capturas;
     r.pocionesUsadas += co.pocionesUsadas;
     r.pocionesEnBrock += co.pocionesEnBrock;
@@ -742,8 +770,10 @@ void tramo(Config cfg, CatalogoCampana c) {
         '(con reintentos): ${pct(r.ganaBrock / r.recorridos)} · derrotas por '
         'recorrido: ${(r.derrotasTotal / r.recorridos).toStringAsFixed(2)} · '
         'intentos contra Brock: ${(r.intentosBrock / r.recorridos).toStringAsFixed(2)}');
-    stdout.writeln('              XP al llegar a Brock: '
-        '${(r.xpBrock / r.recorridos).toStringAsFixed(0)} · capturas: '
+    stdout.writeln('              XP ganada hasta Brock: '
+        '${(r.xpGanada / r.recorridos).toStringAsFixed(0)} (con Brock: '
+        '${(r.xpTramo / r.recorridos).toStringAsFixed(0)}; sin gastar: '
+        '${(r.xpBrock / r.recorridos).toStringAsFixed(0)}) · capturas: '
         '${(r.capturas / r.recorridos).toStringAsFixed(1)} · evolucionan al '
         'inicial: ${pct(r.evolucionInicial / r.recorridos)} · rendidos tras '
         '$tope intentos: ${r.abortadas}'
@@ -1159,6 +1189,8 @@ void main(List<String> args) {
         cfg.rival = v.split(',');
       case '--pociones-combate':
         cfg.pocionesCombate = v == 'si';
+      case '--pocion-politica':
+        cfg.pocionPolitica = v;
       case '--umbral-pocion':
         cfg.umbralPocion = int.parse(v);
       case '--pociones-en':
@@ -1197,7 +1229,8 @@ void main(List<String> args) {
       energiaInicial: energia[0],
       energiaMaxima: energia[1],
       energiaPorTurno: energia[2],
-      energiaAlCargar: energia[3]);
+      energiaAlCargar: energia[3],
+      psPocion: cfg.psPocion);
   final c = cargarCatalogo(cfg);
   switch (cfg.modo) {
     case 'tramo':

@@ -1,12 +1,12 @@
 MODELO DE CUENTAS DE XP Y CARTAS EX (#451). No simula combates.
-Tramo 1 medido en el catálogo: 180 XP en la ruta principal.
+Tramo 1 medido en el catálogo: 200 XP en la ruta principal.
 No entran: Nidoran♀, Nidoran♂ (Piedra Lunar) y Eevee (sin zona).
 16 Pokémon posibles: bulbasaur, caterpie, weedle, pidgey, rattata, pikachu, spearow, zubat, sandshrew, mankey, geodude, diglett, machop, onix, cubone, slowpoke.
 
 == 1. XP de la ruta principal, sin repetir salvajes ==
 Diseño: ~100 por tramo (700–900 en total)      total 800 · por tramo 100/100/100/100/100/100/100/100
-Como el tramo 1: 180 por tramo                 total 1440 · por tramo 180/180/180/180/180/180/180/180
-Creciente: 180 a 360 (rivales más fuertes)     total 2160 · por tramo 180/206/231/257/283/309/334/360
+Como el tramo 1: 200 por tramo                 total 1600 · por tramo 200/200/200/200/200/200/200/200
+Creciente: 200 a 400 (rivales más fuertes)     total 2400 · por tramo 200/229/257/286/314/343/371/400
 
 == 2. Ex al llegar a la Liga (tras la 8.ª medalla), opción D 2/3/4 (Básico ex 2, Fase 1 ex 3, Fase 2 ex 4; Onix ex a 2), inicial Bulbasaur ==
 XP de la ruta                                  xpEvo  política   ex (Fase 2)  XP gastada  compradas
@@ -14,14 +14,14 @@ Diseño: ~100 por tramo (700–900 en total)         80    barato   10      (3) 
 Diseño: ~100 por tramo (700–900 en total)         80     orden    7      (4)         730          0
 Diseño: ~100 por tramo (700–900 en total)        110    barato    7      (3)         720          0
 Diseño: ~100 por tramo (700–900 en total)        110     orden    4      (4)         720          0
-Como el tramo 1: 180 por tramo                    80    barato   16      (6)        1370          8
-Como el tramo 1: 180 por tramo                    80     orden   16      (6)        1370          8
-Como el tramo 1: 180 por tramo                   110    barato   13      (5)        1380          5
-Como el tramo 1: 180 por tramo                   110     orden   11      (5)        1380          3
-Creciente: 180 a 360 (rivales más fuertes)        80    barato   16      (6)        1370          8
-Creciente: 180 a 360 (rivales más fuertes)        80     orden   16      (6)        1370          8
-Creciente: 180 a 360 (rivales más fuertes)       110    barato   16      (6)        1820          8
-Creciente: 180 a 360 (rivales más fuertes)       110     orden   16      (6)        1820          8
+Como el tramo 1: 200 por tramo                    80    barato   16      (6)        1370          8
+Como el tramo 1: 200 por tramo                    80     orden   16      (6)        1370          8
+Como el tramo 1: 200 por tramo                   110    barato   15      (5)        1600          7
+Como el tramo 1: 200 por tramo                   110     orden   14      (6)        1600          6
+Creciente: 200 a 400 (rivales más fuertes)        80    barato   16      (6)        1370          8
+Creciente: 200 a 400 (rivales más fuertes)        80     orden   16      (6)        1370          8
+Creciente: 200 a 400 (rivales más fuertes)       110    barato   16      (6)        1820          8
+Creciente: 200 a 400 (rivales más fuertes)       110     orden   16      (6)        1820          8
 
 == 3. XP extra por tramo (repitiendo salvajes) para llegar a 12 ex ==
 XP de la ruta                                  xpEvo  política  extra/tramo  extra total  combates a 10   a 15   a 20
@@ -29,14 +29,14 @@ Diseño: ~100 por tramo (700–900 en total)         80    barato           20  
 Diseño: ~100 por tramo (700–900 en total)         80     orden           45          360             36     24     18
 Diseño: ~100 por tramo (700–900 en total)        110    barato           60          480             48     32     24
 Diseño: ~100 por tramo (700–900 en total)        110     orden           90          720             72     48     36
-Como el tramo 1: 180 por tramo                    80    barato            0            0              0      0      0
-Como el tramo 1: 180 por tramo                    80     orden            0            0              0      0      0
-Como el tramo 1: 180 por tramo                   110    barato            0            0              0      0      0
-Como el tramo 1: 180 por tramo                   110     orden           10           80              8      6      4
-Creciente: 180 a 360 (rivales más fuertes)        80    barato            0            0              0      0      0
-Creciente: 180 a 360 (rivales más fuertes)        80     orden            0            0              0      0      0
-Creciente: 180 a 360 (rivales más fuertes)       110    barato            0            0              0      0      0
-Creciente: 180 a 360 (rivales más fuertes)       110     orden            0            0              0      0      0
+Como el tramo 1: 200 por tramo                    80    barato            0            0              0      0      0
+Como el tramo 1: 200 por tramo                    80     orden            0            0              0      0      0
+Como el tramo 1: 200 por tramo                   110    barato            0            0              0      0      0
+Como el tramo 1: 200 por tramo                   110     orden            0            0              0      0      0
+Creciente: 200 a 400 (rivales más fuertes)        80    barato            0            0              0      0      0
+Creciente: 200 a 400 (rivales más fuertes)        80     orden            0            0              0      0      0
+Creciente: 200 a 400 (rivales más fuertes)       110    barato            0            0              0      0      0
+Creciente: 200 a 400 (rivales más fuertes)       110     orden            0            0              0      0      0
 
 == 4. Ex disponibles tras cada medalla, según la opción de medallas (XP como el tramo 1, xpEvo 80, política barata) ==
 opción A 4/4/5:  ex por medalla 0 0 0 6 8 11 13 16 · Fase 2 0 0 0 0 2 3 4 6
@@ -66,11 +66,11 @@ Dinero total de 8 tramos: 20680 + 1000 de salida.
 
 == 6. Por inicial (XP como el tramo 1 y ~100, xpEvo 80, opción D, barato) ==
 bulbasaur    100 XP/tramo → 10 ex
-bulbasaur    180 XP/tramo → 16 ex
+bulbasaur    200 XP/tramo → 16 ex
 charmander   100 XP/tramo → 10 ex
-charmander   180 XP/tramo → 16 ex
+charmander   200 XP/tramo → 16 ex
 squirtle     100 XP/tramo → 10 ex
-squirtle     180 XP/tramo → 16 ex
+squirtle     200 XP/tramo → 16 ex
 
 == 8. Palanca «XP propia en los rivales de los tramos 5 a 8» (ruta de ~100) ==
  xpEvo  política   extra por tramo (5 a 8)  extra total
@@ -97,4 +97,4 @@ onix        ex en el tramo 3
 cubone      sin ex (le faltan 80 XP)
 slowpoke    sin ex (le faltan 80 XP)
 
-CSV: /tmp/ex2.csv
+CSV: /tmp/ex3.csv
