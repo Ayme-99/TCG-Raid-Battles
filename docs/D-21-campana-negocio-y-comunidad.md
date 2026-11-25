@@ -1,6 +1,6 @@
 # D-21 · Modo campaña: tienda de puntos, Pokédex «Mis cartas» y comunicación
 
-Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23, el 2026-11-24 y el 2026-11-25 con sus decisiones. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
+Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23, el 2026-11-24 y el 2026-11-25 (dos veces) con sus decisiones. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
 
 Cómo leerlo:
 
@@ -13,7 +13,7 @@ Cómo leerlo:
 | Nº | Decisión | Propuesta | Dónde |
 |---|---|---|---|
 | 1 | ¿Qué es cada moneda? Puntos (cuenta) frente a dinero (campaña) | Se separan del todo: el dinero compra consumibles dentro de una campaña; los puntos compran colección y cosmética fuera. Ningún objeto se vende por las dos vías. | §1.1 |
-| 2 | Los puntos se gastan (D-20) pero D-10 dice que no se gastan | Dos contadores: **puntos ganados** (total histórico, para desbloquear jefes) y **saldo** (lo gastable). | §1.2 |
+| 2 | Los puntos se gastan (D-20) pero D-10 dice que no se gastan | **Decidido el 2026-11-25 (respuesta de Ayme):** **un solo total** por cuenta. Los puntos de campaña se suman a ese total y cuentan para desbloquear los jefes de las incursiones. **Sin cerrar:** qué pasa con ese total al comprar (§1.2). | §1.2 |
 | 3 | Catálogo de la tienda al lanzar | Solo **monedas y dados** (cosmética). Sobres y cartas sueltas esperan a que existan cartas del formato digital. Las campañas y los jefes **no** se venden. | §2.2 |
 | 4 | Precios | **Decididos (iniciales) el 2026-11-25:** moneda de serie 800, temática 2.000; dados de serie 1.500, temáticos 3.000; sobre 1.000; carta suelta 200 / 400 / 800 / 2.000 según rareza. Ajustables. | §2.3 |
 | 5 | **Decidido el 2026-11-24:** los puntos no se usan en la campaña, el intercambio es **gratis**, hacerse ex es la **piedra ex** a **2.000 de dinero**, hay **una piedra de premio por medalla** y el objetivo es llegar a la Liga con **12 ex o más** entre equipo y PC. | Dinero por tramo con una subida suave (+150) para tener margen; la lista de excepciones (Pikachu, Eevee) la define Diseño; medir la XP necesaria. | §2.5 |
@@ -22,7 +22,7 @@ Cómo leerlo:
 | 8 | Relación con las cartas físicas | Misma imagen y misma numeración, sin escaneo ni canje; reglas de reimpresión y de uso privado. El código de canje queda como idea futura. | §3.5 |
 | 9 | Bono de primera captura | **Decidido el 2026-11-25:** por ahora **no hay** bono (+50 puntos por carta nueva). Se puede revisar con datos de uso. | §3.6 |
 | 10 | Cómo se presenta el modo campaña al grupo | Tres fases: Ayme solo, 2 o 3 probadores, grupo entero; con el mensaje de §4.3. | §4 |
-| 11 | Sesión en la campaña | **Decidido:** la sesión es obligatoria para jugar el modo campaña. **Decidido el 2026-11-25:** la partida de campaña se guarda también en la cuenta. | §4.3, §6 |
+| 11 | Sesión | **Decidido el 2026-11-25:** solo la partida libre en **formato físico** no usa cuenta; todo lo demás (campaña, formato digital, tienda) exige sesión. La partida de campaña se guarda también en la cuenta. | §4.3, §6 |
 
 ## 1. Marco común
 
@@ -48,18 +48,31 @@ Una precisión de redacción: la XP **se mide en XP**, nunca en «puntos», aunq
 - **Nada se vende por las dos vías.** Si los puntos pudieran comprar Pokéballs, el dinero perdería sentido y la campaña se resolvería «pagando». Si el dinero pudiera comprar cosmética, la tienda dejaría de ser un incentivo para jugar las incursiones.
 - Esto responde a la pregunta abierta de D-20 §8 (5), «para qué sirve el dinero frente a los puntos».
 
-### 1.2 Dos contadores de puntos
+### 1.2 Puntos: un solo total por cuenta
 
-D-10 (§5) dice que «los puntos no se gastan»: el coste de desbloquear un jefe (10.000 a 40.000) se mide sobre el **total acumulado**. D-20 (§5) y `flujo-app.md` (§1 bis) dicen que los puntos **se gastan** en una tienda. Las dos cosas no caben con un solo número.
+D-10 (§5) dice que «los puntos no se gastan»: el coste de desbloquear un jefe (10.000 a 40.000) se mide sobre el **total acumulado**. D-20 (§5) y `flujo-app.md` (§1 bis) dicen que los puntos **se gastan** en una tienda. Las dos cosas no caben con un solo número si el total baja al comprar.
 
-**PROPUESTA (decisión 2):** cada cuenta lleva dos contadores.
+**Decidido el 2026-11-25 (Ayme, en respuesta a esta pregunta): un solo total por cuenta.** La versión anterior de este documento proponía dos contadores («puntos ganados» y «saldo»); queda sustituida.
 
-| Contador | Sube | Baja | Para qué sirve |
-|---|---|---|---|
-| **Puntos ganados** | Con cada abono de puntos | Nunca | Desbloquear jefes de la partida libre (D-10) |
-| **Saldo** | Con cada abono de puntos | Con cada compra | Pagar en la tienda |
+Lo decidido el 2026-11-25 sobre cómo se ganan, ya en el código (#480, #481) y registrado por Diseño:
 
-Así comprar un dado no retrasa el desbloqueo de un jefe, y no hay que elegir entre divertirse y progresar. El abono sigue las reglas de D-10 (solo cobra quien tiene cuenta; la parte de un invitado se pierde).
+- Los **puntos de campaña suman al total de la cuenta** y cuentan para desbloquear los jefes de las incursiones.
+- **Cada hito da sus puntos una vez por cuenta, campaña y partida:** repetir la campaña vuelve a darlos.
+- **Topes por hito** (datos editables): salvaje 100, entrenador 200, jefe 1.000, medalla 1.500.
+- Dentro de la campaña los puntos **no se gastan ni dan ventajas** (D-20 §10.9): la campaña los da, nada más.
+
+**Sin cerrar (PROPUESTA, para Ayme):** qué ocurre con el total al comprar en la tienda. Con un solo total hay dos lecturas:
+
+| Opción | Efecto | Riesgo |
+|---|---|---|
+| **A. La compra baja el total** | Gastar es gastar de verdad | Un jefe ya desbloqueado podría volver a bloquearse; y comprar retrasa el desbloqueo de los siguientes |
+| **B. La compra no baja el total que desbloquea jefes** | Comprar no frena el progreso | Exige llevar dos cifras (lo que desbloquea y lo gastable), es decir, los dos contadores que se acaban de descartar |
+
+Recomiendo **B** y decirlo claro, porque con A el jugador tiene que elegir entre divertirse y progresar, y un jefe desbloqueado que se vuelve a cerrar se lee como un error. Pero la cifra gastable no tiene por qué mostrarse como un segundo «contador»: puede enseñarse como «puntos disponibles en la tienda». Es decisión de Ayme.
+
+**Aviso de contradicción (no se corrige aquí):** D-10 §5, D-20 §10.1 y §10.9 y la implementación en curso (#374) usan hoy «puntos ganados» y «saldo». Si Ayme confirma un solo total sin dos cifras, Diseño y Programación deben ajustarlos.
+
+El abono sigue las reglas de D-10 (solo cobra quien tiene cuenta; la parte de un invitado se pierde).
 
 ### 1.3 Reglas de negocio que se mantienen
 
@@ -111,7 +124,7 @@ Regla práctica que he usado: **un jugador debe poder comprar algo cada una o do
 Lo que **no** entra en la tienda, y por qué:
 
 - **Campañas nuevas.** Ayme apuntó que «lo normal es que estén abiertas de primeras» (D-20 §5). **Recomiendo** abrir la siguiente al terminar la anterior, no pagarla: una campaña es contenido que el jugador espera tener, no un extra.
-- **Jefes de la partida libre.** Se siguen desbloqueando con los **puntos ganados** (D-10), nunca con saldo.
+- **Jefes de la partida libre.** Se desbloquean con el total de puntos de la cuenta (D-10); si la compra baja ese total o no, está sin cerrar (§1.2).
 - **Consumibles de campaña** (Pokéballs, Pociones, Repelentes): son del dinero (§1.1).
 - **Sprites, medallas y cualquier arte ajeno** (§1.3).
 
@@ -328,7 +341,7 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 **Riesgos que hay que decir de entrada** (mejor sin sorpresas):
 
 - **La partida se guardará también en la cuenta** (**decidido por Ayme el 2026-11-25**). Hasta que Programación lo implemente, la partida solo está en el dispositivo: si el amigo juega en la **web** y borra los datos del navegador, **pierde el progreso**, y hay que avisarlo. Cuando la sincronización esté hecha, el aviso se quita del mensaje.
-- **La sesión es obligatoria** para jugar la campaña (**decidido por Ayme el 2026-11-23**). En la app solo se inicia sesión y el registro se hace en Deck Tracker, así que el amigo **debe tener ya su cuenta antes de empezar**. Es la mayor fricción de la primera sesión: conviene que se la cree antes de que le llegue el enlace.
+- **La sesión es obligatoria** para jugar la campaña (**decidido por Ayme el 2026-11-23**; el 2026-11-25 concretó que solo la partida libre en formato físico queda sin cuenta, y el formato digital y la tienda también la exigen). En la app solo se inicia sesión y el registro se hace en Deck Tracker, así que el amigo **debe tener ya su cuenta antes de empezar**. Es la mayor fricción de la primera sesión: conviene que se la cree antes de que le llegue el enlace.
 - **No es un proyecto público.** Los sprites son de Nintendo y The Pokémon Company, tomados de Escarlata y Púrpura (#389): el enlace es para el grupo y no se reenvía ni se publica.
 
 **Borrador del mensaje al grupo** (tono de grupo de WhatsApp, para que Ayme lo adapte):
@@ -402,15 +415,15 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 | D-20 §5 y §8 (4, 5) | Cerrar «qué se vende» y «dinero frente a puntos» con §1.1 y §2 |
 | D-20 §2.1, §5 y §10.6 | Los puntos **no** se usan en la campaña (decidido). Intercambio **gratis** y hacerse ex con la **piedra ex** (decidido el 2026-11-24, ya recogido en el PR #448 de Diseño). Precio de la piedra: 2.000, una piedra de premio por medalla y objetivo de 12 ex en la Liga (decidido, §2.5) |
 | D-20 §8 (13) | Nidoran♂ ya es 032/150: la pregunta se da por resuelta |
-| D-20 §6 y `flujo-app.md` §2 | La sesión es obligatoria en el modo campaña (la regla general «nunca obligatoria» deja de valer ahí) |
+| D-20 §6 y `flujo-app.md` §2 y §4 | Decidido el 2026-11-25: solo la partida libre en formato físico no usa cuenta; campaña, formato digital y tienda exigen sesión. `flujo-app.md` §2 («la sesión nunca es obligatoria») y §4 («se guarda en el dispositivo y funciona sin sesión») deben decir lo mismo; es de Diseño de interfaz |
 | D-20 §10 | Nuevas filas del registro con las decisiones 1 a 9 |
-| D-10 §5 | Añadir el contador de **saldo** junto al de puntos ganados |
+| D-10 §5 | Hoy tiene «puntos ganados» y «saldo»; Ayme decidió un solo total (§1.2). Pendiente de que Diseño lo ajuste cuando se cierre qué pasa al comprar |
 | `flujo-app.md` §6 | Definir las dos colecciones de «Mis cartas» y su relación con Enemigos |
 | `docs/README.md` | Ya enlaza este documento |
 
 **Para Programación** («Puntos al servidor y tienda», que #387 bloquea), en datos y sin escribir código aquí:
 
-- El servidor guarda **puntos ganados** y **saldo** por cuenta, y un registro de compras (`compras`: cuenta, producto, precio, fecha) con clave generada por el cliente para que los reintentos no cobren dos veces, como en D-10.
+- El servidor guarda el **total de puntos** por cuenta (si hace falta una segunda cifra gastable depende de §1.2), y un registro de compras (`compras`: cuenta, producto, precio, fecha) con clave generada por el cliente para que los reintentos no cobren dos veces, como en D-10.
 - El catálogo de la tienda debe ser **datos** (`id`, familia, nombre, precio, requisitos), no constantes, para ajustar precios sin publicar app.
 - «Mis cartas» necesita un registro por carta (§3.3), con clave en el dispositivo y sincronización al iniciar sesión.
 - La **partida de campaña** también se guarda en la cuenta (decidido el 2026-11-25). El formato y el momento de sincronización los define Diseño con Programación; aquí no se propone ninguno.
