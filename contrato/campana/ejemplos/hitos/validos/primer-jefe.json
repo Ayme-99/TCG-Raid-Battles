@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "campana": "kanto",
+  "hitos": [
+    {
+      "id": "ruta-1-pidgey",
+      "tipo": "salvaje",
+      "puntos": 100
+    },
+    {
+      "id": "pikachu",
+      "tipo": "jefe",
+      "puntos": 1000
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "fuente": "D-21 §2.2 y §2.3: precios iniciales aceptados por Ayme el 2026-11-25. Se cambian aquí, sin tocar código.",
+  "productos": [
+    { "id": "moneda-clasica", "familia": "monedas", "nombre": "Moneda clásica", "precio": 0, "disponible": true },
+    { "id": "moneda-serie", "familia": "monedas", "nombre": "Moneda de serie (color o metal)", "precio": 800, "disponible": true },
+    { "id": "moneda-tematica", "familia": "monedas", "nombre": "Moneda temática", "precio": 2000, "disponible": true },
+    { "id": "dados-estandar", "familia": "dados", "nombre": "Dados estándar", "precio": 0, "disponible": true },
+    { "id": "dados-serie", "familia": "dados", "nombre": "Juego de dados de serie", "precio": 1500, "disponible": true },
+    { "id": "dados-tematicos", "familia": "dados", "nombre": "Juego de dados temático", "precio": 3000, "disponible": true },
+    { "id": "sobre", "familia": "sobres", "nombre": "Sobre del formato digital", "precio": 1000, "disponible": false },
+    { "id": "carta-comun", "familia": "cartas", "nombre": "Carta suelta: Común", "rareza": "comun", "precio": 200, "disponible": false },
+    { "id": "carta-poco-comun", "familia": "cartas", "nombre": "Carta suelta: Poco común", "rareza": "pocoComun", "precio": 400, "disponible": false },
+    { "id": "carta-rara", "familia": "cartas", "nombre": "Carta suelta: Rara", "rareza": "rara", "precio": 800, "disponible": false },
+    { "id": "carta-ultra-rara", "familia": "cartas", "nombre": "Carta suelta: Ultra rara", "rareza": "ultraRara", "precio": 2000, "disponible": false }
+  ]
+}

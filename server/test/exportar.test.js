@@ -14,6 +14,8 @@ test('el módulo exportado funciona fuera del monorepo', () => {
     assert.ok(copiados.includes('contrato/partida.v2.schema.json'));
     assert.ok(copiados.includes('contrato/sala/sala.v1.schema.json'));
     assert.ok(copiados.includes('ws.js') && copiados.includes('salas.js'));
+    assert.ok(copiados.includes('hitosCampana.js'));
+    assert.ok(copiados.includes('catalogo/tienda.json') && copiados.includes('catalogo/topes-puntos.json'));
     // Se carga desde la copia y encuentra los esquemas de ./contrato.
     const { crearValidador } = require(path.join(destino, 'esquema.js'));
     const validar = crearValidador();
@@ -22,6 +24,11 @@ test('el módulo exportado funciona fuera del monorepo', () => {
     const { crearValidadorSala } = require(path.join(destino, 'protocoloSala.js'));
     assert.deepStrictEqual(crearValidadorSala()({ tipo: 'ping' }).errores, []);
     assert.ok(errores.length > 0, 'un registro vacío no cumple el esquema');
+    // Los hitos y la tienda (#374) encuentran su esquema y sus datos.
+    const hitos = require(path.join(destino, 'hitosCampana.js'));
+    assert.ok(hitos.crearValidadorHitos()({}).length > 0);
+    assert.strictEqual(hitos.cargarTopes().jefe > 0, true);
+    assert.ok(hitos.cargarTienda().productos.length > 0);
   } finally {
     fs.rmSync(destino, { recursive: true, force: true });
   }

@@ -11,6 +11,8 @@ Catálogo oficial de jefes. Los jefes son **datos**, no código: se añaden edit
 | `schema/boss.schema.json` | Esquema de un jefe (formato 1). |
 | `schema/catalogo.schema.json` | Esquema del índice. |
 | `ejemplos/validos/`, `ejemplos/invalidos/` | Jefes de ejemplo (no son jefes reales ni llevan números de juego) que los tests usan para comprobar el esquema. |
+| `tienda/tienda.json` | Catálogo de la tienda de la pantalla de inicio (#374, D-21 §2.3), con su esquema `schema/tienda.schema.json`. Lo sirve `GET /tienda`. |
+| `campana/topes-puntos.json` | Tope de puntos por hito de la campaña que acepta el servidor (#374, D-20 §6), con su esquema `schema/topes-puntos.schema.json`. |
 
 ## Un jefe
 

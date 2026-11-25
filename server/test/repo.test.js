@@ -71,6 +71,29 @@ function pruebasDeRepo(nombre, crear, opciones = {}) {
     assert.deepStrictEqual(ids(await repo.listar('a', { limite: 1, antes: null })), ['p4']);
     assert.deepStrictEqual(ids(await repo.listar('b', { limite: 10, antes: null })), []);
   });
+
+  test(`${nombre}: los hitos de campaña se abonan una vez por id (#374)`, opciones, async (t) => {
+    const repo = await crear(t);
+    const base = { cuentaId: 'a', campana: 'kanto', abonadoEn: 't1' };
+    const h1 = { id: 'ruta-1-pidgey', tipo: 'salvaje', puntos: 100 };
+    const h2 = { id: 'pikachu', tipo: 'jefe', puntos: 1000 };
+    assert.deepStrictEqual(await repo.puntosCampanaDe('a'), { puntos: 0, hitos: 0 });
+    assert.deepStrictEqual(await repo.abonarHitosCampana({ ...base, hitos: [h1] }),
+      { nuevos: ['ruta-1-pidgey'], repetidos: [], distintos: [] });
+    assert.deepStrictEqual(await repo.abonarHitosCampana({ ...base, hitos: [h1, h2] }),
+      { nuevos: ['pikachu'], repetidos: ['ruta-1-pidgey'], distintos: [] });
+    assert.deepStrictEqual(await repo.puntosCampanaDe('a'), { puntos: 1100, hitos: 2 });
+    const otro = await repo.abonarHitosCampana({ ...base, hitos: [{ ...h1, puntos: 90 }, { id: 'x', tipo: 'salvaje', puntos: 10 }] });
+    assert.deepStrictEqual(otro, {
+      nuevos: [], repetidos: [], distintos: [{ id: 'ruta-1-pidgey', tipo: 'salvaje', puntos: 100 }],
+    });
+    assert.deepStrictEqual(await repo.puntosCampanaDe('a'), { puntos: 1100, hitos: 2 });
+    // Otra campaña u otra cuenta no chocan.
+    await repo.abonarHitosCampana({ ...base, campana: 'johto', hitos: [h1] });
+    await repo.abonarHitosCampana({ ...base, cuentaId: 'b', hitos: [h1] });
+    assert.deepStrictEqual(await repo.puntosCampanaDe('a'), { puntos: 1200, hitos: 3 });
+    assert.deepStrictEqual(await repo.puntosCampanaDe('b'), { puntos: 100, hitos: 1 });
+  });
 }
 
 pruebasDeRepo('memoria', async () => crearRepoMemoria());

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "campana": "kanto",
+  "hitos": [
+    {
+      "id": "gimnasio-plateada",
+      "tipo": "entrenador",
+      "puntos": 200
+    },
+    {
+      "id": "medalla:roca",
+      "tipo": "medalla",
+      "puntos": 1500
+    }
+  ]
+}

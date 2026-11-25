@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "fuente": "D-20 §6: el servidor acepta lo que reporta el cliente con un tope por hito. Los topes son las cifras provisionales de ParametrosCampana (D-20 §5, D-21 §2.1) hasta que Ayme cierre las definitivas.",
+  "topes": {
+    "salvaje": 100,
+    "entrenador": 200,
+    "jefe": 1000,
+    "medalla": 1500
+  }
+}

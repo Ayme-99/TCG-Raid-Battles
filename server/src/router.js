@@ -9,6 +9,7 @@ function listaDeVersiones(versiones) {
 }
 const { comprobarCoherencia, abonos } = require('./coherencia');
 const { COSTE_DESBLOQUEO } = require('./puntos');
+const { rutasHitosCampana } = require('./hitosCampana');
 
 const LIMITE_POR_DEFECTO = 20;
 const LIMITE_MAXIMO = 50;
@@ -213,11 +214,15 @@ function crearRouter({
   }));
 
   // Puntos acumulados y a qué jefes da acceso (los puntos no se gastan).
+  // `puntosCampana` son los de los hitos de la campaña (#374); de momento no
+  // cuentan para desbloquear jefes (pregunta abierta a Ayme en #374).
   router.get('/me/puntos', asincrono(async (req, res) => {
     const { puntos, partidas } = await repo.puntosDe(req.cuentaId);
+    const campana = await repo.puntosCampanaDe(req.cuentaId);
     return res.json({
       puntos,
       partidas,
+      puntosCampana: campana.puntos,
       niveles: Object.entries(COSTE_DESBLOQUEO).map(([nivel, coste]) => ({
         nivel: Number(nivel),
         coste,
@@ -226,6 +231,9 @@ function crearRouter({
       })),
     });
   }));
+
+  // Puntos de la campaña por hitos y catálogo de la tienda (#374).
+  router.use(rutasHitosCampana({ repo, ahora, error }));
 
   // Errores del propio router (JSON mal formado, cuerpo demasiado grande).
   // eslint-disable-next-line no-unused-vars

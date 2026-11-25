@@ -23,6 +23,8 @@ Todos requieren sesión. Los errores tienen la forma `{ "error": "codigo", "mens
 | `GET /partidas?limite=20&despues=<cursor>` | Historial de la cuenta, de la más reciente a la más antigua. `limite` de 1 a 50. Devuelve `partidas` (resumen de cada una con `miPuesto` y `misPuntos`) y `siguiente` (cursor, `null` en la última página). |
 | `GET /partidas/:id` | El registro completo de una partida. `404` si no existe o si la cuenta no jugó en ella. |
 | `GET /me/puntos` | `puntos` acumulados (solo lo abonado; no se gastan), `partidas` jugadas y, por nivel, `coste`, `alcanzado` y `faltan` para desbloquear jefe nuevo. |
+| `POST /campana/hitos` | Abona a la cuenta los puntos de hitos de la campaña (#374, D-20 §6): `{ version: 1, campana, hitos: [{ id, tipo, puntos }] }` ([`../contrato/campana/hitos.v1.schema.json`](../contrato/campana/hitos.v1.schema.json)). El `id` es único por cuenta y campaña: un reenvío no suma dos veces (`repetidos`). Cada tipo tiene un **tope** ([`../catalog/campana/topes-puntos.json`](../catalog/campana/topes-puntos.json)); pasarlo da `422 puntos_fuera_de_tope`, y un id ya abonado con otros datos, `409 hito_distinto`. En los dos casos no se abona nada del envío. Responde `abonados`, `repetidos`, `puntosAbonados` y `puntosCampana`. `GET /me/puntos` enseña además `puntosCampana`. |
+| `GET /tienda` | Catálogo de la tienda de la pantalla de inicio ([`../catalog/tienda/tienda.json`](../catalog/tienda/tienda.json), D-21 §2.3). Son datos: los precios se cambian ahí. Todavía no se compra. |
 
 Los invitados ocupan puesto en el reparto pero no cobran ni el reparto ni el bono (D-10, D-11, D-12). A una cuenta se le abona `puntos + bonoEstados` de cada partida; el bono queda fuera de `puntosTotal`.
 
@@ -32,6 +34,7 @@ Dos colecciones, el modelo de D-10 §5 (`src/repoMongo.js`):
 
 - `incursiones_partidas`: una por partida (`_id` = `partidaId`), con el registro completo y los datos del resumen.
 - `incursiones_partida_jugadores`: una por asiento, con lo que se abona. Índice único `(partidaId, asiento)`.
+- `incursiones_campana_hitos`: un hito de campaña abonado (#374), `_id` = `cuentaId:campana:id`, con `tipo` y `puntos`. Los puntos de campaña de una cuenta son la suma de sus hitos.
 
 Los totales de una cuenta **se calculan sumando sus filas**, nunca se guardan, así que un reintento no puede sumar dos veces. Si un intento se corta entre las dos colecciones, el reintento completa las filas que faltan.
 
