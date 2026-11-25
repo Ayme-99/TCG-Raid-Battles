@@ -59,7 +59,8 @@ function rutasHitosCampana({
   const router = express.Router();
   const asincrono = (fn) => (req, res, next) => fn(req, res).catch(next);
 
-  // Abona los hitos nuevos. Idempotente por (cuenta, campaña, id).
+  // Abona los hitos nuevos. Idempotente por (cuenta, campaña, partida, id): una
+  // partida nueva de la campaña vuelve a dar los puntos (Ayme, 2026-11-25).
   router.post('/campana/hitos', asincrono(async (req, res) => {
     const cuerpo = req.body;
     const errores = validar(cuerpo);
@@ -79,6 +80,7 @@ function rutasHitosCampana({
     const r = await repo.abonarHitosCampana({
       cuentaId: req.cuentaId,
       campana: cuerpo.campana,
+      partida: cuerpo.partida,
       hitos: cuerpo.hitos,
       abonadoEn: ahora().toISOString(),
     });

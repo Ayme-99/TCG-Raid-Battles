@@ -214,15 +214,17 @@ function crearRouter({
     });
   }));
 
-  // Puntos acumulados y a qué jefes da acceso (los puntos no se gastan).
-  // `puntosCampana` son los de los hitos de la campaña (#374); de momento no
-  // cuentan para desbloquear jefes (pregunta abierta a Ayme en #374).
+  // Puntos ganados y a qué jefes da acceso (no bajan al comprar: D-21 §1.2).
+  // Suman las incursiones y los hitos de la campaña: los de campaña también
+  // desbloquean jefes (decidido por Ayme el 2026-11-25, #374).
   router.get('/me/puntos', asincrono(async (req, res) => {
-    const { puntos, partidas } = await repo.puntosDe(req.cuentaId);
+    const incursiones = await repo.puntosDe(req.cuentaId);
     const campana = await repo.puntosCampanaDe(req.cuentaId);
+    const puntos = incursiones.puntos + campana.puntos;
     return res.json({
       puntos,
-      partidas,
+      partidas: incursiones.partidas,
+      puntosIncursiones: incursiones.puntos,
       puntosCampana: campana.puntos,
       niveles: Object.entries(COSTE_DESBLOQUEO).map(([nivel, coste]) => ({
         nivel: Number(nivel),

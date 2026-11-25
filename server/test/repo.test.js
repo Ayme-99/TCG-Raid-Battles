@@ -99,7 +99,7 @@ function pruebasDeRepo(nombre, crear, opciones = {}) {
 
   test(`${nombre}: los hitos de campaña se abonan una vez por id (#374)`, opciones, async (t) => {
     const repo = await crear(t);
-    const base = { cuentaId: 'a', campana: 'kanto', abonadoEn: 't1' };
+    const base = { cuentaId: 'a', campana: 'kanto', partida: 'p1', abonadoEn: 't1' };
     const h1 = { id: 'ruta-1-pidgey', tipo: 'salvaje', puntos: 100 };
     const h2 = { id: 'pikachu', tipo: 'jefe', puntos: 1000 };
     assert.deepStrictEqual(await repo.puntosCampanaDe('a'), { puntos: 0, hitos: 0 });
@@ -118,6 +118,10 @@ function pruebasDeRepo(nombre, crear, opciones = {}) {
     await repo.abonarHitosCampana({ ...base, cuentaId: 'b', hitos: [h1] });
     assert.deepStrictEqual(await repo.puntosCampanaDe('a'), { puntos: 1200, hitos: 3 });
     assert.deepStrictEqual(await repo.puntosCampanaDe('b'), { puntos: 100, hitos: 1 });
+    // Una partida nueva de la misma campaña los vuelve a dar (Ayme, 2026-11-25).
+    assert.deepStrictEqual(await repo.abonarHitosCampana({ ...base, partida: 'p2', hitos: [h1, h2] }),
+      { nuevos: ['ruta-1-pidgey', 'pikachu'], repetidos: [], distintos: [] });
+    assert.deepStrictEqual(await repo.puntosCampanaDe('a'), { puntos: 2300, hitos: 5 });
   });
 }
 
