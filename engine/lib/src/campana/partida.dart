@@ -308,6 +308,40 @@ int _xpDeEquipo(List<PokemonCampana> equipo) => equipo.fold(
         t +
         (p.categoriaCaptura == null ? 0 : xpDeCategoria(p.categoriaCaptura!)));
 
+/// Tipo de un hito de la campaña que abona puntos a la cuenta (#374, D-20 §6):
+/// el del combate ganado. Ganar un gimnasio es [medalla].
+enum TipoHito { salvaje, entrenador, jefe, medalla }
+
+/// Un hito ganado que aún no se ha enviado a la cuenta (#374): el combate del
+/// nodo [id] y los [puntos] que dio. El servidor lo abona una vez por partida
+/// (contrato/campana/hitos.v1.schema.json); una partida nueva los vuelve a dar
+/// (decidido por Ayme el 2026-11-25).
+class HitoCampana {
+  final String id;
+  final TipoHito tipo;
+  final int puntos;
+
+  const HitoCampana(this.id, this.tipo, this.puntos);
+
+  Map<String, dynamic> aJson() => {'id': id, 'tipo': tipo.name, 'puntos': puntos};
+
+  factory HitoCampana.desdeJson(Map<String, dynamic> json) => HitoCampana(
+        json['id'] as String,
+        TipoHito.values.byName(json['tipo'] as String),
+        json['puntos'] as int,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      other is HitoCampana &&
+      other.id == id &&
+      other.tipo == tipo &&
+      other.puntos == puntos;
+
+  @override
+  int get hashCode => Object.hash(id, tipo, puntos);
+}
+
 /// Una partida de la campaña de un jugador: dónde está, su equipo, su PC y sus
 /// puntos. Es lo que se guarda en el dispositivo (D-20 §6). Inmutable: cada
 /// operación devuelve una partida nueva.
@@ -325,7 +359,8 @@ class PartidaCampana {
   /// Los Pokémon que no caben en el equipo. Sin límite (D-20 §8, pregunta 7).
   final List<PokemonGuardado> pc;
 
-  /// Puntos ganados en la campaña. Todavía no se envían al servidor.
+  /// Puntos ganados en la campaña. Van a la cuenta como [hitosPendientes]
+  /// (#374).
   final int puntos;
 
   /// Semilla de la partida: elige el rival de cada combate y siembra las
@@ -357,6 +392,14 @@ class PartidaCampana {
   /// Combates perdidos (solo informativo).
   final int derrotas;
 
+  /// Id de esta partida, que la app genera al empezarla (#374): los hitos se
+  /// abonan una vez por partida. Null en partidas guardadas antes de #374 (la
+  /// app les pone uno con [conPartidaId]).
+  final String? partidaId;
+
+  /// Hitos ganados que aún no se han enviado a la cuenta, en orden (#374).
+  final List<HitoCampana> hitosPendientes;
+
   const PartidaCampana({
     required this.progreso,
     this.equipo = const [],
@@ -370,16 +413,33 @@ class PartidaCampana {
     this.xp = 0,
     this.mochila = const {},
     this.ultimaCura,
+    this.partidaId,
+    this.hitosPendientes = const [],
   });
 
   factory PartidaCampana.nueva(RegionCampana region,
           {int semilla = 1,
+          String? partidaId,
           ParametrosCampana parametros = const ParametrosCampana()}) =>
       PartidaCampana(
         progreso: ProgresoRuta.inicial(region),
         semilla: _normalizar(semilla),
         dinero: parametros.dineroInicial,
+        partidaId: partidaId,
       );
+
+  /// La misma partida con el id [id] (para las guardadas sin id).
+  PartidaCampana conPartidaId(String id) => _copiar(partidaId: id);
+
+  /// La partida sin los hitos pendientes de [ids]: los que la cuenta ya ha
+  /// abonado o ha dado por repetidos (#374).
+  PartidaCampana quitarHitos(Iterable<String> ids) {
+    final fuera = ids.toSet();
+    return _copiar(hitosPendientes: [
+      for (final h in hitosPendientes)
+        if (!fuera.contains(h.id)) h,
+    ]);
+  }
 
   int cuantos(ObjetoCampana o) => mochila[o] ?? 0;
 
@@ -397,6 +457,8 @@ class PartidaCampana {
     int? xp,
     Map<ObjetoCampana, int>? mochila,
     String? ultimaCura,
+    String? partidaId,
+    List<HitoCampana>? hitosPendientes,
   }) =>
       PartidaCampana(
         progreso: progreso ?? this.progreso,
@@ -413,6 +475,8 @@ class PartidaCampana {
         xp: xp ?? this.xp,
         mochila: mochila ?? this.mochila,
         ultimaCura: ultimaCura ?? this.ultimaCura,
+        partidaId: partidaId ?? this.partidaId,
+        hitosPendientes: hitosPendientes ?? this.hitosPendientes,
       );
 
   NodoRuta nodoActual(CatalogoCampana c) => c.region.nodo(progreso.nodoActual);
@@ -665,8 +729,24 @@ class PartidaCampana {
             },
       semilla: siguiente,
       capturaPendiente: r.captura,
+      hitosPendientes: r.puntos > 0 &&
+              !hitosPendientes.any((h) => h.id == nodoActual(c).id)
+          ? [
+              ...hitosPendientes,
+              HitoCampana(nodoActual(c).id, _tipoHito(nodoActual(c)), r.puntos),
+            ]
+          : null,
     );
   }
+
+  /// El tipo de hito de ganar el combate de [nodo].
+  static TipoHito _tipoHito(NodoRuta nodo) => switch (nodo.tipo) {
+        TipoNodo.gimnasio => TipoHito.medalla,
+        TipoNodo.jefe => TipoHito.jefe,
+        _ => nodo.rival == RivalDeCombate.salvaje
+            ? TipoHito.salvaje
+            : TipoHito.entrenador,
+      };
 
   /// Lo que vende la tienda del nodo actual, en el orden del catálogo: lo que
   /// lista el centro (`tienda`) y tiene precio, menos lo que pide más
@@ -1061,6 +1141,9 @@ class PartidaCampana {
         'xp': xp,
         'mochila': {for (final e in mochila.entries) e.key.name: e.value},
         if (ultimaCura != null) 'ultimaCura': ultimaCura,
+        if (partidaId != null) 'partidaId': partidaId,
+        if (hitosPendientes.isNotEmpty)
+          'hitosPendientes': [for (final h in hitosPendientes) h.aJson()],
       };
 
   factory PartidaCampana.desdeJson(Map<String, dynamic> json) {
@@ -1098,6 +1181,11 @@ class PartidaCampana {
           ObjetoCampana.values.byName(e.key): e.value as int,
       },
       ultimaCura: json['ultimaCura'] as String?,
+      partidaId: json['partidaId'] as String?,
+      hitosPendientes: [
+        for (final h in (json['hitosPendientes'] as List<dynamic>?) ?? const [])
+          HitoCampana.desdeJson(h as Map<String, dynamic>),
+      ],
     );
   }
 

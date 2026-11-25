@@ -1,9 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:incursiones_engine/campana.dart';
 
 import '../almacen/almacen.dart';
+import '../cuenta/cliente_api.dart';
+import '../cuenta/controlador_sesion.dart';
+import '../cuenta/sesion.dart';
+import '../envios/cola_envios.dart' show esperaTrasFallo;
+import '../envios/controlador_envios.dart' show Cancelar, programadorProvider;
 import '../partida/controlador_partida.dart' show azarProvider;
 
 /// Clave bajo la que se guarda la partida de campaña en el dispositivo.
@@ -12,6 +19,15 @@ const claveCampana = 'campana_kanto';
 /// Cifras provisionales de la campaña (puntos, equipo…), en un solo sitio
 /// del motor: [ParametrosCampana].
 const parametrosCampana = ParametrosCampana();
+
+/// Id de la campaña para el servidor (contrato/campana/hitos.v1.schema.json).
+const idCampanaServidor = 'kanto';
+
+/// Un id nuevo de partida de campaña (#374): 16 caracteres hexadecimales.
+String nuevoIdPartida(Random azar) => [
+      for (var i = 0; i < 4; i++)
+        azar.nextInt(1 << 16).toRadixString(16).padLeft(4, '0'),
+    ].join();
 
 /// Lee la partida de campaña guardada. Si no hay, o no se puede leer (otra
 /// versión, datos dañados), devuelve `null` y la descarta.
@@ -48,9 +64,33 @@ class EstadoCampana {
 /// (`engine/lib/src/campana/`); aquí solo se encadenan las acciones, se juega
 /// el turno de la máquina y se guarda.
 class ControladorCampana extends Notifier<EstadoCampana> {
+  bool _enviando = false;
+  bool _vivo = true;
+  int _fallos = 0;
+  Cancelar? _cancelarReintento;
+
   @override
-  EstadoCampana build() =>
-      EstadoCampana(partida: ref.read(campanaInicialProvider));
+  EstadoCampana build() {
+    _vivo = true;
+    ref.onDispose(() {
+      _vivo = false;
+      _cancelarReintento?.call();
+    });
+    // Al iniciar sesión (o leerla al arrancar) se envían los hitos pendientes.
+    ref.listen<Sesion?>(sesionActualProvider, (_, sesion) {
+      if (sesion != null) unawaited(Future.microtask(enviarHitos));
+    });
+    unawaited(Future.microtask(enviarHitos));
+    var partida = ref.read(campanaInicialProvider);
+    // Las partidas guardadas antes de #374 no tienen id: se les pone uno.
+    if (partida != null && partida.partidaId == null) {
+      partida = partida.conPartidaId(nuevoIdPartida(ref.read(azarProvider)));
+      ref
+          .read(almacenProvider)
+          .escribir(claveCampana, jsonEncode(partida.aJson()));
+    }
+    return EstadoCampana(partida: partida);
+  }
 
   PartidaCampana get _partida {
     final p = state.partida;
@@ -67,7 +107,9 @@ class ControladorCampana extends Notifier<EstadoCampana> {
   void nueva(CatalogoCampana c) {
     final semilla = ref.read(azarProvider).nextInt(1 << 30) + 1;
     _guardar(PartidaCampana.nueva(c.region,
-        semilla: semilla, parametros: parametrosCampana));
+        semilla: semilla,
+        partidaId: nuevoIdPartida(ref.read(azarProvider)),
+        parametros: parametrosCampana));
   }
 
   /// Borra la campaña guardada.
@@ -197,6 +239,76 @@ class ControladorCampana extends Notifier<EstadoCampana> {
     if (combate == null || combate.fase != FaseCombate.terminado) return;
     _guardar(
         _partida.terminarCombate(c, combate, parametros: parametrosCampana));
+    // Un jefe o una medalla se envían a la cuenta en cuanto se ganan; los
+    // salvajes y entrenadores van con ellos o al iniciar sesión (#374).
+    if (_partida.hitosPendientes
+        .any((h) => h.tipo == TipoHito.jefe || h.tipo == TipoHito.medalla)) {
+      unawaited(enviarHitos());
+    }
+  }
+
+  /// Envía a la cuenta los hitos pendientes de la partida (#374). Si van bien
+  /// (abonados o ya abonados) se quitan de la partida. Si el servidor los
+  /// rechaza, reintentar no sirve y también se quitan. Sin conexión se quedan
+  /// y se reintenta más tarde.
+  Future<void> enviarHitos() async {
+    if (_enviando) return;
+    _enviando = true;
+    try {
+      await _enviarHitos();
+    } finally {
+      _enviando = false;
+    }
+  }
+
+  Future<void> _enviarHitos() async {
+    final sesion = ref.read(sesionActualProvider);
+    final partida = state.partida;
+    final id = partida?.partidaId;
+    if (sesion == null ||
+        partida == null ||
+        id == null ||
+        partida.hitosPendientes.isEmpty) {
+      return;
+    }
+    _cancelarReintento?.call();
+    _cancelarReintento = null;
+    final enviados = partida.hitosPendientes.take(100).toList();
+    final r = await ref.read(clienteApiProvider).enviarHitos(
+      sesion.token,
+      campana: idCampanaServidor,
+      partida: id,
+      hitos: [for (final h in enviados) h.aJson()],
+    );
+    if (!_vivo) return;
+    switch (r.resultado) {
+      case ResultadoEnvio.guardada:
+        _fallos = 0;
+        _quitarHitos(id, r.ids);
+      case ResultadoEnvio.rechazada:
+        _fallos = 0;
+        _quitarHitos(id, [for (final h in enviados) h.id]);
+      case ResultadoEnvio.sesionCaducada:
+        // Se reenvían al volver a iniciar sesión.
+        break;
+      case ResultadoEnvio.reintentar:
+        _fallos++;
+        _cancelarReintento = ref.read(programadorProvider)(
+          esperaTrasFallo(_fallos),
+          () => unawaited(enviarHitos()),
+        );
+    }
+  }
+
+  /// Quita los hitos [ids] de la partida en curso si sigue siendo la [id]
+  /// (mientras se enviaban se ha podido empezar otra). Conserva el combate.
+  void _quitarHitos(String id, List<String> ids) {
+    final p = state.partida;
+    if (p == null || p.partidaId != id || ids.isEmpty) return;
+    final sin = p.quitarHitos(ids);
+    state = EstadoCampana(
+        partida: sin, combate: state.combate, registro: state.registro);
+    ref.read(almacenProvider).escribir(claveCampana, jsonEncode(sin.aJson()));
   }
 }
 
