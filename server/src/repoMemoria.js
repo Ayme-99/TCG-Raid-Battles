@@ -6,7 +6,7 @@ function crearRepoMemoria() {
   const partidas = new Map();
   const filas = new Map(); // `${partidaId}:${asiento}` → fila
   const guardados = new Map(); // `${cuentaId}:${campana}` → partida de campaña
-  const hitos = new Map(); // `${cuentaId}:${campana}:${id}` → hito de campaña
+  const hitos = new Map(); // `${cuentaId}:${campana}:${partida}:${id}` → hito de campaña
 
   return {
     async guardarPartida({ partida, jugadores }) {
@@ -75,8 +75,8 @@ function crearRepoMemoria() {
 
     // Abona los hitos de campaña que no estaban (#374). Si alguno ya estaba
     // con otro tipo o puntos, no abona nada y lo devuelve en `distintos`.
-    async abonarHitosCampana({ cuentaId, campana, hitos: lista, abonadoEn }) {
-      const clave = (h) => `${cuentaId}:${campana}:${h.id}`;
+    async abonarHitosCampana({ cuentaId, campana, partida, hitos: lista, abonadoEn }) {
+      const clave = (h) => `${cuentaId}:${campana}:${partida}:${h.id}`;
       const distintos = [];
       const repetidos = [];
       const nuevos = [];
@@ -89,7 +89,9 @@ function crearRepoMemoria() {
       if (distintos.length > 0) return { nuevos: [], repetidos: [], distintos };
       for (const h of lista) {
         if (nuevos.includes(h.id)) {
-          hitos.set(clave(h), { cuentaId, campana, hitoId: h.id, tipo: h.tipo, puntos: h.puntos, abonadoEn });
+          hitos.set(clave(h), {
+            cuentaId, campana, partida, hitoId: h.id, tipo: h.tipo, puntos: h.puntos, abonadoEn,
+          });
         }
       }
       return { nuevos, repetidos, distintos };

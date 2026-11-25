@@ -2,13 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Ayme-99/TCG-Raid-Battles/contrato/campana/hitos.v1.schema.json",
   "title": "Hitos de campaña que abonan puntos a la cuenta (versión 1)",
-  "description": "Cuerpo de POST /campana/hitos (#374, D-20 §6). La app manda los hitos pendientes al terminar un jefe o una medalla (y al iniciar sesión). Cada hito tiene un id único por cuenta y campaña: el mismo id no suma dos veces. El servidor rechaza un hito que pase del tope de su tipo (catalog/campana/topes-puntos.json).",
+  "description": "Cuerpo de POST /campana/hitos (#374, D-20 §6). La app manda los hitos pendientes al terminar un jefe o una medalla (y al iniciar sesión). Cada hito tiene un id único por cuenta, campaña y partida: el mismo id no suma dos veces en la misma partida, pero una partida nueva de la campaña los vuelve a dar (decidido por Ayme el 2026-11-25). El servidor rechaza un hito que pase del tope de su tipo (catalog/campana/topes-puntos.json).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "campana", "hitos"],
+  "required": [
+    "version",
+    "campana",
+    "partida",
+    "hitos"
+  ],
   "properties": {
-    "version": { "const": 1 },
-    "campana": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,31}$" },
+    "version": {
+      "const": 1
+    },
+    "campana": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,31}$"
+    },
+    "partida": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,64}$",
+      "description": "Id de la partida de campaña, que genera la app al empezar una partida nueva. Empezar otra partida da los puntos de nuevo (Ayme, 2026-11-25)."
+    },
     "hitos": {
       "type": "array",
       "minItems": 1,
@@ -16,15 +31,29 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "tipo", "puntos"],
+        "required": [
+          "id",
+          "tipo",
+          "puntos"
+        ],
         "properties": {
           "id": {
             "type": "string",
             "pattern": "^[a-z0-9][a-z0-9:-]{0,95}$",
-            "description": "Único por cuenta y campaña. Propuesta: el id del nodo para un combate (`ruta-1-pidgey`, `jefe-pikachu`) y `medalla:<id>` para una medalla."
+            "description": "Único por cuenta, campaña y partida. Propuesta: el id del nodo para un combate (`ruta-1-pidgey`, `jefe-pikachu`) y `medalla:<id>` para una medalla."
           },
-          "tipo": { "enum": ["salvaje", "entrenador", "jefe", "medalla"] },
-          "puntos": { "type": "integer", "minimum": 0 }
+          "tipo": {
+            "enum": [
+              "salvaje",
+              "entrenador",
+              "jefe",
+              "medalla"
+            ]
+          },
+          "puntos": {
+            "type": "integer",
+            "minimum": 0
+          }
         }
       }
     }

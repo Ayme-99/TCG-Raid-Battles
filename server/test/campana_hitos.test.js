@@ -85,7 +85,7 @@ async function arrancar(opciones = {}) {
 
 const ANA = 'usuario-ana';
 const BEA = 'usuario-bea';
-const envio = (...hitos) => ({ version: 1, campana: 'kanto', hitos });
+const envio = (...hitos) => ({ version: 1, campana: 'kanto', partida: 'p1', hitos });
 const salvaje = { id: 'ruta-1-pidgey', tipo: 'salvaje', puntos: 100 };
 const jefe = { id: 'pikachu', tipo: 'jefe', puntos: 1000 };
 
@@ -113,10 +113,18 @@ test('abona los hitos nuevos y un reenvío no suma dos veces', async (t) => {
   assert.strictEqual(dos.json.puntosAbonados, 1500);
   assert.strictEqual(dos.json.puntosCampana, 2600);
 
-  // /me/puntos lo enseña aparte; los de incursiones no cambian.
+  // /me/puntos los suma al total que desbloquea jefes (Ayme, 2026-11-25).
   const me = await llamar('GET', '/me/puntos', { usuario: ANA });
   assert.strictEqual(me.json.puntosCampana, 2600);
-  assert.strictEqual(me.json.puntos, 0);
+  assert.strictEqual(me.json.puntosIncursiones, 0);
+  assert.strictEqual(me.json.puntos, 2600);
+  assert.strictEqual(me.json.niveles[0].faltan, Math.max(0, me.json.niveles[0].coste - 2600));
+  // Una partida nueva de la campaña vuelve a dar los mismos hitos.
+  const nueva = await llamar('POST', '/campana/hitos', {
+    usuario: ANA, cuerpo: { ...envio(jefe), partida: 'p2' },
+  });
+  assert.deepStrictEqual(nueva.json.abonados, ['pikachu']);
+  assert.strictEqual(nueva.json.puntosCampana, 3600);
   // Otra cuenta, el mismo id: se abona a ella.
   const bea = await llamar('POST', '/campana/hitos', { usuario: BEA, cuerpo: envio(jefe) });
   assert.deepStrictEqual(bea.json.abonados, ['pikachu']);

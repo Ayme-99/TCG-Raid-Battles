@@ -11,7 +11,7 @@ const COLECCION_JUGADORES = 'incursiones_partida_jugadores';
 // Partida de campaña guardada en la cuenta (#478): una por cuenta y campaña,
 // `_id` = `${cuentaId}:${campana}`.
 const COLECCION_GUARDADOS_CAMPANA = 'incursiones_campana_partidas';
-// Hitos de campaña abonados (#374): uno por cuenta, campaña e id de hito.
+// Hitos de campaña abonados (#374): uno por cuenta, campaña, partida e id.
 const COLECCION_HITOS_CAMPANA = 'incursiones_campana_hitos';
 
 function crearRepoMongo(db) {
@@ -125,10 +125,10 @@ function crearRepoMongo(db) {
       return { ok: false, actual: sinId(await guardados.findOne({ _id })) };
     },
 
-    // `_id` = `${cuentaId}:${campana}:${id}`: el mismo hito no se abona dos
+    // `_id` = `${cuentaId}:${campana}:${partida}:${id}`: el mismo hito no se abona dos
     // veces aunque lleguen dos envíos a la vez ($setOnInsert con upsert).
-    async abonarHitosCampana({ cuentaId, campana, hitos: lista, abonadoEn }) {
-      const idDe = (h) => `${cuentaId}:${campana}:${h.id}`;
+    async abonarHitosCampana({ cuentaId, campana, partida, hitos: lista, abonadoEn }) {
+      const idDe = (h) => `${cuentaId}:${campana}:${partida}:${h.id}`;
       const ya = new Map(
         (await hitos.find({ _id: { $in: lista.map(idDe) } }).toArray()).map((d) => [d._id, d]),
       );
@@ -148,7 +148,9 @@ function crearRepoMongo(db) {
             updateOne: {
               filter: { _id: idDe(h) },
               update: {
-                $setOnInsert: { cuentaId, campana, hitoId: h.id, tipo: h.tipo, puntos: h.puntos, abonadoEn },
+                $setOnInsert: {
+                  cuentaId, campana, partida, hitoId: h.id, tipo: h.tipo, puntos: h.puntos, abonadoEn,
+                },
               },
               upsert: true,
             },
