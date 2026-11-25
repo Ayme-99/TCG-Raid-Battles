@@ -2,8 +2,8 @@
 /// roca, los Pokémon de tierra y de roca son de tipo [lucha].
 ///
 /// Tampoco hay hielo, veneno, volador, bicho ni fantasma (D-20 §10.3): pasan a
-/// agua, oscuridad, normal, planta y oscuridad. [metal] está aunque aún no lo
-/// lleve ninguna carta.
+/// agua, oscuridad, normal, planta y oscuridad. Tampoco hay metal (D-20 §10.9):
+/// Onix no evoluciona a Steelix.
 ///
 /// El nombre de cada valor es el que se escribe en el catálogo JSON.
 enum TipoCampana {
@@ -16,7 +16,6 @@ enum TipoCampana {
   psiquico,
   oscuridad,
   dragon,
-  metal,
 }
 
 /// Debilidad de una carta: los ataques de [tipo] le hacen [multiplicador]

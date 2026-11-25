@@ -14,8 +14,6 @@ Color colorTipo(TipoCampana t) => switch (t) {
       TipoCampana.psiquico => const Color(0xFFEC407A),
       TipoCampana.oscuridad => const Color(0xFF455A64),
       TipoCampana.dragon => const Color(0xFF3949AB),
-      // Provisional: el color y el icono de metal son de Arte (D-20 §10.3).
-      TipoCampana.metal => const Color(0xFF78909C),
     };
 
 /// Nombre de cada tipo para mostrarlo.

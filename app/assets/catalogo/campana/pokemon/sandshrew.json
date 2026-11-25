@@ -29,7 +29,7 @@
       "dano": 20,
       "efecto": {
         "tipo": "danoPorRacha",
-        "texto": "Este ataque hace 20 puntos de daño más por cada vez que este Pokémon usó Rodar en su turno anterior."
+        "texto": "Este ataque empieza haciendo 20 puntos de daño y hace 20 más por cada vez consecutiva que se use."
       }
     }
   ]

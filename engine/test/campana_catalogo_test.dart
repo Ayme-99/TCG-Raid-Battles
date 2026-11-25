@@ -266,10 +266,12 @@ void main() {
     test('los tipos son los del TCG (D-20 §10.3)', () {
       expect(TipoCampana.values.map((t) => t.name), [
         'normal', 'fuego', 'agua', 'planta', 'electrico', 'lucha', //
-        'psiquico', 'oscuridad', 'dragon', 'metal',
+        'psiquico', 'oscuridad', 'dragon',
       ]);
-      expect(tipoCampanaDeTexto('metal'), TipoCampana.metal);
-      for (final fuera in ['hielo', 'veneno', 'volador', 'bicho', 'fantasma']) {
+      // D-20 §10.9: en la campaña no hay tipo metal.
+      for (final fuera in [
+        'hielo', 'veneno', 'volador', 'bicho', 'fantasma', 'metal', //
+      ]) {
         expect(() => tipoCampanaDeTexto(fuera), throwsFormatException,
             reason: fuera);
       }
