@@ -239,35 +239,64 @@ class _Zona extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: estado.activa ? alTocar : null,
-          child: conRotulo
-              ? Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(estado.icono,
-                              color: ColoresCampana.tinta
-                                  .withValues(alpha: estado.activa ? 1 : 0.5)),
-                          Text(
-                            estado.rotulo,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: ColoresCampana.tinta
-                                  .withValues(alpha: estado.activa ? 1 : 0.5),
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              : const SizedBox.expand(),
+          child: conRotulo ? _Rotulo(estado: estado) : const SizedBox.expand(),
         ),
       ),
+    );
+  }
+}
+
+/// Tamaño de letra del rótulo de una zona (#495). Las puertas miden el 10 %
+/// del ancho de la escena; el rótulo parte en líneas para no encogerse.
+const tamanoRotuloZona = 14.0;
+
+/// El icono y el rótulo de una zona. El texto ocupa todo el ancho de la zona y
+/// parte en varias líneas (#495: antes iba en una sola línea y, en una puerta
+/// estrecha, «Salida de Ciudad Verde» se encogía a la mitad). Solo se encoge
+/// si no cabe de alto.
+class _Rotulo extends StatelessWidget {
+  const _Rotulo({required this.estado});
+
+  final EstadoZona estado;
+
+  @override
+  Widget build(BuildContext context) {
+    final color =
+        ColoresCampana.tinta.withValues(alpha: estado.activa ? 1 : 0.5);
+    return LayoutBuilder(
+      builder: (context, caja) {
+        const margen = 4.0;
+        final ancho =
+            caja.maxWidth > 2 * margen ? caja.maxWidth - 2 * margen : 0.0;
+        return Center(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Padding(
+              padding: const EdgeInsets.all(margen),
+              child: SizedBox(
+                width: ancho,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(estado.icono, color: color),
+                    Text(
+                      estado.rotulo,
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: tamanoRotuloZona,
+                        height: 1.1,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
