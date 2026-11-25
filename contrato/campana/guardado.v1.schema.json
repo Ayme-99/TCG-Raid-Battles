@@ -5,69 +5,206 @@
   "description": "Cuerpo de PUT /campana/partidas/:campana (#478). `partida` es PartidaCampana.aJson() tal cual (engine/lib/src/campana/partida.dart), con su propio campo `version`. El servidor solo comprueba la forma: no ejecuta las reglas y nunca abona puntos por el guardado (los puntos van por los hitos, #374).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "revision", "partida"],
+  "required": [
+    "version",
+    "revision",
+    "partida"
+  ],
   "properties": {
-    "version": { "const": 1 },
+    "version": {
+      "const": 1
+    },
     "revision": {
       "type": "integer",
       "minimum": 0,
       "description": "La revisión que el cliente leyó del servidor (0 si no había partida). Si no coincide con la guardada, 409 revision_distinta."
     },
-    "partida": { "$ref": "#/$defs/partida" }
+    "partida": {
+      "$ref": "#/$defs/partida"
+    }
   },
   "$defs": {
-    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
-    "entero": { "type": "integer", "minimum": 0 },
-    "ids": { "type": "array", "items": { "$ref": "#/$defs/id" }, "maxItems": 500 },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "entero": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/id"
+      },
+      "maxItems": 500
+    },
     "pokemon": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "ps"],
+      "required": [
+        "id",
+        "ps"
+      ],
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "ps": { "$ref": "#/$defs/entero" },
-        "xp": { "$ref": "#/$defs/entero", "description": "Solo en partidas de la versión 1 (la XP iba por Pokémon)." }
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "ps": {
+          "$ref": "#/$defs/entero"
+        },
+        "xp": {
+          "$ref": "#/$defs/entero",
+          "description": "Solo en partidas de la versión 1 (la XP iba por Pokémon)."
+        }
       }
     },
     "progreso": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["nodoActual", "resuelto", "superados", "medallas", "jefesDerrotados"],
+      "required": [
+        "nodoActual",
+        "resuelto",
+        "superados",
+        "medallas",
+        "jefesDerrotados"
+      ],
       "properties": {
-        "nodoActual": { "$ref": "#/$defs/id" },
-        "resuelto": { "type": "boolean" },
-        "superados": { "$ref": "#/$defs/ids" },
-        "medallas": { "$ref": "#/$defs/ids" },
-        "jefesDerrotados": { "$ref": "#/$defs/ids" },
-        "inicial": { "$ref": "#/$defs/id" },
-        "visitados": { "$ref": "#/$defs/ids" },
-        "repitiendo": { "type": "boolean" }
+        "nodoActual": {
+          "$ref": "#/$defs/id"
+        },
+        "resuelto": {
+          "type": "boolean"
+        },
+        "superados": {
+          "$ref": "#/$defs/ids"
+        },
+        "medallas": {
+          "$ref": "#/$defs/ids"
+        },
+        "jefesDerrotados": {
+          "$ref": "#/$defs/ids"
+        },
+        "inicial": {
+          "$ref": "#/$defs/id"
+        },
+        "visitados": {
+          "$ref": "#/$defs/ids"
+        },
+        "repitiendo": {
+          "type": "boolean"
+        }
       }
     },
     "partida": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["version", "progreso", "equipo", "pc", "puntos", "semilla"],
+      "required": [
+        "version",
+        "progreso",
+        "equipo",
+        "pc",
+        "puntos",
+        "semilla"
+      ],
       "properties": {
-        "version": { "enum": [1, 2], "description": "Versión de PartidaCampana (hoy 2; la 1 se sigue leyendo)." },
-        "progreso": { "$ref": "#/$defs/progreso" },
-        "equipo": { "type": "array", "items": { "$ref": "#/$defs/pokemon" }, "maxItems": 6 },
-        "pc": { "type": "array", "items": { "$ref": "#/$defs/pokemon" }, "maxItems": 2000 },
-        "puntos": { "$ref": "#/$defs/entero", "description": "Solo para enseñarlo: la cuenta no suma puntos por el guardado." },
-        "semilla": { "type": "integer" },
-        "capturaPendiente": { "$ref": "#/$defs/id" },
-        "capturaLograda": { "type": "boolean" },
-        "derrotas": { "$ref": "#/$defs/entero" },
-        "dinero": { "$ref": "#/$defs/entero" },
-        "xp": { "$ref": "#/$defs/entero" },
+        "version": {
+          "enum": [
+            1,
+            2
+          ],
+          "description": "Versión de PartidaCampana (hoy 2; la 1 se sigue leyendo)."
+        },
+        "progreso": {
+          "$ref": "#/$defs/progreso"
+        },
+        "equipo": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pokemon"
+          },
+          "maxItems": 6
+        },
+        "pc": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pokemon"
+          },
+          "maxItems": 2000
+        },
+        "puntos": {
+          "$ref": "#/$defs/entero",
+          "description": "Solo para enseñarlo: la cuenta no suma puntos por el guardado."
+        },
+        "semilla": {
+          "type": "integer"
+        },
+        "capturaPendiente": {
+          "$ref": "#/$defs/id"
+        },
+        "capturaLograda": {
+          "type": "boolean"
+        },
+        "derrotas": {
+          "$ref": "#/$defs/entero"
+        },
+        "dinero": {
+          "$ref": "#/$defs/entero"
+        },
+        "xp": {
+          "$ref": "#/$defs/entero"
+        },
         "mochila": {
           "type": "object",
           "description": "Objeto de la mochila (nombre de ObjetoCampana) → cuántos.",
-          "propertyNames": { "pattern": "^[a-z][A-Za-z]{0,31}$" },
-          "additionalProperties": { "$ref": "#/$defs/entero" },
+          "propertyNames": {
+            "pattern": "^[a-z][A-Za-z]{0,31}$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/entero"
+          },
           "maxProperties": 32
         },
-        "ultimaCura": { "$ref": "#/$defs/id" }
+        "ultimaCura": {
+          "$ref": "#/$defs/id"
+        },
+        "partidaId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$",
+          "description": "Id de la partida, que la app genera al empezarla (#374): los hitos se abonan una vez por partida."
+        },
+        "hitosPendientes": {
+          "type": "array",
+          "maxItems": 500,
+          "description": "Hitos ganados que aún no se han enviado a POST /campana/hitos (#374).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "puntos"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9:-]{0,95}$"
+              },
+              "tipo": {
+                "enum": [
+                  "salvaje",
+                  "entrenador",
+                  "jefe",
+                  "medalla"
+                ]
+              },
+              "puntos": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
       }
     }
   }

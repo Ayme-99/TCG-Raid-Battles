@@ -46,6 +46,16 @@ class RespuestaEnvio {
   final String? mensaje;
 }
 
+/// Qué ha pasado al enviar hitos de campaña: si se han guardado, [ids] son
+/// los que la cuenta ya tiene.
+class RespuestaHitos {
+  const RespuestaHitos(this.resultado, {this.ids = const [], this.mensaje});
+
+  final ResultadoEnvio resultado;
+  final List<String> ids;
+  final String? mensaje;
+}
+
 /// Cliente HTTP del servidor de Deck Tracker (cuentas e Incursiones).
 class ClienteApi {
   ClienteApi({
@@ -140,17 +150,69 @@ class ClienteApi {
     );
   }
 
+  /// Envía los hitos de campaña ganados en la partida [partida] para que la
+  /// cuenta abone sus puntos (#374, contrato/campana/hitos.v1.schema.json). Es
+  /// idempotente: un hito ya abonado vuelve como repetido y no suma otra vez.
+  /// Si va bien, [RespuestaHitos.ids] son los que ya están en la cuenta
+  /// (abonados ahora o antes).
+  Future<RespuestaHitos> enviarHitos(
+    String token, {
+    required String campana,
+    required String partida,
+    required List<Map<String, Object?>> hitos,
+  }) async {
+    final http.Response r;
+    try {
+      r = await _http
+          .post(
+            Uri.parse('$base/incursiones/campana/hitos'),
+            headers: {
+              'content-type': 'application/json',
+              'authorization': 'Bearer $token',
+            },
+            body: jsonEncode({
+              'version': 1,
+              'campana': campana,
+              'partida': partida,
+              'hitos': hitos,
+            }),
+          )
+          .timeout(espera);
+    } catch (_) {
+      return const RespuestaHitos(ResultadoEnvio.reintentar);
+    }
+    final estado = r.statusCode;
+    final cuerpo = _cuerpo(r);
+    if (estado == 200 || estado == 201) {
+      List<String> lista(Object? v) =>
+          v is List ? [for (final e in v) '$e'] : const [];
+      return RespuestaHitos(
+        ResultadoEnvio.guardada,
+        ids: [...lista(cuerpo['abonados']), ...lista(cuerpo['repetidos'])],
+      );
+    }
+    if (estado == 401) {
+      return const RespuestaHitos(ResultadoEnvio.sesionCaducada);
+    }
+    if (estado == 408 || estado == 429 || estado >= 500) {
+      return const RespuestaHitos(ResultadoEnvio.reintentar);
+    }
+    final mensaje = cuerpo['mensaje'] ?? cuerpo['error'];
+    return RespuestaHitos(
+      ResultadoEnvio.rechazada,
+      mensaje: mensaje == null ? 'El servidor respondió $estado.' : '$mensaje',
+    );
+  }
+
   /// Crea una sala (el que la crea es el host). Devuelve el código de 5
   /// caracteres que se comparte con los demás jugadores.
   Future<String> crearSala(String token) async {
     final http.Response r;
     try {
-      r = await _http
-          .post(
-            Uri.parse('$base/incursiones/salas'),
-            headers: {'authorization': 'Bearer $token'},
-          )
-          .timeout(espera);
+      r = await _http.post(
+        Uri.parse('$base/incursiones/salas'),
+        headers: {'authorization': 'Bearer $token'},
+      ).timeout(espera);
     } catch (_) {
       throw const ErrorApi('No se pudo conectar con el servidor.');
     }

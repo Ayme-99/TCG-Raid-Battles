@@ -250,6 +250,57 @@ void main() {
     expect(p.medallasParaComprar[ObjetoCampana.cuerdaHuida], 1);
   });
 
+  group('hitos para la cuenta (#374)', () {
+    EstadoCombate ganar(EstadoCombate e) => e.copiarCon(
+          rival: e.rival.copiarCon(
+              equipo: [for (final x in e.rival.equipo) x.conPs(0)]),
+          fase: FaseCombate.terminado,
+          ganador: Bando.jugador,
+        );
+
+    test('ganar un combate que da puntos deja un hito pendiente', () {
+      final p = PartidaCampana.nueva(c.region, semilla: 3, partidaId: 'p1')
+          .elegirInicial(c, 'bulbasaur')
+          .avanzar(c, 'ruta-1')
+          .avanzar(c, 'ruta-1-pidgey');
+      expect(p.hitosPendientes, isEmpty);
+      final tras = p.terminarCombate(c, ganar(p.empezarCombate(c)));
+      const pts = ParametrosCampana();
+      expect(tras.hitosPendientes,
+          [HitoCampana('ruta-1-pidgey', TipoHito.salvaje, pts.puntosSalvaje)]);
+      expect(tras.partidaId, 'p1');
+      // Se guarda y se lee igual.
+      final leida = PartidaCampana.desdeJson(
+          jsonDecode(jsonEncode(tras.aJson())) as Map<String, dynamic>);
+      expect(leida.hitosPendientes, tras.hitosPendientes);
+      expect(leida.partidaId, 'p1');
+      // Enviado, sale de la lista.
+      expect(tras.quitarHitos(['ruta-1-pidgey']).hitosPendientes, isEmpty);
+    });
+
+    test('perder no deja hito', () {
+      final p = PartidaCampana.nueva(c.region, semilla: 3)
+          .elegirInicial(c, 'bulbasaur')
+          .avanzar(c, 'ruta-1')
+          .avanzar(c, 'ruta-1-pidgey');
+      final e = p.empezarCombate(c);
+      final perdido = e.copiarCon(
+        jugador: e.jugador.copiarCon(
+            equipo: [for (final x in e.jugador.equipo) x.conPs(0)]),
+        fase: FaseCombate.terminado,
+        ganador: Bando.rival,
+      );
+      expect(p.terminarCombate(c, perdido).hitosPendientes, isEmpty);
+    });
+
+    test('una partida sin hitos ni id se guarda como antes', () {
+      final p = PartidaCampana.nueva(c.region);
+      expect(p.aJson().containsKey('partidaId'), isFalse);
+      expect(p.aJson().containsKey('hitosPendientes'), isFalse);
+      expect(p.conPartidaId('x').partidaId, 'x');
+    });
+  });
+
   test('perder cura al equipo y le devuelve al último sitio donde se curó', () {
     var p = PartidaCampana.nueva(c.region)
         .elegirInicial(c, 'bulbasaur')
