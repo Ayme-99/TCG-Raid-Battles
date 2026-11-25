@@ -47,3 +47,7 @@ Juega el tramo entero seguido, sin pausas largas, y apunta:
 | Bloqueos (sitio donde no pudiste seguir) | |
 
 Referencia del simulador: ≈18 combates de ≈12 turnos por recorrido. La fase 0 se da por buena cuando el tramo se completa sin bloqueos y se conoce la duración. Pasa a la fase 1 (2 o 3 amigos, uno cada vez, tú mirando sin ayudar y apuntando en `PLANTILLA.md`).
+
+## Segunda partida de Ayme (2026-11-25)
+
+La 1.ª pasada salió sin bloqueos y sin datos de duración, derrotas ni compras. Para la siguiente usa `PLANTILLA_CAMPANA_TRAMO1.md`: pide esos tres datos y comprueba las dos observaciones de la 1.ª pasada (el centro Pokémon que obliga a curar para abrir la salida y los rótulos diminutos de las puertas bloqueadas).
