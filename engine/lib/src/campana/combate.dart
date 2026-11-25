@@ -23,11 +23,27 @@ class ParametrosCombate {
   /// Energía extra que recupera al cargar (además de la del fin de turno).
   final int energiaAlCargar;
 
+  /// PS que cura una Poción en combate (la campaña pasa los suyos,
+  /// `ParametrosCampana.psPocion`: 20).
+  final int psPocion;
+
+  /// Propuesta de Diseño por confirmar (D-20 §3.2): la Poción en combate cura
+  /// a cualquier Pokémon en pie del equipo, también de la banca. Con false,
+  /// solo al activo.
+  final bool pocionCuraBanca;
+
+  /// Propuesta de Diseño por confirmar (D-20 §3.2): el rival no usa objetos.
+  /// Con true, el motor acepta [UsarPocion] del rival y la IA las usa.
+  final bool rivalUsaObjetos;
+
   const ParametrosCombate({
     this.energiaInicial = 10,
     this.energiaMaxima = 10,
     this.energiaPorTurno = 1,
     this.energiaAlCargar = 1,
+    this.psPocion = 20,
+    this.pocionCuraBanca = true,
+    this.rivalUsaObjetos = false,
   });
 }
 
@@ -94,6 +110,14 @@ class BandoCombate {
   /// el jefe que se ha retirado y solo vuelve cuando el aliado cae.
   final int enEspera;
 
+  /// Pociones que le quedan a este bando en el combate (D-20 §3.2, #458): las
+  /// del inventario al empezar. No hay límite por combate.
+  final int pociones;
+
+  /// Pociones gastadas en este combate; la partida las resta de la mochila
+  /// al terminarlo.
+  final int pocionesUsadas;
+
   const BandoCombate({
     required this.equipo,
     required this.activo,
@@ -109,6 +133,8 @@ class BandoCombate {
     this.ultimoAtaque = -1,
     this.racha = 0,
     this.enEspera = -1,
+    this.pociones = 0,
+    this.pocionesUsadas = 0,
   });
 
   PokemonEnCombate get pokemonActivo => equipo[activo];
@@ -148,6 +174,8 @@ class BandoCombate {
     int? ultimoAtaque,
     int? racha,
     int? enEspera,
+    int? pociones,
+    int? pocionesUsadas,
   }) =>
       BandoCombate(
         equipo: equipo ?? this.equipo,
@@ -164,6 +192,8 @@ class BandoCombate {
         ultimoAtaque: ultimoAtaque ?? this.ultimoAtaque,
         racha: racha ?? this.racha,
         enEspera: enEspera ?? this.enEspera,
+        pociones: pociones ?? this.pociones,
+        pocionesUsadas: pocionesUsadas ?? this.pocionesUsadas,
       );
 }
 
@@ -272,6 +302,8 @@ class EstadoCombate {
     ParametrosCombate parametros = const ParametrosCombate(),
     int semilla = 1,
     LlamadaEnCombate? llamadaRival,
+    int pocionesJugador = 0,
+    int pocionesRival = 0,
   }) {
     if (equipoJugador.isEmpty || equipoRival.isEmpty) {
       throw const ReglaIncumplida('Cada bando necesita al menos un Pokémon.');
@@ -283,14 +315,16 @@ class EstadoCombate {
             llamadaRival.jefe >= equipoRival.length)) {
       throw const ReglaIncumplida('La llamada de aliado no es válida.');
     }
-    BandoCombate bando(List<PokemonCampana> equipo) => BandoCombate(
+    BandoCombate bando(List<PokemonCampana> equipo, int pociones) =>
+        BandoCombate(
           equipo: [for (final p in equipo) PokemonEnCombate.completo(p)],
           activo: 0,
           energia: parametros.energiaInicial,
+          pociones: pociones,
         );
     return EstadoCombate(
-      jugador: bando(equipoJugador),
-      rival: bando(equipoRival),
+      jugador: bando(equipoJugador, pocionesJugador),
+      rival: bando(equipoRival, pocionesRival),
       turno: empieza,
       fase: FaseCombate.enCurso,
       ganador: null,
@@ -310,6 +344,8 @@ class EstadoCombate {
     ParametrosCombate parametros = const ParametrosCombate(),
     int semilla = 1,
     LlamadaEnCombate? llamadaRival,
+    int pocionesJugador = 0,
+    int pocionesRival = 0,
   }) {
     if (llamadaRival != null &&
         (llamadaRival.aliados.isEmpty ||
@@ -318,7 +354,7 @@ class EstadoCombate {
             llamadaRival.jefe >= equipoRival.length)) {
       throw const ReglaIncumplida('La llamada de aliado no es válida.');
     }
-    BandoCombate bando(List<PokemonEnCombate> equipo) {
+    BandoCombate bando(List<PokemonEnCombate> equipo, int pociones) {
       final activo = equipo.indexWhere((p) => p.enPie);
       if (activo < 0) {
         throw const ReglaIncumplida(
@@ -328,12 +364,13 @@ class EstadoCombate {
         equipo: List.of(equipo),
         activo: activo,
         energia: parametros.energiaInicial,
+        pociones: pociones,
       );
     }
 
     return EstadoCombate(
-      jugador: bando(equipoJugador),
-      rival: bando(equipoRival),
+      jugador: bando(equipoJugador, pocionesJugador),
+      rival: bando(equipoRival, pocionesRival),
       turno: empieza,
       fase: FaseCombate.enCurso,
       ganador: null,
@@ -425,6 +462,18 @@ class Cargar extends AccionCombate {
   const Cargar(super.bando);
 }
 
+/// Usa una Poción con el Pokémon del equipo en la posición [indice] (D-20
+/// §3.2, #458): cura [ParametrosCombate.psPocion] PS sin pasar de sus PS
+/// máximos y **no gasta el turno**, así que después se ataca, cambia o carga.
+/// No hay límite por combate, solo [BandoCombate.pociones]. No revive. Cura a
+/// cualquiera en pie si [ParametrosCombate.pocionCuraBanca]; si no, solo al
+/// activo. El rival solo puede si [ParametrosCombate.rivalUsaObjetos].
+class UsarPocion extends AccionCombate {
+  final int indice;
+
+  const UsarPocion(super.bando, this.indice);
+}
+
 /// Elige el Pokémon que sustituye al que ha caído. No gasta turno.
 class ElegirSiguiente extends AccionCombate {
   final int indice;
@@ -471,6 +520,7 @@ EstadoCombate aplicarCombate(EstadoCombate estado, AccionCombate accion) {
     Atacar a => _atacar(estado, a),
     Cambiar a => _cambiar(estado, a),
     Cargar a => _cargar(estado, a),
+    UsarPocion a => _usarPocion(estado, a),
     ElegirSiguiente _ =>
       throw const ReglaIncumplida('No hay que elegir Pokémon ahora.'),
   };
@@ -745,6 +795,60 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
         ultimoAtaque: -1,
         racha: 0),
   ));
+}
+
+/// Si [a] es válida, el estado con la Poción usada; si no, lanza
+/// [ReglaIncumplida]. No termina el turno ni toca la racha ni los estados.
+EstadoCombate _usarPocion(EstadoCombate estado, UsarPocion a) {
+  final p = estado.parametros;
+  final b = estado.bando(a.bando);
+  if (a.bando == Bando.rival && !p.rivalUsaObjetos) {
+    throw const ReglaIncumplida('El rival no usa objetos.');
+  }
+  if (b.pociones < 1) throw const ReglaIncumplida('No te quedan Pociones.');
+  if (a.indice < 0 || a.indice >= b.equipo.length) {
+    throw const ReglaIncumplida('Ese Pokémon no está en el equipo.');
+  }
+  if (!p.pocionCuraBanca && a.indice != b.activo) {
+    throw const ReglaIncumplida(
+        'En combate, la Poción solo cura al Pokémon activo.');
+  }
+  final x = b.equipo[a.indice];
+  if (!x.enPie) {
+    throw const ReglaIncumplida('Una Poción no revive a un Pokémon.');
+  }
+  final max = x.especie.ps;
+  if (x.ps >= max) throw const ReglaIncumplida('Ya tiene todos sus PS.');
+  final ps = x.ps + p.psPocion;
+  return estado.conBando(
+    a.bando,
+    b.copiarCon(
+      equipo: [...b.equipo]..[a.indice] = x.conPs(ps > max ? max : ps),
+      pociones: b.pociones - 1,
+      pocionesUsadas: b.pocionesUsadas + 1,
+    ),
+  );
+}
+
+/// A quién puede curar ahora [bando] con una Poción (índices del equipo), o
+/// vacío si no puede usarla: no es su turno, no le quedan, es el rival sin
+/// [ParametrosCombate.rivalUsaObjetos] o nadie en pie le falta PS.
+List<int> objetivosDePocion(EstadoCombate estado, Bando bando) {
+  final p = estado.parametros;
+  final b = estado.bando(bando);
+  if (estado.fase != FaseCombate.enCurso ||
+      estado.turno != bando ||
+      b.pociones < 1 ||
+      (bando == Bando.rival && !p.rivalUsaObjetos)) {
+    return const [];
+  }
+  return [
+    for (var i = 0; i < b.equipo.length; i++)
+      if ((p.pocionCuraBanca || i == b.activo) &&
+          b.equipo[i].enPie &&
+          b.equipo[i].ps < b.equipo[i].especie.ps)
+        i,
+  ];
 }
 
 EstadoCombate _cargar(EstadoCombate estado, Cargar a) {

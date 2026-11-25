@@ -188,12 +188,14 @@ class _PantallaCombateCampanaState
   }
 }
 
-/// Hoja de acciones del activo: sus ataques con su coste y Cargar.
+/// Hoja de acciones del activo: sus ataques con su coste, Cargar y Usar
+/// Poción (no gasta turno, D-20 §3.2; #458).
 void _hojaAcciones(BuildContext context, EstadoCombate combate,
     void Function(AccionCombate) actuar) {
   final yo = combate.jugador;
   final especie = yo.pokemonActivo.especie;
   final p = combate.parametros;
+  final curables = objetivosDePocion(combate, Bando.jugador);
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: _crema,
@@ -212,7 +214,7 @@ void _hojaAcciones(BuildContext context, EstadoCombate combate,
               const Padding(
                 key: Key('aviso-paralizado'),
                 padding: EdgeInsets.only(top: 4),
-                child: Text('Paralizado: este turno solo puede cargar.',
+                child: Text('Paralizado: este turno solo puede cargar (o usar una Poción).',
                     style: TextStyle(color: _tinta)),
               ),
             const SizedBox(height: 12),
@@ -240,6 +242,66 @@ void _hojaAcciones(BuildContext context, EstadoCombate combate,
                 actuar(const Cargar(Bando.jugador));
               },
             ),
+            const SizedBox(height: 8),
+            _BotonAccion(
+              clave: 'accion-pocion',
+              color: _verde,
+              texto: yo.pociones == 0
+                  ? 'Poción: no te quedan'
+                  : 'Usar Poción (+${p.psPocion} PS, no gasta turno) · '
+                      'quedan ${yo.pociones}',
+              activo: curables.isNotEmpty,
+              alTocar: () {
+                Navigator.of(hoja).pop();
+                if (curables.length == 1) {
+                  actuar(UsarPocion(Bando.jugador, curables.single));
+                } else {
+                  _elegirParaPocion(context, combate, curables, actuar);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+/// A quién curar con la Poción cuando hay más de uno en pie al que le faltan
+/// PS (la propuesta de Diseño deja curar también a la banca).
+void _elegirParaPocion(BuildContext context, EstadoCombate combate,
+    List<int> curables, void Function(AccionCombate) actuar) {
+  final yo = combate.jugador;
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: _crema,
+    builder: (hoja) => SafeArea(
+      child: Padding(
+        key: const Key('hoja-pocion'),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('¿A quién curas?',
+                style: TextStyle(
+                    color: _tinta, fontSize: 18, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            for (final i in curables) ...[
+              _BotonAccion(
+                clave: 'pocion-$i',
+                color: _verde,
+                texto: '${yo.equipo[i].especie.nombre}'
+                    '${i == yo.activo ? ' (activo)' : ''} · '
+                    '${yo.equipo[i].ps}/${yo.equipo[i].especie.ps} PS',
+                activo: true,
+                alTocar: () {
+                  Navigator.of(hoja).pop();
+                  actuar(UsarPocion(Bando.jugador, i));
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
           ],
         ),
       ),

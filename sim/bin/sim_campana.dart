@@ -126,6 +126,7 @@ Resultado jugarDesde(EstadoCombate e) {
       case Cargar _:
         cargar++;
       case ElegirSiguiente _:
+      case UsarPocion _:
         break;
     }
     e = aplicarCombate(e, accion);

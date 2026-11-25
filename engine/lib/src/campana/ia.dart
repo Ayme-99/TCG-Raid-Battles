@@ -11,9 +11,17 @@ import 'pokemon.dart';
 /// Orden de decisión:
 /// 1. Si cae su Pokémon activo, saca el relevo con mejor combinación de no ser
 ///    débil, daño que puede hacer y salud.
-///    Si está Paralizado (Dragoaliento), carga: no puede hacer otra cosa.
+///    Si está Paralizado (Dragoaliento), carga: no puede hacer otra cosa
+///    (salvo curarse con una Poción, como en el paso 2 bis).
 /// 2. Si puede dejar fuera de combate al rival, ataca con lo más barato que
 ///    lo logre.
+/// 2 bis. Pociones (D-20 §3.2, #458; no gastan turno): si el rival puede
+///    derribar a su activo en su próximo turno (con su golpe más fuerte que
+///    pueda pagar, más el veneno de los dos chequeos) y con los PS máximos
+///    sobreviviría, usa una Poción con el activo. Como no gasta turno, la
+///    siguiente llamada vuelve a decidir (otra Poción o la acción del turno).
+///    El rival no usa objetos mientras [ParametrosCombate.rivalUsaObjetos]
+///    sea false (propuesta de Diseño por confirmar).
 /// 3. Si su activo es débil a un ataque del rival, o no llega a ningún ataque,
 ///    cambia a un relevo que sí le sirva (nunca al jefe que espera a que caiga
 ///    su aliado).
@@ -61,8 +69,10 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
     return ElegirSiguiente(bando, i ?? yo.relevos.first);
   }
 
+  final pocion = _pocionQueSalva(estado, bando);
+
   // Paralizado (Dragoaliento): este turno no puede atacar ni cambiar.
-  if (yo.paralizado) return Cargar(bando);
+  if (yo.paralizado) return pocion ?? Cargar(bando);
 
   final activo = _conRacha(yo);
   final ataque = _mejorAtaque(
@@ -74,6 +84,7 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
   if (ataque != null && danoMio >= objetivo.ps) {
     return Atacar(bando, ataque);
   }
+  if (pocion != null) return pocion;
 
   final debil = _esDebilContra(activo, objetivo.especie);
   if (debil || ataque == null) {
@@ -113,6 +124,27 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
   }
   if (ataque != null) return Atacar(bando, ataque);
   return _cargarOGanar(yo, bando, p);
+}
+
+/// Una Poción para el activo de [bando] si el rival lo derribaría en su
+/// próximo turno y, curado del todo, aguantaría (paso 2 bis); si no, null.
+UsarPocion? _pocionQueSalva(EstadoCombate estado, Bando bando) {
+  final yo = estado.bando(bando);
+  if (!objetivosDePocion(estado, bando).contains(yo.activo)) return null;
+  final rival = estado.bando(bando.otro);
+  final activo = yo.pokemonActivo;
+  final atacante = _conRacha(rival);
+  var amenaza = 0;
+  for (final a in atacante.ataques) {
+    if (a.coste > rival.energia) continue;
+    final d = danoDeAtaque(a, activo.especie,
+        reduccion: rival.danoReducido, extra: yo.extraRecibido);
+    if (d > amenaza) amenaza = d;
+  }
+  amenaza += 2 * yo.veneno;
+  if (amenaza <= 0 || activo.ps > amenaza) return null;
+  if (activo.especie.ps <= amenaza) return null;
+  return UsarPocion(bando, yo.activo);
 }
 
 /// Carga, o usa en su lugar un ataque que da energía a su bando (Pulimento)

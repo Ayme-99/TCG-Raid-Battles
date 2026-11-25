@@ -217,6 +217,8 @@ List<String> describirAccion(
       Cambiar a =>
         '$propio $activo vuelve; sale ${quien.equipo[a.indice].especie.nombre}.',
       Cargar _ => '$propio $activo carga energía.',
+      UsarPocion a => '$propio ${quien.equipo[a.indice].especie.nombre} '
+          'recupera ${_curado(antes, despues, a)} PS con una Poción.',
       ElegirSiguiente a =>
         '$propio sale ${quien.equipo[a.indice].especie.nombre}.',
     },
@@ -248,3 +250,8 @@ List<String> describirAccion(
   }
   return lineas;
 }
+
+/// PS que ha curado la Poción [a].
+int _curado(EstadoCombate antes, EstadoCombate despues, UsarPocion a) =>
+    despues.bando(a.bando).equipo[a.indice].ps -
+    antes.bando(a.bando).equipo[a.indice].ps;

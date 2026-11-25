@@ -177,6 +177,46 @@ void main() {
     expect(p.opciones(c), ['ciudad-verde']);
   });
 
+  test('las Pociones de la mochila se usan en combate y se gastan (#458)', () {
+    final base = PartidaCampana.nueva(c.region, semilla: 3)
+        .elegirInicial(c, 'bulbasaur')
+        .avanzar(c, 'ruta-1')
+        .avanzar(c, 'ruta-1-pidgey');
+    final p = PartidaCampana(
+      progreso: base.progreso,
+      equipo: base.equipo,
+      semilla: base.semilla,
+      dinero: base.dinero,
+      mochila: const {ObjetoCampana.pocion: 3},
+      ultimaCura: base.ultimaCura,
+    );
+    final e = p.empezarCombate(c);
+    expect(e.jugador.pociones, 3);
+    expect(e.rival.pociones, 0);
+    // Pierde 30 PS, usa una Poción y gana el combate.
+    final herido = e.copiarCon(
+        jugador: e.jugador
+            .copiarCon(equipo: [e.jugador.equipo.single.conPs(60)]));
+    final curado = aplicarCombate(herido, const UsarPocion(Bando.jugador, 0));
+    final ganado = curado.copiarCon(
+      rival: curado.rival.copiarCon(
+          equipo: [for (final x in curado.rival.equipo) x.conPs(0)]),
+      fase: FaseCombate.terminado,
+      ganador: Bando.jugador,
+    );
+    final tras = p.terminarCombate(c, ganado);
+    expect(tras.cuantos(ObjetoCampana.pocion), 2);
+    expect(tras.equipo.single.ps, 80);
+    // Perdiendo también se gastan.
+    final perdido = curado.copiarCon(
+      jugador: curado.jugador
+          .copiarCon(equipo: [curado.jugador.equipo.single.conPs(0)]),
+      fase: FaseCombate.terminado,
+      ganador: Bando.rival,
+    );
+    expect(p.terminarCombate(c, perdido).cuantos(ObjetoCampana.pocion), 2);
+  });
+
   test('perder cura al equipo y le devuelve al último sitio donde se curó', () {
     var p = PartidaCampana.nueva(c.region)
         .elegirInicial(c, 'bulbasaur')

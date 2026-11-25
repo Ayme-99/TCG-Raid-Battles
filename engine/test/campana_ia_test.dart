@@ -734,4 +734,55 @@ void main() {
       }
     });
   });
+
+  group('Poción en combate (D-20 §3.2, #458)', () {
+    // El rival pega 60 con energía 10: a 50 PS el activo caería.
+    EstadoCombate amenazado(int ps, {int pociones = 3, int psMax = 100}) =>
+        EstadoCombate.conEquipos(
+          equipoJugador: [PokemonEnCombate(pokemon('a', ps: psMax), ps)],
+          equipoRival: [
+            PokemonEnCombate.completo(
+                pokemon('r', ps: 200, ataques: [ataque(3, 60)]))
+          ],
+          pocionesJugador: pociones,
+        );
+
+    test('cura al activo hasta aguantar el golpe y luego actúa', () {
+      var e = amenazado(50);
+      expect(decidirAccion(e, Bando.jugador), isA<UsarPocion>());
+      e = aplicarCombate(e, decidirAccion(e, Bando.jugador));
+      expect(e.jugador.equipo.single.ps, 70);
+      expect(e.turno, Bando.jugador, reason: 'no gasta turno');
+      expect(decidirAccion(e, Bando.jugador), isNot(isA<UsarPocion>()));
+    });
+
+    test('no cura si no le hace falta, si no le salva o si no le quedan', () {
+      expect(decidirAccion(amenazado(70), Bando.jugador),
+          isNot(isA<UsarPocion>()));
+      expect(decidirAccion(amenazado(30, psMax: 60), Bando.jugador),
+          isNot(isA<UsarPocion>()),
+          reason: 'ni con los PS máximos aguantaría');
+      expect(decidirAccion(amenazado(50, pociones: 0), Bando.jugador),
+          isNot(isA<UsarPocion>()));
+    });
+
+    test('remata antes que curarse', () {
+      final e = EstadoCombate.conEquipos(
+        equipoJugador: [PokemonEnCombate(pokemon('a'), 20)],
+        equipoRival: [PokemonEnCombate(pokemon('r'), 30)],
+        pocionesJugador: 3,
+      );
+      expect(decidirAccion(e, Bando.jugador), isA<Atacar>());
+    });
+
+    test('el rival no usa Pociones (propuesta de Diseño)', () {
+      final e = EstadoCombate.conEquipos(
+        equipoJugador: [PokemonEnCombate.completo(pokemon('a'))],
+        equipoRival: [PokemonEnCombate(pokemon('r'), 20)],
+        empieza: Bando.rival,
+        pocionesRival: 3,
+      );
+      expect(decidirAccion(e, Bando.rival), isNot(isA<UsarPocion>()));
+    });
+  });
 }

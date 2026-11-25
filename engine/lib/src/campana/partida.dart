@@ -89,7 +89,8 @@ enum ObjetoCampana {
   ultraBall,
 
   /// Cura [ParametrosCampana.psPocion] PS a un Pokémon en pie, fuera de
-  /// combate. No cuenta como «sitio donde te curaste».
+  /// combate ([PartidaCampana.usarPocion]) o en combate ([UsarPocion], sin
+  /// gastar turno; D-20 §3.2). No cuenta como «sitio donde te curaste».
   pocion,
 
   /// Evita un combate contra un Pokémon salvaje: el nodo se da por pasado sin
@@ -563,7 +564,8 @@ class PartidaCampana {
     return c.pokemon.containsKey(id) ? id : null;
   }
 
-  /// El combate del nodo actual, con los PS que trae el equipo.
+  /// El combate del nodo actual, con los PS que trae el equipo y las
+  /// Pociones de la mochila (se usan en combate sin gastar turno, D-20 §3.2).
   EstadoCombate empezarCombate(CatalogoCampana c,
       {ParametrosCampana parametros = const ParametrosCampana()}) {
     if (!hayCombate(c)) {
@@ -577,6 +579,8 @@ class PartidaCampana {
       equipoRival: [for (final p in r.equipo) PokemonEnCombate.completo(p)],
       semilla: _siguiente(_siguiente(semilla)),
       llamadaRival: r.llamada,
+      parametros: ParametrosCombate(psPocion: parametros.psPocion),
+      pocionesJugador: cuantos(ObjetoCampana.pocion),
     );
   }
 
@@ -592,7 +596,8 @@ class PartidaCampana {
   ///   curado. Se conserva lo ganado (capturas, puntos, dinero, XP, medallas);
   ///   el combate perdido no da XP.
   ///
-  /// En los dos casos avanza la semilla.
+  /// En los dos casos avanza la semilla y se restan de la mochila las Pociones
+  /// usadas en el combate ([BandoCombate.pocionesUsadas]).
   PartidaCampana terminarCombate(CatalogoCampana c, EstadoCombate fin,
       {ParametrosCampana parametros = const ParametrosCampana()}) {
     if (fin.fase != FaseCombate.terminado) {
@@ -602,12 +607,18 @@ class PartidaCampana {
       throw const ReglaIncumplida('Aquí no hay ningún combate pendiente.');
     }
     final siguiente = _siguiente(semilla);
+    final usadas = fin.jugador.pocionesUsadas;
+    final quedan = cuantos(ObjetoCampana.pocion) - usadas;
+    final mochilaTras = usadas == 0
+        ? mochila
+        : {...mochila, ObjetoCampana.pocion: quedan < 0 ? 0 : quedan};
     if (fin.ganador != Bando.jugador) {
       return _copiar(
         progreso: progreso.volverA(c.region, ultimaCura ?? c.region.inicio),
         equipo: [for (final p in equipo) p.conPs(c.especie(p.id).ps)],
         semilla: siguiente,
         derrotas: derrotas + 1,
+        mochila: usadas == 0 ? null : mochilaTras,
       );
     }
     final r = rival(c, parametros: parametros);
@@ -627,12 +638,13 @@ class PartidaCampana {
       puntos: puntos + r.puntos,
       dinero: dinero + r.dinero,
       xp: xp + r.xp + _xpDeEquipo(aliadosCaidos),
-      mochila: r.piedrasEx == 0
+      mochila: r.piedrasEx == 0 && usadas == 0
           ? null
           : {
-              ...mochila,
-              ObjetoCampana.piedraEx:
-                  cuantos(ObjetoCampana.piedraEx) + r.piedrasEx,
+              ...mochilaTras,
+              if (r.piedrasEx > 0)
+                ObjetoCampana.piedraEx:
+                    cuantos(ObjetoCampana.piedraEx) + r.piedrasEx,
             },
       semilla: siguiente,
       capturaPendiente: r.captura,

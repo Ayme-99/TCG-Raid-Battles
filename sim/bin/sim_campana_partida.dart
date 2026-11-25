@@ -1095,6 +1095,7 @@ void equipoContra(Config cfg, CatalogoCampana c) {
           Atacar x => 'ataca con ${b.pokemonActivo.especie.ataques[x.indice].nombre}',
           Cambiar x => 'cambia a ${b.equipo[x.indice].especie.nombre}',
           Cargar _ => 'carga',
+          UsarPocion x => 'usa una Poción con ${b.equipo[x.indice].especie.nombre}',
           ElegirSiguiente x => 'saca a ${b.equipo[x.indice].especie.nombre}',
         };
         stdout.writeln('  t${e.numeroTurno} ${e.actua.name} $nombre '
