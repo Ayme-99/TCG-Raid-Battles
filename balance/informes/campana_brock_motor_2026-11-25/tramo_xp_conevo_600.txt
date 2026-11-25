@@ -1,0 +1,28 @@
+Tramo con las reglas reales de partida (#409): 600 recorridos por inicial, semilla 1.
+Evolución del inicial: sí (70 XP) · curar volviendo al centro: sí · Ruta 1 con Balls: sí · Ruta 22: no · Cazabichos con 2 · prioridad XP: inicial
+
+Pokéballs que compra la IA en Ciudad Verde: bulbasaur 5, charmander 5, squirtle 5
+
+Victorias a la primera por combate, entre los que llegan a él:
+Combate                                          bulbasaur              charmander                squirtle
+Ruta 1: Pidgey                       100.0 % (llegan 47 %)   100.0 % (llegan 47 %)   100.0 % (llegan 47 %)
+Ruta 1: Rattata                       87.4 % (llegan 53 %)   100.0 % (llegan 53 %)    72.3 % (llegan 53 %)
+Ruta 2: Weedle                       100.0 % (llegan 50 %)   100.0 % (llegan 50 %)   100.0 % (llegan 50 %)
+Ruta 2: Caterpie                     100.0 % (llegan 50 %)   100.0 % (llegan 50 %)   100.0 % (llegan 50 %)
+Bosque Verde: primer Cazabichos      86.5 % (llegan 100 %)  100.0 % (llegan 100 %)   88.3 % (llegan 100 %)
+Bosque Verde: segundo Cazabichos     88.5 % (llegan 100 %)  100.0 % (llegan 100 %)   90.8 % (llegan 100 %)
+Pikachu                              93.7 % (llegan 100 %)  100.0 % (llegan 100 %)   70.0 % (llegan 100 %)
+Gimnasio: Entrenador Joven           99.7 % (llegan 100 %)   99.5 % (llegan 100 %)    93.6 % (llegan 91 %)
+Gimnasio de Ciudad Plateada          98.5 % (llegan 100 %)   97.0 % (llegan 100 %)   100.0 % (llegan 91 %)
+
+Tramo entero                      
+  bulbasaur   sin perder ningún combate: 69.2 % · acaba ganando a Brock (con reintentos): 100.0 % · derrotas por recorrido: 0.69 · intentos contra Brock: 1.04
+              XP ganada hasta Brock: 150 (con Brock: 200; sin gastar: 32) · capturas: 2.9 · evolucionan al inicial: 100.0 % · rendidos tras 80 intentos: 0
+  charmander  sin perder ningún combate: 96.5 % · acaba ganando a Brock (con reintentos): 99.8 % · derrotas por recorrido: 0.42 · intentos contra Brock: 1.39
+              XP ganada hasta Brock: 152 (con Brock: 202; sin gastar: 34) · capturas: 3.0 · evolucionan al inicial: 100.0 % · rendidos tras 80 intentos: 1 (gimnasio-brock 1)
+  squirtle    sin perder ningún combate: 51.0 % · acaba ganando a Brock (con reintentos): 90.5 % · derrotas por recorrido: 8.88 · intentos contra Brock: 0.91
+              XP ganada hasta Brock: 138 (con Brock: 183; sin gastar: 32) · capturas: 2.7 · evolucionan al inicial: 90.5 % · rendidos tras 80 intentos: 57 (jefe-pikachu 57)
+
+Duración de los combates terminados (turnos): mediana 10 · p95 20 · p99 27 · máximo 34.
+Combates jugados: 20111 · cortados por el tope (sin tope: no acaban): 121 (0.6 %).
+Por casilla: cazabichos-2 57, cazabichos-1 64.
