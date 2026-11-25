@@ -56,6 +56,81 @@ class RespuestaHitos {
   final String? mensaje;
 }
 
+/// Un nivel de jefe y si la cuenta ya lo tiene desbloqueado (D-10, D-21 §1.2).
+class NivelJefe {
+  const NivelJefe({
+    required this.nivel,
+    required this.coste,
+    required this.alcanzado,
+    required this.faltan,
+  });
+
+  final int nivel;
+  final int coste;
+  final bool alcanzado;
+  final int faltan;
+}
+
+/// Los puntos de la cuenta: un solo total que sube al ganar y baja al comprar.
+/// Un jefe desbloqueado no se vuelve a bloquear (opción C de Ayme).
+class PuntosCuenta {
+  const PuntosCuenta({required this.puntos, this.niveles = const []});
+
+  factory PuntosCuenta.desdeJson(Map<String, Object?> json) {
+    final niveles = json['niveles'];
+    return PuntosCuenta(
+      puntos: (json['puntos'] as num?)?.toInt() ?? 0,
+      niveles: [
+        if (niveles is List)
+          for (final n in niveles)
+            if (n is Map)
+              NivelJefe(
+                nivel: (n['nivel'] as num).toInt(),
+                coste: (n['coste'] as num).toInt(),
+                alcanzado: n['alcanzado'] == true,
+                faltan: (n['faltan'] as num?)?.toInt() ?? 0,
+              ),
+      ],
+    );
+  }
+
+  final int puntos;
+  final List<NivelJefe> niveles;
+
+  /// El primer nivel de jefe que aún no está desbloqueado, o null.
+  NivelJefe? get proximoJefe {
+    for (final n in niveles) {
+      if (!n.alcanzado) return n;
+    }
+    return null;
+  }
+}
+
+/// Un producto de la tienda de puntos.
+class ProductoTienda {
+  const ProductoTienda({
+    required this.id,
+    required this.familia,
+    required this.nombre,
+    required this.precio,
+    required this.disponible,
+  });
+
+  factory ProductoTienda.desdeJson(Map<String, Object?> json) => ProductoTienda(
+        id: '${json['id']}',
+        familia: '${json['familia']}',
+        nombre: '${json['nombre']}',
+        precio: (json['precio'] as num?)?.toInt() ?? 0,
+        disponible: json['disponible'] == true,
+      );
+
+  final String id;
+  final String familia;
+  final String nombre;
+  final int precio;
+  final bool disponible;
+}
+
 /// Cliente HTTP del servidor de Deck Tracker (cuentas e Incursiones).
 class ClienteApi {
   ClienteApi({
@@ -202,6 +277,95 @@ class ClienteApi {
       ResultadoEnvio.rechazada,
       mensaje: mensaje == null ? 'El servidor respondió $estado.' : '$mensaje',
     );
+  }
+
+  /// GET autenticado que devuelve el cuerpo JSON, o lanza [ErrorApi].
+  Future<Map<String, Object?>> _leer(String token, String ruta) async {
+    final http.Response r;
+    try {
+      r = await _http.get(
+        Uri.parse('$base$ruta'),
+        headers: {'authorization': 'Bearer $token'},
+      ).timeout(espera);
+    } catch (_) {
+      throw const ErrorApi('No se pudo conectar con el servidor.');
+    }
+    final cuerpo = _cuerpo(r);
+    if (r.statusCode == 200) return cuerpo;
+    if (r.statusCode == 401) {
+      throw const ErrorApi(
+        'La sesión ha caducado. Inicia sesión otra vez.',
+        estado: 401,
+      );
+    }
+    throw ErrorApi(
+      '${cuerpo['mensaje'] ?? cuerpo['error'] ?? 'El servidor respondió ${r.statusCode}.'}',
+      estado: r.statusCode,
+    );
+  }
+
+  /// El total de puntos de la cuenta y los niveles de jefe (D-21 §1.2).
+  Future<PuntosCuenta> leerPuntos(String token) async =>
+      PuntosCuenta.desdeJson(await _leer(token, '/incursiones/me/puntos'));
+
+  /// El catálogo de la tienda (catalog/tienda/tienda.json en el servidor).
+  Future<List<ProductoTienda>> leerTienda(String token) async {
+    final cuerpo = await _leer(token, '/incursiones/tienda');
+    final lista = cuerpo['productos'];
+    return [
+      if (lista is List)
+        for (final p in lista)
+          if (p is Map) ProductoTienda.desdeJson(Map<String, Object?>.from(p)),
+    ];
+  }
+
+  /// Los productos que ya tiene la cuenta.
+  Future<Set<String>> leerComprados(String token) async {
+    final lista = (await _leer(token, '/incursiones/tienda/compras'))['productos'];
+    return {if (lista is List) for (final p in lista) '$p'};
+  }
+
+  /// Compra [producto] con el id [compra], que genera la app: repetir la
+  /// misma compra no cobra dos veces. Devuelve el total de puntos tras pagar,
+  /// o lanza [ErrorApi] con un mensaje para enseñar (sin conexión, sin
+  /// puntos, ya comprado...).
+  Future<int> comprar(
+    String token, {
+    required String compra,
+    required String producto,
+  }) async {
+    final http.Response r;
+    try {
+      r = await _http
+          .post(
+            Uri.parse('$base/incursiones/tienda/compras'),
+            headers: {
+              'content-type': 'application/json',
+              'authorization': 'Bearer $token',
+            },
+            body: jsonEncode(
+                {'version': 1, 'compra': compra, 'producto': producto}),
+          )
+          .timeout(espera);
+    } catch (_) {
+      throw const ErrorApi('No se pudo conectar con el servidor.');
+    }
+    final cuerpo = _cuerpo(r);
+    final puntos = cuerpo['puntos'];
+    if ((r.statusCode == 200 || r.statusCode == 201) && puntos is int) {
+      return puntos;
+    }
+    final mensaje = switch (cuerpo['error']) {
+      'puntos_insuficientes' => 'No tienes puntos suficientes.',
+      'ya_comprado' => 'Ya lo tienes.',
+      'no_disponible' => 'Todavía no se vende.',
+      'producto_gratis' => 'Es gratis: ya lo tienes.',
+      'producto_desconocido' => 'La tienda ya no tiene ese producto.',
+      _ when r.statusCode == 401 =>
+        'La sesión ha caducado. Inicia sesión otra vez.',
+      _ => '${cuerpo['mensaje'] ?? 'El servidor respondió ${r.statusCode}.'}',
+    };
+    throw ErrorApi(mensaje, estado: r.statusCode);
   }
 
   /// Crea una sala (el que la crea es el host). Devuelve el código de 5

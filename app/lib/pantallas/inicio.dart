@@ -7,6 +7,7 @@ import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
 import '../sala/pantalla_sala.dart';
+import '../tienda/pantalla_tienda.dart';
 import 'carta.dart';
 import 'nueva_partida.dart';
 import 'pantalla_pokedex.dart';
@@ -168,6 +169,12 @@ Future<bool> empezarPartidaNueva(
   ref.read(jefePreelegidoProvider.notifier).fijar(null);
   ref.read(enPartidaProvider.notifier).entrar();
   return true;
+}
+
+void _tienda(BuildContext context) {
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => const PantallaTienda()),
+  );
 }
 
 void _pokedex(BuildContext context) {
@@ -366,6 +373,15 @@ class _MenuTitulo extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 _BotonInicio(
+                  clave: 'inicio-tienda',
+                  etiqueta: 'Tienda',
+                  detalle: 'Monedas y dados con tus puntos',
+                  icono: Icons.storefront_rounded,
+                  alto: 84,
+                  onPressed: () => _tienda(context),
+                ),
+                const SizedBox(height: 16),
+                _BotonInicio(
                   clave: 'inicio-cuenta',
                   etiqueta: 'Cuenta',
                   detalle: _textoCuenta(ref),
@@ -509,12 +525,28 @@ class _MenuMovil extends ConsumerWidget {
               onPressed: () => _nuevaPartida(context, ref),
             ),
             const SizedBox(height: 12),
-            _MosaicoInicio(
-              clave: 'inicio-sala',
-              etiqueta: 'Jugar en sala',
-              detalle: 'Con otros dispositivos',
-              icono: Icons.groups_rounded,
-              onPressed: () => abrirSala(context, ref),
+            Row(
+              children: [
+                Expanded(
+                  child: _MosaicoInicio(
+                    clave: 'inicio-sala',
+                    etiqueta: 'Jugar en sala',
+                    detalle: 'Con otros dispositivos',
+                    icono: Icons.groups_rounded,
+                    onPressed: () => abrirSala(context, ref),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _MosaicoInicio(
+                    clave: 'inicio-tienda',
+                    etiqueta: 'Tienda',
+                    detalle: 'Con tus puntos',
+                    icono: Icons.storefront_rounded,
+                    onPressed: () => _tienda(context),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             Row(
