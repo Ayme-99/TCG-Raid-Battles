@@ -42,6 +42,30 @@ Future<PartidaCampana?> leerCampana(Almacen almacen) async {
   }
 }
 
+/// Clave del estado de la copia en la cuenta (#478): la revisión que se leyó
+/// o subió por última vez y si la partida local ha cambiado desde entonces.
+const claveCampanaCuenta = 'campana_kanto_cuenta';
+
+/// La partida de este dispositivo y la de la cuenta han cambiado las dos
+/// desde la última vez que se igualaron: el jugador elige con cuál quedarse.
+class ConflictoCampana {
+  const ConflictoCampana({
+    required this.local,
+    required this.cuenta,
+    required this.revision,
+  });
+
+  final PartidaCampana local;
+  final PartidaCampana cuenta;
+
+  /// Revisión de la copia de la cuenta.
+  final int revision;
+}
+
+/// El conflicto pendiente de elegir, o null.
+final conflictoCampanaProvider =
+    StateProvider<ConflictoCampana?>((ref) => null);
+
 /// La partida guardada al abrir la app (la pone `main.dart`).
 final campanaInicialProvider = Provider<PartidaCampana?>((ref) => null);
 
@@ -65,6 +89,17 @@ class EstadoCampana {
 /// el turno de la máquina y se guarda.
 class ControladorCampana extends Notifier<EstadoCampana> {
   bool _enviando = false;
+
+  // Copia en la cuenta (#478).
+  bool _sincronizando = false;
+  bool _otraVez = false;
+  Future<void>? _metaLeida;
+  int _revision = 0;
+  bool _sucia = false;
+
+  /// Sube cada vez que cambia la partida local: si cambia mientras se sube,
+  /// la copia subida ya no es la última y sigue «sucia».
+  int _cambios = 0;
   bool _vivo = true;
   int _fallos = 0;
   Cancelar? _cancelarReintento;
@@ -78,9 +113,13 @@ class ControladorCampana extends Notifier<EstadoCampana> {
     });
     // Al iniciar sesión (o leerla al arrancar) se envían los hitos pendientes.
     ref.listen<Sesion?>(sesionActualProvider, (_, sesion) {
-      if (sesion != null) unawaited(Future.microtask(enviarHitos));
+      if (sesion != null) {
+        unawaited(Future.microtask(enviarHitos));
+        unawaited(Future.microtask(sincronizar));
+      }
     });
     unawaited(Future.microtask(enviarHitos));
+    unawaited(Future.microtask(sincronizar));
     var partida = ref.read(campanaInicialProvider);
     // Las partidas guardadas antes de #374 no tienen id: se les pone uno.
     if (partida != null && partida.partidaId == null) {
@@ -88,6 +127,7 @@ class ControladorCampana extends Notifier<EstadoCampana> {
       ref
           .read(almacenProvider)
           .escribir(claveCampana, jsonEncode(partida.aJson()));
+      unawaited(_marcarSucia());
     }
     return EstadoCampana(partida: partida);
   }
@@ -101,6 +141,176 @@ class ControladorCampana extends Notifier<EstadoCampana> {
   void _guardar(PartidaCampana p) {
     state = EstadoCampana(partida: p);
     ref.read(almacenProvider).escribir(claveCampana, jsonEncode(p.aJson()));
+    unawaited(_marcarSucia());
+  }
+
+  // --- Copia en la cuenta (#478) -------------------------------------------
+
+  Future<void> _leerMeta() => _metaLeida ??= () async {
+        final texto = await ref.read(almacenProvider).leer(claveCampanaCuenta);
+        if (texto == null) return;
+        try {
+          final json = jsonDecode(texto) as Map<String, dynamic>;
+          _revision = json['revision'] as int;
+          // Un cambio hecho antes de leer esto sigue contando.
+          _sucia = _sucia || json['sucia'] == true;
+        } catch (_) {
+          // Dañado: se empieza de cero y la próxima subida lo arregla.
+        }
+      }();
+
+  Future<void> _escribirMeta() => ref.read(almacenProvider).escribir(
+      claveCampanaCuenta, jsonEncode({'revision': _revision, 'sucia': _sucia}));
+
+  Future<void> _marcarSucia() async {
+    _cambios++;
+    _sucia = true;
+    await _leerMeta();
+    _sucia = true;
+    await _escribirMeta();
+  }
+
+  /// Iguala la partida local con la de la cuenta (D-20 §6, #478). Si solo ha
+  /// cambiado una, gana esa. Si han cambiado las dos, deja un
+  /// [ConflictoCampana] para que elija el jugador. Sin sesión o sin conexión
+  /// no hace nada: se sigue jugando con la local y se sube después.
+  Future<void> sincronizar() async {
+    if (_sincronizando) {
+      _otraVez = true;
+      return;
+    }
+    _sincronizando = true;
+    try {
+      do {
+        _otraVez = false;
+        await _sincronizarUnaVez();
+      } while (_otraVez && _vivo);
+    } finally {
+      _sincronizando = false;
+    }
+  }
+
+  Future<void> _sincronizarUnaVez() async {
+    final sesion = ref.read(sesionActualProvider);
+    if (sesion == null || !_vivo) return;
+    if (ref.read(conflictoCampanaProvider) != null) return;
+    await _leerMeta();
+    final api = ref.read(clienteApiProvider);
+    final GuardadoCuenta? cuenta;
+    try {
+      cuenta = await api.leerGuardadoCampana(sesion.token, idCampanaServidor);
+    } on ErrorApi {
+      return;
+    }
+    if (!_vivo) return;
+    final local = state.partida;
+    if (cuenta == null) {
+      // La cuenta no tiene ninguna: se sube la local.
+      if (local != null) await _subir(sesion, local, 0);
+      return;
+    }
+    if (cuenta.revision == _revision) {
+      // La de la cuenta no ha cambiado: se sube la local si cambió.
+      if (_sucia && local != null) await _subir(sesion, local, _revision);
+      return;
+    }
+    final PartidaCampana deCuenta;
+    try {
+      deCuenta = PartidaCampana.desdeJson(cuenta.partida);
+    } catch (_) {
+      return; // De otra versión de la app: no se toca nada.
+    }
+    if (local == null) {
+      // Sin partida aquí: se trae la de la cuenta, salvo que se abandonara.
+      if (!_sucia) await _adoptar(deCuenta, cuenta.revision);
+    } else if (!_sucia) {
+      await _adoptar(deCuenta, cuenta.revision);
+    } else {
+      ref.read(conflictoCampanaProvider.notifier).state = ConflictoCampana(
+          local: local, cuenta: deCuenta, revision: cuenta.revision);
+    }
+  }
+
+  Future<void> _subir(Sesion sesion, PartidaCampana p, int revision) async {
+    final cambios = _cambios;
+    final ResultadoSubida r;
+    try {
+      r = await ref.read(clienteApiProvider).subirGuardadoCampana(
+          sesion.token, idCampanaServidor,
+          revision: revision, partida: p.aJson());
+    } on ErrorApi {
+      return; // Sigue «sucia»: se sube la próxima vez.
+    }
+    if (!_vivo) return;
+    if (!r.conflicto) {
+      _revision = r.revision!;
+      if (_cambios == cambios) _sucia = false;
+      await _escribirMeta();
+      return;
+    }
+    // Otro dispositivo subió antes: se vuelve a mirar con su copia.
+    final actual = r.actual;
+    if (actual == null) {
+      _revision = 0;
+      _otraVez = true;
+      return;
+    }
+    try {
+      ref.read(conflictoCampanaProvider.notifier).state = ConflictoCampana(
+          local: p,
+          cuenta: PartidaCampana.desdeJson(actual.partida),
+          revision: actual.revision);
+    } catch (_) {
+      // De otra versión de la app: no se toca nada.
+    }
+  }
+
+  /// Usa la partida de la cuenta en este dispositivo. No interrumpe un
+  /// combate en curso: espera a la próxima vez.
+  Future<void> _adoptar(PartidaCampana p, int revision) async {
+    if (state.combate != null) return;
+    state = EstadoCampana(partida: p);
+    await ref
+        .read(almacenProvider)
+        .escribir(claveCampana, jsonEncode(p.aJson()));
+    _revision = revision;
+    _sucia = false;
+    await _escribirMeta();
+    unawaited(enviarHitos());
+  }
+
+  /// Resuelve el conflicto con la partida de la cuenta. Los hitos sin enviar
+  /// de la local se conservan si son de la misma partida, para no perder
+  /// puntos (el servidor no los abona dos veces).
+  Future<void> usarPartidaDeLaCuenta() async {
+    final c = ref.read(conflictoCampanaProvider);
+    if (c == null) return;
+    ref.read(conflictoCampanaProvider.notifier).state = null;
+    var p = c.cuenta;
+    if (p.partidaId != null && p.partidaId == c.local.partidaId) {
+      final ids = {for (final h in p.hitosPendientes) h.id};
+      p = PartidaCampana.desdeJson({
+        ...p.aJson(),
+        'hitosPendientes': [
+          for (final h in p.hitosPendientes) h.aJson(),
+          for (final h in c.local.hitosPendientes)
+            if (!ids.contains(h.id)) h.aJson(),
+        ],
+      });
+    }
+    await _adoptar(p, c.revision);
+  }
+
+  /// Resuelve el conflicto con la partida de este dispositivo: sustituye a la
+  /// de la cuenta.
+  Future<void> usarPartidaDeEsteDispositivo() async {
+    final c = ref.read(conflictoCampanaProvider);
+    final sesion = ref.read(sesionActualProvider);
+    if (c == null) return;
+    ref.read(conflictoCampanaProvider.notifier).state = null;
+    if (sesion == null) return;
+    final local = state.partida ?? c.local;
+    await _subir(sesion, local, c.revision);
   }
 
   /// Empieza una campaña nueva (borra la anterior).
@@ -110,19 +320,27 @@ class ControladorCampana extends Notifier<EstadoCampana> {
         semilla: semilla,
         partidaId: nuevoIdPartida(ref.read(azarProvider)),
         parametros: parametrosCampana));
+    unawaited(sincronizar());
   }
 
   /// Borra la campaña guardada.
   void abandonar() {
     state = const EstadoCampana();
     ref.read(almacenProvider).borrar(claveCampana);
+    // Así no se vuelve a traer la de la cuenta (que se queda allí hasta que
+    // se empiece otra).
+    unawaited(_marcarSucia());
   }
 
   void elegirInicial(CatalogoCampana c, String id) =>
       _guardar(_partida.elegirInicial(c, id));
 
-  void avanzar(CatalogoCampana c, String destino) =>
-      _guardar(_partida.avanzar(c, destino));
+  /// Avanza a otro nodo y sube la partida a la cuenta (así se sube también
+  /// al salir del centro Pokémon).
+  void avanzar(CatalogoCampana c, String destino) {
+    _guardar(_partida.avanzar(c, destino));
+    unawaited(sincronizar());
+  }
 
   void capturar(CatalogoCampana c, {int? sustituir}) => _guardar(_partida
       .capturar(c, sustituir: sustituir, parametros: parametrosCampana));
@@ -239,6 +457,8 @@ class ControladorCampana extends Notifier<EstadoCampana> {
     if (combate == null || combate.fase != FaseCombate.terminado) return;
     _guardar(
         _partida.terminarCombate(c, combate, parametros: parametrosCampana));
+    // La partida se sube a la cuenta al terminar cada combate (#478).
+    unawaited(sincronizar());
     // Un jefe o una medalla se envían a la cuenta en cuanto se ganan; los
     // salvajes y entrenadores van con ellos o al iniciar sesión (#374).
     if (_partida.hitosPendientes

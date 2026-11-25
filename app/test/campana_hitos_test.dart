@@ -14,6 +14,10 @@ import 'campana_test.dart' show jugarCombate, tocar;
 
 /// Servidor de hitos que abona todo lo que llega y apunta los cuerpos.
 Servidor servidorDeHitos(List<Map<String, dynamic>> cuerpos) => (p) async {
+      // El guardado en la cuenta (#478) se prueba en campana_cuenta_test.
+      if (!p.url.path.endsWith('/campana/hitos')) {
+        return http.Response('{"error":"no_encontrada"}', 404);
+      }
       final cuerpo = jsonDecode(p.body) as Map<String, dynamic>;
       cuerpos.add(cuerpo);
       final ids = [for (final h in cuerpo['hitos'] as List) h['id']];

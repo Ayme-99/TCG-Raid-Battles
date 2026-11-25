@@ -19,4 +19,5 @@ Decidido por Ayme el 2026-11-24 (#390): la partida de campaña se guarda tambié
 
 - `partida` es `PartidaCampana.aJson()` tal cual. Si el motor sube su versión o añade un campo, hay que actualizar este esquema en el mismo PR.
 - `revision` es la que el cliente leyó (`0` si no había). El servidor guarda con `revision + 1`; si la guardada es otra, responde `409 revision_distinta` con su copia, y la app decide.
+- **La app (#478, `ControladorCampana.sincronizar`)** iguala las dos copias al abrir la campaña y al iniciar sesión, y sube la suya tras cada combate, al moverse de nodo (también al salir del centro) y al empezar otra campaña. Guarda en el dispositivo (`campana_kanto_cuenta`) la última `revision` y si la local ha cambiado desde entonces. Si solo cambió una copia, gana esa. Si cambiaron las dos, el jugador elige con cuál sigue; al elegir la de la cuenta se conservan los hitos sin enviar de la misma partida. Sin conexión se juega con la local y se sube después. Abandonar la campaña no borra la copia de la cuenta, pero esta tampoco se vuelve a traer.
 - **El guardado nunca abona puntos.** Los puntos de la campaña van a la cuenta por los hitos (#374).
