@@ -301,14 +301,14 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 | Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod, Kakuna | **Ya existen** | Salvajes y rivales | — | — | — | — | — | — |
 | **Clefairy** | **Nueva** | Jefe 02 en el Monte Moon; capturable la primera vez (carta normal) | Normal | 60 (carta normal) · 100 (jefe) | Lucha ×2 | 1 | Jefe (30 XP) | Destructor (1 energía, 20) · Doble bofetón (2 energías, 30; moneda: cara +20 con el efecto `monedaDanoExtra` que ya existe) |
 | **Paras** | **Nueva** | Salvaje raro del Monte Moon | Planta | 50 | Fuego ×2 | 1 | Intermedio (20 XP) | Arañazo (1 energía, 10) · Espora (2 energías, 30) |
-| **Jigglypuff** | **Nueva** | Salvaje raro de la Ruta 3 | Normal | 70 | Lucha ×2 | 1 | Intermedio (20 XP) | Canto (sin efecto aún: Destructor, 1 energía, 10) · Doble bofetón (2 energías, 30) |
+| **Jigglypuff** | **Nueva** | Salvaje raro de la Ruta 3 | Normal | 70 | Lucha ×2 | 1 | Intermedio (20 XP) | **Canto** (1 energía, sin daño; lanza una moneda y, si sale cara, el Defensor queda **Dormido**; efecto nuevo `duermeDefensor`, ver abajo) · Doble bofetón (2 energías, 30) |
 | **Ekans** | **Nueva** | Salvaje raro de la Ruta 4 | Oscuridad | 60 | Lucha ×2 | 0 | Intermedio (20 XP) | Mordisco (1 energía, 10) · Constricción (2 energías, 30) |
 | **Horsea** | **Nueva** | Nadador Luis (gimnasio) | Agua | 50 | Eléctrico ×2 | 1 | Común (10 XP) | Burbuja (1 energía, 10) · Chorro (2 energías, 30) |
 | **Shellder** | **Nueva** | Nadador Luis (gimnasio) | Agua | 60 | Eléctrico ×2 | 1 | Común (10 XP) | Placaje (1 energía, 10) · Pinza (2 energías, 30) |
 | **Staryu** | **Nueva** | Misty | Agua | 60 | Eléctrico ×2 | 1 | Intermedio (20 XP) | Placaje (1 energía, 10) · Giro rápido (2 energías, 30) |
 | **Starmie** | **Nueva** | Misty (no capturable en el tramo 2) | Agua | 100 (Fase 1; evoluciona de Staryu con Piedra Agua, aún sin usar) | Eléctrico ×2 | 0 | Fuerte (30 XP) | Rayo burbuja (2 energías, 50) · Cascada (3 energías, 90) |
 
-Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. En esta tabla hay ocho cartas nuevas.
+Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. **Jigglypuff sí lleva Canto** (su ataque emblema, Ayme 2026-11-26): es la **primera carta que causa Dormido**, así que se cumple la condición de §8 punto 25 (#436) y Programación tiene que crear el estado. **Regla propuesta de Dormido (por confirmar):** el Pokémon Dormido no puede atacar ni retirarse; al final de cada turno suyo lanza una moneda y, si sale cara, despierta; cambiarlo a la banca también lo despierta. Alternativa más barata: Dormido como el Paralizado de Dragoaliento (§3.2, solo su próximo turno, sin moneda). En esta tabla hay ocho cartas nuevas.
 
 ### Reglas del recorrido
 
