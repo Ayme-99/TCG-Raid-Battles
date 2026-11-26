@@ -261,14 +261,14 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 
 ### Segundo tramo: Ciudad Plateada → Ciudad Celeste (propuesta de Diseño, 2026-11-26, por confirmar; #380)
 
-**Todo esto es propuesta: Ayme decide.** Responde a la pregunta de Arte en #380 (qué hay en las zonas del tramo 2 y qué Pokémon salen). Sigue la forma del tramo 1 y la plantilla de «Rivales por tramo» de abajo (2 salvajes obligatorios, 2 entrenadores de ruta, el jefe 02, 1 entrenador de gimnasio y el líder: 7 rivales, 180 XP). Las cartas las hace Ayme (§11); aquí solo se dice qué Pokémon hacen falta. Fuentes de los juegos (FireRed y LeafGreen): **✓** contrastado con Bulbapedia, Serebii o StrategyWiki; **◐** de memoria, por contrastar.
+**Todo esto es propuesta y las zonas y salvajes del tramo 2 aún NO están decididos (Ayme, 2026-11-26, #380).** Lo único que sale de esta propuesta ya pedido por Ayme es la tabla de cartas de abajo. Responde a la pregunta de Arte en #380 (qué hay en las zonas del tramo 2 y qué Pokémon salen). Sigue la forma del tramo 1 y la plantilla de «Rivales por tramo» de abajo (2 salvajes obligatorios, 2 entrenadores de ruta, el jefe 02, 1 entrenador de gimnasio y el líder: 7 rivales, 180 XP). Las cartas las hace Ayme (§11); aquí solo se dice qué Pokémon hacen falta. Fuentes de los juegos (FireRed y LeafGreen): **✓** contrastado con Bulbapedia, Serebii o StrategyWiki; **◐** de memoria, por contrastar.
 
 | # | Nodo | Qué pasa |
 |---|---|---|
 | 9 | **Ruta 3** (bifurcación) | Elegir entre un **Spearow** y un **Nidoran♂** salvajes. Dos entrenadores de ruta: la **Chica** (Rattata y Nidoran♀) y el **Joven** (Spearow y Rattata). Un **centro Pokémon** al final, junto a la entrada del Monte Moon ◐. |
 | 10 | **Monte Moon** | Un salvaje **opcional** (Zubat o Geodude) en una galería lateral, y el jefe **02/20 Clefairy** (capturable la primera vez, §10.8) con los aliados de la lista A: Zubat, Geodude y Sandshrew. |
 | 11 | **Ruta 4** (bifurcación) | Elegir entre un **Sandshrew** y un **Rattata** salvajes. |
-| 12 | **Ciudad Celeste** | Centro Pokémon y tienda. **Gimnasio:** el **Nadador Luis** (Horsea y Shellder) y **Misty** (Staryu y Starmie), que da la **Medalla Cascada** (2.ª). |
+| 12 | **Ciudad Celeste** | Centro Pokémon y tienda. **Gimnasio:** un **entrenador de gimnasio** (Slowpoke y Staryu) y **Misty** (Staryu y Starmie), que da la **Medalla Cascada** (2.ª). |
 | 13 | **Ruta 24, Puente Pepita** (desvío **opcional**) | Un salvaje opcional (Caterpie, Weedle, Metapod, Kakuna o Pidgey ◐). Da puntos y XP; no hace falta para seguir. |
 
 **Qué Pokémon salen en cada zona** (id de zona propuesto del catálogo):
@@ -278,12 +278,12 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 | `ruta-3` | Pidgey, Spearow, Nidoran♀, Nidoran♂, Mankey (poco frecuente). **Bifurcación obligatoria: Spearow o Nidoran♂.** | Chica: Rattata, Nidoran♀. Joven: Spearow, Rattata. | ✓ Bulbapedia (Ruta 3). En los juegos también sale **Jigglypuff**, que no entra: no hay carta |
 | `monte-moon` | Zubat y Geodude (opcional, uno de los dos) | **Jefe 02 Clefairy** | ✓ Serebii y SuperCheats (Zubat, Geodude, Paras y Clefairy; Paras y Clefairy son raros) |
 | `ruta-4` | Rattata, Spearow, Sandshrew, Mankey (muy poco frecuente). **Bifurcación obligatoria: Sandshrew o Rattata.** | — | ✓ Bulbapedia (Ruta 4). En los juegos también sale Ekans, que no entra: no hay carta |
-| `gimnasio-celeste` | Sin salvajes | Nadador Luis: Horsea, Shellder. Líder Misty: Staryu, Starmie | ✓ StrategyWiki y Serebii (Misty: Staryu de nivel 18 y Starmie de nivel 21). El gimnasio de los juegos tiene también una Chica de Camping (Goldeen), que no entra |
+| `gimnasio-celeste` | Sin salvajes | Entrenador de gimnasio: Slowpoke, Staryu. Líder Misty: Staryu, Starmie | ✓ StrategyWiki y Serebii (Misty: Staryu de nivel 18 y Starmie de nivel 21). El gimnasio de los juegos tiene también una Chica de Camping (Goldeen), que no entra |
 | `ruta-24` (opcional) | Caterpie, Weedle, Metapod, Kakuna, Pidgey | — | ✓ Caterpie (StrategyWiki); el resto ◐ |
 
-**Cartas que ya existen** y valen para todo el tramo: Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod y Kakuna. **Cartas nuevas que hacen falta: cinco.** **Clefairy** (jefe 02), **Staryu** y **Starmie** (Misty) y **Horsea** y **Shellder** (el Nadador Luis). Para ahorrar dos, el Nadador Luis puede llevar **Slowpoke** (ya existe) en lugar de Horsea y Shellder; se pierde algo de fidelidad con los juegos.
+**Cartas que ya existen** y valen para todo el tramo: Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod y Kakuna, más **Slowpoke** (entrenador de gimnasio). **Cartas nuevas que hacen falta: tres**, las de la tabla siguiente. **Surf:** en la campaña aún no hay Surf ni zonas de agua, así que **no sale ningún salvaje de agua** en el tramo 2 (ni Horsea ni Shellder). Los Pokémon de agua solo aparecen como rivales en el gimnasio, y los entrenadores no necesitan Surf. Horsea y Shellder quedan para cuando se decida el Surf.
 
-**Plantilla del tramo (con «Rivales por tramo», más abajo):** salvajes obligatorios 2 de categoría Común (20 XP), 2 entrenadores de ruta (60), el jefe 02 (30), el Nadador Luis (20) y Misty (50): **7 rivales y 180 XP**. Dinero: 710 para los entrenadores (por ejemplo Chica 230, Joven 230 y Luis 250) y 1.500 para Misty, según el presupuesto de §10.6.
+**Plantilla del tramo (con «Rivales por tramo», más abajo):** salvajes obligatorios 2 de categoría Común (20 XP), 2 entrenadores de ruta (60), el jefe 02 (30), el entrenador de gimnasio (20) y Misty (50): **7 rivales y 180 XP**. Dinero: 710 para los entrenadores (por ejemplo Chica 230, Joven 230 y gimnasio 250) y 1.500 para Misty, según el presupuesto de §10.6.
 
 **Misty.** Dos Pokémon, como Brock: Staryu y Starmie, de tipo agua, con **debilidad eléctrico ×2** (como en el JCC) y sin resistencia. Starmie es la evolución de Staryu con la **Piedra Agua**, que en la campaña aún no se puede obtener (como la Piedra Trueno de Raichu); el jugador no la evoluciona, así que no hay que decidirlo ahora. La ficha de Misty (PS, ataques, dinero) se rellena con las del resto de líderes (§4, «Líderes de gimnasio»).
 
@@ -293,6 +293,17 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 - Con lucha ×2 el jugador tiene respuesta a mano: Mankey (Ruta 3), Machop y Geodude son de lucha, y Sandshrew también. Con psíquico y debilidad oscuridad ×2 solo la tendrían Nidoran♀, Nidoran♂ y Zubat.
 - Alternativa B: **psíquico con debilidad oscuridad ×2**, más fiel a la carta física pero con menos respuestas en el tramo 2.
 - PS: **100**, como Pikachu jefe (60 PS la carta normal); ataques: **Destructor y Doble bofetón**, de la propuesta de Arte en #380.
+
+**Tabla de cartas del tramo 2 para que Ayme las cree** (valores propuestos dentro del baremo de §3.5; Ayme los ajusta). Todos los Pokémon del tramo, con lo que hay que crear:
+
+| Pokémon | ¿Carta? | Papel | Tipo | PS | Debilidad | Retirada | Categoría | Ataques propuestos |
+|---|---|---|---|---|---|---|---|---|
+| Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod, Kakuna, Slowpoke | **Ya existen** | Salvajes y rivales | — | — | — | — | — | — |
+| **Clefairy** | **Nueva** | Jefe 02 en el Monte Moon; capturable la primera vez (carta normal) | Normal | 60 (carta normal) · 100 (jefe) | Lucha ×2 | 1 | Jefe (30 XP) | Destructor (1 energía, 20) · Doble bofetón (2 energías, 30; moneda: cara +20 con el efecto `monedaDanoExtra` que ya existe) |
+| **Staryu** | **Nueva** | Misty y entrenador de gimnasio | Agua | 60 | Eléctrico ×2 | 1 | Intermedio (20 XP) | Placaje (1 energía, 10) · Giro rápido (2 energías, 30) |
+| **Starmie** | **Nueva** | Misty (no capturable en el tramo 2) | Agua | 100 (Fase 1; evoluciona de Staryu con Piedra Agua, aún sin usar) | Eléctrico ×2 | 0 | Fuerte (30 XP) | Rayo burbuja (2 energías, 50) · Cascada (3 energías, 90) |
+
+Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. En esta tabla hay tres cartas nuevas, no cinco.
 
 ### Reglas del recorrido
 
