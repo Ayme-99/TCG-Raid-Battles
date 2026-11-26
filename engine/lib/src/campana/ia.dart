@@ -42,7 +42,11 @@ import 'pokemon.dart';
 ///    derriba en menos golpes contando el turno que gasta, lo usa.
 ///    Si tiene un ataque que envenena al rival y este no lo está ya, lo usa
 ///    (antes que Gruñido y compañía: el veneno cuenta aunque el golpe quede
-///    en 0).
+///    en 0). Nunca contra Muro Mágico.
+///    Si tiene un ataque que apresa (Torbellino) y el rival no está apresado
+///    ni tiene Muro Mágico, lo usa si su golpe más 20 (dos chequeos) supera
+///    al de su mejor ataque (propuesta, #522). Apresada, no cambia:
+///    solo sale con la Cuerda Huida.
 ///    Si tiene un ataque que reduce el daño que recibe su activo (Fortaleza) y
 ///    compensa igual que Gruñido, lo usa.
 ///    Si tiene un ataque que quita energía al rival (Disparo Demora) y con ello
@@ -117,7 +121,8 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
   if (canto != null) return Atacar(bando, canto);
 
   if (debil || ataque == null) {
-    if (activo.retirada <= yo.energia) {
+    // Apresado (Torbellino): no puede cambiar, solo salir con la Cuerda.
+    if (!yo.apresado && activo.retirada <= yo.energia) {
       final relevo = _mejorRelevo(
         yo,
         objetivo,
@@ -136,6 +141,9 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
 
   final veneno = _ataqueDeVeneno(yo, rival);
   if (veneno != null) return Atacar(bando, veneno);
+
+  final apresa = _ataqueDeApresar(yo, rival, danoMio);
+  if (apresa != null) return Atacar(bando, apresa);
 
   final reduccion = _ataqueDeReduccion(yo, rival, danoMio);
   if (reduccion != null) return Atacar(bando, reduccion);
@@ -184,9 +192,8 @@ int _amenaza(EstadoCombate estado, Bando bando) {
         reduccion: rival.danoReducido, extra: yo.extraRecibido);
     if (d > amenaza) amenaza = d;
   }
-  return sinDanoIndirecto(activo.especie)
-      ? amenaza
-      : amenaza + 2 * yo.veneno;
+  if (sinDanoIndirecto(activo.especie)) return amenaza;
+  return amenaza + 2 * yo.veneno + (yo.apresado ? 2 * ApresaDefensor.dano : 0);
 }
 
 /// Índice de un ataque que duerme al rival (Canto, paso 2 ter), o null: solo
@@ -320,6 +327,33 @@ int? _ataqueDeVeneno(BandoCombate yo, BandoCombate rival) {
     if (e.valor > mejorValor) {
       mejor = i;
       mejorValor = e.valor;
+    }
+  }
+  return mejor;
+}
+
+/// Índice de un ataque que apresa al rival (Torbellino, Constricción;
+/// propuesta de Programación, #522), o null. Lo usa si el rival no está ya
+/// Apresado, no tiene Muro Mágico y el golpe más el daño esperado de apresar
+/// (dos chequeos, 20) supera el de su mejor ataque ([danoMio]): si solo lo
+/// iguala, el golpe seguro es mejor (en duelos, Ekans gana un 30,8 % mordiendo
+/// y un 26,9 % apresando primero).
+/// Entre varios, el que más daño hace.
+int? _ataqueDeApresar(BandoCombate yo, BandoCombate rival, int danoMio) {
+  final objetivo = rival.pokemonActivo;
+  if (rival.apresado || sinDanoIndirecto(objetivo.especie)) return null;
+  final ataques = _conRacha(yo).ataques;
+  int? mejor;
+  var mejorDano = -1;
+  for (var i = 0; i < ataques.length; i++) {
+    final a = ataques[i];
+    if (a.efecto is! ApresaDefensor || a.coste > yo.energia) continue;
+    final d = danoDeAtaque(a, objetivo.especie,
+        reduccion: yo.danoReducido, extra: rival.extraRecibido);
+    if (d + 2 * ApresaDefensor.dano <= danoMio) continue;
+    if (d > mejorDano) {
+      mejor = i;
+      mejorDano = d;
     }
   }
   return mejor;

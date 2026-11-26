@@ -107,6 +107,13 @@ class BandoCombate {
   /// si cae o pasa a la banca.
   final bool dormido;
 
+  /// Apresado (Torbellino o Constricción del rival, [ApresaDefensor], D-20
+  /// §3.6): el activo de este bando no puede cambiar con [Cambiar] (sí con
+  /// la Cuerda Huida); en cada chequeo Pokémon pierde [ApresaDefensor.dano]
+  /// PS (nada con Muro Mágico) y se lanza una moneda: con cara se libera. Se
+  /// quita también si cae o pasa a la banca.
+  final bool apresado;
+
   /// Índice del ataque que usó el activo en su turno anterior (-1 si no atacó,
   /// o si cargó o cambió) y cuántas veces seguidas lo lleva usando (Rodar).
   final int ultimoAtaque;
@@ -147,6 +154,7 @@ class BandoCombate {
     this.drenado = false,
     this.paralizado = false,
     this.dormido = false,
+    this.apresado = false,
     this.ultimoAtaque = -1,
     this.racha = 0,
     this.enEspera = -1,
@@ -191,6 +199,7 @@ class BandoCombate {
     bool? drenado,
     bool? paralizado,
     bool? dormido,
+    bool? apresado,
     int? ultimoAtaque,
     int? racha,
     int? enEspera,
@@ -212,6 +221,7 @@ class BandoCombate {
         drenado: drenado ?? this.drenado,
         paralizado: paralizado ?? this.paralizado,
         dormido: dormido ?? this.dormido,
+        apresado: apresado ?? this.apresado,
         ultimoAtaque: ultimoAtaque ?? this.ultimoAtaque,
         racha: racha ?? this.racha,
         enEspera: enEspera ?? this.enEspera,
@@ -601,6 +611,7 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
           drenado: false,
           paralizado: false,
           dormido: false,
+          apresado: false,
           ultimoAtaque: -1,
           racha: 0,
           enEspera: -1));
@@ -789,6 +800,10 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
       defensorNuevo = defensorNuevo.copiarCon(dormido: true);
     }
   }
+  if (efecto is ApresaDefensor && golpeado.enPie) {
+    // Torbellino y Constricción: tras el daño, el Defensor queda Apresado.
+    defensorNuevo = defensorNuevo.copiarCon(apresado: true);
+  }
   if (efecto is QuitaEnergiaRival) {
     final resto = defensorNuevo.energia - efecto.valor;
     defensorNuevo = defensorNuevo.copiarCon(energia: resto < 0 ? 0 : resto);
@@ -844,6 +859,10 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
     throw const ReglaIncumplida(
         'Está dormido: solo sale con una Cuerda Huida.');
   }
+  if (b.apresado) {
+    throw const ReglaIncumplida(
+        'Está apresado: solo sale con una Cuerda Huida.');
+  }
   if (a.indice == b.enEspera && b.relevos.contains(a.indice)) {
     throw ReglaIncumplida(estado.aliadoAlFrente
         ? 'El jefe no vuelve hasta que caiga su aliado.'
@@ -863,7 +882,7 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
 /// [b] con [indice] de activo y [energia]: se quitan los efectos que solo
 /// duran mientras sigue el mismo activo. Al pasar a la banca se curan todos
 /// los estados (D-20 §10.2, 2026-11-26): Dormido, Paralizado, Confundido
-/// ([BandoCombate.cegado]) y Envenenado.
+/// ([BandoCombate.cegado]), Envenenado y Apresado.
 BandoCombate _conNuevoActivo(BandoCombate b, int indice, int energia) =>
     b.copiarCon(
         activo: indice,
@@ -877,12 +896,13 @@ BandoCombate _conNuevoActivo(BandoCombate b, int indice, int energia) =>
         drenado: false,
         paralizado: false,
         dormido: false,
+        apresado: false,
         ultimoAtaque: -1,
         racha: 0);
 
 /// Si [a] es válida, el estado con la Cuerda Huida usada y el turno
 /// terminado; si no, lanza [ReglaIncumplida]. No paga la retirada y vale
-/// aunque el activo esté Paralizado o Dormido.
+/// aunque el activo esté Paralizado, Dormido o Apresado.
 EstadoCombate _usarCuerdaHuida(EstadoCombate estado, UsarCuerdaHuida a) {
   final b = estado.bando(a.bando);
   if (a.bando == Bando.rival && !estado.parametros.rivalUsaObjetos) {
@@ -1010,7 +1030,8 @@ EstadoCombate _terminarTurno(EstadoCombate estado) {
 }
 
 /// Chequeo Pokémon, cada vez que cambia el turno: el activo envenenado de cada
-/// bando pierde su veneno en PS (salvo con Muro Mágico) y, si sigue en pie y está Dormido, lanza una
+/// bando pierde su veneno en PS (salvo con Muro Mágico), el Apresado pierde
+/// 10 y lanza su moneda de liberarse y, si sigue en pie y está Dormido, lanza una
 /// moneda: con cara se despierta (D-20 §10.2). Va primero el bando que acaba
 /// de terminar su turno; si su último Pokémon cae, el combate termina y gana
 /// el otro aunque el segundo chequeo también lo hubiera derribado.
@@ -1019,9 +1040,35 @@ EstadoCombate _chequeoPokemon(EstadoCombate estado, Bando primero) {
   for (final b in [primero, primero.otro]) {
     s = _chequeoVeneno(s, b);
     if (s.fase == FaseCombate.terminado) return s;
+    s = _chequeoApresado(s, b);
+    if (s.fase == FaseCombate.terminado) return s;
     s = _chequeoSueno(s, b);
   }
   return s;
+}
+
+/// Apresado en el chequeo de [b]: pierde [ApresaDefensor.dano] PS (nada con
+/// Muro Mágico, que sigue apresado) y, si sigue en pie, lanza una moneda: con
+/// cara se libera.
+EstadoCombate _chequeoApresado(EstadoCombate s, Bando b) {
+  var bando = s.bando(b);
+  final activo = bando.pokemonActivo;
+  if (!bando.apresado || !activo.enPie) return s;
+  if (!sinDanoIndirecto(activo.especie)) {
+    bando = bando.copiarCon(
+        equipo: [...bando.equipo]..[bando.activo] =
+            activo.conPs(activo.ps - ApresaDefensor.dano));
+    s = s.conBando(b, bando);
+    if (bando.derrotado) {
+      return s.copiarCon(fase: FaseCombate.terminado, ganador: b.otro);
+    }
+    if (!bando.pokemonActivo.enPie) return s;
+  }
+  final semilla = _siguienteSemilla(s.semilla);
+  final cara = (semilla >> 8) & 1 == 1;
+  return s
+      .conBando(b, cara ? bando.copiarCon(apresado: false) : bando)
+      .copiarCon(semilla: semilla);
 }
 
 /// La moneda del Dormido en el chequeo de [b]: con cara se despierta.
@@ -1117,6 +1164,7 @@ EstadoCombate _llamarAliado(EstadoCombate estado) {
             drenado: false,
             paralizado: false,
             dormido: false,
+            apresado: false,
             ultimoAtaque: -1,
             racha: 0,
             enEspera: llamada.jefe,

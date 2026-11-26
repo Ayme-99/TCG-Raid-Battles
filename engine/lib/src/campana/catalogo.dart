@@ -94,6 +94,8 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
           mientrasActivo: (json['mientrasActivo'] as bool?) ?? false);
     case 'drenaDefensor':
       return const DrenaDefensor();
+    case 'apresaDefensor':
+      return const ApresaDefensor();
     case 'paralizaDefensor':
       final monedas = _campo<int>(json, 'monedas');
       final minimo = _campo<int>(json, 'minimoCaras');

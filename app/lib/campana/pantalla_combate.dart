@@ -79,14 +79,18 @@ class _PantallaCombateCampanaState
       setState(() => _tocado = true);
       if (eligiendo) {
         actuar(ElegirSiguiente(Bando.jugador, i));
-      } else if ((combate.jugador.paralizado || combate.jugador.dormido) &&
+      } else if ((combate.jugador.paralizado ||
+              combate.jugador.dormido ||
+              combate.jugador.apresado) &&
           !objetivosDeCuerda(combate, Bando.jugador).contains(i)) {
         // Dragoaliento o Canto: no se puede cambiar (D-20 §3.6, §10.2), salvo
         // con una Cuerda Huida (§10.6).
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
             content: Text(combate.jugador.dormido
                 ? 'Está dormido: solo sale con una Cuerda Huida.'
-                : 'Está paralizado: este turno no puede cambiar.')));
+                : combate.jugador.apresado
+                    ? 'Está apresado: solo sale con una Cuerda Huida.'
+                    : 'Está paralizado: este turno no puede cambiar.')));
       } else {
         _confirmarCambio(context, combate, i, actuar);
       }
@@ -395,8 +399,10 @@ Future<void> _confirmarCambio(BuildContext context, EstadoCombate combate,
   final yo = combate.jugador;
   final sale = yo.equipo[indice].especie;
   final retirada = yo.pokemonActivo.especie.retirada;
-  final puedeCambiar =
-      !yo.paralizado && !yo.dormido && yo.energia >= retirada;
+  final puedeCambiar = !yo.paralizado &&
+      !yo.dormido &&
+      !yo.apresado &&
+      yo.energia >= retirada;
   final puedeCuerda =
       objetivosDeCuerda(combate, Bando.jugador).contains(indice);
   final eleccion = await mostrarDialogoCampana<AccionCombate>(
@@ -461,6 +467,7 @@ List<String> estadosDeBando(BandoCombate b) => [
       if (b.veneno > 0) b.drenado ? 'drenado' : 'envenenado',
       if (b.paralizado) 'paralizado',
       if (b.dormido) 'dormido',
+      if (b.apresado) 'apresado',
       if (b.danoReducido > 0) 'pega −${b.danoReducido}',
       if (b.danoExtra > 0) 'recibe +${b.danoExtra}',
       if (b.proteccion > 0) 'recibe −${b.proteccion}',

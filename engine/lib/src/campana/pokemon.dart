@@ -145,6 +145,19 @@ class DuermeDefensor extends EfectoAtaque {
   const DuermeDefensor([this.monedas = 1]);
 }
 
+/// Torbellino (Shellder) y Constricción (Ekans), D-20 §3.6 (decidido el
+/// 2026-11-26): tras el daño, el Defensor queda **Apresado**
+/// (`BandoCombate.apresado`): no puede retirarse (solo sale con la Cuerda
+/// Huida), en cada chequeo Pokémon recibe [dano] (1 contador; Muro Mágico lo
+/// bloquea pero sigue apresado) y se lanza una moneda: con cara se libera. Se
+/// cura al pasar a la banca. No se acumula.
+class ApresaDefensor extends EfectoAtaque {
+  /// PS que quita en cada chequeo.
+  static const dano = 10;
+
+  const ApresaDefensor();
+}
+
 /// El daño del ataque se multiplica por las veces **seguidas** que este
 /// Pokémon lo ha usado, contando la actual: [AtaqueCampana.dano] la primera
 /// vez, el doble la segunda, el triple la tercera… Se reinicia si el Pokémon usa
@@ -191,9 +204,9 @@ class MonedaDanoExtraAlAtacar extends HabilidadCampana {
 /// Muro Mágico (Clefairy jefe, D-20 §4 y §3.6, decidido el 2026-11-26):
 /// mientras el Pokémon esté activo **solo le hacen daño los ataques**. No
 /// recibe el daño indirecto: el del veneno, el de Drenadoras
-/// ([DrenaDefensor], y entonces tampoco cura al que lo usó) y, cuando exista,
-/// el de apresar. Los estados sí se le ponen (sigue Envenenado, sin perder
-/// PS). En campaña no hay golpe de la Confusión a uno mismo (Confundido es la
+/// ([DrenaDefensor], y entonces tampoco cura al que lo usó) y el de apresar
+/// ([ApresaDefensor]: sigue apresado). Los estados sí se le ponen (sigue
+/// Envenenado, sin perder PS). En campaña no hay golpe de la Confusión a uno mismo (Confundido es la
 /// moneda de fallo), así que no hay nada que decidir sobre él.
 class SinDanoIndirecto extends HabilidadCampana {
   const SinDanoIndirecto(super.nombre);
