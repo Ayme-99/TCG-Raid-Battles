@@ -257,7 +257,7 @@ Recorrido que Ayme definió el 2026-11-21 y que recoge `catalog/campana/regiones
 | 7 | **Ruta 2 norte** (bifurcación) | Un salvaje **opcional**, o seguir directo. |
 | 8 | **Ciudad Plateada** | Centro Pokémon, y el **gimnasio**: el **Entrenador Joven** (Diglett y Sandshrew, como en los juegos) y **Brock** (Geodude y Onix), que da la medalla Roca. |
 
-Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Caterpie, Weedle), `bosque-verde` (salvajes Caterpie, Weedle, Metapod, Kakuna y Pikachu; entrenadores Cazabichos), `ruta-22` (Rattata, Spearow, Nidoran♀, Nidoran♂, Mankey), `gimnasio-plateada` (sin salvajes; Entrenador Joven) y `tunel-roca`. Las listas de salvajes salen de los juegos (Rojo y Azul) y **están por contrastar con Serebii o Bulbapedia**.
+Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Caterpie, Weedle), `bosque-verde` (salvajes Caterpie, Weedle, Metapod, Kakuna y Pikachu; entrenadores Cazabichos), `ruta-22` (Rattata, Spearow, Nidoran♀, Nidoran♂, Mankey), `gimnasio-plateada` (sin salvajes; Entrenador Joven) y `tunel-roca` (salvajes Zubat, Geodude, Machop y Onix; PokéManiaco, 270; **sin jefe**; entra en el **tramo 4**, decidido el 2026-11-26, #375, y todavía sin nodos en la región). Una zona **no lleva jefe**: el jefe es una carta NN/20 de `jefes/` que pone un nodo `jefe` de la región, como Pikachu en el Bosque Verde. Las listas de salvajes salen de los juegos (Rojo y Azul) y **están por contrastar con Serebii o Bulbapedia**.
 
 ### Reglas del recorrido
 
@@ -479,7 +479,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 12. **Spearow.** Con 0 caras hace 50 (así lo dice la carta: la tirada peor es la que más daño hace). Se señaló como inusual y se dejó como está impreso.
 13. **Nidoran♂.** Su carta lleva impreso 029/150, que es el número de la hembra; el catálogo guarda 32 (número de la Pokédex). Falta saber si se reimprime.
 14. ~~Jefes 02 a 16.~~ **Decidido el 2026-11-25 por Ayme (#364):** LISTA A de §4, Hitmonlee como jefe 12, aliados A y Marowak capturable la primera vez (§10.8); los jefes se implementan por tramos, según haya cartas. Sigue como propuesta (§4, rivales por tramo) que los jefes 09 a 16 sean opcionales.
-15. **Túnel Roca.** La zona sigue listando a Onix como jefe y no tiene sitio en el recorrido; hay que rehacerla (el jefe de la zona es un salvaje de la serie NN/20) y decidir en qué tramo entra.
+15. ~~Túnel Roca.~~ **Decidido el 2026-11-26 por Ayme (#375):** la zona ya no lleva jefe y Onix queda solo como salvaje (§10.9); el Túnel Roca entra en el **tramo 4** (entre la 3.ª y la 4.ª medalla, camino de Lavanda), **sin jefe propio** (el del tramo 4 es Marowak, en la Torre Pokémon), y el **PokéManiaco** sigue con Cubone y Slowpoke y paga **270** (cifra inicial, se puede cambiar) (§10.7). Sus nodos en la región se hacen con el tramo 4, cuando existan los tramos 2 y 3 y su escena.
 16. **Listas de Pokémon por zona.** Las de Ruta 1, Ruta 2, Bosque Verde, Ruta 22 y el gimnasio de Ciudad Plateada salen de los juegos Rojo y Azul **por contrastar con Serebii o Bulbapedia**.
 17. ~~Campo `rareza`~~ **Sustituido el 2026-11-22** (§10.6) por el campo `categoriaCaptura` (Común, Intermedio, Fuerte o Jefe), que aún no existe en el esquema ni en el motor (#368).
 18. **Más Pokémon.** El tramo de Pueblo Paleta a Ciudad Plateada está completo (la lista de Ayme se acabó el 2026-11-22), pero los 151 y el resto de zonas no: la creación de cartas es manual y es el cuello de botella.
@@ -684,6 +684,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-25 | **Plataforma:** **PC es la plataforma principal** y el **móvil sigue admitido** (Ayme, #415; Dirección). Las escenas pasan de vertical (390×844) a **apaisadas 16:9** (1920×1088), y los wireframes del mapa, el combate, el equipo, el centro y el PC se plantean **apaisados, válidos para PC y móvil horizontal** ([wireframes](diseno-ui/campana-wireframes-apaisados.md)). Sustituye a la disposición vertical de las propuestas D, I, J y M. **Decidido el 2026-11-25 (Ayme):** en el móvil, la campaña **solo en horizontal** (opción A; fila siguiente). | §10.7; #415 |
 | 2026-11-25 | **Móvil: la campaña se juega solo en horizontal** (Ayme, #415, opción A). En vertical sale el aviso **«Gira el móvil»** y se fija la orientación horizontal al entrar en la campaña; el resto de la app sigue en vertical. **Un solo diseño y un solo juego de escenas 16:9**; no hay escenas ni diseño vertical. Arte no cambia; Programación hace el aviso (Dirección crea la tarea). [Wireframes](diseno-ui/campana-wireframes-apaisados.md). | §10.7; #415 |
 | 2026-11-26 | **Centro Pokémon: la salida se abre sin obligar a curar** (Ayme, #385, propuesta A de Dirección; salió de la 1.ª partida de playtest). Curar en el mostrador sigue siendo **gratis y opcional** (también a los debilitados): el jugador puede salir por la puerta con el equipo como esté. No cambia el motor, el PC ni la tienda. Los NPC que curan en la ruta siguen igual (§10.6, 2026-11-22). Programación quita la obligación en la app (Dirección crea la tarea); Calidad comprueba en la 2.ª partida que la salida se abre sin curar. | §4, §5; #385; #365 |
+| 2026-11-26 | **Túnel Roca** (Ayme, #375): entra en el **tramo 4**, entre la 3.ª y la 4.ª medalla, camino de Lavanda; **no lleva jefe propio** (el jefe del tramo 4 es Marowak, 04 de la LISTA A, en la Torre Pokémon); el **PokéManiaco** (Cubone y Slowpoke) paga **270** de dinero, cifra inicial que se puede cambiar. Los nodos del túnel se añaden a `kanto.json` con el tramo 4. | §4, §8 (15), §12; `tunel-roca.json` |
 
 ### 10.8 Jefes
 
@@ -702,6 +703,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 
 | Fecha | Antes | Ahora |
 |---|---|---|
+| 2026-11-26 | La zona `tunel-roca` listaba **a Onix como jefe** (del primer catálogo, #340), y las zonas tenían un campo `jefe`. | **Sin jefe en la zona** (#375): los jefes son salvajes de la serie NN/20 (§10.8, 2026-11-21) y los pone un nodo `jefe` de la región. Onix sigue en la zona como salvaje. El campo `jefe` sale del esquema de zona y del motor, que rechaza una zona que lo lleve. No cambia ninguna decisión: aplica la de §10.8. |
 | 2026-11-23 | #368 leyó «la Ruta 1 no permite capturar» como una regla de la zona (`captura: false`). | No es una regla de la zona: en la Ruta 1 no se captura **la primera vez** porque no hay Pokéballs hasta la primera tienda (Ciudad Verde); después se puede volver a capturar (Ayme, 2026-11-23). La zona deja de llevar `captura: false`. |
 | 2026-11-23 | §5 decía que las **compras del descanso**, la **XP de evolución** y la evolución se pagaban **con puntos**, y que el dinero estaba «por definir». | Desde el 2026-11-22 (§10.6) las compras del centro Pokémon se pagan con **dinero**, la evolución cuesta **XP** de combate, y los puntos solo pagan el **intercambio** y el **hacerse ex**. Texto de §5 corregido el 2026-11-23. **Parte sustituida el 2026-11-24:** los puntos tampoco pagan el intercambio ni hacerse ex (ver la fila siguiente). |
 | 2026-11-24 | El intercambio y hacerse ex costaban **puntos** (§2.1, §10.6, §10.9 del 2026-11-23). | Los **puntos no tienen ningún uso dentro de la campaña**. El **intercambio es gratis** y hacerse ex es la **piedra ex** a **2.000** de dinero (Ayme, 2026-11-24; D-21 §2.5). Corrige mi versión de #445 (4.000) y la de #448 (precio sin fijar). |
@@ -868,9 +870,9 @@ Geodude ya sigue a su carta impresa (2026-11-22, tarea 14): Pulimento (1: `ganaE
 | `ruta-1` | Ruta 1 | pidgey, rattata | — | — |
 | `ruta-2` | Ruta 2 | rattata, pidgey, caterpie, weedle | — | — |
 | `ruta-22` | Ruta 22 | rattata, spearow, nidoran-f, nidoran-m, mankey | — | — |
-| `tunel-roca` | Túnel Roca | zubat, geodude, machop, onix | PokéManiaco (cubone, slowpoke) | onix |
+| `tunel-roca` | Túnel Roca | zubat, geodude, machop, onix | PokéManiaco (cubone, slowpoke), 270 | — |
 
-Las listas de Pokémon por zona están por contrastar con Serebii o Bulbapedia (§8, 16). La zona `tunel-roca` todavía lista a Onix como jefe, lo que ya no cuadra (§8, 15).
+Las listas de Pokémon por zona están por contrastar con Serebii o Bulbapedia (§8, 16). Ninguna zona lleva jefe: el esquema ya no admite el campo y el motor rechaza una zona que lo traiga (#375). El Túnel Roca va en el tramo 4 y sin jefe propio (§10.7, 2026-11-26).
 
 ### Región de Kanto (`catalog/campana/regiones/kanto.json`, 18 nodos)
 
