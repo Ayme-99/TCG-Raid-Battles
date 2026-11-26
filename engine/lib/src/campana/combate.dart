@@ -776,6 +776,15 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
     final total = atacanteNuevo.energia + efecto.valor;
     atacanteNuevo = atacanteNuevo.copiarCon(energia: total > max ? max : total);
   }
+  if (efecto is CuraAlAtacar) {
+    // Absorber: tras el daño, se cura (con tope), aunque el Defensor caiga.
+    final yo = atacanteNuevo.pokemonActivo;
+    final max = yo.especie.ps;
+    final ps = yo.ps + efecto.valor;
+    atacanteNuevo = atacanteNuevo.copiarCon(
+        equipo: [...atacanteNuevo.equipo]..[atacanteNuevo.activo] =
+            yo.conPs(ps > max ? max : ps));
+  }
   if (efecto is ReduceDanoPropio && efecto.valor > atacante.proteccion) {
     atacanteNuevo = atacanteNuevo.copiarCon(proteccion: efecto.valor);
   }

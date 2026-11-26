@@ -576,6 +576,18 @@ List<String> describirAccion(
           : '$de pierde $perdido PS y queda fuera de combate.');
     }
   }
+  // Absorber (curaAlAtacar, D-20 §3.6): el atacante se cura tras el daño.
+  if (accion is Atacar) {
+    final a = antes.bando(accion.bando);
+    final d = despues.bando(accion.bando);
+    final curado = d.equipo[a.activo].ps - a.equipo[a.activo].ps;
+    if (curado > 0) {
+      final nombre = a.pokemonActivo.especie.nombre;
+      lineas.add(accion.bando == Bando.jugador
+          ? 'Tu $nombre recupera $curado PS.'
+          : '$nombre rival recupera $curado PS.');
+    }
+  }
   if (accion is Atacar &&
       antes.bando(accion.bando.otro).pokemonActivo.ps ==
           despues.bando(accion.bando.otro).pokemonActivo.ps &&

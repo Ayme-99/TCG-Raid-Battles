@@ -43,6 +43,17 @@ class GanaEnergia extends EfectoAtaque {
   const GanaEnergia(this.valor);
 }
 
+/// Absorber (Paras, D-20 §3.6, decidido el 2026-11-26): **tras hacer su
+/// daño**, el atacante se cura [valor] PS (10, fijo; no la mitad del daño),
+/// sin pasar de su máximo. Cura aunque el Defensor caiga o tenga Muro Mágico
+/// (es un ataque de daño directo); si el ataque no se lleva a cabo (moneda de
+/// fallo con cruz), no cura. Instantáneo: no deja estado.
+class CuraAlAtacar extends EfectoAtaque {
+  final int valor;
+
+  const CuraAlAtacar(this.valor);
+}
+
 /// Lanza una moneda al atacar: si sale cara, el ataque hace [valor] puntos de
 /// daño más (Hiper Colmillo). El daño de la carta ([AtaqueCampana.dano]) es el
 /// de cruz; el extra se suma al daño base, antes de reducciones, debilidad y
