@@ -306,9 +306,6 @@ class ZonaCampana {
   final List<String> salvajes;
   final List<EntrenadoresDeZona> entrenadores;
 
-  /// Id del Pokémon jefe de la zona, si lo hay.
-  final String? jefe;
-
   /// Si sus salvajes se pueden capturar. La Ruta 1 no deja: solo se aprende
   /// a combatir (D-20 §10.6). En el JSON, `captura` (true si no está).
   final bool permiteCaptura;
@@ -319,7 +316,6 @@ class ZonaCampana {
     required this.region,
     required this.salvajes,
     this.entrenadores = const [],
-    this.jefe,
     this.permiteCaptura = true,
   });
 
@@ -327,12 +323,19 @@ class ZonaCampana {
   Set<String> get todosLosPokemon => {
         ...salvajes,
         for (final e in entrenadores) ...e.pokemon,
-        if (jefe != null) jefe!,
       };
 }
 
 /// Una zona a partir de su JSON (`catalog/campana/zonas/*.json`).
+///
+/// Una zona no lleva jefe: los jefes son cartas NN/20 de `jefes/` y los pone
+/// un nodo `jefe` de la región (D-20 §4, Jefes; §10.8). Un `jefe` en la zona
+/// es un error de datos (#375).
 ZonaCampana zonaCampanaDesdeJson(Map<String, dynamic> json) {
+  if (json.containsKey('jefe')) {
+    throw FormatException('La zona "${json['id']}" lleva "jefe": los jefes '
+        'van en un nodo de la región, no en la zona (D-20 §4, Jefes).');
+  }
   final entrenadores = json['entrenadores'];
   return ZonaCampana(
     id: _campo<String>(json, 'id'),
@@ -354,7 +357,6 @@ ZonaCampana zonaCampanaDesdeJson(Map<String, dynamic> json) {
               ),
           ]
         : const [],
-    jefe: json['jefe'] as String?,
     permiteCaptura: (json['captura'] as bool?) ?? true,
   );
 }

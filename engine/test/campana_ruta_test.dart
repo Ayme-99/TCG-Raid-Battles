@@ -245,6 +245,34 @@ void main() {
           [['pidgey'], ['rattata']]);
     });
 
+    test('la escena de la Ruta 1 usa las zonas de Arte (#415)', () {
+      final arte = leer(File('../docs/diseno-ui/escenas/ruta-1.zonas.json'));
+      final rel = {
+        for (final z in arte['zonas'] as List)
+          (z as Map)['id'] as String: [
+            for (final v in z['rel'] as List) (v as num).toDouble()
+          ]
+      };
+      void igual(ZonaPulsable z, String id) =>
+          expect([z.x, z.y, z.ancho, z.alto], rel[id], reason: id);
+      ZonaPulsable de(String nodo, AccionZona a, [String? destino]) =>
+          kanto.nodo(nodo).escena!.zonas.singleWhere(
+              (z) => z.accion == a && z.destino == destino);
+
+      for (final n in ['ruta-1', 'ruta-1-pidgey', 'ruta-1-rattata']) {
+        expect(kanto.nodo(n).escena!.imagen, 'ruta-1', reason: n);
+      }
+      igual(de('ruta-1', AccionZona.ir, 'ruta-1-pidgey'), 'hierba-izquierda');
+      igual(de('ruta-1', AccionZona.ir, 'ruta-1-rattata'), 'hierba-derecha');
+      igual(de('ruta-1', AccionZona.ir, 'pueblo-paleta'), 'entrada');
+      igual(de('ruta-1-pidgey', AccionZona.combate), 'hierba-izquierda');
+      igual(de('ruta-1-rattata', AccionZona.combate), 'hierba-derecha');
+      for (final n in ['ruta-1-pidgey', 'ruta-1-rattata']) {
+        igual(de(n, AccionZona.ir, 'ruta-1'), 'entrada');
+        igual(de(n, AccionZona.ir, 'ciudad-verde'), 'salida-ciudad-verde');
+      }
+    });
+
     test('Ciudad Verde tiene centro Pokémon y la Ruta 22 es un desvío opcional',
         () {
       expect(kanto.nodo('ciudad-verde').tipo, TipoNodo.descanso);

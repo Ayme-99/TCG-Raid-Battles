@@ -655,13 +655,26 @@ void main() {
       }
     });
 
-    test('el Túnel Roca: Zubat, Geodude, Machop y Onix salvajes', () {
+    test('el Túnel Roca: Zubat, Geodude, Machop y Onix salvajes, sin jefe', () {
       final z = zonas.firstWhere((z) => z.id == 'tunel-roca');
       expect(z.region, 'kanto');
       expect(z.salvajes, ['zubat', 'geodude', 'machop', 'onix']);
       expect(z.entrenadores.single.clase, 'PokéManiaco');
       expect(z.entrenadores.single.pokemon, ['cubone', 'slowpoke']);
-      expect(z.jefe, 'onix');
+      expect(z.entrenadores.single.dinero, 270);
+    });
+
+    test('una zona no lleva jefe: los jefes van en un nodo de la región', () {
+      expect(
+        () => zonaCampanaDesdeJson({
+          'id': 'tunel-roca',
+          'nombre': 'Túnel Roca',
+          'region': 'kanto',
+          'salvajes': ['onix'],
+          'jefe': 'onix',
+        }),
+        throwsFormatException,
+      );
     });
   });
 
