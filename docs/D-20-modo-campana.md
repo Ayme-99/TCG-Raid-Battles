@@ -308,7 +308,7 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 | **Staryu** | **Nueva** | Misty | Agua | 60 | Eléctrico ×2 | 1 | Intermedio (20 XP) | Placaje (1 energía, 10) · Giro rápido (2 energías, 30) |
 | **Starmie** | **Nueva** | Misty (no capturable en el tramo 2) | Agua | 100 (Fase 1; evoluciona de Staryu con Piedra Agua, aún sin usar) | Eléctrico ×2 | 0 | Fuerte (30 XP) | Rayo burbuja (2 energías, 50) · Cascada (3 energías, 90) |
 
-Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. **Jigglypuff sí lleva Canto** (su ataque emblema, Ayme 2026-11-26): es la **primera carta que causa Dormido**, así que se cumple la condición de §8 punto 25 (#436) y Programación tiene que crear el estado. **Regla de Dormido decidida por Ayme el 2026-11-26 (§10.2):** en cada **chequeo Pokémon** (cada vez que cambia el turno, de cualquiera de los dos bandos) se lanza una moneda y, si sale cara, el Pokémon se despierta. Dormido **no puede atacar ni retirarse**; la única forma de cambiarlo es la **Cuerda Huida**.
+Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. **Jigglypuff sí lleva Canto** (su ataque emblema, Ayme 2026-11-26): es la **primera carta que causa Dormido**, así que se cumple la condición de §8 punto 25 (#436) y Programación tiene que crear el estado. **Regla de Dormido decidida por Ayme el 2026-11-26 (§10.2; en la banca se curan los estados):** en cada **chequeo Pokémon** (cada vez que cambia el turno, de cualquiera de los dos bandos) se lanza una moneda y, si sale cara, el Pokémon se despierta. Dormido **no puede atacar ni retirarse**; la única forma de cambiarlo es la **Cuerda Huida**.
 
 ### Reglas del recorrido
 
@@ -619,7 +619,7 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 | 2026-11-22 | **Derrota:** al perder vuelves al **último punto donde te has curado** (centro Pokémon, zona de descanso…). No es lo mismo que curar fuera de combate (Pociones). | §4 |
 | 2026-11-21 | **El azar entra en el motor** con una semilla (reproducible y con las mismas cuentas en la VM y en web). | §3.6 |
 | 2026-11-21 | **Envenenado:** hace daño en cada **chequeo Pokémon**, es decir, cada vez que cambia el turno. | §3.6 |
-| 2026-11-26 | **Estado Dormido** (Ayme, #380, #436; causado por el Canto de Jigglypuff, §4): **cada vez que cambia el turno, en el chequeo Pokémon, se lanza una moneda y, si sale cara, el Pokémon se despierta.** Dormido **no puede atacar ni retirarse**: solo se cambia con la **Cuerda Huida** (§10.6). Programación crea el estado, el efecto `duermeDefensor`, la IA y el simulador (Dirección crea la tarea). **Por confirmar:** si cambiar a un Dormido con la Cuerda Huida lo deja despierto en la banca o sigue Dormido. | §3.2, §8 punto 25 |
+| 2026-11-26 | **Estado Dormido** (Ayme, #380, #436; causado por el Canto de Jigglypuff, §4): **cada vez que cambia el turno, en el chequeo Pokémon, se lanza una moneda y, si sale cara, el Pokémon se despierta.** Dormido **no puede atacar ni retirarse**: solo se cambia con la **Cuerda Huida** (§10.6). Programación crea el estado, el efecto `duermeDefensor`, la IA y el simulador (Dirección crea la tarea). **Regla general decidida por Ayme el 2026-11-26: al pasar a la banca se curan los efectos de estado** (Dormido, Paralizado, Confundido y Envenenado), como en el JCC; así, un Dormido cambiado con la Cuerda Huida queda despierto en la banca. Programación lo comprueba con los estados que ya existen (por si algún motor hoy los conserva). | §3.2, §8 punto 25 |
 
 ### 10.3 Tipos
 
