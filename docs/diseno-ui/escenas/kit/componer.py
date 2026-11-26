@@ -34,7 +34,7 @@ def main(ruta):
             x, y, w, h = z["rect"]
             if fl == -1: x = s["ancho"] - x - w
             r = [round(o["x"] + (x - ax) * k), round(o["y"] + (y - ay) * k), round(w * k), round(h * k)]
-            q = {"id": f'{o.get("id", o["sprite"])}-{z["id"]}', "tipo": z["tipo"], "accion": None, "rect": r}
+            q = {"id": (o.get("id", o["sprite"]) if z["id"] == "cuerpo" else f'{o.get("id", o["sprite"])}-{z["id"]}'), "tipo": z["tipo"], "accion": None, "rect": r}
             q.update(o.get("acciones", {}).get(z["id"], {}))
             zonas.append(q)
     zonas += esc.get("zonas_extra", [])

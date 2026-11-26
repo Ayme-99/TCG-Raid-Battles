@@ -57,6 +57,28 @@ def matas():
     for i in range(3):
         x = 18 + i * 14; o += f'<path d="M{x-8} 44 q4 -22 8 -34 q4 14 12 34z" fill="#3a9a4a" stroke="#1d5a2b" stroke-width="2"/>'
     sprite("mata-hierba", 50, 44, o, [], "Mata de hierba pequeña, de relleno.")
+def hierba_alta_sprite(id, w, h, seed, nota):
+    p = PAD; r = random.Random(seed)
+    o = f'<rect x="{p}" y="{p+10}" width="{w}" height="{h-10}" rx="46" fill="#2a7a3a" stroke="{INK}" stroke-width="6"/>'
+    cols = ["#2f9a4e", "#3aa85a", "#52c46a", "#278a45"]
+    pts = sorted([(r.randint(p + 16, p + w - 16), r.randint(p + 40, p + h - 6)) for _ in range(int(w * h / 1300))], key=lambda q: q[1])
+    for bx, by in pts:
+        o += f'<path d="M{bx-9} {by} q8 -30 9 -44 q5 24 9 44z" fill="{r.choice(cols)}" stroke="#1d5a2b" stroke-width="1.5"/>'
+    sprite(id, w, h, o, [{"id": "cuerpo", "tipo": "hierba-alta", "rect": [p, p + 10, w, h - 10]}], nota)
+def valla():
+    p = 20; o = ""
+    o += f'<ellipse cx="{p+110}" cy="{p+74}" rx="120" ry="9" fill="#1b4d2a" opacity=".25"/>'
+    for y in (22, 46): o += f'<rect x="{p}" y="{p+y}" width="220" height="10" rx="3" fill="#c9895a" stroke="{INK}" stroke-width="3"/>'
+    for x in (6, 106, 206): o += f'<rect x="{p+x}" y="{p+8}" width="14" height="66" rx="3" fill="#a96f3f" stroke="{INK}" stroke-width="3"/>'
+    sprite("valla", 240, 74, o, [], "Tramo de valla de madera (3 postes).")
+def roca():
+    p = 20
+    o = f'<ellipse cx="{p+46}" cy="{p+52}" rx="58" ry="10" fill="#1b4d2a" opacity=".25"/><path d="M{p} {p+50} q-4 -30 22 -42 q26 -12 52 4 q24 14 16 38z" fill="#b8b6c2" stroke="{INK}" stroke-width="4" stroke-linejoin="round"/><path d="M{p+16} {p+18} q16 -10 34 -2" fill="none" stroke="#e6e4ee" stroke-width="5" stroke-linecap="round"/><path d="M{p+50} {p+50} q10 -22 38 -26 q4 14 0 26z" fill="#9694a6"/>'
+    sprite("roca", 92, 54, o, [], "Roca pequeña gris.")
+def arbol2():
+    p = PAD; s = 1.0
+    o = pine(p + 40, p + 80, s)
+    sprite("arbol-2", 80, 150, o, [], "Conífera (segundo tipo de árbol).")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -64,5 +86,8 @@ casa("casa-pequena-azul", 240, 195, "#3b72e0", "#2a56b3", "Casa pequeña de veci
 casa("casa-pequena-roja", 250, 205, "#c2405b", "#9b2f46", "Casa pequeña de vecino, tejado rojo.")
 casa("casa-pequena-verde", 230, 170, "#2f9a4e", "#25803f", "Casa pequeña de Ciudad Verde, tejado verde (ya usada en la base de Ciudad Verde).")
 buzon(); farola(); arbol("arbol-1", 56, "Árbol redondo grande, copa clara."); arbusto(); matas()
+hierba_alta_sprite("hierba-alta-grande", 690, 820, 11, "Mancha grande de hierba alta (zona de combate de ruta).")
+hierba_alta_sprite("hierba-alta-media", 400, 300, 12, "Mancha de hierba alta mediana.")
+valla(); roca(); arbol2()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")
