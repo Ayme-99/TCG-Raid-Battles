@@ -558,6 +558,9 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 20 | **Usar Poción en combate sin gastar turno** (Programación, #458): motor, IA y pantalla de combate. Empieza cuando Calidad haya medido (tarea 19) | Pendiente |
 | 21 | **Quitar `metal`** del enum de tipos, del esquema y de la app, y borrar el icono `sprites_ajenos/iconos_tipo/metal.png` (§10.9, #408; #459) | Pendiente |
 | 22 | **Guardar la partida de campaña en la cuenta** y exigir sesión para jugarla (§6, §10.1; #390). Tarea secundaria, sin prisa; Programación abre la issue | Pendiente |
+| 23 | **Muro Mágico de Clefairy jefe** (Programación, #380): tipo de habilidad nuevo `sinDanoIndirecto` (no recibe daño del veneno ni de `drenaDefensor`; solo le hacen daño los ataques), esquema, motor, IA y simulador. La carta funciona sin la habilidad hasta entonces | Pendiente |
+| 24 | **Estado Dormido y Canto de Jigglypuff** (Programación, #380, #436): moneda en cada chequeo Pokémon (cara = despierta), no ataca ni se retira (solo Cuerda Huida), efecto `duermeDefensor`, IA y simulador; **al pasar a la banca se curan los estados** (§10.2; comprobar Paralizado, Confundido y Envenenado) | Pendiente |
+| 25 | **Jefe 02 Clefairy y zonas del tramo 2** (Programación, #380): JSON del jefe (`clefairy-jefe`, 120 PS, imagen `clefairy-jefe.webp`) y de las zonas `ruta-3`, `monte-moon`, `ruta-4`, `gimnasio-celeste` y `ruta-24`, y los nodos en `kanto.json`. Empieza cuando Ayme haya hecho las cartas del tramo (§4) | Pendiente |
 
 ## 10. Registro de decisiones
 
