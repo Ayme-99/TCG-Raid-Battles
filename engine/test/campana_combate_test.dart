@@ -692,9 +692,9 @@ void main() {
     });
 
     test('con cara el Defensor queda Confundido; con cruz, no', () {
-      expect(usado(porMoneda[true]!).rival.cegado, isTrue);
-      expect(usado(porMoneda[false]!).rival.cegado, isFalse);
-      expect(usado(porMoneda[true]!).jugador.cegado, isFalse);
+      expect(usado(porMoneda[true]!).rival.confundido, isTrue);
+      expect(usado(porMoneda[false]!).rival.confundido, isFalse);
+      expect(usado(porMoneda[true]!).jugador.confundido, isFalse);
     });
 
     test('Confundido: con cruz en su ataque no hace nada y gasta la energía',
@@ -702,7 +702,7 @@ void main() {
       final resultados = <bool, EstadoCombate>{};
       for (var s = 1; s <= 80; s++) {
         final e0 = usado(s);
-        if (!e0.rival.cegado) continue;
+        if (!e0.rival.confundido) continue;
         final e = aplicarCombate(e0, const Atacar(Bando.rival, 0));
         resultados[e.ultimaMoneda!] = e;
       }
@@ -711,14 +711,14 @@ void main() {
       expect(cara.jugador.pokemonActivo.ps, 60);
       expect(cruz.jugador.pokemonActivo.ps, 100);
       expect(cruz.rival.energia, cara.rival.energia);
-      expect(cara.rival.cegado, isFalse);
-      expect(cruz.rival.cegado, isFalse);
+      expect(cara.rival.confundido, isFalse);
+      expect(cruz.rival.confundido, isFalse);
     });
 
     test('solo dura su próximo turno', () {
       var e = usado(porMoneda[true]!);
       e = aplicarCombate(e, const Cargar(Bando.rival));
-      expect(e.rival.cegado, isFalse);
+      expect(e.rival.confundido, isFalse);
       e = aplicarCombate(e, const Cargar(Bando.jugador));
       e = aplicarCombate(e, const Atacar(Bando.rival, 0));
       expect(e.jugador.pokemonActivo.ps, 60, reason: 'sin moneda, hace daño');
@@ -747,7 +747,7 @@ void main() {
         expect(e.rival.pokemonActivo.ps, 160);
         final m = e.ultimasMonedas!;
         expect(m, hasLength(2));
-        expect(e.rival.cegado, m[0] && m[1]);
+        expect(e.rival.confundido, m[0] && m[1]);
         vistos.add(m.join(','));
       }
       expect(vistos, hasLength(4), reason: 'salen las cuatro combinaciones');

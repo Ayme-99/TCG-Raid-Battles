@@ -91,6 +91,14 @@ class BandoCombate {
   /// rival, [MonedaFalloRival.mientrasActivo]). Se quita al cambiar de activo.
   final bool cegadoMientrasActivo;
 
+  /// Confundido (Supersónico, Hidropulso o Rayo Confuso del rival,
+  /// [ConfundeDefensor]): en su próximo turno, si ataca, lanza una moneda y
+  /// con cruz ese ataque no hace nada, como [cegado]. Va aparte de [cegado]
+  /// porque Rapidez ([AtaqueCampana.ignoraFallo]) ignora la moneda de
+  /// Bofetón Lodo y Pantalla de Humo, pero no la de la Confusión (D-20 §3.6,
+  /// recomendación de Dirección en #524). Dura solo ese turno.
+  final bool confundido;
+
   /// Si el veneno de [veneno] es de Drenadoras ([DrenaDefensor]): cada chequeo
   /// que quita PS cura además al activo del otro bando. Se quita al cambiar.
   final bool drenado;
@@ -151,6 +159,7 @@ class BandoCombate {
     this.proteccion = 0,
     this.cegado = false,
     this.cegadoMientrasActivo = false,
+    this.confundido = false,
     this.drenado = false,
     this.paralizado = false,
     this.dormido = false,
@@ -196,6 +205,7 @@ class BandoCombate {
     int? proteccion,
     bool? cegado,
     bool? cegadoMientrasActivo,
+    bool? confundido,
     bool? drenado,
     bool? paralizado,
     bool? dormido,
@@ -218,6 +228,7 @@ class BandoCombate {
         proteccion: proteccion ?? this.proteccion,
         cegado: cegado ?? this.cegado,
         cegadoMientrasActivo: cegadoMientrasActivo ?? this.cegadoMientrasActivo,
+        confundido: confundido ?? this.confundido,
         drenado: drenado ?? this.drenado,
         paralizado: paralizado ?? this.paralizado,
         dormido: dormido ?? this.dormido,
@@ -608,6 +619,7 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
           proteccion: 0,
           cegado: false,
           cegadoMientrasActivo: false,
+          confundido: false,
           drenado: false,
           paralizado: false,
           dormido: false,
@@ -664,9 +676,13 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   var semilla = estado.semilla;
   bool? moneda;
   final monedas = <bool>[];
-  if (atacante.cegado || atacante.cegadoMientrasActivo) {
-    // Bofetón Lodo o Pantalla de Humo del rival: con cruz este ataque no hace
-    // nada. Pantalla de Humo sigue mientras el Pokémon siga activo.
+  // Rapidez (ignoraFallo) no lanza la moneda de Bofetón Lodo ni de Pantalla
+  // de Humo; la de la Confusión, sí.
+  final falloRival = !ataque.ignoraFallo &&
+      (atacante.cegado || atacante.cegadoMientrasActivo);
+  if (falloRival || atacante.confundido) {
+    // Bofetón Lodo, Pantalla de Humo o Confusión: con cruz este ataque no
+    // hace nada. Pantalla de Humo sigue mientras el Pokémon siga activo.
     semilla = _siguienteSemilla(semilla);
     moneda = (semilla >> 8) & 1 == 1;
     monedas.add(moneda);
@@ -677,6 +693,7 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
               atacante.copiarCon(
                   energia: atacante.energia - ataque.coste,
                   cegado: false,
+                  confundido: false,
                   ultimoAtaque: a.indice,
                   racha: racha))
           .copiarCon(
@@ -776,8 +793,8 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
     }
   }
   if (efecto is ConfundeDefensor) {
-    // Supersónico e Hidropulso: si todas salen cara, el mismo estado que
-    // Bofetón Lodo.
+    // Supersónico e Hidropulso: si todas salen cara, Confundido (la misma
+    // moneda de fallo que Bofetón Lodo, en un campo aparte).
     var todasCara = true;
     for (var i = 0; i < efecto.monedas; i++) {
       semilla = _siguienteSemilla(semilla);
@@ -785,7 +802,7 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
       monedas.add(moneda);
       if (!moneda) todasCara = false;
     }
-    if (todasCara) defensorNuevo = defensorNuevo.copiarCon(cegado: true);
+    if (todasCara) defensorNuevo = defensorNuevo.copiarCon(confundido: true);
   }
   if (efecto is DuermeDefensor) {
     // Canto: si todas salen cara, el Defensor se duerme (si sigue en pie).
@@ -893,6 +910,7 @@ BandoCombate _conNuevoActivo(BandoCombate b, int indice, int energia) =>
         proteccion: 0,
         cegado: false,
         cegadoMientrasActivo: false,
+        confundido: false,
         drenado: false,
         paralizado: false,
         dormido: false,
@@ -1011,7 +1029,11 @@ EstadoCombate _terminarTurno(EstadoCombate estado) {
   // Bofetón Lodo y la parálisis solo duran el turno que acaba de jugarse.
   final cambiado = estado
       .conBando(termina,
-          actual.copiarCon(energia: energia, cegado: false, paralizado: false))
+          actual.copiarCon(
+              energia: energia,
+              cegado: false,
+              confundido: false,
+              paralizado: false))
       .copiarCon(
         turno: termina.otro,
         numeroTurno: estado.numeroTurno + 1,
@@ -1161,6 +1183,7 @@ EstadoCombate _llamarAliado(EstadoCombate estado) {
             proteccion: 0,
             cegado: false,
             cegadoMientrasActivo: false,
+            confundido: false,
             drenado: false,
             paralizado: false,
             dormido: false,
