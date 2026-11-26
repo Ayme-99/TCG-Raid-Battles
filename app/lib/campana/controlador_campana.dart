@@ -575,6 +575,10 @@ List<String> describirAccion(
     if (a.dormido && !d.dormido && d.pokemonActivo.enPie) {
       lineas.add('$de se despierta.');
     }
+    if (!a.apresado && d.apresado) lineas.add('$de queda apresado.');
+    if (a.apresado && !d.apresado && d.pokemonActivo.enPie) {
+      lineas.add('$de se libera.');
+    }
   }
   for (final b in [accion.bando.otro, accion.bando]) {
     final a = antes.bando(b).equipo;
