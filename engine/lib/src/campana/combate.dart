@@ -1010,7 +1010,7 @@ EstadoCombate _terminarTurno(EstadoCombate estado) {
 }
 
 /// Chequeo Pokémon, cada vez que cambia el turno: el activo envenenado de cada
-/// bando pierde su veneno en PS y, si sigue en pie y está Dormido, lanza una
+/// bando pierde su veneno en PS (salvo con Muro Mágico) y, si sigue en pie y está Dormido, lanza una
 /// moneda: con cara se despierta (D-20 §10.2). Va primero el bando que acaba
 /// de terminar su turno; si su último Pokémon cae, el combate termina y gana
 /// el otro aunque el segundo chequeo también lo hubiera derribado.
@@ -1035,11 +1035,14 @@ EstadoCombate _chequeoSueno(EstadoCombate s, Bando b) {
       .copiarCon(semilla: semilla);
 }
 
-/// El veneno del chequeo de [b] (y la cura de Drenadoras al otro bando).
+/// El veneno del chequeo de [b] (y la cura de Drenadoras al otro bando). Con
+/// Muro Mágico ([SinDanoIndirecto]) el activo sigue Envenenado pero no pierde
+/// PS, y Drenadoras tampoco cura (no ha quitado nada).
 EstadoCombate _chequeoVeneno(EstadoCombate s, Bando b) {
   final bando = s.bando(b);
   final activo = bando.pokemonActivo;
   if (bando.veneno <= 0 || !activo.enPie) return s;
+  if (sinDanoIndirecto(activo.especie)) return s;
   final equipo = [...bando.equipo]..[bando.activo] =
       activo.conPs(activo.ps - bando.veneno);
   final nuevo = bando.copiarCon(equipo: equipo);

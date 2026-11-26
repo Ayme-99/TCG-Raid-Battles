@@ -188,6 +188,21 @@ class MonedaDanoExtraAlAtacar extends HabilidadCampana {
   const MonedaDanoExtraAlAtacar(super.nombre, this.valor);
 }
 
+/// Muro Mágico (Clefairy jefe, D-20 §4 y §3.6, decidido el 2026-11-26):
+/// mientras el Pokémon esté activo **solo le hacen daño los ataques**. No
+/// recibe el daño indirecto: el del veneno, el de Drenadoras
+/// ([DrenaDefensor], y entonces tampoco cura al que lo usó) y, cuando exista,
+/// el de apresar. Los estados sí se le ponen (sigue Envenenado, sin perder
+/// PS). En campaña no hay golpe de la Confusión a uno mismo (Confundido es la
+/// moneda de fallo), así que no hay nada que decidir sobre él.
+class SinDanoIndirecto extends HabilidadCampana {
+  const SinDanoIndirecto(super.nombre);
+}
+
+/// Si [especie] no recibe daño indirecto (Muro Mágico, [SinDanoIndirecto]).
+bool sinDanoIndirecto(PokemonCampana especie) =>
+    especie.habilidad is SinDanoIndirecto;
+
 /// Un ataque de un Pokémon de campaña. Un ataque con [efecto] puede tener
 /// [dano] 0 (solo hace el efecto).
 class AtaqueCampana {

@@ -195,6 +195,12 @@ HabilidadCampana? _habilidadDesdeJson(dynamic json) {
   switch (_campo<String>(h, 'tipo')) {
     case 'monedaDanoExtraAlAtacar':
       return MonedaDanoExtraAlAtacar(nombre, _campo<int>(h, 'valor'));
+    case 'sinDanoIndirecto':
+      if (h.containsKey('valor')) {
+        throw const FormatException(
+            'sinDanoIndirecto (Muro Mágico) no lleva "valor".');
+      }
+      return SinDanoIndirecto(nombre);
   }
   throw FormatException('Habilidad desconocida: ${h['tipo']}');
 }
