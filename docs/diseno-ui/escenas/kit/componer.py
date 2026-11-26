@@ -5,7 +5,7 @@ Escena: {"escena","caminos":[{"material","ancho","d"}],"objetos":[{"sprite","x",
 "zonas_extra":[{"id","tipo","accion","destino","rect"}]}. (x,y) = ancla del sprite (base centrada)."""
 import json, os, re, subprocess, sys
 from vec import INK, defs
-MAT = {"tierra": ("#efd79b", INK), "piedra": ("#e8dfcf", INK), "hierba": ("#a6e07a", "#4e9a3a")}
+MAT = {"tierra": ("#efd79b", INK), "piedra": ("#e8dfcf", INK), "hierba": ("#a6e07a", "#4e9a3a"), "agua": ("#7fd6f5", INK)}
 W, H = 1920, 1088
 def main(ruta):
     esc = json.load(open(ruta)); cat = json.load(open("sprites.json"))
@@ -22,6 +22,10 @@ def main(ruta):
     for c in esc.get("caminos", []):
         f, e = MAT[c["material"]]
         body += f'<path d="{c["d"]}" fill="none" stroke="{f}" stroke-width="{c["ancho"]}" stroke-linecap="round" stroke-linejoin="round"/>'
+    for c in esc.get("caminos", []):
+        if c["material"] == "agua":
+            for dy in (-c["ancho"] * .22, c["ancho"] * .22):
+                body += f'<path d="{c["d"]}" transform="translate(0 {dy})" fill="none" stroke="#c4f0ff" stroke-width="6" stroke-linecap="round" stroke-dasharray="46 90"/>'
     zonas = []
     objs = sorted(esc["objetos"], key=lambda o: (o.get("z", 0), o["y"]))
     for o in objs:
