@@ -22,7 +22,7 @@ Cómo leerlo:
 | 8 | Relación con las cartas físicas | Misma imagen y misma numeración, sin escaneo ni canje; reglas de reimpresión y de uso privado. El código de canje queda como idea futura. | §3.5 |
 | 9 | Bono de primera captura | **Decidido el 2026-11-25:** por ahora **no hay** bono (+50 puntos por carta nueva). Se puede revisar con datos de uso. | §3.6 |
 | 10 | Cómo se presenta el modo campaña al grupo | Tres fases: Ayme solo, 2 o 3 probadores, grupo entero; con el mensaje de §4.3. | §4 |
-| 11 | Sesión | **Decidido el 2026-11-25:** solo la partida libre en **formato físico** no usa cuenta; todo lo demás (campaña, formato digital, tienda) exige sesión. La partida de campaña se guarda también en la cuenta. | §4.3, §6 |
+| 11 | Sesión | **Decidido el 2026-11-25:** solo la partida libre en **formato físico** no usa cuenta; todo lo demás (campaña, formato digital, tienda) exige sesión. **Decidido el 2026-11-24:** la partida de campaña se guarda también en la cuenta. | §4.3, §6 |
 
 ## 1. Marco común
 
@@ -341,7 +341,7 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 
 **Riesgos que hay que decir de entrada** (mejor sin sorpresas):
 
-- **La partida se guarda también en la cuenta** (decidido por Ayme el 2026-11-25; hecho en el PR #497). Borrar los datos del navegador ya no hace perder el progreso, así que el mensaje al grupo no lo avisa.
+- **La partida se guarda también en la cuenta** (decidido por Ayme el 2026-11-24; hecho en el PR #497). Borrar los datos del navegador ya no hace perder el progreso, así que el mensaje al grupo no lo avisa.
 - **La sesión es obligatoria** para jugar la campaña (**decidido por Ayme el 2026-11-23**; el 2026-11-25 concretó que solo la partida libre en formato físico queda sin cuenta, y el formato digital y la tienda también la exigen). En la app solo se inicia sesión y el registro se hace en Deck Tracker, así que el amigo **debe tener ya su cuenta antes de empezar**. Es la mayor fricción de la primera sesión: conviene que se la cree antes de que le llegue el enlace.
 - **No es un proyecto público.** Los sprites son de Nintendo y The Pokémon Company, tomados de Escarlata y Púrpura (#389): el enlace es para el grupo y no se reenvía ni se publica.
 
@@ -427,7 +427,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 - El servidor guarda el **total de puntos** por cuenta y los **jefes desbloqueados** (permanente, §1.2), y un registro de compras (`compras`: cuenta, producto, precio, fecha) con clave generada por el cliente para que los reintentos no cobren dos veces, como en D-10.
 - El catálogo de la tienda debe ser **datos** (`id`, familia, nombre, precio, requisitos), no constantes, para ajustar precios sin publicar app.
 - «Mis cartas» necesita un registro por carta (§3.3), con clave en el dispositivo y sincronización al iniciar sesión.
-- La **partida de campaña** ya se guarda también en la cuenta (decidido el 2026-11-25; PR #497). Aquí no se propone formato.
+- La **partida de campaña** ya se guarda también en la cuenta (decidido el 2026-11-24; PR #497). Aquí no se propone formato.
 - El servidor acepta lo que reporta el cliente con tope por hito (D-20 §6); los topes son los valores de §2.1.
 
 **Para Diseño y Calidad:** la lista de excepciones (Pikachu, Eevee), la XP necesaria para 12 ex, la curva de dinero y la simulación del número de ex en la Liga (§2.5); decidir los duplicados de sobre (§2.4); el momento exacto de cada texto de §4.5.
@@ -438,11 +438,11 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 
 ## 6. Preguntas abiertas
 
-Resueltas el 2026-11-25: los precios de §2.3 quedan decididos (iniciales, ajustables), no hay bono de primera captura y la partida de campaña se guarda también en la cuenta.
+Resueltas el 2026-11-25: los precios de §2.3 quedan decididos (iniciales, ajustables) y no hay bono de primera captura. Resuelta el 2026-11-24: la partida de campaña se guarda también en la cuenta.
 
 Resueltas el 2026-11-23: la sesión es obligatoria en la campaña, las cartas de campaña valen solo en campaña, solo se registra la carta, los puntos no se usan dentro de la campaña, y la carta de Nidoran♂ ya es la 032/150.
 
-1. ~~¿Se guarda la partida de campaña también en la cuenta?~~ **Resuelta el 2026-11-25: sí**, y ya está hecho (PR #497).
+1. ~~¿Se guarda la partida de campaña también en la cuenta?~~ **Resuelta el 2026-11-24: sí**, y ya está hecho (PR #497).
 2. **Tamaño del sobre y composición** (§2.4): son números míos.
 3. **Rarezas de las cartas del formato digital:** se han usado las del proyecto (Común a Ultra rara) y pueden no ser las definitivas.
 4. ~~Duplicados de sobre~~ **Resuelta el 2026-11-25:** carta repetida = 25 % del precio de la carta suelta de su rareza; sobres repetibles y cartas sueltas, una vez (§2.4).
