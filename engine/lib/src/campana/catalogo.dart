@@ -126,6 +126,13 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
       return QuitaEnergiaRival(_campo<int>(json, 'valor'));
     case 'ganaEnergia':
       return GanaEnergia(_campo<int>(json, 'valor'));
+    case 'curaAlAtacar':
+      final valor = _campo<int>(json, 'valor');
+      if (valor < 10 || valor % 10 != 0) {
+        throw const FormatException(
+            '"valor" de curaAlAtacar tiene que ser múltiplo de 10.');
+      }
+      return CuraAlAtacar(valor);
   }
   throw FormatException('Efecto de ataque desconocido: "$tipo".');
 }
