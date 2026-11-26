@@ -661,6 +661,7 @@ void main() {
       expect(z.salvajes, ['zubat', 'geodude', 'machop', 'onix']);
       expect(z.entrenadores.single.clase, 'PokéManiaco');
       expect(z.entrenadores.single.pokemon, ['cubone', 'slowpoke']);
+      expect(z.entrenadores.single.dinero, 270);
     });
 
     test('una zona no lleva jefe: los jefes van en un nodo de la región', () {
