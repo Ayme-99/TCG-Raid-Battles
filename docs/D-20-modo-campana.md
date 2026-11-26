@@ -259,9 +259,9 @@ Recorrido que Ayme definió el 2026-11-21 y que recoge `catalog/campana/regiones
 
 Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Caterpie, Weedle), `bosque-verde` (salvajes Caterpie, Weedle, Metapod, Kakuna y Pikachu; entrenadores Cazabichos), `ruta-22` (Rattata, Spearow, Nidoran♀, Nidoran♂, Mankey), `gimnasio-plateada` (sin salvajes; Entrenador Joven) y `tunel-roca`. Las listas de salvajes salen de los juegos (Rojo y Azul) y **están por contrastar con Serebii o Bulbapedia**.
 
-### Segundo tramo: Ciudad Plateada → Ciudad Celeste (propuesta de Diseño, 2026-11-26, por confirmar; #380)
+### Segundo tramo: Ciudad Plateada → Ciudad Celeste (decidido por Ayme el 2026-11-26, opción C; #380)
 
-**Todo esto es propuesta y las zonas y salvajes del tramo 2 aún NO están decididos (Ayme, 2026-11-26, #380).** Lo único que sale de esta propuesta ya pedido por Ayme es la tabla de cartas de abajo. Responde a la pregunta de Arte en #380 (qué hay en las zonas del tramo 2 y qué Pokémon salen). Sigue la forma del tramo 1 y la plantilla de «Rivales por tramo» de abajo (2 salvajes obligatorios, 2 entrenadores de ruta, el jefe 02, 1 entrenador de gimnasio y el líder: 7 rivales, 180 XP). Las cartas las hace Ayme (§11); aquí solo se dice qué Pokémon hacen falta. Fuentes de los juegos (FireRed y LeafGreen): **✓** contrastado con Bulbapedia, Serebii o StrategyWiki; **◐** de memoria, por contrastar.
+**Decidido por Ayme el 2026-11-26 (#380): opción C, zonas del tramo 2 como se describen y con tres salvajes raros más (Paras, Jigglypuff y Ekans).** Los valores de las cartas de la tabla son propuestos y Ayme los ajusta al crearlas. Responde a la pregunta de Arte en #380 (qué hay en las zonas del tramo 2 y qué Pokémon salen). Sigue la forma del tramo 1 y la plantilla de «Rivales por tramo» de abajo (2 salvajes obligatorios, 2 entrenadores de ruta, el jefe 02, 1 entrenador de gimnasio y el líder: 7 rivales, 180 XP). Las cartas las hace Ayme (§11); aquí solo se dice qué Pokémon hacen falta. Fuentes de los juegos (FireRed y LeafGreen): **✓** contrastado con Bulbapedia, Serebii o StrategyWiki; **◐** de memoria, por contrastar.
 
 | # | Nodo | Qué pasa |
 |---|---|---|
@@ -275,13 +275,13 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 
 | Zona | Salvajes (lo que se puede encontrar) | Entrenadores y jefe | Fuente |
 |---|---|---|---|
-| `ruta-3` | Pidgey, Spearow, Nidoran♀, Nidoran♂, Mankey (poco frecuente). **Bifurcación obligatoria: Spearow o Nidoran♂.** | Chica: Rattata, Nidoran♀. Joven: Spearow, Rattata. | ✓ Bulbapedia (Ruta 3). En los juegos también sale **Jigglypuff**, que no entra: no hay carta |
-| `monte-moon` | Zubat y Geodude (opcional, uno de los dos) | **Jefe 02 Clefairy** | ✓ Serebii y SuperCheats (Zubat, Geodude, Paras y Clefairy; Paras y Clefairy son raros) |
-| `ruta-4` | Rattata, Spearow, Sandshrew, Mankey (muy poco frecuente). **Bifurcación obligatoria: Sandshrew o Rattata.** | — | ✓ Bulbapedia (Ruta 4). En los juegos también sale Ekans, que no entra: no hay carta |
+| `ruta-3` | Pidgey, Spearow, Nidoran♀, Nidoran♂, Mankey (poco frecuente), **Jigglypuff** (raro, Intermedio). **Bifurcación obligatoria: Spearow o Nidoran♂.** | Chica: Rattata, Nidoran♀. Joven: Spearow, Rattata. | ✓ Bulbapedia (Ruta 3). Jigglypuff entra como salvaje raro (opción C); necesita carta nueva |
+| `monte-moon` | Zubat y Geodude (opcional, uno de los dos); **Paras** (raro, Intermedio) | **Jefe 02 Clefairy** | ✓ Serebii y SuperCheats (Zubat, Geodude, Paras y Clefairy; Paras y Clefairy son raros) |
+| `ruta-4` | Rattata, Spearow, Sandshrew, Mankey (muy poco frecuente), **Ekans** (raro, Intermedio). **Bifurcación obligatoria: Sandshrew o Rattata.** | — | ✓ Bulbapedia (Ruta 4). Ekans entra como salvaje raro (opción C); necesita carta nueva |
 | `gimnasio-celeste` | Sin salvajes | Nadador Luis: Horsea, Shellder. Líder Misty: Staryu, Starmie | ✓ StrategyWiki y Serebii (Misty: Staryu de nivel 18 y Starmie de nivel 21). El gimnasio de los juegos tiene también una Chica de Camping (Goldeen), que no entra |
 | `ruta-24` (opcional) | Caterpie, Weedle, Metapod, Kakuna, Pidgey | — | ✓ Caterpie (StrategyWiki); el resto ◐ |
 
-**Cartas que ya existen** y valen para todo el tramo: Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod y Kakuna. **Cartas nuevas que hacen falta: cinco**, las de la tabla siguiente. **Surf:** en la campaña aún no hay Surf, así que **ningún salvaje de las rutas es de agua**. Horsea y Shellder solo salen como Pokémon del **Nadador Luis en el gimnasio**, y los entrenadores no necesitan Surf (decidido por Ayme el 2026-11-26: el Nadador se queda).
+**Cartas que ya existen** y valen para todo el tramo: Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod y Kakuna. **Cartas nuevas que hacen falta: ocho**, las de la tabla siguiente. **Surf:** en la campaña aún no hay Surf, así que **ningún salvaje de las rutas es de agua**. Horsea y Shellder solo salen como Pokémon del **Nadador Luis en el gimnasio**, y los entrenadores no necesitan Surf (decidido por Ayme el 2026-11-26: el Nadador se queda).
 
 **Plantilla del tramo (con «Rivales por tramo», más abajo):** salvajes obligatorios 2 de categoría Común (20 XP), 2 entrenadores de ruta (60), el jefe 02 (30), el Nadador Luis (20) y Misty (50): **7 rivales y 180 XP**. Dinero: 710 para los entrenadores (por ejemplo Chica 230, Joven 230 y Luis 250) y 1.500 para Misty, según el presupuesto de §10.6.
 
@@ -300,12 +300,15 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 |---|---|---|---|---|---|---|---|---|
 | Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod, Kakuna | **Ya existen** | Salvajes y rivales | — | — | — | — | — | — |
 | **Clefairy** | **Nueva** | Jefe 02 en el Monte Moon; capturable la primera vez (carta normal) | Normal | 60 (carta normal) · 100 (jefe) | Lucha ×2 | 1 | Jefe (30 XP) | Destructor (1 energía, 20) · Doble bofetón (2 energías, 30; moneda: cara +20 con el efecto `monedaDanoExtra` que ya existe) |
+| **Paras** | **Nueva** | Salvaje raro del Monte Moon | Planta | 50 | Fuego ×2 | 1 | Intermedio (20 XP) | Arañazo (1 energía, 10) · Espora (2 energías, 30) |
+| **Jigglypuff** | **Nueva** | Salvaje raro de la Ruta 3 | Normal | 70 | Lucha ×2 | 1 | Intermedio (20 XP) | Canto (sin efecto aún: Destructor, 1 energía, 10) · Doble bofetón (2 energías, 30) |
+| **Ekans** | **Nueva** | Salvaje raro de la Ruta 4 | Oscuridad | 60 | Lucha ×2 | 0 | Intermedio (20 XP) | Mordisco (1 energía, 10) · Constricción (2 energías, 30) |
 | **Horsea** | **Nueva** | Nadador Luis (gimnasio) | Agua | 50 | Eléctrico ×2 | 1 | Común (10 XP) | Burbuja (1 energía, 10) · Chorro (2 energías, 30) |
 | **Shellder** | **Nueva** | Nadador Luis (gimnasio) | Agua | 60 | Eléctrico ×2 | 1 | Común (10 XP) | Placaje (1 energía, 10) · Pinza (2 energías, 30) |
 | **Staryu** | **Nueva** | Misty | Agua | 60 | Eléctrico ×2 | 1 | Intermedio (20 XP) | Placaje (1 energía, 10) · Giro rápido (2 energías, 30) |
 | **Starmie** | **Nueva** | Misty (no capturable en el tramo 2) | Agua | 100 (Fase 1; evoluciona de Staryu con Piedra Agua, aún sin usar) | Eléctrico ×2 | 0 | Fuerte (30 XP) | Rayo burbuja (2 energías, 50) · Cascada (3 energías, 90) |
 
-Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. En esta tabla hay cinco cartas nuevas.
+Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. En esta tabla hay ocho cartas nuevas.
 
 ### Reglas del recorrido
 
@@ -731,6 +734,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | **Centro Pokémon (propuesta M del lienzo de wireframes).** Escena interactiva como el mapa: el **mostrador** cura a todo el equipo (gratis, también a los debilitados), la **estantería** abre la tienda (en el primer tramo, Pokéball 200 y Poción 300; Super Ball con la 1.ª medalla y Ultra Ball con 5), el **PC** abre su pantalla aparte y la **puerta** vuelve al mapa. Muestra el equipo con su vida abajo y dinero y Pokéballs arriba. El motor no cambia. | §4, §5, §9; #365 |
 | 2026-11-25 | **Plataforma:** **PC es la plataforma principal** y el **móvil sigue admitido** (Ayme, #415; Dirección). Las escenas pasan de vertical (390×844) a **apaisadas 16:9** (1920×1088), y los wireframes del mapa, el combate, el equipo, el centro y el PC se plantean **apaisados, válidos para PC y móvil horizontal** ([wireframes](diseno-ui/campana-wireframes-apaisados.md)). Sustituye a la disposición vertical de las propuestas D, I, J y M. **Decidido el 2026-11-25 (Ayme):** en el móvil, la campaña **solo en horizontal** (opción A; fila siguiente). | §10.7; #415 |
 | 2026-11-25 | **Móvil: la campaña se juega solo en horizontal** (Ayme, #415, opción A). En vertical sale el aviso **«Gira el móvil»** y se fija la orientación horizontal al entrar en la campaña; el resto de la app sigue en vertical. **Un solo diseño y un solo juego de escenas 16:9**; no hay escenas ni diseño vertical. Arte no cambia; Programación hace el aviso (Dirección crea la tarea). [Wireframes](diseno-ui/campana-wireframes-apaisados.md). | §10.7; #415 |
+| 2026-11-26 | **Zonas y salvajes del tramo 2: opción C** (Ayme, #380): Ruta 3, Monte Moon, Ruta 4, Ciudad Celeste (Nadador Luis y Misty) y desvío opcional de la Ruta 24, con Paras, Jigglypuff y Ekans como salvajes raros de categoría Intermedio. Ocho cartas nuevas (Clefairy, Staryu, Starmie, Horsea, Shellder, Paras, Jigglypuff y Ekans); los valores de la tabla de §4 son propuestos y Ayme los ajusta al crearlas. Sin Surf: ningún salvaje de ruta es de agua. | §4; #380 |
 
 ### 10.8 Jefes
 
