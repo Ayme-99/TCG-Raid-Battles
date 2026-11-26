@@ -79,12 +79,14 @@ class _PantallaCombateCampanaState
       setState(() => _tocado = true);
       if (eligiendo) {
         actuar(ElegirSiguiente(Bando.jugador, i));
-      } else if (combate.jugador.paralizado &&
+      } else if ((combate.jugador.paralizado || combate.jugador.dormido) &&
           !objetivosDeCuerda(combate, Bando.jugador).contains(i)) {
-        // Dragoaliento: este turno no se puede cambiar (D-20 §3.6), salvo con
-        // una Cuerda Huida (§10.6).
-        ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(
-            content: Text('Está paralizado: este turno no puede cambiar.')));
+        // Dragoaliento o Canto: no se puede cambiar (D-20 §3.6, §10.2), salvo
+        // con una Cuerda Huida (§10.6).
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
+            content: Text(combate.jugador.dormido
+                ? 'Está dormido: solo sale con una Cuerda Huida.'
+                : 'Está paralizado: este turno no puede cambiar.')));
       } else {
         _confirmarCambio(context, combate, i, actuar);
       }
@@ -228,14 +230,25 @@ void _hojaAcciones(BuildContext context, EstadoCombate combate,
                     'Poción o una Cuerda Huida).',
                     style: TextStyle(color: _tinta)),
               ),
+            if (yo.dormido)
+              const Padding(
+                key: Key('aviso-dormido'),
+                padding: EdgeInsets.only(top: 4),
+                child: Text(
+                    'Dormido: no puede atacar ni retirarse. Puede cargar, usar '
+                    'una Poción o salir con una Cuerda Huida. En cada cambio '
+                    'de turno se lanza una moneda: con cara se despierta.',
+                    style: TextStyle(color: _tinta)),
+              ),
             const SizedBox(height: 12),
             for (var i = 0; i < especie.ataques.length; i++) ...[
               _BotonAccion(
                 clave: 'ataque-$i',
                 color: colorTipo(especie.ataques[i].tipo),
                 texto: textoAtaque(especie.ataques[i]),
-                activo:
-                    !yo.paralizado && yo.energia >= especie.ataques[i].coste,
+                activo: !yo.paralizado &&
+                    !yo.dormido &&
+                    yo.energia >= especie.ataques[i].coste,
                 alTocar: () {
                   Navigator.of(hoja).pop();
                   actuar(Atacar(Bando.jugador, i));
@@ -382,7 +395,8 @@ Future<void> _confirmarCambio(BuildContext context, EstadoCombate combate,
   final yo = combate.jugador;
   final sale = yo.equipo[indice].especie;
   final retirada = yo.pokemonActivo.especie.retirada;
-  final puedeCambiar = !yo.paralizado && yo.energia >= retirada;
+  final puedeCambiar =
+      !yo.paralizado && !yo.dormido && yo.energia >= retirada;
   final puedeCuerda =
       objetivosDeCuerda(combate, Bando.jugador).contains(indice);
   final eleccion = await mostrarDialogoCampana<AccionCombate>(
@@ -446,6 +460,7 @@ void _hojaRegistro(BuildContext context, List<String> lineas) {
 List<String> estadosDeBando(BandoCombate b) => [
       if (b.veneno > 0) b.drenado ? 'drenado' : 'envenenado',
       if (b.paralizado) 'paralizado',
+      if (b.dormido) 'dormido',
       if (b.danoReducido > 0) 'pega −${b.danoReducido}',
       if (b.danoExtra > 0) 'recibe +${b.danoExtra}',
       if (b.proteccion > 0) 'recibe −${b.proteccion}',

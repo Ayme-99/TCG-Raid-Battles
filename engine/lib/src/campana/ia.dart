@@ -11,9 +11,11 @@ import 'pokemon.dart';
 /// Orden de decisión:
 /// 1. Si cae su Pokémon activo, saca el relevo con mejor combinación de no ser
 ///    débil, daño que puede hacer y salud.
-///    Si está Paralizado (Dragoaliento), carga: no puede atacar ni cambiar
-///    (salvo curarse con una Poción, como en el paso 2 bis, o salir con una
-///    Cuerda Huida si el paso 3 querría cambiar).
+///    Si está Paralizado (Dragoaliento) o Dormido (Canto), carga: no puede
+///    atacar ni cambiar (salvo curarse con una Poción, como en el paso 2 bis,
+///    o salir con una Cuerda Huida si el paso 3 querría cambiar). Que un
+///    Dormido pueda cargar es la recomendación de Dirección (#511), por
+///    confirmar.
 /// 2. Si puede dejar fuera de combate al rival, ataca con lo más barato que
 ///    lo logre.
 /// 2 bis. Pociones (D-20 §3.2, #458; no gastan turno): si el rival puede
@@ -23,6 +25,9 @@ import 'pokemon.dart';
 ///    siguiente llamada vuelve a decidir (otra Poción o la acción del turno).
 ///    El rival no usa objetos mientras [ParametrosCombate.rivalUsaObjetos]
 ///    sea false (propuesta de Diseño por confirmar).
+/// 2 ter. Canto (propuesta de Programación, #511): si el rival puede derribar
+///    a su activo en su próximo turno, no está ya Dormido y tiene un ataque
+///    que duerme ([DuermeDefensor]), lo usa para intentar que no ataque.
 /// 3. Si su activo es débil a un ataque del rival, o no llega a ningún ataque,
 ///    cambia a un relevo que sí le sirva (nunca al jefe que espera a que caiga
 ///    su aliado).
@@ -97,8 +102,8 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
     return relevo == null ? null : UsarCuerdaHuida(bando, relevo);
   }
 
-  // Paralizado (Dragoaliento): este turno no puede atacar ni cambiar.
-  if (yo.paralizado) {
+  // Paralizado (Dragoaliento) o Dormido (Canto): no puede atacar ni cambiar.
+  if (yo.paralizado || yo.dormido) {
     if (pocion != null) return pocion;
     return (debil || ataque == null ? cuerda() : null) ?? Cargar(bando);
   }
@@ -107,6 +112,9 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
     return Atacar(bando, ataque);
   }
   if (pocion != null) return pocion;
+
+  final canto = _ataqueDeSueno(estado, bando);
+  if (canto != null) return Atacar(bando, canto);
 
   if (debil || ataque == null) {
     if (activo.retirada <= yo.energia) {
@@ -154,6 +162,18 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
 UsarPocion? _pocionQueSalva(EstadoCombate estado, Bando bando) {
   final yo = estado.bando(bando);
   if (!objetivosDePocion(estado, bando).contains(yo.activo)) return null;
+  final activo = yo.pokemonActivo;
+  final amenaza = _amenaza(estado, bando);
+  if (amenaza <= 0 || activo.ps > amenaza) return null;
+  if (activo.especie.ps <= amenaza) return null;
+  return UsarPocion(bando, yo.activo);
+}
+
+/// Daño que el rival puede hacer al activo de [bando] en su próximo turno:
+/// su golpe más fuerte que pueda pagar, más el veneno de los dos chequeos
+/// (nada con Muro Mágico).
+int _amenaza(EstadoCombate estado, Bando bando) {
+  final yo = estado.bando(bando);
   final rival = estado.bando(bando.otro);
   final activo = yo.pokemonActivo;
   final atacante = _conRacha(rival);
@@ -164,11 +184,32 @@ UsarPocion? _pocionQueSalva(EstadoCombate estado, Bando bando) {
         reduccion: rival.danoReducido, extra: yo.extraRecibido);
     if (d > amenaza) amenaza = d;
   }
-  // El veneno de los dos chequeos (nada con Muro Mágico).
-  if (!sinDanoIndirecto(activo.especie)) amenaza += 2 * yo.veneno;
-  if (amenaza <= 0 || activo.ps > amenaza) return null;
-  if (activo.especie.ps <= amenaza) return null;
-  return UsarPocion(bando, yo.activo);
+  return sinDanoIndirecto(activo.especie)
+      ? amenaza
+      : amenaza + 2 * yo.veneno;
+}
+
+/// Índice de un ataque que duerme al rival (Canto, paso 2 ter), o null: solo
+/// si el rival puede derribar al activo en su próximo turno, está en pie y no
+/// está ya Dormido ni Paralizado (si no va a poder atacar, no hace falta).
+/// Entre varios, el más barato.
+int? _ataqueDeSueno(EstadoCombate estado, Bando bando) {
+  final yo = estado.bando(bando);
+  final rival = estado.bando(bando.otro);
+  if (rival.dormido || rival.paralizado || !rival.pokemonActivo.enPie) {
+    return null;
+  }
+  final ataques = yo.pokemonActivo.especie.ataques;
+  int? mejor;
+  for (var i = 0; i < ataques.length; i++) {
+    final a = ataques[i];
+    if (a.efecto is! DuermeDefensor || a.coste > yo.energia) continue;
+    if (mejor == null || a.coste < ataques[mejor].coste) mejor = i;
+  }
+  if (mejor == null) return null;
+  final amenaza = _amenaza(estado, bando);
+  if (amenaza <= 0 || yo.pokemonActivo.ps > amenaza) return null;
+  return mejor;
 }
 
 /// Carga, o usa en su lugar un ataque que da energía a su bando (Pulimento)

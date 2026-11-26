@@ -956,9 +956,16 @@ class PartidaCampana {
     return _copiar(equipo: [p, ...lista]);
   }
 
+  /// Si el equipo y el PC tienen todos los PS: el mostrador del centro no
+  /// tiene nada que curar.
+  bool equipoSano(CatalogoCampana c) =>
+      [...equipo, ...pc].every((p) => p.ps == c.especie(p.id).ps);
+
   /// En un centro Pokémon: cura a todo el equipo y al PC (D-20 §4) y pasa a
-  /// ser el sitio al que se vuelve al perder. Se puede usar varias veces; la
-  /// primera da el nodo por resuelto.
+  /// ser el sitio al que se vuelve al perder. Es opcional y se puede usar
+  /// varias veces: el centro ya está resuelto al llegar y se sale sin curar
+  /// (D-20 §10.7, #510). Una partida guardada antes, parada en un centro sin
+  /// resolver, queda resuelta al curar.
   PartidaCampana descansar(CatalogoCampana c) {
     if (nodoActual(c).tipo != TipoNodo.descanso) {
       throw const ReglaIncumplida('Aquí no hay un centro Pokémon.');

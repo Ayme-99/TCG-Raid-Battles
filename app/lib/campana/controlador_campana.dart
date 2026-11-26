@@ -563,6 +563,19 @@ List<String> describirAccion(
     final m = despues.ultimasMonedas!.map((c) => c ? 'cara' : 'cruz');
     lineas.add('Moneda: ${m.join(', ')}.');
   }
+  // Dormido (Canto, D-20 §10.2): se duerme con el ataque y se despierta con
+  // la moneda del chequeo Pokémon, en el mismo activo.
+  for (final b in [accion.bando.otro, accion.bando]) {
+    final a = antes.bando(b);
+    final d = despues.bando(b);
+    if (a.activo != d.activo) continue;
+    final nombre = d.pokemonActivo.especie.nombre;
+    final de = b == Bando.jugador ? 'Tu $nombre' : '$nombre rival';
+    if (!a.dormido && d.dormido) lineas.add('$de se ha dormido.');
+    if (a.dormido && !d.dormido && d.pokemonActivo.enPie) {
+      lineas.add('$de se despierta.');
+    }
+  }
   for (final b in [accion.bando.otro, accion.bando]) {
     final a = antes.bando(b).equipo;
     final d = despues.bando(b).equipo;

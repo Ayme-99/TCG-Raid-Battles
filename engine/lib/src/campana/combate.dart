@@ -100,6 +100,13 @@ class BandoCombate {
   /// quita al acabar ese turno, o si su activo cae o deja de estar activo.
   final bool paralizado;
 
+  /// Dormido (Canto del rival, [DuermeDefensor], D-20 §10.2): el activo de
+  /// este bando no puede atacar ni cambiar con [Cambiar]; sí cargar, usar una
+  /// Poción o salir con una Cuerda Huida. En cada chequeo Pokémon (cada cambio
+  /// de turno) se lanza una moneda y con cara se despierta. Se quita también
+  /// si cae o pasa a la banca.
+  final bool dormido;
+
   /// Índice del ataque que usó el activo en su turno anterior (-1 si no atacó,
   /// o si cargó o cambió) y cuántas veces seguidas lo lleva usando (Rodar).
   final int ultimoAtaque;
@@ -139,6 +146,7 @@ class BandoCombate {
     this.cegadoMientrasActivo = false,
     this.drenado = false,
     this.paralizado = false,
+    this.dormido = false,
     this.ultimoAtaque = -1,
     this.racha = 0,
     this.enEspera = -1,
@@ -182,6 +190,7 @@ class BandoCombate {
     bool? cegadoMientrasActivo,
     bool? drenado,
     bool? paralizado,
+    bool? dormido,
     int? ultimoAtaque,
     int? racha,
     int? enEspera,
@@ -202,6 +211,7 @@ class BandoCombate {
         cegadoMientrasActivo: cegadoMientrasActivo ?? this.cegadoMientrasActivo,
         drenado: drenado ?? this.drenado,
         paralizado: paralizado ?? this.paralizado,
+        dormido: dormido ?? this.dormido,
         ultimoAtaque: ultimoAtaque ?? this.ultimoAtaque,
         racha: racha ?? this.racha,
         enEspera: enEspera ?? this.enEspera,
@@ -590,6 +600,7 @@ EstadoCombate _elegirSiguiente(EstadoCombate estado, ElegirSiguiente a) {
           cegadoMientrasActivo: false,
           drenado: false,
           paralizado: false,
+          dormido: false,
           ultimoAtaque: -1,
           racha: 0,
           enEspera: -1));
@@ -629,6 +640,9 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
   final ataque = ataques[a.indice];
   if (atacante.paralizado) {
     throw const ReglaIncumplida('Está paralizado: este turno no puede atacar.');
+  }
+  if (atacante.dormido) {
+    throw const ReglaIncumplida('Está dormido: no puede atacar.');
   }
   if (atacante.energia < ataque.coste) {
     throw const ReglaIncumplida('No hay energía suficiente para ese ataque.');
@@ -762,6 +776,19 @@ EstadoCombate _atacar(EstadoCombate estado, Atacar a) {
     }
     if (todasCara) defensorNuevo = defensorNuevo.copiarCon(cegado: true);
   }
+  if (efecto is DuermeDefensor) {
+    // Canto: si todas salen cara, el Defensor se duerme (si sigue en pie).
+    var todasCara = true;
+    for (var i = 0; i < efecto.monedas; i++) {
+      semilla = _siguienteSemilla(semilla);
+      moneda = (semilla >> 8) & 1 == 1;
+      monedas.add(moneda);
+      if (!moneda) todasCara = false;
+    }
+    if (todasCara && golpeado.enPie) {
+      defensorNuevo = defensorNuevo.copiarCon(dormido: true);
+    }
+  }
   if (efecto is QuitaEnergiaRival) {
     final resto = defensorNuevo.energia - efecto.valor;
     defensorNuevo = defensorNuevo.copiarCon(energia: resto < 0 ? 0 : resto);
@@ -804,6 +831,10 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
     throw const ReglaIncumplida(
         'Está paralizado: este turno no puede cambiar.');
   }
+  if (b.dormido) {
+    throw const ReglaIncumplida(
+        'Está dormido: solo sale con una Cuerda Huida.');
+  }
   if (a.indice == b.enEspera && b.relevos.contains(a.indice)) {
     throw ReglaIncumplida(estado.aliadoAlFrente
         ? 'El jefe no vuelve hasta que caiga su aliado.'
@@ -821,7 +852,9 @@ EstadoCombate _cambiar(EstadoCombate estado, Cambiar a) {
 }
 
 /// [b] con [indice] de activo y [energia]: se quitan los efectos que solo
-/// duran mientras sigue el mismo activo.
+/// duran mientras sigue el mismo activo. Al pasar a la banca se curan todos
+/// los estados (D-20 §10.2, 2026-11-26): Dormido, Paralizado, Confundido
+/// ([BandoCombate.cegado]) y Envenenado.
 BandoCombate _conNuevoActivo(BandoCombate b, int indice, int energia) =>
     b.copiarCon(
         activo: indice,
@@ -830,14 +863,17 @@ BandoCombate _conNuevoActivo(BandoCombate b, int indice, int energia) =>
         danoExtra: 0,
         veneno: 0,
         proteccion: 0,
+        cegado: false,
         cegadoMientrasActivo: false,
         drenado: false,
+        paralizado: false,
+        dormido: false,
         ultimoAtaque: -1,
         racha: 0);
 
 /// Si [a] es válida, el estado con la Cuerda Huida usada y el turno
 /// terminado; si no, lanza [ReglaIncumplida]. No paga la retirada y vale
-/// aunque el activo esté Paralizado.
+/// aunque el activo esté Paralizado o Dormido.
 EstadoCombate _usarCuerdaHuida(EstadoCombate estado, UsarCuerdaHuida a) {
   final b = estado.bando(a.bando);
   if (a.bando == Bando.rival && !estado.parametros.rivalUsaObjetos) {
@@ -965,39 +1001,59 @@ EstadoCombate _terminarTurno(EstadoCombate estado) {
 }
 
 /// Chequeo Pokémon, cada vez que cambia el turno: el activo envenenado de cada
-/// bando pierde su veneno en PS (salvo con Muro Mágico, [SinDanoIndirecto]). Va primero el bando que acaba de terminar su
-/// turno; si su último Pokémon cae, el combate termina y gana el otro aunque
-/// el segundo chequeo también lo hubiera derribado.
+/// bando pierde su veneno en PS (salvo con Muro Mágico) y, si sigue en pie y está Dormido, lanza una
+/// moneda: con cara se despierta (D-20 §10.2). Va primero el bando que acaba
+/// de terminar su turno; si su último Pokémon cae, el combate termina y gana
+/// el otro aunque el segundo chequeo también lo hubiera derribado.
 EstadoCombate _chequeoPokemon(EstadoCombate estado, Bando primero) {
   var s = estado;
   for (final b in [primero, primero.otro]) {
-    final bando = s.bando(b);
-    final activo = bando.pokemonActivo;
-    if (bando.veneno <= 0 || !activo.enPie) continue;
-    // Muro Mágico: sigue Envenenado pero no pierde PS, y Drenadoras tampoco
-    // cura (no ha quitado nada).
-    if (sinDanoIndirecto(activo.especie)) continue;
-    final equipo = [...bando.equipo]..[bando.activo] =
-        activo.conPs(activo.ps - bando.veneno);
-    final nuevo = bando.copiarCon(equipo: equipo);
-    s = s.conBando(b, nuevo);
-    if (bando.drenado) {
-      // Drenadoras: el chequeo ha quitado PS, así que cura al activo del otro
-      // bando (el que esté ahora), hasta su máximo y si sigue en pie.
-      final otro = s.bando(b.otro);
-      final suyo = otro.pokemonActivo;
-      if (suyo.enPie && suyo.ps < suyo.especie.ps) {
-        final ps = suyo.ps + DrenaDefensor.cura;
-        s = s.conBando(
-            b.otro,
-            otro.copiarCon(
-                equipo: [...otro.equipo]..[otro.activo] =
-                    suyo.conPs(ps > suyo.especie.ps ? suyo.especie.ps : ps)));
-      }
+    s = _chequeoVeneno(s, b);
+    if (s.fase == FaseCombate.terminado) return s;
+    s = _chequeoSueno(s, b);
+  }
+  return s;
+}
+
+/// La moneda del Dormido en el chequeo de [b]: con cara se despierta.
+EstadoCombate _chequeoSueno(EstadoCombate s, Bando b) {
+  final bando = s.bando(b);
+  if (!bando.dormido || !bando.pokemonActivo.enPie) return s;
+  final semilla = _siguienteSemilla(s.semilla);
+  final cara = (semilla >> 8) & 1 == 1;
+  return s
+      .conBando(b, cara ? bando.copiarCon(dormido: false) : bando)
+      .copiarCon(semilla: semilla);
+}
+
+/// El veneno del chequeo de [b] (y la cura de Drenadoras al otro bando). Con
+/// Muro Mágico ([SinDanoIndirecto]) el activo sigue Envenenado pero no pierde
+/// PS, y Drenadoras tampoco cura (no ha quitado nada).
+EstadoCombate _chequeoVeneno(EstadoCombate s, Bando b) {
+  final bando = s.bando(b);
+  final activo = bando.pokemonActivo;
+  if (bando.veneno <= 0 || !activo.enPie) return s;
+  if (sinDanoIndirecto(activo.especie)) return s;
+  final equipo = [...bando.equipo]..[bando.activo] =
+      activo.conPs(activo.ps - bando.veneno);
+  final nuevo = bando.copiarCon(equipo: equipo);
+  s = s.conBando(b, nuevo);
+  if (bando.drenado) {
+    // Drenadoras: el chequeo ha quitado PS, así que cura al activo del otro
+    // bando (el que esté ahora), hasta su máximo y si sigue en pie.
+    final otro = s.bando(b.otro);
+    final suyo = otro.pokemonActivo;
+    if (suyo.enPie && suyo.ps < suyo.especie.ps) {
+      final ps = suyo.ps + DrenaDefensor.cura;
+      s = s.conBando(
+          b.otro,
+          otro.copiarCon(
+              equipo: [...otro.equipo]..[otro.activo] =
+                  suyo.conPs(ps > suyo.especie.ps ? suyo.especie.ps : ps)));
     }
-    if (nuevo.derrotado) {
-      return s.copiarCon(fase: FaseCombate.terminado, ganador: b.otro);
-    }
+  }
+  if (nuevo.derrotado) {
+    return s.copiarCon(fase: FaseCombate.terminado, ganador: b.otro);
   }
   return s;
 }
@@ -1051,6 +1107,7 @@ EstadoCombate _llamarAliado(EstadoCombate estado) {
             cegadoMientrasActivo: false,
             drenado: false,
             paralizado: false,
+            dormido: false,
             ultimoAtaque: -1,
             racha: 0,
             enEspera: llamada.jefe,
