@@ -287,28 +287,7 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 
 **Misty.** Dos Pokémon, como Brock: Staryu y Starmie, de tipo agua, con **debilidad eléctrico ×2** (como en el JCC) y sin resistencia. Starmie es la evolución de Staryu con la **Piedra Agua**, que en la campaña aún no se puede obtener (como la Piedra Trueno de Raichu); el jugador no la evoluciona, así que no hay que decidirlo ahora. La ficha de Misty (PS, ataques, dinero) se rellena con las del resto de líderes (§4, «Líderes de gimnasio»).
 
-**Clefairy: tipo y debilidad (opinión de Diseño; Ayme decide).** Arte propone **normal, debilidad lucha ×2**. **Estoy de acuerdo.**
-- En los juegos de Kanto era de tipo normal, y los tipos de la campaña no incluyen hada.
-- La carta actual del JCC (151, 035/165) es de **tipo psíquico con debilidad metal ×2**, y el metal se descartó en la campaña (#408): esa debilidad no se puede copiar.
-- Con lucha ×2 el jugador tiene respuesta a mano: Mankey (Ruta 3), Machop y Geodude son de lucha, y Sandshrew también. Con psíquico y debilidad oscuridad ×2 solo la tendrían Nidoran♀, Nidoran♂ y Zubat.
-- Alternativa B: **psíquico con debilidad oscuridad ×2**, más fiel a la carta física pero con menos respuestas en el tramo 2.
-- PS: **100**, como Pikachu jefe (60 PS la carta normal); ataques: **Destructor y Doble bofetón**, de la propuesta de Arte en #380.
-
-**Tabla de cartas del tramo 2 para que Ayme las cree** (valores propuestos dentro del baremo de §3.5; Ayme los ajusta). Todos los Pokémon del tramo, con lo que hay que crear:
-
-| Pokémon | ¿Carta? | Papel | Tipo | PS | Debilidad | Retirada | Categoría | Ataques propuestos |
-|---|---|---|---|---|---|---|---|---|
-| Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod, Kakuna | **Ya existen** | Salvajes y rivales | — | — | — | — | — | — |
-| **Clefairy** | **Nueva** | Jefe 02 en el Monte Moon; capturable la primera vez (carta normal) | Normal | 60 (carta normal) · 100 (jefe) | Lucha ×2 | 1 | Jefe (30 XP) | Destructor (1 energía, 20) · Doble bofetón (2 energías, 30; moneda: cara +20 con el efecto `monedaDanoExtra` que ya existe) |
-| **Paras** | **Nueva** | Salvaje raro del Monte Moon | Planta | 50 | Fuego ×2 | 1 | Intermedio (20 XP) | Arañazo (1 energía, 10) · Espora (2 energías, 30) |
-| **Jigglypuff** | **Nueva** | Salvaje raro de la Ruta 3 | Normal | 70 | Lucha ×2 | 1 | Intermedio (20 XP) | **Canto** (1 energía, sin daño; lanza una moneda y, si sale cara, el Defensor queda **Dormido**; efecto nuevo `duermeDefensor`, ver abajo) · Doble bofetón (2 energías, 30) |
-| **Ekans** | **Nueva** | Salvaje raro de la Ruta 4 | Oscuridad | 60 | Lucha ×2 | 0 | Intermedio (20 XP) | Mordisco (1 energía, 10) · Constricción (2 energías, 30) |
-| **Horsea** | **Nueva** | Nadador Luis (gimnasio) | Agua | 50 | Eléctrico ×2 | 1 | Común (10 XP) | Burbuja (1 energía, 10) · Chorro (2 energías, 30) |
-| **Shellder** | **Nueva** | Nadador Luis (gimnasio) | Agua | 60 | Eléctrico ×2 | 1 | Común (10 XP) | Placaje (1 energía, 10) · Pinza (2 energías, 30) |
-| **Staryu** | **Nueva** | Misty | Agua | 60 | Eléctrico ×2 | 1 | Intermedio (20 XP) | Placaje (1 energía, 10) · Giro rápido (2 energías, 30) |
-| **Starmie** | **Nueva** | Misty (no capturable en el tramo 2) | Agua | 100 (Fase 1; evoluciona de Staryu con Piedra Agua, aún sin usar) | Eléctrico ×2 | 0 | Fuerte (30 XP) | Rayo burbuja (2 energías, 50) · Cascada (3 energías, 90) |
-
-Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. **Jigglypuff sí lleva Canto** (su ataque emblema, Ayme 2026-11-26): es la **primera carta que causa Dormido**, así que se cumple la condición de §8 punto 25 (#436) y Programación tiene que crear el estado. **Regla de Dormido decidida por Ayme el 2026-11-26 (§10.2; en la banca se curan los estados):** en cada **chequeo Pokémon** (cada vez que cambia el turno, de cualquiera de los dos bandos) se lanza una moneda y, si sale cara, el Pokémon se despierta. Dormido **no puede atacar ni retirarse**; la única forma de cambiarlo es la **Cuerda Huida**.
+**Clefairy (decidido por Ayme el 2026-11-26):** carta del jefe hecha (`clefairy-jefe.webp`): **psíquico, 120 PS, debilidad oscuridad ×2, retirada 0, Muro Mágico y Doble Bofetón**. Se descarta la propuesta de Arte y Diseño (normal, lucha ×2). El jugador solo tiene a Nidoran♀, Nidoran♂, Zubat y Ekans para golpearlo fuerte; Calidad medirá el 75 % de victoria y la subida de nivel frente a Pikachu (100 PS). Muro Mágico necesita una tarea de Programación; hasta entonces la carta funciona sin la habilidad. Doble Bofetón no necesita nada nuevo. El coste de los ataques es un **número**, no un tipo de energía.
 
 ### Reglas del recorrido
 
