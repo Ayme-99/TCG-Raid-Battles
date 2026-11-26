@@ -401,18 +401,18 @@ class Jugador {
     return q;
   }
 
-  /// Si el nodo actual es un centro o una conversación sin resolver, lo
-  /// resuelve (evoluciona antes para que curar deje a todos al máximo).
+  /// En un centro, cura si alguien tiene daño (curar es opcional desde #510:
+  /// el centro ya está resuelto al llegar). Una conversación sin resolver se
+  /// resuelve.
   PartidaCampana resolverNodo(PartidaCampana p) {
     final n = p.nodoActual(c);
-    if (p.progreso.resuelto) return p;
     if (n.tipo == TipoNodo.descanso) {
-      final d = p.descansar(c);
+      final d = p.equipoSano(c) ? p : p.descansar(c);
       return cfg.pocionesCombate && n.id == 'centro-plateada'
           ? comprarPocionesFaltan(d)
           : d;
     }
-    if (n.tipo == TipoNodo.conversacion) {
+    if (n.tipo == TipoNodo.conversacion && !p.progreso.resuelto) {
       return p.conversar(c);
     }
     return p;
