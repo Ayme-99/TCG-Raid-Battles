@@ -114,7 +114,8 @@ PartidaCampana hasta(CatalogoCampana c, PartidaCampana p, String nodo) {
       }
       continue;
     }
-    if (s.nodoActual(c).tipo == TipoNodo.descanso && !s.progreso.resuelto) {
+    if (s.nodoActual(c).tipo == TipoNodo.descanso &&
+        s.ultimaCura != s.progreso.nodoActual) {
       s = robusto(s.descansar(c));
       continue;
     }
@@ -757,7 +758,8 @@ void main() {
           if (++combates > 300) fail('$inicial no acaba el tramo.');
           continue;
         }
-        if (p.nodoActual(c).tipo == TipoNodo.descanso && !p.progreso.resuelto) {
+        if (p.nodoActual(c).tipo == TipoNodo.descanso &&
+            p.ultimaCura != p.progreso.nodoActual) {
           p = robusto(p.descansar(c));
           continue;
         }
@@ -1257,6 +1259,38 @@ void main() {
       p = p.terminarCombate(c, ganar(p.empezarCombate(c))).noCapturar();
       return p.avanzar(c, 'ciudad-verde');
     }
+
+    test('del centro se sale sin curar y se puede curar después (#510)', () {
+      final p = enVerde();
+      expect(p.progreso.resuelto, isTrue);
+      expect(p.opciones(c), ['ciudad-verde-salida']);
+      expect(p.ultimaCura, 'pueblo-paleta', reason: 'aún no ha curado');
+      // Sale sin pasar por el mostrador.
+      final fuera = p.avanzar(c, 'ciudad-verde-salida');
+      expect(fuera.progreso.nodoActual, 'ciudad-verde-salida');
+      expect(fuera.ultimaCura, 'pueblo-paleta');
+      // Vuelve y cura: sigue funcionando y marca el punto de vuelta.
+      final curada =
+          fuera.retroceder(c, 'ciudad-verde').descansar(c).descansar(c);
+      expect(curada.ultimaCura, 'ciudad-verde');
+      expect(curada.equipoSano(c), isTrue);
+      expect(curada.opciones(c), ['ciudad-verde-salida']);
+    });
+
+    test('salir del centro sin curar y perder vuelve a la última cura', () {
+      var p = enVerde().avanzar(c, 'ciudad-verde-salida').avanzar(c, 'ruta-2');
+      p = p.avanzar(c, p.opciones(c).first);
+      final e = p.empezarCombate(c);
+      final perdido = e.copiarCon(
+        jugador: e.jugador.copiarCon(
+            equipo: [for (final x in e.jugador.equipo) x.conPs(0)]),
+        fase: FaseCombate.terminado,
+        ganador: Bando.rival,
+      );
+      p = p.terminarCombate(c, perdido);
+      expect(p.progreso.nodoActual, 'pueblo-paleta',
+          reason: 'D-20 §3.3: el último sitio donde se curó');
+    });
 
     test('se guardan los nodos visitados', () {
       expect(enVerde().progreso.visitados,

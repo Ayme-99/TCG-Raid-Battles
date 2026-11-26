@@ -180,14 +180,23 @@ void main() {
     final catalogo = catalogoCampanaDeDisco();
     for (var paso = 0; paso < 40; paso++) {
       final p = c.read(campanaProvider).partida!;
-      if (p.progreso.nodoActual == 'ciudad-verde' && p.progreso.resuelto) break;
+      if (p.progreso.nodoActual == 'ciudad-verde' &&
+          p.ultimaCura == 'ciudad-verde') {
+        break;
+      }
       if (p.capturaPendiente != null) {
         await tocar(tester, 'campana-no-capturar');
       } else if (p.hayCombate(catalogo)) {
         await tocar(tester, 'campana-combatir');
         await jugarCombate(tester);
       } else if (p.nodoActual(catalogo).tipo == TipoNodo.descanso &&
-          !p.progreso.resuelto) {
+          p.ultimaCura != p.progreso.nodoActual) {
+        // Curar es opcional: la salida ya está abierta antes (#510).
+        expect(p.opciones(catalogo), isNotEmpty);
+        expect(
+            find.byKey(Key('ir-${p.opciones(catalogo).first}'),
+                skipOffstage: false),
+            findsOneWidget);
         await tocar(tester, 'campana-curar');
       } else {
         await tocar(tester, 'ir-${p.opciones(catalogo).first}');
