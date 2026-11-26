@@ -69,7 +69,7 @@ Decidido el 2026-11-21. **No hay niveles**: las cartas tienen siempre los mismos
 - **Las victorias en combate dan puntos** (los mismos puntos del juego, §5). Van a la cuenta: **no se usan dentro de la campaña** (§10.9, 2026-11-24).
 - En un **centro Pokémon** (el nodo de descanso) se pueden **convertir puntos en XP** de un Pokémon del equipo. Cuántos puntos cuesta cada XP queda por equilibrar. **Sustituido el 2026-11-22** (§10.6, §10.9): los puntos no se convierten en XP; la XP sale solo del combate, en una reserva común, y desde el 2026-11-24 los puntos no se usan dentro de la campaña.
 - Cada Pokémon necesita **N de XP** para evolucionar (`via: "xp"` y `xpEvolucion: N` en la carta; el campo se llamaba `xp` hasta #403), con `medallasMinimas` para la medalla que la desbloquea (§10.11, #414). Al llegar a N, puede evolucionar en un centro Pokémon, con un máximo de **un Pokémon por visita** (§4). **Sustituido el 2026-11-22** (§10.6): la XP es una reserva común y se evoluciona fuera de combate, desde el menú del equipo, sin límite por visita.
-- **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`).
+- **Objetos de evolución** (piedras…): se compran fuera de los centros Pokémon o se encuentran en las rutas (`via: "objeto"`, `objeto: "piedra-trueno"`). **Decidido el 2026-11-27 (§10.6, #508):** hay cinco (Trueno, Agua, Fuego, Hoja y Luna), las cuatro primeras se compran en Ciudad Azulona a 2.100 desde la 4.ª medalla y se gastan al usarlas.
 - **Evolución por intercambio** (Kadabra, Haunter, Machoke, Graveler): es **gratis** (decidido el 2026-11-24, §10.9): la máquina de intercambio no cobra (`via: "intercambio"`, sin campo de precio; hoy lleva `puntos: N`, que se quita en el Motor).
 - **Cartas ex y piedra ex** (decidido por Ayme el 2026-11-24, D-21 §2.5; sustituye a «la última fase de cada Pokémon es una carta ex», §10.9):
   - **La carta ex es un paso más** tras la última fase normal: Básico → Fase 1 → Fase 2 → **Fase 2 ex**; Básico → Fase 1 → **Fase 1 ex**; Básico → **Básico ex**. Solo se ofrece cuando el Pokémon **ya no puede evolucionar más**.
@@ -582,6 +582,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 26 | **Rapidez de Starmie** (Programación, #380): indicador `ignoraFallo` en el ataque: no lanza la moneda de `monedaFalloRival` del rival (Bofetón Lodo y Pantalla de Humo); esquema, motor, IA y simulador. La carta funciona sin él hasta entonces (el ataque hace sus 50 de daño) | Pendiente |
 | 27 | **Torbellino de Shellder** (Programación, #380): efecto `apresaDefensor`: mientras esté activo, el Defensor no puede retirarse (solo con la Cuerda Huida), en cada chequeo Pokémon recibe 1 contador de daño (10; **Muro Mágico sí bloquea ese daño**, §4; decidido el 2026-11-26) y se lanza una moneda: cara = se libera. Como Dormido y `drenaDefensor`. Se cura al pasar a la banca (§10.2); esquema, motor, IA y simulador | Pendiente |
 | 28 | **Absorber de Paras** (Programación, #380): efecto `curaAlAtacar`: tras hacer su daño, el atacante se cura `valor` PS (10), sin pasar de su máximo; esquema, motor, IA y simulador. La carta funciona sin la cura hasta entonces (el ataque hace sus 20 de daño) | Pendiente |
+| 29 | **Piedras evolutivas y tienda de Azulona** (Programación, #508): objetos `piedra-trueno`, `piedra-agua`, `piedra-fuego`, `piedra-hoja` y `piedra-luna` (`via: "objeto"`), contador en la mochila, **se gastan al usarlas**; la tienda de Ciudad Azulona vende las cuatro primeras a **2.100** desde la 4.ª medalla; la Piedra Luna es un objeto escondido en el Monte Moon (nodo por colocar, cantidad por confirmar). Arte hace los iconos. Prioridad baja: ninguna evolución por piedra tiene aún carta jugable | Pendiente |
 
 ## 10. Registro de decisiones
 
@@ -714,6 +715,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-22 | **PC:** el equipo y el PC se cambian **solo en un centro Pokémon**; los NPC de conversación, aunque curen, no dan acceso. Con el equipo lleno, capturar sigue obligando a elegir a quién mandar al PC (§10.6, 2026-11-21). | §2, §4; #362 |
 | 2026-11-22 | **Evolucionar se hace fuera de combate, desde el menú del equipo,** tantas veces como dé la reserva de XP; no hace falta un centro ni hay límite por visita. La carta evolucionada sustituye a la anterior y el Pokémon queda con **10 PS siempre**, también si tenía más o estaba debilitado (**evolucionar revive a 10 PS**). Así evolucionar no es una curación: lo normal es hacerlo justo antes de curar en un centro. **Hecho (#403).** | §2.1; #362, #363 |
 | 2026-11-22 | **Evolución por medalla.** Cada evolución se desbloquea con la **medalla que le corresponde según los juegos**; si faltan medallas, no se ofrece aunque haya XP, y el menú del equipo muestra el motivo («requiere N medallas»). Antes de Brock pueden evolucionar **Caterpie → Metapod**, **Weedle → Kakuna** y, **opcionalmente, el inicial**; no pueden Raticate, Pidgeotto ni Fearow. **La XP no tiene límite; el techo lo pone esta regla**, así que no hace falta recortar la XP de los salvajes repetibles (§10.7). Catálogo: campo `medallasMinimas` (entero) en la ficha de cada evolución. La tabla con las medallas mínimas está en §10.11, **confirmada por Ayme el 2026-11-22**. **Hecho (#414):** el motor no deja evolucionar sin las medallas y la hoja de la carta muestra «Requiere N medallas.»; una evolución sin `medallasMinimas` (por decidir) no limita. | §2.1, §10.11; #414, #416 |
+| 2026-11-27 | **Piedras evolutivas** (Ayme, #508; opciones 1C, 2A, 3A y 4A): (1) entran **cinco**: **Trueno, Agua, Fuego, Hoja y Luna** (Luna: Clefairy, Jigglypuff, Nidorina y Nidorino; Fuego: Growlithe, Vulpix y Eevee; Hoja: Gloom, Weepinbell y Exeggcute), aunque aún no haya cartas de todas sus evoluciones; (2) **tienda de Ciudad Azulona** para Trueno, Agua, Fuego y Hoja, y la **Piedra Luna escondida en el Monte Moon** ◐ (en los juegos no se vende); (3) **2.100 de dinero** (el precio de los juegos), **desde la 4.ª medalla** (Azulona); (4) **se gasta al usarla**, como la piedra ex. La Piedra Trueno **ya se puede obtener** (antes, §10.6 del 2026-11-24: «aún no se puede»). Sigue sin carta de Raichu. Arte hace los iconos; Programación, tarea 29. Los puntos no se usan (§10.9); la evolución por medalla de §10.6 se mantiene. | §2.1, §4; #508 |
 
 ### 10.7 Mapa y ruta
 
@@ -830,7 +832,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | Diglett → Dugtrio | 26 | 3 |
 | Machop → Machoke, Mankey → Primeape, Cubone → Marowak | 28 | 3 |
 | Slowpoke → Slowbro | 37 | 5 |
-| Pikachu → Raichu | Piedra Trueno | **Decidido el 2026-11-24:** evoluciona con la Piedra Trueno, que **aún no se puede obtener**; dónde y cuándo se consigue sigue abierto (ver «Pikachu y Raichu», abajo) |
+| Pikachu → Raichu | Piedra Trueno | **Decidido el 2026-11-24:** evoluciona con la Piedra Trueno, que **se compra en Ciudad Azulona a 2.100 desde la 4.ª medalla** (decidido el 2026-11-27, §10.6, #508; antes «aún no se podía obtener»); falta la carta de Raichu (ver «Pikachu y Raichu», abajo) |
 | Onix → Steelix | — | **No evoluciona** (decidido el 2026-11-24, #408): no hay Steelix ni tipo metal. «Evolucionar» es subirlo a **Onix ex** con la piedra ex, a las **2 medallas** (tabla de las cartas ex, abajo) |
 
 #### Cartas ex: reglas y medallas mínimas (propuesta de Diseño, 2026-11-24)
@@ -862,7 +864,7 @@ Notas de Diseño (propuesta, por confirmar): (a) la medalla de un ex no baja de 
 
 **6. Primera piedra de premio.** La da **Brock con la medalla Roca** y el aviso va en §10.6 (2026-11-24). La primera piedra sirve desde la 2.ª medalla (Onix ex); el aviso lo dice.
 
-**7. Piedra Trueno.** Hoy no se puede obtener. Cuando se pueda, la propuesta anterior sigue en pie: venderla en Ciudad Azulona (unos 2.100, por contrastar con Serebii o Bulbapedia) o encontrarla en la Central Eléctrica (ruta clave del jefe 10).
+**7. Piedra Trueno.** **Decidido el 2026-11-27 (#508):** se vende en Ciudad Azulona a **2.100** (contrastado con los juegos: 4.º piso de los Grandes Almacenes) desde la 4.ª medalla; ya no queda abierto lo de la Central Eléctrica. Sigue faltando la carta de Raichu.
 
 
 ## 11. Cómo se crea una carta
