@@ -16,6 +16,12 @@
 //   duelos    cada Pokémon contra cada Pokémon (también contra sí mismo) con
 //             el jugador y con el rival empezando. La IA es determinista, así
 //             que no hace falta repetir.
+//   empezar   cuánto vale empezar primero (#451/#386): todos los duelos 1 contra
+//             1, repetidos con --partidas semillas (20 si no se indica; los
+//             combates sí dependen de la semilla), una vez empezando el
+//             jugador y otra el rival. Da la victoria del jugador en cada caso
+//             y la diferencia, por categoría del rival (Común, Intermedio,
+//             Fuerte, Jefe), y en los duelos igualados.
 //   equipos   equipos aleatorios de --tamano Pokémon distintos, --partidas
 //             combates (empieza siempre el jugador, como en el juego).
 //   nodos     cada inicial contra cada rival posible de cada combate del
@@ -248,6 +254,86 @@ void duelos(Config c, Map<String, PokemonCampana> catalogo) {
   escribirCsv(c.informe ?? '../balance/informes/campana_duelos.csv', lineas);
 }
 
+/// Categoría del Pokémon tal como se le encuentra: Común, Intermedio, Fuerte
+/// o Jefe (sin `categoriaCaptura` en su carta).
+String categoriaDe(PokemonCampana p) => switch (p.categoriaCaptura) {
+      CategoriaCaptura.comun => 'Común',
+      CategoriaCaptura.intermedio => 'Intermedio',
+      CategoriaCaptura.fuerte => 'Fuerte',
+      _ => 'Jefe',
+    };
+
+/// Modo «empezar» (#451/#386): cuánto vale empezar primero. Todos los duelos
+/// 1 contra 1 de la tabla, el jugador contra cada rival, una vez empezando el
+/// jugador y otra empezando el rival, repetidos con --partidas semillas.
+/// Diferencia = victorias del jugador (él empieza) − victorias del jugador
+/// (empieza el rival), en puntos de porcentaje, por categoría del rival.
+void empezar(Config c, Map<String, PokemonCampana> catalogo) {
+  final lista = catalogo.values.toList();
+  final reps = max(1, c.partidas == 2000 ? 20 : c.partidas);
+  const cats = ['Común', 'Intermedio', 'Fuerte', 'Jefe'];
+  // [categoría][0 = empieza jugador, 1 = empieza rival] y «igualados».
+  final acc = <String, List<Acumulado>>{};
+  List<Acumulado> par() => [Acumulado(), Acumulado()];
+  for (final k in [...cats, 'Todos', 'Igualados', 'Igualados Jefe']) {
+    acc[k] = par();
+  }
+  final lineas = ['jugador,rival,categoria_rival,gana_si_empieza_jugador,'
+      'gana_si_empieza_rival,diferencia'];
+  var semilla = c.semilla;
+  var sinTerminar = 0;
+  for (final a in lista) {
+    for (final b in lista) {
+      final w = [0, 0];
+      for (var i = 0; i < reps; i++) {
+        for (final k in [0, 1]) {
+          final empieza = k == 0 ? Bando.jugador : Bando.rival;
+          final r = jugar([a], [b], empieza, c.parametros, semilla + i);
+          if (!r.terminado) sinTerminar++;
+          final gana = r.ganador == Bando.jugador;
+          if (gana) w[k]++;
+          final cat = categoriaDe(b);
+          acc[cat]![k].sumar(r, gana);
+          acc['Todos']![k].sumar(r, gana);
+        }
+      }
+      final tj = w[0] / reps, tr = w[1] / reps;
+      lineas.add('${a.id},${b.id},${categoriaDe(b)},${tj.toStringAsFixed(3)},'
+          '${tr.toStringAsFixed(3)},${(tj - tr).toStringAsFixed(3)}');
+      // «Igualados»: el duelo no está decidido (ninguna tasa ≥ 95 % ni ≤ 5 %
+      // en las dos formas de empezar): ahí es donde empezar puede notarse.
+      final decidido = (tj >= .95 && tr >= .95) || (tj <= .05 && tr <= .05);
+      if (!decidido) {
+        for (final k in [0, 1]) {
+          acc['Igualados']![k].combates += reps;
+          acc['Igualados']![k].victorias += w[k];
+          if (categoriaDe(b) == 'Jefe') {
+            acc['Igualados Jefe']![k].combates += reps;
+            acc['Igualados Jefe']![k].victorias += w[k];
+          }
+        }
+      }
+    }
+  }
+  stdout.writeln('Valor de empezar primero: duelos 1 contra 1 '
+      '(${lista.length} Pokémon, $reps semillas por pareja y por quién empieza)');
+  stdout.writeln('El jugador (de la fila: categoría del RIVAL) gana…');
+  stdout.writeln('${"rival".padRight(16)}${"empieza él".padLeft(12)}'
+      '${"empieza rival".padLeft(15)}${"diferencia".padLeft(12)}${"combates".padLeft(10)}');
+  for (final k in [...cats, 'Todos', 'Igualados', 'Igualados Jefe']) {
+    final j = acc[k]![0], r = acc[k]![1];
+    if (j.combates == 0) continue;
+    stdout.writeln('${k.padRight(16)}${pct(j.tasa).padLeft(12)}'
+        '${pct(r.tasa).padLeft(15)}'
+        '${((j.tasa - r.tasa) * 100).toStringAsFixed(1).padLeft(10)} pt'
+        '${j.combates.toString().padLeft(10)}');
+  }
+  if (sinTerminar > 0) {
+    stdout.writeln('ATENCIÓN: $sinTerminar duelos no terminaron.');
+  }
+  escribirCsv(c.informe ?? '../balance/informes/campana_empezar.csv', lineas);
+}
+
 void equipos(Config c, Map<String, PokemonCampana> catalogo) {
   final lista = catalogo.values.toList();
   final tamano = min(c.tamano, lista.length);
@@ -336,6 +422,8 @@ void main(List<String> args) {
   switch (c.modo) {
     case 'duelos':
       duelos(c, catalogo);
+    case 'empezar':
+      empezar(c, catalogo);
     case 'equipos':
       equipos(c, catalogo);
     case 'nodos':
@@ -345,7 +433,7 @@ void main(List<String> args) {
     case 'realista':
       realista(c, catalogo);
     default:
-      stderr.writeln('--modo: usa «duelos», «equipos», «nodos», «tramo» o «realista»');
+      stderr.writeln('--modo: usa «duelos», «empezar», «equipos», «nodos», «tramo» o «realista»');
       exit(2);
   }
 }

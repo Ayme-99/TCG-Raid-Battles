@@ -43,6 +43,9 @@
 //   --al-tope=derrota|mas-ps    qué pasa al llegar al tope: cuenta como derrota
 //                               o gana quien tenga más PS en pie
 //   --aliado=no                 Pikachu jefe sin su llamada de aliado
+//   --empieza=jugador|rival|rival-jefes  quién empieza cada combate (jugador);
+//                               rival-jefes: el rival solo en Pikachu jefe y
+//                               en los gimnasios (Joven y Brock)
 //   --entrenador=N              Pokémon que saca cada Cazabichos (2, el del
 //                               motor; D-20 §4 lo da como suposición)
 //
@@ -96,6 +99,9 @@ class Config {
   int precioPocion = 300;
   int limitePocionCombate = 0; // 0 = sin límite por combate
   int topeTurnos = 0; // 0 = sin tope (solo corta a las 2000 acciones)
+  // Quién empieza cada combate (#451/#386): jugador (como en el juego hoy) o
+  // rival, o rival-jefes (solo empieza el rival en Pikachu jefe y gimnasios).
+  String empieza = 'jugador';
   String alTope = 'derrota'; // derrota | mas-ps
 }
 
@@ -152,6 +158,15 @@ CatalogoCampana cargarCatalogo(Config c) {
 
 // ---------------------------------------------------------------------------
 // Combate con la IA en los dos bandos
+
+/// Quién empieza el combate de la casilla [nodo] según --empieza.
+Bando quienEmpieza(Config cfg, String nodo) => switch (cfg.empieza) {
+      'rival' => Bando.rival,
+      'rival-jefes' => (nodo == 'jefe-pikachu' || nodo.startsWith('gimnasio-'))
+          ? Bando.rival
+          : Bando.jugador,
+      _ => Bando.jugador,
+    };
 
 EstadoCombate hastaElFinal(EstadoCombate e, [int topeTurnos = 0]) {
   for (var i = 0; i < 2000 && e.fase != FaseCombate.terminado; i++) {
@@ -450,6 +465,7 @@ class Jugador {
         for (final m in q.equipo) PokemonEnCombate(c.especie(m.id), m.ps),
       ],
       equipoRival: [for (final x in rv.equipo) PokemonEnCombate.completo(x)],
+      empieza: quienEmpieza(cfg, nodo),
       parametros: parametrosCombate,
       semilla: _siguiente(_siguiente(q.semilla)),
       llamadaRival: cfg.aliado ? rv.llamada : null,
@@ -1207,6 +1223,12 @@ void main(List<String> args) {
         cfg.aliado = v != 'no';
       case '--tope-turnos':
         cfg.topeTurnos = int.parse(v);
+      case '--empieza':
+        if (!['jugador', 'rival', 'rival-jefes'].contains(v)) {
+          stderr.writeln('--empieza: usa «jugador», «rival» o «rival-jefes»');
+          exit(2);
+        }
+        cfg.empieza = v;
       case '--al-tope':
         cfg.alTope = v;
       case '--traza':
