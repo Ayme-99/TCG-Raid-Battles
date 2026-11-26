@@ -285,9 +285,25 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 
 **Plantilla del tramo (con «Rivales por tramo», más abajo):** salvajes obligatorios 2 de categoría Común (20 XP), 2 entrenadores de ruta (60), el jefe 02 (30), el Nadador Luis (20) y Misty (50): **7 rivales y 180 XP**. Dinero: 710 para los entrenadores (por ejemplo Chica 230, Joven 230 y Luis 250) y 1.500 para Misty, según el presupuesto de §10.6.
 
-**Misty.** Dos Pokémon, como Brock: Staryu y Starmie, de tipo agua, con **debilidad eléctrico ×2** (como en el JCC) y sin resistencia. Starmie es la evolución de Staryu con la **Piedra Agua**, que en la campaña aún no se puede obtener (como la Piedra Trueno de Raichu); el jugador no la evoluciona, así que no hay que decidirlo ahora. La ficha de Misty (PS, ataques, dinero) se rellena con las del resto de líderes (§4, «Líderes de gimnasio»).
+**Misty.** Dos Pokémon, como Brock: Staryu y Starmie, de tipo agua y sin resistencia. **Staryu ya está hecho por Ayme con debilidad oscuridad ×2** (no eléctrico, como proponía yo); Starmie debería llevar la misma, por confirmar. Starmie es la evolución de Staryu con la **Piedra Agua**, que en la campaña aún no se puede obtener (como la Piedra Trueno de Raichu); el jugador no la evoluciona, así que no hay que decidirlo ahora. La ficha de Misty (PS, ataques, dinero) se rellena con las del resto de líderes (§4, «Líderes de gimnasio»).
 
 **Clefairy (decidido por Ayme el 2026-11-26):** carta del jefe hecha (`clefairy-jefe.webp`): **psíquico, 120 PS, debilidad oscuridad ×2, retirada 0, Muro Mágico y Doble Bofetón**. Se descarta la propuesta de Arte y Diseño (normal, lucha ×2). El jugador solo tiene a Nidoran♀, Nidoran♂, Zubat y Ekans para golpearlo fuerte; Calidad medirá el 75 % de victoria y la subida de nivel frente a Pikachu (100 PS). Muro Mágico necesita una tarea de Programación; hasta entonces la carta funciona sin la habilidad. Doble Bofetón no necesita nada nuevo. El coste de los ataques es un **número**, no un tipo de energía.
+
+**Tabla de cartas del tramo 2 para que Ayme las cree** (valores propuestos dentro del baremo de §3.5; Ayme los ajusta). Todos los Pokémon del tramo, con lo que hay que crear:
+
+| Pokémon | ¿Carta? | Papel | Tipo | PS | Debilidad | Retirada | Categoría | Ataques propuestos |
+|---|---|---|---|---|---|---|---|---|
+| Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod, Kakuna | **Ya existen** | Salvajes y rivales | — | — | — | — | — | — |
+| **Clefairy** | **Hecha por Ayme** (jefe 02/20) | Jefe 02 en el Monte Moon; capturable la primera vez (carta normal, por hacer) | Psíquico | 120 (jefe; sube respecto a Pikachu jefe, 100) | Oscuridad ×2 | 0 | Jefe (30 XP) | **Muro Mágico** (habilidad: no recibe daño de efectos que no sean ataques; `sinDanoIndirecto`, tipo nuevo para Programación) · **Doble Bofetón** (2 energías, `20+`: lanza 3 monedas, +10 por cara; `monedasDano` con `danoPorCaras` [20, 30, 40, 50]) |
+| **Paras** | **Nueva** | Salvaje raro del Monte Moon | Planta | 50 | Fuego ×2 | 1 | Intermedio (20 XP) | Arañazo (1 energía, 10) · Espora (2 energías, 30) |
+| **Jigglypuff** | **Nueva** | Salvaje raro de la Ruta 3 | Normal | 70 | Lucha ×2 | 1 | Intermedio (20 XP) | **Canto** (1 energía, sin daño; lanza una moneda y, si sale cara, el Defensor queda **Dormido**; efecto nuevo `duermeDefensor`, ver abajo) · Doble bofetón (2 energías, 30) |
+| **Ekans** | **Nueva** | Salvaje raro de la Ruta 4 | Oscuridad | 60 | Lucha ×2 | 0 | Intermedio (20 XP) | Mordisco (1 energía, 10) · Constricción (2 energías, 30) |
+| **Horsea** | **Nueva** | Nadador Luis (gimnasio) | Agua | 50 | Eléctrico ×2 | 1 | Común (10 XP) | Burbuja (1 energía, 10) · Chorro (2 energías, 30) |
+| **Shellder** | **Nueva** | Nadador Luis (gimnasio) | Agua | 60 | Eléctrico ×2 | 1 | Común (10 XP) | Placaje (1 energía, 10) · Pinza (2 energías, 30) |
+| **Staryu** | **Hecha por Ayme** (120/150) | Misty | Agua | 60 | Oscuridad ×2 | 0 | Intermedio (20 XP) | **Pistola Agua** (2 energías, `20`, como la de Slowpoke; un solo ataque) |
+| **Starmie** | **Nueva** | Misty (no capturable en el tramo 2) | Agua | 100 (Fase 1; evoluciona de Staryu con Piedra Agua, aún sin usar) | Eléctrico ×2 | 0 | Fuerte (30 XP) | Rayo burbuja (2 energías, 50) · Cascada (3 energías, 90) |
+
+Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. **Jigglypuff sí lleva Canto** (su ataque emblema, Ayme 2026-11-26): es la **primera carta que causa Dormido**, así que se cumple la condición de §8 punto 25 (#436) y Programación tiene que crear el estado. **Regla de Dormido decidida por Ayme el 2026-11-26 (§10.2; en la banca se curan los estados):** en cada **chequeo Pokémon** (cada vez que cambia el turno, de cualquiera de los dos bandos) se lanza una moneda y, si sale cara, el Pokémon se despierta. Dormido **no puede atacar ni retirarse**; la única forma de cambiarlo es la **Cuerda Huida**.
 
 ### Reglas del recorrido
 
