@@ -17,11 +17,14 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `farola` | Farola de calle | nuevo; ya existía como dibujo en las bases anteriores | Pueblo Paleta, Ciudad Verde |
 | `arbol-1` | Árbol redondo | nuevo; ya existía como dibujo | todas |
 | `arbusto`, `mata-hierba` | Relleno | nuevos | todas |
+| `arbol-2` | Conífera (segundo tipo de árbol) | nuevo | Ruta 1 |
+| `hierba-alta-grande` / `-media` | Mancha de hierba alta, zona de combate (`combate` + Pokémon) | nuevos | Ruta 1 |
+| `valla`, `roca` | Decoración de ruta | nuevos | Ruta 1 |
 
 Materiales de camino: `tierra`, `piedra`, `hierba` (en `componer.py`).
 
 ## Por hacer según vayamos montando escenas
-`centro-pokemon`, `tienda`, `casa-grande`, `arbol-2`, `cartel-ruta`, `valla`, `hierba-alta`, `fuente`, `roca`, `banco`, `gimnasio`, `entrada-bosque`, `puente`.
+`centro-pokemon`, `tienda`, `casa-grande`, `cartel-ruta`, `fuente`, `banco`, `gimnasio`, `entrada-bosque`, `puente`.
 
 ## Nota de estilo
 Las escenas finales de Pueblo Paleta y Ruta 1 que hay en `app/assets/campana/escenas/` son pintadas (Flux). Este kit es vector: si pasa a ser el aspecto definitivo, habrá que volver a montar esas dos con el kit.

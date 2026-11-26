@@ -173,5 +173,82 @@
     ],
     "zonas": [],
     "nota": "Mata de hierba pequeña, de relleno."
+  },
+  "hierba-alta-grande": {
+    "svg": "sprites/hierba-alta-grande.svg",
+    "ancho": 746,
+    "alto": 894,
+    "ancla": [
+      373.0,
+      848
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "hierba-alta",
+        "rect": [
+          28,
+          38,
+          690,
+          810
+        ]
+      }
+    ],
+    "nota": "Mancha grande de hierba alta (zona de combate de ruta)."
+  },
+  "hierba-alta-media": {
+    "svg": "sprites/hierba-alta-media.svg",
+    "ancho": 456,
+    "alto": 374,
+    "ancla": [
+      228.0,
+      328
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "hierba-alta",
+        "rect": [
+          28,
+          38,
+          400,
+          290
+        ]
+      }
+    ],
+    "nota": "Mancha de hierba alta mediana."
+  },
+  "valla": {
+    "svg": "sprites/valla.svg",
+    "ancho": 296,
+    "alto": 148,
+    "ancla": [
+      148.0,
+      102
+    ],
+    "zonas": [],
+    "nota": "Tramo de valla de madera (3 postes)."
+  },
+  "roca": {
+    "svg": "sprites/roca.svg",
+    "ancho": 148,
+    "alto": 128,
+    "ancla": [
+      74.0,
+      82
+    ],
+    "zonas": [],
+    "nota": "Roca pequeña gris."
+  },
+  "arbol-2": {
+    "svg": "sprites/arbol-2.svg",
+    "ancho": 136,
+    "alto": 224,
+    "ancla": [
+      68.0,
+      178
+    ],
+    "zonas": [],
+    "nota": "Conífera (segundo tipo de árbol)."
   }
 }
