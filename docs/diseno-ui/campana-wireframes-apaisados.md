@@ -63,7 +63,7 @@ Rejilla de **3 × 2** (en vertical era 2 × 3) y la hoja de acciones **a la dere
 
 ## Centro Pokémon (propuesta M) y PC
 
-Escena interactiva como el mapa: mostrador (curar), estantería (tienda), PC (pantalla aparte) y puerta (volver). El **PC** usa una lista a la izquierda (todas las cartas) y el detalle de la carta elegida a la derecha, con **Pasar al equipo** y **Hacerse ex**.
+Escena interactiva como el mapa: mostrador (curar), estantería (tienda), PC (pantalla aparte) y puerta (volver). **Curar es gratis y opcional: la puerta se abre siempre, sin obligar a pasar por el mostrador** (decidido el 2026-11-26, #385). El **PC** usa una lista a la izquierda (todas las cartas) y el detalle de la carta elegida a la derecha, con **Pasar al equipo** y **Hacerse ex**.
 
 ## Móvil: solo en horizontal (decidido el 2026-11-25)
 
