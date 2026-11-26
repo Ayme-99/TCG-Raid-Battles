@@ -49,27 +49,27 @@
         "zonas": [
           {
             "accion": "ir",
-            "destino": "pueblo-paleta",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
-          },
-          {
-            "accion": "ir",
             "destino": "ruta-1-pidgey",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.0208,
+            "y": 0.1011,
+            "ancho": 0.3594,
+            "alto": 0.7537
           },
           {
             "accion": "ir",
             "destino": "ruta-1-rattata",
-            "x": 0.9,
-            "y": 0.5,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.6146,
+            "y": 0.1011,
+            "ancho": 0.3646,
+            "alto": 0.7537
+          },
+          {
+            "accion": "ir",
+            "destino": "pueblo-paleta",
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           }
         ]
       }
@@ -91,26 +91,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.0208,
+            "y": 0.1011,
+            "ancho": 0.3594,
+            "alto": 0.7537
           },
           {
             "accion": "ir",
             "destino": "ruta-1",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ciudad-verde",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4531,
+            "y": 0.0,
+            "ancho": 0.0938,
+            "alto": 0.1011
           }
         ]
       }
@@ -132,26 +132,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.6146,
+            "y": 0.1011,
+            "ancho": 0.3646,
+            "alto": 0.7537
           },
           {
             "accion": "ir",
             "destino": "ruta-1",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ciudad-verde",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4531,
+            "y": 0.0,
+            "ancho": 0.0938,
+            "alto": 0.1011
           }
         ]
       }
