@@ -575,6 +575,10 @@ List<String> describirAccion(
     if (a.dormido && !d.dormido && d.pokemonActivo.enPie) {
       lineas.add('$de se despierta.');
     }
+    if (!a.apresado && d.apresado) lineas.add('$de queda apresado.');
+    if (a.apresado && !d.apresado && d.pokemonActivo.enPie) {
+      lineas.add('$de se libera.');
+    }
   }
   for (final b in [accion.bando.otro, accion.bando]) {
     final a = antes.bando(b).equipo;
@@ -587,6 +591,18 @@ List<String> describirAccion(
       lineas.add(d[i].enPie
           ? '$de pierde $perdido PS.'
           : '$de pierde $perdido PS y queda fuera de combate.');
+    }
+  }
+  // Absorber (curaAlAtacar, D-20 §3.6): el atacante se cura tras el daño.
+  if (accion is Atacar) {
+    final a = antes.bando(accion.bando);
+    final d = despues.bando(accion.bando);
+    final curado = d.equipo[a.activo].ps - a.equipo[a.activo].ps;
+    if (curado > 0) {
+      final nombre = a.pokemonActivo.especie.nombre;
+      lineas.add(accion.bando == Bando.jugador
+          ? 'Tu $nombre recupera $curado PS.'
+          : '$nombre rival recupera $curado PS.');
     }
   }
   if (accion is Atacar &&

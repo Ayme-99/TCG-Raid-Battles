@@ -94,6 +94,8 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
           mientrasActivo: (json['mientrasActivo'] as bool?) ?? false);
     case 'drenaDefensor':
       return const DrenaDefensor();
+    case 'apresaDefensor':
+      return const ApresaDefensor();
     case 'paralizaDefensor':
       final monedas = _campo<int>(json, 'monedas');
       final minimo = _campo<int>(json, 'minimoCaras');
@@ -124,6 +126,13 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
       return QuitaEnergiaRival(_campo<int>(json, 'valor'));
     case 'ganaEnergia':
       return GanaEnergia(_campo<int>(json, 'valor'));
+    case 'curaAlAtacar':
+      final valor = _campo<int>(json, 'valor');
+      if (valor < 10 || valor % 10 != 0) {
+        throw const FormatException(
+            '"valor" de curaAlAtacar tiene que ser múltiplo de 10.');
+      }
+      return CuraAlAtacar(valor);
   }
   throw FormatException('Efecto de ataque desconocido: "$tipo".');
 }
@@ -189,6 +198,12 @@ HabilidadCampana? _habilidadDesdeJson(dynamic json) {
   switch (_campo<String>(h, 'tipo')) {
     case 'monedaDanoExtraAlAtacar':
       return MonedaDanoExtraAlAtacar(nombre, _campo<int>(h, 'valor'));
+    case 'sinDanoIndirecto':
+      if (h.containsKey('valor')) {
+        throw const FormatException(
+            'sinDanoIndirecto (Muro Mágico) no lleva "valor".');
+      }
+      return SinDanoIndirecto(nombre);
   }
   throw FormatException('Habilidad desconocida: ${h['tipo']}');
 }
