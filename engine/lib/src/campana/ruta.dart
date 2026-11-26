@@ -489,7 +489,8 @@ class ProgresoRuta {
   final String nodoActual;
 
   /// Si ya se ha hecho lo que había que hacer en el nodo actual (ganar el
-  /// combate, usar el descanso, elegir inicial…). Hasta entonces no se avanza.
+  /// combate, elegir inicial…). Hasta entonces no se avanza. Las bifurcaciones
+  /// y los centros Pokémon se dan por resueltos al llegar.
   final bool resuelto;
 
   /// Ids de los nodos ya resueltos.
@@ -585,8 +586,9 @@ class ProgresoRuta {
 
   /// Pasa a [destino], que tiene que ser una salida del nodo actual ya
   /// resuelto. Una bifurcación no tiene evento y se da por resuelta al llegar,
-  /// y un nodo ya superado también: solo los salvajes se repiten, y a mano
-  /// ([repetir], D-20 §10.7).
+  /// y un centro Pokémon también: curar en el mostrador es opcional (D-20
+  /// §10.7, decidido el 2026-11-26, #510). Un nodo ya superado también se da
+  /// por resuelto: solo los salvajes se repiten, y a mano ([repetir]).
   ProgresoRuta avanzar(RegionCampana region, String destino) {
     if (!resuelto) {
       throw const ReglaIncumplida('Antes hay que resolver este nodo.');
@@ -594,7 +596,7 @@ class ProgresoRuta {
     if (!region.nodo(nodoActual).salidas.contains(destino)) {
       throw ReglaIncumplida('Desde aquí no se puede ir a "$destino".');
     }
-    final sinEvento = region.nodo(destino).tipo == TipoNodo.bifurcacion;
+    final sinEvento = _sinEvento(region.nodo(destino));
     return _copiar(
       nodoActual: destino,
       resuelto: sinEvento || superados.contains(destino),
@@ -620,11 +622,15 @@ class ProgresoRuta {
     }
     return _copiar(
       nodoActual: destino,
-      resuelto: superados.contains(destino) ||
-          nodo.tipo == TipoNodo.bifurcacion,
+      resuelto: superados.contains(destino) || _sinEvento(nodo),
+      superados: _sinEvento(nodo) ? {...superados, destino} : null,
       repitiendo: false,
     );
   }
+
+  /// Nodos que no hay que resolver: se dan por resueltos al llegar.
+  static bool _sinEvento(NodoRuta n) =>
+      n.tipo == TipoNodo.bifurcacion || n.tipo == TipoNodo.descanso;
 
   /// Si el combate del nodo actual se puede repetir: es contra un Pokémon
   /// salvaje y ya se ganó (D-20 §10.7). Entrenadores, gimnasios y jefes no se
