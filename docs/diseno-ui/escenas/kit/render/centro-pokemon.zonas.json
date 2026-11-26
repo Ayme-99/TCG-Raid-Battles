@@ -1,0 +1,80 @@
+{
+  "escena": "centro-pokemon",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Interior del Centro Pokémon (escena aparte, confirmada por Ayme en #415). Entrada por la puerta abajo (sale a Ciudad Verde). Mostrador central = curar, mostrador derecho = tienda, PC a la izquierda. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "pc-pc",
+      "tipo": "pc",
+      "accion": "pc",
+      "rect": [
+        240,
+        272,
+        180,
+        228
+      ],
+      "rel": [
+        0.125,
+        0.25,
+        0.0938,
+        0.2096
+      ]
+    },
+    {
+      "id": "mostrador-tienda-tienda",
+      "tipo": "tienda",
+      "accion": "tienda",
+      "rect": [
+        1334,
+        289,
+        431,
+        231
+      ],
+      "rel": [
+        0.6948,
+        0.2656,
+        0.2245,
+        0.2123
+      ]
+    },
+    {
+      "id": "mostrador-curar-curar",
+      "tipo": "curar",
+      "accion": "curar",
+      "rect": [
+        712,
+        318,
+        497,
+        241
+      ],
+      "rel": [
+        0.3708,
+        0.2923,
+        0.2589,
+        0.2215
+      ]
+    },
+    {
+      "id": "salida-ciudad-verde",
+      "tipo": "puerta",
+      "accion": "ir",
+      "destino": "ciudad-verde",
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    }
+  ]
+}

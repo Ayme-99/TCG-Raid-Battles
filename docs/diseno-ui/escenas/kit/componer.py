@@ -44,7 +44,14 @@ def main(ruta):
     zonas += esc.get("zonas_extra", [])
     for q in zonas: q["rel"] = [round(q["rect"][0] / W, 4), round(q["rect"][1] / H, 4), round(q["rect"][2] / W, 4), round(q["rect"][3] / H, 4)]
     fondo = esc.get("fondo", "cesped")
-    svg = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">{defs()}<rect width="{W}" height="{H}" fill="url(#{fondo})"/>{body}</svg>'
+    if fondo == "suelo-centro":
+        sue = '<pattern id="losas" width="96" height="96" patternUnits="userSpaceOnUse"><rect width="96" height="96" fill="#fbf3e6"/><rect width="48" height="48" fill="#f3e3cf"/><rect x="48" y="48" width="48" height="48" fill="#f3e3cf"/></pattern>'
+        pared = f'<rect y="0" width="{W}" height="330" fill="#fde3ea"/><rect y="250" width="{W}" height="80" fill="#f6a9bc"/><path d="M0 330 H{W}" stroke="{INK}" stroke-width="8"/>'
+        for x in (330, 760, 1160, 1590): pared += f'<rect x="{x}" y="70" width="170" height="120" rx="10" fill="#b4e1f7" stroke="{INK}" stroke-width="6"/><path d="M{x+85} 70 v120 M{x} 130 h170" stroke="{INK}" stroke-width="4"/>'
+        body = f'<rect y="330" width="{W}" height="{H-330}" fill="url(#losas)"/>' + pared + body
+        defs_x = sue
+    else: defs_x = ""
+    svg = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">{defs()}{defs_x}<rect width="{W}" height="{H}" fill="url(#{fondo if fondo != "suelo-centro" else "cesped"})"/>{body}</svg>'
     os.makedirs("render", exist_ok=True)
     open(f"render/{nombre}.svg", "w").write(svg)
     subprocess.run(["rsvg-convert", "-w", str(W), f"render/{nombre}.svg", "-o", f"render/{nombre}.png"], check=True)

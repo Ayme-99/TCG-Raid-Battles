@@ -94,6 +94,48 @@ def portico():
         o += f'<rect x="{x}" y="{p+30}" width="60" height="{h-32}" rx="8" fill="#d6cdbb" stroke="{INK}" stroke-width="5"/><path d="M{x+14} {p+44} V{p+h-14}" stroke="#f1ebdd" stroke-width="8" stroke-linecap="round"/><rect x="{x-6}" y="{p+20}" width="72" height="26" rx="8" fill="#bdb4a0" stroke="{INK}" stroke-width="4"/>'
     o += f'<path d="M{p-6} {p+34} Q{p+w/2} {p-26} {p+w+6} {p+34} V{p+8} Q{p+w/2} {p-40} {p-6} {p+8}z" fill="#cfc6b4" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/>'
     sprite("portico", w, h, o, [{"id": "puerta", "tipo": "salida", "rect": [p + 64, p, w - 128, h]}], "Pórtico de piedra bajo (salida de ruta). El camino pasa por el hueco central.")
+def mostrador(id, w, h, color, colord, nota, zona, tipo, extra=""):
+    p = PAD
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h-2}" rx="{w/2+8}" ry="10" fill="#000" opacity=".15"/>'
+    o += f'<rect x="{p}" y="{p+h*.38}" width="{w}" height="{h*.62}" rx="14" fill="{color}" stroke="{INK}" stroke-width="5"/>'
+    o += f'<rect x="{p-6}" y="{p+h*.3}" width="{w+12}" height="{h*.14}" rx="8" fill="#f4efe6" stroke="{INK}" stroke-width="5"/>'
+    o += f'<rect x="{p+14}" y="{p+h*.52}" width="{w-28}" height="{h*.34}" rx="8" fill="{colord}" opacity=".55"/>' + extra
+    sprite(id, w, h, o, [{"id": zona, "tipo": tipo, "rect": [p - 6, p, w + 12, h]}], nota)
+def curar():
+    p = PAD; w = 420; m = ""
+    m += f'<rect x="{p+120}" y="{p}" width="180" height="96" rx="16" fill="#ffffff" stroke="{INK}" stroke-width="5"/>'
+    for i in range(6):
+        x = p + 140 + (i % 3) * 52; y = p + 14 + (i // 3) * 36
+        m += f'<circle cx="{x+14}" cy="{y+14}" r="14" fill="#f2f2f2" stroke="{INK}" stroke-width="3"/><path d="M{x} {y+14} H{x+28}" stroke="{INK}" stroke-width="3"/><path d="M{x} {y+14} a14 14 0 0 1 28 0z" fill="#e0453c"/><circle cx="{x+14}" cy="{y+14}" r="4" fill="#fff" stroke="{INK}" stroke-width="2"/>'
+    m += f'<path d="M{p+40} {p+50} h24 v-14 h14 v14 h24 v14 h-24 v14 h-14 v-14 h-24z" fill="#e0453c" stroke="{INK}" stroke-width="3"/>'
+    mostrador("mostrador-curar", w, 210, "#f6a9bc", "#e0788f", "Mostrador de la enfermera con la máquina de curar (zona curar).", "curar", "curar", m)
+def tienda_mostrador():
+    p = PAD; w = 380; m = ""
+    cols = ["#f2c84b", "#58b0e8", "#e0453c", "#7bd36a"]
+    for fila, y in enumerate((p + 4, p + 52)):
+        m += f'<rect x="{p+10}" y="{y}" width="{w-20}" height="10" rx="3" fill="#c9895a" stroke="{INK}" stroke-width="3"/>'
+        for i in range(6): m += f'<rect x="{p+24+i*58}" y="{y-34}" width="38" height="34" rx="6" fill="{cols[(i+fila)%4]}" stroke="{INK}" stroke-width="3"/>'
+    mostrador("mostrador-tienda", w, 210, "#8fb8f0", "#5c8ad0", "Mostrador de la tienda con estantes (zona tienda).", "tienda", "tienda", m)
+def pc():
+    p = PAD; w, h = 150, 190
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h-2}" rx="{w/2}" ry="9" fill="#000" opacity=".15"/>'
+    o += f'<rect x="{p+10}" y="{p+84}" width="{w-20}" height="{h-84}" rx="8" fill="#b9bfd0" stroke="{INK}" stroke-width="5"/>'
+    o += f'<rect x="{p}" y="{p}" width="{w}" height="96" rx="12" fill="#d7dbe8" stroke="{INK}" stroke-width="5"/><rect x="{p+12}" y="{p+12}" width="{w-24}" height="62" rx="6" fill="#58b0e8" stroke="{INK}" stroke-width="4"/><path d="M{p+26} {p+34} h50 M{p+26} {p+50} h80" stroke="#e9f7ff" stroke-width="6" stroke-linecap="round"/>'
+    o += f'<rect x="{p+20}" y="{p+110}" width="{w-40}" height="20" rx="5" fill="#f4efe6" stroke="{INK}" stroke-width="3"/>'
+    sprite("pc", w, h, o, [{"id": "pc", "tipo": "pc", "rect": [p, p, w, h]}], "Terminal de PC de almacenamiento (zona pc).")
+def planta():
+    p = PAD
+    o = f'<ellipse cx="{p+34}" cy="{p+108}" rx="40" ry="8" fill="#000" opacity=".15"/><path d="M{p+8} {p+70} h52 l-8 40 h-36z" fill="#c9895a" stroke="{INK}" stroke-width="4"/>'
+    for a, c in ((-40, "#2f9a4e"), (0, "#3aa85a"), (40, "#278a45")): o += f'<path d="M{p+34} {p+72} q{a*1.2} -40 {a*.6} -66 q{30+a*.4} 30 {-a*.6+8} 66z" fill="{c}" stroke="{INK}" stroke-width="3"/>'
+    sprite("planta", 68, 110, o, [], "Planta de interior en maceta.")
+def sofa():
+    p = PAD; w, h = 260, 90
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h}" rx="{w/2+6}" ry="8" fill="#000" opacity=".15"/><rect x="{p}" y="{p}" width="{w}" height="{h-14}" rx="18" fill="#e0788f" stroke="{INK}" stroke-width="5"/><rect x="{p+14}" y="{p+24}" width="{w-28}" height="{h-34}" rx="12" fill="#f6a9bc" stroke="{INK}" stroke-width="4"/>'
+    sprite("sofa", w, h, o, [], "Sofá de la sala de espera.")
+def alfombra():
+    p = PAD; w, h = 260, 120
+    o = f'<rect x="{p}" y="{p}" width="{w}" height="{h}" rx="16" fill="#e0453c" stroke="{INK}" stroke-width="5"/><rect x="{p+16}" y="{p+16}" width="{w-32}" height="{h-32}" rx="10" fill="none" stroke="#f9d0cb" stroke-width="5"/>'
+    sprite("alfombra-puerta", w, h, o, [], "Alfombra de entrada.")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -103,6 +145,6 @@ casa("casa-pequena-verde", 230, 170, "#2f9a4e", "#25803f", "Casa pequeña de Ciu
 buzon(); farola(); arbol("arbol-1", 56, "Árbol redondo grande, copa clara."); arbusto(); matas()
 hierba_alta_sprite("hierba-alta-grande", 690, 820, 11, "Mancha grande de hierba alta (zona de combate de ruta).")
 hierba_alta_sprite("hierba-alta-media", 400, 300, 12, "Mancha de hierba alta mediana.")
-valla(); roca(); arbol2(); puente(); portico()
+valla(); roca(); arbol2(); puente(); portico(); curar(); tienda_mostrador(); pc(); planta(); sofa(); alfombra()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")

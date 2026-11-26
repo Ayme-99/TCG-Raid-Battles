@@ -22,11 +22,15 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `valla`, `roca` | Decoración de ruta | nuevos | Ruta 1 (`roca` también en Ruta 22) |
 | `puente` | Puente de piedra cenital sobre el río | nuevo | Ruta 22 |
 | `portico` | Pórtico de piedra, salida de ruta (zona `puerta` → `ir`) | nuevo | Ruta 22 |
+| `mostrador-curar`, `mostrador-tienda`, `pc` | Interior del Centro Pokémon: curar, tienda, PC (cada uno con su zona pulsable) | nuevos | Centro Pokémon (interior) |
+| `planta`, `sofa`, `alfombra-puerta` | Decoración de interior | nuevos | Centro Pokémon (interior) |
+
+Fondos de escena: `cesped` (por defecto) y `suelo-centro` (interior con pared y losas).
 
 Materiales de camino: `tierra`, `piedra`, `hierba` y `agua` (río, con brillos) (en `componer.py`).
 
 ## Por hacer según vayamos montando escenas
-`centro-pokemon`, `tienda`, `casa-grande`, `cartel-ruta`, `fuente`, `banco`, `gimnasio`, `entrada-bosque`.
+`tienda` (exterior), `casa-grande`, `cartel-ruta`, `fuente`, `banco`, `gimnasio`, `entrada-bosque`.
 
 ## Nota de estilo
 Las escenas finales de Pueblo Paleta y Ruta 1 que hay en `app/assets/campana/escenas/` son pintadas (Flux). Este kit es vector: si pasa a ser el aspecto definitivo, habrá que volver a montar esas dos con el kit.

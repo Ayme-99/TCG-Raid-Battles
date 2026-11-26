@@ -283,5 +283,104 @@
       }
     ],
     "nota": "Pórtico de piedra bajo (salida de ruta). El camino pasa por el hueco central."
+  },
+  "mostrador-curar": {
+    "svg": "sprites/mostrador-curar.svg",
+    "ancho": 476,
+    "alto": 284,
+    "ancla": [
+      238.0,
+      238
+    ],
+    "zonas": [
+      {
+        "id": "curar",
+        "tipo": "curar",
+        "rect": [
+          22,
+          28,
+          432,
+          210
+        ]
+      }
+    ],
+    "nota": "Mostrador de la enfermera con la máquina de curar (zona curar)."
+  },
+  "mostrador-tienda": {
+    "svg": "sprites/mostrador-tienda.svg",
+    "ancho": 436,
+    "alto": 284,
+    "ancla": [
+      218.0,
+      238
+    ],
+    "zonas": [
+      {
+        "id": "tienda",
+        "tipo": "tienda",
+        "rect": [
+          22,
+          28,
+          392,
+          210
+        ]
+      }
+    ],
+    "nota": "Mostrador de la tienda con estantes (zona tienda)."
+  },
+  "pc": {
+    "svg": "sprites/pc.svg",
+    "ancho": 206,
+    "alto": 264,
+    "ancla": [
+      103.0,
+      218
+    ],
+    "zonas": [
+      {
+        "id": "pc",
+        "tipo": "pc",
+        "rect": [
+          28,
+          28,
+          150,
+          190
+        ]
+      }
+    ],
+    "nota": "Terminal de PC de almacenamiento (zona pc)."
+  },
+  "planta": {
+    "svg": "sprites/planta.svg",
+    "ancho": 124,
+    "alto": 184,
+    "ancla": [
+      62.0,
+      138
+    ],
+    "zonas": [],
+    "nota": "Planta de interior en maceta."
+  },
+  "sofa": {
+    "svg": "sprites/sofa.svg",
+    "ancho": 316,
+    "alto": 164,
+    "ancla": [
+      158.0,
+      118
+    ],
+    "zonas": [],
+    "nota": "Sofá de la sala de espera."
+  },
+  "alfombra-puerta": {
+    "svg": "sprites/alfombra-puerta.svg",
+    "ancho": 316,
+    "alto": 194,
+    "ancla": [
+      158.0,
+      148
+    ],
+    "zonas": [],
+    "nota": "Alfombra de entrada."
   }
 }
