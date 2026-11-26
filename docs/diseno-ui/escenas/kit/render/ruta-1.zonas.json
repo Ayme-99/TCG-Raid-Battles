@@ -1,0 +1,82 @@
+{
+  "escena": "ruta-1",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Entrada por abajo (Pueblo Paleta), salida por el borde superior hacia Ciudad Verde. Hierba izquierda = Pidgey, derecha = Rattata. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "hierba-izquierda",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        40,
+        120,
+        690,
+        810
+      ],
+      "pokemon": "Pidgey",
+      "rel": [
+        0.0208,
+        0.1103,
+        0.3594,
+        0.7445
+      ]
+    },
+    {
+      "id": "hierba-derecha",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        1185,
+        120,
+        690,
+        810
+      ],
+      "pokemon": "Rattata",
+      "rel": [
+        0.6172,
+        0.1103,
+        0.3594,
+        0.7445
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-ciudad-verde",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "ciudad-verde",
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}

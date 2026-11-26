@@ -1,0 +1,100 @@
+{
+  "escena": "ciudad-verde",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Entrada por abajo (Ruta 1), salida a la Ruta 22 por la izquierda (opcional) y a la Ruta 2 por arriba. La puerta del Centro Pokémon lleva al interior. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "centro-pokemon",
+      "tipo": "edificio",
+      "accion": "ir",
+      "destino": "ciudad-verde",
+      "rect": [
+        380,
+        170,
+        500,
+        380
+      ],
+      "rel": [
+        0.1979,
+        0.1562,
+        0.2604,
+        0.3493
+      ]
+    },
+    {
+      "id": "puerta-centro",
+      "tipo": "puerta",
+      "accion": "ir",
+      "destino": "ciudad-verde",
+      "rect": [
+        565,
+        380,
+        130,
+        160
+      ],
+      "rel": [
+        0.2943,
+        0.3493,
+        0.0677,
+        0.1471
+      ]
+    },
+    {
+      "id": "entrada-ruta-1",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        820,
+        903,
+        280,
+        185
+      ],
+      "rel": [
+        0.4271,
+        0.83,
+        0.1458,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-ruta-22",
+      "tipo": "borde-izquierdo",
+      "accion": "ir",
+      "destino": "ruta-22",
+      "rect": [
+        0,
+        620,
+        150,
+        200
+      ],
+      "rel": [
+        0.0,
+        0.5699,
+        0.0781,
+        0.1838
+      ]
+    },
+    {
+      "id": "salida-ruta-2",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "ruta-2",
+      "rect": [
+        1090,
+        0,
+        180,
+        140
+      ],
+      "rel": [
+        0.5677,
+        0.0,
+        0.0938,
+        0.1287
+      ]
+    }
+  ]
+}
