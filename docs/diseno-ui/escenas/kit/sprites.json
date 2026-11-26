@@ -1,0 +1,177 @@
+{
+  "laboratorio": {
+    "svg": "sprites/laboratorio.svg",
+    "ancho": 496,
+    "alto": 544,
+    "ancla": [
+      248.0,
+      498
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          200.8,
+          300.8,
+          94.4,
+          166.48
+        ]
+      },
+      {
+        "id": "edificio",
+        "tipo": "edificio",
+        "rect": [
+          10,
+          38,
+          476,
+          530
+        ]
+      }
+    ],
+    "nota": "Laboratorio del Profesor: tejado verde azulado con cúpula y antena, placa sobre la puerta."
+  },
+  "casa-jugador": {
+    "svg": "sprites/casa-jugador.svg",
+    "ancho": 306,
+    "alto": 274,
+    "ancla": [
+      153.0,
+      228
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          123.0,
+          142.16,
+          60.0,
+          64.95999999999998
+        ]
+      }
+    ],
+    "nota": "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon)."
+  },
+  "casa-pequena-azul": {
+    "svg": "sprites/casa-pequena-azul.svg",
+    "ancho": 296,
+    "alto": 269,
+    "ancla": [
+      148.0,
+      223
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          119.2,
+          139.30599999999998,
+          57.599999999999994,
+          63.335999999999984
+        ]
+      }
+    ],
+    "nota": "Casa pequeña de vecino, tejado azul."
+  },
+  "casa-pequena-roja": {
+    "svg": "sprites/casa-pequena-roja.svg",
+    "ancho": 306,
+    "alto": 279,
+    "ancla": [
+      153.0,
+      233
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          123.0,
+          145.01399999999998,
+          60.0,
+          66.58399999999999
+        ]
+      }
+    ],
+    "nota": "Casa pequeña de vecino, tejado rojo."
+  },
+  "casa-pequena-verde": {
+    "svg": "sprites/casa-pequena-verde.svg",
+    "ancho": 286,
+    "alto": 244,
+    "ancla": [
+      143.0,
+      198
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          115.4,
+          125.03599999999999,
+          55.199999999999996,
+          55.215999999999994
+        ]
+      }
+    ],
+    "nota": "Casa pequeña de Ciudad Verde, tejado verde (ya usada en la base de Ciudad Verde)."
+  },
+  "buzon": {
+    "svg": "sprites/buzon.svg",
+    "ancho": 96,
+    "alto": 152,
+    "ancla": [
+      48.0,
+      106
+    ],
+    "zonas": [],
+    "nota": "Buzón amarillo de la casa del jugador."
+  },
+  "farola": {
+    "svg": "sprites/farola.svg",
+    "ancho": 72,
+    "alto": 204,
+    "ancla": [
+      36.0,
+      158
+    ],
+    "zonas": [],
+    "nota": "Farola de calle: poste oscuro y lámpara amarilla."
+  },
+  "arbol-1": {
+    "svg": "sprites/arbol-1.svg",
+    "ancho": 179.20000000000002,
+    "alto": 200.0,
+    "ancla": [
+      89.60000000000001,
+      154.0
+    ],
+    "zonas": [],
+    "nota": "Árbol redondo grande, copa clara."
+  },
+  "arbusto": {
+    "svg": "sprites/arbusto.svg",
+    "ancho": 146,
+    "alto": 132,
+    "ancla": [
+      73.0,
+      86
+    ],
+    "zonas": [],
+    "nota": "Arbusto bajo redondo."
+  },
+  "mata-hierba": {
+    "svg": "sprites/mata-hierba.svg",
+    "ancho": 106,
+    "alto": 118,
+    "ancla": [
+      53.0,
+      72
+    ],
+    "zonas": [],
+    "nota": "Mata de hierba pequeña, de relleno."
+  }
+}
