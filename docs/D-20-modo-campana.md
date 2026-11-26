@@ -268,7 +268,7 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 | 9 | **Ruta 3** (bifurcación) | Elegir entre un **Spearow** y un **Nidoran♂** salvajes. Dos entrenadores de ruta: la **Chica** (Rattata y Nidoran♀) y el **Joven** (Spearow y Rattata). Un **centro Pokémon** al final, junto a la entrada del Monte Moon ◐. |
 | 10 | **Monte Moon** | Un salvaje **opcional** (Zubat o Geodude) en una galería lateral, y el jefe **02/20 Clefairy** (capturable la primera vez, §10.8) con los aliados de la lista A: Zubat, Geodude y Sandshrew. |
 | 11 | **Ruta 4** (bifurcación) | Elegir entre un **Sandshrew** y un **Rattata** salvajes. |
-| 12 | **Ciudad Celeste** | Centro Pokémon y tienda. **Gimnasio:** un **entrenador de gimnasio** (Slowpoke y Staryu) y **Misty** (Staryu y Starmie), que da la **Medalla Cascada** (2.ª). |
+| 12 | **Ciudad Celeste** | Centro Pokémon y tienda. **Gimnasio:** el **Nadador Luis** (Horsea y Shellder) y **Misty** (Staryu y Starmie), que da la **Medalla Cascada** (2.ª). |
 | 13 | **Ruta 24, Puente Pepita** (desvío **opcional**) | Un salvaje opcional (Caterpie, Weedle, Metapod, Kakuna o Pidgey ◐). Da puntos y XP; no hace falta para seguir. |
 
 **Qué Pokémon salen en cada zona** (id de zona propuesto del catálogo):
@@ -278,12 +278,12 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 | `ruta-3` | Pidgey, Spearow, Nidoran♀, Nidoran♂, Mankey (poco frecuente). **Bifurcación obligatoria: Spearow o Nidoran♂.** | Chica: Rattata, Nidoran♀. Joven: Spearow, Rattata. | ✓ Bulbapedia (Ruta 3). En los juegos también sale **Jigglypuff**, que no entra: no hay carta |
 | `monte-moon` | Zubat y Geodude (opcional, uno de los dos) | **Jefe 02 Clefairy** | ✓ Serebii y SuperCheats (Zubat, Geodude, Paras y Clefairy; Paras y Clefairy son raros) |
 | `ruta-4` | Rattata, Spearow, Sandshrew, Mankey (muy poco frecuente). **Bifurcación obligatoria: Sandshrew o Rattata.** | — | ✓ Bulbapedia (Ruta 4). En los juegos también sale Ekans, que no entra: no hay carta |
-| `gimnasio-celeste` | Sin salvajes | Entrenador de gimnasio: Slowpoke, Staryu. Líder Misty: Staryu, Starmie | ✓ StrategyWiki y Serebii (Misty: Staryu de nivel 18 y Starmie de nivel 21). El gimnasio de los juegos tiene también una Chica de Camping (Goldeen), que no entra |
+| `gimnasio-celeste` | Sin salvajes | Nadador Luis: Horsea, Shellder. Líder Misty: Staryu, Starmie | ✓ StrategyWiki y Serebii (Misty: Staryu de nivel 18 y Starmie de nivel 21). El gimnasio de los juegos tiene también una Chica de Camping (Goldeen), que no entra |
 | `ruta-24` (opcional) | Caterpie, Weedle, Metapod, Kakuna, Pidgey | — | ✓ Caterpie (StrategyWiki); el resto ◐ |
 
-**Cartas que ya existen** y valen para todo el tramo: Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod y Kakuna, más **Slowpoke** (entrenador de gimnasio). **Cartas nuevas que hacen falta: tres**, las de la tabla siguiente. **Surf:** en la campaña aún no hay Surf ni zonas de agua, así que **no sale ningún salvaje de agua** en el tramo 2 (ni Horsea ni Shellder). Los Pokémon de agua solo aparecen como rivales en el gimnasio, y los entrenadores no necesitan Surf. Horsea y Shellder quedan para cuando se decida el Surf.
+**Cartas que ya existen** y valen para todo el tramo: Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod y Kakuna. **Cartas nuevas que hacen falta: cinco**, las de la tabla siguiente. **Surf:** en la campaña aún no hay Surf, así que **ningún salvaje de las rutas es de agua**. Horsea y Shellder solo salen como Pokémon del **Nadador Luis en el gimnasio**, y los entrenadores no necesitan Surf (decidido por Ayme el 2026-11-26: el Nadador se queda).
 
-**Plantilla del tramo (con «Rivales por tramo», más abajo):** salvajes obligatorios 2 de categoría Común (20 XP), 2 entrenadores de ruta (60), el jefe 02 (30), el entrenador de gimnasio (20) y Misty (50): **7 rivales y 180 XP**. Dinero: 710 para los entrenadores (por ejemplo Chica 230, Joven 230 y gimnasio 250) y 1.500 para Misty, según el presupuesto de §10.6.
+**Plantilla del tramo (con «Rivales por tramo», más abajo):** salvajes obligatorios 2 de categoría Común (20 XP), 2 entrenadores de ruta (60), el jefe 02 (30), el Nadador Luis (20) y Misty (50): **7 rivales y 180 XP**. Dinero: 710 para los entrenadores (por ejemplo Chica 230, Joven 230 y Luis 250) y 1.500 para Misty, según el presupuesto de §10.6.
 
 **Misty.** Dos Pokémon, como Brock: Staryu y Starmie, de tipo agua, con **debilidad eléctrico ×2** (como en el JCC) y sin resistencia. Starmie es la evolución de Staryu con la **Piedra Agua**, que en la campaña aún no se puede obtener (como la Piedra Trueno de Raichu); el jugador no la evoluciona, así que no hay que decidirlo ahora. La ficha de Misty (PS, ataques, dinero) se rellena con las del resto de líderes (§4, «Líderes de gimnasio»).
 
@@ -298,12 +298,14 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 
 | Pokémon | ¿Carta? | Papel | Tipo | PS | Debilidad | Retirada | Categoría | Ataques propuestos |
 |---|---|---|---|---|---|---|---|---|
-| Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod, Kakuna, Slowpoke | **Ya existen** | Salvajes y rivales | — | — | — | — | — | — |
+| Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod, Kakuna | **Ya existen** | Salvajes y rivales | — | — | — | — | — | — |
 | **Clefairy** | **Nueva** | Jefe 02 en el Monte Moon; capturable la primera vez (carta normal) | Normal | 60 (carta normal) · 100 (jefe) | Lucha ×2 | 1 | Jefe (30 XP) | Destructor (1 energía, 20) · Doble bofetón (2 energías, 30; moneda: cara +20 con el efecto `monedaDanoExtra` que ya existe) |
-| **Staryu** | **Nueva** | Misty y entrenador de gimnasio | Agua | 60 | Eléctrico ×2 | 1 | Intermedio (20 XP) | Placaje (1 energía, 10) · Giro rápido (2 energías, 30) |
+| **Horsea** | **Nueva** | Nadador Luis (gimnasio) | Agua | 50 | Eléctrico ×2 | 1 | Común (10 XP) | Burbuja (1 energía, 10) · Chorro (2 energías, 30) |
+| **Shellder** | **Nueva** | Nadador Luis (gimnasio) | Agua | 60 | Eléctrico ×2 | 1 | Común (10 XP) | Placaje (1 energía, 10) · Pinza (2 energías, 30) |
+| **Staryu** | **Nueva** | Misty | Agua | 60 | Eléctrico ×2 | 1 | Intermedio (20 XP) | Placaje (1 energía, 10) · Giro rápido (2 energías, 30) |
 | **Starmie** | **Nueva** | Misty (no capturable en el tramo 2) | Agua | 100 (Fase 1; evoluciona de Staryu con Piedra Agua, aún sin usar) | Eléctrico ×2 | 0 | Fuerte (30 XP) | Rayo burbuja (2 energías, 50) · Cascada (3 energías, 90) |
 
-Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. En esta tabla hay tres cartas nuevas, no cinco.
+Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. En esta tabla hay cinco cartas nuevas.
 
 ### Reglas del recorrido
 
