@@ -1,0 +1,20 @@
+{
+ "escena": "ruta-1",
+ "nota": "Entrada por abajo (Pueblo Paleta), salida por el borde superior hacia Ciudad Verde. Hierba izquierda = Pidgey, derecha = Rattata. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {"material": "tierra", "ancho": 300, "d": "M960 1130 C950 940 905 830 925 640 C945 440 925 230 960 -40"}
+ ],
+ "objetos": [
+  {"sprite": "arbol-1", "x": 90, "y": 120, "escala": 0.9}, {"sprite": "arbol-1", "x": 470, "y": 70, "escala": 0.85}, {"sprite": "arbol-1", "x": 1790, "y": 100, "escala": 1.0},
+  {"sprite": "arbol-1", "x": 100, "y": 1020, "escala": 1.0}, {"sprite": "arbol-1", "x": 1840, "y": 1010, "escala": 1.1}, {"sprite": "arbol-2", "x": 1330, "y": 1045, "escala": 0.8},
+  {"sprite": "hierba-alta-grande", "x": 385, "y": 930, "id": "hierba-izquierda", "acciones": {"cuerpo": {"accion": "combate", "pokemon": "Pidgey"}}},
+  {"sprite": "hierba-alta-grande", "x": 1530, "y": 930, "id": "hierba-derecha", "flip": true, "acciones": {"cuerpo": {"accion": "combate", "pokemon": "Rattata"}}},
+  {"sprite": "valla", "x": 1300, "y": 74, "escala": 0.9}, {"sprite": "valla", "x": 1560, "y": 74, "escala": 0.9},
+  {"sprite": "roca", "x": 850, "y": 770}, {"sprite": "roca", "x": 1120, "y": 380}, {"sprite": "arbusto", "x": 835, "y": 300, "escala": 0.9}, {"sprite": "arbusto", "x": 1200, "y": 1000, "escala": 0.9},
+  {"sprite": "mata-hierba", "x": 850, "y": 520}, {"sprite": "mata-hierba", "x": 1130, "y": 620}, {"sprite": "mata-hierba", "x": 860, "y": 980}
+ ],
+ "zonas_extra": [
+  {"id": "entrada", "tipo": "punto-de-entrada", "accion": null, "rect": [760, 903, 400, 185]},
+  {"id": "salida-ciudad-verde", "tipo": "borde-superior", "accion": "ir", "destino": "ciudad-verde", "rect": [820, 0, 280, 120]}
+ ]
+}
