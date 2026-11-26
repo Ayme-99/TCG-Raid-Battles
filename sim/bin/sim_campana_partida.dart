@@ -43,8 +43,9 @@
 //   --al-tope=derrota|mas-ps    qué pasa al llegar al tope: cuenta como derrota
 //                               o gana quien tenga más PS en pie
 //   --aliado=no                 Pikachu jefe sin su llamada de aliado
-//   --empieza=jugador|rival|rival-jefes  quién empieza cada combate (jugador);
-//                               rival-jefes: el rival solo en Pikachu jefe y
+//   --empieza=jugador|gimnasios|rival|rival-jefes  quién empieza cada combate (jugador);
+//                               gimnasios: el rival solo en los gimnasios (lo
+//                               decidido el 2026-11-26); rival-jefes: además en Pikachu jefe y
 //                               en los gimnasios (Joven y Brock)
 //   --entrenador=N              Pokémon que saca cada Cazabichos (2, el del
 //                               motor; D-20 §4 lo da como suposición)
@@ -162,6 +163,9 @@ CatalogoCampana cargarCatalogo(Config c) {
 /// Quién empieza el combate de la casilla [nodo] según --empieza.
 Bando quienEmpieza(Config cfg, String nodo) => switch (cfg.empieza) {
       'rival' => Bando.rival,
+      // Decidido por Ayme el 2026-11-26: solo en gimnasios, Liga y Legendarios
+      // (en master solo hay gimnasios: Joven y Brock).
+      'gimnasios' => nodo.startsWith('gimnasio-') ? Bando.rival : Bando.jugador,
       'rival-jefes' => (nodo == 'jefe-pikachu' || nodo.startsWith('gimnasio-'))
           ? Bando.rival
           : Bando.jugador,
@@ -1224,8 +1228,8 @@ void main(List<String> args) {
       case '--tope-turnos':
         cfg.topeTurnos = int.parse(v);
       case '--empieza':
-        if (!['jugador', 'rival', 'rival-jefes'].contains(v)) {
-          stderr.writeln('--empieza: usa «jugador», «rival» o «rival-jefes»');
+        if (!['jugador', 'rival', 'rival-jefes', 'gimnasios'].contains(v)) {
+          stderr.writeln('--empieza: usa «jugador», «gimnasios», «rival» o «rival-jefes»');
           exit(2);
         }
         cfg.empieza = v;

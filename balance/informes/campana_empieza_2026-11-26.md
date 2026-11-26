@@ -84,12 +84,31 @@ Margen de error: unos ±2,5 puntos en las cifras de 1.500 recorridos, más en la
 - **En combates normales (salvajes y entrenadores), no**: los duelos 1 contra 1 pierden 26 puntos de victoria y, con el rival empezando en todo, la ruta se rompe (punto 2).
 - **Límite de estos datos**: de los demás jefes (D-20 §4, 02–16) y gimnasios no hay catálogo en master, así que no se puede decir nada de ellos. Hay que repetir la medición cuando existan.
 
+## 4. Regla decidida por Ayme (2026-11-26): el rival empieza solo en Gimnasios, Liga y Legendarios
+
+Pikachu jefe queda con el jugador empezando. En master solo existen los gimnasios (Joven y Brock); la Liga y los Legendarios no están y no se han podido medir. Opción nueva `--empieza=gimnasios`, mismas condiciones que el punto 2 (primer intento, jugador → gimnasios):
+
+| Primer intento | Bulbasaur | Charmander | Squirtle |
+|---|---:|---:|---:|
+| Pikachu jefe (con evolución) | 93,7 % (no cambia) | 100 % | 71,0 % |
+| Entrenador Joven, con evolución | 99,5 → 92,0 % | 99,6 → 91,5 % | 92,5 → 75,6 % |
+| Brock, con evolución, 0 Pociones | 98,9 → 98,7 % | 96,5 → 80,8 % | 100 → 100 % |
+| Brock, con evolución, 1 Poción | 98,9 → 98,7 % | 96,9 → 97,9 % | 100 → 100 % |
+| Entrenador Joven, sin evolución | 87,9 → 59,8 % | 76,4 → 59,6 % | 83,0 → 65,0 % |
+| Brock, sin evolución, 0 Pociones | 76,6 → 70,8 % | 97,9 → 73,7 % | 98,0 → 87,8 % |
+| Brock, sin evolución, 2 Pociones | 95,0 → 95,0 % | 98,4 → 97,9 % | 98,0 → 98,6 % |
+| Tramo sin perder, con evolución | 69,9 → 64,7 % | 96,1 → 73,3 % (89,7 con Pociones) | 53,4 → 44,1 % |
+
+- Brock sigue alto con evolución (81 a 100 %) y baja a 71–88 % sin ella y sin Pociones: cerca del 75 %.
+- El Entrenador Joven, que es un gimnasio, es el que más cae: 60 a 92 %. Con el rival empezando queda por debajo del 75 % sin evolución.
+- Salidas: `sievo_gimnasios.txt` y `noevo_gimnasios.txt`. Pendiente medir la Liga y los Legendarios cuando existan.
+
 ## Cómo repetirlo
 
 ```
 cd sim
 dart run bin/sim_campana.dart --modo=empezar --informe=../balance/informes/campana_empieza_2026-11-26/duelos_empezar.csv
-dart run bin/sim_campana_partida.dart --modo=pociones --partidas=1500 --ruta1=si --retroceder=si --balls=5 --pociones=3 [--evolucion-inicial=si] --empieza=jugador|rival-jefes|rival
+dart run bin/sim_campana_partida.dart --modo=pociones --partidas=1500 --ruta1=si --retroceder=si --balls=5 --pociones=3 [--evolucion-inicial=si] --empieza=jugador|gimnasios|rival-jefes|rival
 ```
 
 Archivos: `duelos_empezar.txt` y `.csv`; `sievo_*.txt` (con evolución) y `noevo_*.txt` (sin evolución) por cada valor de `--empieza`.
