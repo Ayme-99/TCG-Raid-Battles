@@ -241,14 +241,24 @@
     "habilidad": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["nombre", "tipo", "valor"],
+      "required": ["nombre", "tipo"],
       "properties": {
         "nombre": { "type": "string" },
-        "tipo": { "enum": ["monedaDanoExtraAlAtacar"] },
+        "tipo": { "enum": ["monedaDanoExtraAlAtacar", "sinDanoIndirecto"] },
         "valor": { "type": "integer", "minimum": 1 },
         "texto": { "type": "string" }
       },
-      "description": "Habilidad pasiva. monedaDanoExtraAlAtacar: mientras el Pokémon siga activo, cada vez que ataca lanza una moneda y con cara el ataque hace `valor` más de daño (D-20 §3.6)."
+      "allOf": [
+        {
+          "if": { "properties": { "tipo": { "const": "monedaDanoExtraAlAtacar" } } },
+          "then": { "required": ["valor"] }
+        },
+        {
+          "if": { "properties": { "tipo": { "const": "sinDanoIndirecto" } } },
+          "then": { "not": { "required": ["valor"] } }
+        }
+      ],
+      "description": "Habilidad pasiva. monedaDanoExtraAlAtacar (con `valor`): mientras el Pokémon siga activo, cada vez que ataca lanza una moneda y con cara el ataque hace `valor` más de daño. sinDanoIndirecto (sin `valor`, Muro Mágico): mientras siga activo solo le hacen daño los ataques; el veneno, Drenadoras (que entonces tampoco cura a quien la usó) y el daño de apresar no le quitan PS, aunque los estados sí se le ponen (D-20 §3.6)."
     },
     "categoriaCaptura": {
       "enum": [

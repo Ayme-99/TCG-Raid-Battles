@@ -164,7 +164,8 @@ UsarPocion? _pocionQueSalva(EstadoCombate estado, Bando bando) {
         reduccion: rival.danoReducido, extra: yo.extraRecibido);
     if (d > amenaza) amenaza = d;
   }
-  amenaza += 2 * yo.veneno;
+  // El veneno de los dos chequeos (nada con Muro Mágico).
+  if (!sinDanoIndirecto(activo.especie)) amenaza += 2 * yo.veneno;
   if (amenaza <= 0 || activo.ps > amenaza) return null;
   if (activo.especie.ps <= amenaza) return null;
   return UsarPocion(bando, yo.activo);
@@ -261,10 +262,13 @@ int? _ataqueDeReduccion(BandoCombate yo, BandoCombate rival, int danoMio) {
 
 /// Índice de un ataque que envenena al activo rival (Picotazo Veneno), o null.
 ///
-/// Siempre compensa mientras el rival no esté envenenado (o lo esté con menos
+/// Nunca contra un rival con Muro Mágico ([SinDanoIndirecto]). Si no, siempre
+/// compensa mientras el rival no esté envenenado (o lo esté con menos
 /// daño): el veneno quita PS en cada chequeo aunque el golpe quede en 0 por
 /// Fortaleza o Gruñido. No se repite mientras siga envenenado.
 int? _ataqueDeVeneno(BandoCombate yo, BandoCombate rival) {
+  // Muro Mágico: el veneno no le quita PS, así que no compensa.
+  if (sinDanoIndirecto(rival.pokemonActivo.especie)) return null;
   final ataques = yo.pokemonActivo.especie.ataques;
   int? mejor;
   var mejorValor = rival.veneno;
