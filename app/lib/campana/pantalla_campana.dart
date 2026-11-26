@@ -297,9 +297,12 @@ class _PanelNodo extends ConsumerWidget {
     ];
 
     if (p.terminada(c)) {
+      final medalla = nodo.medalla;
       hijos.addAll([
-        const Text('¡Has conseguido la Medalla Roca! Aquí acaba, por ahora, '
-            'el primer tramo de Kanto.'),
+        Text(medalla == null
+            ? 'Aquí acaba, por ahora, la campaña de Kanto.'
+            : '¡Has conseguido la Medalla ${nombreMedalla(medalla)}! Aquí '
+                'acaba, por ahora, la campaña de Kanto.'),
         Text('Puntos de la campaña: ${p.puntos}'),
       ]);
     } else if (p.capturaPendiente != null) {
@@ -732,3 +735,8 @@ class _ElegirPartida extends ConsumerWidget {
     );
   }
 }
+
+/// El nombre de una medalla para mostrarlo a partir de su id del catálogo
+/// (`roca` → «Roca», `cascada` → «Cascada»; D-20 §4, «Líderes de gimnasio»).
+String nombreMedalla(String id) =>
+    id.isEmpty ? id : id[0].toUpperCase() + id.substring(1);

@@ -1,0 +1,31 @@
+{
+  "id": "ekans",
+  "numero": 23,
+  "nombre": "Ekans",
+  "tipo": "oscuridad",
+  "ps": 60,
+  "debilidad": {
+    "tipo": "lucha",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "categoriaCaptura": "intermedio",
+  "ataques": [
+    {
+      "nombre": "Constricción",
+      "tipo": "oscuridad",
+      "coste": 2,
+      "dano": 10,
+      "efecto": {
+        "tipo": "apresaDefensor",
+        "texto": "El Pokémon Defensor queda Apresado: no puede retirarse y en cada chequeo Pokémon recibe 10 puntos de daño; lanza una moneda y, si sale Cara, se libera."
+      }
+    },
+    {
+      "nombre": "Mordisco",
+      "tipo": "oscuridad",
+      "coste": 2,
+      "dano": 30
+    }
+  ]
+}

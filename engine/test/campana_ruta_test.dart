@@ -202,7 +202,7 @@ void main() {
     });
   });
 
-  group('Kanto: de Pueblo Paleta a Ciudad Plateada', () {
+  group('Kanto: de Pueblo Paleta a Ciudad Celeste', () {
     final pokemon = {for (final f in jsonDe('../catalog/campana/pokemon')) idDe(f)};
     final jefes = {for (final f in jsonDe('../catalog/campana/jefes')) idDe(f)};
     final zonas = [
@@ -228,14 +228,21 @@ void main() {
           isEmpty);
     });
 
-    test('empieza con los tres iniciales y acaba en el gimnasio de Brock', () {
+    test('empieza con los tres iniciales y acaba en el gimnasio de Misty', () {
       expect(kanto.nodo(kanto.inicio).iniciales,
           ['bulbasaur', 'charmander', 'squirtle']);
+      final brock = kanto.nodo('gimnasio-brock');
+      expect(brock.tipo, TipoNodo.gimnasio);
+      expect(brock.lider!.nombre, 'Brock');
+      expect(brock.lider!.pokemon, ['geodude', 'onix']);
+      expect(brock.medalla, 'roca');
+      expect(brock.salidas, ['ruta-3']);
       final f = kanto.finales.single;
       expect(f.tipo, TipoNodo.gimnasio);
-      expect(f.lider!.nombre, 'Brock');
-      expect(f.lider!.pokemon, ['geodude', 'onix']);
-      expect(f.medalla, 'roca');
+      expect(f.lider!.nombre, 'Misty');
+      expect(f.lider!.pokemon, ['staryu', 'starmie']);
+      expect(f.lider!.dinero, 1500);
+      expect(f.medalla, 'cascada');
     });
 
     test('la Ruta 1 es una bifurcación entre Pidgey y Rattata', () {
@@ -302,8 +309,9 @@ void main() {
     });
 
     test('el jefe es Pikachu y después hay un salvaje opcional o seguir', () {
-      final jefe = kanto.nodos.values.singleWhere((n) => n.tipo == TipoNodo.jefe);
-      expect(jefe.jefe, 'pikachu-jefe');
+      final jefes = kanto.nodos.values.where((n) => n.tipo == TipoNodo.jefe);
+      expect(jefes.map((n) => n.jefe), ['pikachu-jefe', 'clefairy-jefe']);
+      expect(kanto.nodo('jefe-pikachu').salidas, ['ruta-2-norte']);
       final norte = kanto.nodo('ruta-2-norte');
       expect(norte.tipo, TipoNodo.bifurcacion);
       expect(norte.salidas, ['ruta-2-norte-salvaje', 'centro-plateada']);
@@ -318,9 +326,61 @@ void main() {
       expect(joven.salidas, ['gimnasio-brock']);
     });
 
-    test('los únicos nodos opcionales son la Ruta 22 y la Ruta 2 norte', () {
+    test('los únicos nodos opcionales son la Ruta 22, la Ruta 2 norte, la '
+        'galería del Monte Moon y la Ruta 24', () {
       final opcionales = kanto.nodos.values.where((n) => n.opcional).toList();
-      expect(opcionales.map((n) => n.id), ['ruta-22', 'ruta-2-norte-salvaje']);
+      expect(opcionales.map((n) => n.id),
+          ['ruta-22', 'ruta-2-norte-salvaje', 'monte-moon-galeria', 'ruta-24']);
+    });
+
+    // Tramo 2 (D-20 §4, «Segundo tramo»; #513).
+    test('la Ruta 3 ofrece Spearow o Nidoran♂ y luego la Chica y el Joven', () {
+      final r = kanto.nodo('ruta-3');
+      expect(r.tipo, TipoNodo.bifurcacion);
+      expect(r.salidas.map((id) => kanto.nodo(id).pokemon),
+          [['spearow'], ['nidoran-m']]);
+      final chica = kanto.nodo('ruta-3-chica');
+      final joven = kanto.nodo('ruta-3-joven');
+      expect([chica.clase, joven.clase], ['Chica', 'Joven']);
+      expect(chica.pokemon, ['rattata', 'nidoran-f']);
+      expect(joven.pokemon, ['spearow', 'rattata']);
+      expect(joven.salidas, ['centro-monte-moon']);
+      expect(kanto.nodo('centro-monte-moon').tipo, TipoNodo.descanso);
+    });
+
+    test('Monte Moon: galería opcional y el jefe Clefairy', () {
+      expect(kanto.nodo('monte-moon').salidas,
+          ['monte-moon-galeria', 'jefe-clefairy']);
+      final galeria = kanto.nodo('monte-moon-galeria');
+      expect(galeria.opcional, isTrue);
+      expect(galeria.rival, RivalDeCombate.salvaje);
+      expect(galeria.zona, 'monte-moon');
+      expect(kanto.nodo('jefe-clefairy').jefe, 'clefairy-jefe');
+      expect(kanto.nodo('jefe-clefairy').salidas, ['ruta-4']);
+    });
+
+    test('la Ruta 4 ofrece Sandshrew o Rattata y lleva a Ciudad Celeste', () {
+      final r = kanto.nodo('ruta-4');
+      expect(r.tipo, TipoNodo.bifurcacion);
+      expect(r.salidas.map((id) => kanto.nodo(id).pokemon),
+          [['sandshrew'], ['rattata']]);
+      for (final id in r.salidas) {
+        expect(kanto.nodo(id).salidas, ['centro-celeste']);
+      }
+    });
+
+    test('Ciudad Celeste: centro con Super Ball y Cuerda Huida, desvío a la '
+        'Ruta 24, Nadador Luis y Misty', () {
+      final centro = kanto.nodo('centro-celeste');
+      expect(centro.tipo, TipoNodo.descanso);
+      expect(centro.tienda, containsAll(['superBall', 'cuerdaHuida']));
+      expect(kanto.nodo('celeste-salida').salidas, ['ruta-24', 'gimnasio-luis']);
+      expect(kanto.nodo('ruta-24').opcional, isTrue);
+      expect(kanto.nodo('ruta-24').salidas, ['gimnasio-luis']);
+      final luis = kanto.nodo('gimnasio-luis');
+      expect(luis.clase, 'Nadador');
+      expect(luis.pokemon, ['horsea', 'shellder']);
+      expect(luis.salidas, ['gimnasio-misty']);
     });
 
     // Reglas de diseño (D-20 §4): entre una medalla y la siguiente hay un
@@ -334,7 +394,9 @@ void main() {
           expect(nJefes, 1, reason: 'jefes hasta ${n.id}');
           expect(bifurcaciones, greaterThanOrEqualTo(1),
               reason: 'bifurcaciones hasta ${n.id}');
-          return;
+          // El tramo siguiente empieza de cero.
+          nJefes = 0;
+          bifurcaciones = 0;
         }
         for (final s in n.salidas) {
           recorre(s, nJefes, bifurcaciones);
@@ -530,14 +592,16 @@ void main() {
       expect(kanto.problemasDeEscenas(), isEmpty);
     });
 
-    test('cada nodo de Kanto tiene imagen y hay 9 escenas distintas', () {
+    test('cada nodo de Kanto tiene imagen y hay 15 escenas distintas', () {
       final imagenes = {
         for (final n in kanto.nodos.values) n.escena!.imagen,
       };
-      expect(imagenes, hasLength(9));
-      expect(kanto.nodo('ciudad-verde').escena!.imagen,
-          kanto.nodo('centro-plateada').escena!.imagen,
-          reason: 'los dos centros comparten imagen');
+      expect(imagenes, hasLength(15));
+      for (final centro in ['centro-plateada', 'centro-monte-moon', 'centro-celeste']) {
+        expect(kanto.nodo('ciudad-verde').escena!.imagen,
+            kanto.nodo(centro).escena!.imagen,
+            reason: 'los centros comparten imagen');
+      }
     });
 
     test('una región con sus escenas bien hechas no da problemas', () {
@@ -712,13 +776,28 @@ void main() {
         'centro-plateada',
         'gimnasio-joven',
         'gimnasio-brock',
+        'ruta-3',
+        'ruta-3-nidoran-m',
+        'ruta-3-chica',
+        'ruta-3-joven',
+        'centro-monte-moon',
+        'monte-moon',
+        'jefe-clefairy',
+        'ruta-4',
+        'ruta-4-sandshrew',
+        'centro-celeste',
+        'celeste-salida',
+        'gimnasio-luis',
+        'gimnasio-misty',
       ]) {
         p = p.avanzar(kanto, destino);
         if (!p.resuelto) p = p.resolver(kanto);
       }
       expect(p.terminado(kanto), isTrue);
-      expect(p.medallas, {'roca'});
-      expect(p.jefesDerrotados, {'pikachu-jefe'});
+      expect(p.medallas, {'roca', 'cascada'});
+      expect(p.jefesDerrotados, {'pikachu-jefe', 'clefairy-jefe'});
+      expect(p.superados, isNot(contains('monte-moon-galeria')));
+      expect(p.superados, isNot(contains('ruta-24')));
       expect(p.superados, isNot(contains('ruta-22')));
       expect(p.superados, isNot(contains('ruta-2-norte-salvaje')));
       expect(p.superados, isNot(contains('ruta-1-rattata')));

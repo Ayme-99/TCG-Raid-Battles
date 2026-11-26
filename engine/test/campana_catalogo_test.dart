@@ -62,12 +62,14 @@ void main() {
     });
 
     test('ninguna carta queda anulada por Grunido: un ataque de 20 o mas '
-        'o con veneno', () {
+        'o con veneno o apresar', () {
       for (final p in pokemon.values) {
-        final valido = p.ataques
-            .any((a) => a.dano >= 20 || a.efecto is EnvenenaDefensor);
+        final valido = p.ataques.any((a) =>
+            a.dano >= 20 ||
+            a.efecto is EnvenenaDefensor ||
+            a.efecto is ApresaDefensor);
         expect(valido, isTrue,
-            reason: '${p.id}: ningún ataque de 20+ ni con veneno');
+            reason: '${p.id}: ningún ataque de 20+ ni con veneno ni apresar');
       }
     });
 

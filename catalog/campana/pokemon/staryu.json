@@ -1,0 +1,21 @@
+{
+  "id": "staryu",
+  "numero": 120,
+  "nombre": "Staryu",
+  "tipo": "agua",
+  "ps": 60,
+  "debilidad": {
+    "tipo": "electrico",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "categoriaCaptura": "intermedio",
+  "ataques": [
+    {
+      "nombre": "Pistola Agua",
+      "tipo": "agua",
+      "coste": 2,
+      "dano": 20
+    }
+  ]
+}

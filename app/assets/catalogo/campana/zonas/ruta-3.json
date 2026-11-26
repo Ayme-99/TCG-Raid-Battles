@@ -1,0 +1,31 @@
+{
+  "id": "ruta-3",
+  "nombre": "Ruta 3",
+  "region": "kanto",
+  "salvajes": [
+    "pidgey",
+    "spearow",
+    "nidoran-f",
+    "nidoran-m",
+    "mankey",
+    "jigglypuff"
+  ],
+  "entrenadores": [
+    {
+      "clase": "Chica",
+      "pokemon": [
+        "rattata",
+        "nidoran-f"
+      ],
+      "dinero": 230
+    },
+    {
+      "clase": "Joven",
+      "pokemon": [
+        "spearow",
+        "rattata"
+      ],
+      "dinero": 230
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "monte-moon",
+  "nombre": "Monte Moon",
+  "region": "kanto",
+  "salvajes": [
+    "zubat",
+    "geodude",
+    "paras"
+  ]
+}

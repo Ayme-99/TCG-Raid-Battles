@@ -1,0 +1,38 @@
+{
+  "id": "paras",
+  "numero": 46,
+  "nombre": "Paras",
+  "tipo": "planta",
+  "ps": 50,
+  "debilidad": {
+    "tipo": "fuego",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "categoriaCaptura": "intermedio",
+  "ataques": [
+    {
+      "nombre": "Absorber",
+      "tipo": "planta",
+      "coste": 1,
+      "dano": 20,
+      "efecto": {
+        "tipo": "curaAlAtacar",
+        "valor": 10,
+        "texto": "Cura 10 puntos de daño de este Pokémon."
+      }
+    },
+    {
+      "nombre": "Paralizador",
+      "tipo": "planta",
+      "coste": 2,
+      "dano": 0,
+      "efecto": {
+        "tipo": "paralizaDefensor",
+        "monedas": 1,
+        "minimoCaras": 1,
+        "texto": "Lanza una moneda. Si sale Cara, el Pokémon Defensor pasa a estar Paralizado."
+      }
+    }
+  ]
+}

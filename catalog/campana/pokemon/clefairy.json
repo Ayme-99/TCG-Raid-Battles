@@ -1,0 +1,36 @@
+{
+  "id": "clefairy",
+  "numero": 35,
+  "nombre": "Clefairy",
+  "tipo": "psiquico",
+  "ps": 60,
+  "debilidad": {
+    "tipo": "oscuridad",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "habilidad": {
+    "nombre": "Muro Mágico",
+    "tipo": "sinDanoIndirecto",
+    "texto": "Solo le hacen daño los ataques: el veneno, Drenadoras y apresar no le quitan PS."
+  },
+  "ataques": [
+    {
+      "nombre": "Doble Bofetón",
+      "tipo": "psiquico",
+      "coste": 2,
+      "dano": 30,
+      "efecto": {
+        "tipo": "monedasDano",
+        "monedas": 3,
+        "danoPorCaras": [
+          20,
+          30,
+          40,
+          50
+        ],
+        "texto": "Lanza 3 monedas. Este ataque hace 10 puntos de daño más por cada cara."
+      }
+    }
+  ]
+}
