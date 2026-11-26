@@ -103,7 +103,7 @@ Los números (inicio, recuperación, máximo) son **parámetros** y se ajustan c
 
 ### 3.2 Turno
 
-Empieza el **jugador**. En su turno, un bando hace **una acción, y las tres gastan el turno**:
+Empieza el **jugador**, salvo en los **gimnasios, la Liga y los Pokémon legendarios**, donde empieza el **rival** (decidido por Ayme el 2026-11-26, §10.2; #451). Los jefes normales, como Pikachu, siguen con el jugador empezando. En su turno, un bando hace **una acción, y las tres gastan el turno**:
 
 1. **Atacar** con el Pokémon activo (si le llega la energía).
 2. **Cambiar** de Pokémon activo.
@@ -561,7 +561,8 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 | 2026-11-21 | **Una sola barra de energía por bando**, no una por Pokémon. | §3.1 |
 | 2026-11-21 | Atacar, cambiar de Pokémon y cargar (antes, pasar) gastan **el turno**; **elegir al siguiente** cuando cae el activo no. Cambiar gasta turno (y la `retirada` puede costar además energía; 0 de salida). Dudaba entre turno y energía y se quedó con el turno. | §3.2; #336 |
 | 2026-11-21 | La tercera acción pasa de **«Pasar» a «Cargar»**: recupera **1 de energía extra** (2 en total ese turno). Pasar le pareció anticlimático. La tienen también el jugador y la «máquina». | §3.2; #338 |
-| 2026-11-21 | Empieza el jugador. Gana el bando que deja sin Pokémon al otro. | §3.2, §3.3 |
+| 2026-11-21 | Empieza el jugador. Gana el bando que deja sin Pokémon al otro. (**Matizado el 2026-11-26:** abajo.) | §3.2, §3.3 |
+| 2026-11-26 | **El rival empieza primero solo en los gimnasios, la Liga y los Pokémon legendarios**; en el resto de combates (salvajes, entrenadores y jefes como Pikachu) empieza el jugador. Ayme lo planteó y aceptó la recomendación de Calidad. **Calidad midió** (`balance/informes/campana_empieza_2026-11-26.md`, #451): empezar primero vale unos **26 puntos** de victoria en duelos 1 contra 1 (63,1 % frente a 36,9 %); con el rival empezando en los gimnasios, Brock queda entre 81 y 100 % con evolución y entre 71 y 88 % sin ella y sin Pociones, y el Entrenador Joven entre 60 y 92 %; Pikachu jefe con el rival empezando caía a 43 y 59 % (Squirtle y Bulbasaur), por eso queda fuera. La Liga y los Legendarios no están en master y no se han medido. **Por implementar** (Programación): el motor ya admite `empieza` al crear el combate; falta que la partida lo ponga en `rival` en esos combates. | §3.2; #451 |
 | 2026-11-21 | **Sin tabla de tipos global:** cada carta lleva su debilidad (×2) y su resistencia (−30). Primero la debilidad y después la resistencia. **Sin suelo de daño** (rechazó un mínimo): el daño puede quedar en 0. Sin inmunidades. | §3.3; #336 |
 | 2026-11-21 | La **«máquina»** juega con **las mismas reglas** y decide de forma **determinista**. Le gustó cómo decide: remata si puede, cambia ante una debilidad y ataca por daño por energía. | §3.4; #338 |
 | 2026-11-21 | Los **PS se restauran al máximo entre combates**; las **Pociones solo fuera de combate** (**sustituido el 2026-11-24**: también en combate, §10.6). | §4 |
@@ -729,6 +730,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-25 | La **lista de jefes 02 a 16** era una propuesta abierta, y la primera tabla ponía Alakazam y Golem y Dragonite entre la 7.ª y la 8.ª (§8, 14). | **Cerrada con la lista A** (§10.8): Hitmonlee sustituye a Alakazam y Golem y Dragonite van después de la 8.ª. |
 | 2026-11-25 | Un hito de la campaña daba puntos **una sola vez por cuenta** (jefe «solo la primera vez», §4). | **Una vez por cuenta, campaña y partida** (#374): una partida nueva vuelve a dar los puntos (§10.1). |
 | 2026-11-25 | El móvil se adaptaría o se obligaría a girar, a elegir (§10.7, propuesta del 2026-11-25). | **Solo horizontal, con el aviso «Gira el móvil»** (Ayme, opción A; §10.7). |
+| 2026-11-26 | En todos los combates empezaba el jugador (§3.2, §10.2, 2026-11-21). | **El rival empieza en los gimnasios, la Liga y los Pokémon legendarios**; en el resto, el jugador (§10.2, #451). |
 
 ### 10.10 Forma de trabajar
 
