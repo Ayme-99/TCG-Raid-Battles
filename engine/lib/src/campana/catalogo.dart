@@ -108,6 +108,12 @@ EfectoAtaque? _efectoDesdeJson(dynamic json) {
         throw const FormatException('"monedas" tiene que ser 1 o más.');
       }
       return ConfundeDefensor(monedas);
+    case 'duermeDefensor':
+      final monedas = (json['monedas'] as int?) ?? 1;
+      if (monedas < 1) {
+        throw const FormatException('"monedas" tiene que ser 1 o más.');
+      }
+      return DuermeDefensor(monedas);
     case 'reduceDanoPropio':
       return ReduceDanoPropio(_campo<int>(json, 'valor'));
     case 'envenenaDefensor':
