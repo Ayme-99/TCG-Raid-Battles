@@ -203,7 +203,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('se gana la Medalla Roca al vencer a Brock', (tester) async {
+  testWidgets('se gana la Medalla Roca al vencer a Brock y sigue la Ruta 3',
+      (tester) async {
     final almacen = AlmacenMemoria();
     // El equilibrado de la campaña es cosa del simulador: este test solo
     // comprueba la pantalla del gimnasio y el final del tramo.
@@ -222,9 +223,35 @@ void main() {
     await jugarCombate(tester);
     final catalogo = catalogoCampanaDeDisco();
     final p = c.read(campanaProvider).partida!;
-    expect(p.terminada(catalogo), isTrue);
     expect(p.progreso.medallas, {'roca'});
-    expect(find.textContaining('Medalla Roca'), findsOneWidget);
+    // Tras Brock sigue el tramo 2 (D-20 §4; #513).
+    expect(p.terminada(catalogo), isFalse);
+    expect(p.opciones(catalogo), ['ruta-3']);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('se gana la Medalla Cascada al vencer a Misty y acaba Kanto',
+      (tester) async {
+    final almacen = AlmacenMemoria();
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+        nodoActual: 'gimnasio-misty',
+        superados: {'pueblo-paleta', 'centro-celeste'},
+        inicial: 'bulbasaur',
+        medallas: {'roca'},
+      ),
+      equipo: [PokemonGuardado('bulbasaur', 999)],
+      ultimaCura: 'centro-celeste',
+    );
+    final c = await abrirCampana(tester, almacen: almacen, guardada: guardada);
+    expect(find.textContaining('Misty'), findsWidgets);
+    await tocar(tester, 'campana-combatir');
+    await jugarCombate(tester);
+    final catalogo = catalogoCampanaDeDisco();
+    final p = c.read(campanaProvider).partida!;
+    expect(p.terminada(catalogo), isTrue);
+    expect(p.progreso.medallas, {'roca', 'cascada'});
+    expect(find.textContaining('Medalla Cascada'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

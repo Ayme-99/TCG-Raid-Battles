@@ -1,0 +1,32 @@
+{
+  "id": "horsea",
+  "numero": 116,
+  "nombre": "Horsea",
+  "tipo": "agua",
+  "ps": 50,
+  "debilidad": {
+    "tipo": "electrico",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "categoriaCaptura": "comun",
+  "ataques": [
+    {
+      "nombre": "Pantalla de Humo",
+      "tipo": "agua",
+      "coste": 2,
+      "dano": 0,
+      "efecto": {
+        "tipo": "monedaFalloRival",
+        "mientrasActivo": true,
+        "texto": "Mientras el Pokémon Defensor siga en el Puesto Activo. Cada vez que use un Ataque, lanza una moneda. Si sale Cruz el Ataque no se lleva a cabo."
+      }
+    },
+    {
+      "nombre": "Pistola Agua",
+      "tipo": "agua",
+      "coste": 2,
+      "dano": 20
+    }
+  ]
+}

@@ -778,6 +778,9 @@
       "id": "gimnasio-brock",
       "tipo": "gimnasio",
       "nombre": "Gimnasio de Ciudad Plateada",
+      "salidas": [
+        "ruta-3"
+      ],
       "lider": {
         "nombre": "Brock",
         "pokemon": [
@@ -800,6 +803,754 @@
           {
             "accion": "ir",
             "destino": "gimnasio-joven",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-3",
+      "tipo": "bifurcacion",
+      "nombre": "Ruta 3",
+      "salidas": [
+        "ruta-3-spearow",
+        "ruta-3-nidoran-m"
+      ],
+      "escena": {
+        "imagen": "ruta-3",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "gimnasio-brock",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-spearow",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-nidoran-m",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-3-spearow",
+      "tipo": "combate",
+      "nombre": "Ruta 3: Spearow",
+      "salidas": [
+        "ruta-3-chica"
+      ],
+      "zona": "ruta-3",
+      "rival": "salvaje",
+      "pokemon": [
+        "spearow"
+      ],
+      "escena": {
+        "imagen": "ruta-3",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-chica",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-3-nidoran-m",
+      "tipo": "combate",
+      "nombre": "Ruta 3: Nidoran♂",
+      "salidas": [
+        "ruta-3-chica"
+      ],
+      "zona": "ruta-3",
+      "rival": "salvaje",
+      "pokemon": [
+        "nidoran-m"
+      ],
+      "escena": {
+        "imagen": "ruta-3",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-chica",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-3-chica",
+      "tipo": "combate",
+      "nombre": "Ruta 3: Chica",
+      "salidas": [
+        "ruta-3-joven"
+      ],
+      "zona": "ruta-3",
+      "rival": "entrenador",
+      "clase": "Chica",
+      "pokemon": [
+        "rattata",
+        "nidoran-f"
+      ],
+      "escena": {
+        "imagen": "ruta-3",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-spearow",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-nidoran-m",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-joven",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-3-joven",
+      "tipo": "combate",
+      "nombre": "Ruta 3: Joven",
+      "salidas": [
+        "centro-monte-moon"
+      ],
+      "zona": "ruta-3",
+      "rival": "entrenador",
+      "clase": "Joven",
+      "pokemon": [
+        "spearow",
+        "rattata"
+      ],
+      "escena": {
+        "imagen": "ruta-3",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-chica",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "centro-monte-moon",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "centro-monte-moon",
+      "tipo": "descanso",
+      "nombre": "Centro Pokémon del Monte Moon",
+      "salidas": [
+        "monte-moon"
+      ],
+      "escena": {
+        "imagen": "centro-pokemon",
+        "zonas": [
+          {
+            "accion": "curar",
+            "x": 0.4,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.3
+          },
+          {
+            "accion": "tienda",
+            "x": 0.15,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "pc",
+            "x": 0.65,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-joven",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "monte-moon",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      },
+      "tienda": [
+        "pokeball",
+        "superBall",
+        "pocion",
+        "cuerdaHuida",
+        "piedraEx"
+      ]
+    },
+    {
+      "id": "monte-moon",
+      "tipo": "bifurcacion",
+      "nombre": "Monte Moon",
+      "salidas": [
+        "monte-moon-galeria",
+        "jefe-clefairy"
+      ],
+      "escena": {
+        "imagen": "monte-moon",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "centro-monte-moon",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "monte-moon-galeria",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "jefe-clefairy",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "monte-moon-galeria",
+      "tipo": "combate",
+      "nombre": "Monte Moon: galería lateral",
+      "salidas": [
+        "jefe-clefairy"
+      ],
+      "zona": "monte-moon",
+      "rival": "salvaje",
+      "opcional": true,
+      "escena": {
+        "imagen": "monte-moon",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "monte-moon",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "jefe-clefairy",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "jefe-clefairy",
+      "tipo": "jefe",
+      "nombre": "Clefairy",
+      "salidas": [
+        "ruta-4"
+      ],
+      "jefe": "clefairy-jefe",
+      "escena": {
+        "imagen": "monte-moon",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "monte-moon",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "monte-moon-galeria",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-4",
+      "tipo": "bifurcacion",
+      "nombre": "Ruta 4",
+      "salidas": [
+        "ruta-4-sandshrew",
+        "ruta-4-rattata"
+      ],
+      "escena": {
+        "imagen": "ruta-4",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "jefe-clefairy",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4-sandshrew",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4-rattata",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-4-sandshrew",
+      "tipo": "combate",
+      "nombre": "Ruta 4: Sandshrew",
+      "salidas": [
+        "centro-celeste"
+      ],
+      "zona": "ruta-4",
+      "rival": "salvaje",
+      "pokemon": [
+        "sandshrew"
+      ],
+      "escena": {
+        "imagen": "ruta-4",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "centro-celeste",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-4-rattata",
+      "tipo": "combate",
+      "nombre": "Ruta 4: Rattata",
+      "salidas": [
+        "centro-celeste"
+      ],
+      "zona": "ruta-4",
+      "rival": "salvaje",
+      "pokemon": [
+        "rattata"
+      ],
+      "escena": {
+        "imagen": "ruta-4",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "centro-celeste",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "centro-celeste",
+      "tipo": "descanso",
+      "nombre": "Centro Pokémon de Ciudad Celeste",
+      "salidas": [
+        "celeste-salida"
+      ],
+      "escena": {
+        "imagen": "centro-pokemon",
+        "zonas": [
+          {
+            "accion": "curar",
+            "x": 0.4,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.3
+          },
+          {
+            "accion": "tienda",
+            "x": 0.15,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "pc",
+            "x": 0.65,
+            "y": 0.2,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4-sandshrew",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4-rattata",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "celeste-salida",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      },
+      "tienda": [
+        "pokeball",
+        "superBall",
+        "pocion",
+        "cuerdaHuida",
+        "piedraEx"
+      ]
+    },
+    {
+      "id": "celeste-salida",
+      "tipo": "bifurcacion",
+      "nombre": "Ciudad Celeste",
+      "salidas": [
+        "ruta-24",
+        "gimnasio-luis"
+      ],
+      "escena": {
+        "imagen": "ciudad-celeste",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "centro-celeste",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-24",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "gimnasio-luis",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-24",
+      "tipo": "combate",
+      "nombre": "Ruta 24 (Puente Pepita)",
+      "salidas": [
+        "gimnasio-luis"
+      ],
+      "zona": "ruta-24",
+      "rival": "salvaje",
+      "opcional": true,
+      "escena": {
+        "imagen": "ruta-24",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "celeste-salida",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "gimnasio-luis",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "gimnasio-luis",
+      "tipo": "combate",
+      "nombre": "Gimnasio: Nadador Luis",
+      "salidas": [
+        "gimnasio-misty"
+      ],
+      "zona": "gimnasio-celeste",
+      "rival": "entrenador",
+      "clase": "Nadador",
+      "pokemon": [
+        "horsea",
+        "shellder"
+      ],
+      "escena": {
+        "imagen": "gimnasio-celeste",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "celeste-salida",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-24",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "gimnasio-misty",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "gimnasio-misty",
+      "tipo": "gimnasio",
+      "nombre": "Gimnasio de Ciudad Celeste",
+      "lider": {
+        "nombre": "Misty",
+        "pokemon": [
+          "staryu",
+          "starmie"
+        ],
+        "dinero": 1500
+      },
+      "medalla": "cascada",
+      "escena": {
+        "imagen": "gimnasio-celeste",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.4,
+            "y": 0.3,
+            "ancho": 0.2,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "gimnasio-luis",
             "x": 0.0,
             "y": 0.1,
             "ancho": 0.1,

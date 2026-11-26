@@ -584,7 +584,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 22 | **Guardar la partida de campaña en la cuenta** y exigir sesión para jugarla (§6, §10.1; #390). Tarea secundaria, sin prisa; Programación abre la issue | Hecho (#497) |
 | 23 | **Muro Mágico de Clefairy jefe** (Programación, #380): tipo de habilidad nuevo `sinDanoIndirecto` (no recibe daño indirecto: veneno, `drenaDefensor` y `apresaDefensor`; solo le hacen daño los ataques; alcance en §4, «Muro Mágico»), esquema, motor, IA y simulador. La carta funciona sin la habilidad hasta entonces | **Hecho** (#512): esquema, cargador, motor, IA y tests (§3.6). El daño de apresar se bloquea cuando exista `apresaDefensor` (#522). Por confirmar: que Drenadoras no cure al atacante |
 | 24 | **Estado Dormido y Canto de Jigglypuff** (Programación, #380, #436): moneda en cada chequeo Pokémon (cara = despierta), no ataca ni se retira (solo Cuerda Huida), efecto `duermeDefensor`, IA y simulador; **al pasar a la banca se curan los estados** (§10.2; comprobar Paralizado, Confundido y Envenenado) | **Hecho** (#511): esquema, cargador, motor, IA, app y tests (§3.6); falta el JSON de Jigglypuff (#380). Por confirmar: que un Dormido pueda cargar |
-| 25 | **Jefe 02 Clefairy y zonas del tramo 2** (Programación, #380): JSON del jefe (`clefairy-jefe`, 120 PS, imagen `clefairy-jefe.webp`) y de las zonas `ruta-3`, `monte-moon`, `ruta-4`, `gimnasio-celeste` y `ruta-24`, y los nodos en `kanto.json`. Empieza cuando Ayme haya hecho las cartas del tramo (§4) | Pendiente |
+| 25 | **Jefe 02 Clefairy y zonas del tramo 2** (Programación, #380): JSON del jefe (`clefairy-jefe`, 120 PS, imagen `clefairy-jefe.webp`) y de las zonas `ruta-3`, `monte-moon`, `ruta-4`, `gimnasio-celeste` y `ruta-24`, y los nodos en `kanto.json`. Empieza cuando Ayme haya hecho las cartas del tramo (§4) | **Hecho** (#513): las ocho cartas, el jefe, las cinco zonas y los nodos de Brock a Misty (recorrido en §4, «Segundo tramo»), con tests del catálogo, de la ruta y de la app. Las escenas usan el marcador hasta que Arte las entregue. Por confirmar, en #513: los umbrales de la llamada de Clefairy, la tienda de los dos centros y cómo salen Jigglypuff y Ekans |
 | 26 | **Rapidez de Starmie** (Programación, #380): indicador `ignoraFallo` en el ataque: no lanza la moneda de `monedaFalloRival` del rival (Bofetón Lodo y Pantalla de Humo); esquema, motor, IA y simulador. La carta funciona sin él hasta entonces (el ataque hace sus 50 de daño) | **Hecho** (#524): esquema, cargador, motor, IA y tests (§3.6); Confundido pasa a su propio campo y Rapidez no lo ignora. Falta el JSON de Starmie (#513) |
 | 27 | **Torbellino de Shellder** (Programación, #380): efecto `apresaDefensor`: mientras esté activo, el Defensor no puede retirarse (solo con la Cuerda Huida), en cada chequeo Pokémon recibe 1 contador de daño (10; **Muro Mágico sí bloquea ese daño**, §4; decidido el 2026-11-26) y se lanza una moneda: cara = se libera. Como Dormido y `drenaDefensor`. Se cura al pasar a la banca (§10.2); esquema, motor, IA y simulador | **Hecho** (#522): esquema, cargador, motor, IA, app y tests (§3.6); Muro Mágico bloquea el daño y sigue apresado (Ayme, 2026-11-26, 21:37). Faltan los JSON de Shellder y Ekans (#513) |
 | 28 | **Absorber de Paras** (Programación, #380): efecto `curaAlAtacar`: tras hacer su daño, el atacante se cura `valor` PS (10), sin pasar de su máximo; esquema, motor, IA y simulador. La carta funciona sin la cura hasta entonces (el ataque hace sus 20 de daño) | **Hecho** (#523): esquema, cargador, motor, app y tests (§3.6); falta el JSON de Paras (#513). Por confirmar: cura aunque el Defensor caiga o tenga Muro Mágico, y aunque el golpe quede en 0 |
@@ -753,6 +753,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-26 | **Centro Pokémon: la salida se abre sin obligar a curar** (Ayme, #385, propuesta A de Dirección; salió de la 1.ª partida de playtest). Curar en el mostrador sigue siendo **gratis y opcional** (también a los debilitados): el jugador puede salir por la puerta con el equipo como esté. No cambia el motor, el PC ni la tienda. Los NPC que curan en la ruta siguen igual (§10.6, 2026-11-22). Programación quita la obligación en la app (Dirección crea la tarea); Calidad comprueba en la 2.ª partida que la salida se abre sin curar. | §4, §5; #385; #365 |
 | 2026-11-26 | **Túnel Roca** (Ayme, #375): entra en el **tramo 4**, entre la 3.ª y la 4.ª medalla, camino de Lavanda; **no lleva jefe propio** (el jefe del tramo 4 es Marowak, 04 de la LISTA A, en la Torre Pokémon); el **PokéManiaco** (Cubone y Slowpoke) paga **270** de dinero, cifra inicial que se puede cambiar. Los nodos del túnel se añaden a `kanto.json` con el tramo 4. | §4, §8 (15), §12; `tunel-roca.json` |
 | 2026-11-26 | **Zonas y salvajes del tramo 2: opción C** (Ayme, #380): Ruta 3, Monte Moon, Ruta 4, Ciudad Celeste (Nadador Luis y Misty) y desvío opcional de la Ruta 24, con Paras, Jigglypuff y Ekans como salvajes raros de categoría Intermedio. Ocho cartas nuevas (Clefairy, Staryu, Starmie, Horsea, Shellder, Paras, Jigglypuff y Ekans); los valores de la tabla de §4 son propuestos y Ayme los ajusta al crearlas. Sin Surf: ningún salvaje de ruta es de agua. | §4; #380 |
+| 2026-11-26 | **Tramo 2 en el catálogo** (Programación, #513; supuestos por confirmar por Ayme): recorrido Brock → **Ruta 3** (bifurcación Spearow o Nidoran♂, la Chica y el Joven) → **Centro Pokémon del Monte Moon** → **Monte Moon** (galería opcional con un salvaje al azar de la zona: Zubat, Geodude o Paras; y el jefe 02 Clefairy) → **Ruta 4** (bifurcación Sandshrew o Rattata) → **Centro de Ciudad Celeste** → desvío opcional a la **Ruta 24** → **Nadador Luis** → **Misty** (1.500, Medalla Cascada), que pasa a ser el final de la región. Supuestos: (1) la llamada de Clefairy usa los umbrales de Pikachu (50 % a la banca, 40 % al frente, §10.8); (2) los dos centros venden Pokéball, Super Ball, Poción, Cuerda Huida y piedra ex (el motor pide tienda en todo centro; la Super Ball y la Cuerda Huida piden 1 medalla); (3) **Jigglypuff y Ekans no tienen nodo propio**: las bifurcaciones fijan Spearow o Nidoran♂ y Sandshrew o Rattata, así que solo están en la lista de la zona; Programación propone un salvaje opcional al azar en la Ruta 3 y en la Ruta 4, como el de la Ruta 2 norte; (4) el `dano` del Doble Bofetón (daño esperado para la IA) es 30; (5) la carta normal de Clefairy no lleva categoría de captura. **Regla del esquema ampliada:** una carta vale si tiene un ataque de 20 o más, con veneno **o con apresar** (Shellder solo tiene Refugio, 0, y Torbellino, 10; los 10 de cada chequeo tampoco los anula Gruñido). | §4, §9 (25), §12; #513 |
 
 ### 10.8 Jefes
 
@@ -882,7 +883,7 @@ El proceso que se ha seguido con las 22 cartas actuales (el cuello de botella es
 
 1. **Ayme hace la carta.** Elige el Pokémon, pide a otro chat cuatro ataques propuestos desde WikiDex y se queda con **uno o dos**. La hace en PokeCardMaker (perfil «Aymedex»), con numeración **NNN/150** (los jefes, NN/20) y la ajusta al baremo de §3.5.
 2. **Pasa la imagen** de la carta. De ella salen: número de la Pokédex, PS, tipo, debilidad, resistencia (si lleva), retirada, habilidad y, por cada ataque, nombre, coste, daño y texto.
-3. **Se traduce a datos:** `catalog/campana/pokemon/<id>.json` (o `jefes/<id>.json`). El esquema (`catalog/schema/pokemon-campana.schema.json`) y los tests del catálogo (`engine/test/campana_catalogo_test.dart`) comprueban lo básico: PS múltiplos de 10 entre 30 y 340, 1 a 2 ataques, coste de 1 a 4, daños múltiplos de 10, **al menos un ataque de 20 o más o con veneno**, y que el `id` coincida con el nombre del archivo y el número no se repita. Hay además un test «todos contra todos» que juega todas las parejas con la IA y avisa si dos cartas se bloquean por resistencias (se corrige la carta, no el motor). Un ataque con `monedasDano` lleva en `dano` el daño **esperado**.
+3. **Se traduce a datos:** `catalog/campana/pokemon/<id>.json` (o `jefes/<id>.json`). El esquema (`catalog/schema/pokemon-campana.schema.json`) y los tests del catálogo (`engine/test/campana_catalogo_test.dart`) comprueban lo básico: PS múltiplos de 10 entre 30 y 340, 1 a 2 ataques, coste de 1 a 4, daños múltiplos de 10, **al menos un ataque de 20 o más, con veneno o con apresar**, y que el `id` coincida con el nombre del archivo y el número no se repita. Hay además un test «todos contra todos» que juega todas las parejas con la IA y avisa si dos cartas se bloquean por resistencias (se corrige la carta, no el motor). Un ataque con `monedasDano` lleva en `dano` el daño **esperado**.
 4. **La imagen** va a `app/assets/campana/cartas/<id>.webp` a **480×670** (la carpeta ya está declarada en `app/pubspec.yaml`).
 5. **Si la carta trae un efecto nuevo**, hay que tocar el motor (`engine/lib/src/campana/combate.dart`), la IA (`ia.dart`), el esquema, el cargador (`catalogo.dart`) y los tests, y documentar el efecto en §3.6 con la decisión de Ayme. Si no, basta con el JSON, la imagen y su test.
 6. **Si el texto impreso no coincide con el motor** (caso Sandshrew, §8, 11), se anota aquí en lugar de cambiar la carta sin decirlo.
@@ -891,9 +892,9 @@ El proceso que se ha seguido con las 22 cartas actuales (el cuello de botella es
 
 ## 12. Catálogo actual
 
-Generado a partir de `catalog/campana/` el 2026-11-22. Si algo de aquí no coincide con el JSON, manda el JSON.
+Generado a partir de `catalog/campana/` el 2026-11-22 y puesto al día el 2026-11-26 con el tramo 2 (#513). Si algo de aquí no coincide con el JSON, manda el JSON.
 
-### Pokémon (22)
+### Pokémon (30)
 
 | Nº | Id | Pokémon | Tipo | PS | Debilidad | Resistencia | Retirada | Habilidad | Ataques (coste: daño) | Categoría | Evoluciona | Imagen |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -906,39 +907,53 @@ Generado a partir de `catalog/campana/` el 2026-11-22. Si algo de aquí no coinc
 | 014 | `kakuna` | Kakuna | planta | 70 | fuego | — | 0 | — | Fortaleza (1: efecto `reduceDanoPropio`); Picotazo Veneno (2: 10 `envenenaDefensor`) | Intermedio | — | sí |
 | 016 | `pidgey` | Pidgey | normal | 60 | electrico | — | 0 | — | Tornado (2: 30) | Común | — | sí |
 | 019 | `rattata` | Rattata | normal | 60 | lucha | — | 0 | — | Ataque Rápido (1: 10); Hiper Colmillo (2: 20+ `monedaDanoExtra`) | Común | — | sí |
+| 023 | `ekans` | Ekans | oscuridad | 60 | lucha | — | 0 | — | Constricción (2: 10 `apresaDefensor`); Mordisco (2: 30) | Intermedio | — | sí |
 | 021 | `spearow` | Spearow | normal | 60 | electrico | lucha | 0 | — | Picotazo (1: 10); Ataque Furia (2: 30 esp. `monedasDano`) | Común | — | sí |
 | 025 | `pikachu` | Pikachu | electrico | 60 | lucha | — | 0 | — | Látigo (1: efecto `aumentaDanoRecibido`); Impactrueno (2: 30) | Común | — | sí |
 | 027 | `sandshrew` | Sandshrew | lucha | 70 | planta | — | 0 | — | Rizo Defensa (1: efecto `reduceDanoPropio`); Rodar (2: 20×racha `danoPorRacha`) | Común | — | sí |
 | 029 | `nidoran-f` | Nidoran♀ | oscuridad | 60 | lucha | — | 0 | — | Golpes Furia (2: 30 esp. `monedasDano`); Doble Patada (3: 30 `repiteDanoAlDerribar`) | Común | — | sí |
 | 032 | `nidoran-m` | Nidoran♂ | oscuridad | 60 | lucha | — | 0 | — | Picotazo veneno (1: 10 `envenenaDefensor`); Ataque Furia (2: 30 esp. `monedasDano`) | Común | — | sí |
+| 035 | `clefairy` | Clefairy | psiquico | 60 | oscuridad | — | 0 | Muro Mágico | Doble Bofetón (2: 30 esp. `monedasDano`) | — | — | sí |
+| 039 | `jigglypuff` | Jigglypuff | normal | 70 | lucha | — | 0 | — | Canto (1: efecto `duermeDefensor`); Doble Bofetón (2: 30 esp. `monedasDano`) | Intermedio | — | sí |
 | 041 | `zubat` | Zubat | oscuridad | 60 | electrico | — | 0 | — | Supersónico (1: efecto `confundeDefensor`); Mordisco (2: 30) | Común | — | sí |
+| 046 | `paras` | Paras | planta | 50 | fuego | — | 0 | — | Absorber (1: 20 `curaAlAtacar` 10); Paralizador (2: efecto `paralizaDefensor` 1 moneda) | Intermedio | — | sí |
 | 050 | `diglett` | Diglett | lucha | 50 | planta | — | 0 | — | Arañazo (1: 10); Bofetón Lodo (2: 30 `monedaFalloRival`) | Común | — | sí |
 | 056 | `mankey` | Mankey | lucha | 70 | psiquico | — | 0 | Foco Energía | Golpe Kárate (2: 30+ `monedaDanoExtra`) | Intermedio | — | sí |
 | 066 | `machop` | Machop | lucha | 70 | psiquico | — | 0 | Foco Energía | Golpe Kárate (2: 30+ `monedaDanoExtra`) | Común | — | sí |
 | 074 | `geodude` | Geodude | lucha | 80 | agua | — | 1 | — | Pulimento (1: efecto `ganaEnergia`); Lanzarrocas (3: 50) | Intermedio | — | sí |
 | 079 | `slowpoke` | Slowpoke | agua | 80 | electrico | — | 1 | — | Pistola Agua (2: 20); Hidropulso (3: 40 `confundeDefensor` 2 monedas) | Común | — | sí |
+| 090 | `shellder` | Shellder | agua | 60 | electrico | — | 0 | — | Refugio (1: efecto `reduceDanoPropio`); Torbellino (2: 10 `apresaDefensor`) | Común | — | sí |
 | 095 | `onix` | Onix | lucha | 110 | agua | — | 1 | — | Tumba Rocas (3: 50, `quitaEnergiaRival`) | Fuerte | — | sí |
 | 104 | `cubone` | Cubone | lucha | 60 | planta | — | 0 | — | Hueso Palo (2: 30) | Común | — | sí |
+| 116 | `horsea` | Horsea | agua | 50 | electrico | — | 0 | — | Pantalla de Humo (2: efecto `monedaFalloRival` mientras siga activo); Pistola Agua (2: 20) | Común | — | sí |
+| 120 | `staryu` | Staryu | agua | 60 | electrico | — | 0 | — | Pistola Agua (2: 20) | Intermedio | — | sí |
+| 121 | `starmie` | Starmie | agua | 110 | electrico | — | 1 | — | Rayo Confuso (1: efecto `confundeDefensor`); Rapidez (2: 50 `ignoraFallo`) | Fuerte | — | sí |
 
-**Efectos y habilidades** (columna de ataques): `reduceDanoRival`, `aumentaDanoRecibido`, `quitaEnergiaRival`, `ganaEnergia`, `confundeDefensor`, `duermeDefensor`, `apresaDefensor` y `curaAlAtacar` (aún sin carta en el catálogo), `monedaDanoExtra`, `envenenaDefensor`, `reduceDanoPropio`, `monedaFalloRival`, `danoPorRacha`, `monedasDano` y `repiteDanoAlDerribar` (§3.6); `+` es una moneda que suma daño; `esp.` es el daño esperado de las tiradas. Habilidades: `monedaDanoExtraAlAtacar` (Foco Energía, de Mankey y Machop) y `sinDanoIndirecto` (Muro Mágico, para Clefairy jefe, que aún no está en el catálogo).
+**Efectos y habilidades** (columna de ataques): `reduceDanoRival`, `aumentaDanoRecibido`, `quitaEnergiaRival`, `ganaEnergia`, `confundeDefensor`, `duermeDefensor`, `apresaDefensor`, `curaAlAtacar`, `monedaDanoExtra`, `envenenaDefensor`, `reduceDanoPropio`, `monedaFalloRival`, `danoPorRacha`, `monedasDano` y `repiteDanoAlDerribar`, y el indicador de ataque `ignoraFallo` (§3.6); `+` es una moneda que suma daño; `esp.` es el daño esperado de las tiradas (el Doble Bofetón de Clefairy y Jigglypuff, «20+» en la carta, espera 35 y lleva 30, el múltiplo de 10 de debajo). Habilidades: `monedaDanoExtraAlAtacar` (Foco Energía, de Mankey y Machop) y `sinDanoIndirecto` (Muro Mágico, de Clefairy y Clefairy jefe). La carta normal de Clefairy no lleva categoría de captura porque no sale como rival: se consigue al capturar al jefe, con la categoría Jefe (§10.8).
 
 Geodude ya sigue a su carta impresa (2026-11-22, tarea 14): Pulimento (1: `ganaEnergia` 2) y Lanzarrocas (3: 50), sin resistencia y con retirada 1; son valores provisionales hasta que Calidad los mida contra Brock. **Las 22 cartas ya están impresas** (2026-11-23). Las del Túnel Roca (Zubat, Machop, Onix, Cubone y Slowpoke) venían del primer catálogo (#340) con datos y sin carta. **Zubat y Slowpoke** siguen ya sus cartas desde la tarea 15 (2026-11-23), con `confundeDefensor` en Supersónico (1 moneda) e Hidropulso (2 monedas). Nidoran♂ guarda el número 32 de la Pokédex; su carta lleva impreso 029/150 (§8, 13).
 
-### Jefes (1)
+### Jefes (2)
 
 | Serie | Id | Pokémon | Tipo | PS | Debilidad | Ataques (coste: daño) | Llama a un aliado | XP |
 |---|---|---|---|---|---|---|---|---|
 | 01/20 | `pikachu-jefe` | Pikachu | electrico | 100 | lucha | Ataque Rápido (1: 10); Impactrueno (2: 30) | 50 % a la banca, 40 % al frente → weedle, caterpie, metapod, kakuna | 30 |
+| 02/20 | `clefairy-jefe` | Clefairy (Muro Mágico) | psiquico | 120 | oscuridad | Doble Bofetón (2: 30 esp. `monedasDano`) | 50 % a la banca, 40 % al frente → zubat, geodude, sandshrew (umbrales de Pikachu, por confirmar) | 30 |
 
 ### Zonas
 
 | Zona | Nombre | Salvajes | Entrenadores | Jefe |
 |---|---|---|---|---|
 | `bosque-verde` | Bosque Verde | caterpie, weedle, metapod, kakuna, pikachu | Cazabichos (weedle, caterpie, kakuna, metapod) | — |
+| `gimnasio-celeste` | Gimnasio de Ciudad Celeste | — | Nadador (horsea, shellder), 250 | — |
 | `gimnasio-plateada` | Gimnasio de Ciudad Plateada | — | Entrenador Joven (diglett, sandshrew) | — |
+| `monte-moon` | Monte Moon | zubat, geodude, paras | — | — |
 | `ruta-1` | Ruta 1 | pidgey, rattata | — | — |
 | `ruta-2` | Ruta 2 | rattata, pidgey, caterpie, weedle | — | — |
 | `ruta-22` | Ruta 22 | rattata, spearow, nidoran-f, nidoran-m, mankey | — | — |
+| `ruta-24` | Ruta 24 (Puente Pepita) | caterpie, weedle, metapod, kakuna, pidgey | — | — |
+| `ruta-3` | Ruta 3 | pidgey, spearow, nidoran-f, nidoran-m, mankey, jigglypuff | Chica (rattata, nidoran-f), 230; Joven (spearow, rattata), 230 | — |
+| `ruta-4` | Ruta 4 | rattata, spearow, sandshrew, mankey, ekans | — | — |
 | `tunel-roca` | Túnel Roca | zubat, geodude, machop, onix | PokéManiaco (cubone, slowpoke), 270 | — |
 
 Las listas de Pokémon por zona están por contrastar con Serebii o Bulbapedia (§8, 16). Ninguna zona lleva jefe: el esquema ya no admite el campo y el motor rechaza una zona que lo traiga (#375). El Túnel Roca va en el tramo 4 y sin jefe propio (§10.7, 2026-11-26).

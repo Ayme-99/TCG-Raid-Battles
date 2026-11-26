@@ -1,0 +1,43 @@
+{
+  "id": "jigglypuff",
+  "numero": 39,
+  "nombre": "Jigglypuff",
+  "tipo": "normal",
+  "ps": 70,
+  "debilidad": {
+    "tipo": "lucha",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "categoriaCaptura": "intermedio",
+  "ataques": [
+    {
+      "nombre": "Canto",
+      "tipo": "normal",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "duermeDefensor",
+        "monedas": 1,
+        "texto": "Lanza una moneda. Si sale Cara, el Pokémon Defensor pasa a estar Dormido."
+      }
+    },
+    {
+      "nombre": "Doble Bofetón",
+      "tipo": "normal",
+      "coste": 2,
+      "dano": 30,
+      "efecto": {
+        "tipo": "monedasDano",
+        "monedas": 3,
+        "danoPorCaras": [
+          20,
+          30,
+          40,
+          50
+        ],
+        "texto": "Lanza 3 monedas. Este ataque hace 10 puntos de daño más por cada cara."
+      }
+    }
+  ]
+}

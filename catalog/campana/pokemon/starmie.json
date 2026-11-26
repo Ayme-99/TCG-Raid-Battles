@@ -1,0 +1,33 @@
+{
+  "id": "starmie",
+  "numero": 121,
+  "nombre": "Starmie",
+  "tipo": "agua",
+  "ps": 110,
+  "debilidad": {
+    "tipo": "electrico",
+    "multiplicador": 2
+  },
+  "retirada": 1,
+  "categoriaCaptura": "fuerte",
+  "ataques": [
+    {
+      "nombre": "Rayo Confuso",
+      "tipo": "agua",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "confundeDefensor",
+        "monedas": 1,
+        "texto": "Lanza una moneda. Si sale Cara, el Pokémon Defensor pasa a estar Confundido."
+      }
+    },
+    {
+      "nombre": "Rapidez",
+      "tipo": "agua",
+      "coste": 2,
+      "dano": 50,
+      "ignoraFallo": true
+    }
+  ]
+}

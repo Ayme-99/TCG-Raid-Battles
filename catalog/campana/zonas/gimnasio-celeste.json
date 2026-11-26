@@ -1,0 +1,16 @@
+{
+  "id": "gimnasio-celeste",
+  "nombre": "Gimnasio de Ciudad Celeste",
+  "region": "kanto",
+  "salvajes": [],
+  "entrenadores": [
+    {
+      "clase": "Nadador",
+      "pokemon": [
+        "horsea",
+        "shellder"
+      ],
+      "dinero": 250
+    }
+  ]
+}

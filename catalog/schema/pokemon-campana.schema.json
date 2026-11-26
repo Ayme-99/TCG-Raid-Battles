@@ -230,7 +230,7 @@
               "efecto": {
                 "properties": {
                   "tipo": {
-                    "const": "envenenaDefensor"
+                    "enum": ["envenenaDefensor", "apresaDefensor"]
                   }
                 },
                 "required": [
@@ -244,7 +244,7 @@
           }
         ]
       },
-      "description": "Al menos un ataque de 20 o más de daño, o con un efecto de estado (veneno) que Gruñido no anula (D-20 §3.6)."
+      "description": "Al menos un ataque de 20 o más de daño, o con un efecto de estado que quita PS en el chequeo y que Gruñido no anula: veneno o apresar (Torbellino de Shellder) (D-20 §3.6)."
     },
     "habilidad": {
       "type": "object",

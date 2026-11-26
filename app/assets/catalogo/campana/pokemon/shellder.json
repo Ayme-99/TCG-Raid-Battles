@@ -1,0 +1,36 @@
+{
+  "id": "shellder",
+  "numero": 90,
+  "nombre": "Shellder",
+  "tipo": "agua",
+  "ps": 60,
+  "debilidad": {
+    "tipo": "electrico",
+    "multiplicador": 2
+  },
+  "retirada": 0,
+  "categoriaCaptura": "comun",
+  "ataques": [
+    {
+      "nombre": "Refugio",
+      "tipo": "agua",
+      "coste": 1,
+      "dano": 0,
+      "efecto": {
+        "tipo": "reduceDanoPropio",
+        "valor": 10,
+        "texto": "Mientras este Pokémon siga activo, recibe 10 puntos menos de daño de los ataques (antes de aplicar debilidad y resistencia). No se acumula."
+      }
+    },
+    {
+      "nombre": "Torbellino",
+      "tipo": "agua",
+      "coste": 2,
+      "dano": 10,
+      "efecto": {
+        "tipo": "apresaDefensor",
+        "texto": "El Pokémon Defensor queda Apresado: no puede retirarse y en cada chequeo Pokémon recibe 10 puntos de daño; lanza una moneda y, si sale Cara, se libera."
+      }
+    }
+  ]
+}

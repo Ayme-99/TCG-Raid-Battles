@@ -1,0 +1,12 @@
+{
+  "id": "ruta-24",
+  "nombre": "Ruta 24 (Puente Pepita)",
+  "region": "kanto",
+  "salvajes": [
+    "caterpie",
+    "weedle",
+    "metapod",
+    "kakuna",
+    "pidgey"
+  ]
+}

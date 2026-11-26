@@ -745,7 +745,7 @@ void main() {
         throwsA(isA<FormatException>()));
   });
 
-  test('el tramo se puede jugar entero hasta la medalla de Brock', () {
+  test('la región se puede jugar entera hasta la medalla de Misty', () {
     for (final inicial in ['bulbasaur', 'charmander', 'squirtle']) {
       var p = robusto(conBalls(PartidaCampana.nueva(c.region, semilla: 42)
           .elegirInicial(c, inicial)));
@@ -769,8 +769,9 @@ void main() {
         // Coge siempre los desvíos opcionales.
         p = p.avanzar(c, p.opciones(c).first);
       }
-      expect(p.progreso.medallas, {'roca'}, reason: inicial);
-      expect(p.progreso.jefesDerrotados, {'pikachu-jefe'}, reason: inicial);
+      expect(p.progreso.medallas, {'roca', 'cascada'}, reason: inicial);
+      expect(p.progreso.jefesDerrotados, {'pikachu-jefe', 'clefairy-jefe'},
+          reason: inicial);
       expect(p.puntos, greaterThan(1500 + 1000), reason: inicial);
       expect(p.derrotas, 0, reason: inicial);
     }
