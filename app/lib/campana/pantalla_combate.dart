@@ -472,6 +472,7 @@ List<String> estadosDeBando(BandoCombate b) => [
       if (b.danoExtra > 0) 'recibe +${b.danoExtra}',
       if (b.proteccion > 0) 'recibe −${b.proteccion}',
       if (b.cegado || b.cegadoMientrasActivo) 'puede fallar',
+      if (b.confundido) 'confundido',
       if (b.racha > 1) 'racha ×${b.racha}',
     ];
 
