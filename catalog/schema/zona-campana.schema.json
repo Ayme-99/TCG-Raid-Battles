@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Zona de campaña (D-20)",
+  "description": "Qué aparece en una zona: salvajes y entrenadores. Los jefes no van en la zona: son cartas NN/20 de catalog/campana/jefes/ y los pone un nodo `jefe` de la región (D-20 §4, Jefes; §10.8).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -59,10 +60,6 @@
           }
         }
       }
-    },
-    "jefe": {
-      "type": "string",
-      "description": "Id del Pokémon jefe de la zona, si lo hay."
     }
   }
 }
