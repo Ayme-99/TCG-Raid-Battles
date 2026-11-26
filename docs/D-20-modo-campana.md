@@ -259,6 +259,41 @@ Recorrido que Ayme definió el 2026-11-21 y que recoge `catalog/campana/regiones
 
 Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Caterpie, Weedle), `bosque-verde` (salvajes Caterpie, Weedle, Metapod, Kakuna y Pikachu; entrenadores Cazabichos), `ruta-22` (Rattata, Spearow, Nidoran♀, Nidoran♂, Mankey), `gimnasio-plateada` (sin salvajes; Entrenador Joven) y `tunel-roca`. Las listas de salvajes salen de los juegos (Rojo y Azul) y **están por contrastar con Serebii o Bulbapedia**.
 
+### Segundo tramo: Ciudad Plateada → Ciudad Celeste (propuesta de Diseño, 2026-11-26, por confirmar; #380)
+
+**Todo esto es propuesta: Ayme decide.** Responde a la pregunta de Arte en #380 (qué hay en las zonas del tramo 2 y qué Pokémon salen). Sigue la forma del tramo 1 y la plantilla de «Rivales por tramo» de abajo (2 salvajes obligatorios, 2 entrenadores de ruta, el jefe 02, 1 entrenador de gimnasio y el líder: 7 rivales, 180 XP). Las cartas las hace Ayme (§11); aquí solo se dice qué Pokémon hacen falta. Fuentes de los juegos (FireRed y LeafGreen): **✓** contrastado con Bulbapedia, Serebii o StrategyWiki; **◐** de memoria, por contrastar.
+
+| # | Nodo | Qué pasa |
+|---|---|---|
+| 9 | **Ruta 3** (bifurcación) | Elegir entre un **Spearow** y un **Nidoran♂** salvajes. Dos entrenadores de ruta: la **Chica** (Rattata y Nidoran♀) y el **Joven** (Spearow y Rattata). Un **centro Pokémon** al final, junto a la entrada del Monte Moon ◐. |
+| 10 | **Monte Moon** | Un salvaje **opcional** (Zubat o Geodude) en una galería lateral, y el jefe **02/20 Clefairy** (capturable la primera vez, §10.8) con los aliados de la lista A: Zubat, Geodude y Sandshrew. |
+| 11 | **Ruta 4** (bifurcación) | Elegir entre un **Sandshrew** y un **Rattata** salvajes. |
+| 12 | **Ciudad Celeste** | Centro Pokémon y tienda. **Gimnasio:** el **Nadador Luis** (Horsea y Shellder) y **Misty** (Staryu y Starmie), que da la **Medalla Cascada** (2.ª). |
+| 13 | **Ruta 24, Puente Pepita** (desvío **opcional**) | Un salvaje opcional (Caterpie, Weedle, Metapod, Kakuna o Pidgey ◐). Da puntos y XP; no hace falta para seguir. |
+
+**Qué Pokémon salen en cada zona** (id de zona propuesto del catálogo):
+
+| Zona | Salvajes (lo que se puede encontrar) | Entrenadores y jefe | Fuente |
+|---|---|---|---|
+| `ruta-3` | Pidgey, Spearow, Nidoran♀, Nidoran♂, Mankey (poco frecuente). **Bifurcación obligatoria: Spearow o Nidoran♂.** | Chica: Rattata, Nidoran♀. Joven: Spearow, Rattata. | ✓ Bulbapedia (Ruta 3). En los juegos también sale **Jigglypuff**, que no entra: no hay carta |
+| `monte-moon` | Zubat y Geodude (opcional, uno de los dos) | **Jefe 02 Clefairy** | ✓ Serebii y SuperCheats (Zubat, Geodude, Paras y Clefairy; Paras y Clefairy son raros) |
+| `ruta-4` | Rattata, Spearow, Sandshrew, Mankey (muy poco frecuente). **Bifurcación obligatoria: Sandshrew o Rattata.** | — | ✓ Bulbapedia (Ruta 4). En los juegos también sale Ekans, que no entra: no hay carta |
+| `gimnasio-celeste` | Sin salvajes | Nadador Luis: Horsea, Shellder. Líder Misty: Staryu, Starmie | ✓ StrategyWiki y Serebii (Misty: Staryu de nivel 18 y Starmie de nivel 21). El gimnasio de los juegos tiene también una Chica de Camping (Goldeen), que no entra |
+| `ruta-24` (opcional) | Caterpie, Weedle, Metapod, Kakuna, Pidgey | — | ✓ Caterpie (StrategyWiki); el resto ◐ |
+
+**Cartas que ya existen** y valen para todo el tramo: Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod y Kakuna. **Cartas nuevas que hacen falta: cinco.** **Clefairy** (jefe 02), **Staryu** y **Starmie** (Misty) y **Horsea** y **Shellder** (el Nadador Luis). Para ahorrar dos, el Nadador Luis puede llevar **Slowpoke** (ya existe) en lugar de Horsea y Shellder; se pierde algo de fidelidad con los juegos.
+
+**Plantilla del tramo (con «Rivales por tramo», más abajo):** salvajes obligatorios 2 de categoría Común (20 XP), 2 entrenadores de ruta (60), el jefe 02 (30), el Nadador Luis (20) y Misty (50): **7 rivales y 180 XP**. Dinero: 710 para los entrenadores (por ejemplo Chica 230, Joven 230 y Luis 250) y 1.500 para Misty, según el presupuesto de §10.6.
+
+**Misty.** Dos Pokémon, como Brock: Staryu y Starmie, de tipo agua, con **debilidad eléctrico ×2** (como en el JCC) y sin resistencia. Starmie es la evolución de Staryu con la **Piedra Agua**, que en la campaña aún no se puede obtener (como la Piedra Trueno de Raichu); el jugador no la evoluciona, así que no hay que decidirlo ahora. La ficha de Misty (PS, ataques, dinero) se rellena con las del resto de líderes (§4, «Líderes de gimnasio»).
+
+**Clefairy: tipo y debilidad (opinión de Diseño; Ayme decide).** Arte propone **normal, debilidad lucha ×2**. **Estoy de acuerdo.**
+- En los juegos de Kanto era de tipo normal, y los tipos de la campaña no incluyen hada.
+- La carta actual del JCC (151, 035/165) es de **tipo psíquico con debilidad metal ×2**, y el metal se descartó en la campaña (#408): esa debilidad no se puede copiar.
+- Con lucha ×2 el jugador tiene respuesta a mano: Mankey (Ruta 3), Machop y Geodude son de lucha, y Sandshrew también. Con psíquico y debilidad oscuridad ×2 solo la tendrían Nidoran♀, Nidoran♂ y Zubat.
+- Alternativa B: **psíquico con debilidad oscuridad ×2**, más fiel a la carta física pero con menos respuestas en el tramo 2.
+- PS: **100**, como Pikachu jefe (60 PS la carta normal); ataques: **Destructor y Doble bofetón**, de la propuesta de Arte en #380.
+
 ### Reglas del recorrido
 
 Decididas por Ayme el 2026-11-21 al definir el primer tramo:
