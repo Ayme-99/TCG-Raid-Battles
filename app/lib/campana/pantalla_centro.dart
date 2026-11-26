@@ -29,10 +29,12 @@ class PanelCentro extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(p.progreso.resuelto
+        // Curar es opcional: la puerta está abierta igual (D-20 §10.7, #510).
+        Text(p.equipoSano(c)
             ? 'Tu equipo está como nuevo. En la estantería está la tienda y '
                 'en el PC puedes cambiar el equipo.'
-            : 'El mostrador cura a todo el equipo, gratis.'),
+            : 'El mostrador cura a todo el equipo, gratis. Si quieres, '
+                'puedes salir sin curar.'),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
