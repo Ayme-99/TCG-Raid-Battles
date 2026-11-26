@@ -301,7 +301,7 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 | **Horsea** | **Nueva** | Nadador Luis (gimnasio) | Agua | 50 | Eléctrico ×2 | 1 | Común (10 XP) | Burbuja (1 energía, 10) · Chorro (2 energías, 30) |
 | **Shellder** | **Nueva** | Nadador Luis (gimnasio) | Agua | 60 | Eléctrico ×2 | 1 | Común (10 XP) | Placaje (1 energía, 10) · Pinza (2 energías, 30) |
 | **Staryu** | **Hecha por Ayme** (120/150) | Misty | Agua | 60 | Eléctrico ×2 | 0 | Intermedio (20 XP) | **Pistola Agua** (2 energías, `20`, como la de Slowpoke; un solo ataque) |
-| **Starmie** | **Nueva** | Misty (no capturable en el tramo 2) | Agua | 100 (Fase 1; evoluciona de Staryu con Piedra Agua, aún sin usar) | Eléctrico ×2 | 0 | Fuerte (30 XP) | Rayo burbuja (2 energías, 50) · Cascada (3 energías, 90) |
+| **Starmie** | **Hecha por Ayme** (121/150) | Misty (no capturable en el tramo 2) | Agua | 110 (Fase 1; evoluciona de Staryu con Piedra Agua, aún sin usar) | Eléctrico ×2 | 1 | Fuerte (30 XP) | **Rayo Confuso** (1 energía, `0`; moneda, cara = Confundido, `confundeDefensor`, como Supersónico de Zubat) · **Rapidez** (2 energías, `50`; «Este ataque no se ve afectado por los efectos que hacen fallar a tus ataques»; indicador nuevo `ignoraFallo`, tarea 26) |
 
 Clefairy no lleva Canto ni Metrónomo hasta que existan esos efectos. **Jigglypuff sí lleva Canto** (su ataque emblema, Ayme 2026-11-26): es la **primera carta que causa Dormido**, así que se cumple la condición de §8 punto 25 (#436) y Programación tiene que crear el estado. **Regla de Dormido decidida por Ayme el 2026-11-26 (§10.2; en la banca se curan los estados):** en cada **chequeo Pokémon** (cada vez que cambia el turno, de cualquiera de los dos bandos) se lanza una moneda y, si sale cara, el Pokémon se despierta. Dormido **no puede atacar ni retirarse**; la única forma de cambiarlo es la **Cuerda Huida**.
 
@@ -577,6 +577,7 @@ Una issue por pieza; cada una se trabaja en su rama y su PR (el título del PR c
 | 23 | **Muro Mágico de Clefairy jefe** (Programación, #380): tipo de habilidad nuevo `sinDanoIndirecto` (no recibe daño del veneno ni de `drenaDefensor`; solo le hacen daño los ataques), esquema, motor, IA y simulador. La carta funciona sin la habilidad hasta entonces | Pendiente |
 | 24 | **Estado Dormido y Canto de Jigglypuff** (Programación, #380, #436): moneda en cada chequeo Pokémon (cara = despierta), no ataca ni se retira (solo Cuerda Huida), efecto `duermeDefensor`, IA y simulador; **al pasar a la banca se curan los estados** (§10.2; comprobar Paralizado, Confundido y Envenenado) | Pendiente |
 | 25 | **Jefe 02 Clefairy y zonas del tramo 2** (Programación, #380): JSON del jefe (`clefairy-jefe`, 120 PS, imagen `clefairy-jefe.webp`) y de las zonas `ruta-3`, `monte-moon`, `ruta-4`, `gimnasio-celeste` y `ruta-24`, y los nodos en `kanto.json`. Empieza cuando Ayme haya hecho las cartas del tramo (§4) | Pendiente |
+| 26 | **Rapidez de Starmie** (Programación, #380): indicador `ignoraFallo` en el ataque: no lanza la moneda de `monedaFalloRival` del rival (Bofetón Lodo y Pantalla de Humo); esquema, motor, IA y simulador. La carta funciona sin él hasta entonces (el ataque hace sus 50 de daño) | Pendiente |
 
 ## 10. Registro de decisiones
 
