@@ -661,6 +661,25 @@ void main() {
       expect(p.opciones(kanto), isEmpty);
     });
 
+    test('un centro Pokémon está resuelto al llegar: se sale sin curar (#510)',
+        () {
+      var p = ProgresoRuta.inicial(kanto)
+          .resolver(kanto, inicial: 'bulbasaur')
+          .avanzar(kanto, 'ruta-1')
+          .avanzar(kanto, 'ruta-1-pidgey')
+          .resolver(kanto)
+          .avanzar(kanto, 'ciudad-verde');
+      expect(p.resuelto, isTrue);
+      expect(p.superados, contains('ciudad-verde'));
+      expect(p.opciones(kanto), ['ciudad-verde-salida']);
+      expect(() => p.resolver(kanto), throwsA(isA<ReglaIncumplida>()));
+      // Al volver atrás también está resuelto.
+      p = p
+          .avanzar(kanto, 'ciudad-verde-salida')
+          .retroceder(kanto, 'ciudad-verde');
+      expect(p.resuelto, isTrue);
+    });
+
     test('el desvío opcional se puede hacer y vuelve al camino principal', () {
       var p = ProgresoRuta.inicial(kanto)
           .resolver(kanto, inicial: 'bulbasaur')
@@ -668,7 +687,6 @@ void main() {
           .avanzar(kanto, 'ruta-1-rattata')
           .resolver(kanto)
           .avanzar(kanto, 'ciudad-verde')
-          .resolver(kanto)
           .avanzar(kanto, 'ciudad-verde-salida');
       expect(p.opciones(kanto), ['ruta-22', 'ruta-2']);
       p = p.avanzar(kanto, 'ruta-22').resolver(kanto).avanzar(kanto, 'ruta-2');

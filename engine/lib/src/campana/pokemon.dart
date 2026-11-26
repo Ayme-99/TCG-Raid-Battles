@@ -124,6 +124,17 @@ class ConfundeDefensor extends EfectoAtaque {
   const ConfundeDefensor([this.monedas = 1]);
 }
 
+/// Canto (Jigglypuff, D-20 §3.6 y §10.2, decidido el 2026-11-26): lanza
+/// [monedas] monedas al usar el ataque y, si **todas** salen cara, el Pokémon
+/// Defensor pasa a estar **Dormido** (`BandoCombate.dormido`): no puede atacar
+/// ni retirarse (solo sale con la Cuerda Huida) y en cada chequeo Pokémon
+/// lanza una moneda; con cara se despierta. No se acumula.
+class DuermeDefensor extends EfectoAtaque {
+  final int monedas;
+
+  const DuermeDefensor([this.monedas = 1]);
+}
+
 /// El daño del ataque se multiplica por las veces **seguidas** que este
 /// Pokémon lo ha usado, contando la actual: [AtaqueCampana.dano] la primera
 /// vez, el doble la segunda, el triple la tercera… Se reinicia si el Pokémon usa
