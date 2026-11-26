@@ -1,0 +1,10 @@
+Valor de empezar primero: duelos 1 contra 1 (25 Pokémon, 20 semillas por pareja y por quién empieza)
+El jugador (de la fila: categoría del RIVAL) gana…
+rival             empieza él  empieza rival  diferencia  combates
+Común                 75.1 %         46.3 %      28.9 pt      7000
+Intermedio            57.9 %         31.4 %      26.5 pt      2000
+Fuerte                23.4 %          5.2 %      18.2 pt       500
+Jefe                  45.3 %         23.8 %      21.5 pt      3000
+Todos                 63.1 %         36.9 %      26.3 pt     12500
+Igualados             80.2 %         19.8 %      60.4 pt      5420
+Igualados Jefe        68.9 %         10.5 %      58.5 pt      1100
