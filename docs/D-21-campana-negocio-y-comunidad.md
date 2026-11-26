@@ -1,6 +1,6 @@
 # D-21 · Modo campaña: tienda de puntos, Pokédex «Mis cartas» y comunicación
 
-Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23, el 2026-11-24 y el 2026-11-25 (dos veces) con sus decisiones. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
+Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23, el 2026-11-24, el 2026-11-25 y el 2026-11-26 con sus decisiones. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
 
 Cómo leerlo:
 
@@ -68,7 +68,7 @@ Lo decidido el 2026-11-25 sobre cómo se ganan, ya en el código (#480, #481) y 
 - Lo que sí cambia al comprar es el **ritmo hacia el siguiente jefe**: quien gasta tarda más en llegar al coste del siguiente. Es una elección del jugador y se le dice en la tienda («tus puntos para el próximo jefe bajan»).
 - Para el aviso de la tienda hace falta enseñar siempre el total actual y el coste del próximo jefe.
 
-**Aviso de contradicción (no se corrige aquí):** D-10 §5, D-20 §10.1 y §10.9 y la implementación en curso (#374) usan «puntos ganados» y «saldo». Con la decisión C, Diseño y Programación deben pasar a un único total, más el registro de jefes desbloqueados por cuenta.
+Diseño ya pasó D-10 §5 y D-20 §10.1 a un solo total con jefes desbloqueados permanentes (PR #494); este documento y esos dos dicen lo mismo.
 
 El abono sigue las reglas de D-10 (solo cobra quien tiene cuenta; la parte de un invitado se pierde).
 
@@ -158,12 +158,13 @@ Todas las cifras son **ajustables sin tocar la tienda**: viven en un catálogo d
 
 ### 2.4 Sobres
 
-**PROPUESTA** (dependiente de que existan las cartas digitales):
+**PROPUESTA** (dependiente de que existan las cartas digitales; la regla de repetidas de abajo está decidida):
 
 - **5 cartas por sobre**: 3 Comunes, 1 Poco común y 1 ranura especial (Poco común 60 %, Rara 33 %, Ultra rara 7 %).
 - Valor medio del contenido a precios de carta suelta: unos **1.640** puntos, frente a los 1.000 del sobre. Es decir, el sobre es la forma barata de coleccionar y la carta suelta es el **atajo caro** para completar lo que falta. Así los dos productos tienen sentido.
 - Las rarezas son las del proyecto (Común, Poco común, Rara, Ultra rara). Los jefes se quedan fuera de los sobres.
-- **Duplicados:** decisión abierta, sin propuesta firme. La opción más simple es que se queden en la colección (no hacen falta copias en el juego). Si Ayme quiere un incentivo, se pueden devolver como puntos (por ejemplo, un 25 % del precio de la carta suelta), pero eso crea un bucle de puntos que habría que simular.
+- **Repetir compra** (decidido por Ayme el 2026-11-25, registrado por Diseño en D-20 §10.1, PR #498): los **sobres** se compran las veces que se quiera; las **cartas sueltas** se compran **una sola vez**. Si de un sobre sale una carta que ya se tiene, se recibe el **25 % del precio de la carta suelta de su rareza** en puntos: 50 (Común), 100 (Poco común), 200 (Rara) o 500 (Ultra rara). **Cuatro repetidas pagan una carta nueva** de esa rareza. Los duplicados no se acumulan como copias en el juego.
+- **Bucle de puntos:** el abono por repetidas devuelve puntos al total, así que Calidad debe comprobar con datos reales que no se vuelve rentable abrir sobres solo para recuperar puntos (el valor medio de un sobre ya ronda los 1.640 puntos, frente a un precio de 1.000).
 
 ### 2.5 Qué se paga dentro de la campaña: la piedra ex
 
@@ -340,7 +341,7 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 
 **Riesgos que hay que decir de entrada** (mejor sin sorpresas):
 
-- **La partida se guardará también en la cuenta** (**decidido por Ayme el 2026-11-25**). Hasta que Programación lo implemente, la partida solo está en el dispositivo: si el amigo juega en la **web** y borra los datos del navegador, **pierde el progreso**, y hay que avisarlo. Cuando la sincronización esté hecha, el aviso se quita del mensaje.
+- **La partida se guarda también en la cuenta** (decidido por Ayme el 2026-11-25; hecho en el PR #497). Borrar los datos del navegador ya no hace perder el progreso, así que el mensaje al grupo no lo avisa.
 - **La sesión es obligatoria** para jugar la campaña (**decidido por Ayme el 2026-11-23**; el 2026-11-25 concretó que solo la partida libre en formato físico queda sin cuenta, y el formato digital y la tienda también la exigen). En la app solo se inicia sesión y el registro se hace en Deck Tracker, así que el amigo **debe tener ya su cuenta antes de empezar**. Es la mayor fricción de la primera sesión: conviene que se la cree antes de que le llegue el enlace.
 - **No es un proyecto público.** Los sprites son de Nintendo y The Pokémon Company, tomados de Escarlata y Púrpura (#389): el enlace es para el grupo y no se reenvía ni se publica.
 
@@ -349,7 +350,7 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 > Ya se puede probar el **modo campaña** de Incursiones 🎮
 > Es como un Pokémon de cartas para jugar **solo**: eliges inicial en Pueblo Paleta, recorres Kanto, capturas y llegas hasta la medalla de Brock. De momento solo ese tramo; el resto irá llegando.
 > Lo que ganas se guarda como **puntos** en tu cuenta: servirán para la tienda y para desbloquear jefes de las incursiones.
-> Ojo: es versión de prueba. Para jugar necesitas tu cuenta de Deck Tracker (créala antes), y la partida se guarda **en tu dispositivo** (si juegas en la web y borras datos del navegador, la pierdes; cuando se guarde también en tu cuenta, te lo diremos).
+> Ojo: es versión de prueba. Para jugar necesitas tu cuenta de Deck Tracker (créala antes), y la partida se guarda también en tu cuenta.
 > Enlace: [enlace]. Es solo para nosotros, no lo paséis fuera 🙏
 > Decidme dónde os atascáis o qué no se entiende. Eso es lo más útil.
 
@@ -417,7 +418,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 | D-20 §8 (13) | Nidoran♂ ya es 032/150: la pregunta se da por resuelta |
 | D-20 §6 y `flujo-app.md` §2 y §4 | Decidido el 2026-11-25: solo la partida libre en formato físico no usa cuenta; campaña, formato digital y tienda exigen sesión. `flujo-app.md` §2 («la sesión nunca es obligatoria») y §4 («se guarda en el dispositivo y funciona sin sesión») deben decir lo mismo; es de Diseño de interfaz |
 | D-20 §10 | Nuevas filas del registro con las decisiones 1 a 9 |
-| D-10 §5 | Hoy tiene «puntos ganados» y «saldo»; Ayme decidió un solo total que baja al comprar, con el desbloqueo de jefes permanente (§1.2). Diseño debe ajustarlo |
+| D-10 §5 | Ya recoge un solo total que baja al comprar y el desbloqueo permanente de jefes (PR #494) |
 | `flujo-app.md` §6 | Definir las dos colecciones de «Mis cartas» y su relación con Enemigos |
 | `docs/README.md` | Ya enlaza este documento |
 
@@ -426,7 +427,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 - El servidor guarda el **total de puntos** por cuenta y los **jefes desbloqueados** (permanente, §1.2), y un registro de compras (`compras`: cuenta, producto, precio, fecha) con clave generada por el cliente para que los reintentos no cobren dos veces, como en D-10.
 - El catálogo de la tienda debe ser **datos** (`id`, familia, nombre, precio, requisitos), no constantes, para ajustar precios sin publicar app.
 - «Mis cartas» necesita un registro por carta (§3.3), con clave en el dispositivo y sincronización al iniciar sesión.
-- La **partida de campaña** también se guarda en la cuenta (decidido el 2026-11-25). El formato y el momento de sincronización los define Diseño con Programación; aquí no se propone ninguno.
+- La **partida de campaña** ya se guarda también en la cuenta (decidido el 2026-11-25; PR #497). Aquí no se propone formato.
 - El servidor acepta lo que reporta el cliente con tope por hito (D-20 §6); los topes son los valores de §2.1.
 
 **Para Diseño y Calidad:** la lista de excepciones (Pikachu, Eevee), la XP necesaria para 12 ex, la curva de dinero y la simulación del número de ex en la Liga (§2.5); decidir los duplicados de sobre (§2.4); el momento exacto de cada texto de §4.5.
@@ -441,10 +442,10 @@ Resueltas el 2026-11-25: los precios de §2.3 quedan decididos (iniciales, ajust
 
 Resueltas el 2026-11-23: la sesión es obligatoria en la campaña, las cartas de campaña valen solo en campaña, solo se registra la carta, los puntos no se usan dentro de la campaña, y la carta de Nidoran♂ ya es la 032/150.
 
-1. ~~¿Se guarda la partida de campaña también en la cuenta?~~ **Resuelta el 2026-11-25: sí.** Queda para Diseño y Programación definir cómo (§5).
+1. ~~¿Se guarda la partida de campaña también en la cuenta?~~ **Resuelta el 2026-11-25: sí**, y ya está hecho (PR #497).
 2. **Tamaño del sobre y composición** (§2.4): son números míos.
 3. **Rarezas de las cartas del formato digital:** se han usado las del proyecto (Común a Ultra rara) y pueden no ser las definitivas.
-4. **Duplicados de sobre** (§2.4).
+4. ~~Duplicados de sobre~~ **Resuelta el 2026-11-25:** carta repetida = 25 % del precio de la carta suelta de su rareza; sobres repetibles y cartas sueltas, una vez (§2.4).
 
 ## 7. Fuentes
 
