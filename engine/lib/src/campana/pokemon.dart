@@ -113,7 +113,8 @@ class ParalizaDefensor extends EfectoAtaque {
 
 /// Lanza [monedas] monedas al usar el ataque: si **todas** salen cara, el
 /// Pokémon Defensor queda Confundido, que en campaña es el mismo estado que
-/// [MonedaFalloRival] (`BandoCombate.cegado`): en su próximo turno, si ataca,
+/// [MonedaFalloRival] (`BandoCombate.confundido`, aparte de `cegado` para que
+/// Rapidez no la ignore): en su próximo turno, si ataca,
 /// lanza una moneda y con cruz ese ataque no hace nada. Si alguna sale cruz no
 /// pasa nada. No se acumula (Supersónico con 1 moneda, Hidropulso con 2;
 /// D-20 §3.6).
@@ -177,12 +178,21 @@ class AtaqueCampana {
   final int dano;
   final EfectoAtaque? efecto;
 
+  /// Rapidez (Starmie, D-20 §3.6, decidido el 2026-11-26): «Este ataque no se
+  /// ve afectado por los efectos que hacen fallar a tus ataques». No lanza la
+  /// moneda de [MonedaFalloRival] del rival (Bofetón Lodo y Pantalla de Humo).
+  /// La de la Confusión ([ConfundeDefensor]) sí la lanza (recomendación de
+  /// Dirección, por confirmar en #524). Va aparte de [efecto]: el ataque
+  /// puede llevar los dos.
+  final bool ignoraFallo;
+
   const AtaqueCampana({
     required this.nombre,
     required this.tipo,
     required this.coste,
     required this.dano,
     this.efecto,
+    this.ignoraFallo = false,
   });
 }
 

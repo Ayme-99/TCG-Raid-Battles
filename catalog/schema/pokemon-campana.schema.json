@@ -123,6 +123,11 @@
             "multipleOf": 10,
             "description": "0 solo si el ataque lleva un efecto."
           },
+          "ignoraFallo": {
+            "type": "boolean",
+            "default": false,
+            "description": "Rapidez (Starmie): el ataque no lanza la moneda de monedaFalloRival del rival (Bofetón Lodo y Pantalla de Humo); la de Confundido sí (D-20 §3.6)."
+          },
           "efecto": {
             "type": "object",
             "additionalProperties": false,

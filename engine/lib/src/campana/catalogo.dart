@@ -170,6 +170,7 @@ PokemonCampana pokemonCampanaDesdeJson(Map<String, dynamic> json) {
           coste: _campo<int>(a, 'coste'),
           dano: _campo<int>(a, 'dano'),
           efecto: _efectoDesdeJson(a['efecto']),
+          ignoraFallo: (a['ignoraFallo'] as bool?) ?? false,
         ),
     ],
   );

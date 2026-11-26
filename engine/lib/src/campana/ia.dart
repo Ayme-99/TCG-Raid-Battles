@@ -48,6 +48,12 @@ import 'pokemon.dart';
 ///    sobrante se perdería) y, si no, con el de más daño por energía gastada.
 /// 8. Si no llega a nada, carga.
 ///
+/// Rapidez (`ignoraFallo`, propuesta de Programación, #524): si tiene la moneda
+/// de fallo del rival (Bofetón Lodo o Pantalla de Humo) y va a atacar (pasos
+/// 2 y 7) con un ataque que la lanzaría, cambia a uno que la ignore si con él
+/// también remata (paso 2) o si hace al menos la mitad de daño (paso 7: la
+/// moneda deja el otro, de media, en la mitad).
+///
 /// Cuando le toca cargar (pasos 6 y 8), si tiene un ataque que da energía a
 /// su bando (Pulimento) lo usa en su lugar, siempre que la reserva no esté
 /// llena, le falte energía para algún ataque suyo y acabe con al menos la
@@ -104,7 +110,7 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
   }
 
   if (ataque != null && danoMio >= objetivo.ps) {
-    return Atacar(bando, ataque);
+    return Atacar(bando, _sinFallo(yo, rival, ataque, rematar: true));
   }
   if (pocion != null) return pocion;
 
@@ -145,7 +151,9 @@ AccionCombate decidirAccion(EstadoCombate estado, Bando bando) {
       activo, yo.energia, objetivo, p, yo.danoReducido, rival.extraRecibido)) {
     return _cargarOGanar(yo, bando, p);
   }
-  if (ataque != null) return Atacar(bando, ataque);
+  if (ataque != null) {
+    return Atacar(bando, _sinFallo(yo, rival, ataque, rematar: false));
+  }
   return _cargarOGanar(yo, bando, p);
 }
 
@@ -168,6 +176,37 @@ UsarPocion? _pocionQueSalva(EstadoCombate estado, Bando bando) {
   if (amenaza <= 0 || activo.ps > amenaza) return null;
   if (activo.especie.ps <= amenaza) return null;
   return UsarPocion(bando, yo.activo);
+}
+
+/// [elegido], o un ataque que ignora la moneda de fallo del rival (Rapidez)
+/// si el activo de [yo] la tiene y compensa: con [rematar], si también
+/// derriba al rival; si no, si hace al menos la mitad de daño que [elegido].
+int _sinFallo(BandoCombate yo, BandoCombate rival, int elegido,
+    {required bool rematar}) {
+  final ataques = _conRacha(yo).ataques;
+  // Confundido, Rapidez lanza la moneda igual: no gana nada.
+  if (!(yo.cegado || yo.cegadoMientrasActivo) ||
+      yo.confundido ||
+      ataques[elegido].ignoraFallo) {
+    return elegido;
+  }
+  final objetivo = rival.pokemonActivo;
+  int dano(AtaqueCampana a) => danoDeAtaque(a, objetivo.especie,
+      reduccion: yo.danoReducido, extra: rival.extraRecibido);
+  final base = dano(ataques[elegido]);
+  int? mejor;
+  var mejorDano = 0;
+  for (var i = 0; i < ataques.length; i++) {
+    final a = ataques[i];
+    if (!a.ignoraFallo || a.coste > yo.energia) continue;
+    final d = dano(a);
+    final vale = rematar ? d >= objetivo.ps : d * 2 >= base;
+    if (vale && d > mejorDano) {
+      mejor = i;
+      mejorDano = d;
+    }
+  }
+  return mejor ?? elegido;
 }
 
 /// Carga, o usa en su lugar un ataque que da energía a su bando (Pulimento)
