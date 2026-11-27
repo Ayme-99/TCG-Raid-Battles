@@ -4,6 +4,7 @@ import 'package:incursiones_engine/campana.dart';
 
 import 'controlador_campana.dart';
 import 'escena_mapa.dart' show ColoresCampana;
+import 'pantalla_campana.dart' show nombreObjeto;
 import 'solo_horizontal.dart';
 import 'widgets_campana.dart';
 
@@ -121,6 +122,14 @@ class _ContenidoEquipo extends ConsumerWidget {
                   style: const TextStyle(
                       color: ColoresCampana.tinta,
                       fontWeight: FontWeight.w700)),
+              // Piedras evolutivas, solo las que se tienen (#546).
+              for (final o in piedrasEvolutivas)
+                if (p.cuantos(o) > 0)
+                  Text('${nombreObjeto(o)}: ${p.cuantos(o)}',
+                      key: Key('campana-${o.name}'),
+                      style: const TextStyle(
+                          color: ColoresCampana.tinta,
+                          fontWeight: FontWeight.w700)),
             ],
           ),
         ),
@@ -433,7 +442,11 @@ class _HojaPokemon extends ConsumerWidget {
                     : e.via == ViaEvolucion.xp
                         ? 'Evolucionar en '
                             '${c.especie(e.a).nombre} (${e.xpEvolucion} XP)'
-                        : 'Evolucionar en ${c.especie(e.a).nombre}'),
+                        : e.via == ViaEvolucion.objeto &&
+                                objetoDeEvolucion(e.objeto!) != null
+                            ? 'Evolucionar en ${c.especie(e.a).nombre} (1 '
+                                '${nombreObjeto(objetoDeEvolucion(e.objeto!)!)})'
+                            : 'Evolucionar en ${c.especie(e.a).nombre}'),
                 subtitle: Text(p.motivoSinEvolucion(e) ??
                     'Queda con ${PartidaCampana.psAlEvolucionar} PS.'),
                 enabled: p.puedeEvolucionar(e),
