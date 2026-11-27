@@ -272,26 +272,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.0573,
+            "y": 0.5312,
+            "ancho": 0.2604,
+            "alto": 0.3327
           },
           {
             "accion": "ir",
             "destino": "ciudad-verde-salida",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ruta-2",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4505,
+            "y": 0.091,
+            "ancho": 0.0995,
+            "alto": 0.1406
           }
         ]
       }
