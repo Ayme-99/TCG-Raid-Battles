@@ -1223,6 +1223,7 @@
       "zona": "monte-moon",
       "rival": "salvaje",
       "opcional": true,
+      "objeto": "piedraLuna",
       "escena": {
         "imagen": "monte-moon",
         "zonas": [

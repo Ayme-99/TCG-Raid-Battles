@@ -1,11 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/almacen/almacen.dart';
-import 'package:incursiones_app/campana/catalogo_campana.dart'
-    show carpetaCampana;
 import 'package:incursiones_app/campana/controlador_campana.dart';
 import 'package:incursiones_app/campana/escena_mapa.dart';
 import 'package:incursiones_app/campana/pantalla_campana.dart'
@@ -122,37 +117,26 @@ void main() {
     }
   });
 
-  test('la zona «recoger» da el objeto escondido una sola vez (#546)', () {
-    // La Piedra Luna aún no tiene nodo en Kanto: se prueba en la galería.
-    final base = catalogoCampanaDeDisco();
-    final r = jsonDecode(File('$carpetaCampana/regiones/kanto.json')
-        .readAsStringSync()) as Map<String, dynamic>;
-    for (final n in r['nodos'] as List) {
-      if (n['id'] != 'monte-moon-galeria') continue;
-      n['objeto'] = 'piedraLuna';
-      (n['escena']['zonas'] as List).add(
-          {'accion': 'recoger', 'x': 0.8, 'y': 0.6, 'ancho': 0.1, 'alto': 0.1});
-    }
-    final c = CatalogoCampana(
-      pokemon: base.pokemon,
-      zonas: base.zonas,
-      jefes: base.jefes,
-      region: regionCampanaDesdeJson(r),
+  testWidgets('al llegar a la galería del Monte Moon se coge la Piedra Luna',
+      (tester) async {
+    const guardada = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'monte-moon',
+          resuelto: true,
+          visitados: {'monte-moon'},
+          inicial: 'squirtle'),
+      equipo: [PokemonGuardado('squirtle', 80)],
+      dinero: 1000,
     );
-    expect(c.problemas(), isEmpty);
-    final z = c.region
-        .nodo('monte-moon-galeria')
-        .escena!
-        .zonas
-        .singleWhere((z) => z.accion == AccionZona.recoger);
-    expect(claveZona(z), 'zona-recoger');
-    const p = PartidaCampana(
-        progreso: ProgresoRuta(nodoActual: 'monte-moon-galeria'),
-        equipo: [PokemonGuardado('squirtle', 80)]);
-    expect(estadoZona(c, p, z).activa, isTrue);
-    final q = p.recogerObjeto(c);
-    expect(q.cuantos(ObjetoCampana.piedraLuna), 1);
-    expect(estadoZona(c, q, z).activa, isFalse, reason: 'no se repone');
+    final c = await abrirCampana(tester,
+        almacen: AlmacenMemoria(), guardada: guardada);
+    expect(zonaActiva(tester, 'zona-ir-monte-moon-galeria'), isTrue);
+    await tocar(tester, 'zona-ir-monte-moon-galeria');
+    final p = c.read(campanaProvider).partida!;
+    expect(p.progreso.nodoActual, 'monte-moon-galeria');
+    expect(p.cuantos(ObjetoCampana.piedraLuna), 1);
+    expect(find.text('¡Has encontrado una Piedra Luna!'), findsOneWidget);
     expect(nombreObjeto(ObjetoCampana.piedraLuna), 'Piedra Luna');
+    expect(tester.takeException(), isNull);
   });
 }
