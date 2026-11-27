@@ -993,7 +993,7 @@
     {
       "id": "ruta-3-joven",
       "tipo": "combate",
-      "nombre": "Ruta 3: Joven",
+      "nombre": "Ruta 3: Joven Ben",
       "salidas": [
         "ruta-3-final"
       ],
@@ -1001,8 +1001,8 @@
       "rival": "entrenador",
       "clase": "Joven",
       "pokemon": [
-        "spearow",
-        "rattata"
+        "rattata",
+        "ekans"
       ],
       "escena": {
         "imagen": "ruta-3",

@@ -416,7 +416,9 @@ void main() {
       final joven = kanto.nodo('ruta-3-joven');
       expect([chica.clase, joven.clase], ['Chica', 'Joven']);
       expect(chica.pokemon, ['rattata', 'nidoran-f']);
-      expect(joven.pokemon, ['spearow', 'rattata']);
+      // El Joven Ben (Ayme, 2026-11-27, #380; #574).
+      expect(joven.nombre, 'Ruta 3: Joven Ben');
+      expect(joven.pokemon, ['rattata', 'ekans']);
       expect(joven.salidas, ['ruta-3-final']);
       expect(kanto.nodo('centro-monte-moon').tipo, TipoNodo.descanso);
     });
