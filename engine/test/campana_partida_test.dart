@@ -1597,8 +1597,8 @@ void main() {
 
   group('piedras evolutivas (D-20 §10.6, #508 y #546)', () {
     // Kanto con un centro que vende las cuatro piedras (Ciudad Azulona aún
-    // no está en la región). La Piedra Luna ya está en la galería del Monte
-    // Moon (Ayme, 2026-11-27, #546).
+    // no está en la región). La Piedra Luna ya está en el nodo monte-moon,
+    // la bifurcación (Ayme, 2026-11-27, #546 y #380).
     Map<String, dynamic> regionJson() {
       final r = leer(File('../catalog/campana/regiones/kanto.json'));
       for (final n in r['nodos'] as List) {
@@ -1737,56 +1737,60 @@ void main() {
           contains('pikachu: evoluciona con "piedra-sol", que no es un objeto.'));
     });
 
-    test('la Piedra Luna está en la galería del Monte Moon (#546)', () {
+    test('la Piedra Luna está en la bifurcación del Monte Moon (#380)', () {
       final nodos = [
         for (final n in c.region.nodos.values)
           if (n.objeto != null) '${n.id}: ${n.objeto}'
       ];
-      expect(nodos, ['monte-moon-galeria: piedraLuna'],
+      expect(nodos, ['monte-moon: piedraLuna'],
           reason: 'una sola Piedra Luna en todo Kanto');
-      expect(c.region.nodo('monte-moon-galeria').opcional, isTrue);
+      // El nodo es obligatorio: todo el que pasa por el Monte Moon la tiene.
+      expect(c.region.nodo('monte-moon').opcional, isFalse);
+      expect(c.region.nodo('monte-moon').tipo, TipoNodo.bifurcacion);
     });
 
-    test('la Piedra Luna se coge sola al llegar y no se repone', () {
+    test('la Piedra Luna se coge sola al entrar y no se repone', () {
       final p = PartidaCampana(
         progreso: const ProgresoRuta(
-            nodoActual: 'monte-moon',
+            nodoActual: 'centro-monte-moon',
             resuelto: true,
-            visitados: {'monte-moon'}),
+            visitados: {'centro-monte-moon'}),
         equipo: const [PokemonGuardado('squirtle', 80)],
       );
       expect(p.cuantos(ObjetoCampana.piedraLuna), 0);
-      final q = p.avanzar(c, 'monte-moon-galeria');
+      final q = p.avanzar(c, 'monte-moon');
       expect(q.cuantos(ObjetoCampana.piedraLuna), 1);
-      expect(q.recogidos, {'monte-moon-galeria'});
+      expect(q.recogidos, {'monte-moon'});
       // Volver atrás y entrar otra vez no da otra.
       final otraVez = q
-          .retroceder(c, 'monte-moon')
-          .retroceder(c, 'monte-moon-galeria');
+          .retroceder(c, 'centro-monte-moon')
+          .retroceder(c, 'monte-moon');
       expect(otraVez.cuantos(ObjetoCampana.piedraLuna), 1);
+      // Ni pasar por la galería ni seguir al jefe dan otra.
+      expect(q.avanzar(c, 'monte-moon-galeria').cuantos(ObjetoCampana.piedraLuna),
+          1);
+      expect(q.avanzar(c, 'jefe-clefairy').cuantos(ObjetoCampana.piedraLuna), 1);
       // Se guarda: tras cargar la partida tampoco vuelve a estar.
       final cargada = PartidaCampana.desdeJson(
           jsonDecode(jsonEncode(q.aJson())) as Map<String, dynamic>);
-      expect(cargada.recogidos, {'monte-moon-galeria'});
+      expect(cargada.recogidos, {'monte-moon'});
       expect(
           cargada
+              .retroceder(c, 'centro-monte-moon')
               .retroceder(c, 'monte-moon')
-              .retroceder(c, 'monte-moon-galeria')
               .cuantos(ObjetoCampana.piedraLuna),
           1);
-      // Saltarse la galería no la da, y sin recogidos no se guarda el campo.
-      final sinGaleria = p.avanzar(c, 'jefe-clefairy');
-      expect(sinGaleria.cuantos(ObjetoCampana.piedraLuna), 0);
-      expect(sinGaleria.aJson().containsKey('recogidos'), isFalse);
+      // Antes de entrar no se tiene, y sin recogidos no se guarda el campo.
+      expect(p.aJson().containsKey('recogidos'), isFalse);
     });
 
     test('un objeto escondido que no existe es un problema', () {
       final r = regionJson();
       for (final n in r['nodos'] as List) {
-        if (n['id'] == 'monte-moon-galeria') n['objeto'] = 'piedraSol';
+        if (n['id'] == 'monte-moon') n['objeto'] = 'piedraSol';
       }
       expect(conRegion(r).problemas(),
-          contains('monte-moon-galeria: esconde "piedraSol", que no es un objeto.'));
+          contains('monte-moon: esconde "piedraSol", que no es un objeto.'));
     });
   });
 }

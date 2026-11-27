@@ -85,7 +85,7 @@
         "cura": { "type": "boolean", "default": false, "description": "conversacion: si cura al equipo. Un nodo que cura es un punto de curación: al perder se vuelve a él." },
         "escena": { "$ref": "#/$defs/escena" },
         "tienda": { "type": "array", "items": { "enum": ["pokeball", "superBall", "ultraBall", "pocion", "repelente", "cuerdaHuida", "piedraEx", "piedraTrueno", "piedraAgua", "piedraFuego", "piedraHoja"] }, "description": "descanso: lo que vende la tienda del centro (D-20 §10.6). En el primer tramo, pokeball y pocion. Super Ball y Cuerda Huida (550, desde el tramo 2) piden además 1 medalla y Ultra Ball 5. piedraEx: la piedra ex (2.000, D-21 §2.5), que se vende desde la 2.ª medalla (Ayme, 2026-11-24, #447). piedraTrueno, piedraAgua, piedraFuego y piedraHoja: 2.100, desde la 4.ª medalla, en Ciudad Azulona (Ayme, 2026-11-27, #508). La Piedra Luna no se vende. Sin él, el centro no tiene tienda." },
-        "objeto": { "enum": ["piedraLuna"], "description": "Objeto escondido en el nodo (D-20 §10.6, #508): uno solo por partida, que se coge solo al llegar al nodo y no se repone (Ayme, 2026-11-27, #546). Hoy solo la Piedra Luna, en la galería lateral del Monte Moon." }
+        "objeto": { "enum": ["piedraLuna"], "description": "Objeto escondido en el nodo (D-20 §10.6, #508): uno solo por partida, que se coge solo al llegar al nodo y no se repone (Ayme, 2026-11-27, #546). Hoy solo la Piedra Luna, en el nodo monte-moon (la bifurcación; Ayme, 2026-11-27, #380)." }
       }
     }
   }
