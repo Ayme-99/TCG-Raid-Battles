@@ -1,0 +1,37 @@
+Tramo con las reglas reales de partida (#409): 1500 recorridos por inicial, semilla 1.
+Evolución del inicial: no · curar volviendo al centro: sí · Ruta 1 con Balls: sí · Ruta 22: no · Cazabichos con 2 · prioridad XP: inicial
+
+Pokéballs que compra la IA en Ciudad Verde: bulbasaur 5, charmander 5, squirtle 5
+
+Victorias a la primera por combate, entre los que llegan a él:
+Combate                                          bulbasaur              charmander                squirtle
+Ruta 1: Pidgey                       100.0 % (llegan 49 %)   100.0 % (llegan 51 %)   100.0 % (llegan 49 %)
+Ruta 1: Rattata                       87.0 % (llegan 51 %)   100.0 % (llegan 49 %)    76.7 % (llegan 51 %)
+Ruta 2: Weedle                       100.0 % (llegan 51 %)   100.0 % (llegan 49 %)   100.0 % (llegan 50 %)
+Ruta 2: Caterpie                     100.0 % (llegan 49 %)   100.0 % (llegan 51 %)   100.0 % (llegan 50 %)
+Bosque Verde: primer Cazabichos      84.7 % (llegan 100 %)   99.9 % (llegan 100 %)   88.5 % (llegan 100 %)
+Bosque Verde: segundo Cazabichos      88.6 % (llegan 99 %)  100.0 % (llegan 100 %)    91.7 % (llegan 99 %)
+Pikachu                               87.9 % (llegan 99 %)   96.7 % (llegan 100 %)    63.7 % (llegan 99 %)
+Gimnasio: Entrenador Joven            59.5 % (llegan 97 %)    58.5 % (llegan 97 %)    64.2 % (llegan 85 %)
+Gimnasio de Ciudad Plateada           71.4 % (llegan 97 %)    75.3 % (llegan 97 %)    89.1 % (llegan 85 %)
+Ruta 3: Spearow                      100.0 % (llegan 45 %)   100.0 % (llegan 47 %)   100.0 % (llegan 44 %)
+Ruta 3: Nidoran♂                     100.0 % (llegan 43 %)   100.0 % (llegan 48 %)   100.0 % (llegan 40 %)
+Ruta 3: Chica                        100.0 % (llegan 89 %)   100.0 % (llegan 95 %)   100.0 % (llegan 84 %)
+Ruta 3: Joven                        100.0 % (llegan 89 %)   100.0 % (llegan 95 %)   100.0 % (llegan 84 %)
+Clefairy                              99.8 % (llegan 89 %)   100.0 % (llegan 95 %)    99.8 % (llegan 84 %)
+Ruta 4: Sandshrew                    100.0 % (llegan 45 %)   100.0 % (llegan 49 %)   100.0 % (llegan 42 %)
+Ruta 4: Rattata                      100.0 % (llegan 44 %)   100.0 % (llegan 46 %)   100.0 % (llegan 42 %)
+Gimnasio: Nadador Luis               100.0 % (llegan 89 %)   100.0 % (llegan 95 %)   100.0 % (llegan 84 %)
+Gimnasio de Ciudad Celeste           100.0 % (llegan 89 %)   100.0 % (llegan 95 %)   100.0 % (llegan 84 %)
+
+Tramo entero                      
+  bulbasaur   sin perder ningún combate: 33.6 % · acaba ganando a Brock (con reintentos): 88.9 % · derrotas por recorrido: 11.46 · intentos contra Brock: 8.56 · acaba ganando a Misty: 88.9 %
+              XP ganada hasta Brock: 149 (con Brock: 182; sin gastar: 101) · capturas: 4.2 · evolucionan al inicial: 0.0 % · rendidos tras 80 intentos: 166 (gimnasio-brock 123, jefe-pikachu 35, cazabichos-1 8)
+  charmander  sin perder ningún combate: 39.5 % · acaba ganando a Brock (con reintentos): 95.2 % · derrotas por recorrido: 5.32 · intentos contra Brock: 3.11 · acaba ganando a Misty: 95.2 %
+              XP ganada hasta Brock: 150 (con Brock: 195; sin gastar: 103) · capturas: 4.4 · evolucionan al inicial: 0.0 % · rendidos tras 80 intentos: 72 (gimnasio-brock 31, jefe-pikachu 41)
+  squirtle    sin perder ningún combate: 33.2 % · acaba ganando a Brock (con reintentos): 83.8 % · derrotas por recorrido: 15.11 · intentos contra Brock: 2.11 · acaba ganando a Misty: 83.8 %
+              XP ganada hasta Brock: 130 (con Brock: 170; sin gastar: 89) · capturas: 3.9 · evolucionan al inicial: 0.0 % · rendidos tras 80 intentos: 243 (jefe-pikachu 213, gimnasio-brock 22, cazabichos-1 8)
+
+Duración de los combates terminados (turnos): mediana 10 · p95 18 · p99 25 · máximo 34.
+Combates jugados: 110565 · cortados por el tope (sin tope: no acaban): 430 (0.4 %).
+Por casilla: cazabichos-1 292, cazabichos-2 138.

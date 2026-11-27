@@ -1,0 +1,60 @@
+  Rattata                                       87.5 %     100.0 %      75.0 %
+  Spearow                                       89.5 %     100.0 %      85.0 %
+  Nidoran♀                                      89.5 %     100.0 %      85.0 %
+  Nidoran♂                                      42.0 %     100.0 %      75.0 %
+  Mankey                                         0.0 %       6.0 %       0.0 %
+Ruta 2: Weedle
+  Weedle                                       100.0 %     100.0 %     100.0 %
+Ruta 2: Caterpie
+  Caterpie                                     100.0 %     100.0 %     100.0 %
+Bosque Verde: primer Cazabichos
+  Weedle                                       100.0 %     100.0 %     100.0 %
+  Caterpie                                     100.0 %     100.0 %     100.0 %
+  Kakuna                                         0.0 %     100.0 %       0.0 %
+  Metapod                                      100.0 %     100.0 %     100.0 %
+Bosque Verde: segundo Cazabichos
+  Weedle                                       100.0 %     100.0 %     100.0 %
+  Caterpie                                     100.0 %     100.0 %     100.0 %
+  Kakuna                                         0.0 %     100.0 %       0.0 %
+  Metapod                                      100.0 %     100.0 %     100.0 %
+Pikachu
+  Pikachu                                        0.0 %       0.0 %       0.0 %
+Ruta 2 (norte) (opcional)
+  Rattata                                       87.5 %     100.0 %      75.0 %
+  Pidgey                                       100.0 %     100.0 %     100.0 %
+  Caterpie                                     100.0 %     100.0 %     100.0 %
+  Weedle                                       100.0 %     100.0 %     100.0 %
+Gimnasio: Entrenador Joven
+  Diglett + Sandshrew                            0.0 %       0.0 %       0.0 %
+Gimnasio de Ciudad Plateada
+  Geodude + Onix                                 0.0 %       0.0 %       0.0 %
+Ruta 3: Spearow
+  Spearow                                       89.5 %     100.0 %      85.0 %
+Ruta 3: Nidoran♂
+  Nidoran♂                                      42.0 %     100.0 %      75.0 %
+Ruta 3: Chica
+  Rattata + Nidoran♀                             0.0 %       4.5 %       0.0 %
+Ruta 3: Joven
+  Spearow + Rattata                              0.0 %       9.0 %       0.0 %
+Monte Moon: galería lateral (opcional)
+  Zubat                                        100.0 %     100.0 %     100.0 %
+  Geodude                                        0.0 %       0.0 %     100.0 %
+  Paras                                        100.0 %     100.0 %     100.0 %
+Clefairy
+  Clefairy                                       0.0 %       0.0 %       0.0 %
+Ruta 4: Sandshrew
+  Sandshrew                                      0.0 %       0.0 %       0.0 %
+Ruta 4: Rattata
+  Rattata                                       87.5 %     100.0 %      75.0 %
+Ruta 24 (Puente Pepita) (opcional)
+  Caterpie                                     100.0 %     100.0 %     100.0 %
+  Weedle                                       100.0 %     100.0 %     100.0 %
+  Metapod                                      100.0 %     100.0 %     100.0 %
+  Kakuna                                         0.0 %     100.0 %       0.0 %
+  Pidgey                                       100.0 %     100.0 %     100.0 %
+Gimnasio: Nadador Luis
+  Horsea + Shellder                             12.5 %       0.0 %       0.0 %
+Gimnasio de Ciudad Celeste
+  Staryu + Starmie                               0.0 %       0.0 %       0.0 %
+
+Media sin opcionales                            50.8 %      63.1 %      50.4 %
