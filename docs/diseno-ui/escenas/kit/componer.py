@@ -57,6 +57,13 @@ def main(ruta):
         pared += f'<path d="M0 300 H{W}" stroke="{INK}" stroke-width="8"/>'
         body = f'<rect y="300" width="{W}" height="{H-300}" fill="url(#piedras)"/>' + pared + body
         defs_x = sue
+    elif fondo == "suelo-agua":
+        sue = '<pattern id="azulejos" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="#d9ecf7"/><path d="M0 0 H100 V100 H0z" fill="none" stroke="#b4d6ea" stroke-width="3"/></pattern>'
+        pared = f'<rect y="0" width="{W}" height="300" fill="#8fc7ea"/>'
+        for x in range(0, W, 160): pared += f'<path d="M{x} 0 V300" stroke="#74b3dc" stroke-width="4"/>'
+        pared += f'<path d="M0 300 H{W}" stroke="{INK}" stroke-width="8"/>'
+        body = f'<rect y="300" width="{W}" height="{H-300}" fill="url(#azulejos)"/>' + pared + body
+        defs_x = sue
     elif fondo == "seco":
         defs_x = '<linearGradient id="seco" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cf7a"/><stop offset="1" stop-color="#c8bc62"/></linearGradient>'
     else: defs_x = ""

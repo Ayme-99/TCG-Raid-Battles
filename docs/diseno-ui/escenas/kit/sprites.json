@@ -621,5 +621,27 @@
       }
     ],
     "nota": "Gimnasio de agua (exterior): tejado azul y paredes claras. Zona puerta → ir al interior."
+  },
+  "piscina-gimnasio": {
+    "svg": "sprites/piscina-gimnasio.svg",
+    "ancho": 1056,
+    "alto": 634,
+    "ancla": [
+      528.0,
+      588
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "arena",
+        "rect": [
+          28,
+          28,
+          1000,
+          560
+        ]
+      }
+    ],
+    "nota": "Piscina de combate con tres plataformas (zona combate)."
   }
 }

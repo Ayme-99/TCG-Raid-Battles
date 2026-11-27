@@ -1,0 +1,81 @@
+{
+  "escena": "gimnasio-celeste",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Interior del gimnasio de Ciudad Celeste (imagen gimnasio-celeste). Puerta abajo (salida a la ciudad), piscina de combate con tres plataformas en el centro: Nadador Luis (zona plaza-luis, abajo) y Misty (arriba). La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "piscina",
+      "tipo": "arena",
+      "accion": "combate",
+      "rect": [
+        485,
+        288,
+        950,
+        532
+      ],
+      "rel": [
+        0.2526,
+        0.2647,
+        0.4948,
+        0.489
+      ]
+    },
+    {
+      "id": "plaza-luis",
+      "tipo": "plaza",
+      "accion": "ir",
+      "destino": "gimnasio-misty",
+      "rect": [
+        760,
+        690,
+        400,
+        200
+      ],
+      "rel": [
+        0.3958,
+        0.6342,
+        0.2083,
+        0.1838
+      ]
+    },
+    {
+      "id": "plaza-misty",
+      "tipo": "plaza",
+      "accion": null,
+      "rect": [
+        760,
+        430,
+        400,
+        180
+      ],
+      "rel": [
+        0.3958,
+        0.3952,
+        0.2083,
+        0.1654
+      ]
+    },
+    {
+      "id": "salida",
+      "tipo": "puerta",
+      "accion": "ir",
+      "destino": "celeste-salida",
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    }
+  ]
+}
