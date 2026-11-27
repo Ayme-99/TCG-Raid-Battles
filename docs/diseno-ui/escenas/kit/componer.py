@@ -50,6 +50,13 @@ def main(ruta):
         for x in (330, 760, 1160, 1590): pared += f'<rect x="{x}" y="70" width="170" height="120" rx="10" fill="#b4e1f7" stroke="{INK}" stroke-width="6"/><path d="M{x+85} 70 v120 M{x} 130 h170" stroke="{INK}" stroke-width="4"/>'
         body = f'<rect y="330" width="{W}" height="{H-330}" fill="url(#losas)"/>' + pared + body
         defs_x = sue
+    elif fondo == "suelo-gimnasio":
+        sue = '<pattern id="piedras" width="120" height="80" patternUnits="userSpaceOnUse"><rect width="120" height="80" fill="#8c8478"/><path d="M0 0 H120 M0 40 H120 M0 0 V40 M60 40 V80 M120 0 V40" stroke="#6f685d" stroke-width="3" fill="none"/></pattern>'
+        pared = f'<rect y="0" width="{W}" height="300" fill="#5d564d"/>'
+        for y in (40, 120, 200): pared += f'<path d="M0 {y} H{W}" stroke="#4a443d" stroke-width="4"/>'
+        pared += f'<path d="M0 300 H{W}" stroke="{INK}" stroke-width="8"/>'
+        body = f'<rect y="300" width="{W}" height="{H-300}" fill="url(#piedras)"/>' + pared + body
+        defs_x = sue
     elif fondo == "seco":
         defs_x = '<linearGradient id="seco" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cf7a"/><stop offset="1" stop-color="#c8bc62"/></linearGradient>'
     else: defs_x = ""

@@ -545,5 +545,49 @@
     ],
     "zonas": [],
     "nota": "Tramo de muro bajo de piedra."
+  },
+  "arena-roca": {
+    "svg": "sprites/arena-roca.svg",
+    "ancho": 956,
+    "alto": 594,
+    "ancla": [
+      478.0,
+      548
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "arena",
+        "rect": [
+          28,
+          28,
+          900,
+          520
+        ]
+      }
+    ],
+    "nota": "Arena oval de tierra apisonada rodeada de bloques de piedra (zona combate)."
+  },
+  "columna": {
+    "svg": "sprites/columna.svg",
+    "ancho": 128,
+    "alto": 250,
+    "ancla": [
+      64.0,
+      204
+    ],
+    "zonas": [],
+    "nota": "Columna de piedra."
+  },
+  "antorcha": {
+    "svg": "sprites/antorcha.svg",
+    "ancho": 84,
+    "alto": 156,
+    "ancla": [
+      42.0,
+      110
+    ],
+    "zonas": [],
+    "nota": "Antorcha de pared."
   }
 }
