@@ -1,0 +1,169 @@
+{
+  "escena": "bosque-verde",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Bosque Verde. Camino en S de abajo (entrada) a arriba (salida), cuatro hierbas altas (combate salvaje) y tres claros vacíos junto al camino para colocar personajes (Cazabichos 1 y 2, personaje de aviso; el jefe va tras el último). La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "hierba-4",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        1390,
+        54,
+        340,
+        246
+      ],
+      "pokemon": "salvaje",
+      "rel": [
+        0.724,
+        0.0496,
+        0.1771,
+        0.2261
+      ]
+    },
+    {
+      "id": "hierba-3",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        230,
+        184,
+        340,
+        246
+      ],
+      "pokemon": "salvaje",
+      "rel": [
+        0.1198,
+        0.1691,
+        0.1771,
+        0.2261
+      ]
+    },
+    {
+      "id": "hierba-2",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        1360,
+        474,
+        340,
+        246
+      ],
+      "pokemon": "salvaje",
+      "rel": [
+        0.7083,
+        0.4357,
+        0.1771,
+        0.2261
+      ]
+    },
+    {
+      "id": "hierba-1",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        210,
+        614,
+        340,
+        246
+      ],
+      "pokemon": "salvaje",
+      "rel": [
+        0.1094,
+        0.5643,
+        0.1771,
+        0.2261
+      ]
+    },
+    {
+      "id": "claro-1",
+      "tipo": "claro",
+      "accion": null,
+      "rect": [
+        920,
+        845,
+        240,
+        130
+      ],
+      "rel": [
+        0.4792,
+        0.7767,
+        0.125,
+        0.1195
+      ]
+    },
+    {
+      "id": "claro-2",
+      "tipo": "claro",
+      "accion": null,
+      "rect": [
+        395,
+        540,
+        250,
+        140
+      ],
+      "rel": [
+        0.2057,
+        0.4963,
+        0.1302,
+        0.1287
+      ]
+    },
+    {
+      "id": "claro-3",
+      "tipo": "claro",
+      "accion": null,
+      "rect": [
+        1020,
+        130,
+        220,
+        120
+      ],
+      "rel": [
+        0.5312,
+        0.1195,
+        0.1146,
+        0.1103
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-ruta-2-norte",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "ruta-2-norte",
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}

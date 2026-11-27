@@ -1,0 +1,855 @@
+{
+ "escena": "bosque-verde",
+ "nota": "Bosque Verde. Camino en S de abajo (entrada) a arriba (salida), cuatro hierbas altas (combate salvaje) y tres claros vacíos junto al camino para colocar personajes (Cazabichos 1 y 2, personaje de aviso; el jefe va tras el último). La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {
+   "material": "tierra",
+   "ancho": 190,
+   "d": "M960 1130 C960 1000 640 980 640 820 C640 660 1280 700 1280 520 C1280 360 700 380 700 240 C700 130 960 120 960 -40"
+  }
+ ],
+ "rellenos": [
+  {
+   "material": "hierba",
+   "x": 1040,
+   "y": 910,
+   "rx": 120,
+   "ry": 65
+  },
+  {
+   "material": "hierba",
+   "x": 520,
+   "y": 610,
+   "rx": 125,
+   "ry": 70
+  },
+  {
+   "material": "hierba",
+   "x": 1130,
+   "y": 190,
+   "rx": 110,
+   "ry": 60
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "hierba-alta-media",
+   "x": 380,
+   "y": 860,
+   "escala": 0.85,
+   "flip": false,
+   "id": "hierba-1",
+   "acciones": {
+    "cuerpo": {
+     "accion": "combate",
+     "pokemon": "salvaje"
+    }
+   }
+  },
+  {
+   "sprite": "hierba-alta-media",
+   "x": 1530,
+   "y": 720,
+   "escala": 0.85,
+   "flip": true,
+   "id": "hierba-2",
+   "acciones": {
+    "cuerpo": {
+     "accion": "combate",
+     "pokemon": "salvaje"
+    }
+   }
+  },
+  {
+   "sprite": "hierba-alta-media",
+   "x": 400,
+   "y": 430,
+   "escala": 0.85,
+   "flip": false,
+   "id": "hierba-3",
+   "acciones": {
+    "cuerpo": {
+     "accion": "combate",
+     "pokemon": "salvaje"
+    }
+   }
+  },
+  {
+   "sprite": "hierba-alta-media",
+   "x": 1560,
+   "y": 300,
+   "escala": 0.85,
+   "flip": true,
+   "id": "hierba-4",
+   "acciones": {
+    "cuerpo": {
+     "accion": "combate",
+     "pokemon": "salvaje"
+    }
+   }
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1781,
+   "y": 661,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 222,
+   "y": 517,
+   "escala": 0.79
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1853,
+   "y": 770,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1306,
+   "y": 75,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 103,
+   "y": 254,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 698,
+   "y": 511,
+   "escala": 0.96
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1341,
+   "y": 361,
+   "escala": 0.75
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 204,
+   "y": 528,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 621,
+   "y": 90,
+   "escala": 0.89
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 251,
+   "y": 470,
+   "escala": 0.96
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 64,
+   "y": 927,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 137,
+   "y": 541,
+   "escala": 1.0
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 843,
+   "y": 489,
+   "escala": 0.89
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1412,
+   "y": 336,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 869,
+   "y": 836,
+   "escala": 0.78
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 52,
+   "y": 121,
+   "escala": 0.95
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 420,
+   "y": 1068,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 838,
+   "y": 490,
+   "escala": 0.75
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1800,
+   "y": 1054,
+   "escala": 0.83
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1842,
+   "y": 80,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1779,
+   "y": 676,
+   "escala": 0.78
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 49,
+   "y": 851,
+   "escala": 0.83
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 636,
+   "y": 455,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1333,
+   "y": 308,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 307,
+   "y": 947,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1890,
+   "y": 293,
+   "escala": 0.81
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1436,
+   "y": 1032,
+   "escala": 0.97
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 109,
+   "y": 584,
+   "escala": 0.81
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1716,
+   "y": 986,
+   "escala": 0.87
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1505,
+   "y": 1060,
+   "escala": 0.78
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1368,
+   "y": 932,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 63,
+   "y": 130,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 540,
+   "y": 121,
+   "escala": 0.79
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1201,
+   "y": 1056,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 313,
+   "y": 972,
+   "escala": 1.0
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1375,
+   "y": 810,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 101,
+   "y": 1005,
+   "escala": 0.87
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 98,
+   "y": 81,
+   "escala": 0.91
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1526,
+   "y": 378,
+   "escala": 0.78
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 178,
+   "y": 137,
+   "escala": 0.89
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1873,
+   "y": 1018,
+   "escala": 0.95
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 189,
+   "y": 952,
+   "escala": 0.99
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 91,
+   "y": 944,
+   "escala": 0.89
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1309,
+   "y": 738,
+   "escala": 0.84
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 55,
+   "y": 683,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1339,
+   "y": 178,
+   "escala": 0.97
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1521,
+   "y": 398,
+   "escala": 0.98
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 967,
+   "y": 511,
+   "escala": 0.96
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 91,
+   "y": 377,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 75,
+   "y": 295,
+   "escala": 0.87
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1288,
+   "y": 735,
+   "escala": 0.81
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 53,
+   "y": 436,
+   "escala": 0.79
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1282,
+   "y": 267,
+   "escala": 0.79
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1884,
+   "y": 410,
+   "escala": 0.87
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1676,
+   "y": 885,
+   "escala": 0.97
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1224,
+   "y": 1002,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1864,
+   "y": 929,
+   "escala": 0.93
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 468,
+   "y": 910,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1406,
+   "y": 382,
+   "escala": 0.86
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 182,
+   "y": 908,
+   "escala": 0.82
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1419,
+   "y": 785,
+   "escala": 0.89
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 69,
+   "y": 716,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 418,
+   "y": 85,
+   "escala": 0.81
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 126,
+   "y": 1067,
+   "escala": 0.86
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 104,
+   "y": 243,
+   "escala": 0.82
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1458,
+   "y": 1029,
+   "escala": 0.88
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1651,
+   "y": 776,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1858,
+   "y": 799,
+   "escala": 0.78
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1311,
+   "y": 968,
+   "escala": 0.84
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1830,
+   "y": 574,
+   "escala": 0.87
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1363,
+   "y": 1065,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1803,
+   "y": 897,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1873,
+   "y": 459,
+   "escala": 0.99
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1649,
+   "y": 1014,
+   "escala": 0.82
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1501,
+   "y": 936,
+   "escala": 0.84
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 199,
+   "y": 98,
+   "escala": 0.84
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 88,
+   "y": 283,
+   "escala": 0.86
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 101,
+   "y": 237,
+   "escala": 0.83
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1643,
+   "y": 997,
+   "escala": 0.87
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1750,
+   "y": 754,
+   "escala": 0.99
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1732,
+   "y": 806,
+   "escala": 0.91
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1757,
+   "y": 988,
+   "escala": 0.81
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1761,
+   "y": 950,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 40,
+   "y": 679,
+   "escala": 0.76
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 120,
+   "y": 588,
+   "escala": 0.89
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 164,
+   "y": 1013,
+   "escala": 0.86
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1669,
+   "y": 1005,
+   "escala": 0.82
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1700,
+   "y": 1018,
+   "escala": 0.88
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 90,
+   "y": 1007,
+   "escala": 0.78
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1625,
+   "y": 1060,
+   "escala": 0.76
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 54,
+   "y": 763,
+   "escala": 0.83
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 281,
+   "y": 932,
+   "escala": 0.91
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1829,
+   "y": 507,
+   "escala": 0.84
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 448,
+   "y": 944,
+   "escala": 0.91
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1773,
+   "y": 615,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1689,
+   "y": 415,
+   "escala": 0.83
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1847,
+   "y": 159,
+   "escala": 0.97
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1647,
+   "y": 781,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1316,
+   "y": 761,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1197,
+   "y": 758,
+   "escala": 0.98
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1329,
+   "y": 836,
+   "escala": 0.88
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1434,
+   "y": 912,
+   "escala": 0.95
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 79,
+   "y": 98,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1883,
+   "y": 642,
+   "escala": 0.79
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 305,
+   "y": 1034,
+   "escala": 0.77
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 830,
+   "y": 538,
+   "escala": 0.88
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 57,
+   "y": 709,
+   "escala": 0.96
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 401,
+   "y": 477,
+   "escala": 0.84
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 788,
+   "y": 475,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-oscuro",
+   "x": 1754,
+   "y": 781,
+   "escala": 0.89
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1708,
+   "y": 880
+  },
+  {
+   "sprite": "tronco",
+   "x": 1581,
+   "y": 896
+  },
+  {
+   "sprite": "arbusto",
+   "x": 332,
+   "y": 1018
+  },
+  {
+   "sprite": "arbusto",
+   "x": 266,
+   "y": 110
+  },
+  {
+   "sprite": "hongo",
+   "x": 1368,
+   "y": 1024
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1424,
+   "y": 406
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 217,
+   "y": 498
+  },
+  {
+   "sprite": "hongo",
+   "x": 968,
+   "y": 511
+  },
+  {
+   "sprite": "arbusto",
+   "x": 82,
+   "y": 200
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "claro-1",
+   "tipo": "claro",
+   "accion": null,
+   "rect": [
+    920,
+    845,
+    240,
+    130
+   ]
+  },
+  {
+   "id": "claro-2",
+   "tipo": "claro",
+   "accion": null,
+   "rect": [
+    395,
+    540,
+    250,
+    140
+   ]
+  },
+  {
+   "id": "claro-3",
+   "tipo": "claro",
+   "accion": null,
+   "rect": [
+    1020,
+    130,
+    220,
+    120
+   ]
+  },
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  },
+  {
+   "id": "salida-ruta-2-norte",
+   "tipo": "borde-superior",
+   "accion": "ir",
+   "destino": "ruta-2-norte",
+   "rect": [
+    820,
+    0,
+    280,
+    120
+   ]
+  }
+ ]
+}
