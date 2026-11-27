@@ -217,6 +217,13 @@ def antorcha():
     o = f'<rect x="{p+8}" y="{p+36}" width="12" height="46" rx="3" fill="#6b4a2f" stroke="{INK}" stroke-width="3"/><path d="M{p-2} {p+38} h32 l-6 -14 h-20z" fill="#8d8276" stroke="{INK}" stroke-width="3"/><path d="M{p+14} {p+22} q-24 -22 0 -50 q8 18 18 8 q10 20 -18 42z" fill="#f2a43b" stroke="{INK}" stroke-width="3"/><path d="M{p+14} {p+18} q-10 -12 0 -26 q10 12 0 26z" fill="#ffe27a"/>'
     sprite("antorcha", 28, 82, o, [], "Antorcha de pared.")
 
+def piscina():
+    p = PAD; w, h = 1000, 560
+    o = f'<rect x="{p}" y="{p}" width="{w}" height="{h}" rx="30" fill="#e7f1f8" stroke="{INK}" stroke-width="6"/><rect x="{p+34}" y="{p+34}" width="{w-68}" height="{h-68}" rx="20" fill="#5fb8f2" stroke="{INK}" stroke-width="5"/>'
+    for i in range(7): o += f'<path d="M{p+70+i*130} {p+90} q40 -22 80 0 t80 0" fill="none" stroke="#c4f0ff" stroke-width="6" stroke-linecap="round" opacity=".8" transform="translate(0 {(i%3)*140})"/>'
+    for x, y in ((p + 220, p + h / 2), (p + w / 2, p + h / 2), (p + w - 220, p + h / 2)):
+        o += f'<ellipse cx="{x}" cy="{y+8}" rx="92" ry="48" fill="#000" opacity=".15"/><ellipse cx="{x}" cy="{y}" rx="90" ry="46" fill="#e7f1f8" stroke="{INK}" stroke-width="5"/><ellipse cx="{x}" cy="{y}" rx="60" ry="28" fill="#cfe3f0"/>'
+    sprite("piscina-gimnasio", w, h, o, [{"id": "cuerpo", "tipo": "arena", "rect": [p, p, w, h]}], "Piscina de combate con tres plataformas (zona combate).")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -232,5 +239,6 @@ acantilado(520,"acantilado"); roca_grande()
 gimnasio_exterior(); centro_exterior(); barril(); muro_piedra()
 arena_roca(); columna(); antorcha()
 gimnasio_exterior("gimnasio-agua-exterior", {"#5f6672":"#3f7fd0","#474d58":"#2f62a8","#b8ada0":"#dcebf7","#8d8276":"#8fb4d8","#6b4a2f":"#2f62a8","#d6cdbb":"#bfe3f7","#e6c27a":"#a9d8f2"}, "Gimnasio de agua (exterior): tejado azul y paredes claras. Zona puerta → ir al interior.")
+piscina()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")

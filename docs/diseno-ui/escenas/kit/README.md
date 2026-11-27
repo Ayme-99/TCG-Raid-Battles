@@ -31,8 +31,9 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `barril`, `muro-piedra` | Decoración de pueblo de montaña | nuevos | Ciudad Plateada |
 | `arena-roca`, `columna`, `antorcha` | Interior del gimnasio de roca (la arena lleva zona `cuerpo` → combate) | nuevos | Gimnasio de Brock |
 | `gimnasio-agua-exterior` | Gimnasio de agua (mismo dibujo que `gimnasio-exterior` con otra paleta; zona `puerta`) | nuevo | Ciudad Celeste |
+| `piscina-gimnasio` | Piscina de combate con tres plataformas (zona `cuerpo` → combate) | nuevo | Gimnasio de Celeste |
 
-Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra) y `suelo-centro` (interior con pared y losas).
+Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra), `suelo-agua` (interior de azulejos azules) y `suelo-centro` (interior con pared y losas).
 
 Materiales de camino: `tierra`, `piedra`, `hierba` y `agua` (río, con brillos) (en `componer.py`).
 
