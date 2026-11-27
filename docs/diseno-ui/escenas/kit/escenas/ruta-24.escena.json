@@ -1,0 +1,177 @@
+{
+ "escena": "ruta-24",
+ "nota": "Ruta 24 (puente). Entrada por abajo (sale de Ciudad Celeste); un puente largo cruza un río ancho; hierba alta de combate a la entrada. Arriba el camino sigue sin destino definido en el catálogo. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {
+   "material": "agua",
+   "ancho": 480,
+   "d": "M-60 400 C400 420 700 380 960 400 S1500 420 1980 390"
+  },
+  {
+   "material": "tierra",
+   "ancho": 220,
+   "d": "M960 1130 C950 1000 970 900 960 780 L960 640"
+  },
+  {
+   "material": "tierra",
+   "ancho": 220,
+   "d": "M960 160 L960 -40"
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "puente-largo",
+   "x": 958,
+   "y": 720
+  },
+  {
+   "sprite": "hierba-alta-media",
+   "x": 450,
+   "y": 900,
+   "escala": 1.2,
+   "id": "hierba",
+   "acciones": {
+    "cuerpo": {
+     "accion": "combate"
+    }
+   }
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 120,
+   "y": 1010
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1800,
+   "y": 1010,
+   "escala": 1.1
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1640,
+   "y": 860,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 130,
+   "y": 780,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1780,
+   "y": 780
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 140,
+   "y": 125,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1790,
+   "y": 125,
+   "escala": 0.95
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 560,
+   "y": 125,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1370,
+   "y": 125,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbusto",
+   "x": 760,
+   "y": 930
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1220,
+   "y": 860
+  },
+  {
+   "sprite": "arbusto",
+   "x": 700,
+   "y": 120
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1180,
+   "y": 120
+  },
+  {
+   "sprite": "roca",
+   "x": 1400,
+   "y": 940
+  },
+  {
+   "sprite": "roca",
+   "x": 300,
+   "y": 690
+  },
+  {
+   "sprite": "roca",
+   "x": 1560,
+   "y": 700,
+   "escala": 1.1
+  },
+  {
+   "sprite": "cartel",
+   "x": 1100,
+   "y": 940
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 900,
+   "y": 1000
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1500,
+   "y": 780
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 250,
+   "y": 780
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1080,
+   "y": 220
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  },
+  {
+   "id": "salida-norte",
+   "tipo": "borde-superior",
+   "accion": null,
+   "rect": [
+    820,
+    0,
+    280,
+    120
+   ]
+  }
+ ]
+}

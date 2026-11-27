@@ -643,5 +643,16 @@
       }
     ],
     "nota": "Piscina de combate con tres plataformas (zona combate)."
+  },
+  "puente-largo": {
+    "svg": "sprites/puente-largo.svg",
+    "ancho": 356,
+    "alto": 694,
+    "ancla": [
+      178.0,
+      648
+    ],
+    "zonas": [],
+    "nota": "Puente de piedra largo (vista cenital vertical) sobre un río ancho."
   }
 }

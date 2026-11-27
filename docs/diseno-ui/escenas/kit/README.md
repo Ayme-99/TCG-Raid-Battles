@@ -32,6 +32,7 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `arena-roca`, `columna`, `antorcha` | Interior del gimnasio de roca (la arena lleva zona `cuerpo` → combate) | nuevos | Gimnasio de Brock |
 | `gimnasio-agua-exterior` | Gimnasio de agua (mismo dibujo que `gimnasio-exterior` con otra paleta; zona `puerta`) | nuevo | Ciudad Celeste |
 | `piscina-gimnasio` | Piscina de combate con tres plataformas (zona `cuerpo` → combate) | nuevo | Gimnasio de Celeste |
+| `puente-largo` | Puente de piedra largo (cenital, vertical) para ríos anchos | nuevo | Ruta 24 |
 
 Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra), `suelo-agua` (interior de azulejos azules) y `suelo-centro` (interior con pared y losas).
 
