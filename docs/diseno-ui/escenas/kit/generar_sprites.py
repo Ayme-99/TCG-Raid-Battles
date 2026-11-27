@@ -168,6 +168,33 @@ def roca_grande():
     p = PAD
     o = f'<ellipse cx="{p+80}" cy="{p+92}" rx="92" ry="14" fill="#000" opacity=".15"/><path d="M{p} {p+90} q-8 -56 40 -78 q50 -22 90 6 q36 26 28 72z" fill="#b8b6c2" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/><path d="M{p+30} {p+30} q30 -20 64 -4" fill="none" stroke="#e6e4ee" stroke-width="7" stroke-linecap="round"/><path d="M{p+90} {p+88} q16 -40 66 -48 q6 28 0 48z" fill="#9694a6"/>'
     sprite("roca-grande", 160, 94, o, [], "Peñasco grande gris.")
+def gimnasio_exterior():
+    p = PAD; w, h = 480, 360
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h+6}" rx="{w*.58}" ry="20" fill="#000" opacity=".18"/>'
+    o += f'<rect x="{p}" y="{p+h*.34}" width="{w}" height="{h*.66}" fill="#b8ada0" stroke="{INK}" stroke-width="5"/>'
+    for r_ in range(5):
+        for c_ in range(7 if r_ % 2 else 8): o += f'<rect x="{p+c_*60+(30 if r_%2 else 0)}" y="{p+h*.34+r_*44}" width="60" height="44" fill="none" stroke="#8d8276" stroke-width="3"/>'
+    o += f'<path d="M{p-20} {p+h*.36} L{p+w*.12} {p} H{p+w*.88} L{p+w+20} {p+h*.36}z" fill="#5f6672" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/>'
+    for i in range(1, 5): o += f'<path d="M{p+w*.12-i*8} {p+i*h*.36/5} H{p+w*.88+i*8}" stroke="#474d58" stroke-width="3"/>'
+    cx = p + w / 2
+    o += f'<circle cx="{cx}" cy="{p+h*.18}" r="34" fill="#d6cdbb" stroke="{INK}" stroke-width="5"/><path d="M{cx-18} {p+h*.18+14} l8 -20 l10 12 l10 -12 l8 20z" fill="#8d8276" stroke="{INK}" stroke-width="3" stroke-linejoin="round"/>'
+    dw = 130; dy = p + h * .52
+    o += f'<rect x="{cx-dw/2-12}" y="{dy-12}" width="{dw+24}" height="{h*.48+12}" rx="10" fill="#8d8276" stroke="{INK}" stroke-width="5"/><rect x="{cx-dw/2}" y="{dy}" width="{dw}" height="{h*.48}" fill="#6b4a2f" stroke="{INK}" stroke-width="5"/><path d="M{cx} {dy} v{h*.48}" stroke="{INK}" stroke-width="4"/><circle cx="{cx-14}" cy="{dy+h*.26}" r="5" fill="#f2c84b"/><circle cx="{cx+14}" cy="{dy+h*.26}" r="5" fill="#f2c84b"/>'
+    for x in (p + 40, p + w - 100): o += f'<rect x="{x}" y="{p+h*.52}" width="60" height="{h*.2}" rx="8" fill="#e6c27a" stroke="{INK}" stroke-width="4"/>'
+    sprite("gimnasio-exterior", w, h, o, [{"id": "puerta", "tipo": "puerta", "rect": [cx - dw / 2, dy, dw, h * .48]}, {"id": "edificio", "tipo": "edificio", "rect": [p, p, w, h]}], "Gimnasio de roca (exterior): tejado de pizarra y portón de madera. Zona puerta → ir al interior.")
+def centro_exterior():
+    p = PAD; w, h = 400, 300
+    cx = p + w / 2; dw = w * .26; wy = p + h * .38; wh = h * .62; dy = wy + wh * .3; dh = wh * .7 - wh * .14
+    sprite("centro-pokemon-exterior", w, h, centro(p, p, w, h), [{"id": "puerta", "tipo": "puerta", "rect": [cx - dw / 2, dy, dw, dh]}, {"id": "edificio", "tipo": "edificio", "rect": [p, p, w, h]}], "Centro Pokémon (exterior): tejado rojo y cruz blanca. Zona puerta → ir al interior.")
+def barril():
+    p = PAD
+    o = f'<ellipse cx="{p+22}" cy="{p+50}" rx="28" ry="6" fill="#000" opacity=".18"/><path d="M{p} {p+10} q-4 20 0 40 h44 q4 -20 0 -40z" fill="#c9895a" stroke="{INK}" stroke-width="3"/><ellipse cx="{p+22}" cy="{p+10}" rx="22" ry="6" fill="#e0b27a" stroke="{INK}" stroke-width="3"/><path d="M{p+1} {p+24} h42 M{p+1} {p+38} h42" stroke="#6b4a2f" stroke-width="3"/>'
+    sprite("barril", 44, 50, o, [], "Barril de madera.")
+def muro_piedra():
+    p = PAD; w = 240
+    o = f'<ellipse cx="{p+w/2}" cy="{p+44}" rx="{w/2+6}" ry="7" fill="#000" opacity=".15"/><rect x="{p}" y="{p}" width="{w}" height="42" rx="10" fill="#c9c1b3" stroke="{INK}" stroke-width="4"/>'
+    for i in range(1, 5): o += f'<path d="M{p+i*48} {p+2} v38" stroke="#8d8276" stroke-width="3"/>'
+    sprite("muro-piedra", w, 44, o, [], "Tramo de muro bajo de piedra.")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -180,5 +207,6 @@ hierba_alta_sprite("hierba-alta-media", 400, 300, 12, "Mancha de hierba alta med
 valla(); roca(); arbol2(); puente(); portico(); curar(); tienda_mostrador(); pc(); planta(); sofa(); alfombra()
 cartel(); seto(300,"seto"); arbol_oscuro(); tronco(); hongo()
 acantilado(520,"acantilado"); roca_grande()
+gimnasio_exterior(); centro_exterior(); barril(); muro_piedra()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")

@@ -27,6 +27,8 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `cartel`, `seto`, `arbol-oscuro`, `tronco`, `hongo` | Decoración de bosque y bifurcación | nuevos | Ruta 2 sur |
 | (reutiliza) `arbol-oscuro`, `arbol-2`, `hierba-alta-media`, `tronco`, `hongo` | Bosque denso; claros = elipses de material `hierba` sin objeto | — | Bosque Verde |
 | `acantilado`, `roca-grande` | Colina rocosa, peñasco | nuevos | Ruta 2 norte |
+| `gimnasio-exterior`, `centro-pokemon-exterior` | Edificios de la ciudad (zona `puerta` → ir al interior) | nuevos; el Centro ya existía como dibujo en la base de Ciudad Verde | Ciudad Plateada |
+| `barril`, `muro-piedra` | Decoración de pueblo de montaña | nuevos | Ciudad Plateada |
 
 Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada) y `suelo-centro` (interior con pared y losas).
 
