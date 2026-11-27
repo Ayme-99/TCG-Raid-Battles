@@ -224,6 +224,15 @@ def piscina():
     for x, y in ((p + 220, p + h / 2), (p + w / 2, p + h / 2), (p + w - 220, p + h / 2)):
         o += f'<ellipse cx="{x}" cy="{y+8}" rx="92" ry="48" fill="#000" opacity=".15"/><ellipse cx="{x}" cy="{y}" rx="90" ry="46" fill="#e7f1f8" stroke="{INK}" stroke-width="5"/><ellipse cx="{x}" cy="{y}" rx="60" ry="28" fill="#cfe3f0"/>'
     sprite("piscina-gimnasio", w, h, o, [{"id": "cuerpo", "tipo": "arena", "rect": [p, p, w, h]}], "Piscina de combate con tres plataformas (zona combate).")
+def puente_largo():
+    p = PAD; w, h = 300, 620
+    o = f'<rect x="{p+30}" y="{p+4}" width="{w-60}" height="{h-8}" fill="#e8dfcf" stroke="{INK}" stroke-width="5"/>'
+    for y in range(p + 30, p + h - 20, 34): o += f'<path d="M{p+38} {y} H{p+w-38}" stroke="#c9bfa8" stroke-width="3"/>'
+    for x in (p + 6, p + w - 46):
+        o += f'<rect x="{x}" y="{p}" width="40" height="{h}" rx="12" fill="#cfc6b4" stroke="{INK}" stroke-width="5"/><rect x="{x+8}" y="{p+8}" width="10" height="{h-16}" rx="5" fill="#efe9dc"/>'
+        for y in range(p - 2, p + h - 20, 150): o += f'<rect x="{x-4}" y="{y}" width="48" height="28" rx="8" fill="#b9b09c" stroke="{INK}" stroke-width="4"/>'
+        o += f'<rect x="{x-4}" y="{p+h-26}" width="48" height="28" rx="8" fill="#b9b09c" stroke="{INK}" stroke-width="4"/>'
+    sprite("puente-largo", w, h, o, [], "Puente de piedra largo (vista cenital vertical) sobre un río ancho.")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -240,5 +249,6 @@ gimnasio_exterior(); centro_exterior(); barril(); muro_piedra()
 arena_roca(); columna(); antorcha()
 gimnasio_exterior("gimnasio-agua-exterior", {"#5f6672":"#3f7fd0","#474d58":"#2f62a8","#b8ada0":"#dcebf7","#8d8276":"#8fb4d8","#6b4a2f":"#2f62a8","#d6cdbb":"#bfe3f7","#e6c27a":"#a9d8f2"}, "Gimnasio de agua (exterior): tejado azul y paredes claras. Zona puerta → ir al interior.")
 piscina()
+puente_largo()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")
