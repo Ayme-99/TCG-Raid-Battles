@@ -260,6 +260,18 @@ def setas_grandes():
         c = r.choice(["#e0453c", "#e8a23b", "#c9d36b"])
         o += f'<rect x="{x-5*k}" y="{y}" width="{10*k}" height="{22*k}" rx="3" fill="#f4efe6" stroke="{INK}" stroke-width="3"/><path d="M{x-22*k} {y+4} q{22*k} {-34*k} {44*k} 0z" fill="{c}" stroke="{INK}" stroke-width="3"/><circle cx="{x-6*k}" cy="{y-6*k}" r="{3*k}" fill="#fff"/><circle cx="{x+8*k}" cy="{y-10*k}" r="{3*k}" fill="#fff"/>'
     sprite("setas-grandes", w, h, o, [{"id": "cuerpo", "tipo": "combate", "rect": [p, p, w, h]}], "Alfombra de setas (zona de combate salvaje: Paras).")
+def escombros():
+    p = PAD; w, h = 460, 250
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h*.55}" rx="{w/2}" ry="{h*.5}" fill="#7a7266" stroke="{INK}" stroke-width="6"/><ellipse cx="{p+w/2}" cy="{p+h*.55}" rx="{w/2-26}" ry="{h*.5-24}" fill="#8c8478"/>'
+    r = random.Random(33)
+    for i in range(18):
+        x = p + 60 + r.random() * (w - 120); y = p + 50 + r.random() * (h * .85 - 60); k = r.uniform(.6, 1.3)
+        o += f'<path d="M{x-24*k} {y+16*k} L{x-14*k} {y-12*k} L{x+8*k} {y-18*k} L{x+26*k} {y+2*k} L{x+20*k} {y+16*k}z" fill="{r.choice(["#b8b6c2","#a8a29a","#9694a6"])}" stroke="{INK}" stroke-width="3" stroke-linejoin="round"/>'
+    sprite("escombros", w, h, o, [{"id": "cuerpo", "tipo": "combate", "rect": [p, p, w, h]}], "Montón de escombros y rocas sueltas (zona de combate salvaje: Zubat o Geodude).")
+def rayo_luz():
+    p = PAD; w, h = 220, 700
+    o = f'<path d="M{p+60} {p} H{p+w-60} L{p+w} {p+h} H{p}z" fill="#fff6c8" opacity=".28"/><ellipse cx="{p+w/2}" cy="{p+h}" rx="{w/2}" ry="30" fill="#fff6c8" opacity=".35"/>'
+    sprite("rayo-luz", w, h, o, [], "Rayo de luz desde una grieta del techo (decoración translúcida).")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -279,5 +291,6 @@ piscina()
 puente_largo()
 cueva_entrada()
 estalagmita("estalagmita", 140); estalagmita("estalagmita-baja", 90, "Estalagmita baja de cueva."); estalactita(); setas_grandes()
+escombros(); rayo_luz()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")

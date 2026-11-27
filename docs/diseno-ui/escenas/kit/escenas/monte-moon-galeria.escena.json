@@ -1,0 +1,209 @@
+{
+ "escena": "monte-moon-galeria",
+ "fondo": "suelo-cueva",
+ "nota": "Monte Moon, galería lateral (desvío opcional; salvaje Zubat o Geodude al azar, Ayme 2026-11-27, #380). Entrada por abajo (vuelve al nodo monte-moon); montón de escombros en el centro = combate salvaje; salida arriba hacia el jefe (jefe-clefairy). La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {
+   "material": "piedra",
+   "ancho": 190,
+   "d": "M960 1130 C1000 980 920 860 960 760 C1010 640 920 520 960 380 C980 300 960 200 960 -40"
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "rayo-luz",
+   "x": 460,
+   "y": 720,
+   "z": -1
+  },
+  {
+   "sprite": "rayo-luz",
+   "x": 1480,
+   "y": 680,
+   "z": -1
+  },
+  {
+   "sprite": "escombros",
+   "x": 960,
+   "y": 760,
+   "escala": 1.5,
+   "id": "escombros",
+   "acciones": {
+    "cuerpo": {
+     "accion": "combate",
+     "pokemon": "zubat-o-geodude"
+    }
+   }
+  },
+  {
+   "sprite": "estalactita",
+   "x": 240,
+   "y": 200,
+   "escala": 1.4
+  },
+  {
+   "sprite": "estalactita",
+   "x": 520,
+   "y": 210,
+   "escala": 1.1
+  },
+  {
+   "sprite": "estalactita",
+   "x": 1380,
+   "y": 210,
+   "escala": 1.1
+  },
+  {
+   "sprite": "estalactita",
+   "x": 1680,
+   "y": 200,
+   "escala": 1.4
+  },
+  {
+   "sprite": "estalactita",
+   "x": 760,
+   "y": 200,
+   "escala": 0.8
+  },
+  {
+   "sprite": "estalactita",
+   "x": 1180,
+   "y": 200,
+   "escala": 0.8
+  },
+  {
+   "sprite": "antorcha",
+   "x": 640,
+   "y": 320,
+   "escala": 1.7
+  },
+  {
+   "sprite": "antorcha",
+   "x": 1280,
+   "y": 320,
+   "escala": 1.7
+  },
+  {
+   "sprite": "antorcha",
+   "x": 760,
+   "y": 960,
+   "escala": 1.4
+  },
+  {
+   "sprite": "antorcha",
+   "x": 1160,
+   "y": 960,
+   "escala": 1.4
+  },
+  {
+   "sprite": "estalagmita",
+   "x": 170,
+   "y": 520,
+   "escala": 1.4
+  },
+  {
+   "sprite": "estalagmita",
+   "x": 1760,
+   "y": 540,
+   "escala": 1.4
+  },
+  {
+   "sprite": "estalagmita",
+   "x": 330,
+   "y": 900,
+   "escala": 1.2
+  },
+  {
+   "sprite": "estalagmita",
+   "x": 1590,
+   "y": 930,
+   "escala": 1.2
+  },
+  {
+   "sprite": "estalagmita-baja",
+   "x": 560,
+   "y": 520
+  },
+  {
+   "sprite": "estalagmita-baja",
+   "x": 1380,
+   "y": 480
+  },
+  {
+   "sprite": "estalagmita-baja",
+   "x": 120,
+   "y": 960
+  },
+  {
+   "sprite": "estalagmita-baja",
+   "x": 1800,
+   "y": 1010
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 300,
+   "y": 660
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 1620,
+   "y": 700,
+   "flip": true
+  },
+  {
+   "sprite": "roca",
+   "x": 700,
+   "y": 480
+  },
+  {
+   "sprite": "roca",
+   "x": 1240,
+   "y": 560
+  },
+  {
+   "sprite": "roca",
+   "x": 580,
+   "y": 1000
+  },
+  {
+   "sprite": "roca",
+   "x": 1330,
+   "y": 1010
+  },
+  {
+   "sprite": "roca",
+   "x": 500,
+   "y": 820
+  },
+  {
+   "sprite": "roca",
+   "x": 1450,
+   "y": 840
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  },
+  {
+   "id": "salida-jefe-clefairy",
+   "tipo": "borde-superior",
+   "accion": "ir",
+   "destino": "jefe-clefairy",
+   "rect": [
+    820,
+    0,
+    280,
+    120
+   ]
+  }
+ ]
+}

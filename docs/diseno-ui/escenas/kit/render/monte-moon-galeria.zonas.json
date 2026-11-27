@@ -1,0 +1,64 @@
+{
+  "escena": "monte-moon-galeria",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Monte Moon, galería lateral (desvío opcional; salvaje Zubat o Geodude al azar, Ayme 2026-11-27, #380). Entrada por abajo (vuelve al nodo monte-moon); montón de escombros en el centro = combate salvaje; salida arriba hacia el jefe (jefe-clefairy). La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "escombros",
+      "tipo": "combate",
+      "accion": "combate",
+      "rect": [
+        615,
+        385,
+        690,
+        375
+      ],
+      "pokemon": "zubat-o-geodude",
+      "rel": [
+        0.3203,
+        0.3539,
+        0.3594,
+        0.3447
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-jefe-clefairy",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "jefe-clefairy",
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}

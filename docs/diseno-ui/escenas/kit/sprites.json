@@ -731,5 +731,38 @@
       }
     ],
     "nota": "Alfombra de setas (zona de combate salvaje: Paras)."
+  },
+  "escombros": {
+    "svg": "sprites/escombros.svg",
+    "ancho": 516,
+    "alto": 324,
+    "ancla": [
+      258.0,
+      278
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "combate",
+        "rect": [
+          28,
+          28,
+          460,
+          250
+        ]
+      }
+    ],
+    "nota": "Montón de escombros y rocas sueltas (zona de combate salvaje: Zubat o Geodude)."
+  },
+  "rayo-luz": {
+    "svg": "sprites/rayo-luz.svg",
+    "ancho": 276,
+    "alto": 774,
+    "ancla": [
+      138.0,
+      728
+    ],
+    "zonas": [],
+    "nota": "Rayo de luz desde una grieta del techo (decoración translúcida)."
   }
 }

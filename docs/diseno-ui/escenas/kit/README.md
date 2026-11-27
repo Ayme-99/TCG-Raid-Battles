@@ -35,6 +35,7 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `puente-largo` | Puente de piedra largo (cenital, vertical) para ríos anchos | nuevo | Ruta 24 |
 | `cueva-entrada` | Boca de cueva con vigas (zona `puerta` → galería) | nuevo | Monte Moon |
 | `estalagmita`, `estalagmita-baja`, `estalactita`, `setas-grandes` | Interior de cueva; las setas llevan zona `cuerpo` → combate | nuevos | Monte Moon B1F |
+| `escombros`, `rayo-luz` | Interior de cueva: montón de rocas (zona `cuerpo` → combate) y rayo de luz translúcido | nuevos | Monte Moon, galería |
 
 Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra), `suelo-agua` (interior de azulejos azules), `suelo-cueva` (cueva oscura) y `suelo-centro` (interior con pared y losas).
 
