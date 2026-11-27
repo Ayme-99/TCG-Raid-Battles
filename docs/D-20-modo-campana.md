@@ -271,7 +271,7 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 
 | # | Nodo | Qué pasa |
 |---|---|---|
-| 9 | **Ruta 3** (bifurcación) | Elegir entre un **Spearow** y un **Nidoran♂** salvajes. Dos entrenadores de ruta: la **Chica** (Rattata y Nidoran♀) y el **Joven** (Spearow y Rattata). Un **centro Pokémon** al final, junto a la entrada del Monte Moon ◐. |
+| 9 | **Ruta 3** (bifurcación) | Elegir entre un **Spearow** y un **Nidoran♂** salvajes. Dos entrenadores de ruta: la **Chica** (Rattata y Nidoran♀) y el **Joven** (Spearow y Rattata). Un **centro Pokémon** al final, junto a la entrada del Monte Moon ✓ (contrastado el 2026-11-27: Bulbapedia, StrategyWiki y Serebii lo sitúan al final de la Ruta 3, antes de la entrada al Monte Moon; en los juegos cae en el tramo oeste de la Ruta 4). |
 | 10 | **Monte Moon** | Un salvaje **opcional** (Zubat o Geodude) en una galería lateral, y el jefe **02/20 Clefairy** (capturable la primera vez, §10.8) con los aliados de la lista A: Zubat, Geodude y Sandshrew. |
 | 11 | **Ruta 4** (bifurcación) | Elegir entre un **Sandshrew** y un **Rattata** salvajes. |
 | 12 | **Ciudad Celeste** | Centro Pokémon y tienda. **Gimnasio:** el **Nadador Luis** (Horsea y Shellder) y **Misty** (Staryu y Starmie), que da la **Medalla Cascada** (2.ª). |
@@ -285,13 +285,13 @@ Zonas del catálogo: `ruta-1` (Pidgey, Rattata), `ruta-2` (Rattata, Pidgey, Cate
 | `monte-moon` | Zubat y Geodude (opcional, uno de los dos); **Paras** (raro, Intermedio) | **Jefe 02 Clefairy** | ✓ Serebii y SuperCheats (Zubat, Geodude, Paras y Clefairy; Paras y Clefairy son raros) |
 | `ruta-4` | Rattata, Spearow, Sandshrew, Mankey (muy poco frecuente), **Ekans** (raro, Intermedio). **Bifurcación obligatoria: Sandshrew o Rattata.** | — | ✓ Bulbapedia (Ruta 4). Ekans entra como salvaje raro (opción C); necesita carta nueva |
 | `gimnasio-celeste` | Sin salvajes | Nadador Luis: Horsea, Shellder. Líder Misty: Staryu, Starmie | ✓ StrategyWiki y Serebii (Misty: Staryu de nivel 18 y Starmie de nivel 21). El gimnasio de los juegos tiene también una Chica de Camping (Goldeen), que no entra |
-| `ruta-24` (opcional) | Caterpie, Weedle, Metapod, Kakuna, Pidgey | — | ✓ Caterpie (StrategyWiki); el resto ◐ |
+| `ruta-24` (opcional) | Caterpie, Weedle, Metapod, Kakuna, Pidgey | — | ✓ Caterpie (StrategyWiki); Weedle, Pidgey, Metapod y Kakuna ✓ (Calidad, Serebii, 2026-11-26, #527). Oddish, Bellsprout y Abra salen en los juegos y no entran: no hay carta |
 
 **Cartas que ya existen** y valen para todo el tramo: Pidgey, Spearow, Rattata, Nidoran♀, Nidoran♂, Mankey, Sandshrew, Zubat, Geodude, Caterpie, Weedle, Metapod y Kakuna. **Cartas nuevas que hacen falta: ocho**, las de la tabla siguiente. **Surf:** en la campaña aún no hay Surf, así que **ningún salvaje de las rutas es de agua**. Horsea y Shellder solo salen como Pokémon del **Nadador Luis en el gimnasio**, y los entrenadores no necesitan Surf (decidido por Ayme el 2026-11-26: el Nadador se queda).
 
 **Plantilla del tramo (con «Rivales por tramo», más abajo):** salvajes obligatorios 2 de categoría Común (20 XP), 2 entrenadores de ruta (60), el jefe 02 (30), el Nadador Luis (20) y Misty (50): **7 rivales y 180 XP**. Dinero: 710 para los entrenadores (por ejemplo Chica 230, Joven 230 y Luis 250) y 1.500 para Misty, según el presupuesto de §10.6.
 
-**Misty.** Dos Pokémon, como Brock: Staryu y Starmie, de tipo agua y sin resistencia. **Staryu ya está hecho por Ayme con debilidad eléctrico ×2**; Starmie lleva la misma. Starmie es la evolución de Staryu con la **Piedra Agua**, que en la campaña aún no se puede obtener (como la Piedra Trueno de Raichu); el jugador no la evoluciona, así que no hay que decidirlo ahora. La ficha de Misty (PS, ataques, dinero) se rellena con las del resto de líderes (§4, «Líderes de gimnasio»).
+**Misty.** Dos Pokémon, como Brock: Staryu y Starmie, de tipo agua y sin resistencia. **Staryu ya está hecho por Ayme con debilidad eléctrico ×2**; Starmie lleva la misma. Starmie es la evolución de Staryu con la **Piedra Agua**, que se vende en Ciudad Azulona desde la 4.ª medalla (§10.6, 2026-11-27, #508); el jugador no puede tener un Staryu en el tramo 2, así que Starmie solo la usa Misty y no hay que decidir nada ahora. La ficha de Misty (PS, ataques, dinero) se rellena con las del resto de líderes (§4, «Líderes de gimnasio»).
 
 **Clefairy (decidido por Ayme el 2026-11-26):** carta del jefe hecha (`clefairy-jefe.webp`): **psíquico, 120 PS, debilidad oscuridad ×2, retirada 0, Muro Mágico y Doble Bofetón**. Se descarta la propuesta de Arte y Diseño (normal, lucha ×2). El jugador solo tiene a Nidoran♀, Nidoran♂, Zubat y Ekans para golpearlo fuerte; Calidad medirá el 75 % de victoria y la subida de nivel frente a Pikachu (100 PS). Muro Mágico necesita una tarea de Programación; hasta entonces la carta funciona sin la habilidad.
 
