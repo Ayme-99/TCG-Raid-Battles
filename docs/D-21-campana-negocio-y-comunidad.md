@@ -1,6 +1,6 @@
 # D-21 · Modo campaña: tienda de puntos, Pokédex «Mis cartas» y comunicación
 
-Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23, el 2026-11-24, el 2026-11-25 y el 2026-11-26 con sus decisiones. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
+Estado: **PROPUESTA para que Ayme confirme**, actualizada el 2026-11-23, el 2026-11-24, el 2026-11-25, el 2026-11-26 y el 2026-11-27 con sus decisiones. Lo que Ayme ya ha cerrado va marcado como **Decidido** y lo que sigue sin cerrar, como **PROPUESTA**. Es un documento del sector **Negocio y comunidad**; no toca código. Cubre las issues **#387** (tienda), **#388** (Pokédex «Mis cartas») y **#390** (tutorial y comunicación). **#389** (propiedad intelectual) está cerrada y aquí solo se cita (§1.3).
 
 Cómo leerlo:
 
@@ -123,7 +123,7 @@ Lo que **no** entra en la tienda, y por qué:
 
 - **Campañas nuevas.** Ayme apuntó que «lo normal es que estén abiertas de primeras» (D-20 §5). **Recomiendo** abrir la siguiente al terminar la anterior, no pagarla: una campaña es contenido que el jugador espera tener, no un extra.
 - **Jefes de la partida libre.** Se desbloquean con el total de puntos de la cuenta (D-10). Comprar baja el total, pero un jefe desbloqueado no se vuelve a bloquear (§1.2).
-- **Consumibles de campaña** (Pokéballs, Pociones, Repelentes): son del dinero (§1.1).
+- **Consumibles de campaña** (Pokéballs, Pociones, Repelentes) y **piedras** (ex y evolutivas): son del dinero (§1.1, §2.5).
 - **Sprites, medallas y cualquier arte ajeno** (§1.3).
 
 ### 2.3 Precios
@@ -179,6 +179,7 @@ Todas las cifras son **ajustables sin tocar la tienda**: viven en un catálogo d
   - Básico → **Básico ex**
 - **Excepciones por fandom:** Pikachu y Eevee, que pueden evolucionar y también ser ex. La lista exacta y cómo se resuelven la define **Diseño** (Ayme le pasa un prompt).
 - **Piedra de premio: una por medalla** (8 en total). Como el juego no tiene MT, es un premio que encaja. Se entrega con la medalla y no caduca.
+- **Piedras evolutivas** (Ayme, 2026-11-27, D-20 §10.6, #508): hay **cinco**, **Trueno, Agua, Fuego, Hoja y Luna**. Las cuatro primeras se compran con **dinero** en la tienda de **Ciudad Azulona** a **2.100** cada una, **desde la 4.ª medalla**. La **Piedra Luna** no se vende: es **una sola, escondida en el Monte Moon, y no se repone**. Se **gastan al usarlas**, como la piedra ex. Los puntos no se usan para nada de esto. Aún no hay carta jugable de ninguna evolución por piedra (D-20 §10.6, tarea 29).
 - **Objetivo: llegar a la Liga con al menos 12 ex entre el equipo y el PC**, con cartas de más de 200 PS, porque los rivales serán cada vez más fuertes. El equipo final es de 6 ex y el resto, en el PC para tener un equipo polivalente. Las cartas las crea Ayme a mano, así que no es un cuello de botella.
 
 Esto sustituye a mis propuestas anteriores (intercambio 2.000 y hacerse ex 4.000; tres piedras de premio en las medallas 4, 6 y 8; unos 10 ex posibles).
@@ -210,7 +211,28 @@ Suman unos **20.680** más 1.000 de salida (**21.680**). Salen de **4 a 6 piedra
 
 **Por qué 2.000 con este objetivo.** Antes me parecía barato. Con las piedras de premio, la escasez ya no la pone el precio sino las medallas mínimas y el ritmo de las evoluciones. Un precio mayor (3.000 o 4.000) obligaría a subir el dinero de los tramos ×1,5 o más, o a dejar de comprar Balls y Pociones.
 
-**Dónde se vende:** en la tienda del centro Pokémon, como la Super Ball y la Ultra Ball.
+**Dónde se vende:** en la tienda del centro Pokémon, como la Super Ball y la Ultra Ball (la piedra ex, desde la 2.ª medalla, D-20 §10.6).
+
+#### Cuadre con las piedras evolutivas (revisado el 2026-11-27)
+
+Las piedras evolutivas son un gasto nuevo en el mismo bolsillo de dinero, y **solo existen desde la 4.ª medalla**, así que se pagan con el dinero de los tramos 5 a 8 (2.660 + 2.810 + 2.960 + 3.110 = **11.540**) más lo que sobre antes.
+
+| Concepto | Dinero |
+|---|---|
+| Dinero total de la campaña (curva de arriba, con la salida de 1.000) | 21.680 |
+| Pokéballs y Pociones (suposición mía, sin medir) | 8.000 a 12.000 |
+| 4 piedras ex compradas (para 12 ex: 8 de premio y 4 compradas, 2.000 cada una) | 8.000 |
+| **Queda para piedras evolutivas** | **1.680 a 5.680** |
+| Cuatro piedras evolutivas compradas (4 × 2.100) | 8.400 |
+
+**Resultado:**
+
+- Con el gasto supuesto **no caben las cuatro** piedras evolutivas **y** los 12 ex a la vez: caben de **0 a 2** piedras evolutivas (2.100 cada una) sin bajar de 12 ex.
+- Si se compraran las cuatro, los ex bajarían a unos **8 a 10** (2 piedras ex compradas con 8.000 en Pokéballs y Pociones, y ninguna con 12.000).
+- **Hoy no hay problema real**, porque ninguna evolución por piedra tiene carta jugable (D-20 §10.6): la demanda es de **0 piedras** y el 12 ex sigue cuadrando. El problema aparecerá cuando Ayme haga las cartas de Raichu, Starmie y las demás.
+- La **Piedra Luna** no cuesta dinero, así que no entra en la cuenta. Al ser única, solo una evolución por Luna será posible por partida salvo que se repita la campaña.
+
+**PROPUESTA (para Ayme, sin urgencia):** no cambiar ningún precio (la piedra ex sigue en 2.000 y las evolutivas en 2.100, que es el de los juegos) ni la curva de +150 por ahora, y **revisarlo cuando existan las cartas de las evoluciones por piedra**. Si entonces el jugador no llega, las palancas son subir el dinero de los tramos 5 a 8 (unos +700 a +1.700 por tramo para pagar las cuatro) o limitar las piedras evolutivas a una por tipo. Calidad debe incluir estas piedras al medir cuántos ex llegan a la Liga (más abajo).
 
 #### El verdadero cuello de botella: capturas y XP, no las piedras
 
@@ -220,7 +242,7 @@ Esto no es decisión mía, pero **Diseño y Calidad deben medirlo antes de dar p
 
 #### Qué se espera medir (Calidad)
 
-- Cuántos ex puede tener un jugador al llegar a la Liga, con la XP y el dinero de la ruta principal y sin repetir salvajes. Todo parte de la suposición de ~2.060 por tramo y de mi estimación de gasto, **sin medir**.
+- Cuántos ex puede tener un jugador al llegar a la Liga, con la XP y el dinero de la ruta principal y sin repetir salvajes, **y cuántas piedras evolutivas compra por el camino**. Todo parte de la suposición de ~2.060 por tramo y de mi estimación de gasto, **sin medir**.
 - Con 6 ex de más de 200 PS como punto de partida, la **Liga** (objetivo del 25 %, D-20 §10.7) se calibra con ese poder, no con el de un equipo normal.
 - Si con tantos ex el equipo sale **demasiado fuerte**, las palancas son el dinero por tramo y las piedras de premio, no el precio.
 
@@ -333,11 +355,11 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 
 **Tres ideas** (en este orden):
 
-1. **Es el Pokémon de siempre, pero en cartas, y se juega solo.** Eliges un inicial, recorres Kanto, capturas y ganas la medalla de Brock. No hace falta mesa, ni cartas físicas, ni amigos.
-2. **Es una versión de prueba.** Hoy llega de Pueblo Paleta a Brock. El resto de Kanto llega con actualizaciones.
+1. **Es el Pokémon de siempre, pero en cartas, y se juega solo.** Eliges un inicial, recorres Kanto, capturas y ganas las medallas de Brock y de Misty. No hace falta mesa, ni cartas físicas, ni amigos.
+2. **Es una versión de prueba.** Hoy llega de Pueblo Paleta a Ciudad Celeste: la Medalla Roca (Brock) y la **Medalla Cascada (Misty)**. El resto de Kanto llega con actualizaciones.
 3. **Lo que ganas sirve fuera.** Los puntos van a tu cuenta y se gastan en la tienda (cuando abra) y suman para desbloquear jefes de las incursiones.
 
-**Lo que no se promete**: la tienda (aún no existe), la Liga, las cartas del formato digital, el tiempo que dura el primer tramo (sin medir hasta el primer playtest), ni que se pueda jugar sin cuenta (la campaña exige sesión).
+**Lo que no se promete**: la tienda (aún no existe), la Liga, las cartas del formato digital, el tiempo que dura el recorrido hasta Misty (hasta que lo midan los playtests de Calidad), ni que se pueda jugar sin cuenta (la campaña exige sesión).
 
 **Riesgos que hay que decir de entrada** (mejor sin sorpresas):
 
@@ -348,7 +370,7 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 **Borrador del mensaje al grupo** (tono de grupo de WhatsApp, para que Ayme lo adapte):
 
 > Ya se puede probar el **modo campaña** de Incursiones 🎮
-> Es como un Pokémon de cartas para jugar **solo**: eliges inicial en Pueblo Paleta, recorres Kanto, capturas y llegas hasta la medalla de Brock. De momento solo ese tramo; el resto irá llegando.
+> Es como un Pokémon de cartas para jugar **solo**: eliges inicial en Pueblo Paleta, recorres Kanto, capturas y llegas hasta la Medalla Cascada de Misty (pasando antes por Brock y por el Monte Moon). De momento solo hasta ahí; el resto irá llegando.
 > Lo que ganas se guarda como **puntos** en tu cuenta: servirán para la tienda y para desbloquear jefes de las incursiones.
 > Ojo: es versión de prueba. Para jugar necesitas tu cuenta de Deck Tracker (créala antes), y la partida se guarda también en tu cuenta.
 > Enlace: [enlace]. Es solo para nosotros, no lo paséis fuera 🙏
@@ -358,7 +380,7 @@ Se usan siempre las mismas palabras (las de §1.1): **energía**, **XP**, **dine
 
 | Fase | Quién | Qué se hace | Se pasa a la siguiente cuando |
 |---|---|---|---|
-| **0. Ayme solo** | Ayme | Juega el tramo entero y mide cuánto dura | El tramo se completa sin bloqueos y se conoce la duración |
+| **0. Ayme solo** | Ayme | Juega el recorrido entero hasta Misty (tramos 1 y 2) y mide cuánto dura | El recorrido se completa sin bloqueos y se conoce la duración de cada tramo |
 | **1. Probadores** | 2 o 3 amigos cercanos | Una sesión cada uno, con Ayme mirando sin ayudar y apuntando en `docs/playtests/PLANTILLA.md` | Nadie se queda parado más de un minuto sin saber qué hacer |
 | **2. Grupo entero** | Todos | Mensaje de §4.3 y un único canal para opiniones | — |
 
@@ -387,6 +409,8 @@ El primer combate es en la **Ruta 1** (un Pidgey o un Rattata salvajes). Hay un 
 
 **Qué no se explica en el primer combate:** efectos y veneno, debilidades, evolución, la tienda, el PC y los puntos de cuenta. Si se mete todo, el jugador no retiene nada.
 
+**Revisado el 2026-11-27: el tutorial del primer combate sigue siendo válido.** La Ruta 1 permite capturar, pero la mochila de salida lleva 0 Pokéballs y la primera tienda es el Centro Pokémon de Ciudad Verde (D-20 §10.9, corregido el 2026-11-23), así que la primera vez no hay con qué capturar, y después se puede volver a la Ruta 1. El mensaje de la última fila de la tabla de arriba lo dice tal cual. Con la salida de 1.000 de dinero (§2.5) alcanza para Pokéballs en esa primera tienda (200 cada una).
+
 **Calendario de lo demás** (cuándo aparece cada concepto, siguiendo el recorrido de Kanto):
 
 | Dónde | Qué se explica |
@@ -396,6 +420,10 @@ El primer combate es en la **Ruta 1** (un Pidgey o un Rattata salvajes). Hay un 
 | Bosque Verde (Cazabichos) | El veneno y que los efectos quedan sobre el rival |
 | Conversación antes de Pikachu | La **debilidad** (×2) y el aviso de que el jefe llama a un aliado |
 | Pikachu | Cambiar de Pokémon cuesta el turno; el aliado del jefe |
+| Al ganar la Medalla Roca | La **piedra ex** de premio: «¡Has ganado la Medalla Roca y una Piedra ex! Servirá cuando tengas 2 medallas.» (D-20 §10.6) |
+| Ruta 3 | Elegir entre un Spearow y un Nidoran♂: es una elección, no hay respuesta mala |
+| Monte Moon | El jefe Clefairy se puede capturar la primera vez (D-20 §10.8); una piedra escondida no se anuncia |
+| Ciudad Celeste (Misty) | Con 2 medallas, la piedra ex ya sirve: «Hacerse ex» desde la hoja del Pokémon |
 | Menú del equipo | La XP y la evolución (solo cuando hay XP suficiente) |
 | Pantalla de inicio | Los puntos y la tienda (solo cuando la tienda exista) |
 
@@ -405,6 +433,7 @@ El tutorial enlaza con la issue **#264** (tutorial «cuando la base del juego es
 
 - Nada sobre la **Liga** ni sobre campañas nuevas: no están diseñadas.
 - Nada sobre **sobres** hasta que existan cartas digitales.
+- Nada sobre las **piedras evolutivas** (Trueno, Agua, Fuego, Hoja y Luna) hasta Ciudad Azulona: no están en el tramo jugable. La **Piedra Luna** del Monte Moon no se anuncia: se encuentra, o no.
 - Nada de **precios** de la tienda hasta que exista la tienda: los precios de §2.3 están decididos, pero la tienda aún no está construida.
 
 ## 5. Qué cambia en otros documentos y qué necesita cada sector
