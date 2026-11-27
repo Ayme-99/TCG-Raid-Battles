@@ -20,18 +20,18 @@
         "zonas": [
           {
             "accion": "inicial",
-            "x": 0.3,
-            "y": 0.3,
-            "ancho": 0.4,
-            "alto": 0.4
+            "x": 0.1875,
+            "y": 0.0368,
+            "ancho": 0.3073,
+            "alto": 0.5607
           },
           {
             "accion": "ir",
             "destino": "ruta-1",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.5781,
+            "y": 0.0,
+            "ancho": 0.1094,
+            "alto": 0.1746
           }
         ]
       }
@@ -233,26 +233,26 @@
           {
             "accion": "ir",
             "destino": "ciudad-verde",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.1979,
+            "y": 0.1562,
+            "ancho": 0.2604,
+            "alto": 0.3493
           },
           {
             "accion": "ir",
             "destino": "ruta-22",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.0,
+            "y": 0.5699,
+            "ancho": 0.0781,
+            "alto": 0.1838
           },
           {
             "accion": "ir",
             "destino": "ruta-2",
-            "x": 0.9,
-            "y": 0.5,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.5677,
+            "y": 0.0,
+            "ancho": 0.0938,
+            "alto": 0.1287
           }
         ]
       }
@@ -995,7 +995,7 @@
       "tipo": "combate",
       "nombre": "Ruta 3: Joven",
       "salidas": [
-        "centro-monte-moon"
+        "ruta-3-final"
       ],
       "zona": "ruta-3",
       "rival": "entrenador",
@@ -1017,6 +1017,83 @@
           {
             "accion": "ir",
             "destino": "ruta-3-chica",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-final",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-3-final",
+      "tipo": "bifurcacion",
+      "nombre": "Ruta 3 (final)",
+      "salidas": [
+        "ruta-3-salvaje",
+        "centro-monte-moon"
+      ],
+      "escena": {
+        "imagen": "ruta-3",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "ruta-3-joven",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-salvaje",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "centro-monte-moon",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-3-salvaje",
+      "tipo": "combate",
+      "nombre": "Ruta 3: hierba alta",
+      "salidas": [
+        "centro-monte-moon"
+      ],
+      "zona": "ruta-3",
+      "rival": "salvaje",
+      "opcional": true,
+      "escena": {
+        "imagen": "ruta-3",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-final",
             "x": 0.0,
             "y": 0.1,
             "ancho": 0.1,
@@ -1066,11 +1143,19 @@
           },
           {
             "accion": "ir",
-            "destino": "ruta-3-joven",
+            "destino": "ruta-3-final",
             "x": 0.0,
             "y": 0.1,
             "ancho": 0.1,
-            "alto": 0.8
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-3-salvaje",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
           },
           {
             "accion": "ir",
@@ -1255,7 +1340,7 @@
       "tipo": "combate",
       "nombre": "Ruta 4: Sandshrew",
       "salidas": [
-        "centro-celeste"
+        "ruta-4-final"
       ],
       "zona": "ruta-4",
       "rival": "salvaje",
@@ -1282,7 +1367,7 @@
           },
           {
             "accion": "ir",
-            "destino": "centro-celeste",
+            "destino": "ruta-4-final",
             "x": 0.9,
             "y": 0.1,
             "ancho": 0.1,
@@ -1296,7 +1381,7 @@
       "tipo": "combate",
       "nombre": "Ruta 4: Rattata",
       "salidas": [
-        "centro-celeste"
+        "ruta-4-final"
       ],
       "zona": "ruta-4",
       "rival": "salvaje",
@@ -1316,6 +1401,91 @@
           {
             "accion": "ir",
             "destino": "ruta-4",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4-final",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-4-final",
+      "tipo": "bifurcacion",
+      "nombre": "Ruta 4 (final)",
+      "salidas": [
+        "ruta-4-salvaje",
+        "centro-celeste"
+      ],
+      "escena": {
+        "imagen": "ruta-4",
+        "zonas": [
+          {
+            "accion": "ir",
+            "destino": "ruta-4-sandshrew",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4-rattata",
+            "x": 0.0,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4-salvaje",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.4
+          },
+          {
+            "accion": "ir",
+            "destino": "centro-celeste",
+            "x": 0.9,
+            "y": 0.5,
+            "ancho": 0.1,
+            "alto": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ruta-4-salvaje",
+      "tipo": "combate",
+      "nombre": "Ruta 4: hierba alta",
+      "salidas": [
+        "centro-celeste"
+      ],
+      "zona": "ruta-4",
+      "rival": "salvaje",
+      "opcional": true,
+      "escena": {
+        "imagen": "ruta-4",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "ruta-4-final",
             "x": 0.0,
             "y": 0.1,
             "ancho": 0.1,
@@ -1365,7 +1535,7 @@
           },
           {
             "accion": "ir",
-            "destino": "ruta-4-sandshrew",
+            "destino": "ruta-4-final",
             "x": 0.0,
             "y": 0.1,
             "ancho": 0.1,
@@ -1373,7 +1543,7 @@
           },
           {
             "accion": "ir",
-            "destino": "ruta-4-rattata",
+            "destino": "ruta-4-salvaje",
             "x": 0.0,
             "y": 0.5,
             "ancho": 0.1,

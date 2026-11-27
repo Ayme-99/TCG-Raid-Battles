@@ -62,6 +62,10 @@ enum AccionZona {
   curar,
   tienda,
   pc,
+
+  /// Coger el objeto escondido del nodo ([NodoRuta.objeto]; la Piedra Luna,
+  /// D-20 §10.6). Solo en un nodo que lo tenga.
+  recoger,
 }
 
 /// Una zona pulsable de una escena: un rectángulo en coordenadas relativas a
@@ -162,6 +166,12 @@ class NodoRuta {
   /// Balls mejores piden además medallas (D-20 §10.6).
   final List<String> tienda;
 
+  /// Objeto escondido en el nodo (nombre de `ObjetoCampana`, p. ej.
+  /// `piedraLuna`), o null. Se coge una sola vez por partida y no se repone
+  /// (D-20 §10.6, decidido el 2026-11-27). Cualquier tipo de nodo; su escena
+  /// lleva una zona `recoger`.
+  final String? objeto;
+
   /// Si en este nodo se cura el equipo y pasa a ser el sitio al que se vuelve
   /// al perder: un descanso o una conversación que cura.
   bool get curaEquipo =>
@@ -186,6 +196,7 @@ class NodoRuta {
     this.cura = false,
     this.escena,
     this.tienda = const [],
+    this.objeto,
   });
 }
 
@@ -472,6 +483,14 @@ class RegionCampana {
         }
       }
       final acciones = {for (final z in e.zonas) z.accion};
+      if (n.objeto != null && !acciones.contains(AccionZona.recoger)) {
+        p.add('${n.id}: esconde un objeto y su escena necesita una zona '
+            '"recoger".');
+      }
+      if (n.objeto == null && acciones.contains(AccionZona.recoger)) {
+        p.add('${n.id}: la zona "recoger" pide un objeto escondido en el '
+            'nodo.');
+      }
       for (final a in accionesDeTipo(n.tipo)) {
         if (!acciones.contains(a)) {
           p.add('${n.id}: la escena de un ${n.tipo.name} necesita una zona '

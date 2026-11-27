@@ -280,6 +280,45 @@ void main() {
       }
     });
 
+    test('Pueblo Paleta y Ciudad Verde usan las zonas de Arte (#504)', () {
+      Map<String, List<double>> arte(String escena) => {
+            for (final z in leer(File(
+                    '../docs/diseno-ui/escenas/$escena.zonas.json'))['zonas']
+                as List)
+              (z as Map)['id'] as String: [
+                for (final v in z['rel'] as List) (v as num).toDouble()
+              ]
+          };
+      final paleta = arte('pueblo-paleta');
+      final verde = arte('ciudad-verde');
+      void igual(ZonaPulsable z, List<double>? rel, String id) =>
+          expect([z.x, z.y, z.ancho, z.alto], rel, reason: id);
+      ZonaPulsable de(String nodo, AccionZona a, [String? destino]) =>
+          kanto.nodo(nodo).escena!.zonas.singleWhere(
+              (z) => z.accion == a && z.destino == destino);
+
+      // Pueblo Paleta: el laboratorio elige el inicial y el camino de
+      // arriba sale a la Ruta 1. Las casas son decorado.
+      expect(kanto.nodo('pueblo-paleta').escena!.imagen, 'pueblo-paleta');
+      expect(kanto.nodo('pueblo-paleta').escena!.zonas, hasLength(2));
+      igual(de('pueblo-paleta', AccionZona.inicial), paleta['laboratorio'],
+          'laboratorio');
+      igual(de('pueblo-paleta', AccionZona.ir, 'ruta-1'), paleta['ruta-1'],
+          'ruta-1');
+
+      // Ciudad Verde (la ciudad; el centro es otro nodo): el edificio del
+      // centro vuelve a él, la izquierda va a la Ruta 22 y arriba a la
+      // Ruta 2. La entrada de abajo no lleva a ningún vecino.
+      expect(kanto.nodo('ciudad-verde-salida').escena!.imagen, 'ciudad-verde');
+      expect(kanto.nodo('ciudad-verde-salida').escena!.zonas, hasLength(3));
+      igual(de('ciudad-verde-salida', AccionZona.ir, 'ciudad-verde'),
+          verde['centro-pokemon'], 'centro-pokemon');
+      igual(de('ciudad-verde-salida', AccionZona.ir, 'ruta-22'),
+          verde['salida-ruta-22'], 'salida-ruta-22');
+      igual(de('ciudad-verde-salida', AccionZona.ir, 'ruta-2'),
+          verde['salida-ruta-2'], 'salida-ruta-2');
+    });
+
     test('Ciudad Verde tiene centro Pokémon y la Ruta 22 es un desvío opcional',
         () {
       expect(kanto.nodo('ciudad-verde').tipo, TipoNodo.descanso);
@@ -327,10 +366,16 @@ void main() {
     });
 
     test('los únicos nodos opcionales son la Ruta 22, la Ruta 2 norte, la '
-        'galería del Monte Moon y la Ruta 24', () {
+        'Ruta 3, la galería del Monte Moon, la Ruta 4 y la Ruta 24', () {
       final opcionales = kanto.nodos.values.where((n) => n.opcional).toList();
-      expect(opcionales.map((n) => n.id),
-          ['ruta-22', 'ruta-2-norte-salvaje', 'monte-moon-galeria', 'ruta-24']);
+      expect(opcionales.map((n) => n.id), [
+        'ruta-22',
+        'ruta-2-norte-salvaje',
+        'ruta-3-salvaje',
+        'monte-moon-galeria',
+        'ruta-4-salvaje',
+        'ruta-24',
+      ]);
     });
 
     // Tramo 2 (D-20 §4, «Segundo tramo»; #513).
@@ -344,8 +389,28 @@ void main() {
       expect([chica.clase, joven.clase], ['Chica', 'Joven']);
       expect(chica.pokemon, ['rattata', 'nidoran-f']);
       expect(joven.pokemon, ['spearow', 'rattata']);
-      expect(joven.salidas, ['centro-monte-moon']);
+      expect(joven.salidas, ['ruta-3-final']);
       expect(kanto.nodo('centro-monte-moon').tipo, TipoNodo.descanso);
+    });
+
+    // Salvajes opcionales al azar de la zona (Ayme, 2026-11-27; #543): así
+    // salen Jigglypuff en la Ruta 3 y Ekans en la Ruta 4.
+    test('las Rutas 3 y 4 tienen un salvaje opcional al azar de su zona', () {
+      for (final (ruta, raro, siguiente) in [
+        ('ruta-3', 'jigglypuff', 'centro-monte-moon'),
+        ('ruta-4', 'ekans', 'centro-celeste'),
+      ]) {
+        final fin = kanto.nodo('$ruta-final');
+        expect(fin.tipo, TipoNodo.bifurcacion, reason: ruta);
+        expect(fin.salidas, ['$ruta-salvaje', siguiente], reason: ruta);
+        final s = kanto.nodo('$ruta-salvaje');
+        expect(s.opcional, isTrue, reason: ruta);
+        expect(s.rival, RivalDeCombate.salvaje, reason: ruta);
+        expect(s.zona, ruta, reason: ruta);
+        expect(s.pokemon, isEmpty, reason: '$ruta: sale al azar de la zona');
+        expect(s.salidas, [siguiente], reason: ruta);
+        expect(salvajes[ruta], contains(raro), reason: ruta);
+      }
     });
 
     test('Monte Moon: galería opcional y el jefe Clefairy', () {
@@ -365,7 +430,7 @@ void main() {
       expect(r.salidas.map((id) => kanto.nodo(id).pokemon),
           [['sandshrew'], ['rattata']]);
       for (final id in r.salidas) {
-        expect(kanto.nodo(id).salidas, ['centro-celeste']);
+        expect(kanto.nodo(id).salidas, ['ruta-4-final']);
       }
     });
 
@@ -780,11 +845,13 @@ void main() {
         'ruta-3-nidoran-m',
         'ruta-3-chica',
         'ruta-3-joven',
+        'ruta-3-final',
         'centro-monte-moon',
         'monte-moon',
         'jefe-clefairy',
         'ruta-4',
         'ruta-4-sandshrew',
+        'ruta-4-final',
         'centro-celeste',
         'celeste-salida',
         'gimnasio-luis',
@@ -798,6 +865,8 @@ void main() {
       expect(p.jefesDerrotados, {'pikachu-jefe', 'clefairy-jefe'});
       expect(p.superados, isNot(contains('monte-moon-galeria')));
       expect(p.superados, isNot(contains('ruta-24')));
+      expect(p.superados, isNot(contains('ruta-3-salvaje')));
+      expect(p.superados, isNot(contains('ruta-4-salvaje')));
       expect(p.superados, isNot(contains('ruta-22')));
       expect(p.superados, isNot(contains('ruta-2-norte-salvaje')));
       expect(p.superados, isNot(contains('ruta-1-rattata')));

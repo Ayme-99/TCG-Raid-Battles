@@ -359,6 +359,10 @@ class ControladorCampana extends Notifier<EstadoCampana> {
 
   void conversar(CatalogoCampana c) => _guardar(_partida.conversar(c));
 
+  /// Coge el objeto escondido del nodo (la Piedra Luna, D-20 §10.6).
+  void recogerObjeto(CatalogoCampana c) =>
+      _guardar(_partida.recogerObjeto(c));
+
   void moverPc(CatalogoCampana c, {int? deEquipo, int? dePc}) =>
       _guardar(_partida.moverPc(c,
           deEquipo: deEquipo, dePc: dePc, parametros: parametrosCampana));
