@@ -437,5 +437,27 @@
     ],
     "zonas": [],
     "nota": "Seta roja pequeña."
+  },
+  "acantilado": {
+    "svg": "sprites/acantilado.svg",
+    "ancho": 576,
+    "alto": 224,
+    "ancla": [
+      288.0,
+      178
+    ],
+    "zonas": [],
+    "nota": "Acantilado gris de roca con repisas (borde de colina)."
+  },
+  "roca-grande": {
+    "svg": "sprites/roca-grande.svg",
+    "ancho": 216,
+    "alto": 168,
+    "ancla": [
+      108.0,
+      122
+    ],
+    "zonas": [],
+    "nota": "Peñasco grande gris."
   }
 }

@@ -26,8 +26,9 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `planta`, `sofa`, `alfombra-puerta` | Decoración de interior | nuevos | Centro Pokémon (interior) |
 | `cartel`, `seto`, `arbol-oscuro`, `tronco`, `hongo` | Decoración de bosque y bifurcación | nuevos | Ruta 2 sur |
 | (reutiliza) `arbol-oscuro`, `arbol-2`, `hierba-alta-media`, `tronco`, `hongo` | Bosque denso; claros = elipses de material `hierba` sin objeto | — | Bosque Verde |
+| `acantilado`, `roca-grande` | Colina rocosa, peñasco | nuevos | Ruta 2 norte |
 
-Fondos de escena: `cesped` (por defecto) y `suelo-centro` (interior con pared y losas).
+Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada) y `suelo-centro` (interior con pared y losas).
 
 Materiales de camino: `tierra`, `piedra`, `hierba` y `agua` (río, con brillos) (en `componer.py`).
 

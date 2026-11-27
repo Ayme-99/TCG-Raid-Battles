@@ -50,8 +50,10 @@ def main(ruta):
         for x in (330, 760, 1160, 1590): pared += f'<rect x="{x}" y="70" width="170" height="120" rx="10" fill="#b4e1f7" stroke="{INK}" stroke-width="6"/><path d="M{x+85} 70 v120 M{x} 130 h170" stroke="{INK}" stroke-width="4"/>'
         body = f'<rect y="330" width="{W}" height="{H-330}" fill="url(#losas)"/>' + pared + body
         defs_x = sue
+    elif fondo == "seco":
+        defs_x = '<linearGradient id="seco" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cf7a"/><stop offset="1" stop-color="#c8bc62"/></linearGradient>'
     else: defs_x = ""
-    svg = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">{defs()}{defs_x}<rect width="{W}" height="{H}" fill="url(#{fondo if fondo != "suelo-centro" else "cesped"})"/>{body}</svg>'
+    svg = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">{defs()}{defs_x}<rect width="{W}" height="{H}" fill="url(#{fondo if fondo in ("seco",) else "cesped"})"/>{body}</svg>'
     os.makedirs("render", exist_ok=True)
     open(f"render/{nombre}.svg", "w").write(svg)
     subprocess.run(["rsvg-convert", "-w", str(W), f"render/{nombre}.svg", "-o", f"render/{nombre}.png"], check=True)
