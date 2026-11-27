@@ -1,0 +1,246 @@
+{
+ "escena": "ruta-3",
+ "nota": "Ruta 3. Entrada por abajo (viene de Ciudad Plateada); el camino se parte en dos ramales alrededor de un peñasco: hierba izquierda = Spearow (ir a ruta-3-spearow), derecha = Nidoran♂ (ir a ruta-3-nidoran-m). Se reúnen arriba y salen hacia el Monte Moon. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {
+   "material": "tierra",
+   "ancho": 280,
+   "d": "M960 1130 C955 1000 950 940 950 860"
+  },
+  {
+   "material": "tierra",
+   "ancho": 190,
+   "d": "M950 880 C900 800 700 760 640 600 C600 470 720 330 880 260 C930 235 955 190 960 -40"
+  },
+  {
+   "material": "tierra",
+   "ancho": 190,
+   "d": "M950 880 C1000 800 1220 760 1280 600 C1320 470 1200 330 1040 260 C990 235 965 190 960 -40"
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "roca-grande",
+   "x": 960,
+   "y": 620,
+   "escala": 1.6
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 960,
+   "y": 510,
+   "escala": 1.2
+  },
+  {
+   "sprite": "hierba-alta-media",
+   "x": 520,
+   "y": 560,
+   "escala": 1.0,
+   "id": "hierba-spearow",
+   "acciones": {
+    "cuerpo": {
+     "accion": "ir",
+     "destino": "ruta-3-spearow"
+    }
+   }
+  },
+  {
+   "sprite": "hierba-alta-media",
+   "x": 1400,
+   "y": 560,
+   "escala": 1.0,
+   "id": "hierba-nidoran",
+   "flip": true,
+   "acciones": {
+    "cuerpo": {
+     "accion": "ir",
+     "destino": "ruta-3-nidoran-m"
+    }
+   }
+  },
+  {
+   "sprite": "cartel",
+   "x": 790,
+   "y": 900
+  },
+  {
+   "sprite": "cartel",
+   "x": 1130,
+   "y": 900
+  },
+  {
+   "sprite": "roca",
+   "x": 90,
+   "y": 150,
+   "escala": 1.1
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 300,
+   "y": 90
+  },
+  {
+   "sprite": "roca",
+   "x": 1800,
+   "y": 150,
+   "escala": 1.1
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1600,
+   "y": 90
+  },
+  {
+   "sprite": "roca",
+   "x": 560,
+   "y": 170,
+   "escala": 0.9
+  },
+  {
+   "sprite": "roca",
+   "x": 1360,
+   "y": 180,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 120,
+   "y": 1020
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1800,
+   "y": 1020
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 300,
+   "y": 930,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1640,
+   "y": 940,
+   "escala": 0.8
+  },
+  {
+   "sprite": "roca",
+   "x": 400,
+   "y": 340
+  },
+  {
+   "sprite": "roca",
+   "x": 1530,
+   "y": 360
+  },
+  {
+   "sprite": "roca",
+   "x": 700,
+   "y": 950,
+   "escala": 0.9
+  },
+  {
+   "sprite": "roca",
+   "x": 1250,
+   "y": 960,
+   "escala": 0.9
+  },
+  {
+   "sprite": "roca",
+   "x": 300,
+   "y": 740
+  },
+  {
+   "sprite": "roca",
+   "x": 1650,
+   "y": 780,
+   "flip": true
+  },
+  {
+   "sprite": "roca",
+   "x": 210,
+   "y": 400
+  },
+  {
+   "sprite": "roca",
+   "x": 1700,
+   "y": 420
+  },
+  {
+   "sprite": "roca",
+   "x": 360,
+   "y": 860
+  },
+  {
+   "sprite": "arbusto",
+   "x": 780,
+   "y": 240,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1150,
+   "y": 230,
+   "escala": 0.9
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 470,
+   "y": 900
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1470,
+   "y": 880
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 640,
+   "y": 380
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1290,
+   "y": 400
+  },
+  {
+   "sprite": "acantilado",
+   "x": 300,
+   "y": 130,
+   "escala": 1.0
+  },
+  {
+   "sprite": "acantilado",
+   "x": 1640,
+   "y": 130,
+   "escala": 1.0
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  },
+  {
+   "id": "salida-monte-moon",
+   "tipo": "borde-superior",
+   "accion": "ir",
+   "destino": "monte-moon",
+   "rect": [
+    820,
+    0,
+    280,
+    120
+   ]
+  }
+ ],
+ "fondo": "seco"
+}
