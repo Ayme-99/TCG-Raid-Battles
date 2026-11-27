@@ -136,6 +136,28 @@ def alfombra():
     p = PAD; w, h = 260, 120
     o = f'<rect x="{p}" y="{p}" width="{w}" height="{h}" rx="16" fill="#e0453c" stroke="{INK}" stroke-width="5"/><rect x="{p+16}" y="{p+16}" width="{w-32}" height="{h-32}" rx="10" fill="none" stroke="#f9d0cb" stroke-width="5"/>'
     sprite("alfombra-puerta", w, h, o, [], "Alfombra de entrada.")
+def cartel():
+    p = PAD
+    o = f'<ellipse cx="{p+30}" cy="{p+86}" rx="34" ry="7" fill="#1b4d2a" opacity=".25"/><rect x="{p+24}" y="{p+36}" width="12" height="52" fill="#a96f3f" stroke="{INK}" stroke-width="3"/><rect x="{p}" y="{p}" width="60" height="42" rx="6" fill="#d9a066" stroke="{INK}" stroke-width="4"/><path d="M{p+10} {p+14} h40 M{p+10} {p+26} h28" stroke="#a96f3f" stroke-width="4" stroke-linecap="round"/>'
+    sprite("cartel", 60, 88, o, [], "Cartel de madera sin texto (ruta, bifurcación).")
+def seto(w=300, id="seto"):
+    p = PAD; o = f'<ellipse cx="{p+w/2}" cy="{p+66}" rx="{w/2+8}" ry="9" fill="#1b4d2a" opacity=".25"/>'
+    n = int(w // 46)
+    for i in range(n): o += f'<circle cx="{p+30+i*(w-60)/max(n-1,1)}" cy="{p+34}" r="34" fill="#2f9a4e" stroke="{INK}" stroke-width="4"/>'
+    for i in range(n): o += f'<circle cx="{p+30+i*(w-60)/max(n-1,1)-4}" cy="{p+26}" r="18" fill="#52c46a" opacity=".6"/>'
+    sprite(id, w, 70, o, [], "Seto denso (separa ramales).")
+def arbol_oscuro():
+    p = PAD; r = 50; cx = p + r * 1.1; cy = p + r * 1.05
+    o = tree(cx, cy, r).replace("#3aa85a", "#1f6e3a").replace("#2a8a47", "#17562d").replace("#7fd77c", "#3f9a5a")
+    sprite("arbol-oscuro", r * 2.2, r * 2.25, o, [], "Árbol de copa oscura (bosque).")
+def tronco():
+    p = PAD
+    o = f'<ellipse cx="{p+80}" cy="{p+40}" rx="86" ry="9" fill="#1b4d2a" opacity=".25"/><rect x="{p}" y="{p+4}" width="160" height="38" rx="18" fill="#a96f3f" stroke="{INK}" stroke-width="4"/><ellipse cx="{p+148}" cy="{p+23}" rx="12" ry="17" fill="#e0b27a" stroke="{INK}" stroke-width="3"/><path d="M{p+20} {p+12} h90" stroke="#c9895a" stroke-width="4" stroke-linecap="round"/><path d="M{p+10} {p+4} q20 -14 40 0" fill="#5fb85a" stroke="{INK}" stroke-width="2"/>'
+    sprite("tronco", 160, 44, o, [], "Tronco caído con musgo.")
+def hongo():
+    p = PAD
+    o = f'<ellipse cx="{p+20}" cy="{p+40}" rx="22" ry="5" fill="#1b4d2a" opacity=".25"/><rect x="{p+14}" y="{p+20}" width="12" height="20" rx="4" fill="#f4efe6" stroke="{INK}" stroke-width="3"/><path d="M{p} {p+24} q20 -34 40 0z" fill="#e0453c" stroke="{INK}" stroke-width="3"/><circle cx="{p+13}" cy="{p+14}" r="3" fill="#fff"/><circle cx="{p+26}" cy="{p+10}" r="3" fill="#fff"/>'
+    sprite("hongo", 40, 42, o, [], "Seta roja pequeña.")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -146,5 +168,6 @@ buzon(); farola(); arbol("arbol-1", 56, "Árbol redondo grande, copa clara."); a
 hierba_alta_sprite("hierba-alta-grande", 690, 820, 11, "Mancha grande de hierba alta (zona de combate de ruta).")
 hierba_alta_sprite("hierba-alta-media", 400, 300, 12, "Mancha de hierba alta mediana.")
 valla(); roca(); arbol2(); puente(); portico(); curar(); tienda_mostrador(); pc(); planta(); sofa(); alfombra()
+cartel(); seto(300,"seto"); arbol_oscuro(); tronco(); hongo()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")
