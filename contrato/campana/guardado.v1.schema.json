@@ -173,6 +173,10 @@
           "pattern": "^[A-Za-z0-9_-]{1,64}$",
           "description": "Id de la partida, que la app genera al empezarla (#374): los hitos se abonan una vez por partida."
         },
+        "recogidos": {
+          "$ref": "#/$defs/ids",
+          "description": "Nodos cuyo objeto escondido ya se ha cogido (la Piedra Luna, D-20 §10.6; #546): no se reponen."
+        },
         "hitosPendientes": {
           "type": "array",
           "maxItems": 500,

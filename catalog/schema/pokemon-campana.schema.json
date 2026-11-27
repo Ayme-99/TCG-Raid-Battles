@@ -313,8 +313,15 @@
             "description": "XP que gasta de la reserva común de la partida al evolucionar (D-20 §10.6): 50 para Caterpie y Weedle, 70 para un inicial."
           },
           "objeto": {
-            "type": "string",
-            "description": "Id del objeto de evolución: piedra-ex para hacerse ex (D-20 §2.1), piedra-trueno…"
+            "enum": [
+              "piedra-ex",
+              "piedra-trueno",
+              "piedra-agua",
+              "piedra-fuego",
+              "piedra-hoja",
+              "piedra-luna"
+            ],
+            "description": "Id del objeto de evolución: piedra-ex para hacerse ex (D-20 §2.1); las cinco piedras evolutivas (Trueno, Agua, Fuego, Hoja y Luna; §10.6, decidido el 2026-11-27, #508). Se gasta una al evolucionar."
           },
           "medallasMinimas": {
             "type": "integer",

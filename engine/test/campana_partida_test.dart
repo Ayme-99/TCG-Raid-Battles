@@ -519,6 +519,10 @@ void main() {
         ObjetoCampana.repelente: 350,
         ObjetoCampana.cuerdaHuida: 550,
         ObjetoCampana.piedraEx: 2000,
+        ObjetoCampana.piedraTrueno: 2100,
+        ObjetoCampana.piedraAgua: 2100,
+        ObjetoCampana.piedraFuego: 2100,
+        ObjetoCampana.piedraHoja: 2100,
       });
     });
 
@@ -1487,6 +1491,7 @@ void main() {
       expect(q.dinero, 500);
     });
 
+    // Ciudad Azulona aún no está en la región (acaba en Misty, #546).
     test('los centros de Kanto venden la piedra ex y ninguna Piedra Trueno',
         () {
       for (final n in c.region.nodos.values) {
@@ -1560,23 +1565,6 @@ void main() {
           reason: 'la piedra ex no es una evolución por XP');
     });
 
-    test('un objeto que aún no se puede conseguir no deja evolucionar', () {
-      final pika = leer(File('../catalog/campana/pokemon/pikachu.json'));
-      pika['evoluciones'] = [
-        {'a': 'rattata', 'via': 'objeto', 'objeto': 'piedra-trueno'},
-      ];
-      final c2 = CatalogoCampana(
-        pokemon: {...c.pokemon, 'pikachu': pokemonCampanaDesdeJson(pika)},
-        zonas: c.zonas,
-        jefes: c.jefes,
-        region: c.region,
-      );
-      final p = con(const [PokemonGuardado('pikachu', 60)], medallas: 8);
-      expect(objetoDeEvolucion('piedra-trueno'), isNull);
-      expect(p.motivoSinEvolucion(p.evolucionesDe(c2, 0).single),
-          'Aún no se puede conseguir ese objeto.');
-    });
-
     test('cada medalla nueva da una piedra ex; Brock da la primera', () {
       var p = PartidaCampana(
           progreso: const ProgresoRuta(nodoActual: 'gimnasio-brock'),
@@ -1604,6 +1592,201 @@ void main() {
           progreso: const ProgresoRuta(nodoActual: 'gimnasio-joven'),
           equipo: const [PokemonGuardado('squirtle', 80)]);
       expect(p.rival(c).piedrasEx, 0);
+    });
+  });
+
+  group('piedras evolutivas (D-20 §10.6, #508 y #546)', () {
+    // Una región como Kanto con un centro que vende las cuatro piedras y la
+    // Piedra Luna escondida en la galería del Monte Moon (el nodo de verdad
+    // está por decidir, #546).
+    Map<String, dynamic> regionJson(
+        {bool zonaRecoger = true, bool objeto = true}) {
+      final r = leer(File('../catalog/campana/regiones/kanto.json'));
+      for (final n in r['nodos'] as List) {
+        final nodo = n as Map<String, dynamic>;
+        if (nodo['id'] == 'centro-plateada') {
+          nodo['tienda'] = [
+            ...nodo['tienda'] as List,
+            'piedraTrueno',
+            'piedraAgua',
+            'piedraFuego',
+            'piedraHoja',
+            'piedraLuna',
+          ];
+        }
+        if (nodo['id'] == 'monte-moon-galeria') {
+          if (objeto) nodo['objeto'] = 'piedraLuna';
+          if (zonaRecoger) {
+            (nodo['escena']['zonas'] as List).add({
+              'accion': 'recoger',
+              'x': 0.8,
+              'y': 0.6,
+              'ancho': 0.1,
+              'alto': 0.1,
+            });
+          }
+        }
+      }
+      return r;
+    }
+
+    CatalogoCampana conRegion(Map<String, dynamic> r,
+            {Map<String, PokemonCampana>? pokemon}) =>
+        CatalogoCampana(
+          pokemon: pokemon ?? c.pokemon,
+          zonas: c.zonas,
+          jefes: c.jefes,
+          region: regionCampanaDesdeJson(r),
+        );
+
+    final c2 = conRegion(regionJson());
+
+    PartidaCampana en(String nodo,
+            {int medallas = 0,
+            int dinero = 0,
+            int xp = 0,
+            List<PokemonGuardado> equipo = const [
+              PokemonGuardado('squirtle', 80)
+            ],
+            Map<ObjetoCampana, int> mochila = const {}}) =>
+        PartidaCampana(
+          progreso: ProgresoRuta(
+              nodoActual: nodo,
+              visitados: {nodo},
+              medallas: {for (var i = 0; i < medallas; i++) 'm$i'}),
+          equipo: equipo,
+          dinero: dinero,
+          xp: xp,
+          mochila: mochila,
+        );
+
+    test('hay cinco piedras y cada id del catálogo gasta la suya', () {
+      expect(piedrasEvolutivas, [
+        ObjetoCampana.piedraTrueno,
+        ObjetoCampana.piedraAgua,
+        ObjetoCampana.piedraFuego,
+        ObjetoCampana.piedraHoja,
+        ObjetoCampana.piedraLuna,
+      ]);
+      expect(objetoDeEvolucion('piedra-trueno'), ObjetoCampana.piedraTrueno);
+      expect(objetoDeEvolucion('piedra-agua'), ObjetoCampana.piedraAgua);
+      expect(objetoDeEvolucion('piedra-fuego'), ObjetoCampana.piedraFuego);
+      expect(objetoDeEvolucion('piedra-hoja'), ObjetoCampana.piedraHoja);
+      expect(objetoDeEvolucion('piedra-luna'), ObjetoCampana.piedraLuna);
+      expect(objetoDeEvolucion(idPiedraEx), ObjetoCampana.piedraEx);
+      expect(objetoDeEvolucion('piedra-sol'), isNull);
+    });
+
+    test('Trueno, Agua, Fuego y Hoja cuestan 2.100 desde la 4.ª medalla; '
+        'la Luna no se vende', () {
+      const par = ParametrosCampana();
+      for (final o in piedrasEvolutivas.take(4)) {
+        expect(par.precios[o], 2100, reason: o.name);
+        expect(par.medallasParaComprar[o], 4, reason: o.name);
+      }
+      expect(par.precios[ObjetoCampana.piedraLuna], isNull);
+
+      final antes = en('centro-plateada', medallas: 3, dinero: 9000);
+      expect(antes.tienda(c2), isNot(contains(ObjetoCampana.piedraTrueno)));
+      expect(() => antes.comprar(c2, ObjetoCampana.piedraTrueno),
+          throwsA(isA<ReglaIncumplida>()));
+
+      final p = en('centro-plateada', medallas: 4, dinero: 5000);
+      expect(p.tienda(c2), containsAll(piedrasEvolutivas.take(4)));
+      expect(p.tienda(c2), isNot(contains(ObjetoCampana.piedraLuna)),
+          reason: 'aunque el centro la liste, no tiene precio');
+      expect(() => p.comprar(c2, ObjetoCampana.piedraLuna),
+          throwsA(isA<ReglaIncumplida>()));
+      final q = p.comprar(c2, ObjetoCampana.piedraFuego, cantidad: 2);
+      expect(q.cuantos(ObjetoCampana.piedraFuego), 2, reason: 'se apilan');
+      expect(q.dinero, 800);
+    });
+
+    test('evolucionar con una piedra gasta una, nada de XP, y deja 10 PS', () {
+      // Aún no hay carta de Raichu: Pikachu evoluciona en una de mentira.
+      final pika = leer(File('../catalog/campana/pokemon/pikachu.json'));
+      pika['evoluciones'] = [
+        {'a': 'rattata', 'via': 'objeto', 'objeto': 'piedra-trueno'},
+      ];
+      final c3 = CatalogoCampana(
+        pokemon: {...c.pokemon, 'pikachu': pokemonCampanaDesdeJson(pika)},
+        zonas: c.zonas,
+        jefes: c.jefes,
+        region: c.region,
+      );
+      expect(c3.problemas(), isEmpty);
+      final sin = en('centro-plateada',
+          equipo: const [PokemonGuardado('pikachu', 60)], xp: 40);
+      final e = sin.evolucionesDe(c3, 0).single;
+      expect(sin.motivoSinEvolucion(e), 'No tienes esa piedra.');
+      expect(() => sin.evolucionar(c3, 0, 'rattata'),
+          throwsA(isA<ReglaIncumplida>()));
+      final con = en('centro-plateada',
+          equipo: const [PokemonGuardado('pikachu', 60)],
+          mochila: const {
+            ObjetoCampana.piedraTrueno: 2,
+            ObjetoCampana.piedraAgua: 1,
+          }, xp: 40);
+      final p = con.evolucionar(c3, 0, 'rattata');
+      expect(p.equipo.single.id, 'rattata');
+      expect(p.equipo.single.ps, PartidaCampana.psAlEvolucionar);
+      expect(p.cuantos(ObjetoCampana.piedraTrueno), 1, reason: 'se gasta');
+      expect(p.cuantos(ObjetoCampana.piedraAgua), 1, reason: 'otra piedra');
+      expect(p.xp, 40);
+    });
+
+    test('una evolución con un objeto que no existe es un problema', () {
+      final pika = leer(File('../catalog/campana/pokemon/pikachu.json'));
+      pika['evoluciones'] = [
+        {'a': 'rattata', 'via': 'objeto', 'objeto': 'piedra-sol'},
+      ];
+      final c3 = CatalogoCampana(
+        pokemon: {...c.pokemon, 'pikachu': pokemonCampanaDesdeJson(pika)},
+        zonas: c.zonas,
+        jefes: c.jefes,
+        region: c.region,
+      );
+      expect(c3.problemas(),
+          contains('pikachu: evoluciona con "piedra-sol", que no es un objeto.'));
+    });
+
+    test('la Piedra Luna escondida se coge una vez y no se repone', () {
+      expect(c2.problemas(), isEmpty);
+      final p = en('monte-moon-galeria');
+      expect(p.puedeRecoger(c2), isTrue);
+      final q = p.recogerObjeto(c2);
+      expect(q.cuantos(ObjetoCampana.piedraLuna), 1);
+      expect(q.recogidos, {'monte-moon-galeria'});
+      expect(q.puedeRecoger(c2), isFalse);
+      expect(() => q.recogerObjeto(c2), throwsA(isA<ReglaIncumplida>()));
+      // Se guarda: tras cargar la partida tampoco vuelve a estar.
+      final cargada = PartidaCampana.desdeJson(
+          jsonDecode(jsonEncode(q.aJson())) as Map<String, dynamic>);
+      expect(cargada.recogidos, {'monte-moon-galeria'});
+      expect(cargada.puedeRecoger(c2), isFalse);
+      // Donde no hay nada escondido no se coge nada.
+      expect(en('monte-moon').puedeRecoger(c2), isFalse);
+      expect(() => en('monte-moon').recogerObjeto(c2),
+          throwsA(isA<ReglaIncumplida>()));
+      // Una partida sin recogidos no guarda el campo.
+      expect(p.aJson().containsKey('recogidos'), isFalse);
+    });
+
+    test('un objeto escondido necesita su zona «recoger» y al revés', () {
+      expect(
+          conRegion(regionJson(zonaRecoger: false)).problemas(),
+          contains('monte-moon-galeria: esconde un objeto y su escena '
+              'necesita una zona "recoger".'));
+      expect(
+          conRegion(regionJson(objeto: false)).problemas(),
+          contains('monte-moon-galeria: la zona "recoger" pide un objeto '
+              'escondido en el nodo.'));
+      final r = regionJson();
+      for (final n in r['nodos'] as List) {
+        if (n['id'] == 'monte-moon-galeria') n['objeto'] = 'piedraSol';
+      }
+      expect(conRegion(r).problemas(),
+          contains('monte-moon-galeria: esconde "piedraSol", que no es un objeto.'));
     });
   });
 }
