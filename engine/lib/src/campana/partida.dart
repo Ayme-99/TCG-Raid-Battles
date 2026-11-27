@@ -67,6 +67,12 @@ class ParametrosCampana {
       ObjetoCampana.cuerdaHuida: 550,
       // Decidido por Ayme el 2026-11-24 (D-21 §2.5).
       ObjetoCampana.piedraEx: 2000,
+      // Piedras evolutivas (Ayme, 2026-11-27, #508): las de los juegos, en
+      // la tienda de Ciudad Azulona. La Piedra Luna no se vende.
+      ObjetoCampana.piedraTrueno: 2100,
+      ObjetoCampana.piedraAgua: 2100,
+      ObjetoCampana.piedraFuego: 2100,
+      ObjetoCampana.piedraHoja: 2100,
     },
     this.medallasParaComprar = const {
       ObjetoCampana.superBall: 1,
@@ -75,6 +81,11 @@ class ParametrosCampana {
       ObjetoCampana.cuerdaHuida: 1,
       // Desde la medalla del ex más barato (Básico ex, 2; Ayme, 2026-11-24).
       ObjetoCampana.piedraEx: 2,
+      // Desde la 4.ª medalla, la de Azulona (Ayme, 2026-11-27, #508).
+      ObjetoCampana.piedraTrueno: 4,
+      ObjetoCampana.piedraAgua: 4,
+      ObjetoCampana.piedraFuego: 4,
+      ObjetoCampana.piedraHoja: 4,
     },
     this.psPocion = 20,
     this.piedrasExPorMedalla = 1,
@@ -111,13 +122,43 @@ enum ObjetoCampana {
   /// última fase normal. Se apila y se gasta una por ex. En el catálogo, el
   /// objeto de evolución [idPiedraEx].
   piedraEx,
+
+  /// Piedras evolutivas (D-20 §10.6, decidido el 2026-11-27, #508): hacen
+  /// evolucionar a los Pokémon cuya evolución lleva `"via": "objeto"` con su
+  /// id ([objetosDeEvolucion]). Se apilan y se gasta una al usarla. Trueno,
+  /// Agua, Fuego y Hoja se compran en Ciudad Azulona (2.100, desde la 4.ª
+  /// medalla); la Luna no se vende: hay una sola, escondida en el Monte Moon
+  /// (un nodo con `objeto`, [PartidaCampana.recogerObjeto]).
+  piedraTrueno,
+  piedraAgua,
+  piedraFuego,
+  piedraHoja,
+  piedraLuna,
 }
 
+/// Id de cada objeto de evolución del catálogo (`"objeto"` de una evolución
+/// con `"via": "objeto"`) y el objeto de la mochila que gasta.
+const objetosDeEvolucion = {
+  idPiedraEx: ObjetoCampana.piedraEx,
+  'piedra-trueno': ObjetoCampana.piedraTrueno,
+  'piedra-agua': ObjetoCampana.piedraAgua,
+  'piedra-fuego': ObjetoCampana.piedraFuego,
+  'piedra-hoja': ObjetoCampana.piedraHoja,
+  'piedra-luna': ObjetoCampana.piedraLuna,
+};
+
+/// Las cinco piedras evolutivas, en el orden de la mochila (#546).
+const piedrasEvolutivas = [
+  ObjetoCampana.piedraTrueno,
+  ObjetoCampana.piedraAgua,
+  ObjetoCampana.piedraFuego,
+  ObjetoCampana.piedraHoja,
+  ObjetoCampana.piedraLuna,
+];
+
 /// El objeto de la mochila que corresponde a un objeto de evolución del
-/// catálogo (`"objeto"` de una evolución), o null si no se puede tener (la
-/// Piedra Trueno aún no se obtiene, D-20 §10.11).
-ObjetoCampana? objetoDeEvolucion(String id) =>
-    id == idPiedraEx ? ObjetoCampana.piedraEx : null;
+/// catálogo (`"objeto"` de una evolución), o null si no existe.
+ObjetoCampana? objetoDeEvolucion(String id) => objetosDeEvolucion[id];
 
 /// Todo lo que una partida de campaña necesita del catálogo: los Pokémon, las
 /// zonas, los jefes y la región.
@@ -205,10 +246,20 @@ class CatalogoCampana {
         for (final z in zonas.values)
           for (final id in z.todosLosPokemon)
             if (!pokemon.containsKey(id)) 'zona ${z.id}: falta "$id".',
+        // Cada evolución por objeto gasta un objeto de la mochila (#546).
+        for (final p in pokemon.values)
+          for (final e in p.evoluciones)
+            if (e.via == ViaEvolucion.objeto &&
+                objetoDeEvolucion(e.objeto ?? '') == null)
+              '${p.id}: evoluciona con "${e.objeto}", que no es un objeto.',
         for (final n in region.nodos.values) ...[
           for (final id in n.tienda)
             if (!ObjetoCampana.values.any((o) => o.name == id))
               '${n.id}: la tienda vende "$id", que no es un objeto.',
+          // Un objeto escondido (la Piedra Luna, D-20 §10.6).
+          if (n.objeto != null &&
+              !ObjetoCampana.values.any((o) => o.name == n.objeto))
+            '${n.id}: esconde "${n.objeto}", que no es un objeto.',
           // Lo que paga cada entrenador y cada líder (D-20 §10.6).
           if (n.lider != null && n.lider!.dinero == null)
             '${n.id}: el líder no tiene "dinero".',
@@ -400,6 +451,10 @@ class PartidaCampana {
   /// Hitos ganados que aún no se han enviado a la cuenta, en orden (#374).
   final List<HitoCampana> hitosPendientes;
 
+  /// Nodos cuyo objeto escondido ya se ha cogido ([recogerObjeto]): no se
+  /// reponen (la Piedra Luna, D-20 §10.6, decidido el 2026-11-27).
+  final Set<String> recogidos;
+
   const PartidaCampana({
     required this.progreso,
     this.equipo = const [],
@@ -415,6 +470,7 @@ class PartidaCampana {
     this.ultimaCura,
     this.partidaId,
     this.hitosPendientes = const [],
+    this.recogidos = const {},
   });
 
   factory PartidaCampana.nueva(RegionCampana region,
@@ -459,6 +515,7 @@ class PartidaCampana {
     String? ultimaCura,
     String? partidaId,
     List<HitoCampana>? hitosPendientes,
+    Set<String>? recogidos,
   }) =>
       PartidaCampana(
         progreso: progreso ?? this.progreso,
@@ -477,6 +534,7 @@ class PartidaCampana {
         ultimaCura: ultimaCura ?? this.ultimaCura,
         partidaId: partidaId ?? this.partidaId,
         hitosPendientes: hitosPendientes ?? this.hitosPendientes,
+        recogidos: recogidos ?? this.recogidos,
       );
 
   NodoRuta nodoActual(CatalogoCampana c) => c.region.nodo(progreso.nodoActual);
@@ -795,6 +853,32 @@ class PartidaCampana {
     );
   }
 
+  /// Si en el nodo actual hay un objeto escondido que aún no se ha cogido.
+  bool puedeRecoger(CatalogoCampana c) {
+    final objeto = nodoActual(c).objeto;
+    return objeto != null &&
+        !recogidos.contains(progreso.nodoActual) &&
+        ObjetoCampana.values.any((o) => o.name == objeto);
+  }
+
+  /// Coge el objeto escondido del nodo actual (la Piedra Luna del Monte
+  /// Moon, D-20 §10.6): uno a la mochila. Hay uno solo y **no se repone**: el
+  /// nodo queda en [recogidos], también tras perder o volver atrás.
+  PartidaCampana recogerObjeto(CatalogoCampana c) {
+    final nodo = nodoActual(c);
+    if (nodo.objeto == null) {
+      throw const ReglaIncumplida('Aquí no hay nada escondido.');
+    }
+    if (recogidos.contains(nodo.id)) {
+      throw const ReglaIncumplida('Ya lo has cogido.');
+    }
+    final objeto = ObjetoCampana.values.byName(nodo.objeto!);
+    return _copiar(
+      mochila: {...mochila, objeto: cuantos(objeto) + 1},
+      recogidos: {...recogidos, nodo.id},
+    );
+  }
+
   /// Usa una Poción con el Pokémon [indice] del equipo, fuera de combate. No
   /// revive a uno fuera de combate ni pasa de sus PS máximos.
   PartidaCampana usarPocion(CatalogoCampana c, int indice,
@@ -1082,7 +1166,7 @@ class PartidaCampana {
       if (cuantos(objeto) < 1) {
         return objeto == ObjetoCampana.piedraEx
             ? 'No tienes ninguna piedra ex.'
-            : 'No tienes el objeto.';
+            : 'No tienes esa piedra.';
       }
       return null;
     }
@@ -1151,6 +1235,7 @@ class PartidaCampana {
         if (partidaId != null) 'partidaId': partidaId,
         if (hitosPendientes.isNotEmpty)
           'hitosPendientes': [for (final h in hitosPendientes) h.aJson()],
+        if (recogidos.isNotEmpty) 'recogidos': [...recogidos]..sort(),
       };
 
   factory PartidaCampana.desdeJson(Map<String, dynamic> json) {
@@ -1193,6 +1278,10 @@ class PartidaCampana {
         for (final h in (json['hitosPendientes'] as List<dynamic>?) ?? const [])
           HitoCampana.desdeJson(h as Map<String, dynamic>),
       ],
+      recogidos: {
+        for (final id in (json['recogidos'] as List<dynamic>?) ?? const [])
+          id as String,
+      },
     );
   }
 

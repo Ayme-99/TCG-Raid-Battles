@@ -205,6 +205,11 @@ class _Mapa extends ConsumerWidget {
         abrirTienda(context, c);
       case AccionZona.pc:
         abrirPc(context, c);
+      // Objeto escondido (la Piedra Luna, D-20 §10.6; #546).
+      case AccionZona.recoger:
+        final objeto = ObjetoCampana.values.byName(p.nodoActual(c).objeto!);
+        control.recogerObjeto(c);
+        _avisar(context, '¡Has encontrado una ${nombreObjeto(objeto)}!');
     }
   }
 }
@@ -662,6 +667,11 @@ String nombreObjeto(ObjetoCampana o) => switch (o) {
       ObjetoCampana.repelente => 'Repelente',
       ObjetoCampana.cuerdaHuida => 'Cuerda Huida',
       ObjetoCampana.piedraEx => 'Piedra ex',
+      ObjetoCampana.piedraTrueno => 'Piedra Trueno',
+      ObjetoCampana.piedraAgua => 'Piedra Agua',
+      ObjetoCampana.piedraFuego => 'Piedra Fuego',
+      ObjetoCampana.piedraHoja => 'Piedra Hoja',
+      ObjetoCampana.piedraLuna => 'Piedra Luna',
     };
 
 String descripcionObjeto(ObjetoCampana o) => switch (o) {
@@ -676,6 +686,12 @@ String descripcionObjeto(ObjetoCampana o) => switch (o) {
         'En combate, cambia de Pokémon sin pagar la retirada (gasta el turno)',
       ObjetoCampana.piedraEx =>
         'Hace ex a un Pokémon que ya no evoluciona; una por ex',
+      ObjetoCampana.piedraTrueno ||
+      ObjetoCampana.piedraAgua ||
+      ObjetoCampana.piedraFuego ||
+      ObjetoCampana.piedraHoja ||
+      ObjetoCampana.piedraLuna =>
+        'Hace evolucionar a algunos Pokémon; se gasta al usarla',
     };
 
 /// La partida de este dispositivo y la de la cuenta han cambiado las dos

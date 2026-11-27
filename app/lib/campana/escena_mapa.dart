@@ -49,6 +49,7 @@ class EstadoZona {
 /// - `inicial`, `hablar`, `curar`: mientras el nodo no esté resuelto (curar,
 ///   siempre en un centro).
 /// - `tienda` y `pc`: siempre en un centro.
+/// - `recoger`: mientras no se haya cogido el objeto escondido del nodo.
 EstadoZona estadoZona(CatalogoCampana c, PartidaCampana p, ZonaPulsable z) {
   final libre = p.capturaPendiente == null && !p.terminada(c);
   final nodo = p.nodoActual(c);
@@ -104,6 +105,11 @@ EstadoZona estadoZona(CatalogoCampana c, PartidaCampana p, ZonaPulsable z) {
     case AccionZona.pc:
       return EstadoZona(
           activa: libre, rotulo: 'PC', icono: Icons.computer_rounded);
+    case AccionZona.recoger:
+      return EstadoZona(
+          activa: libre && p.puedeRecoger(c),
+          rotulo: 'Objeto',
+          icono: Icons.auto_awesome_rounded);
   }
 }
 

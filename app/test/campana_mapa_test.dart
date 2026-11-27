@@ -1,8 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/almacen/almacen.dart';
+import 'package:incursiones_app/campana/catalogo_campana.dart'
+    show carpetaCampana;
 import 'package:incursiones_app/campana/controlador_campana.dart';
 import 'package:incursiones_app/campana/escena_mapa.dart';
+import 'package:incursiones_app/campana/pantalla_campana.dart'
+    show nombreObjeto;
 import 'package:incursiones_engine/campana.dart';
 
 import 'ayudas.dart';
@@ -113,5 +120,39 @@ void main() {
         expect(estadoZona(c, p, z).rotulo, isNotEmpty, reason: n.id);
       }
     }
+  });
+
+  test('la zona «recoger» da el objeto escondido una sola vez (#546)', () {
+    // La Piedra Luna aún no tiene nodo en Kanto: se prueba en la galería.
+    final base = catalogoCampanaDeDisco();
+    final r = jsonDecode(File('$carpetaCampana/regiones/kanto.json')
+        .readAsStringSync()) as Map<String, dynamic>;
+    for (final n in r['nodos'] as List) {
+      if (n['id'] != 'monte-moon-galeria') continue;
+      n['objeto'] = 'piedraLuna';
+      (n['escena']['zonas'] as List).add(
+          {'accion': 'recoger', 'x': 0.8, 'y': 0.6, 'ancho': 0.1, 'alto': 0.1});
+    }
+    final c = CatalogoCampana(
+      pokemon: base.pokemon,
+      zonas: base.zonas,
+      jefes: base.jefes,
+      region: regionCampanaDesdeJson(r),
+    );
+    expect(c.problemas(), isEmpty);
+    final z = c.region
+        .nodo('monte-moon-galeria')
+        .escena!
+        .zonas
+        .singleWhere((z) => z.accion == AccionZona.recoger);
+    expect(claveZona(z), 'zona-recoger');
+    const p = PartidaCampana(
+        progreso: ProgresoRuta(nodoActual: 'monte-moon-galeria'),
+        equipo: [PokemonGuardado('squirtle', 80)]);
+    expect(estadoZona(c, p, z).activa, isTrue);
+    final q = p.recogerObjeto(c);
+    expect(q.cuantos(ObjetoCampana.piedraLuna), 1);
+    expect(estadoZona(c, q, z).activa, isFalse, reason: 'no se repone');
+    expect(nombreObjeto(ObjetoCampana.piedraLuna), 'Piedra Luna');
   });
 }

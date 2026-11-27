@@ -454,6 +454,7 @@ NodoRuta nodoRutaDesdeJson(Map<String, dynamic> json) {
     cura: (json['cura'] as bool?) ?? false,
     escena: _escenaDesdeJson(json['escena']),
     tienda: _textos(json, 'tienda'),
+    objeto: json['objeto'] as String?,
   );
 }
 
