@@ -158,6 +158,16 @@ def hongo():
     p = PAD
     o = f'<ellipse cx="{p+20}" cy="{p+40}" rx="22" ry="5" fill="#1b4d2a" opacity=".25"/><rect x="{p+14}" y="{p+20}" width="12" height="20" rx="4" fill="#f4efe6" stroke="{INK}" stroke-width="3"/><path d="M{p} {p+24} q20 -34 40 0z" fill="#e0453c" stroke="{INK}" stroke-width="3"/><circle cx="{p+13}" cy="{p+14}" r="3" fill="#fff"/><circle cx="{p+26}" cy="{p+10}" r="3" fill="#fff"/>'
     sprite("hongo", 40, 42, o, [], "Seta roja pequeña.")
+def acantilado(w=520, id="acantilado"):
+    p = PAD; h = 150
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h}" rx="{w/2}" ry="12" fill="#000" opacity=".15"/>'
+    o += f'<path d="M{p} {p+h} V{p+50} L{p+w*.08} {p+20} L{p+w*.25} {p+36} L{p+w*.42} {p+8} L{p+w*.6} {p+30} L{p+w*.8} {p+6} L{p+w*.94} {p+34} L{p+w} {p+50} V{p+h}z" fill="#a8a29a" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/>'
+    o += f'<path d="M{p+10} {p+h-44} H{p+w-10} M{p} {p+h-90} H{p+w}" stroke="#7d776f" stroke-width="4" opacity=".7"/><path d="M{p+w*.25} {p+36} v50 M{p+w*.6} {p+30} v60 M{p+w*.8} {p+6} v70" stroke="#7d776f" stroke-width="4"/><path d="M{p+w*.42} {p+8} l30 44 h-60z" fill="#c7c1b8" opacity=".6"/>'
+    sprite(id, w, h, o, [], "Acantilado gris de roca con repisas (borde de colina).")
+def roca_grande():
+    p = PAD
+    o = f'<ellipse cx="{p+80}" cy="{p+92}" rx="92" ry="14" fill="#000" opacity=".15"/><path d="M{p} {p+90} q-8 -56 40 -78 q50 -22 90 6 q36 26 28 72z" fill="#b8b6c2" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/><path d="M{p+30} {p+30} q30 -20 64 -4" fill="none" stroke="#e6e4ee" stroke-width="7" stroke-linecap="round"/><path d="M{p+90} {p+88} q16 -40 66 -48 q6 28 0 48z" fill="#9694a6"/>'
+    sprite("roca-grande", 160, 94, o, [], "Peñasco grande gris.")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -169,5 +179,6 @@ hierba_alta_sprite("hierba-alta-grande", 690, 820, 11, "Mancha grande de hierba 
 hierba_alta_sprite("hierba-alta-media", 400, 300, 12, "Mancha de hierba alta mediana.")
 valla(); roca(); arbol2(); puente(); portico(); curar(); tienda_mostrador(); pc(); planta(); sofa(); alfombra()
 cartel(); seto(300,"seto"); arbol_oscuro(); tronco(); hongo()
+acantilado(520,"acantilado"); roca_grande()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")
