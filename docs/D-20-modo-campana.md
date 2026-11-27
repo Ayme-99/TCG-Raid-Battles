@@ -854,7 +854,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 
 #### Cartas ex: reglas y medallas mínimas (propuesta de Diseño, 2026-11-24)
 
-**Lo decidido por Ayme (§2.1) va sin marca; todo lo demás es propuesta mía, por confirmar.** Raichu evoluciona con la **Piedra Trueno**, que **todavía no se puede obtener**. Onix «evoluciona» subiendo a **Onix ex**, sin Steelix.
+**Lo decidido por Ayme (§2.1) va sin marca; todo lo demás es propuesta mía, por confirmar.** Raichu evoluciona con la **Piedra Trueno**, que **se compra en Ciudad Azulona a 2.100 desde la 4.ª medalla** (§10.6, 2026-11-27, #508); la carta Raichu aún no existe. Onix «evoluciona» subiendo a **Onix ex**, sin Steelix.
 
 **Ejemplos de línea** (decidido): Bulbasaur → Ivysaur (XP) → Venusaur (XP) → Venusaur ex (piedra ex); Rattata → Raticate (XP) → Raticate ex (piedra ex); Onix → Onix ex (piedra ex). Llegar a la última fase normal cuesta XP y medallas; la piedra ex no cuesta XP.
 
@@ -863,7 +863,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 - **B. Añadir Jigglypuff y Meowth** (mascotas de rutas y del Team Rocket): 2 ex más y unas 4 cartas.
 - **C. Además, Magikarp y Psyduck** (populares): 4 ex más. Solo si el simulador (tarea 18) dice que faltan ex.
 
-**2. Pikachu y Raichu.** Son **dos cartas ex distintas**: **Pikachu ex** (Básico ex) y **Raichu ex** (Fase 1 ex), y además hace falta la carta Raichu normal. La **Piedra Trueno sigue siendo necesaria** para Raichu y hoy no se puede obtener, así que por ahora **solo existe el camino de Pikachu ex**. Elegir ex **cierra la línea**: Pikachu ex ya no llega a Raichu, y Raichu ex cuesta Piedra Trueno más piedra ex. Opciones por coste: **(1) Pikachu ex cierra la línea** (recomendada; no hacen falta Raichu ni Raichu ex hasta que haya Piedra Trueno); (2) Pikachu ex puede seguir a Raichu ex con las dos piedras (rompe el punto 4); (3) quitar a Pikachu de las excepciones.
+**2. Pikachu y Raichu.** Son **dos cartas ex distintas**: **Pikachu ex** (Básico ex) y **Raichu ex** (Fase 1 ex), y además hace falta la carta Raichu normal. La **Piedra Trueno sigue siendo necesaria** para Raichu y **se compra en Ciudad Azulona a 2.100 desde la 4.ª medalla** (§10.6, 2026-11-27, #508), pero **falta la carta Raichu**, así que por ahora **solo existe el camino de Pikachu ex**. Elegir ex **cierra la línea**: Pikachu ex ya no llega a Raichu, y Raichu ex cuesta Piedra Trueno más piedra ex. Opciones por coste: **(1) Pikachu ex cierra la línea** (recomendada; no hacen falta Raichu ni Raichu ex hasta que exista la carta Raichu); (2) Pikachu ex puede seguir a Raichu ex con las dos piedras (rompe el punto 4); (3) quitar a Pikachu de las excepciones.
 
 **3. Eevee.** Es un Básico con tres ramas por piedra (Vaporeon, Jolteon, Flareon). Opciones por coste: **(A) primera entrega solo con Eevee ex** (Eevee + piedra ex; las tres ramas y sus piedras quedan para después; **recomendada**, cero cartas más); (B) Eevee → una de las tres (piedra elemental) → Fase 1 ex: 6 cartas (3 normales y 3 ex) y tres piedras en el mapa (la de Trueno se comparte con Raichu); (C) que Eevee ex pueda evolucionar después (rompe el punto 4). Con A o B, la piedra ex **cierra** la línea: un Eevee ex no se ramifica, y uno ramificado ya no es Eevee ex.
 
