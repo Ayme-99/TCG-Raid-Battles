@@ -676,5 +676,60 @@
       }
     ],
     "nota": "Entrada de cueva (Monte Moon): montículo de roca con boca oscura y vigas de madera. Zona puerta → ir a la galería."
+  },
+  "estalagmita": {
+    "svg": "sprites/estalagmita.svg",
+    "ancho": 126,
+    "alto": 214,
+    "ancla": [
+      63.0,
+      168
+    ],
+    "zonas": [],
+    "nota": "Estalagmita de cueva."
+  },
+  "estalagmita-baja": {
+    "svg": "sprites/estalagmita-baja.svg",
+    "ancho": 126,
+    "alto": 164,
+    "ancla": [
+      63.0,
+      118
+    ],
+    "zonas": [],
+    "nota": "Estalagmita baja de cueva."
+  },
+  "estalactita": {
+    "svg": "sprites/estalactita.svg",
+    "ancho": 136,
+    "alto": 194,
+    "ancla": [
+      68.0,
+      148
+    ],
+    "zonas": [],
+    "nota": "Estalactita colgante (se coloca con el ancla en la punta de arriba del techo; aquí el ancla es la base del sprite)."
+  },
+  "setas-grandes": {
+    "svg": "sprites/setas-grandes.svg",
+    "ancho": 476,
+    "alto": 334,
+    "ancla": [
+      238.0,
+      288
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "combate",
+        "rect": [
+          28,
+          28,
+          420,
+          260
+        ]
+      }
+    ],
+    "nota": "Alfombra de setas (zona de combate salvaje: Paras)."
   }
 }

@@ -243,6 +243,23 @@ def cueva_entrada():
     o += f'<rect x="{p+w*.28}" y="{p+h*.3}" width="{w*.44}" height="20" rx="6" fill="#c9895a" stroke="{INK}" stroke-width="4"/>'
     for x, y, r_ in ((.12, .5, 26), (.86, .55, 30), (.2, .78, 20), (.8, .82, 22)): o += f'<circle cx="{p+w*x}" cy="{p+h*y}" r="{r_}" fill="#c7c1b8" stroke="{INK}" stroke-width="4"/>'
     sprite("cueva-entrada", w, h, o, [{"id": "puerta", "tipo": "puerta", "rect": [p + w * .3, p + h * .2, w * .4, h * .8]}], "Entrada de cueva (Monte Moon): montículo de roca con boca oscura y vigas de madera. Zona puerta → ir a la galería.")
+def estalagmita(id="estalagmita", h=140, nota="Estalagmita de cueva."):
+    p = PAD; w = 70
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h}" rx="{w*.62}" ry="9" fill="#000" opacity=".25"/><path d="M{p} {p+h} L{p+w*.3} {p+h*.25} L{p+w*.5} {p} L{p+w*.7} {p+h*.3} L{p+w} {p+h}z" fill="#8a8499" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/><path d="M{p+w*.5} {p} L{p+w*.4} {p+h*.7}" stroke="#b6b1c4" stroke-width="6" stroke-linecap="round"/>'
+    sprite(id, w, h, o, [], nota)
+def estalactita():
+    p = PAD; w, h = 80, 120
+    o = f'<path d="M{p} {p} L{p+w} {p} L{p+w*.58} {p+h*.7} L{p+w*.5} {p+h} L{p+w*.42} {p+h*.7}z" fill="#8a8499" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/><path d="M{p+w*.3} {p+6} L{p+w*.45} {p+h*.7}" stroke="#b6b1c4" stroke-width="5" stroke-linecap="round"/>'
+    sprite("estalactita", w, h, o, [], "Estalactita colgante (se coloca con el ancla en la punta de arriba del techo; aquí el ancla es la base del sprite).")
+def setas_grandes():
+    p = PAD; w, h = 420, 260
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h*.55}" rx="{w/2}" ry="{h*.5}" fill="#5a4a6e" stroke="{INK}" stroke-width="6"/><ellipse cx="{p+w/2}" cy="{p+h*.55}" rx="{w/2-24}" ry="{h*.5-22}" fill="#6c5a83"/>'
+    r = random.Random(21)
+    for i in range(16):
+        x = p + 60 + r.random() * (w - 120); y = p + 60 + r.random() * (h * .8 - 60); k = r.uniform(.8, 1.4)
+        c = r.choice(["#e0453c", "#e8a23b", "#c9d36b"])
+        o += f'<rect x="{x-5*k}" y="{y}" width="{10*k}" height="{22*k}" rx="3" fill="#f4efe6" stroke="{INK}" stroke-width="3"/><path d="M{x-22*k} {y+4} q{22*k} {-34*k} {44*k} 0z" fill="{c}" stroke="{INK}" stroke-width="3"/><circle cx="{x-6*k}" cy="{y-6*k}" r="{3*k}" fill="#fff"/><circle cx="{x+8*k}" cy="{y-10*k}" r="{3*k}" fill="#fff"/>'
+    sprite("setas-grandes", w, h, o, [{"id": "cuerpo", "tipo": "combate", "rect": [p, p, w, h]}], "Alfombra de setas (zona de combate salvaje: Paras).")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -261,5 +278,6 @@ gimnasio_exterior("gimnasio-agua-exterior", {"#5f6672":"#3f7fd0","#474d58":"#2f6
 piscina()
 puente_largo()
 cueva_entrada()
+estalagmita("estalagmita", 140); estalagmita("estalagmita-baja", 90, "Estalagmita baja de cueva."); estalactita(); setas_grandes()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")

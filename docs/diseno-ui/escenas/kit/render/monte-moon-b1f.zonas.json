@@ -1,0 +1,64 @@
+{
+  "escena": "monte-moon-b1f",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Monte Moon, planta B1F (desvío opcional; único salvaje: Paras, Ayme 2026-11-27, #380). Entrada por abajo (vuelve al nodo monte-moon); alfombra de setas grande en el centro = combate salvaje; salida arriba hacia el jefe (jefe-clefairy). La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "setas",
+      "tipo": "combate",
+      "accion": "combate",
+      "rect": [
+        645,
+        310,
+        630,
+        390
+      ],
+      "pokemon": "paras",
+      "rel": [
+        0.3359,
+        0.2849,
+        0.3281,
+        0.3585
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-jefe-clefairy",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "jefe-clefairy",
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}
