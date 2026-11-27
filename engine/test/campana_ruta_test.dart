@@ -327,10 +327,16 @@ void main() {
     });
 
     test('los únicos nodos opcionales son la Ruta 22, la Ruta 2 norte, la '
-        'galería del Monte Moon y la Ruta 24', () {
+        'Ruta 3, la galería del Monte Moon, la Ruta 4 y la Ruta 24', () {
       final opcionales = kanto.nodos.values.where((n) => n.opcional).toList();
-      expect(opcionales.map((n) => n.id),
-          ['ruta-22', 'ruta-2-norte-salvaje', 'monte-moon-galeria', 'ruta-24']);
+      expect(opcionales.map((n) => n.id), [
+        'ruta-22',
+        'ruta-2-norte-salvaje',
+        'ruta-3-salvaje',
+        'monte-moon-galeria',
+        'ruta-4-salvaje',
+        'ruta-24',
+      ]);
     });
 
     // Tramo 2 (D-20 §4, «Segundo tramo»; #513).
@@ -344,8 +350,28 @@ void main() {
       expect([chica.clase, joven.clase], ['Chica', 'Joven']);
       expect(chica.pokemon, ['rattata', 'nidoran-f']);
       expect(joven.pokemon, ['spearow', 'rattata']);
-      expect(joven.salidas, ['centro-monte-moon']);
+      expect(joven.salidas, ['ruta-3-final']);
       expect(kanto.nodo('centro-monte-moon').tipo, TipoNodo.descanso);
+    });
+
+    // Salvajes opcionales al azar de la zona (Ayme, 2026-11-27; #543): así
+    // salen Jigglypuff en la Ruta 3 y Ekans en la Ruta 4.
+    test('las Rutas 3 y 4 tienen un salvaje opcional al azar de su zona', () {
+      for (final (ruta, raro, siguiente) in [
+        ('ruta-3', 'jigglypuff', 'centro-monte-moon'),
+        ('ruta-4', 'ekans', 'centro-celeste'),
+      ]) {
+        final fin = kanto.nodo('$ruta-final');
+        expect(fin.tipo, TipoNodo.bifurcacion, reason: ruta);
+        expect(fin.salidas, ['$ruta-salvaje', siguiente], reason: ruta);
+        final s = kanto.nodo('$ruta-salvaje');
+        expect(s.opcional, isTrue, reason: ruta);
+        expect(s.rival, RivalDeCombate.salvaje, reason: ruta);
+        expect(s.zona, ruta, reason: ruta);
+        expect(s.pokemon, isEmpty, reason: '$ruta: sale al azar de la zona');
+        expect(s.salidas, [siguiente], reason: ruta);
+        expect(salvajes[ruta], contains(raro), reason: ruta);
+      }
     });
 
     test('Monte Moon: galería opcional y el jefe Clefairy', () {
@@ -365,7 +391,7 @@ void main() {
       expect(r.salidas.map((id) => kanto.nodo(id).pokemon),
           [['sandshrew'], ['rattata']]);
       for (final id in r.salidas) {
-        expect(kanto.nodo(id).salidas, ['centro-celeste']);
+        expect(kanto.nodo(id).salidas, ['ruta-4-final']);
       }
     });
 
@@ -780,11 +806,13 @@ void main() {
         'ruta-3-nidoran-m',
         'ruta-3-chica',
         'ruta-3-joven',
+        'ruta-3-final',
         'centro-monte-moon',
         'monte-moon',
         'jefe-clefairy',
         'ruta-4',
         'ruta-4-sandshrew',
+        'ruta-4-final',
         'centro-celeste',
         'celeste-salida',
         'gimnasio-luis',
@@ -798,6 +826,8 @@ void main() {
       expect(p.jefesDerrotados, {'pikachu-jefe', 'clefairy-jefe'});
       expect(p.superados, isNot(contains('monte-moon-galeria')));
       expect(p.superados, isNot(contains('ruta-24')));
+      expect(p.superados, isNot(contains('ruta-3-salvaje')));
+      expect(p.superados, isNot(contains('ruta-4-salvaje')));
       expect(p.superados, isNot(contains('ruta-22')));
       expect(p.superados, isNot(contains('ruta-2-norte-salvaje')));
       expect(p.superados, isNot(contains('ruta-1-rattata')));
