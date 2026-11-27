@@ -20,18 +20,18 @@
         "zonas": [
           {
             "accion": "inicial",
-            "x": 0.3,
-            "y": 0.3,
-            "ancho": 0.4,
-            "alto": 0.4
+            "x": 0.1875,
+            "y": 0.0368,
+            "ancho": 0.3073,
+            "alto": 0.5607
           },
           {
             "accion": "ir",
             "destino": "ruta-1",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.5781,
+            "y": 0.0,
+            "ancho": 0.1094,
+            "alto": 0.1746
           }
         ]
       }
@@ -233,26 +233,26 @@
           {
             "accion": "ir",
             "destino": "ciudad-verde",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.1979,
+            "y": 0.1562,
+            "ancho": 0.2604,
+            "alto": 0.3493
           },
           {
             "accion": "ir",
             "destino": "ruta-22",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.0,
+            "y": 0.5699,
+            "ancho": 0.0781,
+            "alto": 0.1838
           },
           {
             "accion": "ir",
             "destino": "ruta-2",
-            "x": 0.9,
-            "y": 0.5,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.5677,
+            "y": 0.0,
+            "ancho": 0.0938,
+            "alto": 0.1287
           }
         ]
       }

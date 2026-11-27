@@ -280,6 +280,45 @@ void main() {
       }
     });
 
+    test('Pueblo Paleta y Ciudad Verde usan las zonas de Arte (#504)', () {
+      Map<String, List<double>> arte(String escena) => {
+            for (final z in leer(File(
+                    '../docs/diseno-ui/escenas/$escena.zonas.json'))['zonas']
+                as List)
+              (z as Map)['id'] as String: [
+                for (final v in z['rel'] as List) (v as num).toDouble()
+              ]
+          };
+      final paleta = arte('pueblo-paleta');
+      final verde = arte('ciudad-verde');
+      void igual(ZonaPulsable z, List<double>? rel, String id) =>
+          expect([z.x, z.y, z.ancho, z.alto], rel, reason: id);
+      ZonaPulsable de(String nodo, AccionZona a, [String? destino]) =>
+          kanto.nodo(nodo).escena!.zonas.singleWhere(
+              (z) => z.accion == a && z.destino == destino);
+
+      // Pueblo Paleta: el laboratorio elige el inicial y el camino de
+      // arriba sale a la Ruta 1. Las casas son decorado.
+      expect(kanto.nodo('pueblo-paleta').escena!.imagen, 'pueblo-paleta');
+      expect(kanto.nodo('pueblo-paleta').escena!.zonas, hasLength(2));
+      igual(de('pueblo-paleta', AccionZona.inicial), paleta['laboratorio'],
+          'laboratorio');
+      igual(de('pueblo-paleta', AccionZona.ir, 'ruta-1'), paleta['ruta-1'],
+          'ruta-1');
+
+      // Ciudad Verde (la ciudad; el centro es otro nodo): el edificio del
+      // centro vuelve a él, la izquierda va a la Ruta 22 y arriba a la
+      // Ruta 2. La entrada de abajo no lleva a ningún vecino.
+      expect(kanto.nodo('ciudad-verde-salida').escena!.imagen, 'ciudad-verde');
+      expect(kanto.nodo('ciudad-verde-salida').escena!.zonas, hasLength(3));
+      igual(de('ciudad-verde-salida', AccionZona.ir, 'ciudad-verde'),
+          verde['centro-pokemon'], 'centro-pokemon');
+      igual(de('ciudad-verde-salida', AccionZona.ir, 'ruta-22'),
+          verde['salida-ruta-22'], 'salida-ruta-22');
+      igual(de('ciudad-verde-salida', AccionZona.ir, 'ruta-2'),
+          verde['salida-ruta-2'], 'salida-ruta-2');
+    });
+
     test('Ciudad Verde tiene centro Pokémon y la Ruta 22 es un desvío opcional',
         () {
       expect(kanto.nodo('ciudad-verde').tipo, TipoNodo.descanso);
