@@ -26,6 +26,8 @@ Colorido de videojuego, la mesa como tapete y «no es una app, es un juego». Co
 **Arte propio (SVG vectorial, original):**
 `tapete_combate`, `vida_alta` / `vida_media` / `vida_baja`, `boton_ataque` / `boton_cargar` / `boton_cambiar` / `boton_secundario`, `hoja_fondo`, `barra_recursos_fondo`, `icono_dinero`, `icono_xp`, y dos criaturas de relleno (`relleno_criatura_a`, `relleno_criatura_b`) para maquetar mientras no estén los sprites definitivos.
 
+Iconos de las cinco piedras evolutivas (D-20 §9, tarea 29; 2026-11-27): `icono_piedra_trueno`, `icono_piedra_agua`, `icono_piedra_fuego`, `icono_piedra_hoja` e `icono_piedra_luna`, en `app/assets/campana/ui/` (SVG 160×160, propios, en el estilo de `icono_dinero`). Son provisionales: si se prefieren los sprites de Escarlata y Púrpura (WikiDex, «Piedra Trueno EP.png», etc.), basta con soltarlos con el mismo nombre.
+
 Los SVG no llevan texto: nombres, PS y costes los pinta la app.
 
 **Sprites ajenos (PNG), todos en `app/assets/campana/sprites_ajenos/`:**
