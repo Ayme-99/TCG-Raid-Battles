@@ -1,0 +1,216 @@
+{
+ "escena": "ciudad-celeste",
+ "nota": "Ciudad Celeste (exterior). Entrada por abajo (Ruta 4); salida arriba por el puente hacia la Ruta 24. Gimnasio de agua a la derecha, Centro Pokémon a la izquierda. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {
+   "material": "agua",
+   "ancho": 150,
+   "d": "M-60 230 C400 270 700 190 960 230 S1500 270 1980 220"
+  },
+  {
+   "material": "tierra",
+   "ancho": 220,
+   "d": "M960 1130 C950 1000 940 880 930 780 C920 680 950 560 950 420 L960 -40"
+  },
+  {
+   "material": "tierra",
+   "ancho": 120,
+   "d": "M940 780 C1080 780 1160 760 1240 740"
+  },
+  {
+   "material": "tierra",
+   "ancho": 120,
+   "d": "M940 650 C820 650 700 640 600 620"
+  }
+ ],
+ "rellenos": [
+  {
+   "material": "tierra",
+   "x": 1280,
+   "y": 740,
+   "rx": 150,
+   "ry": 60
+  },
+  {
+   "material": "tierra",
+   "x": 580,
+   "y": 620,
+   "rx": 150,
+   "ry": 60
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "puente",
+   "x": 958,
+   "y": 330,
+   "escala": 0.8
+  },
+  {
+   "sprite": "gimnasio-agua-exterior",
+   "x": 1300,
+   "y": 760,
+   "escala": 1.0,
+   "id": "gimnasio",
+   "acciones": {
+    "puerta": {
+     "accion": "ir",
+     "destino": "gimnasio-luis"
+    },
+    "edificio": {
+     "accion": "ir",
+     "destino": "gimnasio-luis"
+    }
+   }
+  },
+  {
+   "sprite": "centro-pokemon-exterior",
+   "x": 520,
+   "y": 640,
+   "escala": 1.0,
+   "id": "centro-pokemon",
+   "acciones": {
+    "puerta": {
+     "accion": "ir",
+     "destino": "centro-celeste"
+    },
+    "edificio": {
+     "accion": "ir",
+     "destino": "centro-celeste"
+    }
+   }
+  },
+  {
+   "sprite": "casa-pequena-azul",
+   "x": 1580,
+   "y": 420,
+   "escala": 0.9
+  },
+  {
+   "sprite": "casa-pequena-verde",
+   "x": 330,
+   "y": 1010,
+   "escala": 0.9
+  },
+  {
+   "sprite": "casa-pequena-roja",
+   "x": 1680,
+   "y": 1010,
+   "escala": 0.8
+  },
+  {
+   "sprite": "muro-piedra",
+   "x": 300,
+   "y": 780
+  },
+  {
+   "sprite": "farola",
+   "x": 830,
+   "y": 700
+  },
+  {
+   "sprite": "farola",
+   "x": 830,
+   "y": 420
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 120,
+   "y": 1000
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1800,
+   "y": 780,
+   "escala": 1.1
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 110,
+   "y": 640,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 780,
+   "y": 980,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1130,
+   "y": 1010,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbusto",
+   "x": 700,
+   "y": 470
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1160,
+   "y": 430
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1450,
+   "y": 1000
+  },
+  {
+   "sprite": "arbusto",
+   "x": 420,
+   "y": 960
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1000,
+   "y": 900
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 860,
+   "y": 560
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1500,
+   "y": 880
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 250,
+   "y": 560
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 600,
+   "y": 850
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  },
+  {
+   "id": "salida-ruta-24",
+   "tipo": "borde-superior",
+   "accion": "ir",
+   "destino": "ruta-24",
+   "rect": [
+    820,
+    0,
+    280,
+    150
+   ]
+  }
+ ]
+}

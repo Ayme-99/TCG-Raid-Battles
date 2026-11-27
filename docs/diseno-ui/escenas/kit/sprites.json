@@ -589,5 +589,37 @@
     ],
     "zonas": [],
     "nota": "Antorcha de pared."
+  },
+  "gimnasio-agua-exterior": {
+    "svg": "sprites/gimnasio-agua-exterior.svg",
+    "ancho": 536,
+    "alto": 434,
+    "ancla": [
+      268.0,
+      388
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          203.0,
+          215.20000000000002,
+          130,
+          172.79999999999998
+        ]
+      },
+      {
+        "id": "edificio",
+        "tipo": "edificio",
+        "rect": [
+          28,
+          28,
+          480,
+          360
+        ]
+      }
+    ],
+    "nota": "Gimnasio de agua (exterior): tejado azul y paredes claras. Zona puerta → ir al interior."
   }
 }

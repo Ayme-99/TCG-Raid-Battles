@@ -30,6 +30,7 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `gimnasio-exterior`, `centro-pokemon-exterior` | Edificios de la ciudad (zona `puerta` → ir al interior) | nuevos; el Centro ya existía como dibujo en la base de Ciudad Verde | Ciudad Plateada |
 | `barril`, `muro-piedra` | Decoración de pueblo de montaña | nuevos | Ciudad Plateada |
 | `arena-roca`, `columna`, `antorcha` | Interior del gimnasio de roca (la arena lleva zona `cuerpo` → combate) | nuevos | Gimnasio de Brock |
+| `gimnasio-agua-exterior` | Gimnasio de agua (mismo dibujo que `gimnasio-exterior` con otra paleta; zona `puerta`) | nuevo | Ciudad Celeste |
 
 Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra) y `suelo-centro` (interior con pared y losas).
 
