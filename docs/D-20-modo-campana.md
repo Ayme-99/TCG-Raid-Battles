@@ -954,7 +954,8 @@ Geodude ya sigue a su carta impresa (2026-11-22, tarea 14): Pulimento (1: `ganaE
 | `bosque-verde` | Bosque Verde | caterpie, weedle, metapod, kakuna, pikachu | Cazabichos (weedle, caterpie, kakuna, metapod) | — |
 | `gimnasio-celeste` | Gimnasio de Ciudad Celeste | — | Nadador (horsea, shellder, staryu), 250 | — |
 | `gimnasio-plateada` | Gimnasio de Ciudad Plateada | — | Entrenador Joven (diglett, sandshrew) | — |
-| `monte-moon` | Monte Moon | zubat, geodude, paras | — | — |
+| `monte-moon` | Monte Moon | zubat, geodude (nodo opcional `monte-moon-1f`, «Monte Moon: planta 1F», al azar; #575) | — | — |
+| `monte-moon-b1f` | Monte Moon: planta B1F | paras (único, 100 %; nodo opcional `monte-moon-galeria`, que conserva el id para no romper partidas guardadas; #575) | — | — |
 | `ruta-1` | Ruta 1 | pidgey, rattata | — | — |
 | `ruta-2` | Ruta 2 | rattata, pidgey, caterpie, weedle | — | — |
 | `ruta-22` | Ruta 22 | rattata, spearow, nidoran-f, nidoran-m, mankey | — | — |

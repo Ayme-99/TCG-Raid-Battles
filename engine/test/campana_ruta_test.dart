@@ -394,13 +394,15 @@ void main() {
     });
 
     test('los únicos nodos opcionales son la Ruta 22, la Ruta 2 norte, la '
-        'Ruta 3, la galería del Monte Moon, la Ruta 4 y la Ruta 24', () {
+        'Ruta 3, las plantas B1F y 1F del Monte Moon, la Ruta 4 y la Ruta 24',
+        () {
       final opcionales = kanto.nodos.values.where((n) => n.opcional).toList();
       expect(opcionales.map((n) => n.id), [
         'ruta-22',
         'ruta-2-norte-salvaje',
         'ruta-3-salvaje',
         'monte-moon-galeria',
+        'monte-moon-1f',
         'ruta-4-salvaje',
         'ruta-24',
       ]);
@@ -441,13 +443,25 @@ void main() {
       }
     });
 
-    test('Monte Moon: galería opcional y el jefe Clefairy', () {
+    // Ayme, 2026-11-27, #380 (#575): la galería pasa a ser la planta B1F, con
+    // solo Paras, y Zubat o Geodude salen en otro nodo opcional (1F). El id
+    // de la galería no cambia, para no romper partidas guardadas.
+    test('Monte Moon: B1F con Paras, 1F con Zubat o Geodude y el jefe', () {
       expect(kanto.nodo('monte-moon').salidas,
-          ['monte-moon-galeria', 'jefe-clefairy']);
-      final galeria = kanto.nodo('monte-moon-galeria');
-      expect(galeria.opcional, isTrue);
-      expect(galeria.rival, RivalDeCombate.salvaje);
-      expect(galeria.zona, 'monte-moon');
+          ['monte-moon-galeria', 'monte-moon-1f', 'jefe-clefairy']);
+      final b1f = kanto.nodo('monte-moon-galeria');
+      expect(b1f.nombre, 'Monte Moon: planta B1F');
+      expect(b1f.opcional, isTrue);
+      expect(b1f.rival, RivalDeCombate.salvaje);
+      expect(b1f.zona, 'monte-moon-b1f');
+      expect(b1f.pokemon, isEmpty, reason: 'sale de la zona al azar');
+      expect(b1f.salidas, ['jefe-clefairy']);
+      final p1f = kanto.nodo('monte-moon-1f');
+      expect(p1f.opcional, isTrue);
+      expect(p1f.rival, RivalDeCombate.salvaje);
+      expect(p1f.zona, 'monte-moon');
+      expect(p1f.pokemon, isEmpty, reason: 'sale de la zona al azar');
+      expect(p1f.salidas, ['jefe-clefairy']);
       expect(kanto.nodo('jefe-clefairy').jefe, 'clefairy-jefe');
       expect(kanto.nodo('jefe-clefairy').salidas, ['ruta-4']);
     });

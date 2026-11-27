@@ -1789,4 +1789,35 @@ void main() {
           contains('monte-moon-galeria: esconde "piedraSol", que no es un objeto.'));
     });
   });
+
+  // Ayme, 2026-11-27, #380 (#575): la planta B1F solo da Paras y la 1F, Zubat
+  // o Geodude al azar.
+  group('salvajes del Monte Moon (#575)', () {
+    test('las zonas del Monte Moon', () {
+      expect(c.zonas['monte-moon-b1f']!.salvajes, ['paras']);
+      expect(c.zonas['monte-moon']!.salvajes, ['zubat', 'geodude']);
+    });
+
+    test('B1F siempre Paras; 1F, Zubat o Geodude según la semilla', () {
+      final vistos = {
+        'monte-moon-galeria': <String>{},
+        'monte-moon-1f': <String>{},
+      };
+      for (var semilla = 0; semilla < 40; semilla++) {
+        for (final nodo in vistos.keys) {
+          final p = PartidaCampana(
+            progreso: const ProgresoRuta(
+                nodoActual: 'monte-moon',
+                resuelto: true,
+                visitados: {'monte-moon'}),
+            equipo: const [PokemonGuardado('squirtle', 80)],
+            semilla: semilla,
+          ).avanzar(c, nodo);
+          vistos[nodo]!.add(p.rival(c).equipo.single.id);
+        }
+      }
+      expect(vistos['monte-moon-galeria'], {'paras'});
+      expect(vistos['monte-moon-1f'], {'zubat', 'geodude'});
+    });
+  });
 }
