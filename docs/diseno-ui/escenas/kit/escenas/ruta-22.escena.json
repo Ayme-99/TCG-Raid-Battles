@@ -1,0 +1,173 @@
+{
+ "escena": "ruta-22",
+ "nota": "Ruta 22 (opcional, un combate). Entrada por abajo; el camino cruza el puente sobre el río y sale por el pórtico superior hacia la Ruta 2. Hierba alta a la izquierda del camino = combate. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {
+   "material": "agua",
+   "ancho": 170,
+   "d": "M-60 430 C300 480 600 380 960 430 S1600 470 1980 410"
+  },
+  {
+   "material": "tierra",
+   "ancho": 210,
+   "d": "M960 1130 C950 920 1000 770 955 610 C925 500 970 340 960 200"
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "portico",
+   "x": 960,
+   "y": 252,
+   "acciones": {
+    "puerta": {
+     "accion": "ir",
+     "destino": "ruta-2"
+    }
+   },
+   "escala": 0.9
+  },
+  {
+   "sprite": "puente",
+   "x": 958,
+   "y": 536,
+   "escala": 0.85
+  },
+  {
+   "sprite": "hierba-alta-media",
+   "x": 360,
+   "y": 940,
+   "escala": 1.25,
+   "id": "hierba",
+   "acciones": {
+    "cuerpo": {
+     "accion": "combate",
+     "pokemon": "salvaje"
+    }
+   }
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 110,
+   "y": 200,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1800,
+   "y": 210,
+   "escala": 0.95
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1700,
+   "y": 1010,
+   "escala": 1.05
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 150,
+   "y": 1030
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 520,
+   "y": 220,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1420,
+   "y": 250,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1500,
+   "y": 800,
+   "escala": 0.8
+  },
+  {
+   "sprite": "roca",
+   "x": 1250,
+   "y": 700,
+   "escala": 1.3
+  },
+  {
+   "sprite": "roca",
+   "x": 1330,
+   "y": 740
+  },
+  {
+   "sprite": "roca",
+   "x": 1650,
+   "y": 620,
+   "escala": 1.4
+  },
+  {
+   "sprite": "arbusto",
+   "x": 720,
+   "y": 260,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1210,
+   "y": 210,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbusto",
+   "x": 780,
+   "y": 820
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1180,
+   "y": 900
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 800,
+   "y": 600
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1150,
+   "y": 620
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1480,
+   "y": 640
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1050,
+   "y": 840
+  },
+  {
+   "sprite": "roca",
+   "x": 80,
+   "y": 700
+  },
+  {
+   "sprite": "roca",
+   "x": 690,
+   "y": 1000,
+   "escala": 0.9
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  }
+ ]
+}
