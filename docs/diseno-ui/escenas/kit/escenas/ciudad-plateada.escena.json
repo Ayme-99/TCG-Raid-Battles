@@ -1,0 +1,237 @@
+{
+ "escena": "ciudad-plateada",
+ "nota": "Ciudad Plateada (exterior). Entrada por abajo (Ruta 2 norte); salida arriba hacia la Ruta 3. Gimnasio de Brock arriba a la izquierda y Centro Pokémon a la derecha. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "fondo": "seco",
+ "caminos": [
+  {
+   "material": "tierra",
+   "ancho": 220,
+   "d": "M960 1130 C950 1000 940 900 910 800 C880 700 930 560 950 440 C965 330 930 200 960 -40"
+  },
+  {
+   "material": "tierra",
+   "ancho": 120,
+   "d": "M930 780 C1080 790 1200 790 1300 770"
+  },
+  {
+   "material": "tierra",
+   "ancho": 120,
+   "d": "M940 560 C800 560 660 540 520 500"
+  }
+ ],
+ "rellenos": [
+  {
+   "material": "tierra",
+   "x": 520,
+   "y": 490,
+   "rx": 150,
+   "ry": 70
+  },
+  {
+   "material": "tierra",
+   "x": 1330,
+   "y": 780,
+   "rx": 150,
+   "ry": 60
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "gimnasio-exterior",
+   "x": 500,
+   "y": 460,
+   "escala": 1.1,
+   "id": "gimnasio",
+   "acciones": {
+    "puerta": {
+     "accion": "ir",
+     "destino": "gimnasio-brock"
+    },
+    "edificio": {
+     "accion": "ir",
+     "destino": "gimnasio-brock"
+    }
+   }
+  },
+  {
+   "sprite": "centro-pokemon-exterior",
+   "x": 1350,
+   "y": 780,
+   "escala": 1.0,
+   "id": "centro-pokemon",
+   "acciones": {
+    "puerta": {
+     "accion": "ir",
+     "destino": "centro-plateada"
+    },
+    "edificio": {
+     "accion": "ir",
+     "destino": "centro-plateada"
+    }
+   }
+  },
+  {
+   "sprite": "casa-pequena-azul",
+   "x": 1450,
+   "y": 300,
+   "escala": 0.9
+  },
+  {
+   "sprite": "casa-pequena-roja",
+   "x": 300,
+   "y": 850,
+   "escala": 0.9
+  },
+  {
+   "sprite": "muro-piedra",
+   "x": 200,
+   "y": 640
+  },
+  {
+   "sprite": "muro-piedra",
+   "x": 440,
+   "y": 640
+  },
+  {
+   "sprite": "barril",
+   "x": 1180,
+   "y": 900
+  },
+  {
+   "sprite": "barril",
+   "x": 1215,
+   "y": 915
+  },
+  {
+   "sprite": "farola",
+   "x": 820,
+   "y": 720
+  },
+  {
+   "sprite": "farola",
+   "x": 1060,
+   "y": 300
+  },
+  {
+   "sprite": "acantilado",
+   "x": 300,
+   "y": 120,
+   "escala": 1.0
+  },
+  {
+   "sprite": "acantilado",
+   "x": 1620,
+   "y": 130,
+   "escala": 1.0
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 120,
+   "y": 960,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1780,
+   "y": 960,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 160,
+   "y": 330,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1800,
+   "y": 620,
+   "escala": 0.85
+  },
+  {
+   "sprite": "roca",
+   "x": 700,
+   "y": 950
+  },
+  {
+   "sprite": "roca",
+   "x": 1100,
+   "y": 1000
+  },
+  {
+   "sprite": "roca",
+   "x": 1650,
+   "y": 900
+  },
+  {
+   "sprite": "roca",
+   "x": 520,
+   "y": 820
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1100,
+   "y": 400
+  },
+  {
+   "sprite": "arbusto",
+   "x": 760,
+   "y": 260
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1100,
+   "y": 640
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 700,
+   "y": 780
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1500,
+   "y": 960
+  },
+  {
+   "sprite": "barril",
+   "x": 740,
+   "y": 500
+  },
+  {
+   "sprite": "barril",
+   "x": 780,
+   "y": 515
+  },
+  {
+   "sprite": "muro-piedra",
+   "x": 1700,
+   "y": 560
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  },
+  {
+   "id": "salida-ruta-3",
+   "tipo": "borde-superior",
+   "accion": "ir",
+   "destino": "ruta-3",
+   "rect": [
+    820,
+    0,
+    280,
+    120
+   ]
+  }
+ ]
+}

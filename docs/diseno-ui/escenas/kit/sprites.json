@@ -459,5 +459,91 @@
     ],
     "zonas": [],
     "nota": "Peñasco grande gris."
+  },
+  "gimnasio-exterior": {
+    "svg": "sprites/gimnasio-exterior.svg",
+    "ancho": 536,
+    "alto": 434,
+    "ancla": [
+      268.0,
+      388
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          203.0,
+          215.20000000000002,
+          130,
+          172.79999999999998
+        ]
+      },
+      {
+        "id": "edificio",
+        "tipo": "edificio",
+        "rect": [
+          28,
+          28,
+          480,
+          360
+        ]
+      }
+    ],
+    "nota": "Gimnasio de roca (exterior): tejado de pizarra y portón de madera. Zona puerta → ir al interior."
+  },
+  "centro-pokemon-exterior": {
+    "svg": "sprites/centro-pokemon-exterior.svg",
+    "ancho": 456,
+    "alto": 374,
+    "ancla": [
+      228.0,
+      328
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          176.0,
+          197.8,
+          104.0,
+          104.15999999999998
+        ]
+      },
+      {
+        "id": "edificio",
+        "tipo": "edificio",
+        "rect": [
+          28,
+          28,
+          400,
+          300
+        ]
+      }
+    ],
+    "nota": "Centro Pokémon (exterior): tejado rojo y cruz blanca. Zona puerta → ir al interior."
+  },
+  "barril": {
+    "svg": "sprites/barril.svg",
+    "ancho": 100,
+    "alto": 124,
+    "ancla": [
+      50.0,
+      78
+    ],
+    "zonas": [],
+    "nota": "Barril de madera."
+  },
+  "muro-piedra": {
+    "svg": "sprites/muro-piedra.svg",
+    "ancho": 296,
+    "alto": 118,
+    "ancla": [
+      148.0,
+      72
+    ],
+    "zonas": [],
+    "nota": "Tramo de muro bajo de piedra."
   }
 }
