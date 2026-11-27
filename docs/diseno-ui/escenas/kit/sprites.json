@@ -654,5 +654,27 @@
     ],
     "zonas": [],
     "nota": "Puente de piedra largo (vista cenital vertical) sobre un río ancho."
+  },
+  "cueva-entrada": {
+    "svg": "sprites/cueva-entrada.svg",
+    "ancho": 616,
+    "alto": 434,
+    "ancla": [
+      308.0,
+      388
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          196.0,
+          100.0,
+          224.0,
+          288.0
+        ]
+      }
+    ],
+    "nota": "Entrada de cueva (Monte Moon): montículo de roca con boca oscura y vigas de madera. Zona puerta → ir a la galería."
   }
 }

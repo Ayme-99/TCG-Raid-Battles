@@ -233,6 +233,16 @@ def puente_largo():
         for y in range(p - 2, p + h - 20, 150): o += f'<rect x="{x-4}" y="{y}" width="48" height="28" rx="8" fill="#b9b09c" stroke="{INK}" stroke-width="4"/>'
         o += f'<rect x="{x-4}" y="{p+h-26}" width="48" height="28" rx="8" fill="#b9b09c" stroke="{INK}" stroke-width="4"/>'
     sprite("puente-largo", w, h, o, [], "Puente de piedra largo (vista cenital vertical) sobre un río ancho.")
+def cueva_entrada():
+    p = PAD; w, h = 560, 360
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h}" rx="{w/2}" ry="16" fill="#000" opacity=".18"/>'
+    o += f'<path d="M{p} {p+h} V{p+150} Q{p+20} {p+30} {p+w*.3} {p+18} Q{p+w*.5} {p-8} {p+w*.7} {p+18} Q{p+w-20} {p+30} {p+w} {p+150} V{p+h}z" fill="#a8a29a" stroke="{INK}" stroke-width="6" stroke-linejoin="round"/>'
+    o += f'<path d="M{p+w*.3} {p+h} V{p+h*.5} Q{p+w*.3} {p+h*.2} {p+w*.5} {p+h*.2} Q{p+w*.7} {p+h*.2} {p+w*.7} {p+h*.5} V{p+h}z" fill="#2a1d3a" stroke="{INK}" stroke-width="6"/>'
+    o += f'<path d="M{p+w*.34} {p+h} V{p+h*.52} Q{p+w*.34} {p+h*.28} {p+w*.5} {p+h*.28} Q{p+w*.66} {p+h*.28} {p+w*.66} {p+h*.52} V{p+h}z" fill="#3d2f55"/>'
+    for x in (p + w * .3, p + w * .7 - 14): o += f'<rect x="{x-4}" y="{p+h*.38}" width="18" height="{h*.62}" fill="#a96f3f" stroke="{INK}" stroke-width="4"/>'
+    o += f'<rect x="{p+w*.28}" y="{p+h*.3}" width="{w*.44}" height="20" rx="6" fill="#c9895a" stroke="{INK}" stroke-width="4"/>'
+    for x, y, r_ in ((.12, .5, 26), (.86, .55, 30), (.2, .78, 20), (.8, .82, 22)): o += f'<circle cx="{p+w*x}" cy="{p+h*y}" r="{r_}" fill="#c7c1b8" stroke="{INK}" stroke-width="4"/>'
+    sprite("cueva-entrada", w, h, o, [{"id": "puerta", "tipo": "puerta", "rect": [p + w * .3, p + h * .2, w * .4, h * .8]}], "Entrada de cueva (Monte Moon): montículo de roca con boca oscura y vigas de madera. Zona puerta → ir a la galería.")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -250,5 +260,6 @@ arena_roca(); columna(); antorcha()
 gimnasio_exterior("gimnasio-agua-exterior", {"#5f6672":"#3f7fd0","#474d58":"#2f62a8","#b8ada0":"#dcebf7","#8d8276":"#8fb4d8","#6b4a2f":"#2f62a8","#d6cdbb":"#bfe3f7","#e6c27a":"#a9d8f2"}, "Gimnasio de agua (exterior): tejado azul y paredes claras. Zona puerta → ir al interior.")
 piscina()
 puente_largo()
+cueva_entrada()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")
