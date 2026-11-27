@@ -1,0 +1,100 @@
+{
+  "escena": "ruta-4",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Ruta 4. Entrada por abajo (sale del Monte Moon); el camino serpentea hacia Ciudad Celeste. Dos hierbas: Sandshrew (ir a ruta-4-sandshrew) y Rattata (ir a ruta-4-rattata). Un claro con peñascos junto al camino es el sitio del jefe (ir a jefe-clefairy). La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "hierba-sandshrew",
+      "tipo": "hierba-alta",
+      "accion": "ir",
+      "rect": [
+        210,
+        524,
+        380,
+        276
+      ],
+      "destino": "ruta-4-sandshrew",
+      "rel": [
+        0.1094,
+        0.4816,
+        0.1979,
+        0.2537
+      ]
+    },
+    {
+      "id": "hierba-rattata",
+      "tipo": "hierba-alta",
+      "accion": "ir",
+      "rect": [
+        1370,
+        614,
+        380,
+        276
+      ],
+      "destino": "ruta-4-rattata",
+      "rel": [
+        0.7135,
+        0.5643,
+        0.1979,
+        0.2537
+      ]
+    },
+    {
+      "id": "claro-jefe",
+      "tipo": "claro",
+      "accion": "ir",
+      "destino": "jefe-clefairy",
+      "rect": [
+        1390,
+        330,
+        340,
+        180
+      ],
+      "rel": [
+        0.724,
+        0.3033,
+        0.1771,
+        0.1654
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-ciudad-celeste",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "ciudad-celeste",
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}
