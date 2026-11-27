@@ -1,0 +1,40 @@
+  Ruta 1: Rattata                      llegan   49.6 %   ganan  100.0 %
+  Ruta 2: Weedle                       llegan   50.2 %   ganan  100.0 %
+  Ruta 2: Caterpie                     llegan   49.8 %   ganan  100.0 %
+  Bosque Verde: primer Cazabichos      llegan  100.0 %   ganan  100.0 %
+  Bosque Verde: segundo Cazabichos     llegan  100.0 %   ganan   98.9 %
+  Pikachu                              llegan   98.9 %   ganan   88.1 %
+  Gimnasio: Entrenador Joven           llegan   87.1 %   ganan   92.4 %
+  Gimnasio de Ciudad Plateada          llegan   80.5 %   ganan    3.6 %
+  Ruta 3: Spearow                      llegan    2.0 %   ganan    0.0 %
+  Ruta 3: Nidoran♂                     llegan    0.9 %   ganan    0.0 %
+
+Charmander: completa el tramo 0.0 %
+  Ruta 1: Pidgey                       llegan   49.2 %   ganan  100.0 %
+  Ruta 1: Rattata                      llegan   50.8 %   ganan  100.0 %
+  Ruta 2: Weedle                       llegan   53.0 %   ganan  100.0 %
+  Ruta 2: Caterpie                     llegan   47.0 %   ganan  100.0 %
+  Bosque Verde: primer Cazabichos      llegan  100.0 %   ganan  100.0 %
+  Bosque Verde: segundo Cazabichos     llegan  100.0 %   ganan  100.0 %
+  Pikachu                              llegan  100.0 %   ganan   98.7 %
+  Gimnasio: Entrenador Joven           llegan   98.7 %   ganan   69.2 %
+  Gimnasio de Ciudad Plateada          llegan   68.3 %   ganan    6.6 %
+  Ruta 3: Spearow                      llegan    2.8 %   ganan    3.6 %
+  Ruta 3: Nidoran♂                     llegan    1.7 %   ganan   64.7 %
+  Ruta 3: Chica                        llegan    1.2 %   ganan   25.0 %
+  Ruta 3: Joven                        llegan    0.3 %   ganan    0.0 %
+
+Squirtle: completa el tramo 0.0 %
+  Ruta 1: Pidgey                       llegan   51.1 %   ganan  100.0 %
+  Ruta 1: Rattata                      llegan   48.9 %   ganan  100.0 %
+  Ruta 2: Weedle                       llegan   52.1 %   ganan  100.0 %
+  Ruta 2: Caterpie                     llegan   47.9 %   ganan  100.0 %
+  Bosque Verde: primer Cazabichos      llegan  100.0 %   ganan  100.0 %
+  Bosque Verde: segundo Cazabichos     llegan  100.0 %   ganan   99.2 %
+  Pikachu                              llegan   99.2 %   ganan   80.8 %
+  Gimnasio: Entrenador Joven           llegan   80.2 %   ganan   72.8 %
+  Gimnasio de Ciudad Plateada          llegan   58.4 %   ganan   21.2 %
+  Ruta 3: Spearow                      llegan    6.3 %   ganan   39.7 %
+  Ruta 3: Nidoran♂                     llegan    6.1 %   ganan   68.9 %
+  Ruta 3: Chica                        llegan    6.7 %   ganan   11.9 %
+  Ruta 3: Joven                        llegan    0.8 %   ganan    0.0 %

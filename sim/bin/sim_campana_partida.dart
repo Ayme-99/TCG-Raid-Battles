@@ -47,6 +47,12 @@
 //                               gimnasios: el rival solo en los gimnasios (lo
 //                               decidido el 2026-11-26); rival-jefes: además en Pikachu jefe y
 //                               en los gimnasios (Joven y Brock)
+//   --hasta=brock|misty         hasta dónde juega: Brock (tramo 1) o Misty
+//                               (tramo 2: Ruta 3, Monte Moon con Clefairy jefe,
+//                               Ruta 4 y gimnasio de Celeste); en el tramo 2
+//                               compra Pociones (--pociones) y --balls-tramo2
+//                               Pokéballs (3) en cada centro, y captura
+//                               los salvajes y a Clefairy (#386)
 //   --entrenador=N              Pokémon que saca cada Cazabichos (2, el del
 //                               motor; D-20 §4 lo da como suposición)
 //
@@ -103,6 +109,10 @@ class Config {
   // Quién empieza cada combate (#451/#386): jugador (como en el juego hoy) o
   // rival, o rival-jefes (solo empieza el rival en Pikachu jefe y gimnasios).
   String empieza = 'jugador';
+  // Hasta dónde juega el recorrido: 'brock' (tramo 1) o 'misty' (tramo 1 y 2).
+  String hasta = 'brock';
+  // Pokéballs que compra en los centros del tramo 2 (tras las Pociones).
+  int ballsTramo2 = 3;
   String alTope = 'derrota'; // derrota | mas-ps
 }
 
@@ -272,12 +282,27 @@ class Corrida {
   int capturas = 0;
   List<String> equipoEnBrock = [];
   bool evolucionoInicial = false;
+  bool ganaMisty = false;
   bool abortada = false;
   String? rendidoEn;
   int estancados = 0;
   int pocionesUsadas = 0;
   int pocionesEnBrock = 0;
 }
+
+const centrosOrdenados = [
+  'ciudad-verde',
+  'centro-plateada',
+  'centro-monte-moon',
+  'centro-celeste',
+];
+
+/// Centros donde la IA compra Pociones (el de Ciudad Verde se trata aparte).
+const centrosConTienda = {
+  'centro-plateada',
+  'centro-monte-moon',
+  'centro-celeste',
+};
 
 class Jugador {
   Jugador(this.c, this.cfg, this.rnd, this.stats, this.balls);
@@ -408,7 +433,7 @@ class Jugador {
     final n = p.nodoActual(c);
     if (n.tipo == TipoNodo.descanso) {
       final d = p.equipoSano(c) ? p : p.descansar(c);
-      return cfg.pocionesCombate && n.id == 'centro-plateada'
+      return cfg.pocionesCombate && centrosConTienda.contains(n.id)
           ? comprarPocionesFaltan(d)
           : d;
     }
@@ -431,7 +456,7 @@ class Jugador {
   /// Último centro Pokémon visitado.
   String? ultimoCentro(PartidaCampana p) {
     String? mejor;
-    for (final id in ['ciudad-verde', 'centro-plateada']) {
+    for (final id in centrosOrdenados) {
       if (p.progreso.visitados.contains(id)) mejor = id;
     }
     return mejor;
@@ -444,7 +469,7 @@ class Jugador {
     var q = p.progreso.nodoActual == centro ? p : p.retroceder(c, centro);
     q = evolucionar(q);
     q = q.descansar(c);
-    if (cfg.pocionesCombate && centro == 'centro-plateada') {
+    if (cfg.pocionesCombate && centrosConTienda.contains(centro)) {
       q = comprarPocionesFaltan(q);
     }
     if (q.progreso.nodoActual != destino) q = q.retroceder(c, destino);
@@ -659,7 +684,63 @@ class Jugador {
     corrida.ganaBrock = p.progreso.medallas.contains('roca');
     corrida.xpTramoCompleto = p.xp + corrida.xpGastada;
     if (corrida.ganaBrock) corrida.intentosBrock++;
+    if (cfg.hasta == 'misty' && corrida.ganaBrock) _tramo2(p);
     return corrida;
+  }
+
+  /// Compra Pokéballs hasta tener [n] (con el dinero que haya).
+  PartidaCampana comprarBallsHasta(PartidaCampana q, int n) {
+    final falta = n - q.cuantos(ObjetoCampana.pokeball);
+    final k = min(falta, q.dinero ~/ 200);
+    return k > 0
+        ? q.comprar(c, ObjetoCampana.pokeball, cantidad: k, parametros: params)
+        : q;
+  }
+
+  /// En un centro del tramo 2: evoluciona, cura, compra Pociones y Pokéballs.
+  PartidaCampana centroTramo2(PartidaCampana p, String centro) {
+    var q = avanzarHasta(p, centro);
+    q = evolucionar(q);
+    q = q.descansar(c);
+    q = comprarPocionesFaltan(q);
+    return comprarBallsHasta(q, cfg.ballsTramo2);
+  }
+
+  /// Tramo 2 (#386): Ruta 3, centro del Monte Moon, Clefairy jefe, Ruta 4,
+  /// centro de Celeste, Nadador Luis y Misty. Se saltan los desvíos
+  /// opcionales (galería del Monte Moon y Ruta 24).
+  PartidaCampana _tramo2(PartidaCampana p) {
+    var q = p;
+    // Antes de salir de Plateada: se vuelve a su centro (la tienda está en los
+    // centros) por Pociones y Pokéballs con el dinero de Brock.
+    q = q.retroceder(c, 'centro-plateada');
+    q = comprarPocionesFaltan(q);
+    q = comprarBallsHasta(q, cfg.ballsTramo2);
+    final ruta3 = rnd.nextBool() ? 'ruta-3-spearow' : 'ruta-3-nidoran-m';
+    q = avanzarHasta(q, ruta3);
+    q = afrontar(q, ruta3);
+    q = capturar(q);
+    q = avanzarHasta(q, 'ruta-3-chica');
+    q = afrontar(q, 'ruta-3-chica');
+    q = avanzarHasta(q, 'ruta-3-joven');
+    q = afrontar(q, 'ruta-3-joven');
+    q = centroTramo2(q, 'centro-monte-moon');
+    q = avanzarHasta(q, 'jefe-clefairy');
+    q = afrontar(q, 'jefe-clefairy');
+    q = capturar(q);
+    final ruta4 = rnd.nextBool() ? 'ruta-4-sandshrew' : 'ruta-4-rattata';
+    q = avanzarHasta(q, ruta4);
+    q = afrontar(q, ruta4);
+    q = capturar(q);
+    q = centroTramo2(q, 'centro-celeste');
+    q = avanzarHasta(q, 'gimnasio-luis');
+    if (cfg.retroceder) q = curarAndando(q, 'gimnasio-luis');
+    q = afrontar(q, 'gimnasio-luis');
+    q = avanzarHasta(q, 'gimnasio-misty');
+    if (cfg.retroceder) q = curarAndando(q, 'gimnasio-misty');
+    q = afrontar(q, 'gimnasio-misty');
+    corrida.ganaMisty = q.progreso.medallas.contains('cascada');
+    return q;
   }
 }
 
@@ -671,6 +752,7 @@ class ResumenTramo {
   int recorridos = 0;
   int sinDerrotas = 0;
   int ganaBrock = 0;
+  int ganaMisty = 0;
   int abortadas = 0;
   final rendidos = <String, int>{};
   int derrotasTotal = 0;
@@ -695,6 +777,7 @@ ResumenTramo correr(Config cfg, CatalogoCampana c, String ini, int balls,
     r.recorridos++;
     if (co.sinDerrotas) r.sinDerrotas++;
     if (co.ganaBrock) r.ganaBrock++;
+    if (co.ganaMisty) r.ganaMisty++;
     if (co.abortada) {
       r.abortadas++;
       r.rendidos[co.rendidoEn!] = (r.rendidos[co.rendidoEn!] ?? 0) + 1;
@@ -725,6 +808,15 @@ const ordenNodos = [
   'jefe-pikachu',
   'gimnasio-joven',
   'gimnasio-brock',
+  'ruta-3-spearow',
+  'ruta-3-nidoran-m',
+  'ruta-3-chica',
+  'ruta-3-joven',
+  'jefe-clefairy',
+  'ruta-4-sandshrew',
+  'ruta-4-rattata',
+  'gimnasio-luis',
+  'gimnasio-misty',
 ];
 
 String etiqueta(String id, CatalogoCampana c) => c.region.nodo(id).nombre;
@@ -789,7 +881,8 @@ void tramo(Config cfg, CatalogoCampana c) {
         '${pct(r.sinDerrotas / r.recorridos)} · acaba ganando a Brock '
         '(con reintentos): ${pct(r.ganaBrock / r.recorridos)} · derrotas por '
         'recorrido: ${(r.derrotasTotal / r.recorridos).toStringAsFixed(2)} · '
-        'intentos contra Brock: ${(r.intentosBrock / r.recorridos).toStringAsFixed(2)}');
+        'intentos contra Brock: ${(r.intentosBrock / r.recorridos).toStringAsFixed(2)}'
+        '${cfg.hasta == "misty" ? " · acaba ganando a Misty: ${pct(r.ganaMisty / r.recorridos)}" : ""}');
     stdout.writeln('              XP ganada hasta Brock: '
         '${(r.xpGanada / r.recorridos).toStringAsFixed(0)} (con Brock: '
         '${(r.xpTramo / r.recorridos).toStringAsFixed(0)}; sin gastar: '
@@ -1227,6 +1320,14 @@ void main(List<String> args) {
         cfg.aliado = v != 'no';
       case '--tope-turnos':
         cfg.topeTurnos = int.parse(v);
+      case '--hasta':
+        if (!['brock', 'misty'].contains(v)) {
+          stderr.writeln('--hasta: usa «brock» o «misty»');
+          exit(2);
+        }
+        cfg.hasta = v;
+      case '--balls-tramo2':
+        cfg.ballsTramo2 = int.parse(v);
       case '--empieza':
         if (!['jugador', 'rival', 'rival-jefes', 'gimnasios'].contains(v)) {
           stderr.writeln('--empieza: usa «jugador», «gimnasios», «rival» o «rival-jefes»');
