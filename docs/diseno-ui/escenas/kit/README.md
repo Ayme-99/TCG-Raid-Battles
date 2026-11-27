@@ -29,8 +29,9 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `acantilado`, `roca-grande` | Colina rocosa, peñasco | nuevos | Ruta 2 norte |
 | `gimnasio-exterior`, `centro-pokemon-exterior` | Edificios de la ciudad (zona `puerta` → ir al interior) | nuevos; el Centro ya existía como dibujo en la base de Ciudad Verde | Ciudad Plateada |
 | `barril`, `muro-piedra` | Decoración de pueblo de montaña | nuevos | Ciudad Plateada |
+| `arena-roca`, `columna`, `antorcha` | Interior del gimnasio de roca (la arena lleva zona `cuerpo` → combate) | nuevos | Gimnasio de Brock |
 
-Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada) y `suelo-centro` (interior con pared y losas).
+Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra) y `suelo-centro` (interior con pared y losas).
 
 Materiales de camino: `tierra`, `piedra`, `hierba` y `agua` (río, con brillos) (en `componer.py`).
 

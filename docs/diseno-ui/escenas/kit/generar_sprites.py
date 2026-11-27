@@ -195,6 +195,26 @@ def muro_piedra():
     o = f'<ellipse cx="{p+w/2}" cy="{p+44}" rx="{w/2+6}" ry="7" fill="#000" opacity=".15"/><rect x="{p}" y="{p}" width="{w}" height="42" rx="10" fill="#c9c1b3" stroke="{INK}" stroke-width="4"/>'
     for i in range(1, 5): o += f'<path d="M{p+i*48} {p+2} v38" stroke="#8d8276" stroke-width="3"/>'
     sprite("muro-piedra", w, 44, o, [], "Tramo de muro bajo de piedra.")
+def arena_roca():
+    p = PAD; w, h = 900, 520
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h/2}" rx="{w/2}" ry="{h/2}" fill="#7a7266" stroke="{INK}" stroke-width="6"/>'
+    import math
+    for i in range(30):
+        a = i / 30 * 2 * math.pi; x = p + w / 2 + math.cos(a) * (w / 2 - 14); y = p + h / 2 + math.sin(a) * (h / 2 - 14)
+        o += f'<rect x="{x-24}" y="{y-16}" width="48" height="32" rx="8" transform="rotate({a*57.3+90} {x} {y})" fill="#b0a898" stroke="{INK}" stroke-width="4"/>'
+    o += f'<ellipse cx="{p+w/2}" cy="{p+h/2}" rx="{w/2-42}" ry="{h/2-42}" fill="#e3c98f" stroke="#b79a5f" stroke-width="5"/>'
+    r = random.Random(3)
+    for _ in range(60): o += f'<ellipse cx="{p+w/2+r.randint(-w//2+90,w//2-90)}" cy="{p+h/2+r.randint(-h//2+80,h//2-80)}" rx="{r.randint(6,14)}" ry="3" fill="#c9ad72"/>'
+    o += f'<path d="M{p+w/2-120} {p+h/2} H{p+w/2+120}" stroke="#b79a5f" stroke-width="6" stroke-linecap="round"/><circle cx="{p+w/2}" cy="{p+h/2}" r="34" fill="none" stroke="#b79a5f" stroke-width="6"/>'
+    sprite("arena-roca", w, h, o, [{"id": "cuerpo", "tipo": "arena", "rect": [p, p, w, h]}], "Arena oval de tierra apisonada rodeada de bloques de piedra (zona combate).")
+def columna():
+    p = PAD
+    o = f'<ellipse cx="{p+36}" cy="{p+170}" rx="46" ry="10" fill="#000" opacity=".2"/><rect x="{p+6}" y="{p+20}" width="60" height="150" fill="#b0a898" stroke="{INK}" stroke-width="5"/><rect x="{p-4}" y="{p}" width="80" height="28" rx="8" fill="#8d8276" stroke="{INK}" stroke-width="5"/><rect x="{p-4}" y="{p+150}" width="80" height="26" rx="8" fill="#8d8276" stroke="{INK}" stroke-width="5"/><path d="M{p+22} {p+34} v120 M{p+50} {p+34} v120" stroke="#8d8276" stroke-width="4"/>'
+    sprite("columna", 72, 176, o, [], "Columna de piedra.")
+def antorcha():
+    p = PAD
+    o = f'<rect x="{p+8}" y="{p+36}" width="12" height="46" rx="3" fill="#6b4a2f" stroke="{INK}" stroke-width="3"/><path d="M{p-2} {p+38} h32 l-6 -14 h-20z" fill="#8d8276" stroke="{INK}" stroke-width="3"/><path d="M{p+14} {p+22} q-24 -22 0 -50 q8 18 18 8 q10 20 -18 42z" fill="#f2a43b" stroke="{INK}" stroke-width="3"/><path d="M{p+14} {p+18} q-10 -12 0 -26 q10 12 0 26z" fill="#ffe27a"/>'
+    sprite("antorcha", 28, 82, o, [], "Antorcha de pared.")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -208,5 +228,6 @@ valla(); roca(); arbol2(); puente(); portico(); curar(); tienda_mostrador(); pc(
 cartel(); seto(300,"seto"); arbol_oscuro(); tronco(); hongo()
 acantilado(520,"acantilado"); roca_grande()
 gimnasio_exterior(); centro_exterior(); barril(); muro_piedra()
+arena_roca(); columna(); antorcha()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")

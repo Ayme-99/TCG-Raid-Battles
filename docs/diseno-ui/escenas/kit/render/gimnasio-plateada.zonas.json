@@ -1,0 +1,81 @@
+{
+  "escena": "gimnasio-plateada",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Interior del gimnasio de Brock (imagen gimnasio-plateada). Puerta abajo (salida), arena de combate oval al centro: Entrenador Joven (zona plaza-joven, abajo de la arena) y Brock (arriba). La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "arena",
+      "tipo": "arena",
+      "accion": "combate",
+      "rect": [
+        510,
+        280,
+        900,
+        520
+      ],
+      "rel": [
+        0.2656,
+        0.2574,
+        0.4688,
+        0.4779
+      ]
+    },
+    {
+      "id": "plaza-joven",
+      "tipo": "plaza",
+      "accion": "ir",
+      "destino": "gimnasio-joven",
+      "rect": [
+        760,
+        700,
+        400,
+        200
+      ],
+      "rel": [
+        0.3958,
+        0.6434,
+        0.2083,
+        0.1838
+      ]
+    },
+    {
+      "id": "plaza-brock",
+      "tipo": "plaza",
+      "accion": null,
+      "rect": [
+        760,
+        420,
+        400,
+        180
+      ],
+      "rel": [
+        0.3958,
+        0.386,
+        0.2083,
+        0.1654
+      ]
+    },
+    {
+      "id": "salida",
+      "tipo": "puerta",
+      "accion": "ir",
+      "destino": "ruta-3",
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    }
+  ]
+}
