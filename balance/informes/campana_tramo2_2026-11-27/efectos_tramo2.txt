@@ -1,0 +1,38 @@
+Efectos del tramo 2 con las cartas reales · 2000 semillas por prueba
+
+## 1. Rapidez de Starmie (`ignoraFallo`, #524/#535)
+Rapidez en la carta: índice 1, ignoraFallo=true, daño 50.
+- Starmie marcado con Bofetón Lodo (cegado) usa Rapidez: pega 100.0 %
+- Starmie marcado con Pantalla de Humo (cegadoMientrasActivo) usa Rapidez: pega 100.0 %
+- Starmie marcado con Confundido usa Rapidez: pega 50.0 %
+- La IA de Starmie con Bofetón Lodo encima (energía inicial): Rapidez 200/200, Rayo Confuso 0/200, otra acción 0/200
+- Con Rapidez la moneda de Bofetón Lodo no se lanza: semilla 7 → 7 (ultimaMoneda: null).
+
+## 2. Dormido (Canto de Jigglypuff, #511/#530)
+- Tras Canto (1 moneda) y el primer chequeo, el Defensor llega dormido a su turno: 25.0 % (D-20 dice 1 de cada 4 = 25 %).
+- No puede atacar: correcto (error de regla)
+- No puede cambiar con Cambiar: correcto
+- Puede cargar: correcto
+- Puede usar Poción: correcto
+- Cuerda Huida: sale el relevo y queda despierto: correcto
+- Un Dormido despierta en 2 chequeos o menos (uno por cambio de turno): 75.0 % (esperado 75 %).
+
+## 3. Apresado (Torbellino de Shellder, Constricción de Ekans, #522/#532)
+- Shellder · Torbellino: PS quitados tras el ataque y su primer chequeo: 20.0 de media (D-20: 20 seguro); sigue apresado 50.0 % (esperado 50 %).
+- Ekans · Constricción: PS quitados tras el ataque y su primer chequeo: 20.0 de media (D-20: 20 seguro); sigue apresado 50.0 % (esperado 50 %).
+- Apresado no puede cambiar con Cambiar: correcto
+- Apresado puede atacar y cargar: correcto
+- Cuerda Huida: sale y el relevo no está apresado: correcto
+- Clefairy jefe (Muro Mágico) contra Torbellino: solo recibe el golpe (≤10 PS en total) 100.0 %; sigue apresado tras el primer chequeo 50.0 % (esperado 50 %, y sin perder PS por apresar).
+
+## 4. Absorber de Paras (`curaAlAtacar`, #523/#533)
+- Paras 30/50 PS usa Absorber: 40 PS (esperado 40); el Defensor pierde 20 (esperado 20).
+- Paras con PS al máximo (50): se queda en 50 (no pasa del máximo).
+- Paras 35 PS remata a un Defensor de 20 PS: combate terminado, Paras 45 PS (D-20: cura igual, esperado 45).
+- Contra Clefairy jefe (Muro Mágico): Paras 40 PS (D-20: cura igual, esperado 40); Clefairy pierde 20 (Paras es planta; Clefairy es psíquico sin resistencia → 20).
+- Paras marcada con Bofetón Lodo: cura en 50.0 % de las tiradas (cara) y no cura cuando el ataque falla (50.0 %) (esperado 50 % / 50 %).
+
+## 5. Doble Bofetón de Clefairy jefe (monedasDano)
+- Daño por tirada: 20 → 12.6 % · 30 → 37.4 % · 40 → 37.4 % · 50 → 12.6 %
+- Daño medio real 35.0; `dano` del JSON 30 (con 3 monedas y 20/30/40/50 la media teórica es 35).
+
