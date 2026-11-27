@@ -1,0 +1,118 @@
+{
+  "escena": "monte-moon",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Monte Moon (exterior). Entrada por abajo (viene de la Ruta 3); la boca de la cueva (galería) arriba a la izquierda, el Centro Pokémon de la montaña a la derecha, un claro con peñascos para el jefe (Clefairy) y la salida arriba hacia la Ruta 4. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "galeria-puerta",
+      "tipo": "puerta",
+      "accion": "ir",
+      "rect": [
+        368,
+        212,
+        224,
+        288
+      ],
+      "destino": "monte-moon-galeria",
+      "rel": [
+        0.1917,
+        0.1949,
+        0.1167,
+        0.2647
+      ]
+    },
+    {
+      "id": "centro-pokemon-puerta",
+      "tipo": "puerta",
+      "accion": "ir",
+      "rect": [
+        1333,
+        623,
+        94,
+        94
+      ],
+      "destino": "centro-monte-moon",
+      "rel": [
+        0.6943,
+        0.5726,
+        0.049,
+        0.0864
+      ]
+    },
+    {
+      "id": "centro-pokemon-edificio",
+      "tipo": "edificio",
+      "accion": "ir",
+      "rect": [
+        1200,
+        470,
+        360,
+        270
+      ],
+      "destino": "centro-monte-moon",
+      "rel": [
+        0.625,
+        0.432,
+        0.1875,
+        0.2482
+      ]
+    },
+    {
+      "id": "claro-jefe",
+      "tipo": "claro",
+      "accion": "ir",
+      "destino": "jefe-clefairy",
+      "rect": [
+        1380,
+        220,
+        360,
+        170
+      ],
+      "rel": [
+        0.7188,
+        0.2022,
+        0.1875,
+        0.1562
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-ruta-4",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "ruta-4",
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}

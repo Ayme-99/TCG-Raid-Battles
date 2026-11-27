@@ -33,6 +33,7 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `gimnasio-agua-exterior` | Gimnasio de agua (mismo dibujo que `gimnasio-exterior` con otra paleta; zona `puerta`) | nuevo | Ciudad Celeste |
 | `piscina-gimnasio` | Piscina de combate con tres plataformas (zona `cuerpo` → combate) | nuevo | Gimnasio de Celeste |
 | `puente-largo` | Puente de piedra largo (cenital, vertical) para ríos anchos | nuevo | Ruta 24 |
+| `cueva-entrada` | Boca de cueva con vigas (zona `puerta` → galería) | nuevo | Monte Moon |
 
 Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra), `suelo-agua` (interior de azulejos azules) y `suelo-centro` (interior con pared y losas).
 
