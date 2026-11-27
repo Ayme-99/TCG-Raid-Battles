@@ -1,7 +1,7 @@
 {
  "escena": "monte-moon",
  "fondo": "seco",
- "nota": "Monte Moon (exterior). Entrada por abajo (viene de la Ruta 3); la boca de la cueva (galería) arriba a la izquierda, el Centro Pokémon de la montaña a la derecha, un claro con peñascos para el jefe (Clefairy) y la salida arriba hacia la Ruta 4. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "nota": "Monte Moon (exterior). Entrada por abajo (viene de la Ruta 3); la boca grande de la cueva (galería lateral, desvío opcional) arriba a la izquierda, la boca pequeña (planta B1F, desvío opcional) abajo a la izquierda, el Centro Pokémon de la montaña a la derecha, un claro con peñascos para el jefe (Clefairy) y la salida arriba hacia la Ruta 4. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
  "caminos": [
   {
    "material": "tierra",
@@ -103,12 +103,6 @@
    "escala": 1.1
   },
   {
-   "sprite": "acantilado",
-   "x": 120,
-   "y": 760,
-   "escala": 0.7
-  },
-  {
    "sprite": "cartel",
    "x": 800,
    "y": 900
@@ -135,12 +129,6 @@
    "x": 1790,
    "y": 560,
    "escala": 0.85
-  },
-  {
-   "sprite": "arbol-2",
-   "x": 300,
-   "y": 900,
-   "escala": 0.8
   },
   {
    "sprite": "roca",
@@ -202,6 +190,19 @@
    "sprite": "mata-hierba",
    "x": 1500,
    "y": 930
+  },
+  {
+   "sprite": "cueva-entrada",
+   "x": 230,
+   "y": 900,
+   "escala": 0.6,
+   "id": "b1f",
+   "acciones": {
+    "puerta": {
+     "accion": "ir",
+     "destino": "monte-moon-b1f"
+    }
+   }
   }
  ],
  "zonas_extra": [

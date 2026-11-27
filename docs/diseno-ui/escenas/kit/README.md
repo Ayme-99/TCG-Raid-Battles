@@ -34,8 +34,9 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `piscina-gimnasio` | Piscina de combate con tres plataformas (zona `cuerpo` → combate) | nuevo | Gimnasio de Celeste |
 | `puente-largo` | Puente de piedra largo (cenital, vertical) para ríos anchos | nuevo | Ruta 24 |
 | `cueva-entrada` | Boca de cueva con vigas (zona `puerta` → galería) | nuevo | Monte Moon |
+| `estalagmita`, `estalagmita-baja`, `estalactita`, `setas-grandes` | Interior de cueva; las setas llevan zona `cuerpo` → combate | nuevos | Monte Moon B1F |
 
-Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra), `suelo-agua` (interior de azulejos azules) y `suelo-centro` (interior con pared y losas).
+Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra), `suelo-agua` (interior de azulejos azules), `suelo-cueva` (cueva oscura) y `suelo-centro` (interior con pared y losas).
 
 Materiales de camino: `tierra`, `piedra`, `hierba` y `agua` (río, con brillos) (en `componer.py`).
 

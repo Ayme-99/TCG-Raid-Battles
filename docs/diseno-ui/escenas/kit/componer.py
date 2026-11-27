@@ -64,6 +64,13 @@ def main(ruta):
         pared += f'<path d="M0 300 H{W}" stroke="{INK}" stroke-width="8"/>'
         body = f'<rect y="300" width="{W}" height="{H-300}" fill="url(#azulejos)"/>' + pared + body
         defs_x = sue
+    elif fondo == "suelo-cueva":
+        sue = '<pattern id="cueva" width="140" height="100" patternUnits="userSpaceOnUse"><rect width="140" height="100" fill="#4b4260"/><path d="M0 0 H140 M0 50 H140 M70 0 V50 M0 50 V100 M140 50 V100" stroke="#3d3550" stroke-width="3" fill="none"/><circle cx="30" cy="30" r="6" fill="#574d6d"/><circle cx="100" cy="76" r="8" fill="#574d6d"/></pattern>'
+        pared = f'<rect y="0" width="{W}" height="290" fill="#2f2840"/>'
+        for x in range(0, W, 180): pared += f'<path d="M{x} 290 L{x+60} 40 L{x+120} 290" fill="#3a3250" stroke="#241d33" stroke-width="4"/>'
+        pared += f'<path d="M0 290 H{W}" stroke="{INK}" stroke-width="8"/>'
+        body = f'<rect y="290" width="{W}" height="{H-290}" fill="url(#cueva)"/>' + pared + body
+        defs_x = sue
     elif fondo == "seco":
         defs_x = '<linearGradient id="seco" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9cf7a"/><stop offset="1" stop-color="#c8bc62"/></linearGradient>'
     else: defs_x = ""
