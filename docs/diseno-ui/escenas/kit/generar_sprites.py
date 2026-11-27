@@ -168,7 +168,7 @@ def roca_grande():
     p = PAD
     o = f'<ellipse cx="{p+80}" cy="{p+92}" rx="92" ry="14" fill="#000" opacity=".15"/><path d="M{p} {p+90} q-8 -56 40 -78 q50 -22 90 6 q36 26 28 72z" fill="#b8b6c2" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/><path d="M{p+30} {p+30} q30 -20 64 -4" fill="none" stroke="#e6e4ee" stroke-width="7" stroke-linecap="round"/><path d="M{p+90} {p+88} q16 -40 66 -48 q6 28 0 48z" fill="#9694a6"/>'
     sprite("roca-grande", 160, 94, o, [], "Peñasco grande gris.")
-def gimnasio_exterior():
+def gimnasio_exterior(id="gimnasio-exterior", pal=None, nota="Gimnasio de roca (exterior): tejado de pizarra y portón de madera. Zona puerta → ir al interior."):
     p = PAD; w, h = 480, 360
     o = f'<ellipse cx="{p+w/2}" cy="{p+h+6}" rx="{w*.58}" ry="20" fill="#000" opacity=".18"/>'
     o += f'<rect x="{p}" y="{p+h*.34}" width="{w}" height="{h*.66}" fill="#b8ada0" stroke="{INK}" stroke-width="5"/>'
@@ -181,7 +181,8 @@ def gimnasio_exterior():
     dw = 130; dy = p + h * .52
     o += f'<rect x="{cx-dw/2-12}" y="{dy-12}" width="{dw+24}" height="{h*.48+12}" rx="10" fill="#8d8276" stroke="{INK}" stroke-width="5"/><rect x="{cx-dw/2}" y="{dy}" width="{dw}" height="{h*.48}" fill="#6b4a2f" stroke="{INK}" stroke-width="5"/><path d="M{cx} {dy} v{h*.48}" stroke="{INK}" stroke-width="4"/><circle cx="{cx-14}" cy="{dy+h*.26}" r="5" fill="#f2c84b"/><circle cx="{cx+14}" cy="{dy+h*.26}" r="5" fill="#f2c84b"/>'
     for x in (p + 40, p + w - 100): o += f'<rect x="{x}" y="{p+h*.52}" width="60" height="{h*.2}" rx="8" fill="#e6c27a" stroke="{INK}" stroke-width="4"/>'
-    sprite("gimnasio-exterior", w, h, o, [{"id": "puerta", "tipo": "puerta", "rect": [cx - dw / 2, dy, dw, h * .48]}, {"id": "edificio", "tipo": "edificio", "rect": [p, p, w, h]}], "Gimnasio de roca (exterior): tejado de pizarra y portón de madera. Zona puerta → ir al interior.")
+    for a_, b_ in (pal or {}).items(): o = o.replace(a_, b_)
+    sprite(id, w, h, o, [{"id": "puerta", "tipo": "puerta", "rect": [cx - dw / 2, dy, dw, h * .48]}, {"id": "edificio", "tipo": "edificio", "rect": [p, p, w, h]}], nota)
 def centro_exterior():
     p = PAD; w, h = 400, 300
     cx = p + w / 2; dw = w * .26; wy = p + h * .38; wh = h * .62; dy = wy + wh * .3; dh = wh * .7 - wh * .14
@@ -215,6 +216,7 @@ def antorcha():
     p = PAD
     o = f'<rect x="{p+8}" y="{p+36}" width="12" height="46" rx="3" fill="#6b4a2f" stroke="{INK}" stroke-width="3"/><path d="M{p-2} {p+38} h32 l-6 -14 h-20z" fill="#8d8276" stroke="{INK}" stroke-width="3"/><path d="M{p+14} {p+22} q-24 -22 0 -50 q8 18 18 8 q10 20 -18 42z" fill="#f2a43b" stroke="{INK}" stroke-width="3"/><path d="M{p+14} {p+18} q-10 -12 0 -26 q10 12 0 26z" fill="#ffe27a"/>'
     sprite("antorcha", 28, 82, o, [], "Antorcha de pared.")
+
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -229,5 +231,6 @@ cartel(); seto(300,"seto"); arbol_oscuro(); tronco(); hongo()
 acantilado(520,"acantilado"); roca_grande()
 gimnasio_exterior(); centro_exterior(); barril(); muro_piedra()
 arena_roca(); columna(); antorcha()
+gimnasio_exterior("gimnasio-agua-exterior", {"#5f6672":"#3f7fd0","#474d58":"#2f62a8","#b8ada0":"#dcebf7","#8d8276":"#8fb4d8","#6b4a2f":"#2f62a8","#d6cdbb":"#bfe3f7","#e6c27a":"#a9d8f2"}, "Gimnasio de agua (exterior): tejado azul y paredes claras. Zona puerta → ir al interior.")
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")

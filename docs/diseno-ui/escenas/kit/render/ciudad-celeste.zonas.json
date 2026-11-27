@@ -1,0 +1,169 @@
+{
+  "escena": "ciudad-celeste",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Ciudad Celeste (exterior). Entrada por abajo (Ruta 4); salida arriba por el puente hacia la Ruta 24. Gimnasio de agua a la derecha, Centro Pokémon a la izquierda. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "casa-pequena-azul-puerta",
+      "tipo": "puerta",
+      "accion": null,
+      "rect": [
+        1554,
+        345,
+        52,
+        57
+      ],
+      "rel": [
+        0.8094,
+        0.3171,
+        0.0271,
+        0.0524
+      ]
+    },
+    {
+      "id": "centro-pokemon-puerta",
+      "tipo": "puerta",
+      "accion": "ir",
+      "rect": [
+        468,
+        510,
+        104,
+        104
+      ],
+      "destino": "centro-celeste",
+      "rel": [
+        0.2437,
+        0.4688,
+        0.0542,
+        0.0956
+      ]
+    },
+    {
+      "id": "centro-pokemon-edificio",
+      "tipo": "edificio",
+      "accion": "ir",
+      "rect": [
+        320,
+        340,
+        400,
+        300
+      ],
+      "destino": "centro-celeste",
+      "rel": [
+        0.1667,
+        0.3125,
+        0.2083,
+        0.2757
+      ]
+    },
+    {
+      "id": "gimnasio-puerta",
+      "tipo": "puerta",
+      "accion": "ir",
+      "rect": [
+        1235,
+        587,
+        130,
+        173
+      ],
+      "destino": "gimnasio-luis",
+      "rel": [
+        0.6432,
+        0.5395,
+        0.0677,
+        0.159
+      ]
+    },
+    {
+      "id": "gimnasio-edificio",
+      "tipo": "edificio",
+      "accion": "ir",
+      "rect": [
+        1060,
+        400,
+        480,
+        360
+      ],
+      "destino": "gimnasio-luis",
+      "rel": [
+        0.5521,
+        0.3676,
+        0.25,
+        0.3309
+      ]
+    },
+    {
+      "id": "casa-pequena-verde-puerta",
+      "tipo": "puerta",
+      "accion": null,
+      "rect": [
+        305,
+        944,
+        50,
+        50
+      ],
+      "rel": [
+        0.1589,
+        0.8676,
+        0.026,
+        0.046
+      ]
+    },
+    {
+      "id": "casa-pequena-roja-puerta",
+      "tipo": "puerta",
+      "accion": null,
+      "rect": [
+        1656,
+        940,
+        48,
+        53
+      ],
+      "rel": [
+        0.8625,
+        0.864,
+        0.025,
+        0.0487
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-ruta-24",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "ruta-24",
+      "rect": [
+        820,
+        0,
+        280,
+        150
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1379
+      ]
+    }
+  ]
+}
