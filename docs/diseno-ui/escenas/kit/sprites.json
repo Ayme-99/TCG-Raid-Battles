@@ -382,5 +382,60 @@
     ],
     "zonas": [],
     "nota": "Alfombra de entrada."
+  },
+  "cartel": {
+    "svg": "sprites/cartel.svg",
+    "ancho": 116,
+    "alto": 162,
+    "ancla": [
+      58.0,
+      116
+    ],
+    "zonas": [],
+    "nota": "Cartel de madera sin texto (ruta, bifurcación)."
+  },
+  "seto": {
+    "svg": "sprites/seto.svg",
+    "ancho": 356,
+    "alto": 144,
+    "ancla": [
+      178.0,
+      98
+    ],
+    "zonas": [],
+    "nota": "Seto denso (separa ramales)."
+  },
+  "arbol-oscuro": {
+    "svg": "sprites/arbol-oscuro.svg",
+    "ancho": 166.0,
+    "alto": 186.5,
+    "ancla": [
+      83.0,
+      140.5
+    ],
+    "zonas": [],
+    "nota": "Árbol de copa oscura (bosque)."
+  },
+  "tronco": {
+    "svg": "sprites/tronco.svg",
+    "ancho": 216,
+    "alto": 118,
+    "ancla": [
+      108.0,
+      72
+    ],
+    "zonas": [],
+    "nota": "Tronco caído con musgo."
+  },
+  "hongo": {
+    "svg": "sprites/hongo.svg",
+    "ancho": 96,
+    "alto": 116,
+    "ancla": [
+      48.0,
+      70
+    ],
+    "zonas": [],
+    "nota": "Seta roja pequeña."
   }
 }

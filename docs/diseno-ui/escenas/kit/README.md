@@ -24,6 +24,7 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `portico` | Pórtico de piedra, salida de ruta (zona `puerta` → `ir`) | nuevo | Ruta 22 |
 | `mostrador-curar`, `mostrador-tienda`, `pc` | Interior del Centro Pokémon: curar, tienda, PC (cada uno con su zona pulsable) | nuevos | Centro Pokémon (interior) |
 | `planta`, `sofa`, `alfombra-puerta` | Decoración de interior | nuevos | Centro Pokémon (interior) |
+| `cartel`, `seto`, `arbol-oscuro`, `tronco`, `hongo` | Decoración de bosque y bifurcación | nuevos | Ruta 2 sur |
 
 Fondos de escena: `cesped` (por defecto) y `suelo-centro` (interior con pared y losas).
 
