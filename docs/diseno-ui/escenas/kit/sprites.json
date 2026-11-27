@@ -250,5 +250,38 @@
     ],
     "zonas": [],
     "nota": "Conífera (segundo tipo de árbol)."
+  },
+  "puente": {
+    "svg": "sprites/puente.svg",
+    "ancho": 356,
+    "alto": 324,
+    "ancla": [
+      178.0,
+      278
+    ],
+    "zonas": [],
+    "nota": "Puente de piedra en vista cenital (el camino lo cruza en vertical). Cubre un río de ~170 px de ancho."
+  },
+  "portico": {
+    "svg": "sprites/portico.svg",
+    "ancho": 396,
+    "alto": 244,
+    "ancla": [
+      198.0,
+      198
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "salida",
+        "rect": [
+          92,
+          28,
+          212,
+          170
+        ]
+      }
+    ],
+    "nota": "Pórtico de piedra bajo (salida de ruta). El camino pasa por el hueco central."
   }
 }

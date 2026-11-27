@@ -1,0 +1,64 @@
+{
+  "escena": "ruta-22",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Ruta 22 (opcional, un combate). Entrada por abajo; el camino cruza el puente sobre el río y sale por el pórtico superior hacia la Ruta 2. Hierba alta a la izquierda del camino = combate. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "portico-puerta",
+      "tipo": "salida",
+      "accion": "ir",
+      "rect": [
+        865,
+        99,
+        191,
+        153
+      ],
+      "destino": "ruta-2",
+      "rel": [
+        0.4505,
+        0.091,
+        0.0995,
+        0.1406
+      ]
+    },
+    {
+      "id": "hierba",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        110,
+        578,
+        500,
+        362
+      ],
+      "pokemon": "salvaje",
+      "rel": [
+        0.0573,
+        0.5312,
+        0.2604,
+        0.3327
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    }
+  ]
+}

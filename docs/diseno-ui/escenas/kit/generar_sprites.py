@@ -79,6 +79,21 @@ def arbol2():
     p = PAD; s = 1.0
     o = pine(p + 40, p + 80, s)
     sprite("arbol-2", 80, 150, o, [], "Conífera (segundo tipo de árbol).")
+def puente():
+    p = PAD; w, h = 300, 250
+    o = f'<rect x="{p+30}" y="{p+4}" width="{w-60}" height="{h-8}" fill="#e8dfcf" stroke="{INK}" stroke-width="5"/>'
+    for y in range(p + 30, p + h - 20, 34): o += f'<path d="M{p+38} {y} H{p+w-38}" stroke="#c9bfa8" stroke-width="3"/>'
+    for x in (p + 6, p + w - 46):
+        o += f'<rect x="{x}" y="{p}" width="40" height="{h}" rx="12" fill="#cfc6b4" stroke="{INK}" stroke-width="5"/><rect x="{x+8}" y="{p+8}" width="10" height="{h-16}" rx="5" fill="#efe9dc"/>'
+        for y in (p - 2, p + h - 26): o += f'<rect x="{x-4}" y="{y}" width="48" height="28" rx="8" fill="#b9b09c" stroke="{INK}" stroke-width="4"/>'
+    sprite("puente", w, h, o, [], "Puente de piedra en vista cenital (el camino lo cruza en vertical). Cubre un río de ~170 px de ancho.")
+def portico():
+    p = PAD; w, h = 340, 170
+    o = f'<ellipse cx="{p+w/2}" cy="{p+h-4}" rx="{w/2+10}" ry="12" fill="#1b4d2a" opacity=".25"/>'
+    for x in (p + 4, p + w - 64):
+        o += f'<rect x="{x}" y="{p+30}" width="60" height="{h-32}" rx="8" fill="#d6cdbb" stroke="{INK}" stroke-width="5"/><path d="M{x+14} {p+44} V{p+h-14}" stroke="#f1ebdd" stroke-width="8" stroke-linecap="round"/><rect x="{x-6}" y="{p+20}" width="72" height="26" rx="8" fill="#bdb4a0" stroke="{INK}" stroke-width="4"/>'
+    o += f'<path d="M{p-6} {p+34} Q{p+w/2} {p-26} {p+w+6} {p+34} V{p+8} Q{p+w/2} {p-40} {p-6} {p+8}z" fill="#cfc6b4" stroke="{INK}" stroke-width="5" stroke-linejoin="round"/>'
+    sprite("portico", w, h, o, [{"id": "puerta", "tipo": "salida", "rect": [p + 64, p, w - 128, h]}], "Pórtico de piedra bajo (salida de ruta). El camino pasa por el hueco central.")
 os.makedirs("sprites", exist_ok=True)
 laboratorio()
 casa("casa-jugador", 250, 200, "#f08a3c", "#c96a22", "Casa del jugador: tejado naranja. Lleva el buzón aparte (sprite buzon).")
@@ -88,6 +103,6 @@ casa("casa-pequena-verde", 230, 170, "#2f9a4e", "#25803f", "Casa pequeña de Ciu
 buzon(); farola(); arbol("arbol-1", 56, "Árbol redondo grande, copa clara."); arbusto(); matas()
 hierba_alta_sprite("hierba-alta-grande", 690, 820, 11, "Mancha grande de hierba alta (zona de combate de ruta).")
 hierba_alta_sprite("hierba-alta-media", 400, 300, 12, "Mancha de hierba alta mediana.")
-valla(); roca(); arbol2()
+valla(); roca(); arbol2(); puente(); portico()
 json.dump(CAT, open("sprites.json", "w"), ensure_ascii=False, indent=2)
 print(len(CAT), "sprites")
