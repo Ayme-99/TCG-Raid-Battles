@@ -1,0 +1,82 @@
+{
+  "escena": "ruta-3",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Ruta 3. Entrada por abajo (viene de Ciudad Plateada); el camino se parte en dos ramales alrededor de un peñasco: hierba izquierda = Spearow (ir a ruta-3-spearow), derecha = Nidoran♂ (ir a ruta-3-nidoran-m). Se reúnen arriba y salen hacia el Monte Moon. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "hierba-spearow",
+      "tipo": "hierba-alta",
+      "accion": "ir",
+      "rect": [
+        320,
+        270,
+        400,
+        290
+      ],
+      "destino": "ruta-3-spearow",
+      "rel": [
+        0.1667,
+        0.2482,
+        0.2083,
+        0.2665
+      ]
+    },
+    {
+      "id": "hierba-nidoran",
+      "tipo": "hierba-alta",
+      "accion": "ir",
+      "rect": [
+        1200,
+        270,
+        400,
+        290
+      ],
+      "destino": "ruta-3-nidoran-m",
+      "rel": [
+        0.625,
+        0.2482,
+        0.2083,
+        0.2665
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-monte-moon",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "monte-moon",
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}
