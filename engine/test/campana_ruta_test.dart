@@ -319,6 +319,34 @@ void main() {
           verde['salida-ruta-2'], 'salida-ruta-2');
     });
 
+    test('la escena de la Ruta 22 usa las zonas de Arte (#415)', () {
+      final arte = leer(
+          File('../docs/diseno-ui/escenas/kit/render/ruta-22.zonas.json'));
+      final rel = {
+        for (final z in arte['zonas'] as List)
+          (z as Map)['id'] as String: [
+            for (final v in z['rel'] as List) (v as num).toDouble()
+          ]
+      };
+      final r22 = kanto.nodo('ruta-22').escena!;
+      void igual(AccionZona a, String? destino, String id) => expect(
+          [
+            for (final z in r22.zonas
+                .where((z) => z.accion == a && z.destino == destino))
+              [z.x, z.y, z.ancho, z.alto]
+          ],
+          [rel[id]],
+          reason: id);
+
+      // La hierba es el combate, la entrada de abajo vuelve a Ciudad
+      // Verde y la puerta del pórtico sale a la Ruta 2.
+      expect(r22.imagen, 'ruta-22');
+      expect(r22.zonas, hasLength(3));
+      igual(AccionZona.combate, null, 'hierba');
+      igual(AccionZona.ir, 'ciudad-verde-salida', 'entrada');
+      igual(AccionZona.ir, 'ruta-2', 'portico-puerta');
+    });
+
     test('Ciudad Verde tiene centro Pokémon y la Ruta 22 es un desvío opcional',
         () {
       expect(kanto.nodo('ciudad-verde').tipo, TipoNodo.descanso);
