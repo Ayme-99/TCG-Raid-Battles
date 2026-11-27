@@ -128,7 +128,7 @@ enum ObjetoCampana {
   /// id ([objetosDeEvolucion]). Se apilan y se gasta una al usarla. Trueno,
   /// Agua, Fuego y Hoja se compran en Ciudad Azulona (2.100, desde la 4.ª
   /// medalla); la Luna no se vende: hay una sola, escondida en el Monte Moon
-  /// (un nodo con `objeto`, [PartidaCampana.recogerObjeto]).
+  /// (un nodo con `objeto`, que la da al llegar; [PartidaCampana.recogidos]).
   piedraTrueno,
   piedraAgua,
   piedraFuego,
@@ -451,8 +451,9 @@ class PartidaCampana {
   /// Hitos ganados que aún no se han enviado a la cuenta, en orden (#374).
   final List<HitoCampana> hitosPendientes;
 
-  /// Nodos cuyo objeto escondido ya se ha cogido ([recogerObjeto]): no se
-  /// reponen (la Piedra Luna, D-20 §10.6, decidido el 2026-11-27).
+  /// Nodos cuyo objeto escondido ya se ha cogido: se coge solo al llegar
+  /// ([avanzar] o [retroceder]) y no se repone (la Piedra Luna, D-20 §10.6,
+  /// decidido el 2026-11-27).
   final Set<String> recogidos;
 
   const PartidaCampana({
@@ -569,7 +570,8 @@ class PartidaCampana {
     if (capturaPendiente != null) {
       throw const ReglaIncumplida('Antes hay que decidir la captura.');
     }
-    return _copiar(progreso: progreso.avanzar(c.region, destino));
+    return _copiar(progreso: progreso.avanzar(c.region, destino))
+        ._recogerAlLlegar(c);
   }
 
   /// Vuelve a [destino], un nodo en el que ya se ha estado (D-20 §10.7).
@@ -577,7 +579,25 @@ class PartidaCampana {
     if (capturaPendiente != null) {
       throw const ReglaIncumplida('Antes hay que decidir la captura.');
     }
-    return _copiar(progreso: progreso.retroceder(c.region, destino));
+    return _copiar(progreso: progreso.retroceder(c.region, destino))
+        ._recogerAlLlegar(c);
+  }
+
+  /// Al llegar a un nodo con un objeto escondido (la Piedra Luna del Monte
+  /// Moon, D-20 §10.6), se coge solo: uno a la mochila (Ayme, 2026-11-27,
+  /// #546). Hay uno solo y **no se repone**: el nodo queda en [recogidos],
+  /// también tras perder, volver atrás o cargar la partida.
+  PartidaCampana _recogerAlLlegar(CatalogoCampana c) {
+    final nodo = nodoActual(c);
+    final id = nodo.objeto;
+    if (id == null || recogidos.contains(nodo.id)) return this;
+    final objeto =
+        ObjetoCampana.values.where((o) => o.name == id).firstOrNull;
+    if (objeto == null) return this;
+    return _copiar(
+      mochila: {...mochila, objeto: cuantos(objeto) + 1},
+      recogidos: {...recogidos, nodo.id},
+    );
   }
 
   /// Si se puede repetir el combate del nodo actual: un salvaje ya vencido.
@@ -850,32 +870,6 @@ class PartidaCampana {
     return _copiar(
       dinero: dinero - precio * cantidad,
       mochila: {...mochila, objeto: cuantos(objeto) + cantidad},
-    );
-  }
-
-  /// Si en el nodo actual hay un objeto escondido que aún no se ha cogido.
-  bool puedeRecoger(CatalogoCampana c) {
-    final objeto = nodoActual(c).objeto;
-    return objeto != null &&
-        !recogidos.contains(progreso.nodoActual) &&
-        ObjetoCampana.values.any((o) => o.name == objeto);
-  }
-
-  /// Coge el objeto escondido del nodo actual (la Piedra Luna del Monte
-  /// Moon, D-20 §10.6): uno a la mochila. Hay uno solo y **no se repone**: el
-  /// nodo queda en [recogidos], también tras perder o volver atrás.
-  PartidaCampana recogerObjeto(CatalogoCampana c) {
-    final nodo = nodoActual(c);
-    if (nodo.objeto == null) {
-      throw const ReglaIncumplida('Aquí no hay nada escondido.');
-    }
-    if (recogidos.contains(nodo.id)) {
-      throw const ReglaIncumplida('Ya lo has cogido.');
-    }
-    final objeto = ObjetoCampana.values.byName(nodo.objeto!);
-    return _copiar(
-      mochila: {...mochila, objeto: cuantos(objeto) + 1},
-      recogidos: {...recogidos, nodo.id},
     );
   }
 

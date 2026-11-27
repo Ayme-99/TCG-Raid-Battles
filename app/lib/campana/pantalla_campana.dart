@@ -166,6 +166,17 @@ class _Mapa extends ConsumerWidget {
         } else {
           _avisar(context, control.retroceder(c, z.destino!));
         }
+        // Un objeto escondido se coge solo al llegar (la Piedra Luna, D-20
+        // §10.6; #546): se avisa de qué se ha encontrado.
+        final ahora = ref.read(campanaProvider).partida;
+        final nodo = c.region.nodos[z.destino];
+        if (ahora != null &&
+            nodo?.objeto != null &&
+            !p.recogidos.contains(nodo!.id) &&
+            ahora.recogidos.contains(nodo.id)) {
+          final objeto = ObjetoCampana.values.byName(nodo.objeto!);
+          _avisar(context, '¡Has encontrado una ${nombreObjeto(objeto)}!');
+        }
       case AccionZona.combate:
         // Un salvaje ya vencido se vuelve a buscar en la hierba (#412).
         if (!p.hayCombate(c)) control.repetirCombate(c);
@@ -205,11 +216,6 @@ class _Mapa extends ConsumerWidget {
         abrirTienda(context, c);
       case AccionZona.pc:
         abrirPc(context, c);
-      // Objeto escondido (la Piedra Luna, D-20 §10.6; #546).
-      case AccionZona.recoger:
-        final objeto = ObjetoCampana.values.byName(p.nodoActual(c).objeto!);
-        control.recogerObjeto(c);
-        _avisar(context, '¡Has encontrado una ${nombreObjeto(objeto)}!');
     }
   }
 }

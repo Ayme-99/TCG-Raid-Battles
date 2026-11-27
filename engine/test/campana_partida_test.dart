@@ -1596,11 +1596,10 @@ void main() {
   });
 
   group('piedras evolutivas (D-20 §10.6, #508 y #546)', () {
-    // Una región como Kanto con un centro que vende las cuatro piedras y la
-    // Piedra Luna escondida en la galería del Monte Moon (el nodo de verdad
-    // está por decidir, #546).
-    Map<String, dynamic> regionJson(
-        {bool zonaRecoger = true, bool objeto = true}) {
+    // Kanto con un centro que vende las cuatro piedras (Ciudad Azulona aún
+    // no está en la región). La Piedra Luna ya está en la galería del Monte
+    // Moon (Ayme, 2026-11-27, #546).
+    Map<String, dynamic> regionJson() {
       final r = leer(File('../catalog/campana/regiones/kanto.json'));
       for (final n in r['nodos'] as List) {
         final nodo = n as Map<String, dynamic>;
@@ -1613,18 +1612,6 @@ void main() {
             'piedraHoja',
             'piedraLuna',
           ];
-        }
-        if (nodo['id'] == 'monte-moon-galeria') {
-          if (objeto) nodo['objeto'] = 'piedraLuna';
-          if (zonaRecoger) {
-            (nodo['escena']['zonas'] as List).add({
-              'accion': 'recoger',
-              'x': 0.8,
-              'y': 0.6,
-              'ancho': 0.1,
-              'alto': 0.1,
-            });
-          }
         }
       }
       return r;
@@ -1750,37 +1737,50 @@ void main() {
           contains('pikachu: evoluciona con "piedra-sol", que no es un objeto.'));
     });
 
-    test('la Piedra Luna escondida se coge una vez y no se repone', () {
-      expect(c2.problemas(), isEmpty);
-      final p = en('monte-moon-galeria');
-      expect(p.puedeRecoger(c2), isTrue);
-      final q = p.recogerObjeto(c2);
+    test('la Piedra Luna está en la galería del Monte Moon (#546)', () {
+      final nodos = [
+        for (final n in c.region.nodos.values)
+          if (n.objeto != null) '${n.id}: ${n.objeto}'
+      ];
+      expect(nodos, ['monte-moon-galeria: piedraLuna'],
+          reason: 'una sola Piedra Luna en todo Kanto');
+      expect(c.region.nodo('monte-moon-galeria').opcional, isTrue);
+    });
+
+    test('la Piedra Luna se coge sola al llegar y no se repone', () {
+      final p = PartidaCampana(
+        progreso: const ProgresoRuta(
+            nodoActual: 'monte-moon',
+            resuelto: true,
+            visitados: {'monte-moon'}),
+        equipo: const [PokemonGuardado('squirtle', 80)],
+      );
+      expect(p.cuantos(ObjetoCampana.piedraLuna), 0);
+      final q = p.avanzar(c, 'monte-moon-galeria');
       expect(q.cuantos(ObjetoCampana.piedraLuna), 1);
       expect(q.recogidos, {'monte-moon-galeria'});
-      expect(q.puedeRecoger(c2), isFalse);
-      expect(() => q.recogerObjeto(c2), throwsA(isA<ReglaIncumplida>()));
+      // Volver atrás y entrar otra vez no da otra.
+      final otraVez = q
+          .retroceder(c, 'monte-moon')
+          .retroceder(c, 'monte-moon-galeria');
+      expect(otraVez.cuantos(ObjetoCampana.piedraLuna), 1);
       // Se guarda: tras cargar la partida tampoco vuelve a estar.
       final cargada = PartidaCampana.desdeJson(
           jsonDecode(jsonEncode(q.aJson())) as Map<String, dynamic>);
       expect(cargada.recogidos, {'monte-moon-galeria'});
-      expect(cargada.puedeRecoger(c2), isFalse);
-      // Donde no hay nada escondido no se coge nada.
-      expect(en('monte-moon').puedeRecoger(c2), isFalse);
-      expect(() => en('monte-moon').recogerObjeto(c2),
-          throwsA(isA<ReglaIncumplida>()));
-      // Una partida sin recogidos no guarda el campo.
-      expect(p.aJson().containsKey('recogidos'), isFalse);
+      expect(
+          cargada
+              .retroceder(c, 'monte-moon')
+              .retroceder(c, 'monte-moon-galeria')
+              .cuantos(ObjetoCampana.piedraLuna),
+          1);
+      // Saltarse la galería no la da, y sin recogidos no se guarda el campo.
+      final sinGaleria = p.avanzar(c, 'jefe-clefairy');
+      expect(sinGaleria.cuantos(ObjetoCampana.piedraLuna), 0);
+      expect(sinGaleria.aJson().containsKey('recogidos'), isFalse);
     });
 
-    test('un objeto escondido necesita su zona «recoger» y al revés', () {
-      expect(
-          conRegion(regionJson(zonaRecoger: false)).problemas(),
-          contains('monte-moon-galeria: esconde un objeto y su escena '
-              'necesita una zona "recoger".'));
-      expect(
-          conRegion(regionJson(objeto: false)).problemas(),
-          contains('monte-moon-galeria: la zona "recoger" pide un objeto '
-              'escondido en el nodo.'));
+    test('un objeto escondido que no existe es un problema', () {
       final r = regionJson();
       for (final n in r['nodos'] as List) {
         if (n['id'] == 'monte-moon-galeria') n['objeto'] = 'piedraSol';
