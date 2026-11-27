@@ -472,7 +472,8 @@ void main() {
       expect(kanto.nodo('ruta-24').salidas, ['gimnasio-luis']);
       final luis = kanto.nodo('gimnasio-luis');
       expect(luis.clase, 'Nadador');
-      expect(luis.pokemon, ['horsea', 'shellder']);
+      // Tercer Pokémon, Staryu (Ayme, 2026-11-27, #380; #573).
+      expect(luis.pokemon, ['horsea', 'shellder', 'staryu']);
       expect(luis.salidas, ['gimnasio-misty']);
     });
 
