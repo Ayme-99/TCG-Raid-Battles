@@ -168,24 +168,24 @@
         "zonas": [
           {
             "accion": "curar",
-            "x": 0.4,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.3
+            "x": 0.3708,
+            "y": 0.2923,
+            "ancho": 0.2589,
+            "alto": 0.2215
           },
           {
             "accion": "tienda",
-            "x": 0.15,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.6948,
+            "y": 0.2656,
+            "ancho": 0.2245,
+            "alto": 0.2123
           },
           {
             "accion": "pc",
-            "x": 0.65,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.125,
+            "y": 0.25,
+            "ancho": 0.0938,
+            "alto": 0.2096
           },
           {
             "accion": "ir",
@@ -206,10 +206,10 @@
           {
             "accion": "ir",
             "destino": "ciudad-verde-salida",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           }
         ]
       },
@@ -310,10 +310,10 @@
           {
             "accion": "ir",
             "destino": "ciudad-verde-salida",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
@@ -326,18 +326,18 @@
           {
             "accion": "ir",
             "destino": "ruta-2-weedle",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.1667,
+            "y": 0.2482,
+            "ancho": 0.2083,
+            "alto": 0.2665
           },
           {
             "accion": "ir",
             "destino": "ruta-2-caterpie",
-            "x": 0.9,
-            "y": 0.5,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.625,
+            "y": 0.2482,
+            "ancho": 0.2083,
+            "alto": 0.2665
           }
         ]
       }
@@ -359,26 +359,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.1667,
+            "y": 0.2482,
+            "ancho": 0.2083,
+            "alto": 0.2665
           },
           {
             "accion": "ir",
             "destino": "ruta-2",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "cazabichos-1",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -400,26 +400,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.625,
+            "y": 0.2482,
+            "ancho": 0.2083,
+            "alto": 0.2665
           },
           {
             "accion": "ir",
             "destino": "ruta-2",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "cazabichos-1",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -439,10 +439,10 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.4,
-            "y": 0.3,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.4792,
+            "y": 0.7767,
+            "ancho": 0.125,
+            "alto": 0.1195
           },
           {
             "accion": "ir",
@@ -463,10 +463,10 @@
           {
             "accion": "ir",
             "destino": "cazabichos-2",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.2057,
+            "y": 0.4963,
+            "ancho": 0.1302,
+            "alto": 0.1287
           }
         ]
       }
@@ -486,26 +486,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.4,
-            "y": 0.3,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.2057,
+            "y": 0.4963,
+            "ancho": 0.1302,
+            "alto": 0.1287
           },
           {
             "accion": "ir",
             "destino": "cazabichos-1",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4792,
+            "y": 0.7767,
+            "ancho": 0.125,
+            "alto": 0.1195
           },
           {
             "accion": "ir",
             "destino": "aviso-pikachu",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.5312,
+            "y": 0.1195,
+            "ancho": 0.1146,
+            "alto": 0.1103
           }
         ]
       }
@@ -530,18 +530,18 @@
         "zonas": [
           {
             "accion": "hablar",
-            "x": 0.4,
-            "y": 0.3,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.5312,
+            "y": 0.1195,
+            "ancho": 0.1146,
+            "alto": 0.1103
           },
           {
             "accion": "ir",
             "destino": "cazabichos-2",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.2057,
+            "y": 0.4963,
+            "ancho": 0.1302,
+            "alto": 0.1287
           },
           {
             "accion": "ir",
@@ -575,18 +575,18 @@
           {
             "accion": "ir",
             "destino": "aviso-pikachu",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.5312,
+            "y": 0.1195,
+            "ancho": 0.1146,
+            "alto": 0.1103
           },
           {
             "accion": "ir",
             "destino": "ruta-2-norte",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -605,26 +605,26 @@
           {
             "accion": "ir",
             "destino": "jefe-pikachu",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ruta-2-norte-salvaje",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.6823,
+            "y": 0.3346,
+            "ancho": 0.1979,
+            "alto": 0.2537
           },
           {
             "accion": "ir",
             "destino": "centro-plateada",
-            "x": 0.9,
-            "y": 0.5,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -644,26 +644,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.6823,
+            "y": 0.3346,
+            "ancho": 0.1979,
+            "alto": 0.2537
           },
           {
             "accion": "ir",
             "destino": "ruta-2-norte",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "centro-plateada",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -680,24 +680,24 @@
         "zonas": [
           {
             "accion": "curar",
-            "x": 0.4,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.3
+            "x": 0.3708,
+            "y": 0.2923,
+            "ancho": 0.2589,
+            "alto": 0.2215
           },
           {
             "accion": "tienda",
-            "x": 0.15,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.6948,
+            "y": 0.2656,
+            "ancho": 0.2245,
+            "alto": 0.2123
           },
           {
             "accion": "pc",
-            "x": 0.65,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.125,
+            "y": 0.25,
+            "ancho": 0.0938,
+            "alto": 0.2096
           },
           {
             "accion": "ir",
@@ -718,10 +718,10 @@
           {
             "accion": "ir",
             "destino": "gimnasio-joven",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           }
         ]
       },
@@ -750,26 +750,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.4,
-            "y": 0.3,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.3958,
+            "y": 0.6434,
+            "ancho": 0.2083,
+            "alto": 0.1838
           },
           {
             "accion": "ir",
             "destino": "centro-plateada",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "gimnasio-brock",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.386,
+            "ancho": 0.2083,
+            "alto": 0.1654
           }
         ]
       }
@@ -795,26 +795,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.4,
-            "y": 0.3,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.3958,
+            "y": 0.386,
+            "ancho": 0.2083,
+            "alto": 0.1654
           },
           {
             "accion": "ir",
             "destino": "gimnasio-joven",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.6434,
+            "ancho": 0.2083,
+            "alto": 0.1838
           },
           {
             "accion": "ir",
             "destino": "ruta-3",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           }
         ]
       }
@@ -833,26 +833,26 @@
           {
             "accion": "ir",
             "destino": "gimnasio-brock",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ruta-3-spearow",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.1667,
+            "y": 0.2482,
+            "ancho": 0.2083,
+            "alto": 0.2665
           },
           {
             "accion": "ir",
             "destino": "ruta-3-nidoran-m",
-            "x": 0.9,
-            "y": 0.5,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.625,
+            "y": 0.2482,
+            "ancho": 0.2083,
+            "alto": 0.2665
           }
         ]
       }
@@ -874,26 +874,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.1667,
+            "y": 0.2482,
+            "ancho": 0.2083,
+            "alto": 0.2665
           },
           {
             "accion": "ir",
             "destino": "ruta-3",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ruta-3-chica",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -915,26 +915,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.625,
+            "y": 0.2482,
+            "ancho": 0.2083,
+            "alto": 0.2665
           },
           {
             "accion": "ir",
             "destino": "ruta-3",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ruta-3-chica",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -1122,24 +1122,24 @@
         "zonas": [
           {
             "accion": "curar",
-            "x": 0.4,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.3
+            "x": 0.3708,
+            "y": 0.2923,
+            "ancho": 0.2589,
+            "alto": 0.2215
           },
           {
             "accion": "tienda",
-            "x": 0.15,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.6948,
+            "y": 0.2656,
+            "ancho": 0.2245,
+            "alto": 0.2123
           },
           {
             "accion": "pc",
-            "x": 0.65,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.125,
+            "y": 0.25,
+            "ancho": 0.0938,
+            "alto": 0.2096
           },
           {
             "accion": "ir",
@@ -1160,10 +1160,10 @@
           {
             "accion": "ir",
             "destino": "monte-moon",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           }
         ]
       },
@@ -1191,34 +1191,34 @@
           {
             "accion": "ir",
             "destino": "centro-monte-moon",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.625,
+            "y": 0.432,
+            "ancho": 0.1875,
+            "alto": 0.2482
           },
           {
             "accion": "ir",
             "destino": "monte-moon-galeria",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.26
+            "x": 0.0849,
+            "y": 0.6682,
+            "ancho": 0.0698,
+            "alto": 0.159
           },
           {
             "accion": "ir",
             "destino": "monte-moon-1f",
-            "x": 0.9,
-            "y": 0.36,
-            "ancho": 0.1,
-            "alto": 0.26
+            "x": 0.1917,
+            "y": 0.1949,
+            "ancho": 0.1167,
+            "alto": 0.2647
           },
           {
             "accion": "ir",
             "destino": "jefe-clefairy",
-            "x": 0.9,
-            "y": 0.62,
-            "ancho": 0.1,
-            "alto": 0.26
+            "x": 0.7188,
+            "y": 0.2022,
+            "ancho": 0.1875,
+            "alto": 0.1562
           }
         ]
       }
@@ -1234,30 +1234,30 @@
       "rival": "salvaje",
       "opcional": true,
       "escena": {
-        "imagen": "monte-moon",
+        "imagen": "monte-moon-b1f",
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.3359,
+            "y": 0.2849,
+            "ancho": 0.3281,
+            "alto": 0.3585
           },
           {
             "accion": "ir",
             "destino": "monte-moon",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "jefe-clefairy",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -1275,42 +1275,42 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.4,
-            "y": 0.3,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.7188,
+            "y": 0.2022,
+            "ancho": 0.1875,
+            "alto": 0.1562
           },
           {
             "accion": "ir",
             "destino": "monte-moon",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.26
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "monte-moon-galeria",
-            "x": 0.0,
-            "y": 0.36,
-            "ancho": 0.1,
-            "alto": 0.26
+            "x": 0.0849,
+            "y": 0.6682,
+            "ancho": 0.0698,
+            "alto": 0.159
           },
           {
             "accion": "ir",
             "destino": "monte-moon-1f",
-            "x": 0.0,
-            "y": 0.62,
-            "ancho": 0.1,
-            "alto": 0.26
+            "x": 0.1917,
+            "y": 0.1949,
+            "ancho": 0.1167,
+            "alto": 0.2647
           },
           {
             "accion": "ir",
             "destino": "ruta-4",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -1326,30 +1326,30 @@
       "rival": "salvaje",
       "opcional": true,
       "escena": {
-        "imagen": "monte-moon",
+        "imagen": "monte-moon-galeria",
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.3203,
+            "y": 0.3539,
+            "ancho": 0.3594,
+            "alto": 0.3447
           },
           {
             "accion": "ir",
             "destino": "monte-moon",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "jefe-clefairy",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -1368,26 +1368,26 @@
           {
             "accion": "ir",
             "destino": "jefe-clefairy",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ruta-4-sandshrew",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.1094,
+            "y": 0.4816,
+            "ancho": 0.1979,
+            "alto": 0.2537
           },
           {
             "accion": "ir",
             "destino": "ruta-4-rattata",
-            "x": 0.9,
-            "y": 0.5,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.7135,
+            "y": 0.5643,
+            "ancho": 0.1979,
+            "alto": 0.2537
           }
         ]
       }
@@ -1409,26 +1409,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.1094,
+            "y": 0.4816,
+            "ancho": 0.1979,
+            "alto": 0.2537
           },
           {
             "accion": "ir",
             "destino": "ruta-4",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ruta-4-final",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -1450,26 +1450,26 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.7135,
+            "y": 0.5643,
+            "ancho": 0.1979,
+            "alto": 0.2537
           },
           {
             "accion": "ir",
             "destino": "ruta-4",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
             "destino": "ruta-4-final",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1103
           }
         ]
       }
@@ -1571,24 +1571,24 @@
         "zonas": [
           {
             "accion": "curar",
-            "x": 0.4,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.3
+            "x": 0.3708,
+            "y": 0.2923,
+            "ancho": 0.2589,
+            "alto": 0.2215
           },
           {
             "accion": "tienda",
-            "x": 0.15,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.6948,
+            "y": 0.2656,
+            "ancho": 0.2245,
+            "alto": 0.2123
           },
           {
             "accion": "pc",
-            "x": 0.65,
-            "y": 0.2,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.125,
+            "y": 0.25,
+            "ancho": 0.0938,
+            "alto": 0.2096
           },
           {
             "accion": "ir",
@@ -1609,10 +1609,10 @@
           {
             "accion": "ir",
             "destino": "celeste-salida",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           }
         ]
       },
@@ -1638,26 +1638,26 @@
           {
             "accion": "ir",
             "destino": "centro-celeste",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.1667,
+            "y": 0.3125,
+            "ancho": 0.2083,
+            "alto": 0.2757
           },
           {
             "accion": "ir",
             "destino": "ruta-24",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.4271,
+            "y": 0.0,
+            "ancho": 0.1458,
+            "alto": 0.1379
           },
           {
             "accion": "ir",
             "destino": "gimnasio-luis",
-            "x": 0.9,
-            "y": 0.5,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.5521,
+            "y": 0.3676,
+            "ancho": 0.25,
+            "alto": 0.3309
           }
         ]
       }
@@ -1677,18 +1677,18 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.3,
-            "y": 0.55,
-            "ancho": 0.4,
-            "alto": 0.3
+            "x": 0.1094,
+            "y": 0.5074,
+            "ancho": 0.25,
+            "alto": 0.3199
           },
           {
             "accion": "ir",
             "destino": "celeste-salida",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
@@ -1721,18 +1721,18 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.4,
-            "y": 0.3,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.3958,
+            "y": 0.6342,
+            "ancho": 0.2083,
+            "alto": 0.1838
           },
           {
             "accion": "ir",
             "destino": "celeste-salida",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.4
+            "x": 0.3958,
+            "y": 0.83,
+            "ancho": 0.2083,
+            "alto": 0.17
           },
           {
             "accion": "ir",
@@ -1745,10 +1745,10 @@
           {
             "accion": "ir",
             "destino": "gimnasio-misty",
-            "x": 0.9,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.3952,
+            "ancho": 0.2083,
+            "alto": 0.1654
           }
         ]
       }
@@ -1771,18 +1771,18 @@
         "zonas": [
           {
             "accion": "combate",
-            "x": 0.4,
-            "y": 0.3,
-            "ancho": 0.2,
-            "alto": 0.4
+            "x": 0.3958,
+            "y": 0.3952,
+            "ancho": 0.2083,
+            "alto": 0.1654
           },
           {
             "accion": "ir",
             "destino": "gimnasio-luis",
-            "x": 0.0,
-            "y": 0.1,
-            "ancho": 0.1,
-            "alto": 0.8
+            "x": 0.3958,
+            "y": 0.6342,
+            "ancho": 0.2083,
+            "alto": 0.1838
           }
         ]
       }

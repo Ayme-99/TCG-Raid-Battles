@@ -319,6 +319,128 @@ void main() {
           verde['salida-ruta-2'], 'salida-ruta-2');
     });
 
+    // Zonas de Arte de las escenas base en vector (#415, PR #539 a #566, #580
+    // y #581; #603). Cada fila: nodo, zona del nodo (acción y destino) y la
+    // zona de Arte de la que sale su rectángulo. El grafo no cambia.
+    test('las escenas del tramo 1 y 2 usan las zonas de Arte (#603)', () {
+      final arte = <String, Map<String, List<double>>>{};
+      Map<String, List<double>> escena(String id) =>
+          arte.putIfAbsent(id, () {
+            final j = leer(File(
+                '../docs/diseno-ui/escenas/kit/render/$id.zonas.json'));
+            return {
+              for (final z in j['zonas'] as List)
+                (z as Map)['id'] as String: [
+                  for (final v in z['rel'] as List) (v as num).toDouble()
+                ]
+            };
+          });
+      for (final (nodo, accion, destino, imagen, id) in [
+        ('ciudad-verde', AccionZona.curar, null, 'centro-pokemon', 'mostrador-curar-curar'),
+        ('ciudad-verde', AccionZona.tienda, null, 'centro-pokemon', 'mostrador-tienda-tienda'),
+        ('ciudad-verde', AccionZona.pc, null, 'centro-pokemon', 'pc-pc'),
+        ('ciudad-verde', AccionZona.ir, 'ciudad-verde-salida', 'centro-pokemon', 'salida-ciudad-verde'),
+        ('centro-plateada', AccionZona.curar, null, 'centro-pokemon', 'mostrador-curar-curar'),
+        ('centro-plateada', AccionZona.tienda, null, 'centro-pokemon', 'mostrador-tienda-tienda'),
+        ('centro-plateada', AccionZona.pc, null, 'centro-pokemon', 'pc-pc'),
+        ('centro-plateada', AccionZona.ir, 'gimnasio-joven', 'centro-pokemon', 'salida-ciudad-verde'),
+        ('centro-monte-moon', AccionZona.curar, null, 'centro-pokemon', 'mostrador-curar-curar'),
+        ('centro-monte-moon', AccionZona.tienda, null, 'centro-pokemon', 'mostrador-tienda-tienda'),
+        ('centro-monte-moon', AccionZona.pc, null, 'centro-pokemon', 'pc-pc'),
+        ('centro-monte-moon', AccionZona.ir, 'monte-moon', 'centro-pokemon', 'salida-ciudad-verde'),
+        ('centro-celeste', AccionZona.curar, null, 'centro-pokemon', 'mostrador-curar-curar'),
+        ('centro-celeste', AccionZona.tienda, null, 'centro-pokemon', 'mostrador-tienda-tienda'),
+        ('centro-celeste', AccionZona.pc, null, 'centro-pokemon', 'pc-pc'),
+        ('centro-celeste', AccionZona.ir, 'celeste-salida', 'centro-pokemon', 'salida-ciudad-verde'),
+        ('ruta-2', AccionZona.ir, 'ruta-2-weedle', 'ruta-2', 'hierba-weedle'),
+        ('ruta-2', AccionZona.ir, 'ruta-2-caterpie', 'ruta-2', 'hierba-caterpie'),
+        ('ruta-2', AccionZona.ir, 'ciudad-verde-salida', 'ruta-2', 'entrada'),
+        ('ruta-2-weedle', AccionZona.combate, null, 'ruta-2', 'hierba-weedle'),
+        ('ruta-2-weedle', AccionZona.ir, 'ruta-2', 'ruta-2', 'entrada'),
+        ('ruta-2-weedle', AccionZona.ir, 'cazabichos-1', 'ruta-2', 'salida-bosque-verde'),
+        ('ruta-2-caterpie', AccionZona.combate, null, 'ruta-2', 'hierba-caterpie'),
+        ('ruta-2-caterpie', AccionZona.ir, 'ruta-2', 'ruta-2', 'entrada'),
+        ('ruta-2-caterpie', AccionZona.ir, 'cazabichos-1', 'ruta-2', 'salida-bosque-verde'),
+        ('cazabichos-1', AccionZona.combate, null, 'bosque-verde', 'claro-1'),
+        ('cazabichos-1', AccionZona.ir, 'cazabichos-2', 'bosque-verde', 'claro-2'),
+        ('cazabichos-2', AccionZona.combate, null, 'bosque-verde', 'claro-2'),
+        ('cazabichos-2', AccionZona.ir, 'cazabichos-1', 'bosque-verde', 'claro-1'),
+        ('cazabichos-2', AccionZona.ir, 'aviso-pikachu', 'bosque-verde', 'claro-3'),
+        ('aviso-pikachu', AccionZona.hablar, null, 'bosque-verde', 'claro-3'),
+        ('aviso-pikachu', AccionZona.ir, 'cazabichos-2', 'bosque-verde', 'claro-2'),
+        ('jefe-pikachu', AccionZona.ir, 'aviso-pikachu', 'bosque-verde', 'claro-3'),
+        ('jefe-pikachu', AccionZona.ir, 'ruta-2-norte', 'bosque-verde', 'salida-ruta-2-norte'),
+        ('ruta-2-norte', AccionZona.ir, 'ruta-2-norte-salvaje', 'ruta-2-norte', 'hierba'),
+        ('ruta-2-norte', AccionZona.ir, 'jefe-pikachu', 'ruta-2-norte', 'entrada'),
+        ('ruta-2-norte', AccionZona.ir, 'centro-plateada', 'ruta-2-norte', 'salida-centro-plateada'),
+        ('ruta-2-norte-salvaje', AccionZona.combate, null, 'ruta-2-norte', 'hierba'),
+        ('ruta-2-norte-salvaje', AccionZona.ir, 'ruta-2-norte', 'ruta-2-norte', 'entrada'),
+        ('ruta-2-norte-salvaje', AccionZona.ir, 'centro-plateada', 'ruta-2-norte', 'salida-centro-plateada'),
+        ('gimnasio-joven', AccionZona.combate, null, 'gimnasio-plateada', 'plaza-joven'),
+        ('gimnasio-joven', AccionZona.ir, 'gimnasio-brock', 'gimnasio-plateada', 'plaza-brock'),
+        ('gimnasio-joven', AccionZona.ir, 'centro-plateada', 'gimnasio-plateada', 'salida'),
+        ('gimnasio-brock', AccionZona.combate, null, 'gimnasio-plateada', 'plaza-brock'),
+        ('gimnasio-brock', AccionZona.ir, 'gimnasio-joven', 'gimnasio-plateada', 'plaza-joven'),
+        ('gimnasio-brock', AccionZona.ir, 'ruta-3', 'gimnasio-plateada', 'salida'),
+        ('ruta-3', AccionZona.ir, 'ruta-3-spearow', 'ruta-3', 'hierba-spearow'),
+        ('ruta-3', AccionZona.ir, 'ruta-3-nidoran-m', 'ruta-3', 'hierba-nidoran'),
+        ('ruta-3', AccionZona.ir, 'gimnasio-brock', 'ruta-3', 'entrada'),
+        ('ruta-3-spearow', AccionZona.combate, null, 'ruta-3', 'hierba-spearow'),
+        ('ruta-3-spearow', AccionZona.ir, 'ruta-3', 'ruta-3', 'entrada'),
+        ('ruta-3-spearow', AccionZona.ir, 'ruta-3-chica', 'ruta-3', 'salida-monte-moon'),
+        ('ruta-3-nidoran-m', AccionZona.combate, null, 'ruta-3', 'hierba-nidoran'),
+        ('ruta-3-nidoran-m', AccionZona.ir, 'ruta-3', 'ruta-3', 'entrada'),
+        ('ruta-3-nidoran-m', AccionZona.ir, 'ruta-3-chica', 'ruta-3', 'salida-monte-moon'),
+        ('monte-moon', AccionZona.ir, 'monte-moon-galeria', 'monte-moon', 'b1f-puerta'),
+        ('monte-moon', AccionZona.ir, 'monte-moon-1f', 'monte-moon', 'galeria-puerta'),
+        ('monte-moon', AccionZona.ir, 'jefe-clefairy', 'monte-moon', 'claro-jefe'),
+        ('monte-moon', AccionZona.ir, 'centro-monte-moon', 'monte-moon', 'centro-pokemon-edificio'),
+        ('monte-moon-galeria', AccionZona.combate, null, 'monte-moon-b1f', 'setas'),
+        ('monte-moon-galeria', AccionZona.ir, 'monte-moon', 'monte-moon-b1f', 'entrada'),
+        ('monte-moon-galeria', AccionZona.ir, 'jefe-clefairy', 'monte-moon-b1f', 'salida-jefe-clefairy'),
+        ('monte-moon-1f', AccionZona.combate, null, 'monte-moon-galeria', 'escombros'),
+        ('monte-moon-1f', AccionZona.ir, 'monte-moon', 'monte-moon-galeria', 'entrada'),
+        ('monte-moon-1f', AccionZona.ir, 'jefe-clefairy', 'monte-moon-galeria', 'salida-jefe-clefairy'),
+        ('jefe-clefairy', AccionZona.combate, null, 'monte-moon', 'claro-jefe'),
+        ('jefe-clefairy', AccionZona.ir, 'monte-moon-galeria', 'monte-moon', 'b1f-puerta'),
+        ('jefe-clefairy', AccionZona.ir, 'monte-moon-1f', 'monte-moon', 'galeria-puerta'),
+        ('jefe-clefairy', AccionZona.ir, 'monte-moon', 'monte-moon', 'entrada'),
+        ('jefe-clefairy', AccionZona.ir, 'ruta-4', 'monte-moon', 'salida-ruta-4'),
+        ('ruta-4', AccionZona.ir, 'ruta-4-sandshrew', 'ruta-4', 'hierba-sandshrew'),
+        ('ruta-4', AccionZona.ir, 'ruta-4-rattata', 'ruta-4', 'hierba-rattata'),
+        ('ruta-4', AccionZona.ir, 'jefe-clefairy', 'ruta-4', 'entrada'),
+        ('ruta-4-sandshrew', AccionZona.combate, null, 'ruta-4', 'hierba-sandshrew'),
+        ('ruta-4-sandshrew', AccionZona.ir, 'ruta-4', 'ruta-4', 'entrada'),
+        ('ruta-4-sandshrew', AccionZona.ir, 'ruta-4-final', 'ruta-4', 'salida-ciudad-celeste'),
+        ('ruta-4-rattata', AccionZona.combate, null, 'ruta-4', 'hierba-rattata'),
+        ('ruta-4-rattata', AccionZona.ir, 'ruta-4', 'ruta-4', 'entrada'),
+        ('ruta-4-rattata', AccionZona.ir, 'ruta-4-final', 'ruta-4', 'salida-ciudad-celeste'),
+        ('celeste-salida', AccionZona.ir, 'centro-celeste', 'ciudad-celeste', 'centro-pokemon-edificio'),
+        ('celeste-salida', AccionZona.ir, 'gimnasio-luis', 'ciudad-celeste', 'gimnasio-edificio'),
+        ('celeste-salida', AccionZona.ir, 'ruta-24', 'ciudad-celeste', 'salida-ruta-24'),
+        ('ruta-24', AccionZona.combate, null, 'ruta-24', 'hierba'),
+        ('ruta-24', AccionZona.ir, 'celeste-salida', 'ruta-24', 'entrada'),
+        ('gimnasio-luis', AccionZona.combate, null, 'gimnasio-celeste', 'plaza-luis'),
+        ('gimnasio-luis', AccionZona.ir, 'gimnasio-misty', 'gimnasio-celeste', 'plaza-misty'),
+        ('gimnasio-luis', AccionZona.ir, 'celeste-salida', 'gimnasio-celeste', 'salida'),
+        ('gimnasio-misty', AccionZona.combate, null, 'gimnasio-celeste', 'plaza-misty'),
+        ('gimnasio-misty', AccionZona.ir, 'gimnasio-luis', 'gimnasio-celeste', 'plaza-luis'),
+      ]) {
+        final zonas = kanto
+            .nodo(nodo)
+            .escena!
+            .zonas
+            .where((z) => z.accion == accion && z.destino == destino);
+        expect([for (final z in zonas) [z.x, z.y, z.ancho, z.alto]],
+            [escena(imagen)[id]],
+            reason: '$nodo: ${accion.name} ${destino ?? ''} ← $imagen/$id');
+      }
+      // B1F (Paras) usa la escena monte-moon-b1f y la 1F (Zubat o Geodude),
+      // la «galería lateral» de Arte.
+      expect(kanto.nodo('monte-moon-galeria').escena!.imagen, 'monte-moon-b1f');
+      expect(kanto.nodo('monte-moon-1f').escena!.imagen, 'monte-moon-galeria');
+    });
+
     test('la escena de la Ruta 22 usa las zonas de Arte (#415)', () {
       final arte = leer(
           File('../docs/diseno-ui/escenas/kit/render/ruta-22.zonas.json'));
@@ -702,11 +824,12 @@ void main() {
       expect(kanto.problemasDeEscenas(), isEmpty);
     });
 
-    test('cada nodo de Kanto tiene imagen y hay 15 escenas distintas', () {
+    test('cada nodo de Kanto tiene imagen y hay 17 escenas distintas', () {
       final imagenes = {
         for (final n in kanto.nodos.values) n.escena!.imagen,
       };
-      expect(imagenes, hasLength(15));
+      // B1F y 1F del Monte Moon tienen la suya (#603).
+      expect(imagenes, hasLength(17));
       for (final centro in ['centro-plateada', 'centro-monte-moon', 'centro-celeste']) {
         expect(kanto.nodo('ciudad-verde').escena!.imagen,
             kanto.nodo(centro).escena!.imagen,
