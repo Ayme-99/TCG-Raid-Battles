@@ -7,12 +7,12 @@ Vas a trabajar en «Incursiones / TCG Raid Battles» (repositorio Ayme-99/TCG-Ra
 
 QUÉ ES
 - Un formato cooperativo casero de Pokémon TCG (estilo Raid Battle) para 1-4 jugadores, más una app Flutter (Web, Windows, Android) que hace de «Game Master»: lleva los PS del jefe y el registro; las cartas viven en la mesa.
-- Modo campaña (en construcción): juego de Pokémon para un jugador, combates 1 contra 1, mapa por nodos, capturas, equipo de 6, gimnasios, tienda y centro Pokémon. Región actual: Kanto. Es independiente de la Partida libre (antes «Partida rápida»).
+- Modo campaña (en construcción): juego de Pokémon para un jugador, combates 1 contra 1, mapa por nodos, capturas, equipo de 6, gimnasios, tienda y centro Pokémon. Región actual: Kanto. Es independiente de la Partida rápida (antes «Partida libre»).
 - El dueño del proyecto es Ayme. Las decisiones son suyas.
 
 DÓNDE ESTÁ TODO
 - README.md: estado y estructura (engine/ motor Dart puro, sim/ simuladores, catalog/ JSON de jefes y campaña, balance/, app/ Flutter, server/ Node, docs/).
-- incursiones_gdd.md: diseño de la Partida libre.
+- incursiones_gdd.md: diseño de la Partida rápida.
 - docs/D-20-modo-campana.md: diseño del modo campaña. §10 es la FUENTE DE VERDAD de las decisiones; si algo choca con ella, gana §10.
 - docs/DEPENDENCIAS.md: qué hay que tocar en otros sitios cuando cambias algo.
 - docs/flujo-de-trabajo.md: cómo trabajamos (léelo antes de nada).
