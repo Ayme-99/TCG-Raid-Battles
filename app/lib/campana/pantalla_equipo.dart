@@ -161,7 +161,8 @@ class _ContenidoEquipo extends ConsumerWidget {
                   clave: 'equipo-$i',
                   especie: c.especie(p.equipo[i].id),
                   ps: p.equipo[i].ps,
-                  primero: i == 0,
+                  // El primero en pie, el que abre el combate (#590).
+                  primero: i == p.salePrimero,
                   onTap: () => _hoja(context, ref, i, enCentro),
                 )
               else
