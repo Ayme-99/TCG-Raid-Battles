@@ -123,21 +123,19 @@ void main() {
     expect(c.jefes, contains('pikachu-jefe'));
   });
 
-  testWidgets('el selector de modo abre la campaña', (tester) async {
+  testWidgets('el bloque de campaña del inicio abre la campaña (#585)',
+      (tester) async {
     tester.view.physicalSize = const Size(1024, 768);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(ProviderScope(
-      overrides: sobrescribir(conInicio: true),
+      overrides: sobrescribir(conInicio: true, almacen: almacenConSesion()),
       child: const IncursionesApp(),
     ));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('inicio-nueva')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('opcion-campana')));
+    await tester.tap(find.byKey(const Key('inicio-nueva-campana')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('campana-mapa')), findsOneWidget);
-    expect(find.byKey(const Key('campana-empezar')), findsOneWidget);
   });
 
   for (final (nombre, tamano) in [
