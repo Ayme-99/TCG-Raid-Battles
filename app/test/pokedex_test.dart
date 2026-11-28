@@ -216,6 +216,9 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    // En 390×600 el inicio no cabe entero: se baja hasta el Pokédex.
+    await tester.ensureVisible(find.byKey(const Key('inicio-pokedex')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('inicio-pokedex')));
     await tester.pumpAndSettle();
 

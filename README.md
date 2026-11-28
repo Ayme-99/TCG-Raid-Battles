@@ -13,7 +13,7 @@ Asistente de combate para **Incursiones**, un formato cooperativo casero de Pok�
 - 4 jefes en el catálogo (Onix, Manectric, Kingdra y Arceus), cada uno con 6 aliados.
 - Condiciones de victoria/derrota, curación del jefe, estados, puntos y envío de resultados al servidor.
 
-🗺️ **Modo campaña (en construcción):** un juego de Pokémon para un jugador, ajeno a la partida libre, con combates 1 contra 1. Ya se puede jugar **el primer tramo de Kanto, de Pueblo Paleta a la Medalla Roca de Brock**, desde «Nueva partida → Modo campaña»:
+🗺️ **Modo campaña (en construcción):** un juego de Pokémon para un jugador, ajeno a la partida rápida, con combates 1 contra 1. Ya se puede jugar **el primer tramo de Kanto, de Pueblo Paleta a la Medalla Roca de Brock**, desde «Nueva partida → Modo campaña»:
 
 - Motor de combate con energía, debilidades y resistencias, 10 efectos de ataque, una habilidad pasiva y azar con semilla, y una IA rival determinista.
 - Mapa por nodos (inicio, combate, bifurcación, descanso, conversación, gimnasio y jefe), captura, equipo de 6 con PC, centro Pokémon con tienda, derrota que vuelve al último punto de curación y guardado en el dispositivo.

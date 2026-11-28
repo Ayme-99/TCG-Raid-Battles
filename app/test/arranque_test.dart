@@ -15,8 +15,12 @@ void main() {
     );
     expect(find.byKey(const Key('inicio')), findsOneWidget);
     expect(find.byKey(const Key('inicio-nueva')), findsOneWidget);
-    // Sin partida guardada no hay nada que continuar.
-    expect(find.byKey(const Key('inicio-continuar')), findsNothing);
+    // Sin partida guardada no hay nada que continuar: sale apagado (#585).
+    expect(
+        tester
+            .widget<InkWell>(find.byKey(const Key('inicio-continuar')))
+            .onTap,
+        isNull);
     expect(find.text('Jugadores y su mejor ataque'), findsNothing);
   });
 
@@ -29,7 +33,7 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('inicio-nueva')));
     await tester.pumpAndSettle();
-    for (final k in ['nueva-siguiente', 'nueva-siguiente', 'nueva-empezar']) {
+    for (final k in ['nueva-siguiente', 'nueva-empezar']) {
       await tester.tap(find.byKey(Key(k)));
       await tester.pumpAndSettle();
     }

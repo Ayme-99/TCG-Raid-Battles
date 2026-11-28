@@ -42,10 +42,8 @@ Future<void> dejarPartidaAMedias(WidgetTester tester, ProviderContainer c) async
   await tester.pumpAndSettle();
 }
 
-/// Recorre los pasos 1 y 2 del selector y pulsa «Empezar» en el 3.
+/// Recorre el paso 1 del selector y pulsa «Empezar» en el 2.
 Future<void> pasarPasos(WidgetTester tester) async {
-  await tester.tap(find.byKey(const Key('nueva-siguiente')));
-  await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('nueva-siguiente')));
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('nueva-empezar')));
@@ -129,16 +127,15 @@ void main() {
     ('tablet', const Size(1024, 768)),
     ('móvil', const Size(390, 844)),
   ]) {
-    testWidgets('el selector de modo recorre tres pasos en $nombre',
+    testWidgets('el selector de la partida rápida recorre dos pasos en $nombre',
         (tester) async {
       await abrirInicio(tester, tamano: tamano);
       await tester.tap(find.byKey(const Key('inicio-nueva')));
       await tester.pumpAndSettle();
-      expect(find.text('¿Cómo quieres jugar?'), findsOneWidget);
-      expect(find.byKey(const Key('opcion-campana')), findsOneWidget);
-
-      await tester.tap(find.byKey(const Key('nueva-siguiente')));
-      await tester.pumpAndSettle();
+      // El modo ya se ha elegido en el inicio (#585).
+      expect(find.text('¿Cómo quieres jugar?'), findsNothing);
+      expect(find.byKey(const Key('opcion-campana')), findsNothing);
+      expect(find.text('Partida rápida'), findsOneWidget);
       expect(find.text('¿Con qué formato?'), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('nueva-siguiente')));
@@ -150,8 +147,6 @@ void main() {
       await tester.tap(find.byKey(const Key('nueva-atras')));
       await tester.pumpAndSettle();
       expect(find.text('¿Con qué formato?'), findsOneWidget);
-      await tester.tap(find.byKey(const Key('nueva-atras')));
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('nueva-atras')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('inicio')), findsOneWidget);
@@ -166,18 +161,15 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('nueva-siguiente')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('nueva-siguiente')));
-    await tester.pumpAndSettle();
+    expect(find.text('¿Cómo preparas la partida?'), findsOneWidget);
     await tester.tap(find.byKey(const Key('paso-0')));
     await tester.pumpAndSettle();
-    expect(find.text('¿Cómo quieres jugar?'), findsOneWidget);
+    expect(find.text('¿Con qué formato?'), findsOneWidget);
   });
 
   testWidgets('Elegir jefe primero lleva a la lista de jefes', (tester) async {
     final c = await abrirInicio(tester);
     await tester.tap(find.byKey(const Key('inicio-nueva')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('nueva-siguiente')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('nueva-siguiente')));
     await tester.pumpAndSettle();
@@ -193,8 +185,6 @@ void main() {
       (tester) async {
     await abrirInicio(tester);
     await tester.tap(find.byKey(const Key('inicio-nueva')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('opcion-libre')));
     await tester.pumpAndSettle();
     expect(find.text('¿Con qué formato?'), findsOneWidget);
     await tester.tap(find.byKey(const Key('opcion-fisico')));
