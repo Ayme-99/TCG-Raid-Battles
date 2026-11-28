@@ -71,7 +71,7 @@ La campaña se juega **solo en horizontal**. No hay diseño vertical ni escenas 
 
 - **Al entrar en la campaña** el móvil fija la orientación horizontal.
 - **Si el móvil está en vertical** (o el giro está bloqueado en el sistema), sale una pantalla de aviso a todo lo ancho, **«Gira el móvil»**, con un icono de móvil girando y el botón **Volver** a la pantalla de inicio. La campaña no se carga hasta que el móvil está en horizontal.
-- **El resto de la app** (inicio, partida libre, tienda, cuenta) **sigue en vertical**.
+- **El resto de la app** (inicio, partida rápida, tienda, cuenta) **sigue en vertical**.
 - **PC:** la ventana es apaisada y no ve el aviso.
 
 ```

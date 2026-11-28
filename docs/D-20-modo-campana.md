@@ -5,7 +5,7 @@ Estado: **en desarrollo** (revisado el 2026-11-23). Issue #334 (diseño) y una i
 > **Nota de Negocio y comunidad para Diseño (2026-11-23).** Este documento es de Diseño y **no se ha modificado su contenido**; esto es un aviso de lo que Ayme decidió el 2026-11-23 al revisar [D-21](./D-21-campana-negocio-y-comunidad.md) y que Diseño debe trasladar a §2.1, §5, §6, §8 y al registro de §10:
 >
 > 1. **Los puntos no tienen utilidad dentro de la campaña** (Ayme). Se ganan en la campaña, pasan a la cuenta al conseguir medallas o avanzar en la historia y se gastan solo en el menú de la app. Esto **sustituye** a «el intercambio y hacerse ex cuestan puntos» (§2.1, §5, §10.6). **Decidido el 2026-11-24 por Ayme (§10.9):** el **intercambio es gratis** y **hacerse ex** se hace con un objeto, la **piedra ex**, cuyo precio fijó Negocio y Ayme aceptó: **2.000 de dinero** (§2.1, §10.6; D-21 §2.5). Los 4.000 de la propuesta anterior de Negocio quedan **obsoletos**.
-> 2. **La sesión es obligatoria para jugar el modo campaña** (Ayme). **Registrado el 2026-11-24 en §10.1 y §6**; afecta a `flujo-app.md` §2, que dice que la sesión nunca es obligatoria (vale solo para la partida libre).
+> 2. **La sesión es obligatoria para jugar el modo campaña** (Ayme). **Registrado el 2026-11-24 en §10.1 y §6**; afecta a `flujo-app.md` §2, que dice que la sesión nunca es obligatoria (vale solo para la partida rápida).
 > 3. **«Mis cartas»** (Ayme): las cartas conseguidas en la campaña se usan **solo en la campaña**; en el futuro habrá cartas en la tienda del menú para las partidas rápidas en formato digital. Se registra **solo la carta** conseguida (D-21 §3).
 > 4. **Nidoran♂ ya es 032/150** (comprobado: la imagen del repositorio y la carta de Ayme coinciden). La pregunta de §8 (13) queda resuelta.
 > 5. **Vocabulario único** (Ayme): energía, XP, dinero y puntos, definidos en D-21 §1.1. La XP se mide en XP, no en «puntos».
@@ -29,9 +29,9 @@ Para saber **por qué** algo es como es, mira el [registro de decisiones (§10)]
 
 ## 1. Idea
 
-La campaña es un **juego de Pokémon para un jugador**: eliges un inicial, recorres rutas, capturas Pokémon, descansas, ganas medallas y te enfrentas a un jefe con sus aliados. Es **ajena a la partida libre**: tiene sus propias criaturas, su propio combate y su propio motor. Lo único que comparte con las incursiones es el **catálogo de jefes** (nombres, mapas, aliados) y la **moneda del juego** (los puntos).
+La campaña es un **juego de Pokémon para un jugador**: eliges un inicial, recorres rutas, capturas Pokémon, descansas, ganas medallas y te enfrentas a un jefe con sus aliados. Es **ajena a la partida rápida**: tiene sus propias criaturas, su propio combate y su propio motor. Lo único que comparte con las incursiones es el **catálogo de jefes** (nombres, mapas, aliados) y la **moneda del juego** (los puntos).
 
-| | Partida libre | Modo campaña |
+| | Partida rápida | Modo campaña |
 |---|---|---|
 | Jugadores | 1 a 4 | 1 |
 | Formato | físico (offline) o digital (online) | digital |
@@ -39,7 +39,7 @@ La campaña es un **juego de Pokémon para un jugador**: eliges un inicial, reco
 | Rival | el jefe, con su baraja de ataques | un Pokémon salvaje, un entrenador o un jefe con aliados |
 | Da puntos | solo la digital | sí |
 
-Decisiones de Ayme (2026-11-21): el modo es **1 contra 1** (2 contra 2 y 3 contra 3, en el futuro); las cartas de campaña **no** se usan en la partida libre; los puntos compran en la tienda monedas, dados, sobres y cartas sueltas del formato digital (y quizá campañas, aunque lo normal es que estén abiertas de primeras). Cuántos puntos da cada cosa es irrelevante salvo que la campaña tenga compras con puntos, y lo que sobre al terminarla se conserva.
+Decisiones de Ayme (2026-11-21): el modo es **1 contra 1** (2 contra 2 y 3 contra 3, en el futuro); las cartas de campaña **no** se usan en la partida rápida; los puntos compran en la tienda monedas, dados, sobres y cartas sueltas del formato digital (y quizá campañas, aunque lo normal es que estén abiertas de primeras). Cuántos puntos da cada cosa es irrelevante salvo que la campaña tenga compras con puntos, y lo que sobre al terminarla se conserva.
 
 ## 2. Pokémon de campaña
 
@@ -492,7 +492,7 @@ Una moneda o unos dados se compran **una vez por cuenta**; los sobres se repiten
 | Servidor | Recibe los puntos ganados al terminar un jefe o una medalla. Al ser un solo jugador y coste 0, se acepta lo que reporta el cliente con un tope por hito (no hay competición). |
 | App | Pantallas nuevas: mapa de región, combate, equipo, descanso y tienda. Reutiliza los fondos de mesa por mapa y los avisos. |
 
-`flujo-app.md` se corrige en este mismo cambio: la campaña **ya no** entrega las cartas de la partida libre digital, y «Mis cartas» deja de depender de ella.
+`flujo-app.md` se corrige en este mismo cambio: la campaña **ya no** entrega las cartas de la partida rápida digital, y «Mis cartas» deja de depender de ella.
 
 ## 7. Primera entrega
 
@@ -553,7 +553,7 @@ Lo que **no** está decidido. En cuanto Ayme responde una, pasa a §10 con su fe
 26. ~~Cuerda Huida: ¿gasta el turno?~~ **Decidido el 2026-11-23 por Ayme: sí gasta el turno** (como cambiar, §3.2) **y ahorra la energía de la retirada**. Se revisa con el simulador si resulta poco útil (#437). **Se vende desde el tramo 2**, junto a la Super Ball (decidido el 2026-11-24).
 27. ~~Pociones en combate~~ **Decidido el 2026-11-24 por Ayme (#435):** **sí**, **no gastan turno** y **no tienen límite por combate**: el límite es lo que haya en el inventario. Sustituye al «no por ahora» del mismo día (§10.9). A quién curan (cualquiera en pie) y que el rival use objetos solo hacia el final están **decididos** (2026-11-25, §3.2); faltan el tramo, los objetos y el criterio del rival; Calidad repite Brock y XP/ex (#409, #451).
 
-Resueltas (se dejan para no repetir la pregunta; los números de arriba no se renumeran): derrota → vuelves al último punto de curación; Fortaleza y Gruñido → se suman; texto de Rodar → 20 más por cada uso consecutivo; máximo de Pokémon en el equipo → 6; cuántos ataques → 1 a 2; PC → ilimitado por ahora; si las cartas de campaña valen en la partida libre → no; qué primer tramo → Pueblo Paleta a Ciudad Plateada; si los jefes son capturables → sí.
+Resueltas (se dejan para no repetir la pregunta; los números de arriba no se renumeran): derrota → vuelves al último punto de curación; Fortaleza y Gruñido → se suman; texto de Rodar → 20 más por cada uso consecutivo; máximo de Pokémon en el equipo → 6; cuántos ataques → 1 a 2; PC → ilimitado por ahora; si las cartas de campaña valen en la partida rápida → no; qué primer tramo → Pueblo Paleta a Ciudad Plateada; si los jefes son capturables → sí.
 
 ## 9. Tareas derivadas
 
@@ -599,7 +599,7 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 
 | Fecha | Decisión | Dónde |
 |---|---|---|
-| 2026-11-21 | El modo campaña es un **juego de Pokémon para un jugador**, ajeno a la partida libre: sus Pokémon **no** se usan en las partidas rápidas, pero dan puntos para la tienda. (Resolvió la pregunta abierta de si las cartas de campaña valían en la partida libre digital.) | §1; `flujo-app.md` |
+| 2026-11-21 | El modo campaña es un **juego de Pokémon para un jugador**, ajeno a la partida rápida: sus Pokémon **no** se usan en las partidas rápidas, pero dan puntos para la tienda. (Resolvió la pregunta abierta de si las cartas de campaña valían en la partida rápida digital.) | §1; `flujo-app.md` |
 | 2026-11-21 | Estilo de juego «RPG»: cartas con PS, daño y costes de energía, retirada gratis de salida y un equipo de hasta X cartas. | §2 |
 | 2026-11-21 | Estructura del mapa **A, «Mapa de ruta»** (camino de nodos por región), entre «ruta», «capítulos por jefe» y «misiones con estrellas». | §4 |
 | 2026-11-21 | Combate **1 contra 1** por ahora; 2 contra 2 y 3 contra 3 quizá en el futuro. | §3, §8 |
@@ -608,12 +608,13 @@ Todo lo que Ayme ha decidido sobre el modo campaña, en orden temático y con su
 | 2026-11-21 | Los puntos de la campaña compran en la tienda monedas, dados, sobres y cartas sueltas del formato digital, y quizá campañas (lo normal es que estén abiertas de primeras). Cuántos puntos da cada cosa es irrelevante salvo que haya compras dentro de la campaña (no las hay desde el 2026-11-24, §10.9); lo que sobre al terminarla se conserva. | §5 |
 | 2026-11-21 | Rechazó **robar energía** como mecánica (obligaría a los rivales a usar la misma para igualar los combates) y vio demasiado simple un «perfil de daño» como carta digital. | §3 |
 | 2026-11-22 | **Arte y derechos (decisión de Ayme, #389).** Los **sprites de Pokémon, objetos y personajes son de Pokémon Escarlata y Púrpura (EP)**, tomados de WikiDex. Es un **proyecto personal, de uso privado para él y sus amigos, sin fines comerciales**. El repositorio sigue siendo **público** y los sprites van incluidos; **si GitHub o los titulares de los derechos piden retirarlos, Ayme los quita en cuanto se le avise.** El **arte propio** se limita a la **interfaz y los fondos de escena**. Las medallas son las de LGPE y los líderes están pendientes (§8, 24). Si hay que retirar los sprites, **hay un prompt en el chat del Director del juego que se encarga de borrarlos**. Esto no es una licencia: los derechos siguen siendo de sus titulares. | §4, §8; #389, #416 |
-| 2026-11-24 | **La sesión es obligatoria para jugar el modo campaña** (Ayme, #390; D-21 §4). Sustituye a «la sesión nunca es obligatoria» de `flujo-app.md` §2, que **sigue valiendo para la partida libre**; el cambio en `flujo-app.md` es de Diseño de interfaz. | §6; #390 |
+| 2026-11-24 | **La sesión es obligatoria para jugar el modo campaña** (Ayme, #390; D-21 §4). Sustituye a «la sesión nunca es obligatoria» de `flujo-app.md` §2, que **sigue valiendo para la partida rápida**; el cambio en `flujo-app.md` es de Diseño de interfaz. | §6; #390 |
 | 2026-11-24 | **La partida de campaña se guarda también en la cuenta** (Ayme, #390): además del dispositivo, para no perder el progreso al borrar los datos del navegador. Sustituye a «en el dispositivo, sincronizado al iniciar sesión» (§6). **Tarea secundaria, sin prisa**; hecho por Programación (tarea 22, #497). | §6; #390 |
 | 2026-11-25 | **Precios en puntos de la tienda de la cuenta: Decididos (iniciales)** (Ayme, #387): moneda de serie 800, temática 2.000; dados de serie 1.500, temáticos 3.000; sobre 1.000; carta suelta 200 / 400 / 800 / 2.000 según rareza; clásicas y estándar, gratis. Valores iniciales, cambiables después; el catálogo de la tienda es de datos (#374). El catálogo de D-21 §2.2 sigue por confirmar; los dos contadores quedaron **obsoletos** (un solo total, fila siguiente). | §5; D-21 §2.3; #387 |
 | 2026-11-25 | **Puntos de la campaña, decisiones de Ayme en #374 ya en el código (#480, #481).** (1) **Topes por hito:** salvaje **100**, entrenador **200**, jefe **1.000**, medalla **1.500**; son datos (`catalog/campana/topes-puntos.json`) y se pueden editar. (2) **Repetir la campaña da los puntos otra vez:** un hito es único por cuenta, campaña **y partida**; el reenvío dentro de la misma partida no suma dos veces, pero una partida nueva vuelve a dar los puntos. (3) **Los puntos de campaña cuentan para desbloquear los jefes de las incursiones (D-10):** se suman al total de la cuenta (`GET /me/puntos`, `puntos`, con `puntosIncursiones` y `puntosCampana` por separado). (4) **Un solo total por cuenta** (Ayme, opción C de D-21 §1.2, ese mismo día; **sustituye** a los dos contadores «puntos ganados» y «saldo»): el total **sube con los abonos y baja con las compras** de la tienda, y desbloquear un jefe de las incursiones es **permanente** (registro de jefes desbloqueados, D-10 §5). **No contradice** «los puntos no se usan dentro de la campaña» (§10.9): la campaña los **da**, pero dentro de ella no se gastan ni dan ventajas. | §5; D-10 §5; D-21 §1.2; #374 |
-| 2026-11-25 | **Cuándo hace falta cuenta** (Ayme): la **partida libre en formato físico** se juega **sin cuenta**; **todo lo demás exige cuenta** (modo campaña, formato digital y tienda). Precisa la fila del 2026-11-24 («la sesión es obligatoria para jugar la campaña»). Corrige `flujo-app.md` §2 («la sesión nunca es obligatoria») y §4 («se guarda en el dispositivo y funciona sin sesión»), que son de Diseño de interfaz, y D-21 §4 (Negocio). | §6; #390 |
+| 2026-11-25 | **Cuándo hace falta cuenta** (Ayme): la **partida rápida en formato físico** se juega **sin cuenta**; **todo lo demás exige cuenta** (modo campaña, formato digital y tienda). Precisa la fila del 2026-11-24 («la sesión es obligatoria para jugar la campaña»). Corrige `flujo-app.md` §2 («la sesión nunca es obligatoria») y §4 («se guarda en el dispositivo y funciona sin sesión»), que son de Diseño de interfaz, y D-21 §4 (Negocio). | §6; #390 |
 | 2026-11-25 | **Una moneda o unos dados se compran una sola vez por cuenta** (Ayme, #387). Se aplica a las monedas y los dados de la tienda (§5, «Precios en puntos»); **los sobres se pueden comprar las veces que se quiera**; **las cartas sueltas no se repiten**, y al obtener una carta que ya se tiene (de un sobre) se recibe **un porcentaje de su valor** en puntos. **Decidido por Ayme el 2026-11-25: el 25 %** del precio de la carta suelta de su rareza (§5, 200 / 400 / 800 / 2.000), así que **cuatro cartas repetidas pagan una carta nueva** de esa rareza. Además, **sin sesión**, los accesos a la campaña, el formato digital y la tienda llevan a iniciar sesión y vuelven al acceso elegido (confirmado). | §5; D-21 §2; #387, #390 |
+| 2026-11-28 | **«Partida libre» pasa a llamarse «Partida rápida»** (Ayme). **El inicio de la app tiene dos bloques, Partida rápida y Campaña, y cada uno tiene su «Nueva» y su «Continuar».** Cambia solo el nombre y el inicio: lo decidido sobre la Partida rápida (formato físico sin cuenta, formato digital con puntos) no cambia. `flujo-app.md` §1 y §2 actualizados; la app, D-10, D-21 y `campana-sonido.md` conservan «partida libre» hasta que su sector los cambie. | §6; `flujo-app.md` §1 y §2 |
 
 ### 10.2 Combate y energía
 
@@ -808,6 +809,7 @@ Cada efecto se decidió al hacer la carta que lo lleva. Todos están en el motor
 | 2026-11-25 | Un hito de la campaña daba puntos **una sola vez por cuenta** (jefe «solo la primera vez», §4). | **Una vez por cuenta, campaña y partida** (#374): una partida nueva vuelve a dar los puntos (§10.1). |
 | 2026-11-25 | El móvil se adaptaría o se obligaría a girar, a elegir (§10.7, propuesta del 2026-11-25). | **Solo horizontal, con el aviso «Gira el móvil»** (Ayme, opción A; §10.7). |
 | 2026-11-26 | En todos los combates empezaba el jugador (§3.2, §10.2, 2026-11-21). | **El rival empieza en los gimnasios, la Liga y los Pokémon legendarios**; en el resto, el jugador (§10.2, #451). |
+| 2026-11-28 | El inicio tenía **un botón «Nueva partida»/«Continuar»** y un paso «Modo de juego», y el modo se llamaba **«Partida libre»** (`flujo-app.md` §1 y §2). | **Dos bloques, «Partida rápida» y «Campaña»**, cada uno con su «Nueva» y su «Continuar»; «Partida libre» → «Partida rápida» (§10.1). |
 
 ### 10.10 Forma de trabajar
 
