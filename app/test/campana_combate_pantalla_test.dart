@@ -271,4 +271,57 @@ void main() {
     expect(estadosDeBando(bando('sandshrew', -1, 2)).any((e) => e.startsWith('racha')),
         isFalse);
   });
+
+  testWidgets('en 1280×720 el relevo y el Continuar se ven sin desplazar (#592)',
+      (tester) async {
+    const alto = 720.0;
+    const herido = PartidaCampana(
+      progreso: ProgresoRuta(
+          nodoActual: 'ruta-1-pidgey',
+          superados: {'pueblo-paleta', 'ruta-1'},
+          inicial: 'squirtle'),
+      equipo: [
+        PokemonGuardado('squirtle', 10),
+        PokemonGuardado('charmander', 70),
+      ],
+    );
+    await empezar(tester, herido, tamano: const Size(1280, alto));
+    bool aLaVista(String clave) {
+      final r = tester.getRect(find.byKey(Key(clave)));
+      return r.top >= 0 && r.bottom <= alto;
+    }
+
+    // Squirtle solo carga hasta que cae.
+    for (var i = 0; i < 20 && !hay('combate-elige-relevo'); i++) {
+      await tocar(tester, 'activo-jugador');
+      await tocar(tester, 'accion-cargar');
+    }
+    expect(hay('combate-elige-relevo'), isTrue);
+    expect(aLaVista('combate-elige-relevo'), isTrue);
+    expect(aLaVista('relevo-1'), isTrue);
+    await tester.tap(find.byKey(const Key('relevo-1')));
+    await tester.pumpAndSettle();
+    expect(
+        find.descendant(
+            of: find.byKey(const Key('activo-jugador')),
+            matching: find.text('Charmander')),
+        findsOneWidget);
+    expect(hay('combate-elige-relevo'), isFalse);
+
+    // Se juega hasta el final: «Continuar» también queda a la vista.
+    for (var i = 0; i < 200 && !hay('combate-continuar'); i++) {
+      if (hay('combate-elige-relevo')) break;
+      await tocar(tester, 'activo-jugador');
+      if (activo(tester, 'ataque-1')) {
+        await tocar(tester, 'ataque-1');
+      } else if (activo(tester, 'ataque-0')) {
+        await tocar(tester, 'ataque-0');
+      } else {
+        await tocar(tester, 'accion-cargar');
+      }
+    }
+    expect(hay('combate-continuar'), isTrue);
+    expect(aLaVista('combate-continuar'), isTrue);
+    expect(tester.takeException(), isNull);
+  });
 }

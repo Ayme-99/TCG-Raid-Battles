@@ -77,7 +77,7 @@ Future<void> jugarCombate(WidgetTester tester) async {
           w is InkWell &&
           w.onTap != null &&
           w.key is ValueKey<String> &&
-          (w.key! as ValueKey<String>).value.startsWith('banca-jugador-'));
+          (w.key! as ValueKey<String>).value.startsWith('relevo-'));
       await tester.tap(relevo.first);
       await tester.pumpAndSettle();
       continue;
