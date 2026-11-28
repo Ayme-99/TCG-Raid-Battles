@@ -18,6 +18,7 @@ Impacto = cuántas veces por partida se ve × cuánto confunde si falta. Direcci
 | 8 | **Resultado del combate**: XP y dinero ganados, y derrota con el sitio al que vuelves | Programación (Arte: iconos ya hechos) | 1 | M |
 | 9 | **Captura con la moneda**: la Ball cae cara o cruz, y «se ha escapado» | Programación (Arte: moneda; Audio) | Nada | M |
 | 10 | **Evolución**: pantalla corta con los PS antes y después (D3 decidido) | Programación y Arte | #571, #570 | M |
+| 12 | **Mochila con pestañas** (Objetos de combate, Pokéballs y Piedras; en combate abre en la primera): icono, pantalla y pestañas | Programación y Arte (icono) | 1 | M |
 | 11 | **Sonidos del combate y del mapa** (lista P0 de `campana-sonido.md` §5) | Audio | 2, 8, 9 | M |
 
 Orden de arranque que recomiendo: **1 con 4 y 6 a la vez** (arreglan el bug y los dos fallos que Ayme vio jugando), luego 2 y 3 (son la mayor parte de la sensación de «juego»), después el resto.
@@ -76,8 +77,10 @@ Es la estructura del wireframe I (tu lado a la izquierda, el rival a la derecha,
 ```
 
 - **Alturas:** 58 + 110 + 330 + 64 = **562 px** de 720; quedan unos 150 px para márgenes y para el desplegable. La carta del activo sube de 190×266 a **230×321** (la imagen es 480×670). Todo se calcula con **proporciones**: el combate **escala** con la ventana, como las escenas.
-- **Tocar la carta del Activo** (decidido por Ayme): la carta **se agranda** (o la cámara se acerca a ella) hasta que **se lea** (unos 340×476 en 1280×720, con el fondo atenuado) y junto a ella sale un **desplegable** con **los ataques y CAMBIAR**. Tocar fuera la devuelve a su sitio.
-- **Tocar una carta de la Banca** (decidido por Ayme): se agranda igual, **para leerla**.
+- **Tocar la carta del Activo** (decidido por Ayme): la carta **se agranda** (o la cámara se acerca) hasta ocupar **una parte generosa de la pantalla**, como en el TCG Live o el TCG Pocket, para que **se lea**: unos 372×520 en 1280×720 (alto del 72 %), con el fondo atenuado. Junto a ella sale un **desplegable con los ataques y, debajo de ellos, CAMBIAR**. Tocar fuera la devuelve a su sitio.
+- **Cambiar** (decidido por Ayme): CAMBIAR **ilumina** en la Banca los Pokémon que pueden entrar; se toca uno y **pasa al puesto Activo con una animación** (el activo y el de la Banca intercambian sitio). Cuando el Activo cae, tocar una carta de la Banca elige el relevo igual.
+- **Tocar una carta de la Banca** (decidido por Ayme): se agranda igual, **solo la carta**, para leerla; sus ataques salen **impresos en la carta**, sin lista ni botones aparte, y no se pueden usar desde ahí. **Sin más desplegables** (Ayme: «no quiero que aparezca mucho más»).
+- **Mochila** (decidido por Ayme): un **icono de mochila** abre el inventario con **pestañas**, como en los juegos originales. En combate **se abre por defecto en «Objetos de combate»** (Pociones y Cuerdas Huida, juntas); las otras pestañas son **Pokéballs** y **Piedras** (Trueno, Agua, Fuego, Hoja, Luna y la piedra ex; en combate **no sirven**, son un recordatorio del inventario). Aquí es donde se usan la Poción y la Cuerda Huida; la hoja «¿A quién curas?» y la de «¿Quién sale?» siguen igual.
 - **Banda «última jugada»** de 2 líneas, a todo el ancho; tocarla abre el registro completo en una hoja (D2-A).
 - **Los avisos nunca quedan fuera:** «Tu Pokémon ha caído. Toca a uno de tu banca» ocupa la banda de jugada (dorado) y **parpadea la banca propia**; «¡Victoria!» y «Derrota» salen como **panel central** con el botón **Continuar** y el resultado (fila 8).
 - **Turno del rival:** el activo propio no se puede tocar, la banda dice «Turno de Staryu…» y el activo rival se resalta mientras actúa, con una pausa de unos 0,6 s por acción (D4-A).
@@ -85,20 +88,26 @@ Es la estructura del wireframe I (tu lado a la izquierda, el rival a la derecha,
 
 ### Decidido por Ayme el 2026-11-28
 
-- **D1. Acciones del combate:** se tocan en las cartas, como se ha descrito arriba. **No hay barra fija.** Cambia el wireframe I de #470 («hoja de acciones abajo a todo lo ancho»).
+- **D1. Acciones del combate:** se tocan en las cartas, como se ha descrito arriba. **No hay barra fija.** Cambia el wireframe I de #470 («hoja de acciones abajo a todo lo ancho»). Los objetos van en la **Mochila**.
 - **D2. Registro:** **A**: dos líneas visibles y el registro entero en una hoja.
 - **D3. Evolución:** **A**: pantalla de unos 2 s, omisible con un toque, con la carta nueva y los PS antes y después (regla del 28-11: 40/60 pasa a 80/110).
 - **D4. Ritmo del turno rival:** **A**: pausa de unos 0,6 s por acción; suma unos 4 s a un combate de 12 turnos (el rival actúa unas 6 veces). Calidad puede medirlo en la 2.ª partida de Ayme (#385).
 
-### 🔶 Detalles que D1 deja abiertos (Decisión de Ayme)
+### Detalles que D1 dejó abiertos: respondidos por Ayme el 2026-11-28
 
-1. **¿Dónde van Cargar, Usar Poción y Usar Cuerda Huida?** Ayme dijo «los ataques y CAMBIAR». **A (recomendada):** en el **mismo desplegable**, tras los ataques: Ataque 1, Ataque 2, Cargar, Poción (si hay), Cuerda Huida (si hay) y CAMBIAR. B: Cargar en el desplegable y los objetos en un botón «Mochila» de la barra superior.
-2. **¿Cómo se cambia?** **A (recomendada):** CAMBIAR del desplegable **resalta la banca** y se toca la carta que entra (que se agranda un momento y pide confirmar, con el coste de energía, como hoy). Cuando el Activo cae, **tocar una carta de la Banca elige el relevo** igual que hoy (sin pasar por CAMBIAR). B: la carta agrandada de la Banca lleva un botón «Sacar a este».
-3. **¿La carta agrandada de la Banca enseña sus ataques?** **A (recomendada):** sí, solo para leerlos, apagados (no se pueden usar desde la Banca). B: solo la carta.
+1. **Poción, Cuerda Huida y el resto de objetos:** en la **Mochila** (arriba), no en el desplegable.
+2. **Cómo se cambia:** CAMBIAR bajo los ataques, se iluminan las opciones y se toca una (arriba).
+3. **Carta agrandada de la Banca:** solo la carta, grande, sin más desplegables.
+
+### 🔶 Lo que añado yo y Ayme confirma
+
+1. **Cargar** (la tercera acción de §10.2) **va en el desplegable del Activo, junto a los ataques**, antes de CAMBIAR. Ayme no la nombró; es lo más corto. Alternativa: dentro de la Mochila (no la recomiendo: se usa casi cada turno).
+2. **Sin ventana de confirmación al cambiar** (hoy sale «Cambiar gasta el turno y N de energía»): el coste se escribe **en el botón** («CAMBIAR · −1 energía · gasta el turno») y solo se iluminan los que se pueden pagar. Si Ayme prefiere la confirmación de hoy, se mantiene.
+3. **Dónde está el icono de la Mochila:** **A (recomendada):** en la **barra superior**, fija en el combate y en el mapa (en el mapa es el mismo inventario, también como recordatorio). B: solo en el combate, junto al Activo propio.
 
 ### Qué se mantiene
 
-PS y barras (verde, naranja y roja), energía en fichas de 0 a 10, estados como chapas, Poción que no gasta turno, Cuerda Huida, tutorial de la Ruta 1 (el brillo dorado en el activo pasa a ser la carta que hay que tocar) y confirmación de cambio: **no cambian**. La hoja de «¿A quién curas?» sigue igual.
+PS y barras (verde, naranja y roja), energía en fichas de 0 a 10, estados como chapas, Poción que no gasta turno, Cuerda Huida (ahora en la Mochila), tutorial de la Ruta 1 (el brillo dorado en el activo pasa a ser la carta que hay que tocar) y confirmación de cambio: **no cambian**.
 
 ## Qué no cubre este documento
 
