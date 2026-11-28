@@ -18,8 +18,8 @@ Impacto = cuántas veces por partida se ve × cuánto confunde si falta. Direcci
 | 8 | **Resultado del combate**: XP y dinero ganados, y derrota con el sitio al que vuelves | Programación (Arte: iconos ya hechos) | 1 | M |
 | 9 | **Captura con la moneda**: la Ball cae cara o cruz, y «se ha escapado» | Programación (Arte: moneda; Audio) | Nada | M |
 | 10 | **Evolución**: pantalla corta con los PS antes y después (D3 decidido) | Programación y Arte | #571, #570 | M |
-| 12 | **Mochila con pestañas** (Objetos de combate, Pokéballs y Piedras; en combate abre en la primera): icono, pantalla y pestañas | Programación y Arte (icono) | 1 | M |
 | 11 | **Sonidos del combate y del mapa** (lista P0 de `campana-sonido.md` §5) | Audio | 2, 8, 9 | M |
+| 12 | **Mochila con pestañas** (Objetos de combate, Pokéballs y Piedras; en combate abre en la primera): icono, pantalla y pestañas | Programación y Arte (icono) | 1 | M |
 
 Orden de arranque que recomiendo: **1 con 4 y 6 a la vez** (arreglan el bug y los dos fallos que Ayme vio jugando), luego 2 y 3 (son la mayor parte de la sensación de «juego»), después el resto.
 
