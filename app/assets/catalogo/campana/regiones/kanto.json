@@ -1184,6 +1184,7 @@
         "monte-moon-1f",
         "jefe-clefairy"
       ],
+      "objeto": "piedraLuna",
       "escena": {
         "imagen": "monte-moon",
         "zonas": [
@@ -1232,7 +1233,6 @@
       "zona": "monte-moon-b1f",
       "rival": "salvaje",
       "opcional": true,
-      "objeto": "piedraLuna",
       "escena": {
         "imagen": "monte-moon",
         "zonas": [

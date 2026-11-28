@@ -117,23 +117,23 @@ void main() {
     }
   });
 
-  testWidgets('al llegar a la galería del Monte Moon se coge la Piedra Luna',
+  testWidgets('al entrar en el Monte Moon se coge la Piedra Luna (#380)',
       (tester) async {
     const guardada = PartidaCampana(
       progreso: ProgresoRuta(
-          nodoActual: 'monte-moon',
+          nodoActual: 'centro-monte-moon',
           resuelto: true,
-          visitados: {'monte-moon'},
+          visitados: {'centro-monte-moon'},
           inicial: 'squirtle'),
       equipo: [PokemonGuardado('squirtle', 80)],
       dinero: 1000,
     );
     final c = await abrirCampana(tester,
         almacen: AlmacenMemoria(), guardada: guardada);
-    expect(zonaActiva(tester, 'zona-ir-monte-moon-galeria'), isTrue);
-    await tocar(tester, 'zona-ir-monte-moon-galeria');
+    expect(zonaActiva(tester, 'zona-ir-monte-moon'), isTrue);
+    await tocar(tester, 'zona-ir-monte-moon');
     final p = c.read(campanaProvider).partida!;
-    expect(p.progreso.nodoActual, 'monte-moon-galeria');
+    expect(p.progreso.nodoActual, 'monte-moon');
     expect(p.cuantos(ObjetoCampana.piedraLuna), 1);
     expect(find.text('¡Has encontrado una Piedra Luna!'), findsOneWidget);
     expect(nombreObjeto(ObjetoCampana.piedraLuna), 'Piedra Luna');
