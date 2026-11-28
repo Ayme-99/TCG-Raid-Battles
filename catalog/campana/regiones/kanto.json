@@ -1181,6 +1181,7 @@
       "nombre": "Monte Moon",
       "salidas": [
         "monte-moon-galeria",
+        "monte-moon-1f",
         "jefe-clefairy"
       ],
       "escena": {
@@ -1200,15 +1201,23 @@
             "x": 0.9,
             "y": 0.1,
             "ancho": 0.1,
-            "alto": 0.4
+            "alto": 0.26
+          },
+          {
+            "accion": "ir",
+            "destino": "monte-moon-1f",
+            "x": 0.9,
+            "y": 0.36,
+            "ancho": 0.1,
+            "alto": 0.26
           },
           {
             "accion": "ir",
             "destino": "jefe-clefairy",
             "x": 0.9,
-            "y": 0.5,
+            "y": 0.62,
             "ancho": 0.1,
-            "alto": 0.4
+            "alto": 0.26
           }
         ]
       }
@@ -1216,11 +1225,11 @@
     {
       "id": "monte-moon-galeria",
       "tipo": "combate",
-      "nombre": "Monte Moon: galería lateral",
+      "nombre": "Monte Moon: planta B1F",
       "salidas": [
         "jefe-clefairy"
       ],
-      "zona": "monte-moon",
+      "zona": "monte-moon-b1f",
       "rival": "salvaje",
       "opcional": true,
       "objeto": "piedraLuna",
@@ -1277,19 +1286,66 @@
             "x": 0.0,
             "y": 0.1,
             "ancho": 0.1,
-            "alto": 0.4
+            "alto": 0.26
           },
           {
             "accion": "ir",
             "destino": "monte-moon-galeria",
             "x": 0.0,
-            "y": 0.5,
+            "y": 0.36,
             "ancho": 0.1,
-            "alto": 0.4
+            "alto": 0.26
+          },
+          {
+            "accion": "ir",
+            "destino": "monte-moon-1f",
+            "x": 0.0,
+            "y": 0.62,
+            "ancho": 0.1,
+            "alto": 0.26
           },
           {
             "accion": "ir",
             "destino": "ruta-4",
+            "x": 0.9,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "monte-moon-1f",
+      "tipo": "combate",
+      "nombre": "Monte Moon: planta 1F",
+      "salidas": [
+        "jefe-clefairy"
+      ],
+      "zona": "monte-moon",
+      "rival": "salvaje",
+      "opcional": true,
+      "escena": {
+        "imagen": "monte-moon",
+        "zonas": [
+          {
+            "accion": "combate",
+            "x": 0.3,
+            "y": 0.55,
+            "ancho": 0.4,
+            "alto": 0.3
+          },
+          {
+            "accion": "ir",
+            "destino": "monte-moon",
+            "x": 0.0,
+            "y": 0.1,
+            "ancho": 0.1,
+            "alto": 0.8
+          },
+          {
+            "accion": "ir",
+            "destino": "jefe-clefairy",
             "x": 0.9,
             "y": 0.1,
             "ancho": 0.1,
