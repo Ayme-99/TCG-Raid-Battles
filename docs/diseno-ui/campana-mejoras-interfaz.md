@@ -1,6 +1,6 @@
 # Modo campaña: mejoras de interfaz (escenas, feedback y combate)
 
-**Propuesta de Diseño, 2026-11-28 (#588, prioritaria).** Solo propuesta: no cambia reglas ni D-20 §10. Lo que necesita elección de Ayme lleva **🔶 Decisión de Ayme** y una opción recomendada. Entradas: playtest del 25-11 (#385, #386), `pantalla_combate.dart` (853 líneas), wireframes apaisados (#470, `campana-wireframes-apaisados.md`), D-20 §10.7, el bug del combate a 1280×720 (#592) y las escenas de #415. La campaña es **solo horizontal** (§10.7).
+**Propuesta de Diseño, 2026-11-28 (#588, prioritaria).** Solo propuesta, salvo D1 a D4, que Ayme decidió y están registradas en D-20 §10.2. D1 a D4 **decididos por Ayme el 2026-11-28**; lo que sigue abierto lleva **🔶 Decisión de Ayme** y una opción recomendada. Entradas: playtest del 25-11 (#385, #386), `pantalla_combate.dart` (853 líneas), wireframes apaisados (#470, `campana-wireframes-apaisados.md`), D-20 §10.7, el bug del combate a 1280×720 (#592) y las escenas de #415. La campaña es **solo horizontal** (§10.7).
 
 ## Lista ordenada por impacto
 
@@ -8,16 +8,16 @@ Impacto = cuántas veces por partida se ve × cuánto confunde si falta. Direcci
 
 | # | Mejora | Sector | Depende de | Tamaño |
 |---|---|---|---|---|
-| 1 | **Combate apaisado que cabe en 1280×720**, con los avisos de relevo y de victoria siempre visibles (#592; disposición abajo) 🔶 D1 | Programación | Nada | L |
+| 1 | **Combate apaisado que cabe en 1280×720**, con los avisos de relevo y de victoria siempre visibles (#592; disposición abajo; D1 decidido) | Programación | Nada | L |
 | 2 | **Daño y curación al instante**: número flotante sobre el activo y barra de vida que baja | Programación (Audio: sonido de golpe) | 1 | M |
-| 3 | **Turno del rival legible**: pausa corta y una frase por acción | Programación 🔶 D4 | 1 | S |
+| 3 | **Turno del rival legible**: pausa corta y una frase por acción | Programación (D4 decidido) | 1 | S |
 | 4 | **Botón apagado con su motivo, siempre** (combate, mapa, tienda, equipo) | Programación (Diseño: tabla de motivos) | Nada | S |
 | 5 | **Estados alterados con icono y regla** (Dormido, Apresado…) y aviso cuando cambian | Programación y Arte (iconos) | 1 | M |
 | 6 | **Rótulos de puertas legibles y «por qué está bloqueado»** | Programación | Nada | S |
 | 7 | **Escenas que faltan** (tramo 1 y tramo 2) e interior del centro | Arte | #415 | L |
 | 8 | **Resultado del combate**: XP y dinero ganados, y derrota con el sitio al que vuelves | Programación (Arte: iconos ya hechos) | 1 | M |
 | 9 | **Captura con la moneda**: la Ball cae cara o cruz, y «se ha escapado» | Programación (Arte: moneda; Audio) | Nada | M |
-| 10 | **Evolución**: pantalla corta con los PS antes y después 🔶 D3 | Programación y Arte | #571, #570 | M |
+| 10 | **Evolución**: pantalla corta con los PS antes y después (D3 decidido) | Programación y Arte | #571, #570 | M |
 | 11 | **Sonidos del combate y del mapa** (lista P0 de `campana-sonido.md` §5) | Audio | 2, 8, 9 | M |
 
 Orden de arranque que recomiendo: **1 con 4 y 6 a la vez** (arreglan el bug y los dos fallos que Ayme vio jugando), luego 2 y 3 (son la mayor parte de la sensación de «juego»), después el resto.
@@ -56,51 +56,49 @@ Animaciones: **sencillas y cortas** (menos de 0,5 s cada una), y el juego **no e
 
 El tapete es **una columna de 640 px como máximo dentro de un scroll** (`ConstrainedBox(maxWidth: 640)` y `SingleChildScrollView`). En 1280×720 la banca propia, el aviso «Tu Pokémon ha caído» y «¡Victoria! Continuar» quedan **debajo del borde** (#592). La hoja de acciones se abre al tocar el activo. La última jugada es **una línea** y el registro entero, otra hoja. Los estados son chapas de texto.
 
-### Propuesta de disposición a 1280×720 (#592)
+### Disposición a 1280×720 (#592) con lo decidido por Ayme el 2026-11-28
 
-Es la estructura del wireframe I (tu lado a la izquierda, el rival a la derecha, banca encima de cada activo), con medidas. **Sin scroll**: todo cabe y todo lo que hay que tocar está siempre en pantalla.
+Es la estructura del wireframe I (tu lado a la izquierda, el rival a la derecha, banca encima de cada activo), con medidas. **Sin scroll**: todo cabe. **Ya no hay barra de acciones fija**: las acciones salen al tocar la carta del Activo (D1), y ese espacio se queda para que las cartas se vean más grandes.
 
 ```
  1280 × 720 (16:9; en otras proporciones, franjas a los lados)
 +------------------------------------------------------------------------------+
 | dinero · Balls · Pociones · medallas · XP                              58 px |
 +---------------------------------------+--+-----------------------------------+
-| TU BANCA   [ ][ ][ ][ ][ ]    100 px  |  |  BANCA RIVAL  [ ][ ][ ][ ][ ]     |
+| TU BANCA   [ ][ ][ ][ ][ ]    110 px  |  |  BANCA RIVAL  [ ][ ][ ][ ][ ]     |
 +---------------------------------------+  +-----------------------------------+
-| [carta  ]  Wartortle        280 px    |VS|  Staryu         [carta  ]         |
-| [190×266]  PS ▓▓▓▓░ 80/110            |  |  PS ▓▓▓░░ 40/60  [190×266]        |
+| [carta  ]  Wartortle        330 px    |VS|  Staryu         [carta  ]         |
+| [230×321]  PS ▓▓▓▓░ 80/110            |  |  PS ▓▓▓░░ 40/60  [230×321]        |
 | [       ]  energía ●●○○  [Dormido]    |  |  energía ●○○     [Confundido]     |
 +---------------------------------------+--+-----------------------------------+
-| Última jugada: «Staryu usa Pistola Agua: −30»  ·  (toca: registro)     56 px |
-+------------------------------------------------------------------------------+
-| [Ataque 1 · coste · daño] [Ataque 2] [Cargar +1] [Poción] [Cuerda] [Cambiar]  |
-|                                                                       130 px |
+| Última jugada: «Staryu usa Pistola Agua: −30»  ·  (toca: registro)     64 px |
 +------------------------------------------------------------------------------+
 ```
 
-- **Alturas:** 58 + 100 + 280 + 56 + 130 = **624 px**, y quedan unos 96 px para los márgenes de 8 a 12 px. Sin tapar nada, sin scroll.
-- **Banca y activo:** miniaturas de 60×84 con barra de vida; la carta del activo mide 190×266 (la imagen es 480×670). Todo se calcula con **proporciones**, no con píxeles fijos: el combate **escala** con la ventana como las escenas.
-- **Banda «última jugada»** de 2 líneas, a todo el ancho; tocarla abre el registro completo en una hoja lateral.
-- **Los avisos nunca quedan fuera:** «Tu Pokémon ha caído. Toca a uno de tu banca» ocupa la banda de jugada (dorado) y **parpadea la banca propia**; «¡Victoria!» y «Derrota» **sustituyen a la barra de acciones** y llevan el botón **Continuar** grande y el resultado (fila 8).
-- **Turno del rival:** la barra de acciones se apaga y dice «Turno de Staryu…»; el activo rival se resalta mientras actúa (fila 3).
+- **Alturas:** 58 + 110 + 330 + 64 = **562 px** de 720; quedan unos 150 px para márgenes y para el desplegable. La carta del activo sube de 190×266 a **230×321** (la imagen es 480×670). Todo se calcula con **proporciones**: el combate **escala** con la ventana, como las escenas.
+- **Tocar la carta del Activo** (decidido por Ayme): la carta **se agranda** (o la cámara se acerca a ella) hasta que **se lea** (unos 340×476 en 1280×720, con el fondo atenuado) y junto a ella sale un **desplegable** con **los ataques y CAMBIAR**. Tocar fuera la devuelve a su sitio.
+- **Tocar una carta de la Banca** (decidido por Ayme): se agranda igual, **para leerla**.
+- **Banda «última jugada»** de 2 líneas, a todo el ancho; tocarla abre el registro completo en una hoja (D2-A).
+- **Los avisos nunca quedan fuera:** «Tu Pokémon ha caído. Toca a uno de tu banca» ocupa la banda de jugada (dorado) y **parpadea la banca propia**; «¡Victoria!» y «Derrota» salen como **panel central** con el botón **Continuar** y el resultado (fila 8).
+- **Turno del rival:** el activo propio no se puede tocar, la banda dice «Turno de Staryu…» y el activo rival se resalta mientras actúa, con una pausa de unos 0,6 s por acción (D4-A).
 - **Móvil horizontal (667×375 y 844×390):** el mismo diseño escalado. Las miniaturas de banca miden unos 31×44 px y **su zona pulsable se ensancha a 48×48** (regla común de los wireframes); el texto no baja de 14 px lógicos. Programación lo prueba a **1280×720, 844×390 y 667×375**, con la prueba de #592 (la banca y el aviso se tocan sin desplazarse).
 
-### 🔶 D1. Cómo se eligen las acciones (Decisión de Ayme)
+### Decidido por Ayme el 2026-11-28
 
-| Opción | Qué es | Coste | Riesgo |
-|---|---|---|---|
-| **A (recomendada)** | **Barra fija abajo** con las acciones siempre visibles (como en el dibujo); no hace falta tocar el activo | Cambia el wireframe I (la hoja deja de salir al tocar el activo) | Seis botones en una fila en móvil: caben a 667×375 con 48 px de alto mínimo |
-| B | **Hoja al tocar tu activo**, como en #470, pero como panel inferior de 130 px que no tapa a los activos | Cambio mínimo | Un toque más por turno, y el tutorial depende de ese toque |
+- **D1. Acciones del combate:** se tocan en las cartas, como se ha descrito arriba. **No hay barra fija.** Cambia el wireframe I de #470 («hoja de acciones abajo a todo lo ancho»).
+- **D2. Registro:** **A**: dos líneas visibles y el registro entero en una hoja.
+- **D3. Evolución:** **A**: pantalla de unos 2 s, omisible con un toque, con la carta nueva y los PS antes y después (regla del 28-11: 40/60 pasa a 80/110).
+- **D4. Ritmo del turno rival:** **A**: pausa de unos 0,6 s por acción; suma unos 4 s a un combate de 12 turnos (el rival actúa unas 6 veces). Calidad puede medirlo en la 2.ª partida de Ayme (#385).
 
-### Otras decisiones de este bloque
+### 🔶 Detalles que D1 deja abiertos (Decisión de Ayme)
 
-- 🔶 **D2. Registro.** **A (recomendada):** dos líneas visibles y el registro entero en una hoja. B: panel lateral permanente (no cabe en 1280×720 sin encoger los activos).
-- 🔶 **D3. Evolución.** **A (recomendada):** pantalla propia de unos 2 s, omisible con un toque, con la carta nueva y los PS antes y después (la regla del 28-11: 40/60 pasa a 80/110). B: solo una línea en la hoja del equipo.
-- 🔶 **D4. Ritmo del turno rival.** **A (recomendada):** pausa de unos 0,6 s por acción del rival, para que se lea qué hace. B: instantáneo y todo en el registro. La A suma unos 4 s a un combate de 12 turnos (el rival actúa unas 6 veces); Calidad lo puede medir en la 2.ª partida de Ayme (#385).
+1. **¿Dónde van Cargar, Usar Poción y Usar Cuerda Huida?** Ayme dijo «los ataques y CAMBIAR». **A (recomendada):** en el **mismo desplegable**, tras los ataques: Ataque 1, Ataque 2, Cargar, Poción (si hay), Cuerda Huida (si hay) y CAMBIAR. B: Cargar en el desplegable y los objetos en un botón «Mochila» de la barra superior.
+2. **¿Cómo se cambia?** **A (recomendada):** CAMBIAR del desplegable **resalta la banca** y se toca la carta que entra (que se agranda un momento y pide confirmar, con el coste de energía, como hoy). Cuando el Activo cae, **tocar una carta de la Banca elige el relevo** igual que hoy (sin pasar por CAMBIAR). B: la carta agrandada de la Banca lleva un botón «Sacar a este».
+3. **¿La carta agrandada de la Banca enseña sus ataques?** **A (recomendada):** sí, solo para leerlos, apagados (no se pueden usar desde la Banca). B: solo la carta.
 
 ### Qué se mantiene
 
-PS y barras (verde, naranja y roja), energía en fichas de 0 a 10, estados como chapas, Poción que no gasta turno, Cuerda Huida, tutorial de la Ruta 1 y confirmación de cambio: **no cambian**. Los objetos (Poción y Cuerda Huida) pasan a la barra de acciones y la hoja de «¿A quién curas?» sigue igual.
+PS y barras (verde, naranja y roja), energía en fichas de 0 a 10, estados como chapas, Poción que no gasta turno, Cuerda Huida, tutorial de la Ruta 1 (el brillo dorado en el activo pasa a ser la carta que hay que tocar) y confirmación de cambio: **no cambian**. La hoja de «¿A quién curas?» sigue igual.
 
 ## Qué no cubre este documento
 

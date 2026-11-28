@@ -47,6 +47,8 @@ La escena ocupa todo; los botones **Equipo** y **Registro** flotan abajo a la de
 
 Tu lado a la izquierda y el rival a la derecha (en vertical estaban arriba y abajo). La hoja de acciones sale **abajo a todo lo ancho** y no tapa a los dos activos.
 
+**Actualizado el 2026-11-28 (Ayme, #588; D-20 §10.2):** ya **no hay hoja de acciones abajo**. Al tocar la carta del Activo, esta se agranda para leerla y sale un desplegable con los ataques y CAMBIAR; al tocar una carta de la Banca, se agranda para leerla. Medidas y detalles en `campana-mejoras-interfaz.md`.
+
 ## Equipo (propuesta J)
 
 ```
