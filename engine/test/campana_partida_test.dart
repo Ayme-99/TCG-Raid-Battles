@@ -957,7 +957,40 @@ void main() {
       }
     });
 
-    test('evolucionar gasta la XP de la reserva y deja el Pokémon a 10 PS', () {
+    test('evolucionar conserva el porcentaje de vida, hacia arriba (#570)', () {
+      // Los ejemplos de Ayme del 2026-11-28 (Squirtle 60 → Wartortle 110).
+      for (final (antes, despues) in [
+        (60, 110),
+        (40, 80),
+        (30, 60),
+        (10, 20),
+        (0, 10),
+      ]) {
+        expect(PartidaCampana.psTrasEvolucion(antes, 60, 110), despues,
+            reason: '$antes/60');
+      }
+      // Sin pasar del máximo de la carta nueva, aunque sea menor.
+      expect(PartidaCampana.psTrasEvolucion(60, 60, 40), 40);
+      expect(PartidaCampana.psTrasEvolucion(50, 60, 40), 40);
+      // Siempre múltiplo de 10.
+      for (var a = 0; a <= 80; a += 10) {
+        expect(PartidaCampana.psTrasEvolucion(a, 80, 110) % 10, 0);
+      }
+    });
+
+    test('evolucionar con XP: lleno queda lleno, herido en proporción', () {
+      // Squirtle (80) → Wartortle (110).
+      for (final (antes, despues) in [(80, 110), (40, 60), (10, 20)]) {
+        final p = enNodo(
+                'ruta-2-norte', [PokemonGuardado('squirtle', antes)],
+                xp: 500)
+            .evolucionar(c, 0, 'wartortle');
+        expect(p.equipo.single.id, 'wartortle');
+        expect(p.equipo.single.ps, despues, reason: 'Squirtle $antes/80');
+      }
+    });
+
+    test('evolucionar gasta la XP de la reserva y conserva la vida llena', () {
       var p = enNodo(
           'ruta-2-norte',
           [
@@ -968,7 +1001,7 @@ void main() {
       expect(p.evolucionesPorXp(c, 1).map((e) => e.a), ['metapod']);
       p = p.evolucionar(c, 1, 'metapod');
       expect(p.equipo[1].id, 'metapod');
-      expect(p.equipo[1].ps, 10, reason: 'aunque tuviera todos sus PS');
+      expect(p.equipo[1].ps, 80, reason: 'Caterpie 50/50 → Metapod 80/80');
       expect(p.xp, 70);
       expect(p.equipo[0].id, 'charmander');
     });
@@ -1557,13 +1590,15 @@ void main() {
           2);
     });
 
-    test('hacerse ex gasta una piedra, nada de XP, y deja 10 PS', () {
+    test('hacerse ex gasta una piedra, nada de XP, y conserva la proporción',
+        () {
       final c2 = conEx();
       final p = con(const [PokemonGuardado('onix', 90)],
               medallas: 2, piedras: 2, xp: 30)
           .evolucionar(c2, 0, 'onix-ex');
       expect(p.equipo.single.id, 'onix-ex');
-      expect(p.equipo.single.ps, PartidaCampana.psAlEvolucionar);
+      expect(p.equipo.single.ps,
+          PartidaCampana.psTrasEvolucion(90, 110, c2.especie('onix-ex').ps));
       expect(p.cuantos(ObjetoCampana.piedraEx), 1);
       expect(p.xp, 30);
       expect(p.evolucionesDe(c2, 0), isEmpty, reason: 'el ex cierra la línea');
@@ -1708,7 +1743,8 @@ void main() {
       expect(q.dinero, 800);
     });
 
-    test('evolucionar con una piedra gasta una, nada de XP, y deja 10 PS', () {
+    test('evolucionar con una piedra gasta una, nada de XP, y conserva la vida',
+        () {
       // Aún no hay carta de Raichu: Pikachu evoluciona en una de mentira.
       final pika = leer(File('../catalog/campana/pokemon/pikachu.json'));
       pika['evoluciones'] = [
@@ -1735,7 +1771,18 @@ void main() {
           }, xp: 40);
       final p = con.evolucionar(c3, 0, 'rattata');
       expect(p.equipo.single.id, 'rattata');
-      expect(p.equipo.single.ps, PartidaCampana.psAlEvolucionar);
+      expect(p.equipo.single.ps, 60, reason: 'Pikachu 60/60 → lleno (60/60)');
+      // Herido y debilitado con piedra.
+      final herido = en('centro-plateada',
+              equipo: const [PokemonGuardado('pikachu', 30)],
+              mochila: const {ObjetoCampana.piedraTrueno: 1})
+          .evolucionar(c3, 0, 'rattata');
+      expect(herido.equipo.single.ps, 30);
+      final caido = en('centro-plateada',
+              equipo: const [PokemonGuardado('pikachu', 0)],
+              mochila: const {ObjetoCampana.piedraTrueno: 1})
+          .evolucionar(c3, 0, 'rattata');
+      expect(caido.equipo.single.ps, PartidaCampana.psAlEvolucionar);
       expect(p.cuantos(ObjetoCampana.piedraTrueno), 1, reason: 'se gasta');
       expect(p.cuantos(ObjetoCampana.piedraAgua), 1, reason: 'otra piedra');
       expect(p.xp, 40);

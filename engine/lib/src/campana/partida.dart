@@ -1191,9 +1191,10 @@ class PartidaCampana {
   ///   y nada de XP (§2.1, decidido el 2026-11-24).
   ///
   /// Se hace fuera de combate, desde el menú del equipo, sin límite por
-  /// visita. La carta evolucionada sustituye a la anterior y queda con
-  /// **10 PS**, aunque tuviera más o estuviera debilitado (evolucionar revive
-  /// a 10 PS).
+  /// visita. La carta evolucionada sustituye a la anterior y conserva el
+  /// mismo **porcentaje de vida**, redondeado hacia arriba al múltiplo de 10
+  /// (ver [psTrasEvolucion]). Un debilitado queda con 10 PS (decidido por
+  /// Ayme el 2026-11-28, #570).
   PartidaCampana evolucionar(CatalogoCampana c, int indice, String destino) {
     if (indice < 0 || indice >= equipo.length) {
       throw const ReglaIncumplida('Ese Pokémon no está en el equipo.');
@@ -1206,8 +1207,10 @@ class PartidaCampana {
     }
     final motivo = motivoSinEvolucion(evolucion);
     if (motivo != null) throw ReglaIncumplida(motivo);
-    final nuevo = [...equipo]..[indice] =
-        PokemonGuardado(destino, psAlEvolucionar);
+    final nuevo = [...equipo]..[indice] = PokemonGuardado(
+        destino,
+        psTrasEvolucion(equipo[indice].ps, c.especie(equipo[indice].id).ps,
+            c.especie(destino).ps));
     if (evolucion.via == ViaEvolucion.objeto) {
       final objeto = objetoDeEvolucion(evolucion.objeto!)!;
       return _copiar(
@@ -1218,8 +1221,21 @@ class PartidaCampana {
     return _copiar(equipo: nuevo, xp: xp - evolucion.xpEvolucion!);
   }
 
-  /// PS con los que queda un Pokémon al evolucionar (D-20 §10.6).
+  /// PS con los que queda un Pokémon **debilitado** al evolucionar
+  /// (D-20 §10.6).
   static const psAlEvolucionar = 10;
+
+  /// PS tras evolucionar (D-20 §10.6, decidido por Ayme el 2026-11-28): el
+  /// mismo porcentaje de vida, redondeado hacia arriba al siguiente múltiplo
+  /// de 10 y sin pasar de [maxNuevo]. Vida llena queda llena; un debilitado
+  /// (0 PS) queda con [psAlEvolucionar]. Solo enteros:
+  /// `((actuales × maxNuevo + maxAntiguo × 10 − 1) ÷ (maxAntiguo × 10)) × 10`.
+  static int psTrasEvolucion(int actuales, int maxAntiguo, int maxNuevo) {
+    if (actuales <= 0) return psAlEvolucionar;
+    final ps =
+        (actuales * maxNuevo + maxAntiguo * 10 - 1) ~/ (maxAntiguo * 10) * 10;
+    return ps > maxNuevo ? maxNuevo : ps;
+  }
 
   Map<String, dynamic> aJson() => {
         'version': version,
