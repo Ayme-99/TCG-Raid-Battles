@@ -251,6 +251,25 @@ void main() {
     expect(p.medallasParaComprar[ObjetoCampana.cuerdaHuida], 1);
   });
 
+  test('sale primero el primer Pokémon en pie, como en el combate (#590)',
+      () {
+    PartidaCampana con(List<int> ps) => PartidaCampana(
+          progreso: const ProgresoRuta(nodoActual: 'ruta-1-pidgey'),
+          equipo: [
+            for (final (i, v) in ps.indexed)
+              PokemonGuardado(['bulbasaur', 'pidgey', 'rattata'][i], v),
+          ],
+        );
+    expect(con([40, 30, 20]).salePrimero, 0);
+    expect(con([0, 30, 20]).salePrimero, 1);
+    expect(con([0, 0, 20]).salePrimero, 2);
+    expect(con([0, 0, 0]).salePrimero, isNull);
+    // Coincide con quien abre el combate.
+    final p = con([0, 30, 20]);
+    final e = p.empezarCombate(c);
+    expect(e.jugador.activo, p.salePrimero);
+  });
+
   group('hitos para la cuenta (#374)', () {
     EstadoCombate ganar(EstadoCombate e) => e.copiarCon(
           rival: e.rival.copiarCon(

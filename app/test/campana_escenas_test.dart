@@ -33,4 +33,24 @@ void main() {
   test('los fondos propios no se mezclan con los sprites ajenos', () {
     expect(carpetaEscenas, isNot(contains('sprites_ajenos')));
   });
+
+  test('cada escena con render de Arte en kit/render/ tiene su fondo (#415)',
+      () async {
+    final c = await cargarCatalogoCampana(rootBundle);
+    final imagenes = {
+      for (final n in c.region.nodos.values)
+        if (n.escena != null) n.escena!.imagen,
+    };
+    final conRender = [
+      for (final i in imagenes)
+        if (File('../docs/diseno-ui/escenas/kit/render/$i.png').existsSync()) i,
+    ];
+    expect(conRender, isNotEmpty);
+    for (final i in conRender) {
+      final fondo = '$carpetaEscenas$i.webp';
+      expect(File(fondo).existsSync(), isTrue, reason: fondo);
+      expect((await rootBundle.load(fondo)).lengthInBytes, greaterThan(0),
+          reason: fondo);
+    }
+  });
 }
