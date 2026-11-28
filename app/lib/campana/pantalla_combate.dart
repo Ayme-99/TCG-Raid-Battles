@@ -473,8 +473,17 @@ List<String> estadosDeBando(BandoCombate b) => [
       if (b.proteccion > 0) 'recibe −${b.proteccion}',
       if (b.cegado || b.cegadoMientrasActivo) 'puede fallar',
       if (b.confundido) 'confundido',
-      if (b.racha > 1) 'racha ×${b.racha}',
+      if (b.racha > 1 && rachaCuenta(b)) 'racha ×${b.racha}',
     ];
+
+/// Si la racha del bando cambia algo: solo cuando su último ataque escala con
+/// ella (`danoPorRacha`, Rodar, D-20 §10.4). El motor la cuenta en todos los
+/// ataques, pero en los demás no sube el daño y no se enseña (#591).
+bool rachaCuenta(BandoCombate b) {
+  final ataques = b.pokemonActivo.especie.ataques;
+  final i = b.ultimoAtaque;
+  return i >= 0 && i < ataques.length && ataques[i].efecto is DanoPorRacha;
+}
 
 /// El activo de un bando: su carta, la vida, la energía como fichas y sus
 /// estados.
