@@ -959,7 +959,7 @@ Geodude ya sigue a su carta impresa (2026-11-22, tarea 14): Pulimento (1: `ganaE
 | `ruta-2` | Ruta 2 | rattata, pidgey, caterpie, weedle | — | — |
 | `ruta-22` | Ruta 22 | rattata, spearow, nidoran-f, nidoran-m, mankey | — | — |
 | `ruta-24` | Ruta 24 (Puente Pepita) | caterpie, weedle, metapod, kakuna, pidgey | — | — |
-| `ruta-3` | Ruta 3 | pidgey, spearow, nidoran-f, nidoran-m, mankey, jigglypuff | Chica (rattata, nidoran-f), 230; Joven Ben (rattata, ekans), 230 | — |
+| `ruta-3` | Ruta 3 | pidgey, spearow, nidoran-f, nidoran-m, mankey, jigglypuff | Chica (rattata, nidoran-f), 230; Joven (rattata, ekans), 230: el nodo `ruta-3-joven` es «Ruta 3: Joven Ben» (#574) | — |
 | `ruta-4` | Ruta 4 | rattata, spearow, sandshrew, mankey, ekans | — | — |
 | `tunel-roca` | Túnel Roca | zubat, geodude, machop, onix | PokéManiaco (cubone, slowpoke), 270 | — |
 
