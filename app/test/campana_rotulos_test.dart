@@ -3,16 +3,25 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:incursiones_app/almacen/almacen.dart';
+import 'package:incursiones_app/campana/controlador_campana.dart';
 import 'package:incursiones_app/campana/escena_mapa.dart';
+import 'package:incursiones_app/campana/pantalla_campana.dart';
 import 'package:incursiones_engine/campana.dart';
 
 import 'ayudas.dart';
-import 'campana_test.dart' show abrirCampana;
 
 /// Rótulos de las zonas pulsables legibles en horizontal (#495; D-20 §10.7,
 /// campaña solo apaisada). En el playtest del 2026-11-25 la puerta bloqueada
 /// «Salida de Ciudad Verde» salía en letra diminuta.
+///
+/// Los rótulos solo se pintan sobre el marcador: con el fondo de Arte la
+/// escena ya dice dónde tocar. Como casi todas las escenas tienen ya fondo
+/// (#415), aquí se prueban sin ninguno, con el marcador.
 void main() {
+  /// Sin fondos de escena: todas con el marcador y sus rótulos.
+  final sinFondos =
+      assetsAppProvider.overrideWith((ref) async => const <String>{});
+
   /// Letra mínima con la que se tiene que ver un rótulo en pantalla.
   const minimo = 12.0;
 
@@ -45,10 +54,18 @@ void main() {
       equipo: [PokemonGuardado('squirtle', 30)],
       dinero: 1000,
     );
-    await abrirCampana(tester,
-        almacen: AlmacenMemoria(),
-        guardada: guardada,
-        tamano: const Size(844, 390));
+    tester.view.physicalSize = const Size(844, 390);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        ...sobrescribir(almacen: AlmacenMemoria(), conInicio: true),
+        campanaInicialProvider.overrideWithValue(guardada),
+        sinFondos,
+      ],
+      child: const MaterialApp(home: PantallaCampana()),
+    ));
+    await tester.pumpAndSettle();
     const clave = 'zona-ir-ciudad-verde-salida';
     final letra = letraEnPantalla(tester, clave, 'Salida de Ciudad Verde');
     expect(letra, closeTo(tamanoRotuloZona, 0.01),
@@ -76,6 +93,7 @@ void main() {
           progreso: ProgresoRuta(nodoActual: n.id),
           equipo: const [PokemonGuardado('squirtle', 80)]);
       await tester.pumpWidget(ProviderScope(
+        overrides: [sinFondos],
         child: MaterialApp(
           home: Scaffold(
             body: SingleChildScrollView(
@@ -93,7 +111,7 @@ void main() {
       await tester.pumpAndSettle();
       for (final z in n.escena!.zonas) {
         final rotulo = estadoZona(c, p, z).rotulo;
-        // Las escenas con el fondo de Arte ya no llevan rótulo.
+        // Una zona sin rótulo (por ejemplo, decorativa) no cuenta.
         if (find
             .descendant(
                 of: find.byKey(Key(claveZona(z))), matching: find.text(rotulo))
