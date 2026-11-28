@@ -283,5 +283,486 @@
       }
     ],
     "nota": "Pórtico de piedra bajo (salida de ruta). El camino pasa por el hueco central."
+  },
+  "mostrador-curar": {
+    "svg": "sprites/mostrador-curar.svg",
+    "ancho": 476,
+    "alto": 284,
+    "ancla": [
+      238.0,
+      238
+    ],
+    "zonas": [
+      {
+        "id": "curar",
+        "tipo": "curar",
+        "rect": [
+          22,
+          28,
+          432,
+          210
+        ]
+      }
+    ],
+    "nota": "Mostrador de la enfermera con la máquina de curar (zona curar)."
+  },
+  "mostrador-tienda": {
+    "svg": "sprites/mostrador-tienda.svg",
+    "ancho": 436,
+    "alto": 284,
+    "ancla": [
+      218.0,
+      238
+    ],
+    "zonas": [
+      {
+        "id": "tienda",
+        "tipo": "tienda",
+        "rect": [
+          22,
+          28,
+          392,
+          210
+        ]
+      }
+    ],
+    "nota": "Mostrador de la tienda con estantes (zona tienda)."
+  },
+  "pc": {
+    "svg": "sprites/pc.svg",
+    "ancho": 206,
+    "alto": 264,
+    "ancla": [
+      103.0,
+      218
+    ],
+    "zonas": [
+      {
+        "id": "pc",
+        "tipo": "pc",
+        "rect": [
+          28,
+          28,
+          150,
+          190
+        ]
+      }
+    ],
+    "nota": "Terminal de PC de almacenamiento (zona pc)."
+  },
+  "planta": {
+    "svg": "sprites/planta.svg",
+    "ancho": 124,
+    "alto": 184,
+    "ancla": [
+      62.0,
+      138
+    ],
+    "zonas": [],
+    "nota": "Planta de interior en maceta."
+  },
+  "sofa": {
+    "svg": "sprites/sofa.svg",
+    "ancho": 316,
+    "alto": 164,
+    "ancla": [
+      158.0,
+      118
+    ],
+    "zonas": [],
+    "nota": "Sofá de la sala de espera."
+  },
+  "alfombra-puerta": {
+    "svg": "sprites/alfombra-puerta.svg",
+    "ancho": 316,
+    "alto": 194,
+    "ancla": [
+      158.0,
+      148
+    ],
+    "zonas": [],
+    "nota": "Alfombra de entrada."
+  },
+  "cartel": {
+    "svg": "sprites/cartel.svg",
+    "ancho": 116,
+    "alto": 162,
+    "ancla": [
+      58.0,
+      116
+    ],
+    "zonas": [],
+    "nota": "Cartel de madera sin texto (ruta, bifurcación)."
+  },
+  "seto": {
+    "svg": "sprites/seto.svg",
+    "ancho": 356,
+    "alto": 144,
+    "ancla": [
+      178.0,
+      98
+    ],
+    "zonas": [],
+    "nota": "Seto denso (separa ramales)."
+  },
+  "arbol-oscuro": {
+    "svg": "sprites/arbol-oscuro.svg",
+    "ancho": 166.0,
+    "alto": 186.5,
+    "ancla": [
+      83.0,
+      140.5
+    ],
+    "zonas": [],
+    "nota": "Árbol de copa oscura (bosque)."
+  },
+  "tronco": {
+    "svg": "sprites/tronco.svg",
+    "ancho": 216,
+    "alto": 118,
+    "ancla": [
+      108.0,
+      72
+    ],
+    "zonas": [],
+    "nota": "Tronco caído con musgo."
+  },
+  "hongo": {
+    "svg": "sprites/hongo.svg",
+    "ancho": 96,
+    "alto": 116,
+    "ancla": [
+      48.0,
+      70
+    ],
+    "zonas": [],
+    "nota": "Seta roja pequeña."
+  },
+  "acantilado": {
+    "svg": "sprites/acantilado.svg",
+    "ancho": 576,
+    "alto": 224,
+    "ancla": [
+      288.0,
+      178
+    ],
+    "zonas": [],
+    "nota": "Acantilado gris de roca con repisas (borde de colina)."
+  },
+  "roca-grande": {
+    "svg": "sprites/roca-grande.svg",
+    "ancho": 216,
+    "alto": 168,
+    "ancla": [
+      108.0,
+      122
+    ],
+    "zonas": [],
+    "nota": "Peñasco grande gris."
+  },
+  "gimnasio-exterior": {
+    "svg": "sprites/gimnasio-exterior.svg",
+    "ancho": 536,
+    "alto": 434,
+    "ancla": [
+      268.0,
+      388
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          203.0,
+          215.20000000000002,
+          130,
+          172.79999999999998
+        ]
+      },
+      {
+        "id": "edificio",
+        "tipo": "edificio",
+        "rect": [
+          28,
+          28,
+          480,
+          360
+        ]
+      }
+    ],
+    "nota": "Gimnasio de roca (exterior): tejado de pizarra y portón de madera. Zona puerta → ir al interior."
+  },
+  "centro-pokemon-exterior": {
+    "svg": "sprites/centro-pokemon-exterior.svg",
+    "ancho": 456,
+    "alto": 374,
+    "ancla": [
+      228.0,
+      328
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          176.0,
+          197.8,
+          104.0,
+          104.15999999999998
+        ]
+      },
+      {
+        "id": "edificio",
+        "tipo": "edificio",
+        "rect": [
+          28,
+          28,
+          400,
+          300
+        ]
+      }
+    ],
+    "nota": "Centro Pokémon (exterior): tejado rojo y cruz blanca. Zona puerta → ir al interior."
+  },
+  "barril": {
+    "svg": "sprites/barril.svg",
+    "ancho": 100,
+    "alto": 124,
+    "ancla": [
+      50.0,
+      78
+    ],
+    "zonas": [],
+    "nota": "Barril de madera."
+  },
+  "muro-piedra": {
+    "svg": "sprites/muro-piedra.svg",
+    "ancho": 296,
+    "alto": 118,
+    "ancla": [
+      148.0,
+      72
+    ],
+    "zonas": [],
+    "nota": "Tramo de muro bajo de piedra."
+  },
+  "arena-roca": {
+    "svg": "sprites/arena-roca.svg",
+    "ancho": 956,
+    "alto": 594,
+    "ancla": [
+      478.0,
+      548
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "arena",
+        "rect": [
+          28,
+          28,
+          900,
+          520
+        ]
+      }
+    ],
+    "nota": "Arena oval de tierra apisonada rodeada de bloques de piedra (zona combate)."
+  },
+  "columna": {
+    "svg": "sprites/columna.svg",
+    "ancho": 128,
+    "alto": 250,
+    "ancla": [
+      64.0,
+      204
+    ],
+    "zonas": [],
+    "nota": "Columna de piedra."
+  },
+  "antorcha": {
+    "svg": "sprites/antorcha.svg",
+    "ancho": 84,
+    "alto": 156,
+    "ancla": [
+      42.0,
+      110
+    ],
+    "zonas": [],
+    "nota": "Antorcha de pared."
+  },
+  "gimnasio-agua-exterior": {
+    "svg": "sprites/gimnasio-agua-exterior.svg",
+    "ancho": 536,
+    "alto": 434,
+    "ancla": [
+      268.0,
+      388
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          203.0,
+          215.20000000000002,
+          130,
+          172.79999999999998
+        ]
+      },
+      {
+        "id": "edificio",
+        "tipo": "edificio",
+        "rect": [
+          28,
+          28,
+          480,
+          360
+        ]
+      }
+    ],
+    "nota": "Gimnasio de agua (exterior): tejado azul y paredes claras. Zona puerta → ir al interior."
+  },
+  "piscina-gimnasio": {
+    "svg": "sprites/piscina-gimnasio.svg",
+    "ancho": 1056,
+    "alto": 634,
+    "ancla": [
+      528.0,
+      588
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "arena",
+        "rect": [
+          28,
+          28,
+          1000,
+          560
+        ]
+      }
+    ],
+    "nota": "Piscina de combate con tres plataformas (zona combate)."
+  },
+  "puente-largo": {
+    "svg": "sprites/puente-largo.svg",
+    "ancho": 356,
+    "alto": 694,
+    "ancla": [
+      178.0,
+      648
+    ],
+    "zonas": [],
+    "nota": "Puente de piedra largo (vista cenital vertical) sobre un río ancho."
+  },
+  "cueva-entrada": {
+    "svg": "sprites/cueva-entrada.svg",
+    "ancho": 616,
+    "alto": 434,
+    "ancla": [
+      308.0,
+      388
+    ],
+    "zonas": [
+      {
+        "id": "puerta",
+        "tipo": "puerta",
+        "rect": [
+          196.0,
+          100.0,
+          224.0,
+          288.0
+        ]
+      }
+    ],
+    "nota": "Entrada de cueva (Monte Moon): montículo de roca con boca oscura y vigas de madera. Zona puerta → ir a la galería."
+  },
+  "estalagmita": {
+    "svg": "sprites/estalagmita.svg",
+    "ancho": 126,
+    "alto": 214,
+    "ancla": [
+      63.0,
+      168
+    ],
+    "zonas": [],
+    "nota": "Estalagmita de cueva."
+  },
+  "estalagmita-baja": {
+    "svg": "sprites/estalagmita-baja.svg",
+    "ancho": 126,
+    "alto": 164,
+    "ancla": [
+      63.0,
+      118
+    ],
+    "zonas": [],
+    "nota": "Estalagmita baja de cueva."
+  },
+  "estalactita": {
+    "svg": "sprites/estalactita.svg",
+    "ancho": 136,
+    "alto": 194,
+    "ancla": [
+      68.0,
+      148
+    ],
+    "zonas": [],
+    "nota": "Estalactita colgante (se coloca con el ancla en la punta de arriba del techo; aquí el ancla es la base del sprite)."
+  },
+  "setas-grandes": {
+    "svg": "sprites/setas-grandes.svg",
+    "ancho": 476,
+    "alto": 334,
+    "ancla": [
+      238.0,
+      288
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "combate",
+        "rect": [
+          28,
+          28,
+          420,
+          260
+        ]
+      }
+    ],
+    "nota": "Alfombra de setas (zona de combate salvaje: Paras)."
+  },
+  "escombros": {
+    "svg": "sprites/escombros.svg",
+    "ancho": 516,
+    "alto": 324,
+    "ancla": [
+      258.0,
+      278
+    ],
+    "zonas": [
+      {
+        "id": "cuerpo",
+        "tipo": "combate",
+        "rect": [
+          28,
+          28,
+          460,
+          250
+        ]
+      }
+    ],
+    "nota": "Montón de escombros y rocas sueltas (zona de combate salvaje: Zubat o Geodude)."
+  },
+  "rayo-luz": {
+    "svg": "sprites/rayo-luz.svg",
+    "ancho": 276,
+    "alto": 774,
+    "ancla": [
+      138.0,
+      728
+    ],
+    "zonas": [],
+    "nota": "Rayo de luz desde una grieta del techo (decoración translúcida)."
   }
 }

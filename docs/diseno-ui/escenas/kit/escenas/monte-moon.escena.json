@@ -1,0 +1,245 @@
+{
+ "escena": "monte-moon",
+ "fondo": "seco",
+ "nota": "Monte Moon (exterior). Entrada por abajo (viene de la Ruta 3); la boca grande de la cueva (galería lateral, desvío opcional) arriba a la izquierda, la boca pequeña (planta B1F, desvío opcional) abajo a la izquierda, el Centro Pokémon de la montaña a la derecha, un claro con peñascos para el jefe (Clefairy) y la salida arriba hacia la Ruta 4. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {
+   "material": "tierra",
+   "ancho": 220,
+   "d": "M960 1130 C950 1000 960 900 950 800 C940 700 980 600 1000 500 C1020 380 960 260 960 140 L960 -40"
+  },
+  {
+   "material": "tierra",
+   "ancho": 130,
+   "d": "M940 640 C800 600 640 560 500 520"
+  },
+  {
+   "material": "tierra",
+   "ancho": 110,
+   "d": "M990 720 C1150 740 1280 730 1380 700"
+  }
+ ],
+ "rellenos": [
+  {
+   "material": "tierra",
+   "x": 480,
+   "y": 500,
+   "rx": 170,
+   "ry": 70
+  },
+  {
+   "material": "tierra",
+   "x": 1380,
+   "y": 720,
+   "rx": 150,
+   "ry": 55
+  },
+  {
+   "material": "tierra",
+   "x": 1560,
+   "y": 300,
+   "rx": 180,
+   "ry": 80
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "cueva-entrada",
+   "x": 480,
+   "y": 500,
+   "escala": 1.0,
+   "id": "galeria",
+   "acciones": {
+    "puerta": {
+     "accion": "ir",
+     "destino": "monte-moon-galeria"
+    }
+   }
+  },
+  {
+   "sprite": "centro-pokemon-exterior",
+   "x": 1380,
+   "y": 740,
+   "escala": 0.9,
+   "id": "centro-pokemon",
+   "acciones": {
+    "puerta": {
+     "accion": "ir",
+     "destino": "centro-monte-moon"
+    },
+    "edificio": {
+     "accion": "ir",
+     "destino": "centro-monte-moon"
+    }
+   }
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 1520,
+   "y": 300,
+   "escala": 1.4
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 1660,
+   "y": 320,
+   "escala": 0.9
+  },
+  {
+   "sprite": "roca",
+   "x": 1440,
+   "y": 330
+  },
+  {
+   "sprite": "acantilado",
+   "x": 300,
+   "y": 120,
+   "escala": 1.1
+  },
+  {
+   "sprite": "acantilado",
+   "x": 1640,
+   "y": 110,
+   "escala": 1.1
+  },
+  {
+   "sprite": "cartel",
+   "x": 800,
+   "y": 900
+  },
+  {
+   "sprite": "cartel",
+   "x": 1100,
+   "y": 880
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 120,
+   "y": 1000,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1800,
+   "y": 1000,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1790,
+   "y": 560,
+   "escala": 0.85
+  },
+  {
+   "sprite": "roca",
+   "x": 640,
+   "y": 780
+  },
+  {
+   "sprite": "roca",
+   "x": 1200,
+   "y": 960
+  },
+  {
+   "sprite": "roca",
+   "x": 760,
+   "y": 300
+  },
+  {
+   "sprite": "roca",
+   "x": 1200,
+   "y": 260
+  },
+  {
+   "sprite": "roca",
+   "x": 1700,
+   "y": 900
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 600,
+   "y": 980,
+   "escala": 1.1
+  },
+  {
+   "sprite": "arbusto",
+   "x": 740,
+   "y": 620
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1150,
+   "y": 520
+  },
+  {
+   "sprite": "arbusto",
+   "x": 280,
+   "y": 680
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 820,
+   "y": 760
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1100,
+   "y": 420
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1500,
+   "y": 930
+  },
+  {
+   "sprite": "cueva-entrada",
+   "x": 230,
+   "y": 900,
+   "escala": 0.6,
+   "id": "b1f",
+   "acciones": {
+    "puerta": {
+     "accion": "ir",
+     "destino": "monte-moon-b1f"
+    }
+   }
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "claro-jefe",
+   "tipo": "claro",
+   "accion": "ir",
+   "destino": "jefe-clefairy",
+   "rect": [
+    1380,
+    220,
+    360,
+    170
+   ]
+  },
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  },
+  {
+   "id": "salida-ruta-4",
+   "tipo": "borde-superior",
+   "accion": "ir",
+   "destino": "ruta-4",
+   "rect": [
+    820,
+    0,
+    280,
+    120
+   ]
+  }
+ ]
+}

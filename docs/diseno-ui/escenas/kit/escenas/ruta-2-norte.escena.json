@@ -1,0 +1,201 @@
+{
+ "escena": "ruta-2-norte",
+ "fondo": "seco",
+ "nota": "Ruta 2 norte. Entrada por abajo; el camino sube hacia la colina rocosa y sale por arriba hacia Ciudad Plateada (centro-plateada). Una hierba alta a la derecha, a media altura = salvaje opcional. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {
+   "material": "tierra",
+   "ancho": 220,
+   "d": "M960 1130 C950 950 1010 800 950 640 C900 500 930 330 960 120 L960 -40"
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "acantilado",
+   "x": 300,
+   "y": 210,
+   "escala": 1.1
+  },
+  {
+   "sprite": "acantilado",
+   "x": 1640,
+   "y": 220,
+   "escala": 1.1
+  },
+  {
+   "sprite": "acantilado",
+   "x": 780,
+   "y": 120,
+   "escala": 0.55
+  },
+  {
+   "sprite": "acantilado",
+   "x": 1150,
+   "y": 120,
+   "escala": 0.55
+  },
+  {
+   "sprite": "hierba-alta-media",
+   "x": 1500,
+   "y": 640,
+   "escala": 0.95,
+   "flip": true,
+   "id": "hierba",
+   "acciones": {
+    "cuerpo": {
+     "accion": "ir",
+     "destino": "ruta-2-norte-salvaje"
+    }
+   }
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 560,
+   "y": 520
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 1330,
+   "y": 380,
+   "escala": 0.9
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 330,
+   "y": 880,
+   "escala": 1.2
+  },
+  {
+   "sprite": "roca",
+   "x": 700,
+   "y": 780
+  },
+  {
+   "sprite": "roca",
+   "x": 1220,
+   "y": 900
+  },
+  {
+   "sprite": "roca",
+   "x": 250,
+   "y": 560
+  },
+  {
+   "sprite": "roca",
+   "x": 1700,
+   "y": 900
+  },
+  {
+   "sprite": "roca",
+   "x": 760,
+   "y": 380
+  },
+  {
+   "sprite": "roca",
+   "x": 1120,
+   "y": 620,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 140,
+   "y": 1010
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1780,
+   "y": 1020,
+   "escala": 1.05
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 520,
+   "y": 960,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1380,
+   "y": 1000,
+   "escala": 0.8
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 120,
+   "y": 420,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbusto",
+   "x": 720,
+   "y": 640
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1210,
+   "y": 470,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbusto",
+   "x": 430,
+   "y": 700
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1760,
+   "y": 520,
+   "escala": 0.9
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 800,
+   "y": 900
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1110,
+   "y": 780
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 620,
+   "y": 300
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1360,
+   "y": 820
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 240,
+   "y": 720
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  },
+  {
+   "id": "salida-centro-plateada",
+   "tipo": "borde-superior",
+   "accion": "ir",
+   "destino": "centro-plateada",
+   "rect": [
+    820,
+    0,
+    280,
+    120
+   ]
+  }
+ ]
+}

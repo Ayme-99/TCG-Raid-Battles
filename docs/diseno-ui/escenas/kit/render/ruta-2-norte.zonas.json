@@ -1,0 +1,64 @@
+{
+  "escena": "ruta-2-norte",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Ruta 2 norte. Entrada por abajo; el camino sube hacia la colina rocosa y sale por arriba hacia Ciudad Plateada (centro-plateada). Una hierba alta a la derecha, a media altura = salvaje opcional. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "hierba",
+      "tipo": "hierba-alta",
+      "accion": "ir",
+      "rect": [
+        1310,
+        364,
+        380,
+        276
+      ],
+      "destino": "ruta-2-norte-salvaje",
+      "rel": [
+        0.6823,
+        0.3346,
+        0.1979,
+        0.2537
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-centro-plateada",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "centro-plateada",
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "escena": "ruta-24",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Ruta 24 (puente). Entrada por abajo (sale de Ciudad Celeste); un puente largo cruza un río ancho; hierba alta de combate a la entrada. Arriba el camino sigue sin destino definido en el catálogo. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "hierba",
+      "tipo": "hierba-alta",
+      "accion": "combate",
+      "rect": [
+        210,
+        552,
+        480,
+        348
+      ],
+      "rel": [
+        0.1094,
+        0.5074,
+        0.25,
+        0.3199
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-norte",
+      "tipo": "borde-superior",
+      "accion": null,
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}

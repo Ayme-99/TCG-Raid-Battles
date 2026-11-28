@@ -1,0 +1,233 @@
+{
+ "escena": "ruta-4",
+ "fondo": "seco",
+ "nota": "Ruta 4. Entrada por abajo (sale del Monte Moon); el camino serpentea hacia Ciudad Celeste. Dos hierbas: Sandshrew (ir a ruta-4-sandshrew) y Rattata (ir a ruta-4-rattata). Un claro con peñascos junto al camino es el sitio del jefe (ir a jefe-clefairy). La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+ "caminos": [
+  {
+   "material": "tierra",
+   "ancho": 200,
+   "d": "M960 1130 C960 1000 700 960 700 800 C700 640 1200 680 1200 500 C1200 340 800 360 800 220 C800 130 950 110 960 -40"
+  }
+ ],
+ "rellenos": [
+  {
+   "material": "tierra",
+   "x": 1560,
+   "y": 420,
+   "rx": 170,
+   "ry": 90
+  }
+ ],
+ "objetos": [
+  {
+   "sprite": "hierba-alta-media",
+   "x": 400,
+   "y": 800,
+   "escala": 0.95,
+   "id": "hierba-sandshrew",
+   "acciones": {
+    "cuerpo": {
+     "accion": "ir",
+     "destino": "ruta-4-sandshrew"
+    }
+   }
+  },
+  {
+   "sprite": "hierba-alta-media",
+   "x": 1560,
+   "y": 890,
+   "escala": 0.95,
+   "flip": true,
+   "id": "hierba-rattata",
+   "acciones": {
+    "cuerpo": {
+     "accion": "ir",
+     "destino": "ruta-4-rattata"
+    }
+   }
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 1510,
+   "y": 420,
+   "escala": 1.4,
+   "id": "jefe-clefairy-roca"
+  },
+  {
+   "sprite": "roca-grande",
+   "x": 1650,
+   "y": 440,
+   "escala": 0.9
+  },
+  {
+   "sprite": "roca",
+   "x": 1450,
+   "y": 470
+  },
+  {
+   "sprite": "acantilado",
+   "x": 300,
+   "y": 130,
+   "escala": 1.1
+  },
+  {
+   "sprite": "acantilado",
+   "x": 1640,
+   "y": 130,
+   "escala": 1.1
+  },
+  {
+   "sprite": "cartel",
+   "x": 820,
+   "y": 950
+  },
+  {
+   "sprite": "cartel",
+   "x": 1100,
+   "y": 900
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 120,
+   "y": 1000,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 1800,
+   "y": 1000,
+   "escala": 0.9
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 260,
+   "y": 430,
+   "escala": 0.85
+  },
+  {
+   "sprite": "arbol-1",
+   "x": 1800,
+   "y": 700,
+   "escala": 1.0
+  },
+  {
+   "sprite": "arbol-2",
+   "x": 420,
+   "y": 330,
+   "escala": 0.8
+  },
+  {
+   "sprite": "roca",
+   "x": 560,
+   "y": 660
+  },
+  {
+   "sprite": "roca",
+   "x": 1050,
+   "y": 830
+  },
+  {
+   "sprite": "roca",
+   "x": 300,
+   "y": 620
+  },
+  {
+   "sprite": "roca",
+   "x": 1260,
+   "y": 280
+  },
+  {
+   "sprite": "roca",
+   "x": 600,
+   "y": 300
+  },
+  {
+   "sprite": "roca",
+   "x": 1700,
+   "y": 960
+  },
+  {
+   "sprite": "arbusto",
+   "x": 520,
+   "y": 540
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1330,
+   "y": 790
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1000,
+   "y": 250
+  },
+  {
+   "sprite": "arbusto",
+   "x": 1800,
+   "y": 330,
+   "escala": 0.9
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 900,
+   "y": 620
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1050,
+   "y": 330
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 230,
+   "y": 960
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1450,
+   "y": 960
+  },
+  {
+   "sprite": "mata-hierba",
+   "x": 1000,
+   "y": 1010
+  }
+ ],
+ "zonas_extra": [
+  {
+   "id": "claro-jefe",
+   "tipo": "claro",
+   "accion": "ir",
+   "destino": "jefe-clefairy",
+   "rect": [
+    1390,
+    330,
+    340,
+    180
+   ]
+  },
+  {
+   "id": "entrada",
+   "tipo": "punto-de-entrada",
+   "accion": null,
+   "rect": [
+    760,
+    903,
+    400,
+    185
+   ]
+  },
+  {
+   "id": "salida-ciudad-celeste",
+   "tipo": "borde-superior",
+   "accion": "ir",
+   "destino": "ciudad-celeste",
+   "rect": [
+    820,
+    0,
+    280,
+    120
+   ]
+  }
+ ]
+}

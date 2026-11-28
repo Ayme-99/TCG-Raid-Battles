@@ -1,0 +1,152 @@
+{
+  "escena": "ciudad-plateada",
+  "formato": "16:9",
+  "tamano": [
+    1920,
+    1088
+  ],
+  "nota": "Ciudad Plateada (exterior). Entrada por abajo (Ruta 2 norte); salida arriba hacia la Ruta 3. Gimnasio de Brock arriba a la izquierda y Centro Pokémon a la derecha. La barra de recursos tapa el 7 % de arriba y el equipo el 17 % de abajo.",
+  "zonas": [
+    {
+      "id": "casa-pequena-azul-puerta",
+      "tipo": "puerta",
+      "accion": null,
+      "rect": [
+        1424,
+        225,
+        52,
+        57
+      ],
+      "rel": [
+        0.7417,
+        0.2068,
+        0.0271,
+        0.0524
+      ]
+    },
+    {
+      "id": "gimnasio-puerta",
+      "tipo": "puerta",
+      "accion": "ir",
+      "rect": [
+        428,
+        270,
+        143,
+        190
+      ],
+      "destino": "gimnasio-brock",
+      "rel": [
+        0.2229,
+        0.2482,
+        0.0745,
+        0.1746
+      ]
+    },
+    {
+      "id": "gimnasio-edificio",
+      "tipo": "edificio",
+      "accion": "ir",
+      "rect": [
+        236,
+        64,
+        528,
+        396
+      ],
+      "destino": "gimnasio-brock",
+      "rel": [
+        0.1229,
+        0.0588,
+        0.275,
+        0.364
+      ]
+    },
+    {
+      "id": "centro-pokemon-puerta",
+      "tipo": "puerta",
+      "accion": "ir",
+      "rect": [
+        1298,
+        650,
+        104,
+        104
+      ],
+      "destino": "centro-plateada",
+      "rel": [
+        0.676,
+        0.5974,
+        0.0542,
+        0.0956
+      ]
+    },
+    {
+      "id": "centro-pokemon-edificio",
+      "tipo": "edificio",
+      "accion": "ir",
+      "rect": [
+        1150,
+        480,
+        400,
+        300
+      ],
+      "destino": "centro-plateada",
+      "rel": [
+        0.599,
+        0.4412,
+        0.2083,
+        0.2757
+      ]
+    },
+    {
+      "id": "casa-pequena-roja-puerta",
+      "tipo": "puerta",
+      "accion": null,
+      "rect": [
+        273,
+        771,
+        54,
+        60
+      ],
+      "rel": [
+        0.1422,
+        0.7086,
+        0.0281,
+        0.0551
+      ]
+    },
+    {
+      "id": "entrada",
+      "tipo": "punto-de-entrada",
+      "accion": null,
+      "rect": [
+        760,
+        903,
+        400,
+        185
+      ],
+      "rel": [
+        0.3958,
+        0.83,
+        0.2083,
+        0.17
+      ]
+    },
+    {
+      "id": "salida-ruta-3",
+      "tipo": "borde-superior",
+      "accion": "ir",
+      "destino": "ruta-3",
+      "rect": [
+        820,
+        0,
+        280,
+        120
+      ],
+      "rel": [
+        0.4271,
+        0.0,
+        0.1458,
+        0.1103
+      ]
+    }
+  ]
+}

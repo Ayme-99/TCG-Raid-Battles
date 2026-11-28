@@ -22,11 +22,27 @@ Sprites sueltos y un compositor, para que lo que sale en varias pantallas se vea
 | `valla`, `roca` | Decoración de ruta | nuevos | Ruta 1 (`roca` también en Ruta 22) |
 | `puente` | Puente de piedra cenital sobre el río | nuevo | Ruta 22 |
 | `portico` | Pórtico de piedra, salida de ruta (zona `puerta` → `ir`) | nuevo | Ruta 22 |
+| `mostrador-curar`, `mostrador-tienda`, `pc` | Interior del Centro Pokémon: curar, tienda, PC (cada uno con su zona pulsable) | nuevos | Centro Pokémon (interior) |
+| `planta`, `sofa`, `alfombra-puerta` | Decoración de interior | nuevos | Centro Pokémon (interior) |
+| `cartel`, `seto`, `arbol-oscuro`, `tronco`, `hongo` | Decoración de bosque y bifurcación | nuevos | Ruta 2 sur |
+| (reutiliza) `arbol-oscuro`, `arbol-2`, `hierba-alta-media`, `tronco`, `hongo` | Bosque denso; claros = elipses de material `hierba` sin objeto | — | Bosque Verde |
+| `acantilado`, `roca-grande` | Colina rocosa, peñasco | nuevos | Ruta 2 norte |
+| `gimnasio-exterior`, `centro-pokemon-exterior` | Edificios de la ciudad (zona `puerta` → ir al interior) | nuevos; el Centro ya existía como dibujo en la base de Ciudad Verde | Ciudad Plateada |
+| `barril`, `muro-piedra` | Decoración de pueblo de montaña | nuevos | Ciudad Plateada |
+| `arena-roca`, `columna`, `antorcha` | Interior del gimnasio de roca (la arena lleva zona `cuerpo` → combate) | nuevos | Gimnasio de Brock |
+| `gimnasio-agua-exterior` | Gimnasio de agua (mismo dibujo que `gimnasio-exterior` con otra paleta; zona `puerta`) | nuevo | Ciudad Celeste |
+| `piscina-gimnasio` | Piscina de combate con tres plataformas (zona `cuerpo` → combate) | nuevo | Gimnasio de Celeste |
+| `puente-largo` | Puente de piedra largo (cenital, vertical) para ríos anchos | nuevo | Ruta 24 |
+| `cueva-entrada` | Boca de cueva con vigas (zona `puerta` → galería) | nuevo | Monte Moon |
+| `estalagmita`, `estalagmita-baja`, `estalactita`, `setas-grandes` | Interior de cueva; las setas llevan zona `cuerpo` → combate | nuevos | Monte Moon B1F |
+| `escombros`, `rayo-luz` | Interior de cueva: montón de rocas (zona `cuerpo` → combate) y rayo de luz translúcido | nuevos | Monte Moon, galería |
+
+Fondos de escena: `cesped` (por defecto), `seco` (hierba seca dorada), `suelo-gimnasio` (interior de piedra), `suelo-agua` (interior de azulejos azules), `suelo-cueva` (cueva oscura) y `suelo-centro` (interior con pared y losas).
 
 Materiales de camino: `tierra`, `piedra`, `hierba` y `agua` (río, con brillos) (en `componer.py`).
 
 ## Por hacer según vayamos montando escenas
-`centro-pokemon`, `tienda`, `casa-grande`, `cartel-ruta`, `fuente`, `banco`, `gimnasio`, `entrada-bosque`.
+`tienda` (exterior), `casa-grande`, `cartel-ruta`, `fuente`, `banco`, `gimnasio`, `entrada-bosque`.
 
 ## Nota de estilo
 Las escenas finales de Pueblo Paleta y Ruta 1 que hay en `app/assets/campana/escenas/` son pintadas (Flux). Este kit es vector: si pasa a ser el aspecto definitivo, habrá que volver a montar esas dos con el kit.
