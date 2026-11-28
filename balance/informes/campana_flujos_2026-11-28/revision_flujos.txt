@@ -1,0 +1,103 @@
+[0] OK    el catálogo no tiene problemas: []
+[1] OK    Nueva campaña empieza en pueblo-paleta, sin equipo, 1000 de dinero
+[1] OK    sin elegir inicial no se puede avanzar: Antes hay que resolver este nodo.
+[1] OK    inicial bulbasaur: 1 Pokémon con PS completos (90), opciones [ruta-1]
+[1] OK    inicial charmander: 1 Pokémon con PS completos (70), opciones [ruta-1]
+[1] OK    inicial squirtle: 1 Pokémon con PS completos (80), opciones [ruta-1]
+[1] OK    inicial que no lo es (pikachu): Hay que elegir uno de los iniciales.
+[1] OK    no se puede elegir otro inicial después: Este nodo ya está resuelto.
+[1] OK    Continuar: guardar y cargar tras elegir inicial
+[1] OK    Continuar: guardado en un combate sin jugar (nodo ruta-1-pidgey, hayCombate=true)
+[1] OK    Continuar: guardado con captura pendiente (pidgey)
+[1] OK    una partida de la versión 1 (XP por Pokémon) se carga
+[1] OK    una partida con versión desconocida se rechaza con mensaje: Versión de partida de campaña desconocida: 99.
+[1] OK    partida con Pokémon fuera del catálogo: problemas=[El Pokémon "mew" no existe.] (la app debe avisar, no romperse)
+[2] OK    salvaje de Ruta 1 vencido: [pidgey], captura pendiente pidgey, XP 10, puntos 100, dinero 1000
+[2] OK    sin Pokéballs: No te quedan de esas.
+[2] OK    con captura pendiente no se avanza: Antes hay que decidir la captura.
+[2] OK    Dejarlo ir: se queda sin captura y puede avanzar a [ciudad-verde]
+[2] OK    tirada de Pokéball en 60 semillas: 44 aciertos, 16 fallos (Común 75 %)
+[2] OK    fallo de captura → tras fallar: pendiente=pidgey, Balls=19, puede seguir=true
+[2] OK    tras lograrla no se puede dejar ir: Ya está capturado: elige dónde va.
+[2] OK    tras lograrla tampoco se avanza sin colocarla: Antes hay que decidir la captura.
+[2] OK    Capturar con hueco: el equipo pasa a 4 con PS completos (60/60)
+[2] OK    equipo lleno: equipoLleno=true; sin sustituir va al PC (1 en el PC); sustituyendo el 6.º, el sustituido va al PC ([caterpie])
+[2] OK    sustituir un Pokémon que no existe: Ese Pokémon no está en el equipo.
+[2] NOTA  repetir el salvaje ya vencido: puedeRepetir=true
+[2] OK    tras capturar sigue en ruta-1-pidgey; se puede repetir=true
+[2] OK    fallar con la última Ball: Balls=0, captura pendiente=pidgey → sale con avanzar bloqueado (debe poder dejarlo ir)
+[3] OK    Cazabichos vencido: dinero +200, puntos +200, XP +30, captura pendiente=null (los entrenadores no se capturan)
+[3] OK    hitos pendientes tras el entrenador: [ruta-1-pidgey:salvaje:100, ruta-2-weedle:salvaje:100, cazabichos-1:entrenador:200] (puntos del menú, no de la campaña)
+[3] OK    aviso de Pikachu cura al equipo ([110, 110, 100]) y es el sitio de vuelta (aviso-pikachu)
+[3] OK    hablar dos veces: Ya has hablado con este personaje.
+[3] OK    Pikachu jefe: hayCombate=true, rival=[pikachu-jefe], empieza el jugador (D-20 §10)
+[3] OK    Pikachu jefe vencido (jugador): captura pendiente=pikachu, jefes derrotados={pikachu-jefe}, XP +30
+[3] OK    el jefe ya vencido no se repite: puedeRepetir=false
+[3] OK    con el jefe ya en jefesDerrotados, no se ofrece captura: null
+[3] OK    Brock (rival empieza primero, D-20 §10; combate jugador): medallas {roca}, piedras ex 1, dinero +1400
+[3] OK    Brock da captura: null (un líder no se captura)
+[4] OK    Ciudad Verde sin curar aún: ultimaCura=pueblo-paleta
+[4] OK    derrota sin haber curado: vuelve a pueblo-paleta (esperado pueblo-paleta), derrotas=1, equipo curado=true, XP 10→10, dinero 1000→1000, puntos 100→100
+[4] OK    curar en Ciudad Verde fija el retorno: ciudad-verde
+[4] OK    derrota tras curar en Ciudad Verde: vuelve a ciudad-verde
+[4] OK    tras volver, el nodo de Ciudad Verde está sin resolver=false y se puede seguir: [ciudad-verde-salida]
+[4] OK    la medalla y la piedra ex ganadas se conservan tras perder después: medallas {roca}, piedras ex 1, retorno centro-plateada
+[4] OK    perder contra Pikachu jefe: vuelve a aviso-pikachu (esperado aviso-pikachu, que cura), derrotas 1
+[4] OK    perder con una Poción gastada en combate: se descuenta de la mochila
+[5] OK    tienda de Ciudad Verde: [pokeball, pocion]
+[5] OK    comprar 2 Pokéballs: dinero 1000→600, Balls 2
+[5] OK    dinero insuficiente: No tienes dinero suficiente.
+[5] OK    cantidad 0: Hay que comprar al menos uno.
+[5] OK    algo que ese centro no vende (Cuerda Huida): Eso no se vende aquí.
+[5] OK    piedra ex sin 2 medallas: tienda=false; comprar → Se vende a partir de 2 medallas.
+[5] OK    piedra ex con 2 medallas y 2.500: se compra
+[5] OK    curar: PS [0, 110, 100]→[110, 110, 100], retorno ciudad-verde
+[5] OK    curar dos veces seguidas no falla: ok
+[5] OK    salir sin curar: avanza a [ciudad-verde-salida] aunque el equipo esté herido y la última cura siga siendo pueblo-paleta
+[5] OK    PC: sacar al equipo con hueco → equipo 3, PC 0
+[5] OK    PC: dejar un Pokémon → PC 2
+[5] OK    PC: intercambiar → [pidgey, ivysaur]
+[5] OK    PC: dejar al último del equipo: El equipo necesita al menos un Pokémon.
+[5] OK    PC: sacar con el equipo lleno: El equipo está lleno.
+[5] OK    PC fuera de un centro: El PC solo se usa en un centro Pokémon.
+[5] OK    curar cura también al PC: 60/60
+[6] OK    Poción fuera de combate: PS 20→40 (+20), Pociones 2→1
+[6] OK    Poción con 5 PS de daño: 80 (máximo 80, no pasa)
+[6] OK    Poción con PS llenos: Ya tiene todos sus PS.
+[6] OK    Poción a un debilitado: Una Poción no revive a un Pokémon.
+[6] OK    Poción a un Pokémon que no existe: Ese Pokémon no está en el equipo.
+[6] OK    sin Pociones: No te quedan Pociones.
+[6] OK    evoluciones de Squirtle: [wartortle (xp, 70 XP)]
+[6] OK    evolucionar por XP: squirtle 20/80 → wartortle 10/110, XP 300→230 (HOY queda a 10 PS; la decisión del 28-11 pide conservar el % y redondear arriba: 74/110 desde 40/60; pendiente de #570)
+[6] OK    evolucionar sin XP: Faltan 60 XP.
+[6] OK    evolucionar a un debilitado: PS 10 (hoy 10; la decisión del 28-11 también lo deja a 10)
+[6] OK    evolucionar a algo que no es su evolución: Squirtle no evoluciona en "charizard".
+[6] OK    tras evolucionar a Wartortle, evoluciones: []
+[6] OK    hacerse ex con 1 medalla: opciones []; motivo —
+[6] OK    Piedra Trueno: piedraTrueno en la tienda de Ciudad Verde=false, Luna vendible=false
+[7] OK    combate con 2 Pociones y 1 Cuerda Huida: pocionesJugador=2, cuerdasJugador=1
+[7] OK    Poción en combate no gasta turno: sigue actuando jugador; PS 30→50; usadas 1
+[7] OK    Cuerda Huida cambia al activo sin retirada y pasa el turno: activo ivysaur, turno de rival
+[7] OK    segunda Cuerda Huida sin tenerla (turno del rival o sin objeto): No es el turno de ese bando.
+[7] OK    tras un combate con Poción (usadas 1) y Cuerda Huida (usadas 1): mochila Pociones 2→1, Cuerdas 1→0
+[7] OK    tras el combate la mochila descuenta lo usado: Pociones 2→2 (usadas 0), Cuerdas 1→1 (usadas 0)
+[7] OK    Repelente fuera de un salvaje: No te quedan Repelentes.
+[8] OK    bifurcación de Ruta 1: opciones [ruta-1-pidgey, ruta-1-rattata]
+[8] OK    destino fuera de las salidas: Desde aquí no se puede ir a "ciudad-verde".
+[8] OK    combate pendiente sin jugar: avanzar → Antes hay que resolver este nodo.
+[8] OK    volver atrás sin jugar el combate: ahora en ruta-1; puede elegir la otra rama [ruta-1-pidgey, ruta-1-rattata]
+[8] OK    volver a un sitio no visitado: No se puede ir a "Centro Pokémon de Ciudad Verde": todavía no has llegado.
+[8] OK    retroceder al mismo nodo: Ya estás aquí.
+[8] OK    cambiar de rama tras volver atrás: ahora ruta-1-pidgey
+[8] OK    saltarse el combate obligatorio de Ruta 1: Antes hay que resolver este nodo.
+[8] OK    volver a un salvaje vencido: puedeRepetir=true, hayCombate=false
+[8] OK    repetir da XP (10→20), puntos 100→100, dinero 1000→1000 (sin puntos ni dinero, D-20 §10.7), captura=pidgey
+[8] OK    volver desde el entrenador al salvaje anterior: puedeRepetir=true
+[8] OK    volver al entrenador ya vencido y repetirlo: Solo se repiten los combates contra Pokémon salvajes ya ganados.
+[8] OK    Repelente en un salvaje: pasa sin XP ni captura; Repelentes 1→0, XP 0→0, opciones [ciudad-verde]
+[8] OK    nodos con objeto escondido: [monte-moon:piedraLuna]
+[8] OK    llegar a monte-moon da piedraLuna: 1; recogidos={monte-moon}
+[8] OK    volver al nodo no repone la piedra: 1
+[8] OK    tras guardar y cargar, `recogidos` se mantiene: {monte-moon}
+
+Fallos: 0
