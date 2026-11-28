@@ -404,8 +404,17 @@ class PartidaCampana {
 
   final ProgresoRuta progreso;
 
-  /// Hasta [ParametrosCampana.tamanoEquipo] Pokémon; el primero sale activo.
+  /// Hasta [ParametrosCampana.tamanoEquipo] Pokémon; el primero en pie sale
+  /// activo ([salePrimero]).
   final List<PokemonGuardado> equipo;
+
+  /// Índice del Pokémon del equipo que abre el próximo combate: el primero
+  /// con PS, como en `EstadoCombate.conEquipos`; null si todos están
+  /// debilitados. Las pantallas lo usan para «sale primero» (#590).
+  int? get salePrimero {
+    final i = equipo.indexWhere((p) => p.enPie);
+    return i < 0 ? null : i;
+  }
 
   /// Los Pokémon que no caben en el equipo. Sin límite (D-20 §8, pregunta 7).
   final List<PokemonGuardado> pc;

@@ -247,6 +247,31 @@ void main() {
     expect(tutoriales, isNot(contains('gimnasio-brock')));
   });
 
+  test('«racha ×N» solo sale en un ataque que escala con ella (#591)', () {
+    final c = catalogoCampanaDeDisco();
+    BandoCombate bando(String id, int ultimo, int racha) => BandoCombate(
+          equipo: [PokemonEnCombate(c.especie(id), c.especie(id).ps)],
+          activo: 0,
+          energia: 10,
+          ultimoAtaque: ultimo,
+          racha: racha,
+        );
+    // Ataque Furia de Nidoran♂ (índice 1) no escala: no se enseña.
+    expect(estadosDeBando(bando('nidoran-m', 1, 3)), isNot(contains('racha ×3')));
+    expect(estadosDeBando(bando('nidoran-m', 1, 3)).any((e) => e.startsWith('racha')),
+        isFalse);
+    // Rodar de Sandshrew (índice 1) sí.
+    expect(estadosDeBando(bando('sandshrew', 1, 3)), contains('racha ×3'));
+    expect(estadosDeBando(bando('sandshrew', 1, 1)).any((e) => e.startsWith('racha')),
+        isFalse, reason: 'la primera vez no hay racha');
+    // Rizo Defensa (índice 0) no escala, aunque sea de Sandshrew.
+    expect(estadosDeBando(bando('sandshrew', 0, 2)).any((e) => e.startsWith('racha')),
+        isFalse);
+    // Sin último ataque (cargó o cambió), nada.
+    expect(estadosDeBando(bando('sandshrew', -1, 2)).any((e) => e.startsWith('racha')),
+        isFalse);
+  });
+
   testWidgets('en 1280×720 el relevo y el Continuar se ven sin desplazar (#592)',
       (tester) async {
     const alto = 720.0;

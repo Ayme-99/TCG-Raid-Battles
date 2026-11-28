@@ -647,8 +647,9 @@ class _Equipo extends StatelessWidget {
                 key: Key('mapa-equipo-$i'),
                 especie: c.especie(p.equipo[i].id),
                 ps: p.equipo[i].ps,
-                destacada: i == 0,
-                detalle: i == 0 ? 'sale primero' : null,
+                // El primero en pie, el que abre el combate (#590).
+                destacada: i == p.salePrimero,
+                detalle: i == p.salePrimero ? 'sale primero' : null,
                 onTap: () => abrirEquipo(context, c),
               ),
           ],

@@ -47,6 +47,8 @@ La escena ocupa todo; los botones **Equipo** y **Registro** flotan abajo a la de
 
 Tu lado a la izquierda y el rival a la derecha (en vertical estaban arriba y abajo). La hoja de acciones sale **abajo a todo lo ancho** y no tapa a los dos activos.
 
+**Actualizado el 2026-11-28 (Ayme, #588; D-20 §10.2):** ya **no hay hoja de acciones abajo**. Al tocar la carta del Activo, esta se agranda para leerla y sale un desplegable con los ataques y CAMBIAR; al tocar una carta de la Banca, se agranda para leerla (solo la carta). CAMBIAR va bajo los ataques; Pociones, Cuerdas Huida, Pokéballs y piedras van en una **Mochila** con pestañas. Medidas y detalles en `campana-mejoras-interfaz.md`.
+
 ## Equipo (propuesta J)
 
 ```
@@ -71,7 +73,7 @@ La campaña se juega **solo en horizontal**. No hay diseño vertical ni escenas 
 
 - **Al entrar en la campaña** el móvil fija la orientación horizontal.
 - **Si el móvil está en vertical** (o el giro está bloqueado en el sistema), sale una pantalla de aviso a todo lo ancho, **«Gira el móvil»**, con un icono de móvil girando y el botón **Volver** a la pantalla de inicio. La campaña no se carga hasta que el móvil está en horizontal.
-- **El resto de la app** (inicio, partida libre, tienda, cuenta) **sigue en vertical**.
+- **El resto de la app** (inicio, partida rápida, tienda, cuenta) **sigue en vertical**.
 - **PC:** la ventana es apaisada y no ve el aviso.
 
 ```

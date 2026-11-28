@@ -351,6 +351,42 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final (nombre, ps, esperado) in [
+    ('el primero caído', [0, 50, 30], 1),
+    ('todos caídos', [0, 0, 0], null),
+  ]) {
+    testWidgets('«sale primero» va al primero en pie: $nombre (#590)',
+        (tester) async {
+      final guardada = PartidaCampana(
+        progreso: const ProgresoRuta(
+            nodoActual: 'ruta-2-norte',
+            superados: {'pueblo-paleta'},
+            inicial: 'charmander'),
+        equipo: [
+          PokemonGuardado('charmander', ps[0]),
+          PokemonGuardado('weedle', ps[1]),
+          PokemonGuardado('caterpie', ps[2]),
+        ],
+      );
+      await abrirCampana(tester,
+          almacen: AlmacenMemoria(), guardada: guardada);
+      bool marca(String clave) => find
+          .descendant(
+              of: find.byKey(Key(clave)),
+              matching: find.textContaining('sale primero'))
+          .evaluate()
+          .isNotEmpty;
+      for (var i = 0; i < 3; i++) {
+        expect(marca('mapa-equipo-$i'), i == esperado, reason: 'mapa $i');
+      }
+      await tocar(tester, 'campana-ver-equipo');
+      for (var i = 0; i < 3; i++) {
+        expect(marca('equipo-$i'), i == esperado, reason: 'equipo $i');
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('desde el equipo se evoluciona con la XP de la reserva',
       (tester) async {
     const guardada = PartidaCampana(
