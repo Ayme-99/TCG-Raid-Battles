@@ -99,11 +99,11 @@ Es la estructura del wireframe I (tu lado a la izquierda, el rival a la derecha,
 2. **Cómo se cambia:** CAMBIAR bajo los ataques, se iluminan las opciones y se toca una (arriba).
 3. **Carta agrandada de la Banca:** solo la carta, grande, sin más desplegables.
 
-### 🔶 Lo que añado yo y Ayme confirma
+### Confirmado por Ayme el 2026-11-28
 
-1. **Cargar** (la tercera acción de §10.2) **va en el desplegable del Activo, junto a los ataques**, antes de CAMBIAR. Ayme no la nombró; es lo más corto. Alternativa: dentro de la Mochila (no la recomiendo: se usa casi cada turno).
-2. **Sin ventana de confirmación al cambiar** (hoy sale «Cambiar gasta el turno y N de energía»): el coste se escribe **en el botón** («CAMBIAR · −1 energía · gasta el turno») y solo se iluminan los que se pueden pagar. Si Ayme prefiere la confirmación de hoy, se mantiene.
-3. **Dónde está el icono de la Mochila:** **A (recomendada):** en la **barra superior**, fija en el combate y en el mapa (en el mapa es el mismo inventario, también como recordatorio). B: solo en el combate, junto al Activo propio.
+1. **Cargar** va en el **desplegable del Activo**, junto a los ataques y antes de CAMBIAR.
+2. **Cambiar sin ventana de confirmación:** el coste se escribe **en el botón** («CAMBIAR · −1 energía · gasta el turno») y solo se iluminan los Pokémon que se pueden pagar. El cambio se confirma **tocando la carta de la Banca que entra**; hasta ese toque, **tocar en cualquier otro sitio de la pantalla cancela la acción** y todo vuelve a su sitio.
+3. **Icono de la Mochila** en la **barra superior**, en el combate y en el mapa (el mismo inventario, en el mapa también como recordatorio).
 
 ### Qué se mantiene
 
