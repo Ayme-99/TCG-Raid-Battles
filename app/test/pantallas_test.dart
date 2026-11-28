@@ -552,8 +552,12 @@ void main() {
     await abrir(tester);
     await tocar(tester, 'preparacion-atras');
     expect(find.byKey(const Key('inicio')), findsOneWidget);
-    // Sin eventos no hay nada que continuar.
-    expect(find.byKey(const Key('inicio-continuar')), findsNothing);
+    // Sin eventos no hay nada que continuar: sale apagado (#585).
+    expect(
+        tester
+            .widget<InkWell>(find.byKey(const Key('inicio-continuar')))
+            .onTap,
+        isNull);
   });
 
   testWidgets(

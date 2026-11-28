@@ -84,7 +84,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('sala-unirse')));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Inicia sesión'), findsOneWidget);
+    expect(find.textContaining('Inicia sesión para jugar en una sala'), findsOneWidget);
     expect(find.byKey(const Key('unirse')), findsNothing);
   });
 

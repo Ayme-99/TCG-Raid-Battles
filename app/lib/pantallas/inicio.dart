@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:incursiones_engine/campana.dart' show CatalogoCampana;
 import 'package:incursiones_engine/incursiones_engine.dart';
 
+import '../campana/catalogo_campana.dart';
+import '../campana/controlador_campana.dart';
+import '../campana/pantalla_campana.dart';
 import '../cuenta/controlador_sesion.dart';
+import '../cuenta/pantalla_login.dart';
 import '../envios/botones_cuenta.dart';
 import '../envios/controlador_envios.dart';
 import '../partida/controlador_partida.dart';
@@ -36,8 +41,9 @@ const _moradoClaro = Color(0xFF2A1D52);
 const _amarillo = Color(0xFFFFC400);
 const _lila = Color(0xFFE6DDF7);
 
-/// Pantalla de inicio: nueva partida, continuar la que quedó a medias, Pokédex
-/// y cuenta. En pantalla ancha (tablet, PC) es un menú de título con la carta
+/// Pantalla de inicio: un bloque para la **partida rápida** y otro para la
+/// **campaña**, cada uno con su «Continuar» y su «Nueva» (#585, decidido por
+/// Ayme el 2026-11-28), y además sala, Pokédex, tienda y cuenta. En pantalla ancha (tablet, PC) es un menú de título con la carta
 /// de Arceus; en móvil, el mapa de fondo con la partida guardada arriba.
 class PantallaInicio extends ConsumerWidget {
   const PantallaInicio({super.key});
@@ -126,6 +132,89 @@ void _nuevaPartida(BuildContext context, WidgetRef ref) {
   Navigator.of(context).push(
     MaterialPageRoute<void>(builder: (_) => const PantallaNuevaPartida()),
   );
+}
+
+/// Resumen de la campaña guardada, o null si no hay ninguna. Para usar
+/// dentro de `build`.
+String? _campanaGuardada(WidgetRef ref) {
+  final p = ref.watch(campanaProvider.select((e) => e.partida));
+  if (p == null) return null;
+  final medallas = p.progreso.medallas.length;
+  final equipo = p.equipo.length;
+  if (equipo == 0) return 'Aún sin inicial';
+  return '${medallas == 1 ? '1 medalla' : '$medallas medallas'} · '
+      '${equipo == 1 ? '1 Pokémon' : '$equipo Pokémon'} en el equipo';
+}
+
+/// La campaña exige cuenta (D-20 §10.1). Sin sesión abre el inicio de sesión
+/// y, al volver con sesión, sigue con lo que se había pulsado (#585).
+/// Devuelve false si se vuelve sin iniciar sesión.
+Future<bool> _conSesion(BuildContext context, WidgetRef ref) async {
+  if (ref.read(sesionActualProvider) != null) return true;
+  await Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => const PantallaLogin()),
+  );
+  if (!context.mounted || ref.read(sesionActualProvider) == null) return false;
+  // Con la sesión recién abierta se trae la campaña de la cuenta, si la hay,
+  // antes de decidir si hay algo que continuar o que pisar.
+  await ref.read(campanaProvider.notifier).sincronizar();
+  return context.mounted;
+}
+
+void _abrirCampana(BuildContext context) {
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => const PantallaCampana()),
+  );
+}
+
+/// «Continuar» del bloque de campaña: abre el mapa donde se dejó.
+Future<void> continuarCampana(BuildContext context, WidgetRef ref) async {
+  if (!await _conSesion(context, ref) || !context.mounted) return;
+  if (ref.read(campanaProvider).partida == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Aún no has empezado una campaña.')),
+    );
+    return;
+  }
+  _abrirCampana(context);
+}
+
+/// «Nueva» del bloque de campaña: si ya hay una guardada pide confirmar antes
+/// de pisarla (una sola campaña guardada, #585); después, a elegir inicial.
+Future<void> nuevaCampana(BuildContext context, WidgetRef ref) async {
+  if (!await _conSesion(context, ref) || !context.mounted) return;
+  if (ref.read(campanaProvider).partida != null) {
+    final pisar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Empezar una campaña nueva?'),
+        content: const Text('Se perderá tu progreso actual.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Volver'),
+          ),
+          FilledButton(
+            key: const Key('inicio-confirmar-nueva-campana'),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Empezar de nuevo'),
+          ),
+        ],
+      ),
+    );
+    if (pisar != true || !context.mounted) return;
+  }
+  final CatalogoCampana catalogo;
+  try {
+    catalogo = await ref.read(catalogoCampanaProvider.future);
+  } catch (_) {
+    // Sin catálogo, la pantalla de campaña explica el error.
+    if (context.mounted) _abrirCampana(context);
+    return;
+  }
+  if (!context.mounted) return;
+  ref.read(campanaProvider.notifier).nueva(catalogo);
+  _abrirCampana(context);
 }
 
 /// Último paso del selector: pide confirmar si hay una partida a medias, la
@@ -223,80 +312,188 @@ class _Logo extends StatelessWidget {
   }
 }
 
-/// Botón grande del inicio. [principal]: amarillo; si no, morado con borde.
-class _BotonInicio extends StatelessWidget {
-  const _BotonInicio({
+/// Un modo del inicio (#585): su nombre, una línea con la partida guardada
+/// (o por qué no se puede continuar) y sus botones «Continuar» y «Nueva».
+class _BloqueModo extends StatelessWidget {
+  const _BloqueModo({
+    required this.clave,
+    required this.titulo,
+    required this.linea,
+    required this.claveContinuar,
+    required this.claveNueva,
+    required this.onContinuar,
+    required this.onNueva,
+    this.jefe,
+  });
+
+  final String clave;
+  final String titulo;
+  final String linea;
+  final String claveContinuar;
+  final String claveNueva;
+
+  /// null: «Continuar» sale apagado.
+  final VoidCallback? onContinuar;
+  final VoidCallback onNueva;
+
+  /// Jefe de la partida rápida guardada, para su carta.
+  final String? jefe;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: Key(clave),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _morado.withValues(alpha: 0.88),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white, width: 2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              if (jefe != null) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: Image.asset(
+                    rutaCarta(jefe!),
+                    width: 34,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    excludeFromSemantics: true,
+                    errorBuilder: (_, __, ___) =>
+                        const SizedBox(width: 34, height: 48),
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      titulo.toUpperCase(),
+                      style: const TextStyle(
+                        color: _amarillo,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    Text(
+                      linea,
+                      key: Key('$clave-linea'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: _lila),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _BotonBloque(
+                  clave: claveContinuar,
+                  etiqueta: 'Continuar',
+                  semantica: 'Continuar $titulo',
+                  icono: Icons.play_arrow_rounded,
+                  principal: onContinuar != null,
+                  onPressed: onContinuar,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _BotonBloque(
+                  clave: claveNueva,
+                  etiqueta: 'Nueva',
+                  semantica: 'Nueva $titulo',
+                  icono: Icons.add_rounded,
+                  principal: onContinuar == null,
+                  onPressed: onNueva,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Botón de un bloque del inicio; con [onPressed] null sale apagado.
+class _BotonBloque extends StatelessWidget {
+  const _BotonBloque({
     required this.clave,
     required this.etiqueta,
+    required this.semantica,
     required this.icono,
     required this.onPressed,
-    this.detalle,
     this.principal = false,
-    this.alto = 64,
   });
 
   final String clave;
   final String etiqueta;
-  final String? detalle;
+  final String semantica;
   final IconData icono;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool principal;
-  final double alto;
 
   @override
   Widget build(BuildContext context) {
-    final fondo = principal ? _amarillo : _moradoClaro;
-    final texto = principal ? _morado : Colors.white;
+    final apagado = onPressed == null;
+    final fondo = apagado
+        ? _moradoClaro.withValues(alpha: 0.5)
+        : principal
+            ? _amarillo
+            : _moradoClaro;
+    final texto = apagado
+        ? _lila.withValues(alpha: 0.6)
+        : principal
+            ? _morado
+            : Colors.white;
     return Semantics(
       button: true,
-      label: etiqueta,
+      enabled: !apagado,
+      label: semantica,
       excludeSemantics: true,
       child: Material(
         color: fondo,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
         child: InkWell(
           key: Key(clave),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
           onTap: onPressed,
           child: Container(
-            constraints: BoxConstraints(minHeight: alto),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            height: 52,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.white, width: 3),
-              boxShadow: principal
-                  ? const [BoxShadow(color: Color(0xFFA57F00), offset: Offset(0, 4))]
-                  : null,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: apagado ? Colors.white38 : Colors.white,
+                width: 2,
+              ),
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icono, color: texto, size: 26),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        etiqueta,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: texto,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      if (detalle != null)
-                        Text(
-                          detalle!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: principal ? const Color(0xFF4A3B00) : _lila,
-                          ),
-                        ),
-                    ],
+                Icon(icono, color: texto, size: 22),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    etiqueta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: texto,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],
@@ -304,277 +501,201 @@ class _BotonInicio extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Los dos bloques del inicio: partida rápida y campaña (#585).
+class _BloquesModo extends ConsumerWidget {
+  const _BloquesModo();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rapida = _partidaGuardada(ref);
+    final campana = _campanaGuardada(ref);
+    final conSesion = ref.watch(sesionActualProvider) != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _BloqueModo(
+          clave: 'inicio-bloque-rapida',
+          titulo: 'Partida rápida',
+          linea: rapida == null
+              ? 'No hay ninguna partida a medias'
+              : '${rapida.titulo} · ${rapida.detalle}',
+          jefe: rapida?.jefe,
+          claveContinuar: 'inicio-continuar',
+          claveNueva: 'inicio-nueva',
+          onContinuar: rapida == null
+              ? null
+              : () => ref.read(enPartidaProvider.notifier).entrar(),
+          onNueva: () => _nuevaPartida(context, ref),
+        ),
+        const SizedBox(height: 14),
+        _BloqueModo(
+          clave: 'inicio-bloque-campana',
+          titulo: 'Campaña',
+          linea: campana ??
+              (conSesion
+                  ? 'Aún no has empezado una campaña'
+                  : 'Inicia sesión para jugar la campaña'),
+          claveContinuar: 'inicio-continuar-campana',
+          claveNueva: 'inicio-nueva-campana',
+          // Sin sesión, los dos llevan al inicio de sesión (la campaña
+          // guardada puede estar en la cuenta).
+          onContinuar: campana == null && conSesion
+              ? null
+              : () => continuarCampana(context, ref),
+          onNueva: () => nuevaCampana(context, ref),
+        ),
+      ],
     );
   }
 }
 
 /// Menú de título (tablet y PC): menú a la izquierda, Arceus a la derecha.
-class _MenuTitulo extends ConsumerWidget {
+class _MenuTitulo extends StatelessWidget {
   const _MenuTitulo({required this.alto});
 
   final double alto;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final guardada = _partidaGuardada(ref);
+  Widget build(BuildContext context) {
     final altoCarta = (alto - 96).clamp(160.0, 475.0);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(72, 56, 72, 40),
+      padding: const EdgeInsets.fromLTRB(72, 40, 72, 32),
       child: IntrinsicHeight(
         child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            width: 420,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const _Logo(tamano: 52),
-                const SizedBox(height: 48),
-                if (guardada != null) ...[
-                  _BotonInicio(
-                    clave: 'inicio-continuar',
-                    etiqueta: 'Continuar',
-                    detalle: '${guardada.titulo} · ${guardada.detalle}',
-                    icono: Icons.play_arrow_rounded,
-                    principal: true,
-                    alto: 84,
-                    onPressed: () =>
-                        ref.read(enPartidaProvider.notifier).entrar(),
-                  ),
-                  const SizedBox(height: 16),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(
+              width: 420,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _Logo(tamano: 52),
+                  SizedBox(height: 24),
+                  _BloquesModo(),
+                  SizedBox(height: 14),
+                  _Mosaicos(),
                 ],
-                _BotonInicio(
-                  clave: 'inicio-nueva',
-                  etiqueta: 'Nueva partida',
-                  detalle: 'Elige modo y jefe',
-                  icono: Icons.add_rounded,
-                  principal: guardada == null,
-                  alto: 84,
-                  onPressed: () => _nuevaPartida(context, ref),
-                ),
-                const SizedBox(height: 16),
-                _BotonInicio(
-                  clave: 'inicio-sala',
-                  etiqueta: 'Jugar en sala',
-                  detalle: 'Con otros dispositivos',
-                  icono: Icons.groups_rounded,
-                  alto: 84,
-                  onPressed: () => abrirSala(context, ref),
-                ),
-                const SizedBox(height: 16),
-                _BotonInicio(
-                  clave: 'inicio-pokedex',
-                  etiqueta: 'Pokédex',
-                  detalle: 'Jefes y aliados enfrentados',
-                  icono: Icons.catching_pokemon,
-                  alto: 84,
-                  onPressed: () => _pokedex(context),
-                ),
-                const SizedBox(height: 16),
-                _BotonInicio(
-                  clave: 'inicio-tienda',
-                  etiqueta: 'Tienda',
-                  detalle: 'Monedas y dados con tus puntos',
-                  icono: Icons.storefront_rounded,
-                  alto: 84,
-                  onPressed: () => _tienda(context),
-                ),
-                const SizedBox(height: 16),
-                _BotonInicio(
-                  clave: 'inicio-cuenta',
-                  etiqueta: 'Cuenta',
-                  detalle: _textoCuenta(ref),
-                  icono: Icons.account_circle_outlined,
-                  alto: 84,
-                  onPressed: () => abrirCuenta(context, ref),
-                ),
-              ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Center(
-              child: Transform.rotate(
-                angle: 0.07,
-                child: SizedBox(
-                  width: altoCarta * 480 / 670,
-                  height: altoCarta,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.white, width: 4),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        rutaCarta('Arceus'),
-                        fit: BoxFit.cover,
-                        excludeFromSemantics: true,
-                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            Expanded(
+              child: Center(
+                child: Transform.rotate(
+                  angle: 0.07,
+                  child: SizedBox(
+                    width: altoCarta * 480 / 670,
+                    height: altoCarta,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.white, width: 4),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          rutaCarta('Arceus'),
+                          fit: BoxFit.cover,
+                          excludeFromSemantics: true,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 }
 
-/// Inicio en móvil: logo arriba, la partida guardada y las demás opciones
-/// abajo, sobre el mapa de fondo.
-class _MenuMovil extends ConsumerWidget {
+/// Inicio en móvil: logo arriba, los bloques de partida rápida y campaña y
+/// las demás opciones abajo, sobre el mapa de fondo.
+class _MenuMovil extends StatelessWidget {
   const _MenuMovil();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final guardada = _partidaGuardada(ref);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(24, 48, 24, 24),
       child: IntrinsicHeight(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const _Logo(tamano: 40),
-            const Spacer(),
-            if (guardada != null) ...[
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: _morado.withValues(alpha: 0.88),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        if (guardada.jefe != null) ...[
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: Image.asset(
-                              rutaCarta(guardada.jefe!),
-                              width: 52,
-                              height: 73,
-                              fit: BoxFit.cover,
-                              excludeFromSemantics: true,
-                              errorBuilder: (_, __, ___) =>
-                                  const SizedBox(width: 52, height: 73),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                        ],
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'PARTIDA A MEDIAS',
-                                style: TextStyle(
-                                  color: _amarillo,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                              Text(
-                                guardada.titulo,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                guardada.detalle,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: _lila),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    _BotonInicio(
-                      clave: 'inicio-continuar',
-                      etiqueta: 'Continuar',
-                      icono: Icons.play_arrow_rounded,
-                      principal: true,
-                      onPressed: () =>
-                          ref.read(enPartidaProvider.notifier).entrar(),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-            _BotonInicio(
-              clave: 'inicio-nueva',
-              etiqueta: 'Nueva partida',
-              icono: Icons.add_rounded,
-              principal: guardada == null,
-              onPressed: () => _nuevaPartida(context, ref),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _MosaicoInicio(
-                    clave: 'inicio-sala',
-                    etiqueta: 'Jugar en sala',
-                    detalle: 'Con otros dispositivos',
-                    icono: Icons.groups_rounded,
-                    onPressed: () => abrirSala(context, ref),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _MosaicoInicio(
-                    clave: 'inicio-tienda',
-                    etiqueta: 'Tienda',
-                    detalle: 'Con tus puntos',
-                    icono: Icons.storefront_rounded,
-                    onPressed: () => _tienda(context),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _MosaicoInicio(
-                    clave: 'inicio-pokedex',
-                    etiqueta: 'Pokédex',
-                    detalle: 'Jefes y aliados',
-                    icono: Icons.catching_pokemon,
-                    onPressed: () => _pokedex(context),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _MosaicoInicio(
-                    clave: 'inicio-cuenta',
-                    etiqueta: 'Cuenta',
-                    detalle: _textoCuenta(ref),
-                    icono: Icons.account_circle_outlined,
-                    onPressed: () => abrirCuenta(context, ref),
-                  ),
-                ),
-              ],
-            ),
+            _Logo(tamano: 40),
+            Spacer(),
+            _BloquesModo(),
+            SizedBox(height: 12),
+            _Mosaicos(),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Sala, tienda, Pokédex y cuenta, en dos filas de dos.
+class _Mosaicos extends ConsumerWidget {
+  const _Mosaicos();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _MosaicoInicio(
+                clave: 'inicio-sala',
+                etiqueta: 'Jugar en sala',
+                detalle: 'Con otros dispositivos',
+                icono: Icons.groups_rounded,
+                onPressed: () => abrirSala(context, ref),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _MosaicoInicio(
+                clave: 'inicio-tienda',
+                etiqueta: 'Tienda',
+                detalle: 'Con tus puntos',
+                icono: Icons.storefront_rounded,
+                onPressed: () => _tienda(context),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _MosaicoInicio(
+                clave: 'inicio-pokedex',
+                etiqueta: 'Pokédex',
+                detalle: 'Jefes y aliados',
+                icono: Icons.catching_pokemon,
+                onPressed: () => _pokedex(context),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _MosaicoInicio(
+                clave: 'inicio-cuenta',
+                etiqueta: 'Cuenta',
+                detalle: _textoCuenta(ref),
+                icono: Icons.account_circle_outlined,
+                onPressed: () => abrirCuenta(context, ref),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

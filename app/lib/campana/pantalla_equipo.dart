@@ -14,7 +14,8 @@ import 'widgets_campana.dart';
 ///   y los huecos libres marcados.
 /// - Arriba, la reserva de XP y las Pociones.
 /// - Se toca una carta y sale su hoja: Usar Poción (+20 PS, no revive) y
-///   Evolucionar (gasta XP y deja al Pokémon a 10 PS). En un debilitado, la
+///   Evolucionar (gasta XP y conserva su proporción de vida; un debilitado
+///   queda con 10 PS). En un debilitado, la
 ///   hoja avisa de que solo lo cura el centro Pokémon.
 /// - Ordenar el equipo y dejar en el PC, solo en un centro Pokémon. El PC es
 ///   una pantalla aparte (la del centro), no una pestaña de esta.
@@ -160,7 +161,8 @@ class _ContenidoEquipo extends ConsumerWidget {
                   clave: 'equipo-$i',
                   especie: c.especie(p.equipo[i].id),
                   ps: p.equipo[i].ps,
-                  primero: i == 0,
+                  // El primero en pie, el que abre el combate (#590).
+                  primero: i == p.salePrimero,
                   onTap: () => _hoja(context, ref, i, enCentro),
                 )
               else
@@ -431,8 +433,8 @@ class _HojaPokemon extends ConsumerWidget {
               onTap: () => hacer(() => control.usarPocion(c, i)),
             ),
             // Evolucionar (D-20 §10.6): gasta XP de la reserva (o una piedra
-            // ex para hacerse ex, §2.1, #447) y deja al Pokémon con 10 PS,
-            // también si estaba debilitado.
+            // ex para hacerse ex, §2.1, #447) y conserva su proporción de
+            // vida; un debilitado queda con 10 PS (#570).
             for (final e in p.evolucionesDe(c, i))
               ListTile(
                 key: Key('equipo-evolucionar-${e.a}'),
@@ -448,7 +450,10 @@ class _HojaPokemon extends ConsumerWidget {
                                 '${nombreObjeto(objetoDeEvolucion(e.objeto!)!)})'
                             : 'Evolucionar en ${c.especie(e.a).nombre}'),
                 subtitle: Text(p.motivoSinEvolucion(e) ??
-                    'Queda con ${PartidaCampana.psAlEvolucionar} PS.'),
+                    (caido
+                        ? 'Estaba debilitado: queda con '
+                            '${PartidaCampana.psAlEvolucionar} PS.'
+                        : 'Conserva su proporción de vida.')),
                 enabled: p.puedeEvolucionar(e),
                 onTap: () {
                   Navigator.of(context).pop();

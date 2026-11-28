@@ -170,31 +170,56 @@ class _PantallaCombateCampanaState
               constraints: const BoxConstraints(maxWidth: 640),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  mesa,
-                  const SizedBox(height: 12),
-                  if (terminado)
-                    _Final(
-                      gano: combate.ganador == Bando.jugador,
-                      onContinuar: () => control.cerrarCombate(widget.catalogo),
-                    )
-                  else if (eligiendo)
-                    const _Aviso(
-                      clave: 'combate-elige-relevo',
-                      texto: 'Tu Pokémon ha caído. Toca a uno de tu banca '
-                          'para que salga.',
-                    )
-                  else if (tutorial && miTurno)
-                    const _Aviso(
-                      clave: 'combate-tutorial',
-                      texto: 'Toca a tu Pokémon para atacar o cargar energía.',
-                    ),
-                ],
+                children: [mesa],
               ),
             ),
           ),
         ),
       ),
+      // Fijo abajo, fuera del desplazamiento (#592): en 1280×720 la mesa no
+      // cabe y el aviso de relevo o el «Continuar» quedaban fuera de
+      // pantalla. Mientras llega el combate apaisado (#588).
+      bottomNavigationBar: terminado
+          ? _Fijo(
+              child: _Final(
+                gano: combate.ganador == Bando.jugador,
+                onContinuar: () => control.cerrarCombate(widget.catalogo),
+              ),
+            )
+          : eligiendo
+              ? _Fijo(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const _Aviso(
+                        clave: 'combate-elige-relevo',
+                        texto: 'Tu Pokémon ha caído. Toca a uno de tu banca '
+                            'para que salga.',
+                      ),
+                      const SizedBox(height: 8),
+                      // La banca, a mano aunque la de la mesa quede abajo.
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _tapete,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: _Banca(
+                            clave: 'relevo', bando: yo, alTocar: tocarBanca),
+                      ),
+                    ],
+                  ),
+                )
+              : tutorial && miTurno
+                  ? const _Fijo(
+                      child: _Aviso(
+                        clave: 'combate-tutorial',
+                        texto:
+                            'Toca a tu Pokémon para atacar o cargar energía.',
+                      ),
+                    )
+                  : null,
     );
   }
 }
@@ -473,8 +498,17 @@ List<String> estadosDeBando(BandoCombate b) => [
       if (b.proteccion > 0) 'recibe −${b.proteccion}',
       if (b.cegado || b.cegadoMientrasActivo) 'puede fallar',
       if (b.confundido) 'confundido',
-      if (b.racha > 1) 'racha ×${b.racha}',
+      if (b.racha > 1 && rachaCuenta(b)) 'racha ×${b.racha}',
     ];
+
+/// Si la racha del bando cambia algo: solo cuando su último ataque escala con
+/// ella (`danoPorRacha`, Rodar, D-20 §10.4). El motor la cuenta en todos los
+/// ataques, pero en los demás no sube el daño y no se enseña (#591).
+bool rachaCuenta(BandoCombate b) {
+  final ataques = b.pokemonActivo.especie.ataques;
+  final i = b.ultimoAtaque;
+  return i >= 0 && i < ataques.length && ataques[i].efecto is DanoPorRacha;
+}
 
 /// El activo de un bando: su carta, la vida, la energía como fichas y sus
 /// estados.
@@ -796,6 +830,29 @@ class _BotonAccion extends StatelessWidget {
       child: Text(texto, style: const TextStyle(fontWeight: FontWeight.w700)),
     );
   }
+}
+
+/// Panel fijo al pie de la pantalla de combate (#592), con el ancho de la
+/// mesa.
+class _Fijo extends StatelessWidget {
+  const _Fijo({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: Center(
+            heightFactor: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: child,
+            ),
+          ),
+        ),
+      );
 }
 
 class _Aviso extends StatelessWidget {

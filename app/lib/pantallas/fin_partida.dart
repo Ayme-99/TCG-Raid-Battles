@@ -45,7 +45,7 @@ class PantallaFinPartida extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 4),
-            // La partida libre no da puntos: solo se enseña cómo ha ido cada uno.
+            // La partida rápida no da puntos: solo se enseña cómo ha ido cada uno.
             if (puntos != null) ...[
               Text(
                 'Jefe: nivel ${puntos.nivel} · daño neto ${puntos.danoTotal}',

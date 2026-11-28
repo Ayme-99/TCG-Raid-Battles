@@ -77,7 +77,7 @@ Future<void> jugarCombate(WidgetTester tester) async {
           w is InkWell &&
           w.onTap != null &&
           w.key is ValueKey<String> &&
-          (w.key! as ValueKey<String>).value.startsWith('banca-jugador-'));
+          (w.key! as ValueKey<String>).value.startsWith('relevo-'));
       await tester.tap(relevo.first);
       await tester.pumpAndSettle();
       continue;
@@ -123,21 +123,19 @@ void main() {
     expect(c.jefes, contains('pikachu-jefe'));
   });
 
-  testWidgets('el selector de modo abre la campaña', (tester) async {
+  testWidgets('el bloque de campaña del inicio abre la campaña (#585)',
+      (tester) async {
     tester.view.physicalSize = const Size(1024, 768);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(ProviderScope(
-      overrides: sobrescribir(conInicio: true),
+      overrides: sobrescribir(conInicio: true, almacen: almacenConSesion()),
       child: const IncursionesApp(),
     ));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('inicio-nueva')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('opcion-campana')));
+    await tester.tap(find.byKey(const Key('inicio-nueva-campana')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('campana-mapa')), findsOneWidget);
-    expect(find.byKey(const Key('campana-empezar')), findsOneWidget);
   });
 
   for (final (nombre, tamano) in [
@@ -350,6 +348,42 @@ void main() {
     expect(hay('lanzar-pokeball'), isTrue);
     expect(tester.takeException(), isNull);
   });
+
+  for (final (nombre, ps, esperado) in [
+    ('el primero caído', [0, 50, 30], 1),
+    ('todos caídos', [0, 0, 0], null),
+  ]) {
+    testWidgets('«sale primero» va al primero en pie: $nombre (#590)',
+        (tester) async {
+      final guardada = PartidaCampana(
+        progreso: const ProgresoRuta(
+            nodoActual: 'ruta-2-norte',
+            superados: {'pueblo-paleta'},
+            inicial: 'charmander'),
+        equipo: [
+          PokemonGuardado('charmander', ps[0]),
+          PokemonGuardado('weedle', ps[1]),
+          PokemonGuardado('caterpie', ps[2]),
+        ],
+      );
+      await abrirCampana(tester,
+          almacen: AlmacenMemoria(), guardada: guardada);
+      bool marca(String clave) => find
+          .descendant(
+              of: find.byKey(Key(clave)),
+              matching: find.textContaining('sale primero'))
+          .evaluate()
+          .isNotEmpty;
+      for (var i = 0; i < 3; i++) {
+        expect(marca('mapa-equipo-$i'), i == esperado, reason: 'mapa $i');
+      }
+      await tocar(tester, 'campana-ver-equipo');
+      for (var i = 0; i < 3; i++) {
+        expect(marca('equipo-$i'), i == esperado, reason: 'equipo $i');
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('desde el equipo se evoluciona con la XP de la reserva',
       (tester) async {
