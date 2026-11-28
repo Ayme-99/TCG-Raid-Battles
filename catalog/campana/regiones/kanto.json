@@ -1657,7 +1657,8 @@
       "clase": "Nadador",
       "pokemon": [
         "horsea",
-        "shellder"
+        "shellder",
+        "staryu"
       ],
       "escena": {
         "imagen": "gimnasio-celeste",
